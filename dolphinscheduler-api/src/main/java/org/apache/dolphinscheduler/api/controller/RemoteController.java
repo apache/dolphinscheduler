@@ -28,8 +28,6 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -542,9 +540,8 @@ public class RemoteController extends BaseController{
         try{
             logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                     loginUser.getUserName(), projectName, processInstanceId);
-            // task queue
-            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
+
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
@@ -625,6 +622,7 @@ public class RemoteController extends BaseController{
 
 
     // ========================= 任务执行&状态 接口 start ===========================================
+
     /**
      * execute process instance
      * @param loginUser login user
@@ -641,7 +639,7 @@ public class RemoteController extends BaseController{
      * @param receiversCc receivers cc
      * @param runMode run mode
      * @param processInstancePriority process instance priority
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @param timeout timeout
      * @return start process result code
      */
@@ -659,7 +657,7 @@ public class RemoteController extends BaseController{
             @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC",dataType ="String" ),
             @ApiImplicitParam(name = "runMode", value = "RUN_MODE",dataType ="RunMode" ),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority" ),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int",example = "100"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String",example = "default"),
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int",example = "100"),
     })
     @PostMapping(value = "/projects/{projectName}/executors/start-process-instance")
@@ -678,15 +676,15 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "receiversCc", required = false) String receiversCc,
             @RequestParam(value = "runMode", required = false) RunMode runMode,
             @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-            @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
+            @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
             @RequestParam(value = "timeout", required = false) Integer timeout) {
         try {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                             + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroupId: {}, timeout: {}",
+                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
                     loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
-                    failureStrategy, startNodeList, taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,
-                    workerGroupId, timeout);
+                    failureStrategy, startNodeList, taskDependType, warningType, workerGroup,receivers,receiversCc,runMode,processInstancePriority,
+                    workerGroup, timeout);
 
             if (timeout == null) {
                 timeout = Constants.MAX_TASK_TIMEOUT;
@@ -694,14 +692,13 @@ public class RemoteController extends BaseController{
 
             Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                     startNodeList, taskDependType, warningType,
-                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroupId, timeout);
+                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroup, timeout);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(Status.START_PROCESS_INSTANCE_ERROR.getMsg(),e);
             return error(Status.START_PROCESS_INSTANCE_ERROR.getCode(), Status.START_PROCESS_INSTANCE_ERROR.getMsg());
         }
     }
-
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
