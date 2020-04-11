@@ -24,10 +24,10 @@
                 <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
             </x-button-group>
         </div>
-        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true" :options="fileList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true" :options="fileList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" :options="udfList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
         <!-- <div class="select-list-box">
@@ -72,6 +72,7 @@
     name: 'transfer',
     data () {
       return {
+        valueConsistsOf: 'LEAF_PRIORITY',
         checkedValue: 'fileResource',
         sourceList: this.fileSourceList,
         targetList: this.fileTargetList,
@@ -115,11 +116,70 @@
       this.selectUdfSource = this.udfTargetList
     },
     methods: {
+      /*
+        getParent
+      */
+      getParent(data2, nodeId2) {
+        var arrRes = [];
+        if (data2.length == 0) {
+            if (!!nodeId2) {
+                arrRes.unshift(data2)
+            }
+            return arrRes;
+        }
+        let rev = (data, nodeId) => {
+            for (var i = 0, length = data.length; i < length; i++) {
+                let node = data[i];
+                if (node.id == nodeId) {
+                    arrRes.unshift(node)
+                    rev(data2, node.pid);
+                    break;
+                }
+                else {
+                    if (!!node.children) {
+                        rev(node.children, nodeId);
+                    }
+                }
+            }
+            return arrRes;
+        };
+        arrRes = rev(data2, nodeId2);
+        return arrRes;
+      },
       _ok () {
+        let fullPathId = []
+        let pathId = []
+        this.selectFileSource.forEach(v=>{
+          this.fileList.forEach(v1=>{
+            let arr = []
+            arr[0] = v1
+            if(this.getParent(arr, v).length>0) {
+              fullPathId = this.getParent(arr, v).map(v2=>{
+                return v2.id
+              })
+              pathId.push(fullPathId.join('-'))
+            }
+          })
+        })
+        let fullUdfPathId = []
+        let pathUdfId = []
+        this.selectUdfSource.forEach(v=>{
+          this.udfList.forEach(v1=>{
+            let arr = []
+            arr[0] = v1
+            if(this.getParent(arr, v).length>0) {
+              fullUdfPathId = this.getParent(arr, v).map(v2=>{
+                return v2.id
+              })
+              pathUdfId.push(fullUdfPathId.join('-'))
+            }
+          })
+        })
+        let selAllSource = pathId.concat(pathUdfId)
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.selectFileSource.concat(this.selectUdfSource), v => v).join(','))
+          this.$emit('onUpdate', _.map(selAllSource, v => v).join(','))
         }, 800)
       },
       _ckFile() {
@@ -181,8 +241,14 @@
       diGuiTree(item) {  // Recursive convenience tree structure
         item.forEach(item => {
           item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
+            this.operationTree(item): this.diGuiTree(item.children);
         })
+      },
+      operationTree(item) {
+        if(item.dirctory) {
+          item.isDisabled =true
+        }
+        delete item.children
       }
     },
     watch: {
