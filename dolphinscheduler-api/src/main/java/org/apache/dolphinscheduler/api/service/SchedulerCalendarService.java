@@ -460,13 +460,13 @@ public class SchedulerCalendarService extends BaseService{
           schedulerCalendarDetails.setStamp(day);
 
           if(extDateMap.containsKey(day)){
-            schedulerCalendarDetails.setFlag(Flag.NO);
-          }else{
             schedulerCalendarDetails.setFlag(Flag.YES);
+          }else{
+            schedulerCalendarDetails.setFlag(Flag.NO);
           }
 
           schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
-          schedulerCalendarDetails = null ;
+
         }
       }
 

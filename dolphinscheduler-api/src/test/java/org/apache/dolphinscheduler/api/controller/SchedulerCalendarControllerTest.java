@@ -41,19 +41,37 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 /**
  * calendar controller test
  */
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class SchedulerCalendarControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(SchedulerCalendarControllerTest.class);
 
 
     @Test
     public void testCreateCalendar() throws Exception {
+
+        Map map = new HashMap<String,Object>();
+        map.put("startTime","20200401");
+        map.put("endTime","20200410");
+
+        List list = new LinkedList<Integer>();
+        list.add(20200401);
+        list.add(20200402);
+        list.add(20200403);
+        list.add(20200404);
+
+        map.put("extTime",list);
+
+
+        String calendarInfo = JSONUtils.toJson(map);
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("calendarCode","calendarCode");
-        paramsMap.add("calendarName","calendarName");
-        paramsMap.add("queueId","1");
+        paramsMap.add("name","name");
+        paramsMap.add("calendarInfo",calendarInfo);
         paramsMap.add("description","calendar description");
 
         MvcResult mvcResult = mockMvc.perform(post("/calendar/create")
@@ -164,17 +182,6 @@ public class SchedulerCalendarControllerTest extends AbstractControllerTest{
 
     @Test
     public  void doDetailsInfo() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
-        List<Date> days  = DateUtils.getDays(sdf.parse("20200331"),new Date());
-
-        for (Date day : days) {
-            System.out.println(sdf.format(day));
-        }
-
-
-
-
 
 //
 //

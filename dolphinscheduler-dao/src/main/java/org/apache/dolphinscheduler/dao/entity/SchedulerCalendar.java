@@ -122,7 +122,7 @@ public class SchedulerCalendar {
         return releaseState;
     }
 
-    public void setReleaseState(ReleaseState flag) {
+    public void setReleaseState(ReleaseState releaseState) {
         this.releaseState = releaseState;
     }
 

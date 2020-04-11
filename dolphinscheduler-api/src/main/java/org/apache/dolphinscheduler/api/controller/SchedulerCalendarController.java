@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -50,6 +52,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(tags = "CALENDAR_TAG", position = 1)
 @RestController
 @RequestMapping("/calendar")
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class SchedulerCalendarController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerCalendarController.class);

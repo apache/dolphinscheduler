@@ -17,24 +17,24 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.SchedulerCalendarMapper">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.SchedulerCalendarDetailsMapper">
 
     <select id="queryByCalendarId" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
         select *
-        from t_ds_calendar
+        from t_yss_calendar_details
         where calendar_id = #{calendarId}
     </select>
 
     <select id="queryByCalendarStamp" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
         select *
-        from t_ds_calendar
+        from t_yss_calendar_details
         where stamp = #{stamp}
     </select>
 
 
-    <select id="clearByCalendarId" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
-        delete from t_ds_calendar
+    <delete id="clearByCalendarId" >
+        delete from t_yss_calendar_details
         where calendar_id = #{calendarId}
-    </select>
+    </delete>
 
 </mapper>

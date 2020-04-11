@@ -21,7 +21,7 @@
 
     <select id="queryCalendarPaging" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendar">
         SELECT t.*
-        FROM t_ds_calendar t
+        FROM t_yss_calendar t
         WHERE 1=1
         <if test="searchVal != null and searchVal != ''">
             and  t.name like concat('%', #{searchVal}, '%')
@@ -32,7 +32,7 @@
 
     <select id="queryByCalendarName" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendar">
         select *
-        from t_ds_calendar
+        from t_yss_calendar
         where name = #{name}
     </select>
 
