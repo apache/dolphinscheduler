@@ -50,6 +50,7 @@ public class Result<T> {
     }
 
     private Result(T data) {
+        this.code  = 0;
         this.data = data;
     }
 
@@ -68,7 +69,7 @@ public class Result<T> {
      * @return resule
      */
     public static <T> Result<T> success(T data) {
-        return new Result<T>(data);
+        return new Result<>(data);
     }
 
     /**

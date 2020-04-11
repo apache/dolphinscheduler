@@ -16,10 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
-import org.apache.hadoop.fs.Stat;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 
 /**
