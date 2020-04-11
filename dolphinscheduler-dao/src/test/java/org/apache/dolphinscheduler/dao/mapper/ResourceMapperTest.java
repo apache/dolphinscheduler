@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -138,6 +139,7 @@ public class ResourceMapperTest {
         resourcesUser.setUpdateTime(new Date());
         resourcesUser.setUserId(user.getId());
         resourcesUser.setResourcesId(resource.getId());
+        resourcesUser.setPerm(7);
         resourceUserMapper.insert(resourcesUser);
         return resourcesUser;
     }
@@ -247,6 +249,7 @@ public class ResourceMapperTest {
 
         resourcesUser.setResourcesId(resource.getId());
         resourcesUser.setUserId(1110);
+        resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         resourceUserMapper.insert(resourcesUser);
 
         List<Resource> resources1 = resourceMapper.queryAuthorizedResourceList(1110);
@@ -350,5 +353,35 @@ public class ResourceMapperTest {
         resourceList.add(resource1.getId());
         int result = resourceMapper.deleteIds(resourceList.toArray(new Integer[resourceList.size()]));
         Assert.assertEquals(result,2);
+    }
+
+    @Test
+    public void queryResourceListAuthoredTest(){
+        // create a general user
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
+        // create resource
+        Resource resource = createResource(generalUser1);
+        createResourcesUser(resource, generalUser2);
+
+        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 0);
+        Assert.assertNotNull(resourceList);
+
+        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 4);
+        Assert.assertFalse(resourceList.contains(resource));
+    }
+
+    @Test
+    public void batchUpdateResourceTest(){
+        // create a general user
+        User generalUser1 = createGeneralUser("user1");
+        // create resource
+        Resource resource = createResource(generalUser1);
+        resource.setFullName(String.format("%s-update",resource.getFullName()));
+        resource.setUpdateTime(new Date());
+        List<Resource> resourceList = new ArrayList<>();
+        resourceList.add(resource);
+        int result = resourceMapper.batchUpdateResource(resourceList);
+        Assert.assertTrue(result>0);
     }
 }

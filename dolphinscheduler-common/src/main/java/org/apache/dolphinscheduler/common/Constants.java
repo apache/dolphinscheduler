@@ -946,4 +946,12 @@ public final class Constants {
      * schedule time
      */
     public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
+    /**
+     * authorize writable perm
+     */
+    public static final int AUTHORIZE_WRITABLE_PERM=7;
+    /**
+     * authorize readable perm
+     */
+    public static final int AUTHORIZE_READABLE_PERM=4;
 }
