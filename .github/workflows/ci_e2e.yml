@@ -55,7 +55,7 @@ jobs:
         run: sh ./dockerfile/hooks/check
       - name: Prepare e2e env
         run: |
-          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip
+          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
           sudo apt-get install -f -y
