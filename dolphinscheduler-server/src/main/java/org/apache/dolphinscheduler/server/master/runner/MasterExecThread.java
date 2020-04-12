@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -68,7 +69,7 @@ public class MasterExecThread implements Runnable {
     /**
      *  runing TaskNode
      */
-    private final Map<MasterBaseTaskExecThread,Future<Boolean>> activeTaskNode = new ConcurrentHashMap<MasterBaseTaskExecThread,Future<Boolean>>();
+    private final Map<MasterBaseTaskExecThread,Future<Boolean>> activeTaskNode = new ConcurrentHashMap<>();
 
     /**
      * task exec service
@@ -78,7 +79,7 @@ public class MasterExecThread implements Runnable {
     /**
      * submit failure nodes
      */
-    private Boolean taskFailedSubmit = false;
+    private boolean taskFailedSubmit = false;
 
     /**
      * recover node id list
@@ -141,11 +142,17 @@ public class MasterExecThread implements Runnable {
     private MasterConfig masterConfig;
 
     /**
-     * constructor of MasterExecThread
-     * @param processInstance   process instance
-     * @param processService        process dao
+     *
      */
-    public MasterExecThread(ProcessInstance processInstance, ProcessService processService){
+    private NettyRemotingClient nettyRemotingClient;
+
+    /**
+     * constructor of MasterExecThread
+     * @param processInstance processInstance
+     * @param processService processService
+     * @param nettyRemotingClient nettyRemotingClient
+     */
+    public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
         this.processService = processService;
 
         this.processInstance = processInstance;
@@ -153,7 +160,10 @@ public class MasterExecThread implements Runnable {
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
+        this.nettyRemotingClient = nettyRemotingClient;
     }
+
+
 
 
     @Override
@@ -454,7 +464,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance node json
-            taskInstance.setTaskJson(JSONObject.toJSONString(taskNode));
+            taskInstance.setTaskJson(JSON.toJSONString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
@@ -482,8 +492,13 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
             }
 
-            int workerGroupId = taskNode.getWorkerGroupId();
-            taskInstance.setWorkerGroupId(workerGroupId);
+            String processWorkerGroup = processInstance.getWorkerGroup();
+            String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+            if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
+                taskInstance.setWorkerGroup(processWorkerGroup);
+            }else {
+                taskInstance.setWorkerGroup(taskWorkerGroup);
+            }
 
         }
         return taskInstance;
@@ -652,7 +667,7 @@ public class MasterExecThread implements Runnable {
                 continue;
             }
             if(task.getState().typeIsPause() || task.getState().typeIsCancel()){
-                logger.info("task {} stopped, the state is {}", task.getName(), task.getState().toString());
+                logger.info("task {} stopped, the state is {}", task.getName(), task.getState());
             }else{
                 addTaskToStandByList(task);
             }
@@ -674,9 +689,9 @@ public class MasterExecThread implements Runnable {
         TaskNode taskNode = dag.getNode(taskName);
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
-
-            if(forbiddenTaskList.containsKey(depsNode) ||
-                    skipTaskNodeList.containsKey(depsNode)){
+            if(!dag.containsNode(depsNode)
+                    || forbiddenTaskList.containsKey(depsNode)
+                    || skipTaskNodeList.containsKey(depsNode)){
                 continue;
             }
             // dependencies must be fully completed
@@ -685,11 +700,12 @@ public class MasterExecThread implements Runnable {
             }
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
             // conditions task would not return failed.
-            if(depTaskState.typeIsFailure()){
-                if(!haveConditionsAfterNode(depsNode) && !dag.getNode(depsNode).isConditionsTask()){
-                    return DependResult.FAILED;
-                }
+            if(depTaskState.typeIsFailure()
+                    && !haveConditionsAfterNode(depsNode)
+                    && !dag.getNode(depsNode).isConditionsTask()){
+                return DependResult.FAILED;
             }
+
             if(depTaskState.typeIsPause() || depTaskState.typeIsCancel()){
                 return DependResult.WAITING;
             }
@@ -737,7 +753,7 @@ public class MasterExecThread implements Runnable {
      *
      * @return Boolean whether has failed task
      */
-    private Boolean hasFailedTask(){
+    private boolean hasFailedTask(){
 
         if(this.taskFailedSubmit){
             return true;
@@ -753,7 +769,7 @@ public class MasterExecThread implements Runnable {
      *
      * @return Boolean whether process instance failed
      */
-    private Boolean processFailed(){
+    private boolean processFailed(){
         if(hasFailedTask()) {
             if(processInstance.getFailureStrategy() == FailureStrategy.END){
                 return true;
@@ -769,9 +785,9 @@ public class MasterExecThread implements Runnable {
      * whether task for waiting thread
      * @return Boolean whether has waiting thread task
      */
-    private Boolean hasWaitingThreadTask(){
+    private boolean hasWaitingThreadTask(){
         List<TaskInstance> waitingList = getCompleteTaskByState(ExecutionStatus.WAITTING_THREAD);
-        return waitingList.size() > 0;
+        return CollectionUtils.isNotEmpty(waitingList);
     }
 
     /**
@@ -787,7 +803,7 @@ public class MasterExecThread implements Runnable {
         }
 
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
-        if(pauseList.size() > 0
+        if(CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
                 || readyToSubmitTaskList.size() > 0){
             return ExecutionStatus.PAUSE;
@@ -805,7 +821,7 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0){
+        if(activeTaskNode.size() > 0 || haveRetryTaskStandBy()){
             return runningState(state);
         }
         // process failure
@@ -827,7 +843,8 @@ public class MasterExecThread implements Runnable {
         if(state == ExecutionStatus.READY_STOP){
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
-            if(stopList.size() > 0 || killList.size() > 0 || !isComplementEnd()){
+            if(CollectionUtils.isNotEmpty(stopList)
+                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -849,10 +866,28 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
+     * whether standby task list have retry tasks
+     * @return
+     */
+    private boolean haveRetryTaskStandBy() {
+
+        boolean result = false;
+
+        for(String taskName : readyToSubmitTaskList.keySet()){
+            TaskInstance task = readyToSubmitTaskList.get(taskName);
+            if(task.getState().typeIsFailure()){
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
      * whether complement end
      * @return Boolean whether is complement end
      */
-    private Boolean isComplementEnd() {
+    private boolean isComplementEnd() {
         if(!processInstance.isComplementData()){
             return true;
         }
@@ -877,8 +912,8 @@ public class MasterExecThread implements Runnable {
             logger.info(
                     "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
                     processInstance.getId(), processInstance.getName(),
-                    processInstance.getState().toString(), state.toString(),
-                    processInstance.getCommandType().toString());
+                    processInstance.getState(), state,
+                    processInstance.getCommandType());
             processInstance.setState(state);
             ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
             instance.setState(state);
@@ -894,8 +929,7 @@ public class MasterExecThread implements Runnable {
      * @return DependResult
      */
     private DependResult getDependResultForTask(TaskInstance taskInstance){
-        DependResult inner = isTaskDepsComplete(taskInstance.getName());
-        return inner;
+        return isTaskDepsComplete(taskInstance.getName());
     }
 
     /**
@@ -920,7 +954,7 @@ public class MasterExecThread implements Runnable {
      * has retry task in standby
      * @return Boolean whether has retry task in standby
      */
-    private Boolean hasRetryTaskInStandBy(){
+    private boolean hasRetryTaskInStandBy(){
         for (Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
             if(entry.getValue().getState().typeIsFailure()){
                 return true;
@@ -936,10 +970,10 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.IsProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop()){
 
             // send warning email if process time out.
-            if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
+            if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){
                 alertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefineById(processInstance.getProcessDefinitionId()));
                 sendTimeWarning = true;
@@ -951,14 +985,23 @@ public class MasterExecThread implements Runnable {
                 if(!future.isDone()){
                     continue;
                 }
+
                 // node monitor thread complete
-                activeTaskNode.remove(entry.getKey());
+                task = this.processService.findTaskInstanceById(task.getId());
+
                 if(task == null){
                     this.taskFailedSubmit = true;
+                    activeTaskNode.remove(entry.getKey());
                     continue;
                 }
+
+                // node monitor thread complete
+                if(task.getState().typeIsFinished()){
+                    activeTaskNode.remove(entry.getKey());
+                }
+
                 logger.info("task :{}, id:{} complete, state is {} ",
-                        task.getName(), task.getId(), task.getState().toString());
+                        task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if(task.getState() == ExecutionStatus.SUCCESS){
                     completeTaskList.put(task.getName(), task);
@@ -990,7 +1033,7 @@ public class MasterExecThread implements Runnable {
                 completeTaskList.put(task.getName(), task);
             }
             // send alert
-            if(this.recoverToleranceFaultTaskList.size() > 0){
+            if(CollectionUtils.isNotEmpty(this.recoverToleranceFaultTaskList)){
                 alertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
                 this.recoverToleranceFaultTaskList.clear();
             }
@@ -1034,10 +1077,7 @@ public class MasterExecThread implements Runnable {
         Date now = new Date();
         long runningTime =  DateUtils.diffMin(now, processInstance.getStartTime());
 
-        if(runningTime > processInstance.getTimeout()){
-            return true;
-        }
-        return false;
+        return runningTime > processInstance.getTimeout();
     }
 
     /**
@@ -1062,7 +1102,7 @@ public class MasterExecThread implements Runnable {
 
             TaskInstance taskInstance = taskExecThread.getTaskInstance();
             taskInstance = processService.findTaskInstanceById(taskInstance.getId());
-            if(taskInstance.getState().typeIsFinished()){
+            if(taskInstance != null && taskInstance.getState().typeIsFinished()){
                 continue;
             }
 
@@ -1081,22 +1121,19 @@ public class MasterExecThread implements Runnable {
      * @param taskInstance task instance
      * @return Boolean
      */
-    private Boolean retryTaskIntervalOverTime(TaskInstance taskInstance){
+    private boolean retryTaskIntervalOverTime(TaskInstance taskInstance){
         if(taskInstance.getState() != ExecutionStatus.FAILURE){
-            return Boolean.TRUE;
+            return true;
         }
         if(taskInstance.getId() == 0 ||
                 taskInstance.getMaxRetryTimes() ==0 ||
                 taskInstance.getRetryInterval() == 0 ){
-            return Boolean.TRUE;
+            return true;
         }
         Date now = new Date();
         long failedTimeInterval = DateUtils.differSec(now, taskInstance.getEndTime());
         // task retry does not over time, return false
-        if(taskInstance.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT >= failedTimeInterval){
-            return Boolean.FALSE;
-        }
-        return Boolean.TRUE;
+        return taskInstance.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     /**
@@ -1189,7 +1226,7 @@ public class MasterExecThread implements Runnable {
      */
     private List<String> getRecoveryNodeNameList(){
         List<String> recoveryNodeNameList = new ArrayList<>();
-        if(recoverNodeIdList.size() > 0) {
+        if(CollectionUtils.isNotEmpty(recoverNodeIdList)) {
             for (TaskInstance task : recoverNodeIdList) {
                 recoveryNodeNameList.add(task.getName());
             }

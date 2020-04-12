@@ -35,13 +35,10 @@ export POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE:-"dolphinscheduler"}
 #============================================================================
 export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
-export DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH:-"/tmp/dolphinscheduler/download"}
-export DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH=${DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH:-"/tmp/dolphinscheduler/exec"}
 
 #============================================================================
 # Zookeeper
 #============================================================================
-export TASK_QUEUE=${TASK_QUEUE:-"zookeeper"}
 export ZOOKEEPER_QUORUM=${ZOOKEEPER_QUORUM:-"127.0.0.1:2181"}
 
 #============================================================================
@@ -54,6 +51,7 @@ export MASTER_TASK_COMMIT_RETRYTIMES=${MASTER_TASK_COMMIT_RETRYTIMES:-"5"}
 export MASTER_TASK_COMMIT_INTERVAL=${MASTER_TASK_COMMIT_INTERVAL:-"1000"}
 export MASTER_MAX_CPULOAD_AVG=${MASTER_MAX_CPULOAD_AVG:-"100"}
 export MASTER_RESERVED_MEMORY=${MASTER_RESERVED_MEMORY:-"0.1"}
+export MASTER_LISTEN_PORT=${MASTER_LISTEN_PORT:-"5678"}
 
 #============================================================================
 # Worker Server
@@ -63,6 +61,8 @@ export WORKER_HEARTBEAT_INTERVAL=${WORKER_HEARTBEAT_INTERVAL:-"10"}
 export WORKER_FETCH_TASK_NUM=${WORKER_FETCH_TASK_NUM:-"3"}
 export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"100"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.1"}
+export WORKER_LISTEN_PORT=${WORKER_LISTEN_PORT:-"1234"}
+export WORKER_GROUP=${WORKER_GROUP:-"default"}
 
 #============================================================================
 # Alert Server

@@ -195,6 +195,45 @@ export default {
       })
     })
   },
+
+  getResourceList ({ state }, payload) {
+    let o = {
+      type: payload.type,
+      category: payload.category
+    }
+
+    let param = {}
+    // Manage user
+    if (o.type === 'user') {
+      param.alertgroupId = payload.id
+    } else {
+      param.userId = payload.id
+    }
+
+    // Authorized project
+    const p1 = new Promise((resolve, reject) => {
+      io.get(`${o.category}/authorize-resource-tree`, param, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+    // Unauthorized project
+    const p2 = new Promise((resolve, reject) => {
+      io.get(`${o.category}/authed-${o.type}`, param, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+    return new Promise((resolve, reject) => {
+      Promise.all([p1, p2]).then(a => {
+        resolve(a)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
   /**
    * Authorization [project, resource, data source]
    * @param Project,Resources,Datasource
@@ -451,10 +490,19 @@ export default {
     return new Promise((resolve, reject) => {
       io.get(`worker-group/all-groups`, payload, res => {
         let list = res.data
-        list.unshift({
-          id: -1,
-          name: 'Default'
-        })
+        if(list.length>0) {
+          list = list.map(item=>{
+            return {
+              id: item,
+              name: item
+            }
+          })
+        } else {
+          list.unshift({
+            id: 'default',
+            name: 'default'
+          })
+        }
         state.workerGroupsListAll = list
         resolve(list)
       }).catch(e => {

@@ -20,15 +20,17 @@ import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.security.TenantManagePage;
 import org.testng.annotations.Test;
 
+
 public class TenantManageTest extends BaseTest {
     private TenantManagePage tenantManagePage;
 
-    @Test(description = "TenantTest", priority = 1)
+    @Test(groups={"functionTests","createTenant"},dependsOnGroups = { "login" },description = "TenantManageTest",priority=2)
     public void testTenantManage() throws InterruptedException {
         tenantManagePage = new TenantManagePage(driver);
-        // enter tenant manage page
-        tenantManagePage.jumpPage();
         //assert tenant manage page
+        System.out.println("start create tenant");
         assert tenantManagePage.createTenant();
+        System.out.println("end create tenant");
+        System.out.println("===================================");
     }
 }

@@ -21,17 +21,15 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -45,6 +43,7 @@ import java.util.Date;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
+@PowerMockIgnore({"javax.management.*"})
 public class ShellTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
@@ -56,9 +55,12 @@ public class ShellTaskTest {
     private ShellCommandExecutor shellCommandExecutor;
 
     private ApplicationContext applicationContext;
+    private TaskExecutionContext taskExecutionContext;
 
     @Before
     public void before() throws Exception {
+        taskExecutionContext = new TaskExecutionContext();
+
         PowerMockito.mockStatic(OSUtils.class);
         processService = PowerMockito.mock(ProcessService.class);
         shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
@@ -69,23 +71,22 @@ public class ShellTaskTest {
         PowerMockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         TaskProps props = new TaskProps();
-        props.setTaskDir("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
         props.setTenantCode("1");
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams("{\"rawScript\": \" echo 'hello world!'\"}");
-        shellTask = new ShellTask(props, logger);
+        shellTask = new ShellTask(taskExecutionContext, logger);
         shellTask.init();
 
         PowerMockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
         PowerMockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
         PowerMockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
-        String fileName = String.format("%s/%s_node.%s", props.getTaskDir(), props.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
-        PowerMockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+        String fileName = String.format("%s/%s_node.%s", taskExecutionContext.getExecutePath(),
+                props.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
+        PowerMockito.when(shellCommandExecutor.run("")).thenReturn(null);
     }
 
     private DataSource getDataSource() {
@@ -114,11 +115,9 @@ public class ShellTaskTest {
     public void testShellTask()
             throws Exception {
         TaskProps props = new TaskProps();
-        props.setTaskDir("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
         props.setTenantCode("1");
-        ShellTask shellTaskTest = new ShellTask(props, logger);
+        ShellTask shellTaskTest = new ShellTask(taskExecutionContext, logger);
         Assert.assertNotNull(shellTaskTest);
     }
 
@@ -133,6 +132,26 @@ public class ShellTaskTest {
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInitException() {
+        TaskProps props = new TaskProps();
+        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+        props.setTenantCode("1");
+        props.setEnvFile(".dolphinscheduler_env.sh");
+        props.setTaskStartTime(new Date());
+        props.setTaskTimeout(0);
+        props.setTaskParams("{\"rawScript\": \"\"}");
+        ShellTask shellTask = new ShellTask(taskExecutionContext, logger);
+        try {
+            shellTask.init();
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
+            if (e.getMessage().contains("shell task params is not valid")) {
+                Assert.assertTrue(true);
+            }
         }
     }
 
@@ -157,7 +176,18 @@ public class ShellTaskTest {
     public void testHandleForUnix() throws Exception {
         try {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
-            shellTask.handle();
+            TaskProps props = new TaskProps();
+            props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+            props.setTenantCode("1");
+            props.setEnvFile(".dolphinscheduler_env.sh");
+            props.setTaskStartTime(new Date());
+            props.setTaskTimeout(0);
+            props.setScheduleTime(new Date());
+            props.setCmdTypeIfComplement(CommandType.START_PROCESS);
+            props.setTaskParams("{\"rawScript\": \" echo ${test}\", \"localParams\": [{\"prop\":\"test\", \"direct\":\"IN\", \"type\":\"VARCHAR\", \"value\":\"123\"}]}");
+            ShellTask shellTask1 = new ShellTask(taskExecutionContext, logger);
+            shellTask1.init();
+            shellTask1.handle();
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")
@@ -174,7 +204,18 @@ public class ShellTaskTest {
     public void testHandleForWindows() throws Exception {
         try {
             Assume.assumeTrue(OSUtils.isWindows());
-            shellTask.handle();
+            TaskProps props = new TaskProps();
+            props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+            props.setTenantCode("1");
+            props.setEnvFile(".dolphinscheduler_env.sh");
+            props.setTaskStartTime(new Date());
+            props.setTaskTimeout(0);
+            props.setScheduleTime(new Date());
+            props.setCmdTypeIfComplement(CommandType.START_PROCESS);
+            props.setTaskParams("{\"rawScript\": \" echo ${test}\", \"localParams\": [{\"prop\":\"test\", \"direct\":\"IN\", \"type\":\"VARCHAR\", \"value\":\"123\"}]}");
+            ShellTask shellTask1 = new ShellTask(taskExecutionContext, logger);
+            shellTask1.init();
+            shellTask1.handle();
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")) {

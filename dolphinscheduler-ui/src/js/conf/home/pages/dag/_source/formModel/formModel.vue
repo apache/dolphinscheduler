@@ -90,7 +90,7 @@
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
         </div>
 
@@ -252,6 +252,7 @@
           v-if="taskType === 'CONDITIONS'"
           ref="CONDITIONS"
           @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
@@ -332,7 +333,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1,
+        workerGroup: 'default',
         stateList:[
           {
             value: 'success',
@@ -429,7 +430,7 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
@@ -438,6 +439,8 @@
       },
 
       _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
             type: this.taskType,
@@ -446,12 +449,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -464,7 +470,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -513,7 +519,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -607,17 +613,17 @@
           // If the workergroup has been deleted, set the default workergroup
           var hasMatch = false;
           for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroupId == workerGroupId) {
+            var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+            if (o.workerGroup == workerGroup) {
               hasMatch = true;
               break;
             }
           }
 
           if(!hasMatch){
-            this.workerGroupId = -1
+            this.workerGroup = 'default'
           }else{
-            this.workerGroupId = o.workerGroupId
+            this.workerGroup = o.workerGroup
           }
 
         this.params = o.params || {}
@@ -657,7 +663,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroup: this.workerGroup,
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
     },

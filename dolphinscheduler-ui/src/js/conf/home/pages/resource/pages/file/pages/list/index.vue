@@ -20,6 +20,7 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
             <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
           </x-button-group>
@@ -61,6 +62,7 @@
         isLoading: false,
         fileResourcesList: [],
         searchParams: {
+          id: -1,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',

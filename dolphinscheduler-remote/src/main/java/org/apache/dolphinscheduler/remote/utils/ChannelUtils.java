@@ -49,9 +49,9 @@ public class ChannelUtils {
      * @param channel channel
      * @return address
      */
-    public static Address toAddress(Channel channel){
+    public static Host toAddress(Channel channel){
         InetSocketAddress socketAddress = ((InetSocketAddress)channel.remoteAddress());
-        return new Address(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
+        return new Host(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
     }
 
 }

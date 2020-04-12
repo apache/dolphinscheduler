@@ -71,24 +71,24 @@ public class ThreadPoolExecutors {
      * Executes the given task sometime in the future. The task may execute in a new thread or in an existing pooled thread.
      * If the task cannot be submitted for execution, either because this executor has been shutdown or because its capacity has been reached,
      * the task is handled by the current RejectedExecutionHandler.
-     * @param event
+     * @param event event
      */
     public void execute(final Runnable event) {
-        Executor executor = getExecutor();
-        if (executor == null) {
-            logger.error("Cannot execute [" + event + "] because the executor is missing.");
+        Executor eventExecutor = getExecutor();
+        if (eventExecutor == null) {
+            logger.error("Cannot execute [{}}] because the executor is missing.", event);
         } else {
-            executor.execute(event);
+            eventExecutor.execute(event);
         }
     }
 
 
     public Future<?> submit(Runnable event) {
-        Executor executor = getExecutor();
-        if (executor == null) {
-            logger.error("Cannot submit [" + event + "] because the executor is missing.");
+        Executor eventExecutor = getExecutor();
+        if (eventExecutor == null) {
+            logger.error("Cannot submit [{}}] because the executor is missing.", event);
         } else {
-            return executor.submit(event);
+            return eventExecutor.submit(event);
         }
 
         return null;
@@ -97,11 +97,11 @@ public class ThreadPoolExecutors {
 
 
     public Future<?> submit(Callable<?> task) {
-        Executor executor = getExecutor();
-        if (executor == null) {
-            logger.error("Cannot submit [" + task + "] because the executor is missing.");
+        Executor taskExecutor = getExecutor();
+        if (taskExecutor == null) {
+            logger.error("Cannot submit [{}] because the executor is missing.", task);
         } else {
-            return executor.submit(task);
+            return taskExecutor.submit(task);
         }
 
         return null;
@@ -110,8 +110,8 @@ public class ThreadPoolExecutors {
 
 
     public void printStatus() {
-        Executor executor = getExecutor();
-        executor.getStatus().dumpInfo();
+        Executor printExecutor = getExecutor();
+        printExecutor.getStatus().dumpInfo();
     }
 
 
@@ -125,7 +125,7 @@ public class ThreadPoolExecutors {
             List<Runnable> wasRunning = executor.threadPoolExecutor
                     .shutdownNow();
             if (!wasRunning.isEmpty()) {
-                logger.info(executor + " had " + wasRunning + " on shutdown");
+                logger.info("{} had {} on shutdown", executor, wasRunning);
             }
         }
     }
@@ -138,7 +138,7 @@ public class ThreadPoolExecutors {
         /**
          * how long to retain excess threads
          */
-        final long keepAliveTimeInMillis = 1000;
+        static final long KEEP_ALIVE_TIME_IN_MILLIS = 1000;
         /**
          *  the thread pool executor that services the requests
          */
@@ -146,7 +146,7 @@ public class ThreadPoolExecutors {
         /**
          * work queue to use - unbounded queue
          */
-        final BlockingQueue<Runnable> q = new LinkedBlockingQueue<Runnable>();
+        final BlockingQueue<Runnable> q = new LinkedBlockingQueue<>();
         private final String name;
         private static final AtomicLong seqids = new AtomicLong(0);
         private final long id;
@@ -156,7 +156,7 @@ public class ThreadPoolExecutors {
             this.name = name;
             //create the thread pool executor
             this.threadPoolExecutor = new TrackingThreadPoolExecutor(
-                    maxThreads, maxThreads, keepAliveTimeInMillis,
+                    maxThreads, maxThreads, KEEP_ALIVE_TIME_IN_MILLIS,
                     TimeUnit.MILLISECONDS, q);
             // name the threads for this threadpool
             ThreadFactoryBuilder tfb = new ThreadFactoryBuilder();
