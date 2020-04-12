@@ -16,23 +16,27 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
+import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
+import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -68,6 +73,82 @@ public class ResourcesService extends BaseService {
     @Autowired
     private ResourceUserMapper resourceUserMapper;
 
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    /**
+     * create directory
+     *
+     * @param loginUser login user
+     * @param name alias
+     * @param description description
+     * @param type type
+     * @param pid parent id
+     * @param currentDir current directory
+     * @return create directory result
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Result createDirectory(User loginUser,
+                                 String name,
+                                 String description,
+                                 ResourceType type,
+                                 int pid,
+                                 String currentDir) {
+        Result result = new Result();
+        // if hdfs not startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            putMsg(result, Status.HDFS_NOT_STARTUP);
+            return result;
+        }
+        String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
+
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
+
+
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
+            logger.error("resource directory {} has exist, can't recreate", fullName);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
+        }
+
+        Date now = new Date();
+
+        Resource resource = new Resource(pid,name,fullName,true,description,name,loginUser.getId(),type,0,now,now);
+
+        try {
+            resourcesMapper.insert(resource);
+
+            putMsg(result, Status.SUCCESS);
+            Map<Object, Object> dataMap = new BeanMap(resource);
+            Map<String, Object> resultMap = new HashMap<String, Object>();
+            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
+                    resultMap.put(entry.getKey().toString(), entry.getValue());
+                }
+            }
+            result.setData(resultMap);
+        } catch (Exception e) {
+            logger.error("resource already exists, can't recreate ", e);
+            throw new RuntimeException("resource already exists, can't recreate");
+        }
+        //create directory in hdfs
+        createDirecotry(loginUser,fullName,type,result);
+        return result;
+    }
+
     /**
      * create resource
      *
@@ -76,6 +157,8 @@ public class ResourcesService extends BaseService {
      * @param desc description
      * @param file file
      * @param type type
+     * @param pid parent id
+     * @param currentDir current directory
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
@@ -83,7 +166,9 @@ public class ResourcesService extends BaseService {
                                  String name,
                                  String desc,
                                  ResourceType type,
-                                 MultipartFile file) {
+                                 MultipartFile file,
+                                 int pid,
+                                 String currentDir) {
         Result result = new Result();
 
         // if hdfs not startup
@@ -92,6 +177,21 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
+
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
+
         // file is empty
         if (file.isEmpty()) {
             logger.error("file is empty: {}", file.getOriginalFilename());
@@ -126,7 +226,8 @@ public class ResourcesService extends BaseService {
         }
 
         // check resoure name exists
-        if (checkResourceExists(name, 0, type.ordinal())) {
+        String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -134,14 +235,16 @@ public class ResourcesService extends BaseService {
 
         Date now = new Date();
 
-        Resource resource = new Resource(name,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
+
+
+        Resource resource = new Resource(pid,name,fullName,false,desc,file.getOriginalFilename(),loginUser.getId(),type,file.getSize(),now,now);
 
         try {
             resourcesMapper.insert(resource);
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<String, Object>();
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -154,7 +257,7 @@ public class ResourcesService extends BaseService {
         }
 
         // fail upload
-        if (!upload(loginUser, name, file, type)) {
+        if (!upload(loginUser, fullName, file, type)) {
             logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
             putMsg(result, Status.HDFS_OPERATION_ERROR);
             throw new RuntimeException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
@@ -165,14 +268,14 @@ public class ResourcesService extends BaseService {
     /**
      * check resource is exists
      *
-     * @param alias     alias
+     * @param fullName  fullName
      * @param userId    user id
      * @param type      type
      * @return true if resource exists
      */
-    private boolean checkResourceExists(String alias, int userId, int type ){
+    private boolean checkResourceExists(String fullName, int userId, int type ){
 
-        List<Resource> resources = resourcesMapper.queryResourceList(alias, userId, type);
+        List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
         if (resources != null && resources.size() > 0) {
             return true;
         }
@@ -180,16 +283,14 @@ public class ResourcesService extends BaseService {
     }
 
 
-
     /**
      * update resource
-     *
-     * @param loginUser login user
-     * @param name alias
-     * @param resourceId resource id
-     * @param type resource type
-     * @param desc description
-     * @return update result code
+     * @param loginUser     login user
+     * @param resourceId    resource id
+     * @param name          name
+     * @param desc          description
+     * @param type          resource type
+     * @return  update result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResource(User loginUser,
@@ -223,7 +324,10 @@ public class ResourcesService extends BaseService {
         }
 
         //check resource aleady exists
-        if (!resource.getAlias().equals(name) && checkResourceExists(name, 0, type.ordinal())) {
+        String originFullName = resource.getFullName();
+
+        String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
+        if (!resource.getAlias().equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -234,25 +338,41 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isEmpty(tenantCode)){
             return result;
         }
-
-        //get the file suffix
-        String originResourceName = resource.getAlias();
-        String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
-
-        //if the name without suffix then add it ,else use the origin name
         String nameWithSuffix = name;
-        if(!name.endsWith(suffix)){
-            nameWithSuffix = nameWithSuffix + suffix;
+        String originResourceName = resource.getAlias();
+        if (!resource.isDirectory()) {
+            //get the file suffix
+
+            String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
+
+            //if the name without suffix then add it ,else use the origin name
+            if(!name.endsWith(suffix)){
+                nameWithSuffix = nameWithSuffix + suffix;
+            }
         }
 
         // updateResource data
+        List<Integer> childrenResource = listAllChildren(resource);
+        String oldFullName = resource.getFullName();
         Date now = new Date();
+
         resource.setAlias(nameWithSuffix);
+        resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
 
         try {
             resourcesMapper.updateById(resource);
+            if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
+                List<Resource> childResourceList = new ArrayList<>();
+                List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
+                childResourceList = resourceList.stream().map(t -> {
+                    t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
+                    t.setUpdateTime(now);
+                    return t;
+                }).collect(Collectors.toList());
+                resourcesMapper.batchUpdateResource(childResourceList);
+            }
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
@@ -274,15 +394,9 @@ public class ResourcesService extends BaseService {
 
         // get file hdfs path
         // delete hdfs file by type
-        String originHdfsFileName = "";
-        String destHdfsFileName = "";
-        if (resource.getType().equals(ResourceType.FILE)) {
-            originHdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, originResourceName);
-            destHdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, name);
-        } else if (resource.getType().equals(ResourceType.UDF)) {
-            originHdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, originResourceName);
-            destHdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
-        }
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
+
         try {
             if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
                 logger.info("hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
@@ -310,7 +424,7 @@ public class ResourcesService extends BaseService {
      * @param pageSize page size
      * @return resource list page
      */
-    public Map<String, Object> queryResourceListPaging(User loginUser, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+    public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Page<Resource> page = new Page(pageNo, pageSize);
@@ -318,8 +432,16 @@ public class ResourcesService extends BaseService {
         if (isAdmin(loginUser)) {
             userId= 0;
         }
+        if (direcotryId != -1) {
+            Resource directory = resourcesMapper.selectById(direcotryId);
+            if (directory == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+        }
+
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
-                userId, type.ordinal(), searchVal);
+                userId,direcotryId, type.ordinal(), searchVal);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
@@ -329,16 +451,45 @@ public class ResourcesService extends BaseService {
     }
 
     /**
+     * create direcoty
+     * @param loginUser login user
+     * @param fullName  full name
+     * @param type      resource type
+     * @param result    Result
+     */
+    private void createDirecotry(User loginUser,String fullName,ResourceType type,Result result){
+        // query tenant
+        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+        String directoryName = HadoopUtils.getHdfsFileName(type,tenantCode,fullName);
+        String resourceRootPath = HadoopUtils.getHdfsDir(type,tenantCode);
+        try {
+            if (!HadoopUtils.getInstance().exists(resourceRootPath)) {
+                createTenantDirIfNotExists(tenantCode);
+            }
+
+            if (!HadoopUtils.getInstance().mkdir(directoryName)) {
+                logger.error("create resource directory {} of hdfs failed",directoryName);
+                putMsg(result,Status.HDFS_OPERATION_ERROR);
+                throw new RuntimeException(String.format("create resource directory: %s failed.", directoryName));
+            }
+        } catch (Exception e) {
+            logger.error("create resource directory {} of hdfs failed",directoryName);
+            putMsg(result,Status.HDFS_OPERATION_ERROR);
+            throw new RuntimeException(String.format("create resource directory: %s failed.", directoryName));
+        }
+    }
+
+    /**
      * upload file to hdfs
      *
-     * @param loginUser
-     * @param name
-     * @param file
+     * @param loginUser login user
+     * @param fullName  full name
+     * @param file      file
      */
-    private boolean upload(User loginUser, String name, MultipartFile file, ResourceType type) {
+    private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
         String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
-        String nameSuffix = FileUtils.suffix(name);
+        String nameSuffix = FileUtils.suffix(fullName);
 
         // determine file suffix
         if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
@@ -351,15 +502,8 @@ public class ResourcesService extends BaseService {
 
 
         // save file to hdfs, and delete original file
-        String hdfsFilename = "";
-        String resourcePath = "";
-        if (type.equals(ResourceType.FILE)) {
-            hdfsFilename = HadoopUtils.getHdfsFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-        } else if (type.equals(ResourceType.UDF)) {
-            hdfsFilename = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        }
+        String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,fullName);
+        String resourcePath = HadoopUtils.getHdfsDir(type,tenantCode);
         try {
             // if tenant dir not exists
             if (!HadoopUtils.getInstance().exists(resourcePath)) {
@@ -384,13 +528,63 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-        List<Resource> resourceList;
+
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
             userId = 0;
         }
-        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        result.put(Constants.DATA_LIST, resourceList);
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
+        //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
+        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
+        putMsg(result,Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * get all resources
+     * @param loginUser     login user
+     * @return all resource set
+     */
+    /*private Set<Resource> getAllResources(User loginUser, ResourceType type) {
+        int userId = loginUser.getId();
+        boolean listChildren = true;
+        if(isAdmin(loginUser)){
+            userId = 0;
+            listChildren = false;
+        }
+        List<Resource> resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        Set<Resource> allResourceList = new HashSet<>(resourceList);
+        if (listChildren) {
+            Set<Integer> authorizedIds = new HashSet<>();
+            List<Resource> authorizedDirecoty = resourceList.stream().filter(t->t.getUserId() != loginUser.getId() && t.isDirectory()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(authorizedDirecoty)) {
+                for(Resource resource : authorizedDirecoty){
+                    authorizedIds.addAll(listAllChildren(resource));
+                }
+                List<Resource> childrenResources = resourcesMapper.listResourceByIds(authorizedIds.toArray(new Integer[authorizedIds.size()]));
+                allResourceList.addAll(childrenResources);
+            }
+        }
+        return allResourceList;
+    }*/
+
+    /**
+     * query resource list
+     *
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
+     */
+    public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
+
+        Map<String, Object> result = new HashMap<>(5);
+
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal(),0);
+        List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
+        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
 
         return result;
@@ -427,22 +621,53 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
-        if (tenant == null){
-            putMsg(result, Status.TENANT_NOT_EXIST);
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return  result;
+        }
+
+        // get all resource id of process definitions those is released
+        List<Map<String, Object>> list = processDefinitionMapper.listResources();
+        Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+        Set<Integer> resourceIdSet = resourceProcessMap.keySet();
+        // get all children of the resource
+        List<Integer> allChildren = listAllChildren(resource);
+        Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
+
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        if (resource.getType() == (ResourceType.UDF)) {
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
+            if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
+                return result;
+            }
+        }
+
+        if (resourceIdSet.contains(resource.getPid())) {
+            logger.error("can't be deleted,because it is used of process definition");
+            putMsg(result, Status.RESOURCE_IS_USED);
             return result;
         }
-        String hdfsFilename = "";
+        resourceIdSet.retainAll(allChildren);
+        if (CollectionUtils.isNotEmpty(resourceIdSet)) {
+            logger.error("can't be deleted,because it is used of process definition");
+            for (Integer resId : resourceIdSet) {
+                logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+            }
+            putMsg(result, Status.RESOURCE_IS_USED);
+            return result;
+        }
 
-        // delete hdfs file by type
-        String tenantCode = tenant.getTenantCode();
-        hdfsFilename = getHdfsFileName(resource, tenantCode, hdfsFilename);
+        // get hdfs file by type
+        String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         //delete data in database
-        resourcesMapper.deleteById(resourceId);
-        resourceUserMapper.deleteResourceUser(0, resourceId);
+        resourcesMapper.deleteIds(needDeleteResourceIdArray);
+        resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
+
         //delete file on hdfs
-        HadoopUtils.getInstance().delete(hdfsFilename, false);
+        HadoopUtils.getInstance().delete(hdfsFilename, true);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -451,15 +676,15 @@ public class ResourcesService extends BaseService {
     /**
      * verify resource by name and type
      * @param loginUser login user
-     * @param name resource alias
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    public Result verifyResourceName(String name, ResourceType type,User loginUser) {
+    public Result verifyResourceName(String fullName, ResourceType type,User loginUser) {
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(name, 0, type.ordinal())) {
-            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
+            logger.error("resource type:{} name:{} has exist, can't create again.", type, fullName);
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
@@ -468,9 +693,9 @@ public class ResourcesService extends BaseService {
                 String tenantCode = tenant.getTenantCode();
 
                 try {
-                    String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                    String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,fullName);
                     if(HadoopUtils.getInstance().exists(hdfsFilename)){
-                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, fullName,hdfsFilename);
                         putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
                     }
 
@@ -484,6 +709,48 @@ public class ResourcesService extends BaseService {
         }
 
 
+        return result;
+    }
+
+    /**
+     * verify resource by full name or pid and type
+     * @param fullName  resource full name
+     * @param id        resource id
+     * @param type      resource type
+     * @return true if the resource full name or pid not exists, otherwise return false
+     */
+    public Result queryResource(String fullName,Integer id,ResourceType type) {
+        Result result = new Result();
+        if (StringUtils.isBlank(fullName) && id == null) {
+            logger.error("You must input one of fullName and pid");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            return result;
+        }
+        if (StringUtils.isNotBlank(fullName)) {
+            List<Resource> resourceList = resourcesMapper.queryResource(fullName,type.ordinal());
+            if (CollectionUtils.isEmpty(resourceList)) {
+                logger.error("resource file not exist,  resource full name {} ", fullName);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            result.setData(resourceList.get(0));
+        } else {
+            Resource resource = resourcesMapper.selectById(id);
+            if (resource == null) {
+                logger.error("resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            Resource parentResource = resourcesMapper.selectById(resource.getPid());
+            if (parentResource == null) {
+                logger.error("parent resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            result.setData(parentResource);
+        }
         return result;
     }
 
@@ -508,7 +775,7 @@ public class ResourcesService extends BaseService {
         // get resource by id
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
-            logger.error("resouce file not exist,  resource id {}", resourceId);
+            logger.error("resource file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -518,7 +785,7 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resouce suffix {} not support view,  resource id {}", nameSuffix, resourceId);
+                logger.error("resource suffix {} not support view,  resource id {}", nameSuffix, resourceId);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
@@ -530,7 +797,7 @@ public class ResourcesService extends BaseService {
         }
 
         // hdfs path
-        String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
+        String hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resource.getFullName());
         logger.info("resource hdfs path is {} ", hdfsFileName);
         try {
             if(HadoopUtils.getInstance().exists(hdfsFileName)){
@@ -566,7 +833,7 @@ public class ResourcesService extends BaseService {
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
-    public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content) {
+    public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory) {
         Result result = new Result();
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()){
@@ -588,15 +855,16 @@ public class ResourcesService extends BaseService {
         }
 
         String name = fileName.trim() + "." + nameSuffix;
+        String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name):String.format("%s/%s",currentDirectory,name);
 
-        result = verifyResourceName(name,type,loginUser);
+        result = verifyResourceName(fullName,type,loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // save data
         Date now = new Date();
-        Resource resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
+        Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
 
@@ -612,7 +880,7 @@ public class ResourcesService extends BaseService {
 
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
-        result = uploadContentToHdfs(name, tenantCode, content);
+        result = uploadContentToHdfs(fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
         }
@@ -664,7 +932,7 @@ public class ResourcesService extends BaseService {
         resourcesMapper.updateById(resource);
 
 
-        result = uploadContentToHdfs(resource.getAlias(), tenantCode, content);
+        result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
         }
@@ -672,10 +940,10 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * @param resourceName
-     * @param tenantCode
-     * @param content
-     * @return
+     * @param resourceName  resource name
+     * @param tenantCode    tenant code
+     * @param content       content
+     * @return result
      */
     private Result uploadContentToHdfs(String resourceName, String tenantCode, String content) {
         Result result = new Result();
@@ -691,8 +959,8 @@ public class ResourcesService extends BaseService {
                 return result;
             }
 
-            // get file hdfs path
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resourceName);
+            // get resource file hdfs path
+            hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resourceName);
             String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
             logger.info("resource hdfs path is {} ", hdfsFileName);
 
@@ -736,20 +1004,49 @@ public class ResourcesService extends BaseService {
             logger.error("download file not exist,  resource id {}", resourceId);
             return null;
         }
+        if (resource.isDirectory()) {
+            logger.error("resource id {} is directory,can't download it", resourceId);
+            throw new RuntimeException("cant't download directory");
+        }
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
 
-        String hdfsFileName = "";
-        hdfsFileName = getHdfsFileName(resource, tenantCode, hdfsFileName);
+        String hdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         String localFileName = FileUtils.getDownloadFilename(resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
 
         HadoopUtils.getInstance().copyHdfsToLocal(hdfsFileName, localFileName, false, true);
-        org.springframework.core.io.Resource file = org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
-        return file;
+        return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
     }
 
+
+    /**
+     * list all file
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
+     */
+    public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
+
+        Map<String, Object> result = new HashMap<>();
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+        List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
+        List<ResourceComponent> list ;
+        if (CollectionUtils.isNotEmpty(resourceList)) {
+            Visitor visitor = new ResourceTreeVisitor(resourceList);
+            list = visitor.visit().getChildren();
+        }else {
+            list = new ArrayList<>(0);
+        }
+
+        result.put(Constants.DATA_LIST, list);
+        putMsg(result,Status.SUCCESS);
+        return result;
+    }
 
     /**
      * unauthorized file
@@ -765,7 +1062,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        List<Object> list ;
+        List<Resource> list ;
         if (resourceList != null && resourceList.size() > 0) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
@@ -775,14 +1072,11 @@ public class ResourcesService extends BaseService {
         }else {
             list = new ArrayList<>(0);
         }
-
-        result.put(Constants.DATA_LIST, list);
+        Visitor visitor = new ResourceTreeVisitor(list);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
         return result;
     }
-
-
-
 
     /**
      * unauthorized udf function
@@ -801,7 +1095,7 @@ public class ResourcesService extends BaseService {
         List<UdfFunc> udfFuncList = udfFunctionMapper.queryUdfFuncExceptUserId(userId);
         List<UdfFunc> resultList = new ArrayList<>();
         Set<UdfFunc> udfFuncSet = null;
-        if (udfFuncList != null && udfFuncList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(udfFuncList)) {
             udfFuncSet = new HashSet<>(udfFuncList);
 
             List<UdfFunc> authedUDFFuncList = udfFunctionMapper.queryAuthedUdfFunc(userId);
@@ -849,44 +1143,13 @@ public class ResourcesService extends BaseService {
             return result;
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
-
-        result.put(Constants.DATA_LIST, authedResources);
+        Visitor visitor = new ResourceTreeVisitor(authedResources);
+        logger.info(JSON.toJSONString(visitor.visit(), SerializerFeature.SortField));
+        String jsonTreeStr = JSON.toJSONString(visitor.visit().getChildren(), SerializerFeature.SortField);
+        logger.info(jsonTreeStr);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * get hdfs file name
-     *
-     * @param resource resource
-     * @param tenantCode tenant code
-     * @param hdfsFileName hdfs file name
-     * @return hdfs file name
-     */
-    private String getHdfsFileName(Resource resource, String tenantCode, String hdfsFileName) {
-        if (resource.getType().equals(ResourceType.FILE)) {
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
-        } else if (resource.getType().equals(ResourceType.UDF)) {
-            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, resource.getAlias());
-        }
-        return hdfsFileName;
-    }
-
-    /**
-     * get hdfs file name
-     *
-     * @param resourceType resource type
-     * @param tenantCode tenant code
-     * @param hdfsFileName hdfs file name
-     * @return hdfs file name
-     */
-    private String getHdfsFileName(ResourceType resourceType, String tenantCode, String hdfsFileName) {
-        if (resourceType.equals(ResourceType.FILE)) {
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, hdfsFileName);
-        } else if (resourceType.equals(ResourceType.UDF)) {
-            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, hdfsFileName);
-        }
-        return hdfsFileName;
     }
 
     /**
@@ -897,10 +1160,9 @@ public class ResourcesService extends BaseService {
      */
     private void getAuthorizedResourceList(Set<?> resourceSet, List<?> authedResourceList) {
         Set<?> authedResourceSet = null;
-        if (authedResourceList != null && authedResourceList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(authedResourceList)) {
             authedResourceSet = new HashSet<>(authedResourceList);
             resourceSet.removeAll(authedResourceSet);
-
         }
     }
 
@@ -927,6 +1189,37 @@ public class ResourcesService extends BaseService {
             return null;
         }
         return tenant.getTenantCode();
+    }
+
+    /**
+     * list all children id
+     * @param resource resource
+     * @return all children id
+     */
+    List<Integer> listAllChildren(Resource resource){
+        List<Integer> childList = new ArrayList<>();
+        if (resource.getId() != -1) {
+            childList.add(resource.getId());
+        }
+
+        if(resource.isDirectory()){
+            listAllChildren(resource.getId(),childList);
+        }
+        return childList;
+    }
+
+    /**
+     * list all children id
+     * @param resourceId    resource id
+     * @param childList     child list
+     */
+    void listAllChildren(int resourceId,List<Integer> childList){
+
+        List<Integer> children = resourcesMapper.listChildren(resourceId);
+        for(int chlidId:children){
+            childList.add(chlidId);
+            listAllChildren(chlidId,childList);
+        }
     }
 
 }

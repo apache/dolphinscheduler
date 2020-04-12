@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -26,11 +27,6 @@ import org.slf4j.Logger;
  *  abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTask {
-
-  /**
-   *  process instance
-   */
-
   /**
    *  process task
    */
@@ -43,28 +39,25 @@ public abstract class AbstractYarnTask extends AbstractTask {
 
   /**
    * Abstract Yarn Task
-   * @param taskProps task rops
+   * @param taskExecutionContext taskExecutionContext
    * @param logger    logger
    */
-  public AbstractYarnTask(TaskProps taskProps, Logger logger) {
-    super(taskProps, logger);
+  public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(),
-            taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
-            taskProps.getTenantCode(),
-            taskProps.getEnvFile(),
-            taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(),
+            taskExecutionContext,
             logger);
   }
 
   @Override
   public void handle() throws Exception {
     try {
-      // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processService);
+      // SHELL task exit code
+      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
     } catch (Exception e) {
       logger.error("yarn process failure", e);
       exitStatusCode = -1;
@@ -82,9 +75,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
     cancel = true;
     // cancel process
     shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstId());
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
     if (status && taskInstance != null){
-      ProcessUtils.killYarnJob(taskInstance);
+      ProcessUtils.killYarnJob(taskExecutionContext);
     }
   }
 
@@ -94,4 +87,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
    * @throws Exception exception
    */
   protected abstract String buildCommand() throws Exception;
+
+  /**
+   * set main jar name
+   */
+  protected abstract void setMainJarName();
 }

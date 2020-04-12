@@ -335,7 +335,7 @@ public abstract class AbstractShell {
 			try{  
 			  entry.getValue().destroy();
 		  	} catch (Exception e) {
-		  		e.printStackTrace();
+		  		logger.error("Destroy All Processes error", e);
 		  	}
 		  }
 		  

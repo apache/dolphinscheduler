@@ -20,7 +20,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class LogClientService {
     /**
      *  request time out
      */
-    private final long logRequestTimeout = 10 * 1000;
+    private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
     /**
      * construct client
@@ -72,10 +72,10 @@ public class LogClientService {
         logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         String result = "";
-        final Address address = new Address(host, port);
+        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
                         response.getBody(), RollViewLogResponseCommand.class);
@@ -100,10 +100,10 @@ public class LogClientService {
         logger.info("view log path {}", path);
         ViewLogRequestCommand request = new ViewLogRequestCommand(path);
         String result = "";
-        final Address address = new Address(host, port);
+        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
                         response.getBody(), ViewLogResponseCommand.class);
@@ -128,10 +128,10 @@ public class LogClientService {
         logger.info("log path {}", path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
         byte[] result = null;
-        final Address address = new Address(host, port);
+        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
                         response.getBody(), GetLogBytesResponseCommand.class);

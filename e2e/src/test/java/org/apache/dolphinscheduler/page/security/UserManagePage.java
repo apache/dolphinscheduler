@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.security.UserManageData;
 import org.apache.dolphinscheduler.locator.security.UserManageLocator;
 import org.openqa.selenium.WebDriver;
@@ -26,24 +25,15 @@ public class UserManagePage extends PageCommon {
     public UserManagePage(WebDriver driver) {
         super(driver);
     }
-    /**
-     * jump page
-     */
-    public void jumpPage() {
-        System.out.println("jump tenant page");
-        super.jumpPage(UserManageData.USER_URL);
-    }
 
     /**
-     * creatTenant
+     * createTenant
      *
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createUser() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
@@ -60,6 +50,21 @@ public class UserManagePage extends PageCommon {
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(UserManageData.USER_MANAGE);
+    }
+
+    public boolean deleteUser() throws InterruptedException {
+
+        // click  user manage
+        clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        // click  delete user button
+        clickButton(UserManageLocator.DELETE_USER_BUTTON );
+
+        // click confirm delete button
+        clickButton(UserManageLocator.CONFIRM_DELETE_USER_BUTTON);
 
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);

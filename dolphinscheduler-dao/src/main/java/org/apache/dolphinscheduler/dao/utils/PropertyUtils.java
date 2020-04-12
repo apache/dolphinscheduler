@@ -49,7 +49,7 @@ public class PropertyUtils {
      * init
      */
     private void init(){
-        String[] propertyFiles = new String[]{Constants.APPLICATION_PROPERTIES};
+        String[] propertyFiles = new String[]{Constants.DATASOURCE_PROPERTIES};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
@@ -77,6 +77,17 @@ public class PropertyUtils {
         return properties.getProperty(key);
     }
 
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static String getString(String key, String defaultVal) {
+        String val = properties.getProperty(key.trim());
+        return val == null ? defaultVal : val;
+    }
 
     /**
      * get property value
@@ -105,5 +116,47 @@ public class PropertyUtils {
             logger.info(e.getMessage(),e);
         }
         return defaultValue;
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @return property value
+     */
+    public static Boolean getBoolean(String key) {
+        String value = properties.getProperty(key.trim());
+        if(null != value){
+            return Boolean.parseBoolean(value);
+        }
+
+        return false;
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultValue default value
+     * @return property value
+     */
+    public static Boolean getBoolean(String key, boolean defaultValue) {
+        String value = properties.getProperty(key.trim());
+        if(null != value){
+            return Boolean.parseBoolean(value);
+        }
+
+        return defaultValue;
+    }
+
+    /**
+     * get property long value
+     * @param key key
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static long getLong(String key, long defaultVal) {
+        String val = getString(key);
+        return val == null ? defaultVal : Long.parseLong(val);
     }
 }

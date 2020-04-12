@@ -1,0 +1,44 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+** Please be patient while the chart is being deployed **
+
+1. Get the Dolphinscheduler URL by running:
+
+{{- if .Values.ingress.enabled }}
+
+  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "dolphinscheduler.fullname" . }} -o jsonpath='{.spec.rules[0].host}')
+  echo "Dolphinscheduler URL: http://$HOSTNAME/"
+
+{{- else }}
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
+
+{{- end }}
+
+2. Get the Dolphinscheduler URL by running:
+
+{{- if .Values.ingress.enabled }}
+
+  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "dolphinscheduler.fullname" . }} -o jsonpath='{.spec.rules[0].host}')
+  echo "Dolphinscheduler URL: http://$HOSTNAME/"
+
+{{- else }}
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
+
+{{- end }}

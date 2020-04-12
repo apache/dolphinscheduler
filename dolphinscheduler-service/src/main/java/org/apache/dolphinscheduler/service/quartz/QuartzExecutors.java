@@ -16,13 +16,19 @@
  */
 package org.apache.dolphinscheduler.service.quartz;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.jdbcjobstore.JobStoreTX;
+import org.quartz.impl.jdbcjobstore.PostgreSQLDelegate;
+import org.quartz.impl.jdbcjobstore.StdJDBCDelegate;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.quartz.simpl.SimpleThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +36,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -59,7 +66,19 @@ public class QuartzExecutors {
    */
   private static volatile QuartzExecutors INSTANCE = null;
 
-  private QuartzExecutors() {}
+  /**
+   * load conf
+   */
+  private static Configuration conf;
+
+
+  private QuartzExecutors() {
+    try {
+      conf = new PropertiesConfiguration(QUARTZ_PROPERTIES_PATH);
+    }catch (ConfigurationException e){
+      logger.warn("not loaded quartz configuration file, will used default value",e);
+    }
+  }
 
   /**
    * thread safe and performance promote
@@ -70,9 +89,10 @@ public class QuartzExecutors {
       synchronized (QuartzExecutors.class) {
         // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
         if (INSTANCE == null) {
-          INSTANCE = new QuartzExecutors();
+          QuartzExecutors quartzExecutors = new QuartzExecutors();
           //finish QuartzExecutors init
-          INSTANCE.init();
+          quartzExecutors.init();
+          INSTANCE = quartzExecutors;
         }
       }
     }
@@ -87,7 +107,33 @@ public class QuartzExecutors {
    */
   private void init() {
     try {
-      SchedulerFactory schedulerFactory = new StdSchedulerFactory(Constants.QUARTZ_PROPERTIES_PATH);
+      StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
+      Properties properties = new Properties();
+
+      String dataSourceDriverClass = org.apache.dolphinscheduler.dao.utils.PropertyUtils.getString(SPRING_DATASOURCE_DRIVER_CLASS_NAME);
+      if (dataSourceDriverClass.equals(ORG_POSTGRESQL_DRIVER)){
+        properties.setProperty(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS,conf.getString(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, PostgreSQLDelegate.class.getName()));
+      } else {
+        properties.setProperty(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS,conf.getString(ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS, StdJDBCDelegate.class.getName()));
+      }
+      properties.setProperty(ORG_QUARTZ_SCHEDULER_INSTANCENAME, conf.getString(ORG_QUARTZ_SCHEDULER_INSTANCENAME, QUARTZ_INSTANCENAME));
+      properties.setProperty(ORG_QUARTZ_SCHEDULER_INSTANCEID, conf.getString(ORG_QUARTZ_SCHEDULER_INSTANCEID, QUARTZ_INSTANCEID));
+      properties.setProperty(ORG_QUARTZ_SCHEDULER_MAKESCHEDULERTHREADDAEMON,conf.getString(ORG_QUARTZ_SCHEDULER_MAKESCHEDULERTHREADDAEMON,STRING_TRUE));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_USEPROPERTIES,conf.getString(ORG_QUARTZ_JOBSTORE_USEPROPERTIES,STRING_FALSE));
+      properties.setProperty(ORG_QUARTZ_THREADPOOL_CLASS,conf.getString(ORG_QUARTZ_THREADPOOL_CLASS, SimpleThreadPool.class.getName()));
+      properties.setProperty(ORG_QUARTZ_THREADPOOL_MAKETHREADSDAEMONS,conf.getString(ORG_QUARTZ_THREADPOOL_MAKETHREADSDAEMONS,STRING_TRUE));
+      properties.setProperty(ORG_QUARTZ_THREADPOOL_THREADCOUNT,conf.getString(ORG_QUARTZ_THREADPOOL_THREADCOUNT, QUARTZ_THREADCOUNT));
+      properties.setProperty(ORG_QUARTZ_THREADPOOL_THREADPRIORITY,conf.getString(ORG_QUARTZ_THREADPOOL_THREADPRIORITY, QUARTZ_THREADPRIORITY));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_CLASS,conf.getString(ORG_QUARTZ_JOBSTORE_CLASS, JobStoreTX.class.getName()));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_TABLEPREFIX,conf.getString(ORG_QUARTZ_JOBSTORE_TABLEPREFIX, QUARTZ_TABLE_PREFIX));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_ISCLUSTERED,conf.getString(ORG_QUARTZ_JOBSTORE_ISCLUSTERED,STRING_TRUE));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD,conf.getString(ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD, QUARTZ_MISFIRETHRESHOLD));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL,conf.getString(ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL, QUARTZ_CLUSTERCHECKININTERVAL));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK,conf.getString(ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK, QUARTZ_ACQUIRETRIGGERSWITHINLOCK));
+      properties.setProperty(ORG_QUARTZ_JOBSTORE_DATASOURCE,conf.getString(ORG_QUARTZ_JOBSTORE_DATASOURCE, QUARTZ_DATASOURCE));
+      properties.setProperty(ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS,conf.getString(ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS,DruidConnectionProvider.class.getName()));
+
+      schedulerFactory.initialize(properties);
       scheduler = schedulerFactory.getScheduler();
 
     } catch (SchedulerException e) {
@@ -261,7 +307,7 @@ public class QuartzExecutors {
    */
   public static String buildJobName(int processId) {
     StringBuilder sb = new StringBuilder(30);
-    sb.append(Constants.QUARTZ_JOB_PRIFIX).append(Constants.UNDERLINE).append(processId);
+    sb.append(QUARTZ_JOB_PRIFIX).append(UNDERLINE).append(processId);
     return sb.toString();
   }
 
@@ -272,7 +318,7 @@ public class QuartzExecutors {
    */
   public static String buildJobGroupName(int projectId) {
     StringBuilder sb = new StringBuilder(30);
-    sb.append(Constants.QUARTZ_JOB_GROUP_PRIFIX).append(Constants.UNDERLINE).append(projectId);
+    sb.append(QUARTZ_JOB_GROUP_PRIFIX).append(UNDERLINE).append(projectId);
     return sb.toString();
   }
 
@@ -286,9 +332,9 @@ public class QuartzExecutors {
    */
   public static Map<String, Object> buildDataMap(int projectId, int scheduleId, Schedule schedule) {
     Map<String, Object> dataMap = new HashMap<>(3);
-    dataMap.put(Constants.PROJECT_ID, projectId);
-    dataMap.put(Constants.SCHEDULE_ID, scheduleId);
-    dataMap.put(Constants.SCHEDULE, JSONUtils.toJson(schedule));
+    dataMap.put(PROJECT_ID, projectId);
+    dataMap.put(SCHEDULE_ID, scheduleId);
+    dataMap.put(SCHEDULE, JSONUtils.toJson(schedule));
 
     return dataMap;
   }

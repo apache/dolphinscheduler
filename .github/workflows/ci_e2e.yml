@@ -49,12 +49,13 @@ jobs:
       - name: Docker Run
         run: |
           VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
-          docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -p 8888:8888 dolphinscheduler:$VERSION all
+          mkdir -p /tmp/logs
+          docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -v /tmp/logs:/opt/dolphinscheduler/logs -p 8888:8888 dolphinscheduler:$VERSION all
       - name: Check Server Status
         run: sh ./dockerfile/hooks/check
       - name: Prepare e2e env
         run: |
-          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip
+          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
           sudo apt-get install -f -y
@@ -65,7 +66,10 @@ jobs:
       - name: Run e2e Test
         run: cd ./e2e && mvn -B clean test
       - name: Collect logs
-        run: |
-          mkdir -p ${LOG_DIR}
-          docker logs dolphinscheduler > ${LOG_DIR}/dolphinscheduler.txt
-        continue-on-error: true
+        if: failure()
+        uses: actions/upload-artifact@v1
+        with:
+          name: dslogs
+          path: /tmp/logs
+
+

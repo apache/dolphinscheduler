@@ -25,7 +25,7 @@
              :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.description">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -177,7 +177,7 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
           ConnectionOverlays: [
             [
@@ -293,7 +293,7 @@
         let is = true
         let code = ''
 
-        if (!item.disable) {
+        if (item.disable) {
           return
         }
 
@@ -326,45 +326,62 @@
        * Storage interface
        */
       _save (sourceType) {
-        return new Promise((resolve, reject) => {
-          this.spinnerLoading = true
-          // Storage store
-          Dag.saveStore().then(res => {
-            if (this.urlParam.id) {
-              /**
-               * Edit
-               * @param saveInstanceEditDAGChart => Process instance editing
-               * @param saveEditDAGChart => Process definition editing
-               */
-              this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.spinnerLoading = false
-                reject(e)
-              })
-            } else {
-              // New
-              this.saveDAGchart().then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
-                if (sourceType !== 'affirm') {
-                  // Jump process definition
-                  this.$router.push({ name: 'projects-definition-list' })
-                }
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.setName('')
-                this.spinnerLoading = false
-                reject(e)
-              })
-            }
+        if(this._verifConditions()) {
+          return new Promise((resolve, reject) => {
+            this.spinnerLoading = true
+            // Storage store
+            Dag.saveStore().then(res => {
+              if (this.urlParam.id) {
+                /**
+                 * Edit
+                 * @param saveInstanceEditDAGChart => Process instance editing
+                 * @param saveEditDAGChart => Process definition editing
+                 */
+                this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              } else {
+                // New
+                this.saveDAGchart().then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
+                  if (sourceType !== 'affirm') {
+                    // Jump process definition
+                    this.$router.push({ name: 'projects-definition-list' })
+                  }
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.setName('')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              }
+            })
           })
+        }
+      },
+      _verifConditions () {
+        let tasks = this.$store.state.dag.tasks
+        let bool = true
+        tasks.map(v=>{
+          if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
+            bool = false
+            return false
+          }
         })
+        if(!bool) {
+          this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
+          return false
+        }
+        return true
       },
       /**
        * Global parameter
@@ -589,7 +606,7 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
           ConnectionOverlays: [
             [

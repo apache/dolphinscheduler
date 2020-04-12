@@ -34,10 +34,9 @@ public final class Preconditions {
      * Ensures that the given object reference is not null.
      * Upon violation, a {@code NullPointerException} with no message is thrown.
      *
-     * @param reference The object reference
-     * @return The object reference itself (generically typed).
-     *
-     * @throws NullPointerException Thrown, if the passed reference was null.
+     * @param reference reference
+     * @param <T> T
+     * @return T
      */
     public static <T> T checkNotNull(T reference) {
         if (reference == null) {
@@ -49,12 +48,10 @@ public final class Preconditions {
     /**
      * Ensures that the given object reference is not null.
      * Upon violation, a {@code NullPointerException} with the given message is thrown.
-     *
-     * @param reference The object reference
-     * @param errorMessage The message for the {@code NullPointerException} that is thrown if the check fails.
-     * @return The object reference itself (generically typed).
-     *
-     * @throws NullPointerException Thrown, if the passed reference was null.
+     * @param reference reference
+     * @param errorMessage errorMessage
+     * @param <T> T
+     * @return T
      */
     public static <T> T checkNotNull(T reference,  String errorMessage) {
         if (reference == null) {
@@ -78,9 +75,8 @@ public final class Preconditions {
      * @param errorMessageArgs The arguments for the error message, to be inserted into the
      *                         message template for the {@code %s} placeholders.
      *
+     * @param <T> T
      * @return The object reference itself (generically typed).
-     *
-     * @throws NullPointerException Thrown, if the passed reference was null.
      */
     public static <T> T checkNotNull(T reference,
                                       String errorMessageTemplate,

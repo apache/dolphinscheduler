@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.sql;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -97,22 +97,22 @@ public class SqlExecutorTest {
      */
     private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, int taskInstId) throws Exception {
         TaskProps taskProps = new TaskProps();
-        taskProps.setTaskDir("");
+        taskProps.setExecutePath("");
         // processDefineId_processInstanceId_taskInstanceId
         taskProps.setTaskAppId(taskAppId);
         // set tenant -> task execute linux user
         taskProps.setTenantCode(tenantCode);
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(taskInstId);
-        taskProps.setNodeName(nodeName);
+        taskProps.setTaskInstanceId(taskInstId);
+        taskProps.setTaskName(nodeName);
         taskProps.setCmdTypeIfComplement(CommandType.START_PROCESS);
 
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 
@@ -123,9 +123,10 @@ public class SqlExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+        AbstractTask task = null;
 
-        logger.info("task info : {}", task);
+                logger.info("task info : {}", task);
 
         // job init
         task.init();
