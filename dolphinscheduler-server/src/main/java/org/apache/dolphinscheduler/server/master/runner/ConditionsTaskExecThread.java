@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.slf4j.Logger;
@@ -47,11 +48,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
     private DependentParameters dependentParameters;
 
     /**
-     *  log record
-     */
-    protected Logger logger;
-
-    /**
      * complete task map
      */
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
@@ -69,17 +65,16 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      */
     public ConditionsTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance) {
         super(taskInstance, processInstance);
-        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                taskInstance.getProcessDefinitionId(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
-
     }
 
     @Override
     public Boolean submitWaitComplete() {
         try{
             this.taskInstance = submit();
+            logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskInstance.getProcessDefinitionId(),
+                    taskInstance.getProcessInstanceId(),
+                    taskInstance.getId()));
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
             Thread.currentThread().setName(threadLoggerInfoName);
             initTaskParameters();
@@ -93,6 +88,12 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void waitTaskQuit() {
+        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
+                taskInstance.getProcessInstanceId()
+        );
+        for(TaskInstance task : taskInstances){
+            completeTaskList.putIfAbsent(task.getName(), task.getState());
+        }
 
         List<DependResult> modelResultList = new ArrayList<>();
         for(DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()){
@@ -126,10 +127,21 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
+        this.taskInstance.setLogPath(getTaskLogPath(taskInstance));
+        this.taskInstance.setHost(OSUtils.getHost());
+        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setStartTime(new Date());
+        this.processService.saveTaskInstance(taskInstance);
+
         this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(), DependentParameters.class);
     }
 
 
+    /**
+     * depend result for depend item
+     * @param item
+     * @return
+     */
     private DependResult getDependResultForItem(DependentItem item){
 
         DependResult dependResult = DependResult.SUCCESS;
@@ -143,8 +155,8 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("depend item : {} expect status: {}, actual status: {}" ,item.getDepTasks(), item.getStatus().toString(), executionStatus.toString());
             dependResult = DependResult.FAILED;
         }
-        logger.info("depend item: {}, depend result: {}",
-                item.getDepTasks(), dependResult);
+        logger.info("dependent item complete {} {},{}",
+                Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult.toString());
         return dependResult;
     }
 

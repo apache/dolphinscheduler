@@ -1799,5 +1799,22 @@ public class ProcessService {
         return resourceMapper.listResourceByIds(resIds);
     }
 
+    /**
+     * format task app id in task instance
+     * @param taskInstance
+     * @return
+     */
+    public String formatTaskAppId(TaskInstance taskInstance){
+        ProcessDefinition definition = this.findProcessDefineById(taskInstance.getProcessDefinitionId());
+        ProcessInstance processInstanceById = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+
+        if(definition == null || processInstanceById == null){
+            return "";
+        }
+        return String.format("%s_%s_%s",
+                definition.getId(),
+                processInstanceById.getId(),
+                taskInstance.getId());
+    }
 
 }

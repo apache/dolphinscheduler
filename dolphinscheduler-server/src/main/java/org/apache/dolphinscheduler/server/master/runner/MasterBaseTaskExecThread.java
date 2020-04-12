@@ -16,11 +16,15 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -41,7 +45,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * logger of MasterBaseTaskExecThread
      */
-    protected Logger logger;
+    protected Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
+
 
     /**
      * process service
@@ -235,5 +240,36 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     public Boolean call() throws Exception {
         return submitWaitComplete();
     }
+
+    /**
+     * get task log path
+     * @return log path
+     */
+    public String getTaskLogPath(TaskInstance task) {
+        String logPath;
+        try{
+            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                    .getLogger("ROOT")
+                    .getAppender("TASKLOGFILE"))
+                    .getDiscriminator()).getLogBase();
+            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+                logPath =  baseLog + Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }else{
+                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                        baseLog +  Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }
+        }catch (Exception e){
+            logger.error("logger" + e);
+            logPath = "";
+        }
+        return logPath;
+    }
+
 
 }
