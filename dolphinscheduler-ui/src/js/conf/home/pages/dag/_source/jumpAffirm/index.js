@@ -100,7 +100,7 @@ Affirm.isPop = (fn) => {
               Vue.$modal.destroy()
             })
           },
-          close () {
+          close () { 
             fn()
             Vue.$modal.destroy()
           }

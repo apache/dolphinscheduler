@@ -23,13 +23,22 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ProjectUserMapperTest {
 
 
@@ -60,7 +69,6 @@ public class ProjectUserMapperTest {
         //update
         int update = projectUserMapper.updateById(projectUser);
         Assert.assertEquals(1, update);
-        projectUserMapper.deleteById(projectUser.getId());
     }
 
     /**
@@ -82,7 +90,6 @@ public class ProjectUserMapperTest {
         //query
         List<ProjectUser> projectUsers = projectUserMapper.selectList(null);
         Assert.assertNotEquals(projectUsers.size(), 0);
-        projectUserMapper.deleteById(projectUser.getId());
     }
 
     /**
@@ -94,8 +101,7 @@ public class ProjectUserMapperTest {
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assert.assertEquals(1, delete);
-
+        assertThat(delete,greaterThanOrEqualTo(1));
     }
 
     /**
@@ -107,6 +113,5 @@ public class ProjectUserMapperTest {
         ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
         Assert.assertNotEquals(projectUser1, null);
 
-        projectUserMapper.deleteById(projectUser.getId());
     }
 }

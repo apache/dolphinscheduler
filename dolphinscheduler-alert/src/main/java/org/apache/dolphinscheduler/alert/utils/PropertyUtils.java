@@ -81,6 +81,18 @@ public class PropertyUtils {
      * get property value
      *
      * @param key property name
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static String getString(String key, String defaultVal) {
+        String val = properties.getProperty(key.trim());
+        return val == null ? defaultVal : val;
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
      * @return  get property int value , if key == null, then return -1
      */
     public static int getInt(String key) {

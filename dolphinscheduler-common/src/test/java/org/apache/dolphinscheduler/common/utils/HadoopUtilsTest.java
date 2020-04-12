@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -84,5 +85,20 @@ public class HadoopUtilsTest {
     public void catFileTest()throws Exception{
         List<String> stringList = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
         logger.info(String.join(",",stringList));
+    }
+
+    @Test
+    public void getHdfsFileNameTest(){
+        logger.info(HadoopUtils.getHdfsFileName(ResourceType.FILE,"test","/test"));
+    }
+
+    @Test
+    public void getHdfsResourceFileNameTest(){
+        logger.info(HadoopUtils.getHdfsResourceFileName("test","/test"));
+    }
+
+    @Test
+    public void getHdfsUdfFileNameTest(){
+        logger.info(HadoopUtils.getHdfsUdfFileName("test","/test.jar"));
     }
 }

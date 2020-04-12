@@ -16,15 +16,17 @@
  */
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskRecord;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskRecord;
+import org.apache.dolphinscheduler.dao.utils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,26 +45,11 @@ public class TaskRecordDao {
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
     /**
-     * load conf
-     */
-    private static Configuration conf;
-
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
-        } catch (ConfigurationException e) {
-            logger.error("load configuration exception", e);
-            System.exit(1);
-        }
-    }
-
-    /**
-     * get task record flag
-     *
+     *  get task record flag
      * @return whether startup taskrecord
      */
-    public static boolean getTaskRecordFlag() {
-        return conf.getBoolean(Constants.TASK_RECORD_FLAG);
+    public static boolean getTaskRecordFlag(){
+       return PropertyUtils.getBoolean(Constants.TASK_RECORD_FLAG,false);
     }
 
     /**
@@ -75,18 +62,18 @@ public class TaskRecordDao {
             return null;
         }
         String driver = "com.mysql.jdbc.Driver";
-        String url = conf.getString(Constants.TASK_RECORD_URL);
-        String username = conf.getString(Constants.TASK_RECORD_USER);
-        String password = conf.getString(Constants.TASK_RECORD_PWD);
+        String url = PropertyUtils.getString(Constants.TASK_RECORD_URL);
+        String username = PropertyUtils.getString(Constants.TASK_RECORD_USER);
+        String password = PropertyUtils.getString(Constants.TASK_RECORD_PWD);
         Connection conn = null;
         try {
             //classLoader，load driver
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {
-            logger.error("Exception ", e);
+            logger.error("Class not found Exception ", e);
         } catch (SQLException e) {
-            logger.error("Exception ", e);
+            logger.error("SQL Exception ", e);
         }
         return conn;
     }
@@ -163,14 +150,14 @@ public class TaskRecordDao {
             sql += getWhereString(filterMap);
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next()){
                 count = rs.getInt("count");
                 break;
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        } finally {
-            closeResource(rs, pstmt, conn);
+        }finally {
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return count;
     }
@@ -254,8 +241,8 @@ public class TaskRecordDao {
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        } finally {
-            closeResource(rs, pstmt, conn);
+        }finally {
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return recordList;
     }
@@ -290,30 +277,6 @@ public class TaskRecordDao {
                 return TaskRecordStatus.SUCCESS;
             }
 
-        }
-    }
-
-    private static void closeResource(ResultSet rs, PreparedStatement pstmt, Connection conn) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
         }
     }
 }

@@ -17,17 +17,18 @@
 package org.apache.dolphinscheduler.server.worker.task.python;
 
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -53,37 +54,29 @@ public class PythonTask extends AbstractTask {
   private PythonCommandExecutor pythonCommandExecutor;
 
   /**
-   * process service
+   * taskExecutionContext
    */
-  private ProcessService processService;
+  private TaskExecutionContext taskExecutionContext;
 
   /**
    * constructor
-   * @param taskProps task props
+   * @param taskExecutionContext taskExecutionContext
    * @param logger    logger
    */
-  public PythonTask(TaskProps taskProps, Logger logger) {
-    super(taskProps, logger);
-
-    this.taskDir = taskProps.getTaskDir();
+  public PythonTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
+    this.taskExecutionContext = taskExecutionContext;
 
     this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(),
-            taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
-            taskProps.getTenantCode(),
-            taskProps.getEnvFile(),
-            taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(),
+            taskExecutionContext,
             logger);
-    this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
 
   @Override
   public void init() {
-    logger.info("python task params {}", taskProps.getTaskParams());
+    logger.info("python task params {}", taskExecutionContext.getTaskParams());
 
-    pythonParameters = JSONUtils.parseObject(taskProps.getTaskParams(), PythonParameters.class);
+    pythonParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PythonParameters.class);
 
     if (!pythonParameters.checkParameters()) {
       throw new RuntimeException("python task params is not valid");
@@ -94,10 +87,15 @@ public class PythonTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       //  construct process
-      exitStatusCode = pythonCommandExecutor.run(buildCommand(), processService);
-    } catch (Exception e) {
+      CommandExecuteResult commandExecuteResult = pythonCommandExecutor.run(buildCommand());
+
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
+    }
+    catch (Exception e) {
       logger.error("python task failure", e);
-      exitStatusCode = -1;
+      setExitStatusCode(Constants.EXIT_CODE_FAILURE);
       throw e;
     }
   }
@@ -116,14 +114,12 @@ public class PythonTask extends AbstractTask {
   private String buildCommand() throws Exception {
     String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
-    /**
-     *  combining local and global parameters
-     */
-    Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(),
+    // replace placeholder
+    Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+            taskExecutionContext.getDefinedParams(),
             pythonParameters.getLocalParametersMap(),
-            taskProps.getCmdTypeIfComplement(),
-            taskProps.getScheduleTime());
+            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+            taskExecutionContext.getScheduleTime());
     if (paramsMap != null){
       rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }

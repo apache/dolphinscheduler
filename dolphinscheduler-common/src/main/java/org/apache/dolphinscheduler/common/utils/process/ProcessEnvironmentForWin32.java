@@ -46,22 +46,23 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
         return (String) o;
     }
 
+    @Override
     public String put(String key, String value) {
         return super.put(validateName(key), validateValue(value));
     }
-
+    @Override
     public String get(Object key) {
         return super.get(nonNullString(key));
     }
-
+    @Override
     public boolean containsKey(Object key) {
         return super.containsKey(nonNullString(key));
     }
-
+    @Override
     public boolean containsValue(Object value) {
         return super.containsValue(nonNullString(value));
     }
-
+    @Override
     public String remove(Object key) {
         return super.remove(nonNullString(key));
     }
@@ -92,6 +93,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
                 public Entry<String,String> next() {
                     return new CheckedEntry(i.next());
                 }
+                @Override
                 public void remove() { i.remove();}
             };
         }
@@ -110,10 +112,14 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
         private final Collection<String> c;
         public CheckedValues(Collection<String> c) {this.c = c;}
         public int size()                  {return c.size();}
+        @Override
         public boolean isEmpty()           {return c.isEmpty();}
+        @Override
         public void clear()                {       c.clear();}
         public Iterator<String> iterator() {return c.iterator();}
+        @Override
         public boolean contains(Object o)  {return c.contains(nonNullString(o));}
+        @Override
         public boolean remove(Object o)    {return c.remove(nonNullString(o));}
     }
 
@@ -127,15 +133,15 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
         public boolean contains(Object o)  {return s.contains(nonNullString(o));}
         public boolean remove(Object o)    {return s.remove(nonNullString(o));}
     }
-
+    @Override
     public Set<String> keySet() {
         return new CheckedKeySet(super.keySet());
     }
-
+    @Override
     public Collection<String> values() {
         return new CheckedValues(super.values());
     }
-
+    @Override
     public Set<Entry<String,String>> entrySet() {
         return new CheckedEntrySet(super.entrySet());
     }

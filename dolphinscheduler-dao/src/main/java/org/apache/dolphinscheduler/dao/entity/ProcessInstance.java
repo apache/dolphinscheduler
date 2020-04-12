@@ -195,9 +195,9 @@ public class ProcessInstance {
     private Priority processInstancePriority;
 
     /**
-     * worker group id
+     * worker group
      */
-    private int workerGroupId;
+    private String workerGroup;
 
     /**
      * process timeout for warning
@@ -208,12 +208,6 @@ public class ProcessInstance {
      * tenant id
      */
     private int tenantId;
-
-    /**
-     * worker group name. for api.
-     */
-    @TableField(exist = false)
-    private String workerGroupName;
 
     /**
      * receivers for api
@@ -366,7 +360,7 @@ public class ProcessInstance {
     }
 
 
-    public boolean IsProcessInstanceStop(){
+    public boolean isProcessInstanceStop(){
         return this.state.typeIsFinished();
     }
 
@@ -507,7 +501,7 @@ public class ProcessInstance {
      * @return whether complement data
      */
     public boolean isComplementData(){
-        if(!StringUtils.isNotEmpty(this.historyCmd)){
+        if(StringUtils.isEmpty(this.historyCmd)){
             return false;
         }
         return historyCmd.startsWith(CommandType.COMPLEMENT_DATA.toString());
@@ -541,12 +535,12 @@ public class ProcessInstance {
         this.duration = duration;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public int getTimeout() {
@@ -564,14 +558,6 @@ public class ProcessInstance {
 
     public int getTenantId() {
         return this.tenantId ;
-    }
-
-    public String getWorkerGroupName() {
-        return workerGroupName;
-    }
-
-    public void setWorkerGroupName(String workerGroupName) {
-        this.workerGroupName = workerGroupName;
     }
 
     public String getReceivers() {
@@ -624,10 +610,9 @@ public class ProcessInstance {
                 ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
                 ", duration=" + duration +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
-                ", workerGroupName='" + workerGroupName + '\'' +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
                 '}';
@@ -635,8 +620,12 @@ public class ProcessInstance {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ProcessInstance that = (ProcessInstance) o;
 
