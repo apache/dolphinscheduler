@@ -69,8 +69,6 @@ public class TaskManager {
         return new DataxTask(taskExecutionContext, logger);
       case SQOOP:
         return new SqoopTask(taskExecutionContext, logger);
-      case CONDITIONS:
-        return new ConditionsTask(taskExecutionContext, logger);
       default:
         logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
         throw new IllegalArgumentException("not support task type");
