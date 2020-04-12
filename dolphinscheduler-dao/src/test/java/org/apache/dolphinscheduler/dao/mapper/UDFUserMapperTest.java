@@ -27,13 +27,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class UDFUserMapperTest {
 
     @Autowired
@@ -126,10 +130,6 @@ public class UDFUserMapperTest {
         udfUser.setUdfId(2);
         int update = udfUserMapper.updateById(udfUser);
         Assert.assertEquals(1, update);
-        udfUserMapper.deleteById(udfUser.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
-        userMapper.deleteById(user.getId());
-
     }
 
     /**
@@ -145,8 +145,6 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteById(udfUser.getId());
         Assert.assertEquals(1, delete);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
     }
 
     /**
@@ -159,7 +157,6 @@ public class UDFUserMapperTest {
         //query
         List<UDFUser> udfUserList = udfUserMapper.selectList(null);
         Assert.assertNotEquals(udfUserList.size(), 0);
-        userMapper.deleteById(udfUser.getId());
     }
 
     /**
@@ -175,9 +172,6 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUserId(user.getId());
         Assert.assertEquals(1, delete);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
-
     }
 
     /**
@@ -193,7 +187,5 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUdfFuncId(udfFunc.getId());
         Assert.assertEquals(1, delete);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
     }
 }

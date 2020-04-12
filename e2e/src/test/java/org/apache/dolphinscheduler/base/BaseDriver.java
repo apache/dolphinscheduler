@@ -19,14 +19,14 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import org.openqa.selenium.PageLoadStrategy;
 
 
 /**
@@ -83,6 +83,7 @@ public class BaseDriver {
      * start chrome browser
      */
     public void startBrowser() throws Exception {
+        System.out.println("===================test start===================");
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -100,9 +101,6 @@ public class BaseDriver {
         /* driver setting wait time */
         // implicitly wait time
         driver.manage().timeouts().implicitlyWait(implicitlyWait, TimeUnit.SECONDS);
-
-        // page load timeout
-        driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
 
         // page load timeout
         driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
@@ -141,12 +139,10 @@ public class BaseDriver {
      * close browser
      */
     public void closeBrowser() throws InterruptedException {
-        // JS Show a pop-up box to indicate the end of the test
-        Thread.sleep(TestConstant.ONE_THOUSANG);
-//        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
-        Thread.sleep(TestConstant.THREE_THOUSANG);
+        Thread.sleep(TestConstant.THREE_THOUSAND);
         if (driver != null) {
             driver.quit();
+            System.out.println("===================test end===================");
         }
     }
 }

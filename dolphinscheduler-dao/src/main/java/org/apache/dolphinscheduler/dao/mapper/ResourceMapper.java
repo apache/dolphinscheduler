@@ -30,12 +30,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * query resource list
-     * @param alias alias
+     * @param fullName full name
      * @param userId userId
      * @param type type
      * @return resource list
      */
-    List<Resource> queryResourceList(@Param("alias") String alias,
+    List<Resource> queryResourceList(@Param("fullName") String fullName,
                                      @Param("userId") int userId,
                                      @Param("type") int type);
 
@@ -43,22 +43,27 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * query resource list
      * @param userId userId
      * @param type type
+     * @param perm perm
      * @return resource list
      */
     List<Resource> queryResourceListAuthored(
                                      @Param("userId") int userId,
-                                     @Param("type") int type);
+                                     @Param("type") int type,
+                                     @Param("perm") int perm);
+
 
     /**
      * resource page
      * @param page page
-     * @param userId query all if 0, then query the authed resources
+     * @param userId userId
+     * @param id id
      * @param type type
      * @param searchVal searchVal
-     * @return resource list
+     * @return resource page
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
                                         @Param("userId") int userId,
+                                        @Param("id") int id,
                                         @Param("type") int type,
                                         @Param("searchVal") String searchVal);
 
@@ -76,19 +81,67 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      */
     List<Resource> queryResourceExceptUserId(@Param("userId") int userId);
 
-
     /**
      * query tenant code by name
      * @param resName resource name
+     * @param resType resource type
      * @return tenant code
      */
-    String queryTenantCodeByResourceName(@Param("resName") String resName);
+    String queryTenantCodeByResourceName(@Param("resName") String resName,@Param("resType") int resType);
 
     /**
      * list authorized resource
      * @param userId userId
-     * @param resNames resource names
+     * @param resNames resNames
+     * @param <T> T
      * @return resource list
      */
     <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
+
+
+
+    /**
+     * list authorized resource
+     * @param userId userId
+     * @param resIds resIds
+     * @param <T> T
+     * @return resource list
+     */
+    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
+
+    /**
+     * delete resource by id array
+     * @param resIds resource id array
+     * @return delete num
+     */
+    int deleteIds(@Param("resIds")Integer[] resIds);
+
+    /**
+     * list children
+     * @param direcotyId directory id
+     * @return resource id array
+     */
+    List<Integer> listChildren(@Param("direcotyId") int direcotyId);
+
+    /**
+     * query resource by full name or pid
+     * @param fullName  full name
+     * @param type      resource type
+     * @return resource
+     */
+    List<Resource> queryResource(@Param("fullName") String fullName,@Param("type") int type);
+
+    /**
+     * list resource by id array
+     * @param resIds resource id array
+     * @return resource list
+     */
+    List<Resource> listResourceByIds(@Param("resIds")Integer[] resIds);
+
+    /**
+     * update resource
+     * @param resourceList  resource list
+     * @return update num
+     */
+    int batchUpdateResource(@Param("resourceList") List<Resource> resourceList);
 }

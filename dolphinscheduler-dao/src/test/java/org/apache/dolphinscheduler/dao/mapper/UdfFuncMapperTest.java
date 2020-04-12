@@ -170,9 +170,7 @@ public class UdfFuncMapperTest {
         udfFunc.setUpdateTime(new Date());
         //update
         int update = udfFuncMapper.updateById(udfFunc);
-        udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertEquals(1, update);
-
     }
 
     /**
@@ -197,7 +195,6 @@ public class UdfFuncMapperTest {
         //query
         List<UdfFunc> udfFuncList = udfFuncMapper.selectList(null);
         Assert.assertNotEquals(udfFuncList.size(), 0);
-        udfFuncMapper.deleteById(udfFunc.getId());
     }
 
     /**
@@ -213,8 +210,6 @@ public class UdfFuncMapperTest {
         //queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray,"");
         Assert.assertNotEquals(udfFuncList.size(), 0);
-        udfFuncMapper.deleteById(udfFunc.getId());
-        udfFuncMapper.deleteById(udfFunc1.getId());
     }
 
     /**
@@ -229,8 +224,6 @@ public class UdfFuncMapperTest {
         //queryUdfFuncPaging
         Page<UdfFunc> page = new Page(1,3);
         IPage<UdfFunc> udfFuncIPage = udfFuncMapper.queryUdfFuncPaging(page,user.getId(),"");
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertNotEquals(udfFuncIPage.getTotal(), 0);
 
     }
@@ -246,8 +239,6 @@ public class UdfFuncMapperTest {
         UdfFunc udfFunc = insertOne(user);
         //getUdfFuncByType
         List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(user.getId(), udfFunc.getType().ordinal());
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
         Assert.assertNotEquals(udfFuncList.size(), 0);
 
     }
@@ -264,10 +255,6 @@ public class UdfFuncMapperTest {
         UdfFunc udfFunc1 = insertOne(user1);
         UdfFunc udfFunc2 = insertOne(user2);
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfFuncExceptUserId(user1.getId());
-        userMapper.deleteById(user1.getId());
-        userMapper.deleteById(user2.getId());
-        udfFuncMapper.deleteById(udfFunc1.getId());
-        udfFuncMapper.deleteById(udfFunc2.getId());
         Assert.assertNotEquals(udfFuncList.size(), 0);
 
     }
@@ -287,9 +274,6 @@ public class UdfFuncMapperTest {
         UDFUser udfUser = insertOneUDFUser(user, udfFunc);
         //queryAuthedUdfFunc
         List<UdfFunc> udfFuncList = udfFuncMapper.queryAuthedUdfFunc(user.getId());
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
-        udfUserMapper.deleteById(udfUser.getId());
         Assert.assertNotEquals(udfFuncList.size(), 0);
     }
 

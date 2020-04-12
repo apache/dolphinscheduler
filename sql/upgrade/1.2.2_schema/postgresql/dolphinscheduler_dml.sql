@@ -14,3 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+UPDATE t_ds_resources SET pid=-1,is_directory=false WHERE pid IS NULL;
+UPDATE t_ds_resources SET full_name = concat('/',alias) WHERE pid=-1 and full_name IS NULL;

@@ -67,7 +67,7 @@ public class OSUtilsTest {
     @Test
     public void cpuUsage() throws Exception {
         logger.info("cpuUsage : {}", OSUtils.cpuUsage());
-        Thread.sleep(1000l);
+        Thread.sleep(1000L);
         logger.info("cpuUsage : {}", OSUtils.cpuUsage());
 
         double cpuUsage = OSUtils.cpuUsage();

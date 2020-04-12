@@ -119,7 +119,7 @@ public class UdfFuncService extends BaseService{
         }
         udf.setDescription(desc);
         udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getAlias());
+        udf.setResourceName(resource.getFullName());
         udf.setType(type);
 
         udf.setCreateTime(now);
@@ -223,7 +223,7 @@ public class UdfFuncService extends BaseService{
         }
         udf.setDescription(desc);
         udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getAlias());
+        udf.setResourceName(resource.getFullName());
         udf.setType(type);
 
         udf.setUpdateTime(now);

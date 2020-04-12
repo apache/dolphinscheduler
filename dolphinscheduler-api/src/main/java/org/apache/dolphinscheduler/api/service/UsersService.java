@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -23,15 +25,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * user service
@@ -71,6 +69,9 @@ public class UsersService extends BaseService {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
 
     /**
@@ -481,23 +482,71 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        String[] resourceFullIdArr = resourceIds.split(",");
+        // need authorize resource id set
+        Set<Integer> needAuthorizeResIds = new HashSet();
+        for (String resourceFullId : resourceFullIdArr) {
+            String[] resourceIdArr = resourceFullId.split("-");
+            for (int i=0;i<=resourceIdArr.length-1;i++) {
+                int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                needAuthorizeResIds.add(resourceIdValue);
+            }
+        }
+
+        //get the authorized resource id list by user id
+        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+
+        //get the unauthorized resource id list
+        oldAuthorizedResIds.removeAll(needAuthorizeResIds);
+
+        if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
+
+            // get all resource id of process definitions those is released
+            List<Map<String, Object>> list = processDefinitionMapper.listResources();
+            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Set<Integer> resourceIdSet = resourceProcessMap.keySet();
+
+            resourceIdSet.retainAll(oldAuthorizedResIds);
+            if (CollectionUtils.isNotEmpty(resourceIdSet)) {
+                logger.error("can't be deleted,because it is used of process definition");
+                for (Integer resId : resourceIdSet) {
+                    logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+                }
+                putMsg(result, Status.RESOURCE_IS_USED);
+                return result;
+            }
+
+        }
+
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
         }
 
-        String[] resourcesIdArr = resourceIds.split(",");
+        for (int resourceIdValue : needAuthorizeResIds) {
+            Resource resource = resourceMapper.selectById(resourceIdValue);
+            if (resource == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
 
-        for (String resourceId : resourcesIdArr) {
             Date now = new Date();
             ResourcesUser resourcesUser = new ResourcesUser();
             resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(Integer.parseInt(resourceId));
-            resourcesUser.setPerm(7);
+            resourcesUser.setResourcesId(resourceIdValue);
+            if (resource.isDirectory()) {
+                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
+            }else{
+                resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            }
+
             resourcesUser.setCreateTime(now);
             resourcesUser.setUpdateTime(now);
             resourcesUserMapper.insert(resourcesUser);
+
         }
 
         putMsg(result, Status.SUCCESS);

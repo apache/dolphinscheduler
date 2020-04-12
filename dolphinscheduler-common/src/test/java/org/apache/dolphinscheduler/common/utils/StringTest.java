@@ -24,12 +24,6 @@ import java.util.List;
 
 public class StringTest {
 
-
-    @Test
-    public void test1(){
-        System.out.println(String.format("%s_%010d_%010d", String.valueOf(1), Long.valueOf(3), Integer.valueOf(4)));
-    }
-
     @Test
     public void stringCompareTest(){
 
