@@ -110,15 +110,6 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('Worker group manage')}`,
-      id: 4,
-      path: 'worker-groups-manage',
-      isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-diary',
-      children: []
-    },
-    {
       name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token-manage',
@@ -148,13 +139,13 @@ let menu = {
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
-          path: 'resource-udf-resource',
+          path: 'resource-udf',
           id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
-          path: 'resource-udf-function',
+          path: 'resource-func',
           id: 1,
           disabled: true
         }

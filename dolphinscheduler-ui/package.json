@@ -11,7 +11,8 @@
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
-    "ans-ui": "1.1.7",
+    "@riophae/vue-treeselect": "^0.4.0",
+    "ans-ui": "1.1.9",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
     "canvg": "1.5.1",

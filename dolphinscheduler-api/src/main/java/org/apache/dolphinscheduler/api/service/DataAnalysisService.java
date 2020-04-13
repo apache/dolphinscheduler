@@ -29,8 +29,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -318,9 +316,8 @@ public class DataAnalysisService extends BaseService{
             return result;
         }
 
-        ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        List<String> tasksQueueList = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-        List<String> tasksKillList = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_KILL);
+        List<String> tasksQueueList = new ArrayList<>();
+        List<String> tasksKillList = new ArrayList<>();
 
         Map<String,Integer> dataMap = new HashMap<>();
         if (loginUser.getUserType() == UserType.ADMIN_USER){
