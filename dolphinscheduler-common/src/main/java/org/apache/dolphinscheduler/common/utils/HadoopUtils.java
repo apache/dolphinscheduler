@@ -45,6 +45,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
+
 /**
  * hadoop utils
  * single instance
@@ -52,6 +54,10 @@ import java.util.stream.Stream;
 public class HadoopUtils implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
+
+    private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
+    public static final String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+
 
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
@@ -65,10 +71,10 @@ public class HadoopUtils implements Closeable {
                 }
             });
 
+    private static volatile boolean yarnEnabled = false;
+
     private Configuration configuration;
     private FileSystem fs;
-
-    private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
 
     private HadoopUtils() {
         init();
@@ -83,9 +89,9 @@ public class HadoopUtils implements Closeable {
     /**
      * init dolphinscheduler root path in hdfs
      */
+
     private void initHdfsPath() {
-        String hdfsPath = PropertyUtils.getString(Constants.DATA_STORE_2_HDFS_BASEPATH);
-        Path path = new Path(hdfsPath);
+        Path path = new Path(resourceUploadPath);
 
         try {
             if (!fs.exists(path)) {
@@ -104,11 +110,11 @@ public class HadoopUtils implements Closeable {
         try {
             configuration = new Configuration();
 
-            String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
+            String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
             ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
 
             if (resUploadType == ResUploadType.HDFS) {
-                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE)) {
+                if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)) {
                     System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
                             PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
                     configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
@@ -162,9 +168,17 @@ public class HadoopUtils implements Closeable {
 
             String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
             String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-            if (!StringUtils.isEmpty(rmHaIds)) {
+            //not use resourcemanager
+            if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)){
+                yarnEnabled = false;
+            } else if (!StringUtils.isEmpty(rmHaIds)) {
+                //resourcemanager HA enabled
                 appAddress = getAppAddress(appAddress, rmHaIds);
+                yarnEnabled = true;
                 logger.info("appAddress : {}", appAddress);
+            } else {
+                //single resourcemanager enabled
+                yarnEnabled = true;
             }
             configuration.set(Constants.YARN_APPLICATION_STATUS_ADDRESS, appAddress);
         } catch (Exception e) {
@@ -364,6 +378,13 @@ public class HadoopUtils implements Closeable {
         return fs.rename(new Path(src), new Path(dst));
     }
 
+    /**
+     * hadoop resourcemanager enabled or not
+     * @return result
+     */
+    public boolean isYarnEnabled()  {
+        return yarnEnabled;
+    }
 
     /**
      * get the state of an application
@@ -404,15 +425,15 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
+     * get data hdfs path
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
-        String basePath = PropertyUtils.getString(Constants.DATA_STORE_2_HDFS_BASEPATH);
-        if ("/".equals(basePath)) {
+        if ("/".equals(resourceUploadPath)) {
             // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
             return "";
         } else {
-            return basePath;
+            return resourceUploadPath;
         }
     }
 

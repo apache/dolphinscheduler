@@ -215,6 +215,23 @@
           })
         })
       },
+      /*
+        getAllLeaf
+       */
+      getAllLeaf (data) {
+        let result = []
+        let getLeaf = (data)=> {
+          data.forEach(item => {
+            if (item.children.length==0) {
+              result.push(item)
+            } else {
+              getLeaf(item.children)
+            }
+          })
+        }
+        getLeaf(data)
+        return result
+      },
       _authFile (item, i) { 
         this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getResourceList({
@@ -240,6 +257,15 @@
           })
           let fileTargetList = []
           let udfTargetList = []
+          
+          let pathId = []
+          data[1].forEach(v=>{
+            let arr = []
+            arr[0] = v
+            if(this.getAllLeaf(arr).length>0) {
+              pathId.push(this.getAllLeaf(arr)[0])
+            }
+          })
           data[1].forEach((value,index,array)=>{
             if(value.type =='FILE'){
               fileTargetList.push(value)

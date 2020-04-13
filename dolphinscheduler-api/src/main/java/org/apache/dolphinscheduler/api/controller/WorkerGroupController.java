@@ -27,6 +27,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,7 +47,6 @@ import java.util.Map;
 public class WorkerGroupController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupController.class);
-
 
     @Autowired
     WorkerGroupService workerGroupService;
@@ -135,6 +136,7 @@ public class WorkerGroupController extends BaseController{
                 loginUser.getUserName() );
 
         try {
+
             Map<String, Object> result = workerGroupService.queryAllGroup();
             return returnDataList(result);
         }catch (Exception e){
