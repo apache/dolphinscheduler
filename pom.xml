@@ -694,6 +694,7 @@
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <include>**/api/enums/testGetEnum.java</include>
                         <include>**/api/enums/StatusTest.java</include>
+                        <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
                         <include>**/api/security/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigTest.java</include>
@@ -726,6 +727,7 @@
                         <include>**/api/utils/FileUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
+                        <include>**/api/utils/ResultTest.java</include>
                         <include>**/common/graph/DAGTest.java</include>
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
