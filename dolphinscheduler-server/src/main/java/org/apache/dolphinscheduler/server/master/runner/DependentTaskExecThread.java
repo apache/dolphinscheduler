@@ -213,6 +213,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         DependResult result = DependentUtils.getDependResultForRelation(
                 this.dependentParameters.getRelation(), dependResultList
         );
+        logger.info("dependent task completed, dependent result:{}", result.toString());
         return result;
     }
 }
