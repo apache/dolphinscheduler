@@ -94,7 +94,7 @@ public class TaskInstanceController extends BaseController{
 
         try{
             logger.info("login user {}, query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
-                    loginUser, projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
+                    loginUser.getUserName(), projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                     loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);

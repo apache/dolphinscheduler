@@ -77,7 +77,7 @@ public class TaskRecordController extends BaseController{
 
    try{
         logger.info("login user {}, query task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
-                loginUser, taskName, state,  taskDate, startTime, endTime);
+                loginUser.getUserName(), taskName, state,  taskDate, startTime, endTime);
         Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(false, taskName, startTime,  taskDate, sourceTable, destTable, endTime,state, pageNo, pageSize);
         return returnDataListPaging(result);
     }catch (Exception e){
@@ -118,7 +118,7 @@ public class TaskRecordController extends BaseController{
 
         try{
             logger.info("login user {}, query hisotry task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
-                    loginUser, taskName, state,  taskDate, startTime, endTime);
+                    loginUser.getUserName(), taskName, state,  taskDate, startTime, endTime);
             Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(true, taskName, startTime,  taskDate, sourceTable, destTable, endTime,state, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
