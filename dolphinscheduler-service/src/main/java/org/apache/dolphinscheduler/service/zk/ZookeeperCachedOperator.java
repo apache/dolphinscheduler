@@ -20,6 +20,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,13 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     private final Logger logger = LoggerFactory.getLogger(ZookeeperCachedOperator.class);
 
 
-    TreeCache treeCache;
+    private TreeCache treeCache;
     /**
      * register a unified listener of /${dsRoot},
      */
     @Override
     protected void registerListener() {
-        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot());
+        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot() + "/nodes");
         logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
         try {
             treeCache.start();
@@ -70,6 +71,10 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
 
     public TreeCache getTreeCache(final String cachePath) {
         return treeCache;
+    }
+
+    public void addListener(TreeCacheListener listener){
+        this.treeCache.getListenable().addListener(listener);
     }
 
     @Override

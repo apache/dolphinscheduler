@@ -150,3 +150,133 @@ d//
 delimiter ;
 select ac_dolphin_T_t_ds_process_definition_A_resource_ids();
 DROP FUNCTION ac_dolphin_T_t_ds_process_definition_A_resource_ids();
+
+
+-- ac_dolphin_T_t_ds_process_instance_A_worker_group
+delimiter ;
+DROP FUNCTION IF EXISTS ac_dolphin_T_t_ds_process_instance_A_worker_group();
+delimiter d//
+CREATE FUNCTION ac_dolphin_T_t_ds_process_instance_A_worker_group() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='worker_group')
+      THEN
+         ALTER TABLE t_ds_process_instance ADD COLUMN worker_group varchar(255) DEFAULT null;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select ac_dolphin_T_t_ds_process_instance_A_worker_group();
+DROP FUNCTION ac_dolphin_T_t_ds_process_instance_A_worker_group();
+
+-- dc_dolphin_T_t_ds_process_instance_D_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS dc_dolphin_T_t_ds_process_instance_D_worker_group_id();
+delimiter d//
+CREATE FUNCTION dc_dolphin_T_t_ds_process_instance_D_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_process_instance DROP COLUMN worker_group_id;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select dc_dolphin_T_t_ds_process_instance_D_worker_group_id();
+DROP FUNCTION dc_dolphin_T_t_ds_process_instance_D_worker_group_id();
+
+
+-- ac_dolphin_T_t_ds_task_instance_A_worker_group
+delimiter ;
+DROP FUNCTION IF EXISTS ac_dolphin_T_t_ds_task_instance_A_worker_group();
+delimiter d//
+CREATE FUNCTION ac_dolphin_T_t_ds_task_instance_A_worker_group() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='worker_group')
+      THEN
+         ALTER TABLE t_ds_task_instance ADD COLUMN worker_group varchar(255) DEFAULT null;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select ac_dolphin_T_t_ds_task_instance_A_worker_group();
+DROP FUNCTION ac_dolphin_T_t_ds_task_instance_A_worker_group();
+
+-- dc_dolphin_T_t_ds_task_instance_D_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS dc_dolphin_T_t_ds_task_instance_D_worker_group_id();
+delimiter d//
+CREATE FUNCTION dc_dolphin_T_t_ds_task_instance_D_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_task_instance DROP COLUMN worker_group_id;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select dc_dolphin_T_t_ds_task_instance_D_worker_group_id();
+DROP FUNCTION dc_dolphin_T_t_ds_task_instance_D_worker_group_id();
+
+-- ac_dolphin_T_t_ds_schedules_A_worker_group
+delimiter ;
+DROP FUNCTION IF EXISTS ac_dolphin_T_t_ds_schedules_A_worker_group();
+delimiter d//
+CREATE FUNCTION ac_dolphin_T_t_ds_schedules_A_worker_group() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_schedules'
+          AND COLUMN_NAME ='worker_group')
+      THEN
+         ALTER TABLE t_ds_schedules ADD COLUMN worker_group varchar(255) DEFAULT null;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select ac_dolphin_T_t_ds_schedules_A_worker_group();
+DROP FUNCTION ac_dolphin_T_t_ds_schedules_A_worker_group();
+
+-- dc_dolphin_T_t_ds_schedules_D_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS dc_dolphin_T_t_ds_schedules_D_worker_group_id();
+delimiter d//
+CREATE FUNCTION dc_dolphin_T_t_ds_schedules_D_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_schedules'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_schedules DROP COLUMN worker_group_id;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select dc_dolphin_T_t_ds_schedules_D_worker_group_id();
+DROP FUNCTION dc_dolphin_T_t_ds_schedules_D_worker_group_id();
+
+

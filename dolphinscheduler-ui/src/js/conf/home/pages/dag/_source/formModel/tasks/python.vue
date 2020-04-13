@@ -28,12 +28,15 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <m-resources
-                ref="refResources"
-                @on-resourcesData="_onResourcesData"
-                @on-cache-resourcesData="_onCacheResourcesData"
-                :resource-list="resourceList">
-        </m-resources>
+        <treeselect v-model="resourceList" :multiple="true" :options="resourceOptions" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
+        <!-- <m-resources
+            ref="refResources"
+            @on-resourcesData="_onResourcesData"
+            @on-cache-resourcesData="_onCacheResourcesData"
+            :resource-list="resourceList">
+        </m-resources> -->
       </div>
     </m-list-box>
 
@@ -56,6 +59,8 @@
   import mListBox from './_source/listBox'
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
@@ -65,6 +70,7 @@
     name: 'python',
     data () {
       return {
+        valueConsistsOf: 'LEAF_PRIORITY',
         // script
         rawScript: '',
         // Custom parameter
@@ -72,7 +78,8 @@
         // resource(list)
         resourceList: [],
         // Cache ResourceList
-        cacheResourceList: []
+        cacheResourceList: [],
+        resourceOptions: [],
       }
     },
     mixins: [disabledState],
@@ -147,6 +154,18 @@
         editor.setValue(this.rawScript)
 
         return editor
+      },
+      diGuiTree(item) {  // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
+            this.operationTree(item) : this.diGuiTree(item.children);
+        })
+      },
+      operationTree(item) {
+        if(item.dirctory) {
+          item.isDisabled =true
+        }
+        delete item.children
       }
     },
     watch: {
@@ -166,6 +185,9 @@
       }
     },
     created () {
+      let item = this.store.state.dag.resourcesListS
+      this.diGuiTree(item)
+      this.options = item
       let o = this.backfillItem
 
       // Non-null objects represent backfill

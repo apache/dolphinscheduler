@@ -55,7 +55,7 @@ public class MailUtils {
 
     public static final Boolean MAIL_USE_SSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String XLS_FILE_PATH = PropertyUtils.getString(Constants.XLS_FILE_PATH);
+    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
 
     public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
@@ -261,8 +261,8 @@ public class MailUtils {
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
         // make excel file
-        ExcelUtils.genExcelFile(content,title, XLS_FILE_PATH);
-        File file = new File(XLS_FILE_PATH + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        ExcelUtils.genExcelFile(content,title, xlsFilePath);
+        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
         // add components to collection
