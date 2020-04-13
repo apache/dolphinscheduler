@@ -29,13 +29,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
         excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
                 pattern = "org.apache.dolphinscheduler.server.*"))
-
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
     System.setProperty("spring.profiles.active","api");
     SpringApplication.run(ApiApplicationServer.class, args);
   }
-
 
 }
