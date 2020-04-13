@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.QueryType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
@@ -24,10 +25,9 @@ import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParamete
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,17 +41,17 @@ public class MysqlSourceGenerator implements ISourceGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters) {
+    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
         StringBuilder result = new StringBuilder();
         try {
             SourceMysqlParameter sourceMysqlParameter
                     = JSONUtils.parseObject(sqoopParameters.getSourceParams(),SourceMysqlParameter.class);
 
+            SqoopTaskExecutionContext sqoopTaskExecutionContext = taskExecutionContext.getSqoopTaskExecutionContext();
+
             if(sourceMysqlParameter != null){
-                ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
-                DataSource dataSource= processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
-                BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
-                        dataSource.getConnectionParams());
+                BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.of(sqoopTaskExecutionContext.getSourcetype()),
+                        sqoopTaskExecutionContext.getSourceConnectionParams());
                 if(baseDataSource != null){
                     result.append(" --connect ")
                             .append(baseDataSource.getJdbcUrl())
