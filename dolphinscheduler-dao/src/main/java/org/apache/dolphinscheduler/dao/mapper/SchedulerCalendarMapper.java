@@ -16,7 +16,9 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.dolphinscheduler.dao.entity.SchedulerCalendar;
 import org.apache.ibatis.annotations.Param;
@@ -45,6 +47,10 @@ public interface SchedulerCalendarMapper extends BaseMapper<SchedulerCalendar> {
      * @return Calendar list
      */
     List<SchedulerCalendar> queryByCalendarName(@Param("name") String name);
+
+
+
+    Map<String, Date> queryMap();
 
 
 

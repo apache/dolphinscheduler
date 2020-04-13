@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.dolphinscheduler.api.dto.CalendarParam;
@@ -64,6 +65,7 @@ public class SchedulerCalendarService extends BaseService{
 
   @Autowired
   private SchedulerCalendarMapper schedulerCalendarMapper;
+
   @Autowired
   private SchedulerCalendarDetailsMapper schedulerCalendarDetailsMapper;
 
@@ -120,15 +122,15 @@ public class SchedulerCalendarService extends BaseService{
     calendar.setCreateTime(now);
     calendar.setUpdateTime(now);
 
-
+    // save
+    schedulerCalendarMapper.insert(calendar);
 
 
    boolean detailStatus = doDetailsInfo(calendar,calendarParam);
 
    if( detailStatus ){
 
-     // save
-     schedulerCalendarMapper.insert(calendar);
+
 
      putMsg(result, Status.SUCCESS);
      result.put(Constants.MSG, Status.SUCCESS.getMsg());
@@ -428,12 +430,12 @@ public class SchedulerCalendarService extends BaseService{
             && null != calendarParam.getStartTime()
             && null != calendarParam.getEndTime()){
 
-      Map<Integer,Object> extDateMap = new HashMap<>();
+      Map<Date,Object> extDateMap = new HashMap<>();
 
-      List<Integer> extList = calendarParam.getExtTime();
+      List<Date> extList = calendarParam.getExtTime();
 
       if(null != extList && extList.size()>0){
-        for (Integer key : extList){
+        for (Date key : extList){
           extDateMap.put(key,null);
         }
       }
@@ -442,15 +444,13 @@ public class SchedulerCalendarService extends BaseService{
       schedulerCalendarDetailsMapper.clearByCalendarId(calendar.getId());
 
       //Gets the list<Integer>  days from the start date to the end date
-      List<Integer> days  =  getDays(calendarParam.getStartTime(),calendarParam.getEndTime());
+      List<Date> days  =  getDays(calendarParam.getStartTime(),calendarParam.getEndTime());
 
       //insert details
       if(null != days && days.size()>0){
 
         SchedulerCalendarDetails schedulerCalendarDetails = null ;
-        for (Integer day : days){
-
-
+        for (Date day : days){
 
           schedulerCalendarDetails = new SchedulerCalendarDetails();
           schedulerCalendarDetails.setCalendarId(calendar.getId());
@@ -460,9 +460,9 @@ public class SchedulerCalendarService extends BaseService{
           schedulerCalendarDetails.setStamp(day);
 
           if(extDateMap.containsKey(day)){
-            schedulerCalendarDetails.setFlag(Flag.YES);
-          }else{
             schedulerCalendarDetails.setFlag(Flag.NO);
+          }else{
+            schedulerCalendarDetails.setFlag(Flag.YES);
           }
 
           schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
@@ -488,10 +488,10 @@ public class SchedulerCalendarService extends BaseService{
    *            结束日期
    * @return
    */
-  public static List<Integer> getDays(Date startTime, Date endTime) {
+  public static List<Date> getDays(Date startTime, Date endTime) {
 
     // 返回的日期集合
-    List<Integer> days = new ArrayList<Integer>();
+    List<Date> days = new ArrayList<Date>();
 
     try {
 
@@ -512,8 +512,7 @@ public class SchedulerCalendarService extends BaseService{
       // 日期加1(包含结束)
       tempEnd.add(Calendar.DATE, +1);
       while (tempStart.before(tempEnd)) {
-        String dateTime =  DateUtils.format(tempStart.getTime(),"yyyyMMdd");
-        days.add(Integer.valueOf(dateTime) );
+        days.add(tempStart.getTime()) ;
         tempStart.add(Calendar.DAY_OF_YEAR, 1);
       }
 
@@ -523,6 +522,5 @@ public class SchedulerCalendarService extends BaseService{
 
     return days;
   }
-
 
 }

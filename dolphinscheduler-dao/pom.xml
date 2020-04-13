@@ -156,5 +156,12 @@
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.yss.henghe.platform.tools</groupId>
+			<artifactId>SourceCodeConstraint</artifactId>
+			<version>1.0-RELEASE</version>
+		</dependency>
+
 	</dependencies>
 </project>

@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -50,6 +51,10 @@ import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 public class SchedulerCalendarControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(SchedulerCalendarControllerTest.class);
 
+    private static Date dateOf(int y, int m, int d) {
+        DateTime dt = new DateTime(y, m, d, 0, 0, 0);
+        return dt.toDate();
+    }
 
     @Test
     public void testCreateCalendar() throws Exception {
@@ -58,11 +63,14 @@ public class SchedulerCalendarControllerTest extends AbstractControllerTest{
         map.put("startTime","20200401");
         map.put("endTime","20200410");
 
-        List list = new LinkedList<Integer>();
-        list.add(20200401);
-        list.add(20200402);
-        list.add(20200403);
-        list.add(20200404);
+        List list = new LinkedList<Date>();
+        list.add(dateOf(2020, 4, 1));
+        list.add(dateOf(2020, 4, 2));
+        list.add(dateOf(2020, 4, 3));
+        list.add(dateOf(2020, 4, 4));
+        list.add(dateOf(2020, 4, 5));
+        list.add(dateOf(2020, 4, 6));
+
 
         map.put("extTime",list);
 

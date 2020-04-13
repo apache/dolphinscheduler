@@ -37,4 +37,13 @@
         where calendar_id = #{calendarId}
     </delete>
 
+    <select id="queryMap" resultType="java.util.Map">
+        select t2.id, t2.name, t1.stamp  from
+        ( select  calendar_id,     stamp from   t_yss_calendar_details where  flag = '1' ) t1
+        left join
+        (select id, name from t_yss_calendar where release_state ='1' ) t2
+        on  t1.calendar_id  = t2.id
+    </select>
+
+
 </mapper>

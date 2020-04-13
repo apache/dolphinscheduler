@@ -18,13 +18,18 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 /**
  * schedule parameters
  */
+@SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class ScheduleParam {
   private Date startTime;
   private Date endTime;
   private String crontab;
+  private String schedulerCalendar;
+
 
   public ScheduleParam() {
   }
@@ -33,6 +38,13 @@ public class ScheduleParam {
     this.startTime = startTime;
     this.endTime = endTime;
     this.crontab = crontab;
+  }
+
+  public ScheduleParam(Date startTime, Date endTime, String crontab , String schedulerCalendar) {
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.crontab = crontab;
+    this.schedulerCalendar = schedulerCalendar ;
   }
 
   public Date getStartTime() {
@@ -59,6 +71,13 @@ public class ScheduleParam {
     this.crontab = crontab;
   }
 
+  public String getSchedulerCalendar() {
+    return schedulerCalendar;
+  }
+
+  public void setSchedulerCalendar(String schedulerCalendar) {
+    this.schedulerCalendar = schedulerCalendar;
+  }
 
   @Override
   public String toString() {

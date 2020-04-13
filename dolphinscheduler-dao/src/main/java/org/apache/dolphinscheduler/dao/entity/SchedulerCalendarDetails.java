@@ -46,7 +46,7 @@ public class SchedulerCalendarDetails {
     /**
      *
      */
-    private int stamp;
+    private Date stamp;
 
 
     /**
@@ -90,11 +90,11 @@ public class SchedulerCalendarDetails {
         this.calendarId = calendarId;
     }
 
-    public int getStamp() {
+    public Date getStamp() {
         return stamp;
     }
 
-    public void setStamp(int stamp) {
+    public void setStamp(Date stamp) {
         this.stamp = stamp;
     }
 

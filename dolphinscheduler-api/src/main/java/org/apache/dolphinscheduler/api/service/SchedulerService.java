@@ -35,7 +35,10 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.provider.CalendarProviderImpl;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -79,6 +82,11 @@ public class SchedulerService extends BaseService {
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+
+    @Autowired
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
+    CalendarProviderImpl calendarProviderImpl;
+
     /**
      * save schedule
      *
@@ -97,6 +105,7 @@ public class SchedulerService extends BaseService {
      * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
     public Map<String, Object> insertSchedule(User loginUser, String projectName,
                                               Integer processDefineId,
                                               String schedule,
@@ -146,7 +155,9 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
             return result;
         }
+
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        scheduleObj.setSchedulerCalendar(scheduleParam.getSchedulerCalendar());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
         scheduleObj.setFailureStrategy(failureStrategy);
@@ -158,6 +169,10 @@ public class SchedulerService extends BaseService {
         scheduleObj.setProcessInstancePriority(processInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
         scheduleMapper.insert(scheduleObj);
+
+        // reload   calendarProvider start :  update by zhanglong   2020年04月13日14:36:37
+        calendarProviderImpl.reload();
+        //reload   calendarProvider  end : update by zhanglong     2020年04月13日14:36:37
 
         /**
          * updateProcessInstance receivers and cc by process definition id
@@ -191,6 +206,7 @@ public class SchedulerService extends BaseService {
      * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
     public Map<String, Object> updateSchedule(User loginUser,
                                               String projectName,
                                               Integer id,
@@ -251,6 +267,7 @@ public class SchedulerService extends BaseService {
                 return result;
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            schedule.setSchedulerCalendar(scheduleParam.getSchedulerCalendar());
         }
 
         if (warningType != null) {
@@ -270,6 +287,12 @@ public class SchedulerService extends BaseService {
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.updateById(schedule);
+
+        // reload   calendarProvider start :  update by zhanglong   2020年04月13日14:36:37
+        calendarProviderImpl.reload();
+        //reload   calendarProvider  end : update by zhanglong     2020年04月13日14:36:37
+
+
 
         /**
          * updateProcessInstance recipients and cc by process definition ID
@@ -293,6 +316,7 @@ public class SchedulerService extends BaseService {
      * @return publish result code
      */
     @Transactional(rollbackFor = Exception.class)
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
     public Map<String, Object> setScheduleState(User loginUser,
                                                 String projectName,
                                                 Integer id,
@@ -371,6 +395,13 @@ public class SchedulerService extends BaseService {
         scheduleObj.setReleaseState(scheduleStatus);
 
         scheduleMapper.updateById(scheduleObj);
+
+        // reload   calendarProvider start :  update by zhanglong   2020年04月13日14:36:37
+        calendarProviderImpl.reload();
+        //reload   calendarProvider  end : update by zhanglong     2020年04月13日14:36:37
+
+
+
 
         try {
             switch (scheduleStatus) {
@@ -570,6 +601,11 @@ public class SchedulerService extends BaseService {
 
         int delete = scheduleMapper.deleteById(scheduleId);
 
+        // reload   calendarProvider start :  update by zhanglong   2020年04月13日14:36:37
+        calendarProviderImpl.reload();
+        //reload   calendarProvider  end : update by zhanglong     2020年04月13日14:36:37
+
+
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -605,5 +641,37 @@ public class SchedulerService extends BaseService {
         result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)));
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+
+    @SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
+    public Map<String, Object> insertScheduleBatch(User loginUser, String projectName, String processDefinitionIds, String schedule, WarningType warningType, int warningGroupId, FailureStrategy failureStrategy, String receivers, String receiversCc,
+            Priority processInstancePriority, String workerGroup) {
+
+        Map<String, Object> result = new HashMap<String, Object>(5);
+
+        if(null !=processDefinitionIds && processDefinitionIds.trim().length() > 0 ){
+            String [] ids = processDefinitionIds.split(",");
+
+            for (String id :ids ){
+                try {
+                    result = insertSchedule(loginUser,projectName,Integer.valueOf(id),schedule,warningType,warningGroupId,failureStrategy,receivers,receiversCc,processInstancePriority,workerGroup);
+                    if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                        return result;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }else {
+            putMsg(result, Status.DATA_IS_NULL, "processDefinitionIds");
+            return result;
+        }
+
+        return result;
+
+
     }
 }

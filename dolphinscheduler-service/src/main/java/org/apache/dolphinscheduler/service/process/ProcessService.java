@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.service.process;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
+import com.yss.henghe.platform.tools.calendar.CalendarProvider;
+import com.yss.henghe.platform.tools.calendar.CalendarUtil;
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -29,6 +33,7 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.service.provider.CalendarProviderImpl;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -37,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,6 +103,13 @@ public class ProcessService {
 
     @Autowired
     private  ProjectMapper projectMapper;
+
+
+    @Autowired
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
+    CalendarProviderImpl calendarProviderImpl;
+
+
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -1798,6 +1811,33 @@ public class ProcessService {
     public List<Resource> listResourceByIds(Integer[] resIds){
         return resourceMapper.listResourceByIds(resIds);
     }
+
+
+    /**
+     * @param schedule
+     * @return
+     */
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
+    public boolean ValidateSchedulerCalendar(Schedule schedule) {
+        boolean flag  = false ;
+
+        if(null == schedule.getSchedulerCalendar() || schedule.getSchedulerCalendar().isEmpty()  ){
+            flag  = true ;
+        }else{
+            try {
+                CalendarUtil.AST ast = CalendarUtil.parseCalendarExpression( schedule.getSchedulerCalendar());
+
+                flag = CalendarUtil.executeCalendarExpression(ast, calendarProviderImpl, new Date());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return flag;
+    }
+
 
 
 }

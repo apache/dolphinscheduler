@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -32,6 +34,7 @@ import java.util.Date;
  *
  */
 @TableName("t_ds_schedules")
+@SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class Schedule {
 
   @TableId(value="id", type=IdType.AUTO)
@@ -73,6 +76,9 @@ public class Schedule {
    * crontab expression
    */
   private String crontab;
+
+  @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
+  private String schedulerCalendar ;
 
   /**
    * failure strategy
@@ -172,6 +178,14 @@ public class Schedule {
 
   public void setCrontab(String crontab) {
     this.crontab = crontab;
+  }
+
+  public String getSchedulerCalendar() {
+    return schedulerCalendar;
+  }
+
+  public void setSchedulerCalendar(String schedulerCalendar) {
+    this.schedulerCalendar = schedulerCalendar;
   }
 
   public FailureStrategy getFailureStrategy() {

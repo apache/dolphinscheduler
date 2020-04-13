@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 
 /**
@@ -28,12 +29,13 @@ import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 public class CalendarParam {
   private Date startTime;
   private Date endTime;
-  private List<Integer> extTime;
+
+  private List<Date> extTime;
 
   public CalendarParam() {
   }
 
-  public CalendarParam(Date startTime, Date endTime, List<Integer> extTime) {
+  public CalendarParam(Date startTime, Date endTime, List<Date> extTime) {
     this.startTime = startTime;
     this.endTime = endTime;
     this.extTime = extTime;
@@ -55,11 +57,11 @@ public class CalendarParam {
     this.endTime = endTime;
   }
 
-  public List<Integer> getExtTime() {
+  public List<Date> getExtTime() {
     return extTime;
   }
 
-  public void setExtTime(List<Integer> extTime) {
+  public void setExtTime(List<Date> extTime) {
     this.extTime = extTime;
   }
 

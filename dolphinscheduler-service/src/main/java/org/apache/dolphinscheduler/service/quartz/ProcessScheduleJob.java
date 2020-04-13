@@ -35,6 +35,8 @@ import org.springframework.util.Assert;
 
 import java.util.Date;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 /**
  * process schedule job
  */
@@ -56,6 +58,7 @@ public class ProcessScheduleJob implements Job {
      * @throws JobExecutionException if there is an exception while executing the job.
      */
     @Override
+    @SourceCodeConstraint.RevisedBy(SourceCodeConstraint.Author.ZHANGLONG)
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
         Assert.notNull(getProcessService(), "please call init() method first");
@@ -89,6 +92,15 @@ public class ProcessScheduleJob implements Job {
             logger.warn("process definition does not exist in db or offline，need not to create command, projectId:{}, processId:{}", projectId, scheduleId);
             return;
         }
+
+        //--------------validate scheduler calendar start :  add by zhanglong   2020年04月13日10:36:09   ------------------
+
+        if(!getProcessService().ValidateSchedulerCalendar(schedule)){
+            return;
+        }
+
+        //--------------validate scheduler calendar  end  :   add by zhanglong   2020年04月13日10:36:09   ------------------
+
 
         Command command = new Command();
         command.setCommandType(CommandType.SCHEDULER);
