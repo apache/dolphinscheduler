@@ -57,4 +57,14 @@ public enum DbType {
     public String getDescp() {
         return descp;
     }
+
+
+    public static DbType of(int type){
+        for(DbType ty : values()){
+            if(ty.getCode() == type){
+                return ty;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
 }

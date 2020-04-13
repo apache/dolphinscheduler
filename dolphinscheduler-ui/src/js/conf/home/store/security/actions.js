@@ -490,10 +490,19 @@ export default {
     return new Promise((resolve, reject) => {
       io.get(`worker-group/all-groups`, payload, res => {
         let list = res.data
-        list.unshift({
-          id: -1,
-          name: 'Default'
-        })
+        if(list.length>0) {
+          list = list.map(item=>{
+            return {
+              id: item,
+              name: item
+            }
+          })
+        } else {
+          list.unshift({
+            id: 'default',
+            name: 'default'
+          })
+        }
         state.workerGroupsListAll = list
         resolve(list)
       }).catch(e => {

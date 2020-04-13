@@ -90,6 +90,6 @@ RUN chmod +x /root/checkpoint.sh && \
 RUN rm -rf /var/cache/apk/*
 
 #9. expose port
-EXPOSE 2181 2888 3888 5432 12345 50051 8888
+EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
 
 ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]
