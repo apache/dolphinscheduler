@@ -117,6 +117,9 @@ public class TaskPriorityQueueConsumer extends Thread{
         try {
             return dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
+            // if dispatch task error，set task status fail
+            processService.changeTaskState(ExecutionStatus.FAILURE,
+                    taskInstanceId);
             logger.error("execute exception", e);
             return false;
         }

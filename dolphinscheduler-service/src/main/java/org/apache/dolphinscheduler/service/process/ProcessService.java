@@ -1357,18 +1357,32 @@ public class ProcessService {
      * change task state
      * @param state state
      * @param endTime endTime
-     * @param taskInstId taskInstId
+     * @param taskInstanceId taskInstanceId
      */
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
-                                int taskInstId) {
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
+                                int taskInstanceId) {
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
+        saveTaskInstance(taskInstance);
+    }
+
+
+    /**
+     * change task state
+     * @param state state
+     * @param taskInstanceId taskInstanceId
+     */
+    public void changeTaskState(ExecutionStatus state,
+                                int taskInstanceId) {
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        taskInstance.setState(state);
+        taskInstance.setEndTime(new Date());
         saveTaskInstance(taskInstance);
     }
 
