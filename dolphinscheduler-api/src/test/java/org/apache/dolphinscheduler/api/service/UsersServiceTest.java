@@ -18,13 +18,16 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.avro.generic.GenericData;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
@@ -68,6 +71,8 @@ public class UsersServiceTest {
     private DataSourceUserMapper datasourceUserMapper;
     @Mock
     private AlertGroupMapper alertGroupMapper;
+    @Mock
+    private ResourceMapper resourceMapper;
 
     private String queueName ="UsersServiceTestQueue";
 
@@ -301,9 +306,13 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
+        when(resourceMapper.queryAuthorizedResourceList(1)).thenReturn(new ArrayList<Resource>());
+
+        when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         result = usersService.grantResources(loginUser, 1, resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
     }
 
 
@@ -476,11 +485,30 @@ public class UsersServiceTest {
         return user;
     }
 
-
+    /**
+     * get tenant
+     * @return tenant
+     */
     private Tenant getTenant(){
         Tenant tenant = new Tenant();
         tenant.setId(1);
         return tenant;
+    }
+
+    /**
+     * get resource
+     * @return resource
+     */
+    private Resource getResource(){
+
+        Resource resource = new Resource();
+        resource.setPid(-1);
+        resource.setUserId(1);
+        resource.setDescription("ResourcesServiceTest.jar");
+        resource.setAlias("ResourcesServiceTest.jar");
+        resource.setFullName("/ResourcesServiceTest.jar");
+        resource.setType(ResourceType.FILE);
+        return resource;
     }
 
 }

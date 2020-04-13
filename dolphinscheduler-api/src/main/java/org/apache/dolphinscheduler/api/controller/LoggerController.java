@@ -60,14 +60,14 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "queryLog", notes= "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "limit", value = "LIMIT", dataType ="Int", example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
     public Result queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                           @RequestParam(value = "taskInstId") int taskInstanceId,
+                           @RequestParam(value = "taskInstanceId") int taskInstanceId,
                            @RequestParam(value = "skipLineNum") int skipNum,
                            @RequestParam(value = "limit") int limit) {
         try {
@@ -91,12 +91,12 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "downloadTaskLog", notes= "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_ID",dataType = "Int", example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody
     public ResponseEntity downloadTaskLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam(value = "taskInstId") int taskInstanceId) {
+                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
         try {
             byte[] logBytes = loggerService.getLogBytes(taskInstanceId);
             return ResponseEntity

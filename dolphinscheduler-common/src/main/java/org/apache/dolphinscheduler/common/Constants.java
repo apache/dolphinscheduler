@@ -25,9 +25,45 @@ import java.util.regex.Pattern;
  * Constants
  */
 public final class Constants {
+
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
+
+    /**
+     * quartz config
+     */
+    public static final String ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS = "org.quartz.jobStore.driverDelegateClass";
+    public static final String ORG_QUARTZ_SCHEDULER_INSTANCENAME = "org.quartz.scheduler.instanceName";
+    public static final String ORG_QUARTZ_SCHEDULER_INSTANCEID = "org.quartz.scheduler.instanceId";
+    public static final String ORG_QUARTZ_SCHEDULER_MAKESCHEDULERTHREADDAEMON = "org.quartz.scheduler.makeSchedulerThreadDaemon";
+    public static final String ORG_QUARTZ_JOBSTORE_USEPROPERTIES = "org.quartz.jobStore.useProperties";
+    public static final String ORG_QUARTZ_THREADPOOL_CLASS = "org.quartz.threadPool.class";
+    public static final String ORG_QUARTZ_THREADPOOL_THREADCOUNT = "org.quartz.threadPool.threadCount";
+    public static final String ORG_QUARTZ_THREADPOOL_MAKETHREADSDAEMONS = "org.quartz.threadPool.makeThreadsDaemons";
+    public static final String ORG_QUARTZ_THREADPOOL_THREADPRIORITY = "org.quartz.threadPool.threadPriority";
+    public static final String ORG_QUARTZ_JOBSTORE_CLASS = "org.quartz.jobStore.class";
+    public static final String ORG_QUARTZ_JOBSTORE_TABLEPREFIX = "org.quartz.jobStore.tablePrefix";
+    public static final String ORG_QUARTZ_JOBSTORE_ISCLUSTERED = "org.quartz.jobStore.isClustered";
+    public static final String ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD = "org.quartz.jobStore.misfireThreshold";
+    public static final String ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL = "org.quartz.jobStore.clusterCheckinInterval";
+    public static final String ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK = "org.quartz.jobStore.acquireTriggersWithinLock";
+    public static final String ORG_QUARTZ_JOBSTORE_DATASOURCE = "org.quartz.jobStore.dataSource";
+    public static final String ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS = "org.quartz.dataSource.myDs.connectionProvider.class";
+
+    /**
+     * quartz config default value
+     */
+    public static final String QUARTZ_TABLE_PREFIX = "QRTZ_";
+    public static final String QUARTZ_MISFIRETHRESHOLD = "60000";
+    public static final String QUARTZ_CLUSTERCHECKININTERVAL = "5000";
+    public static final String QUARTZ_DATASOURCE = "myDs";
+    public static final String QUARTZ_THREADCOUNT = "25";
+    public static final String QUARTZ_THREADPRIORITY = "5";
+    public static final String QUARTZ_INSTANCENAME = "DolphinScheduler";
+    public static final String QUARTZ_INSTANCEID = "AUTO";
+    public static final String QUARTZ_ACQUIRETRIGGERSWITHINLOCK = "true";
+
     /**
      * common properties path
      */
@@ -56,9 +92,11 @@ public final class Constants {
 
 
     /**
-     * yarn.resourcemanager.ha.rm.idsfs.defaultFS
+     * yarn.resourcemanager.ha.rm.ids
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
+    public static final String YARN_RESOURCEMANAGER_HA_XX = "xx";
+
 
     /**
      * yarn.application.status.address
@@ -72,31 +110,25 @@ public final class Constants {
     public static final String HDFS_ROOT_USER = "hdfs.root.user";
 
     /**
-     * hdfs configuration
-     * data.store2hdfs.basepath
+     * hdfs/s3 configuration
+     * resource.upload.path
      */
-    public static final String DATA_STORE_2_HDFS_BASEPATH = "data.store2hdfs.basepath";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
 
     /**
-     * data.basedir.path
+     * data basedir path
      */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
-
-    /**
-     * data.download.basedir.path
-     */
-    public static final String DATA_DOWNLOAD_BASEDIR_PATH = "data.download.basedir.path";
-
-    /**
-     * process.exec.basepath
-     */
-    public static final String PROCESS_EXEC_BASEPATH = "process.exec.basepath";
 
     /**
      * dolphinscheduler.env.path
      */
     public static final String DOLPHINSCHEDULER_ENV_PATH = "dolphinscheduler.env.path";
 
+    /**
+     * environment properties default path
+     */
+    public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
 
     /**
      * python home
@@ -108,30 +140,38 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+
     /**
      * development.state
      */
     public static final String DEVELOPMENT_STATE = "development.state";
+    public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
-     * res.upload.startup.type
+     * string true
      */
-    public static final String RES_UPLOAD_STARTUP_TYPE = "res.upload.startup.type";
+    public static final String STRING_TRUE = "true";
 
     /**
-     * zookeeper quorum
+     * string false
      */
-    public static final String ZOOKEEPER_QUORUM = "zookeeper.quorum";
+    public static final String STRING_FALSE = "false";
+
+    /**
+     * resource storage type
+     */
+    public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/workers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
 
     /**
      * all servers directory registered in zookeeper
@@ -143,10 +183,6 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
-    /**
-     * WorkerServer lock directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "/lock/workers";
 
     /**
      * MasterServer failover directory registered in zookeeper
@@ -163,15 +199,16 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
-    /**
-     * need send warn times when master server or worker server failover
-     */
-    public static final int DOLPHINSCHEDULER_WARN_TIMES_FAILOVER = 3;
 
     /**
      * comma ,
      */
     public static final String COMMA = ",";
+
+    /**
+     * slash /
+     */
+    public static final String SLASH = "/";
 
     /**
      * COLON :
@@ -198,37 +235,6 @@ public final class Constants {
      */
     public static final String EQUAL_SIGN = "=";
 
-    /**
-     * ZOOKEEPER_SESSION_TIMEOUT
-     */
-    public static final String ZOOKEEPER_SESSION_TIMEOUT = "zookeeper.session.timeout";
-
-    public static final String ZOOKEEPER_CONNECTION_TIMEOUT = "zookeeper.connection.timeout";
-
-    public static final String ZOOKEEPER_RETRY_SLEEP = "zookeeper.retry.sleep";
-    public static final String ZOOKEEPER_RETRY_BASE_SLEEP = "zookeeper.retry.base.sleep";
-    public static final String ZOOKEEPER_RETRY_MAX_SLEEP = "zookeeper.retry.max.sleep";
-
-    public static final String ZOOKEEPER_RETRY_MAXTIME = "zookeeper.retry.maxtime";
-
-
-    public static final String MASTER_HEARTBEAT_INTERVAL = "master.heartbeat.interval";
-
-    public static final String MASTER_EXEC_THREADS = "master.exec.threads";
-
-    public static final String MASTER_EXEC_TASK_THREADS = "master.exec.task.number";
-
-
-    public static final String MASTER_COMMIT_RETRY_TIMES = "master.task.commit.retryTimes";
-
-    public static final String MASTER_COMMIT_RETRY_INTERVAL = "master.task.commit.interval";
-
-
-    public static final String WORKER_EXEC_THREADS = "worker.exec.threads";
-
-    public static final String WORKER_HEARTBEAT_INTERVAL = "worker.heartbeat.interval";
-
-    public static final String WORKER_FETCH_TASK_NUM = "worker.fetch.task.num";
 
     public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
 
@@ -237,21 +243,6 @@ public final class Constants {
     public static final String MASTER_MAX_CPULOAD_AVG = "master.max.cpuload.avg";
 
     public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
-
-
-    /**
-     * dolphinscheduler tasks queue
-     */
-    public static final String DOLPHINSCHEDULER_TASKS_QUEUE = "tasks_queue";
-
-    /**
-     * dolphinscheduler need kill tasks queue
-     */
-    public static final String DOLPHINSCHEDULER_TASKS_KILL = "tasks_kill";
-
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_ROOT = "zookeeper.dolphinscheduler.root";
-
-    public static final String SCHEDULER_QUEUE_IMPL = "dolphinscheduler.queue.impl";
 
 
     /**
@@ -346,26 +337,6 @@ public final class Constants {
 
 
     /**
-     * heartbeat threads number
-     */
-    public static final int DEFAUL_WORKER_HEARTBEAT_THREAD_NUM = 1;
-
-    /**
-     * heartbeat interval
-     */
-    public static final int DEFAULT_WORKER_HEARTBEAT_INTERVAL = 60;
-
-    /**
-     * worker fetch task number
-     */
-    public static final int DEFAULT_WORKER_FETCH_TASK_NUM = 1;
-
-    /**
-     * worker execute threads number
-     */
-    public static final int DEFAULT_WORKER_EXEC_THREAD_NUM = 10;
-
-    /**
      * master cpu load
      */
     public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
@@ -386,16 +357,6 @@ public final class Constants {
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
 
-    /**
-     * master execute threads number
-     */
-    public static final int DEFAULT_MASTER_EXEC_THREAD_NUM = 100;
-
-
-    /**
-     * default master concurrent task execute num
-     */
-    public static final int DEFAULT_MASTER_TASK_EXEC_NUM = 20;
 
     /**
      * default log cache rows num,output when reach the number
@@ -403,32 +364,10 @@ public final class Constants {
     public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
 
     /**
-     * log flush interval，output when reach the interval
+     * log flush interval?output when reach the interval
      */
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
 
-
-    /**
-     * default master heartbeat thread number
-     */
-    public static final int DEFAULT_MASTER_HEARTBEAT_THREAD_NUM = 1;
-
-
-    /**
-     * default master heartbeat interval
-     */
-    public static final int DEFAULT_MASTER_HEARTBEAT_INTERVAL = 60;
-
-    /**
-     * default master commit retry times
-     */
-    public static final int DEFAULT_MASTER_COMMIT_RETRY_TIMES = 5;
-
-
-    /**
-     * default master commit retry interval
-     */
-    public static final int DEFAULT_MASTER_COMMIT_RETRY_INTERVAL = 3000;
 
     /**
      * time unit secong to minutes
@@ -448,9 +387,9 @@ public final class Constants {
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
 
     /**
-     * task record configuration path
+     * datasource configuration path
      */
-    public static final String APPLICATION_PROPERTIES = "application.properties";
+    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
@@ -568,7 +507,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 7;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 5;
 
 
     /**
@@ -864,7 +803,7 @@ public final class Constants {
      */
     public static final String HIVE_CONF = "hiveconf:";
 
-    //flink 任务
+    //flink ??
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
@@ -899,26 +838,20 @@ public final class Constants {
 
     /**
      * data total
-     * 数据总数
      */
     public  static final String COUNT = "count";
 
     /**
      * page size
-     * 每页数据条数
      */
     public  static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
-     * 当前页码
      */
     public  static final String PAGE_NUMBER = "pageNo";
 
-    /**
-     * result
-     */
-    public static final String RESULT = "result";
+
 
     /**
      *
@@ -1001,10 +934,24 @@ public final class Constants {
      */
     public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
 
+    /**
+     * default worker group
+     */
+    public static final String DEFAULT_WORKER_GROUP = "default";
+
+    public static final Integer TASK_INFO_LENGTH = 5;
 
     /**
      * new
      * schedule time
      */
     public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
+    /**
+     * authorize writable perm
+     */
+    public static final int AUTHORIZE_WRITABLE_PERM=7;
+    /**
+     * authorize readable perm
+     */
+    public static final int AUTHORIZE_READABLE_PERM=4;
 }

@@ -24,7 +24,7 @@
            <li><span class="tab">{{$t('Complement range')}}：</span><span class="content" v-if="startupParam.commandParam && startupParam.commandParam.complementStartDate">{{startupParam.commandParam.complementStartDate}}-{{startupParam.commandParam.complementEndDate}}</span><span class="content" v-else>-</span></li>
            <li><span class="tab">{{$t('Failure Strategy')}}：</span><span class="content">{{startupParam.failureStrategy === 'END' ? $t('End') : $t('Continue')}}</span></li>
            <li><span class="tab">{{$t('Process priority')}}：</span><span class="content">{{startupParam.processInstancePriority}}</span></li>
-           <li><span class="tab">{{$t('Worker group')}}：</span><span class="content" v-if="workerGroupList.length">{{_rtWorkerGroupName(startupParam.workerGroupId)}}</span></li>
+           <li><span class="tab">{{$t('Worker group')}}：</span><span class="content" v-if="workerGroupList.length">{{_rtWorkerGroupName(startupParam.workerGroup)}}</span></li>
            <li><span class="tab">{{$t('Notification strategy')}}：</span><span class="content">{{_rtWarningType(startupParam.warningType)}}</span></li>
            <li><span class="tab">{{$t('Notification group')}}：</span><span class="content" v-if="notifyGroupList.length">{{_rtNotifyGroupName(startupParam.warningGroupId)}}</span></li>
            <li><span class="tab">{{$t('Recipient')}}：</span><span class="content">{{startupParam.receivers || '-'}}</span></li>

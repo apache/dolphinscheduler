@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -57,23 +58,25 @@ public class ConditionsTask extends AbstractTask {
     private TaskInstance taskInstance;
 
     /**
-     * processInstance
-     */
-    private ProcessInstance processInstance;
-
-    /**
      *
      */
     private Map<String, ExecutionStatus> completeTaskList = new ConcurrentHashMap<>();
 
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
     /**
      * constructor
+     * @param taskExecutionContext taskExecutionContext
      *
-     * @param taskProps task props
-     * @param logger    logger
+     * @param logger logger
      */
-    public ConditionsTask(TaskProps taskProps, Logger logger) {
-        super(taskProps, logger);
+    public ConditionsTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
@@ -82,9 +85,12 @@ public class ConditionsTask extends AbstractTask {
 
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
 
-        this.dependentParameters = JSONUtils.parseObject(this.taskProps.getDependence(), DependentParameters.class);
+        this.dependentParameters = JSONUtils.parseObject(taskExecutionContext.
+                getDependenceTaskExecutionContext()
+                .getDependence(),
+                DependentParameters.class);
 
-        this.taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstId());
+        this.taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
 
         if(taskInstance == null){
             throw new Exception("cannot find the task instance!");
@@ -99,7 +105,8 @@ public class ConditionsTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
 
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT,
+                taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         List<DependResult> modelResultList = new ArrayList<>();
