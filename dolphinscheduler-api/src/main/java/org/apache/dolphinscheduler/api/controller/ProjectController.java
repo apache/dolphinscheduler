@@ -261,7 +261,7 @@ public class ProjectController extends BaseController {
      * @param projectName project name
      * @return import result code
      */
-    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })

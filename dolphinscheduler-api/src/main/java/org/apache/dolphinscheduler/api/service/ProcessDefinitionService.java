@@ -189,13 +189,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition list
+     * query process definition list
      *
      * @param loginUser login user
      * @param projectName project name
      * @return definition list
      */
-    public Map<String, Object> queryProccessDefinitionList(User loginUser, String projectName) {
+    public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -215,7 +215,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition list paging
+     * query process definition list paging
      *
      * @param loginUser login user
      * @param projectName project name
@@ -257,7 +257,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processId process definition id
      * @return process definition detail
      */
-    public Map<String, Object> queryProccessDefinitionById(User loginUser, String projectName, Integer processId) {
+    public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
 
 
         Map<String, Object> result = new HashMap<>(5);
@@ -363,7 +363,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param name name
      * @return true if process definition name not exists, otherwise false
      */
-    public Map<String, Object> verifyProccessDefinitionName(User loginUser, String projectName, String name) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, String projectName, String name) {
 
         Map<String, Object> result = new HashMap<>();
             Project project = projectMapper.queryByName(projectName);
@@ -1036,12 +1036,12 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition all by project id
+     * query process definition all by project id
      *
      * @param projectId project id
      * @return process definitions in the project
      */
-    public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
+    public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
         HashMap<String, Object> result = new HashMap<>(5);
 

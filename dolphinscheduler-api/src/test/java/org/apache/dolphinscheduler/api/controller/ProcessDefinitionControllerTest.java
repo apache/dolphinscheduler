@@ -68,7 +68,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
 
     @Test
-    public void testVerifyProccessDefinitionName() throws Exception {
+    public void testVerifyProcessDefinitionName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","dag_test");
 
@@ -85,7 +85,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void testVerifyProccessDefinitionNameNotExit() throws Exception {
+    public void testVerifyProcessDefinitionNameNotExit() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("name","dag_test_1");
 
@@ -104,7 +104,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
 
     @Test
-    public void UpdateProccessDefinition() throws Exception {
+    public void UpdateProcessDefinition() throws Exception {
         String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
@@ -130,7 +130,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
 
     @Test
-    public void testReleaseProccessDefinition() throws Exception {
+    public void testReleaseProcessDefinition() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId","91");
         paramsMap.add("releaseState",String.valueOf(ReleaseState.OFFLINE));
@@ -149,7 +149,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
 
     @Test
-    public void testQueryProccessDefinitionById() throws Exception {
+    public void testQueryProcessDefinitionById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("processId","91");
 
@@ -166,7 +166,7 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void testQueryProccessDefinitionList() throws Exception {
+    public void testQueryProcessDefinitionList() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list","cxc_1113")
                 .header(SESSION_ID, sessionId)
@@ -276,11 +276,11 @@ public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
 
     @Test
-    public void testQueryProccessDefinitionAllByProjectId() throws Exception {
+    public void testQueryProcessDefinitionAllByProjectId() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectId","9");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/queryProccessDefinitionAllByProjectId","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/queryProcessDefinitionAllByProjectId","cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
