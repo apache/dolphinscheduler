@@ -114,6 +114,7 @@ public class DependentTaskTest {
     private ProcessInstance findLastProcessInterval(){
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(11);
+        processInstance.setProcessDefinitionId(4);
         processInstance.setState(ExecutionStatus.SUCCESS);
         return  processInstance;
     }
@@ -127,6 +128,7 @@ public class DependentTaskTest {
     private ProcessInstance getProcessInstance(){
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(10111);
+        processInstance.setProcessDefinitionId(0);
         processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
 
         return processInstance;

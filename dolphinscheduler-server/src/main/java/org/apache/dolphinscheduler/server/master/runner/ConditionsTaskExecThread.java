@@ -77,7 +77,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
             waitTaskQuit();
             updateTaskState();
         }catch (Exception e){
-            logger.error("conditions task run exception" + e);
+            logger.error("conditions task run exception" , e);
         }
         return true;
     }

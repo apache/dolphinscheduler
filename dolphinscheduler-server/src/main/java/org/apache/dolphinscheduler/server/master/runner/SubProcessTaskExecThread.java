@@ -32,11 +32,6 @@ import java.util.Date;
 public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
-     * logger of SubProcessTaskExecThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(SubProcessTaskExecThread.class);
-
-    /**
      * sub process instance
      */
     private ProcessInstance subProcessInstance;

@@ -49,12 +49,6 @@ import java.util.Date;
 public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
-     * logger of MasterTaskExecThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
-
-
-    /**
      * taskInstance state manager
      */
     private TaskInstanceCacheManager taskInstanceCacheManager;

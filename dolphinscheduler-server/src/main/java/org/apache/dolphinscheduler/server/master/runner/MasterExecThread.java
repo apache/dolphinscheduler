@@ -365,7 +365,6 @@ public class MasterExecThread implements Runnable {
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
-
     }
 
     /**
@@ -508,27 +507,7 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-    /**
-     * is there have conditions after the parent node
-     * @param parentNodeName
-     * @return
-     */
-    private boolean haveConditionsAfterNode(String parentNodeName){
 
-        boolean result = false;
-        Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
-        if(startVertex == null){
-            return result;
-        }
-        for(String nodeName : startVertex){
-            TaskNode taskNode = dag.getNode(nodeName);
-            if(taskNode.getType().equals(TaskType.CONDITIONS.toString())){
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
 
     /**
      * if all of the task dependence are skip, skip it too.
@@ -705,7 +684,7 @@ public class MasterExecThread implements Runnable {
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
             // conditions task would not return failed.
             if(depTaskState.typeIsFailure()
-                    && !haveConditionsAfterNode(depsNode)
+                    && !DagHelper.haveConditionsAfterNode(depsNode, dag )
                     && !dag.getNode(depsNode).isConditionsTask()){
                 return DependResult.FAILED;
             }
@@ -1021,8 +1000,8 @@ public class MasterExecThread implements Runnable {
                         addTaskToStandByList(task);
                     }else{
                         completeTaskList.put(task.getName(), task);
-                        if( task.getTaskType().equals(TaskType.CONDITIONS.toString()) ||
-                                haveConditionsAfterNode(task.getName())) {
+                        if( task.isConditionsTask()
+                            || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
                             submitPostNode(task.getName());
                         }else{
                             errorTaskList.put(task.getName(), task);

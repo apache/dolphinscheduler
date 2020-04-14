@@ -266,7 +266,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                         task.getId() + ".log";
             }
         }catch (Exception e){
-            logger.error("logger" + e);
+            logger.error("logger" , e);
             logPath = "";
         }
         return logPath;

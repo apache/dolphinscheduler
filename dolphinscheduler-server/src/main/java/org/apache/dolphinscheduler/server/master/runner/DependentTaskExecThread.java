@@ -82,7 +82,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             waitTaskQuit();
             updateTaskState();
         }catch (Exception e){
-            logger.error("dependent task run exception" + e);
+            logger.error("dependent task run exception" , e);
         }
         return true;
     }
