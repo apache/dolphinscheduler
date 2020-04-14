@@ -266,8 +266,8 @@
           }
           let noResources = [{
             id: -1,
-            name: $t('No resources'),
-            fullName: '/'+$t('No resources'),
+            name: $t('Unauthorized or deleted resources'),
+            fullName: '/'+$t('Unauthorized or deleted resources'),
             children: []
           }]
           if(optionsCmp.length>0) {
