@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -73,6 +74,7 @@ public class TaskCallbackServiceTest {
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(1);
         ackCommand.setStartTime(new Date());
+        Stopper.stop();
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
         nettyRemotingServer.close();
@@ -82,6 +84,7 @@ public class TaskCallbackServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testSendAckWithIllegalArgumentException(){
         TaskExecuteAckCommand ackCommand = Mockito.mock(TaskExecuteAckCommand.class);
+        Stopper.stop();
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
     }
 
@@ -103,6 +106,7 @@ public class TaskCallbackServiceTest {
         ackCommand.setStartTime(new Date());
 
         nettyRemotingServer.close();
+        Stopper.stop();
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
     }
 
@@ -125,6 +129,7 @@ public class TaskCallbackServiceTest {
         ackCommand.setStartTime(new Date());
 
         nettyRemotingServer.close();
+        Stopper.stop();
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
     }
 }
