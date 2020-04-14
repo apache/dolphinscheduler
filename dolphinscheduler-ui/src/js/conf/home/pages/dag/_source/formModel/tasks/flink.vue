@@ -211,7 +211,9 @@
           return {
             label: node.name
           }
-        }
+        },
+        allNoResources: [],
+        noRes: [],
       }
     },
     props: {
@@ -300,6 +302,12 @@
           return false
         }
 
+        // noRes
+        if (this.noRes.length>0) {
+          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          return false
+        }
+
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
@@ -339,6 +347,67 @@
         }
         delete item.children
       },
+      searchTree(element, id) {
+        // 根据id查找节点
+        if (element.id == id) {
+          return element;
+        } else if (element.children != null) {
+          var i;
+          var result = null;
+          for (i = 0; result == null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id);
+          }
+          return result;
+        }
+        return null;
+      },
+      dataProcess(backResource) {
+        let isResourceId = []
+        let resourceIdArr = []
+        if(this.resourceList.length>0) {
+          this.resourceList.forEach(v=>{
+            this.mainJarList.forEach(v1=>{
+              if(this.searchTree(v1,v)) {
+                isResourceId.push(this.searchTree(v1,v))
+              }
+            })
+          })
+          resourceIdArr = isResourceId.map(item=>{
+            return item.id
+          })
+          Array.prototype.diff = function(a) {
+            return this.filter(function(i) {return a.indexOf(i) < 0;});
+          };
+          let diffSet = this.resourceList.diff(resourceIdArr);
+          let optionsCmp = []
+          if(diffSet.length>0) {
+            diffSet.forEach(item=>{
+              backResource.forEach(item1=>{
+                if(item==item1.id || item==item1.res) {
+                  optionsCmp.push(item1)
+                }
+              })
+            })
+          }
+          let noResources = [{
+            id: -1,
+            name: $t('No resources'),
+            fullName: '/'+$t('No resources'),
+            children: []
+          }]
+          if(optionsCmp.length>0) {
+            this.allNoResources = optionsCmp
+            optionsCmp = optionsCmp.map(item=>{
+              return {id: item.id,name: item.name,fullName: item.res}
+            })
+            optionsCmp.forEach(item=>{
+              item.isNew = true
+            })
+            noResources[0].children = optionsCmp
+            this.mainJarList = this.mainJarList.concat(noResources)
+          }
+        }
+      },
     },
     watch: {
       // Listening type
@@ -354,15 +423,37 @@
     },
     computed: {
       cacheParams () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if(this.resourceList.length>0) {
+          this.resourceList.forEach(v=>{
+            this.mainJarList.forEach(v1=>{
+              if(this.searchTree(v1,v)) {
+                isResourceId.push(this.searchTree(v1,v))
+              }
+            })
+          })
+          resourceIdArr = isResourceId.map(item=>{
+            return {id: item.id,name: item.name,res: item.fullName}
+          })
+        }
+        let result = []
+        resourceIdArr.forEach(item=>{
+          this.allNoResources.forEach(item1=>{
+            if(item.id==item1.id) {
+              // resultBool = true
+             result.push(item1)
+            }
+          })
+        })
+        this.noRes = result
         return {
           mainClass: this.mainClass,
           mainJar: {
             id: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: _.map(this.resourceList, v => {
-            return {id: v}
-          }),
+          resourceList: resourceIdArr,
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,
@@ -404,20 +495,24 @@
           this.programType = o.params.programType || 'SCALA'
 
           // backfill resourceList
+          let backResource = o.params.resourceList || []
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
             _.map(resourceList, v => {
-              if(v.res) {
+              if(!v.id) {
                 this.store.dispatch('dag/getResourceId',{
                   type: 'FILE',
                   fullName: '/'+v.res
                 }).then(res => {
                   this.resourceList.push(res.id)
+                  this.dataProcess(backResource)
                 }).catch(e => {
-                  this.$message.error(e.msg || '')
+                  this.resourceList.push(v.res)
+                  this.dataProcess(backResource)
                 })
               } else {
                 this.resourceList.push(v.id)
+                this.dataProcess(backResource)
               }
             })
             this.cacheResourceList = resourceList
