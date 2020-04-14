@@ -44,10 +44,9 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * sub process task exec thread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public SubProcessTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        super(taskInstance, processInstance);
+    public SubProcessTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
     }
 
     @Override

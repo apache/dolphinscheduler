@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.dependent;
+package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.dependent.DependentDateUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.runner.DependentTaskExecThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
@@ -50,12 +51,23 @@ public class DependentTaskTest {
     private ApplicationContext applicationContext;
 
 
+    private MasterConfig config;
+
     @Before
     public void before() throws Exception{
+
+        config = new MasterConfig();
+        config.setMasterTaskCommitRetryTimes(3);
+        config.setMasterTaskCommitInterval(1000);
         processService = Mockito.mock(ProcessService.class);
+        DateInterval dateInterval =DependentDateUtils.getTodayInterval(new Date()).get(0);
         Mockito.when(processService
-                .findLastRunningProcess(4,DependentDateUtils.getTodayInterval(new Date()).get(0)))
+                .findLastRunningProcess(4, dateInterval.getStartTime(),
+                        dateInterval.getEndTime()))
                 .thenReturn(findLastProcessInterval());
+
+
+
         Mockito.when(processService
                 .getTaskNodeListByDefinitionId(4))
                 .thenReturn(getTaskNodes());
@@ -66,23 +78,37 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findTaskInstanceById(252612))
                 .thenReturn(getTaskInstance());
+
+
+        Mockito.when(processService.findProcessInstanceById(10111))
+                .thenReturn(getProcessInstance());
+        Mockito.when(processService.findProcessDefineById(0))
+                .thenReturn(getProcessDefinition());
+        Mockito.when(processService.saveTaskInstance(getTaskInstance()))
+                .thenReturn(true);
+
         applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
     }
 
     @Test
     public void test() throws Exception{
 
-//        TaskProps taskProps = new TaskProps();
-//        String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
-//        taskProps.setDependence(dependString);
-//        taskProps.setTaskStartTime(new Date());
-//        DependentTask dependentTask = new DependentTask(new TaskExecutionContext(), logger);
-//        dependentTask.init();
-//        dependentTask.handle();
-//        Assert.assertEquals(dependentTask.getExitStatusCode(), Constants.EXIT_CODE_SUCCESS );
+        TaskInstance taskInstance = getTaskInstance();
+        String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
+        taskInstance.setDependency(dependString);
+        Mockito.when(processService.submitTask(taskInstance))
+                .thenReturn(taskInstance);
+        DependentTaskExecThread dependentTask =
+                new DependentTaskExecThread(taskInstance);
+
+        dependentTask.call();
+
+        Assert.assertEquals(dependentTask.getTaskInstance().getState(),
+                ExecutionStatus.SUCCESS);
     }
 
     private ProcessInstance findLastProcessInterval(){
@@ -91,6 +117,21 @@ public class DependentTaskTest {
         processInstance.setState(ExecutionStatus.SUCCESS);
         return  processInstance;
     }
+
+    private ProcessDefinition getProcessDefinition(){
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setId(0);
+        return processDefinition;
+    }
+
+    private ProcessInstance getProcessInstance(){
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(10111);
+        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+
+        return processInstance;
+    }
+
 
     private List<TaskNode> getTaskNodes(){
         List<TaskNode> list = new ArrayList<>();
@@ -113,8 +154,10 @@ public class DependentTaskTest {
 
     private TaskInstance getTaskInstance(){
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskType("DEPENDENT");
         taskInstance.setId(252612);
         taskInstance.setName("C");
+        taskInstance.setProcessInstanceId(10111);
         taskInstance.setState(ExecutionStatus.SUCCESS);
         return taskInstance;
     }

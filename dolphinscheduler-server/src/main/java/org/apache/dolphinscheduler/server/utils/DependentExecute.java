@@ -182,7 +182,7 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval);
+        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval.getStartTime(), dateInterval.getEndTime());
         if(runningProcess != null){
             return runningProcess;
         }

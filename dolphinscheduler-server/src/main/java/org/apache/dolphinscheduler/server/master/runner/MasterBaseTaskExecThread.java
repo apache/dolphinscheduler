@@ -85,12 +85,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
+    public MasterBaseTaskExecThread(TaskInstance taskInstance){
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
-        this.processInstance = processInstance;
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
@@ -128,7 +126,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             try {
                 if(!submitDB){
                     // submit task to db
-                    task = processService.submitTask(taskInstance, processInstance);
+                    task = processService.submitTask(taskInstance);
                     if(task != null && task.getId() != 0){
                         submitDB = true;
                     }
@@ -164,7 +162,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     public Boolean dispatchTask(TaskInstance taskInstance) {
 
         try{
-            if(taskInstance.isSubProcess()){
+            if(taskInstance.isConditionsTask()
+                    || taskInstance.isDependTask()
+                    || taskInstance.isSubProcess()){
                 return true;
             }
             if(taskInstance.getState().typeIsFinished()){
@@ -238,6 +238,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
+        this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }
 

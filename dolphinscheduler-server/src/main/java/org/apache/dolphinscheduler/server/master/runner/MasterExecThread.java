@@ -418,13 +418,13 @@ public class MasterExecThread implements Runnable {
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         MasterBaseTaskExecThread abstractExecThread = null;
         if(taskInstance.isSubProcess()){
-            abstractExecThread = new SubProcessTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new SubProcessTaskExecThread(taskInstance);
         }else if(taskInstance.isDependTask()){
-            abstractExecThread = new DependentTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new DependentTaskExecThread(taskInstance);
         }else if(taskInstance.isConditionsTask()){
-            abstractExecThread = new ConditionsTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new ConditionsTaskExecThread(taskInstance);
         }else {
-            abstractExecThread = new MasterTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new MasterTaskExecThread(taskInstance);
         }
         Future<Boolean> future = taskExecService.submit(abstractExecThread);
         activeTaskNode.putIfAbsent(abstractExecThread, future);

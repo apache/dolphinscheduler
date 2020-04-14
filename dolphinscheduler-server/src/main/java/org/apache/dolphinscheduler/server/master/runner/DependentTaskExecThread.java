@@ -60,10 +60,9 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      * constructor of MasterBaseTaskExecThread
      *
      * @param taskInstance    task instance
-     * @param processInstance process instance
      */
-    public DependentTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance) {
-        super(taskInstance, processInstance);
+    public DependentTaskExecThread(TaskInstance taskInstance) {
+        super(taskInstance);
     }
 
 
@@ -120,7 +119,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         }
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        processService.saveTaskInstance(taskInstance);
     }
 
     /**
@@ -190,7 +189,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     //save depend result to log
                     logger.info("dependent item complete {} {},{}",
-                            DEPENDENT_SPLIT, entry.getKey(), entry.getValue().toString());
+                            DEPENDENT_SPLIT, entry.getKey(), entry.getValue());
                 }
             }
             if(!dependentExecute.finish(dependentDate)){

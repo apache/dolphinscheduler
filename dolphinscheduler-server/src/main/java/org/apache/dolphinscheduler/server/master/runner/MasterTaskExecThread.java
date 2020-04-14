@@ -65,10 +65,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        super(taskInstance, processInstance);
+    public MasterTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
     }

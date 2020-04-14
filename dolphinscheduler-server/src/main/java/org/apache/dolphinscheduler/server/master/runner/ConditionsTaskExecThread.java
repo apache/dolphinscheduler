@@ -61,10 +61,9 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      * constructor of MasterBaseTaskExecThread
      *
      * @param taskInstance    task instance
-     * @param processInstance process instance
      */
-    public ConditionsTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance) {
-        super(taskInstance, processInstance);
+    public ConditionsTaskExecThread(TaskInstance taskInstance) {
+        super(taskInstance);
     }
 
     @Override
