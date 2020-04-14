@@ -63,7 +63,7 @@ public class TaskCallbackServiceTest {
     private MasterRegistry masterRegistry;
 
     @Test
-    public void testSendAck(){
+    public void testSendAck() throws Exception{
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -79,6 +79,9 @@ public class TaskCallbackServiceTest {
         ackCommand.setStartTime(new Date());
 
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
+
+        Thread.sleep(10000);
+
         Stopper.stop();
 
         nettyRemotingServer.close();
