@@ -119,13 +119,7 @@ public class TaskPriorityQueueConsumer extends Thread{
             try {
                 result =  dispatcher.dispatch(executionContext);
             } catch (ExecuteException e) {
-                try {
-                    Thread.sleep(1000);
-                    // if dispatch task error，retry
-                    result =  dispatcher.dispatch(executionContext);
-                }catch (Exception e2){
-
-                }
+                logger.error("dispatch error",e);
             }
 
             if (result){
