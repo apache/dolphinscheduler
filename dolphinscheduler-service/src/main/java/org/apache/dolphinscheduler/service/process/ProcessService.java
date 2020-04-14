@@ -1022,9 +1022,9 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState){
         ExecutionStatus state = taskInstance.getState();
         if(
-                // running or killed
-                // the task already exists in task queue
-                // return state
+            // running or killed
+            // the task already exists in task queue
+            // return state
                 state == ExecutionStatus.RUNNING_EXEUTION
                         || state == ExecutionStatus.KILL
                         || checkTaskExistsInTaskQueue(taskInstance)
@@ -1209,7 +1209,7 @@ public class ProcessService {
      * @return task instance list
      */
     public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId){
-         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
+        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
     }
 
     /**
@@ -1357,32 +1357,18 @@ public class ProcessService {
      * change task state
      * @param state state
      * @param endTime endTime
-     * @param taskInstanceId taskInstanceId
+     * @param taskInstId taskInstId
      */
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
-                                int taskInstanceId) {
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+                                int taskInstId) {
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
-        saveTaskInstance(taskInstance);
-    }
-
-
-    /**
-     * change task state
-     * @param state state
-     * @param taskInstanceId taskInstanceId
-     */
-    public void changeTaskState(ExecutionStatus state,
-                                int taskInstanceId) {
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
-        taskInstance.setState(state);
-        taskInstance.setEndTime(new Date());
         saveTaskInstance(taskInstance);
     }
 
