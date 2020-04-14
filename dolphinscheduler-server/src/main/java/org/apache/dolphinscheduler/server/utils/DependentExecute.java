@@ -155,7 +155,7 @@ public class DependentExecute {
      * @return
      */
     private DependResult getDependTaskResult(String taskName, ProcessInstance processInstance) {
-        DependResult result = DependResult.FAILED;
+        DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 

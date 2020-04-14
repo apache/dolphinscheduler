@@ -107,8 +107,7 @@ public class DependentTaskTest {
 
         dependentTask.call();
 
-        Assert.assertEquals(dependentTask.getTaskInstance().getState(),
-                ExecutionStatus.SUCCESS);
+        Assert.assertEquals(ExecutionStatus.SUCCESS, dependentTask.getTaskInstance().getState());
     }
 
     private ProcessInstance findLastProcessInterval(){
