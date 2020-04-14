@@ -22,14 +22,11 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -37,7 +34,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 
 public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -81,7 +77,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
             waitTaskQuit();
             updateTaskState();
         }catch (Exception e){
-            logger.error("" + e);
+            logger.error("conditions task run exception" + e);
         }
         return true;
     }
@@ -151,11 +147,11 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
         }
         ExecutionStatus executionStatus = completeTaskList.get(item.getDepTasks());
         if(executionStatus != item.getStatus()){
-            logger.info("depend item : {} expect status: {}, actual status: {}" ,item.getDepTasks(), item.getStatus().toString(), executionStatus.toString());
+            logger.info("depend item : {} expect status: {}, actual status: {}" ,item.getDepTasks(), item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
         logger.info("dependent item complete {} {},{}",
-                Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult.toString());
+                Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
         return dependResult;
     }
 
