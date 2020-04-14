@@ -95,7 +95,4 @@ public class SchedulerCalendarControllerTest extends AbstractControllerTest{
 
     }
 
-
-
-
 }
