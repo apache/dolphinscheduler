@@ -130,7 +130,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         if (taskInstance.getState().typeIsFinished()) {
             logger.info("task {} already complete. task state:{}",
                     this.taskInstance.getName(),
-                    this.taskInstance.getState().toString());
+                    this.taskInstance.getState());
             return true;
         }
         while (Stopper.isRunning()) {
@@ -212,7 +212,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         DependResult result = DependentUtils.getDependResultForRelation(
                 this.dependentParameters.getRelation(), dependResultList
         );
-        logger.info("dependent task completed, dependent result:{}", result.toString());
+        logger.info("dependent task completed, dependent result:{}", result);
         return result;
     }
 }
