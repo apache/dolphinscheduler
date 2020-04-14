@@ -459,11 +459,11 @@ public class TaskInstance implements Serializable {
         return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
     }
 
-    public Boolean isDependTask(){
+    public boolean isDependTask(){
         return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
     }
 
-    public Boolean isConditionsTask(){
+    public boolean isConditionsTask(){
         return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
 
