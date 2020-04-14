@@ -538,7 +538,6 @@ export default {
   'Whether directory': 'Whether directory',
   'Yes': 'Yes',
   'No': 'No',
-  'Modify User': 'Modify User',
   'Please enter Mysql Database(required)': 'Please enter Mysql Database(required)',
   'Please enter Mysql Table(required)': 'Please enter Mysql Table(required)',
   'Please enter Columns (Comma separated)': 'Please enter Columns (Comma separated)',
@@ -587,5 +586,12 @@ export default {
   'Some Columns': 'Some Columns',
   'Branch flow': 'Branch flow',
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
-  'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required'
+  'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required',
+  'Kinship': 'Workflow relationship',
+  'Reset': 'Reset',
+  'KinshipStateActive': 'Active',
+  'KinshipState1': 'Online',
+  'KinshipState0': 'Workflow is not online',
+  'KinshipState10': 'Scheduling is not online',
+  'Dag label display control': 'Dag label display control'
 }

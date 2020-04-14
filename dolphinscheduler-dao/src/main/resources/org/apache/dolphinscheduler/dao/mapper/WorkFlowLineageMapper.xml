@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper">
+    <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.id as work_flow_id,tepd.name as work_flow_name
+        from t_ds_process_definition tepd
+        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+        where tepd.project_id = #{projectId}
+        <if test="searchVal != null and searchVal != ''">
+            and  tepd.name like concat('%', #{searchVal}, '%')
+        </if>
+    </select>
+    <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+        select tepd.id as work_flow_id,tepd.name as work_flow_name,
+               (case when json_extract(tepd.process_definition_json, '$**.dependItemList') is not null then 1 else 0 end) as is_depend_work_flow,
+                          json_extract(tepd.process_definition_json, '$**.definitionId') as source_work_flow_id,
+                          tepd.release_state as work_flow_publish_status,
+                          tes.start_time as schedule_start_time,
+                          tes.end_time as schedule_end_time,
+                          tes.crontab as crontab,
+                          tes.release_state as schedule_publish_status
+        from t_ds_process_definition tepd
+        left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+        where tepd.project_id = #{projectId}
+        <if test="ids != null and ids.size()>0">
+            and  tepd.id in
+            <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="querySourceTarget" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelation">
+        select id as target_work_flow_id,#{id} as source_work_flow_id
+        from t_ds_process_definition t
+        where json_extract(t.process_definition_json, '$**.dependItemList') is not null
+          and find_in_set(#{id}, replace(replace(replace(json_extract(t.process_definition_json, '$**.definitionId'), '[', ''),']', ''), ' ', '')) > 0
+    </select>
+</mapper>

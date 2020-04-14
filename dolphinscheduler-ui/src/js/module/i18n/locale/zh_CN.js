@@ -588,4 +588,11 @@ export default {
   'Branch flow': '分支流转',
   'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Successful branch flow and failed branch flow are required': '成功分支流转和失败分支流转必填',
+  'Kinship': '工作流关系',
+  'Reset': '重置',
+  'KinshipStateActive': '当前选择',
+  'KinshipState1': '已上线',
+  'KinshipState0': '工作流未上线',
+  'KinshipState10': '调度未上线',
+  'Dag label display control': 'Dag节点名称显隐'
 }

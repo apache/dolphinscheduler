@@ -31,8 +31,17 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('Process')}`,
+      name: `${i18n.$t('Kinship')}`,
       id: 1,
+      path: 'projects-kinship',
+      isOpen: true,
+      disabled: true,
+      icon: 'ans-icon-node',
+      children: []
+    },
+    {
+      name: `${i18n.$t('Process')}`,
+      id: 2,
       path: '',
       isOpen: true,
       disabled: true,

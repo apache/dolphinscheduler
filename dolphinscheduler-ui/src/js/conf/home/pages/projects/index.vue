@@ -17,7 +17,9 @@
 <template>
   <div class="main-layout-box" :class="!isProjectsList ? '' : 'no'">
     <m-secondary-menu :type="'projects'" v-if="!isProjectsList"></m-secondary-menu>
-    <router-view></router-view>
+    <transition name="fade">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 <script>

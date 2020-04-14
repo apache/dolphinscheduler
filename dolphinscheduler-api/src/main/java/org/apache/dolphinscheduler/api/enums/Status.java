@@ -174,7 +174,7 @@ public enum Status {
 
     QUERY_WORKER_GROUP_FAIL(100146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(100147,"delete worker group fail ", "删除worker分组失败"),
-
+    QUERY_WORKFLOW_LINEAGE_ERROR(10143,"query workflow lineage error", "查询血缘失败"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
