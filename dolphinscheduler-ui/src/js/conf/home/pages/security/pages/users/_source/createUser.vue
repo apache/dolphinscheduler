@@ -93,6 +93,15 @@
             </x-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name">{{$t('State')}}</template>
+          <template slot="content">
+            <x-radio-group v-model="userState" >
+              <x-radio :label="'1'">{{$t('Enable')}}</x-radio>
+              <x-radio :label="'0'">{{$t('Disable')}}</x-radio>
+            </x-radio-group>
+          </template>
+        </m-list-box-f>
       </div>
     </template>
   </m-popup>
@@ -118,6 +127,7 @@
         queueName: '',
         email: '',
         phone: '',
+        userState: '1',
         tenantList: [],
         // Source admin user information
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER' && router.history.current.name !== 'account'
@@ -150,7 +160,7 @@
 
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
-        
+
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         // user name
@@ -194,7 +204,7 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
-          
+
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -235,7 +245,8 @@
           tenantId: this.tenantId,
           email: this.email,
           queue: this.queueList.length>0? _.find(this.queueList, ['id', this.queueName]).code : '',
-          phone: this.phone
+          phone: this.phone,
+          state: this.userState
         }
 
         if (this.item) {
@@ -264,6 +275,7 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
+            this.userState = this.item.state + '' || '1'
             this.tenantId = this.item.tenantId
             this.$nextTick(() => {
               this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
@@ -276,6 +288,7 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
+          this.userState = this.state + '' || '1'
           this.tenantId = this.item.tenantId
           if(this.queueList.length>0) {
             this.queueName = _.find(this.queueList, ['code', this.item.queue]).id

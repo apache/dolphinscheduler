@@ -590,4 +590,6 @@ export default {
   'Successful branch flow and failed branch flow are required': '成功分支流转和失败分支流转必填',
   'No resources': '未授权或已删除资源',
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
+  'Enable': '启用',
+  'Disable': '停用',
 }

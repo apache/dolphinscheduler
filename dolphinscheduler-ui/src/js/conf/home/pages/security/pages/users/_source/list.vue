@@ -40,7 +40,9 @@
           <th>
             <span>{{$t('Phone')}}</span>
           </th>
-
+          <th>
+            <span>{{$t('State')}}</span>
+          </th>
           <th>
             <span>{{$t('Create Time')}}</span>
           </th>
@@ -70,6 +72,10 @@
           </td>
           <td>
             <span>{{item.phone || '-'}}</span>
+          </td>
+          <td>
+            <span v-if="item.state == 1">{{$t('Enable')}}</span>
+            <span v-else>{{$t('Disable')}}</span>
           </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>

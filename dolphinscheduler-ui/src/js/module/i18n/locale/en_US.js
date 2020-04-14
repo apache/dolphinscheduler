@@ -590,4 +590,6 @@ export default {
   'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required',
   'No resources': 'No resources',
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
+  'Enable': 'Enable',
+  'Disable': 'Disable',
 }
