@@ -68,7 +68,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue taskPriorityQueue;
 
     /**
      * processService
@@ -93,7 +93,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         while (Stopper.isRunning()){
             try {
                 // if not task , blocking here
-                String taskPriorityInfo = taskUpdateQueue.take();
+                String taskPriorityInfo = taskPriorityQueue.take();
 
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
 
@@ -114,16 +114,25 @@ public class TaskPriorityQueueConsumer extends Thread{
     private Boolean dispatch(int taskInstanceId){
         TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        try {
-            return dispatcher.dispatch(executionContext);
-        } catch (ExecuteException e) {
-            // if dispatch task error，set task status fail
-            processService.changeTaskState(ExecutionStatus.FAILURE,
-                    taskInstanceId);
-            logger.error("execute exception", e);
-            return false;
-        }
+        Boolean result = false;
+        while (Stopper.isRunning()){
+            try {
+                result =  dispatcher.dispatch(executionContext);
+            } catch (ExecuteException e) {
+                try {
+                    Thread.sleep(1000);
+                    // if dispatch task error，retry
+                    result =  dispatcher.dispatch(executionContext);
+                }catch (Exception e2){
 
+                }
+            }
+
+            if (result){
+                break;
+            }
+        }
+        return result;
     }
 
     /**
