@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -159,7 +158,6 @@ public class DependentTaskTest {
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
-        taskInstance.setState(ExecutionStatus.SUCCESS);
         return taskInstance;
     }
 

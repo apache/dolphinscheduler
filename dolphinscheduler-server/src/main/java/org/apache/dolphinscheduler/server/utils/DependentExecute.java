@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.zk.DefaultEnsembleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
