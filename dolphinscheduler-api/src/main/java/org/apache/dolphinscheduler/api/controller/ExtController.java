@@ -73,8 +73,8 @@ public class ExtController extends BaseController{
                                             @RequestParam(value = "ip",required = false) String ip) {
         try {
 
-            Map<String, Object> result = extService.getClusterInfo(ip);
-            return returnDataList(result);
+            Result result = extService.getClusterInfo(ip);
+            return result;
 
         }catch (Exception e){
             logger.error(Status.CREATE_TENANT_ERROR.getMsg(),e);

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.api.dto.CalendarParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.HttpUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -62,19 +64,18 @@ public class ExtService extends BaseService{
   private String operationHostInfoUrl ;
 
 
-  public Map<String, Object> getClusterInfo(String ip) {
-
-    Map<String, Object> result = new HashMap<>(5);
-    result.put(Constants.STATUS, false);
+  public Result getClusterInfo(String ip) {
 
 
     //通过远程url获取数据
 
-    String data = HttpUtils.get(operationHostInfoUrl);
+    String responseContent = HttpUtils.get(operationHostInfoUrl);
 
-    putMsg(result, Status.SUCCESS);
-    result.put(Constants.MSG, Status.SUCCESS.getMsg());
-    result.put(Constants.DATA_LIST,data);
+    Result result = null ;
+    if(null != responseContent && !responseContent.isEmpty()) {
+      result = JSONUtils.parseObject(responseContent, Result.class);
+    }
+
 
     return result;
   }
