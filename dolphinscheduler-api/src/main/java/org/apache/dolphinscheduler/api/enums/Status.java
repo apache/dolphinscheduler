@@ -270,6 +270,21 @@ public enum Status {
 
 
 
+    VARIABLE_KEY_EXIST(60200, "VARIABLE key already exists", "全局变量KEY已存在"),
+    VARIABLE_NOT_EXIST(60201, "VARIABLE {0} not exists", "全局变量[{0}]不存在"),
+    CREATE_VARIABLE_ERROR(60202, "create VARIABLE error", "创建全局变量异常"),
+    QUERY_VARIABLE_LIST_PAGING_ERROR(60203,"query VARIABLE  list paging error", "获取全局变量列表异常."),
+    QUERY_VARIABLE_LIST_ERROR(60204,"query VARIABLE list error", "查询全局变量列表错误"),
+
+    UPDATE_VARIABLE_ERROR(60205,"update VARIABLE  error", "更新全局变量错误"),
+    DELETE_VARIABLE_BY_ID_ERROR(60206,"delete VARIABLE  error", "删除全局变量错误"),
+    VERIFY_VARIABLE_NAME_ERROR(60207,"verify VARIABLE name error", "验证全局变量名称错误"),
+    RELEASE_VARIABLE_ERROR(60208,"release VARIABLE error", "上线全局变量错误"),
+    UPDATE_VARIABLE_DETAILS_ERROR(60209,"update VARIABLE deatils error", "更新全局变量详情错误"),
+    SELECT_VARIABLE_BY_ID_ERROR(60210,"select VARIABLE  error", "查询全局变量错误"),
+
+
+
     //----------- Create by ZhangLong :   2020年04月08日15:59:14    -----------------
 
     ;

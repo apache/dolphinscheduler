@@ -16,11 +16,13 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-import java.util.Date;
+
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.dao.entity.SchedulerCalendar;
+
+import org.apache.dolphinscheduler.dao.entity.GlobalVariable;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -28,10 +30,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 
 /**
- * Calendar mapper interface
+ * Variable mapper interface
  */
 @SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
-public interface SchedulerCalendarMapper extends BaseMapper<SchedulerCalendar> {
+public interface GlobalVariableMapper extends BaseMapper<GlobalVariable> {
 
     /**
      * tenant page
@@ -39,22 +41,36 @@ public interface SchedulerCalendarMapper extends BaseMapper<SchedulerCalendar> {
      * @param searchVal searchVal
      * @return tenant IPage
      */
-    IPage<SchedulerCalendar> queryCalendarPaging(IPage<SchedulerCalendar> page,
-            @Param("searchVal") String searchVal);
+    IPage<GlobalVariable> queryVariablePaging(IPage<GlobalVariable> page,
+            @Param("projectId") int projectId, @Param("searchVal") String searchVal);
     /**
-     * query Calendar by name
+     * query Variable
      * @param  name
-     * @return Calendar list
+     * @return Variable list
      */
-    List<SchedulerCalendar> queryByCalendarName(@Param("name") String name);
-
+    List<GlobalVariable> queryList(@Param("projectId") int projectId, @Param("key") String key , @Param("name") String name );
 
     /**
-     * get map data
+     *
+     * @param id
+     * @param projectId
      * @return
      */
-    Map<String, Date> queryMap();
+    GlobalVariable selectById(@Param("projectId") int projectId, @Param("id") int id );
 
+    /**
+     *
+     * @param projectId
+     * @return
+     */
+    Map<String,String> queryMap( @Param("projectId") int projectId );
 
+    /**
+     *
+     * @param key
+     * @param projectId
+     * @return
+     */
+    List<GlobalVariable> queryByVariableKey( @Param("projectId") int projectId , @Param("key") String key );
 
 }

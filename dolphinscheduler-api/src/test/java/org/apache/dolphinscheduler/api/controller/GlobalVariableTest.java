@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -42,11 +41,11 @@ import org.springframework.util.MultiValueMap;
 import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 
 /**
- * calendar controller test
+ * variable controller test
  */
 @SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
-public class ExtControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(ExtControllerTest.class);
+public class GlobalVariableTest extends AbstractControllerTest{
+    private static Logger logger = LoggerFactory.getLogger(GlobalVariableTest.class);
 
     private static Date dateOf(int y, int m, int d) {
         DateTime dt = new DateTime(y, m, d, 0, 0, 0);
@@ -54,13 +53,15 @@ public class ExtControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void getClusterInfo() throws Exception {
+    public void testCreateCalendar() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("ip","192.168.100.110");
+        paramsMap.add("projectId","2");
+        paramsMap.add("name","名称");
+        paramsMap.add("key","keydata");
+        paramsMap.add("value","${system.biz.date}");
 
-
-        MvcResult mvcResult = mockMvc.perform(post("/ext/getClusterInfo")
+        MvcResult mvcResult = mockMvc.perform(post("/variable/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
@@ -72,6 +73,5 @@ public class ExtControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
-
 
 }

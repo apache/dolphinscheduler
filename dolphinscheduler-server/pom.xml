@@ -138,6 +138,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
         </dependency>
+
+		<dependency>
+			<groupId>com.yss.henghe.platform.tools</groupId>
+			<artifactId>TemplateEngine</artifactId>
+			<version>1.0-RELEASE</version>
+		</dependency>
 	</dependencies>
 
 

@@ -38,6 +38,24 @@ CREATE TABLE `t_yss_calendar_details` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+DROP TABLE IF EXISTS `t_yss_global_variable`;
+CREATE TABLE `t_yss_global_variable` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+  `name` varchar(100) NOT NULL COMMENT 'variable name',
+  `key_data` varchar(255) NOT NULL COMMENT 'variable key',
+  `value_data` text NOT NULL COMMENT 'variable value',
+  `flag` tinyint(4) DEFAULT NULL COMMENT '0 project variable, 1 system variable',
+  `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `global_variable_key` (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
 INSERT INTO `t_escheduler_user` VALUES ('1', 'sysadmin', '48a365b4ce1e322a55ae9017f3daf0c0', '1', 'xxx@qq.com', 'xx', '1',
  '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
