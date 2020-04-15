@@ -26,8 +26,6 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,8 +240,7 @@ public class ProcessInstanceController extends BaseController{
             logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                     loginUser.getUserName(), projectName, processInstanceId);
             // task queue
-            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
@@ -372,7 +369,6 @@ public class ProcessInstanceController extends BaseController{
             logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
                     loginUser.getUserName(), projectName, processInstanceIds);
             // task queue
-            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
             Map<String, Object> result = new HashMap<>(5);
             List<String> deleteFailedIdList = new ArrayList<>();
             if(StringUtils.isNotEmpty(processInstanceIds)){
@@ -381,7 +377,7 @@ public class ProcessInstanceController extends BaseController{
                 for (String strProcessInstanceId:processInstanceIdArray) {
                     int processInstanceId = Integer.parseInt(strProcessInstanceId);
                     try {
-                        Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
+                        Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
                         if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
                             deleteFailedIdList.add(strProcessInstanceId);
                             logger.error((String)deleteResult.get(Constants.MSG));
