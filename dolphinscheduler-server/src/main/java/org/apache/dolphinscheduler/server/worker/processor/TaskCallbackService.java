@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -93,8 +95,17 @@ public class TaskCallbackService {
         }
         logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
         Set<String> masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
-        if(CollectionUtils.isEmpty(masterNodes)){
-            throw new IllegalStateException("no available master node exception");
+        while (Stopper.isRunning()) {
+            if (CollectionUtils.isEmpty(masterNodes)) {
+                logger.error("no available master node");
+                try {
+                    Thread.sleep(1000);
+                }catch (Exception e){
+
+                }
+            }else {
+                break;
+            }
         }
         for(String masterNode : masterNodes){
             newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
