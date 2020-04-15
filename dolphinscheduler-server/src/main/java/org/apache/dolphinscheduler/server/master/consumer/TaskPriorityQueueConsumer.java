@@ -53,6 +53,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
+
 /**
  * TaskUpdateQueue consumer
  */
@@ -68,7 +70,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue taskPriorityQueue;
 
     /**
      * processService
@@ -93,7 +95,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         while (Stopper.isRunning()){
             try {
                 // if not task , blocking here
-                String taskPriorityInfo = taskUpdateQueue.take();
+                String taskPriorityInfo = taskPriorityQueue.take();
 
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
 
@@ -114,13 +116,22 @@ public class TaskPriorityQueueConsumer extends Thread{
     private Boolean dispatch(int taskInstanceId){
         TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        try {
-            return dispatcher.dispatch(executionContext);
-        } catch (ExecuteException e) {
-            logger.error("execute exception", e);
-            return false;
-        }
+        Boolean result = false;
+        while (Stopper.isRunning()){
+            try {
+                result =  dispatcher.dispatch(executionContext);
+            } catch (ExecuteException e) {
+                logger.error("dispatch error",e);
+                try {
+                    Thread.sleep(SLEEP_TIME_MILLIS);
+                } catch (InterruptedException e1) {}
+            }
 
+            if (result){
+                break;
+            }
+        }
+        return result;
     }
 
     /**
