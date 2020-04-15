@@ -64,7 +64,7 @@ public class SpringConnectionFactory {
      * @return druid dataSource
      */
     @Bean(destroyMethod="")
-    public static DruidDataSource dataSource() {
+    public DruidDataSource dataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
