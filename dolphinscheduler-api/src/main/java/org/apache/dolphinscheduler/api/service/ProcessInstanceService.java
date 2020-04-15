@@ -39,7 +39,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,18 +115,7 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
-        String workerGroupName = "";
-        if(processInstance.getWorkerGroupId() == -1){
-            workerGroupName = DEFAULT;
-        }else{
-            WorkerGroup workerGroup = workerGroupMapper.selectById(processInstance.getWorkerGroupId());
-            if(workerGroup != null){
-                workerGroupName = workerGroup.getName();
-            }else{
-                workerGroupName = DEFAULT;
-            }
-        }
-        processInstance.setWorkerGroupName(workerGroupName);
+
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
@@ -475,11 +463,10 @@ public class ProcessInstanceService extends BaseDAGService {
      * @param loginUser login user
      * @param projectName project name
      * @param processInstanceId process instance id
-     * @param tasksQueue task queue
      * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId, ITaskQueue tasksQueue) {
+    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId) {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -497,51 +484,7 @@ public class ProcessInstanceService extends BaseDAGService {
             return result;
         }
 
-        //process instance priority
-        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
-        // delete zk queue
-        if (CollectionUtils.isNotEmpty(taskInstanceList)){
-            for (TaskInstance taskInstance : taskInstanceList){
-                // task instance priority
-                int taskInstancePriority = taskInstance.getTaskInstancePriority().ordinal();
 
-                StringBuilder nodeValueSb = new StringBuilder(100);
-                nodeValueSb.append(processInstancePriority)
-                        .append(UNDERLINE)
-                        .append(processInstanceId)
-                        .append(UNDERLINE)
-                        .append(taskInstancePriority)
-                        .append(UNDERLINE)
-                        .append(taskInstance.getId())
-                        .append(UNDERLINE);
-
-                int taskWorkerGroupId = processService.getTaskWorkerGroupId(taskInstance);
-                WorkerGroup workerGroup = workerGroupMapper.selectById(taskWorkerGroupId);
-
-                if(workerGroup == null){
-                    nodeValueSb.append(DEFAULT_WORKER_ID);
-                }else {
-
-                    String ips = workerGroup.getIpList();
-                    StringBuilder ipSb = new StringBuilder(100);
-                    String[] ipArray = ips.split(COMMA);
-
-                    for (String ip : ipArray) {
-                        long ipLong = IpUtils.ipToLong(ip);
-                        ipSb.append(ipLong).append(COMMA);
-                    }
-
-                    if(ipSb.length() > 0) {
-                        ipSb.deleteCharAt(ipSb.length() - 1);
-                    }
-                    nodeValueSb.append(ipSb);
-                }
-
-                logger.info("delete task queue node : {}",nodeValueSb);
-                tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
-
-            }
-        }
 
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
