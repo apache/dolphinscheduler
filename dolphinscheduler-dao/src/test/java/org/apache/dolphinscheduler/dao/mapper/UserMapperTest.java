@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -180,6 +180,23 @@ public class UserMapperTest {
     }
 
     /**
+     * insert one Tenant
+     * @return Tenant
+     */
+    private Tenant insertOneTenant(Queue queue){
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("dolphin");
+        tenant.setTenantName("dolphin test");
+        tenant.setDescription("dolphin user use");
+        tenant.setQueueId(queue.getId());
+        tenant.setQueue(queue.getQueue());
+        tenant.setCreateTime(new Date());
+        tenant.setUpdateTime(new Date());
+        tenantMapper.insert(tenant);
+        return tenant;
+    }
+
+    /**
      * insert one Queue
      * @return Queue
      */
@@ -291,11 +308,13 @@ public class UserMapperTest {
      */
     @Test
     public void testQueryDetailsById() {
-        //insertOne
-        User user = insertOne();
+        //insertOneQueue and insertOneTenant
+        Queue queue = insertOneQueue();
+        Tenant tenant = insertOneTenant(queue);
+        User user = insertOne(queue,tenant);
         //queryDetailsById
         User queryUser = userMapper.queryDetailsById(user.getId());
-        Assert.assertEquals(queryUser.getUserName(), queryUser.getUserName());
+        Assert.assertEquals(user.getUserName(), queryUser.getUserName());
     }
 
     /**
