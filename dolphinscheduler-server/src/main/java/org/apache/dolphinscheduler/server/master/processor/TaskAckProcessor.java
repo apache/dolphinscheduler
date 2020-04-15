@@ -37,6 +37,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
+
 /**
  *  task ack processor
  */
@@ -101,10 +103,8 @@ public class TaskAckProcessor implements NettyRequestProcessor {
             }
 
             try {
-                Thread.sleep(1000);
-            }catch (Exception e){
-
-            }
+                Thread.sleep(SLEEP_TIME_MILLIS);
+            } catch (InterruptedException e) {}
         }
 
     }
