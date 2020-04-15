@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Mock from 'mockjs';
 import { resultDTO } from '@/conf/home/mock';
 
 // Get workFlowList

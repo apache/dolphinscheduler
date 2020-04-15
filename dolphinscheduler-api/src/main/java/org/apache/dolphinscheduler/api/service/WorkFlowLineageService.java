@@ -21,18 +21,13 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class WorkFlowLineageService extends BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageService.class);
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
@@ -49,7 +44,7 @@ public class WorkFlowLineageService extends BaseService {
         for(int id : ids) {
             List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
 
-            if(workFlowRelationsTmp != null && workFlowRelationsTmp.size()>0) {
+            if(workFlowRelationsTmp != null && !workFlowRelationsTmp.isEmpty()) {
                 Set<Integer> idsTmp = new HashSet<>();
                 for(WorkFlowRelation workFlowRelation:workFlowRelationsTmp) {
                     idsTmp.add(workFlowRelation.getTargetWorkFlowId());
@@ -65,25 +60,27 @@ public class WorkFlowLineageService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         List<WorkFlowLineage> workFlowLineageList = workFlowLineageMapper.queryByIds(ids, projectId);
         Map<String, Object> workFlowLists = new HashMap<>(5);
-        Set<Integer> idsV = ids;
-        if(ids == null || ids.size() == 0){
+        Set<Integer> idsV = new HashSet<>();
+        if(ids == null || ids.isEmpty()){
             for(WorkFlowLineage workFlowLineage:workFlowLineageList) {
                 idsV.add(workFlowLineage.getWorkFlowId());
             }
+        } else {
+            idsV = ids;
         }
         List<WorkFlowRelation> workFlowRelations = new ArrayList<>();
         getWorkFlowRelationRecursion(idsV, workFlowRelations);
 
         Set<Integer> idSet = new HashSet<>();
         //如果传入参数不为空，则需要补充下游工作流明细属性
-        if(ids != null && ids.size() > 0) {
+        if(ids != null && !ids.isEmpty()) {
             for(WorkFlowRelation workFlowRelation : workFlowRelations) {
                 idSet.add(workFlowRelation.getTargetWorkFlowId());
             }
             for(int id : ids){
                 idSet.remove(id);
             }
-            if(idSet.size()>0) {
+            if(!idSet.isEmpty()) {
                 workFlowLineageList.addAll(workFlowLineageMapper.queryByIds(idSet, projectId));
             }
         }
