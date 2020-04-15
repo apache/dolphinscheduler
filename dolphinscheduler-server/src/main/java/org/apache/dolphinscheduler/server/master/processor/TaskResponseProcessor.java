@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -99,10 +100,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
             if (taskInstance != null && responseStatus.typeIsFinished()){
                 break;
             }
-
-            try {
-                Thread.sleep(SLEEP_TIME_MILLIS);
-            } catch (InterruptedException e) {}
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
     }
 
