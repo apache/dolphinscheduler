@@ -346,7 +346,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -546,6 +545,7 @@
     <build>
 
         <finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+
 
         <pluginManagement>
             <plugins>
