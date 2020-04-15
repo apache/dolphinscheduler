@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -53,6 +52,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * TaskUpdateQueue consumer
@@ -122,7 +123,7 @@ public class TaskPriorityQueueConsumer extends Thread{
             } catch (ExecuteException e) {
                 logger.error("dispatch error",e);
                 try {
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    Thread.sleep(SLEEP_TIME_MILLIS);
                 } catch (InterruptedException e1) {}
             }
 
