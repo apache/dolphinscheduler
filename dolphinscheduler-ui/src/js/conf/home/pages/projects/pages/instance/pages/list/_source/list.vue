@@ -19,43 +19,46 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th width="50">
+          <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th width="40">
+          <th scope="col" width="30">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col" width="70">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="70">
+          <th scope="col" width="60">
+            <span>{{$t('Executor')}}</span>
+          </th>
+          <th scope="col" width="70">
             <span>{{$t('Run Type')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Scheduling Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="60">
+          <th scope="col" width="60">
             <span>{{$t('Duration')}}s</span>
           </th>
-          <th width="60">
+          <th scope="col" width="60">
             <span>{{$t('Run Times')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="125">
             <span>{{$t('host')}}</span>
           </th>
-          <th width="60">
+          <th scope="col" width="55">
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
-          <th width="30">
+          <th scope="col" width="30">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="210">
+          <th scope="col" width="210">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -66,6 +69,10 @@
           </td>
           <td>
             <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+          </td>
+          <td>
+            <span style="word-break: break-all" v-if="item.executorName">{{item.executorName}}</span>
+            <span v-else>-</span>
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
           <td>

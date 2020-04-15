@@ -33,7 +33,9 @@ import static org.apache.commons.lang.time.DateUtils.addDays;
  * business time utils
  */
 public class BusinessTimeUtils {
-
+  private BusinessTimeUtils() {
+    throw new IllegalStateException("BusinessTimeUtils class");
+  }
   /**
    * get business time in parameters by different command types
    *

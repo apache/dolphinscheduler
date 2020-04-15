@@ -22,11 +22,12 @@ import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.DependentItem;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +38,9 @@ import java.util.*;
  */
 public class DependentExecute {
     /**
-     * process dao
+     * process service
      */
-    private final ProcessDao processDao = SpringApplicationContext.getBean(ProcessDao.class);
+    private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     /**
      * depend item list
@@ -82,7 +83,7 @@ public class DependentExecute {
      * @param currentTime   current time
      * @return DependResult
      */
-    public DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
+    private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
         return calculateResultForTasks(dependentItem, dateIntervals );
     }
@@ -94,7 +95,8 @@ public class DependentExecute {
      * @return dateIntervals
      */
     private DependResult calculateResultForTasks(DependentItem dependentItem,
-                                                        List<DateInterval> dateIntervals) {
+                                                 List<DateInterval> dateIntervals) {
+
         DependResult result = DependResult.FAILED;
         for(DateInterval dateInterval : dateIntervals){
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionId(),
@@ -104,30 +106,69 @@ public class DependentExecute {
                        dependentItem.getDefinitionId(), dateInterval.getStartTime(), dateInterval.getEndTime() );
                 return DependResult.FAILED;
             }
+            // need to check workflow for updates, so get all task and check the task state
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
-                result = getDependResultByState(processInstance.getState());
-            }else{
-                TaskInstance taskInstance = null;
-                List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+                List<TaskNode> taskNodes =
+                        processService.getTaskNodeListByDefinitionId(dependentItem.getDefinitionId());
 
-                for(TaskInstance task : taskInstanceList){
-                    if(task.getName().equals(dependentItem.getDepTasks())){
-                        taskInstance = task;
-                        break;
+                if(taskNodes != null && taskNodes.size() > 0){
+                    List<DependResult> results = new ArrayList<>();
+                    DependResult tmpResult =  DependResult.FAILED;
+                    for(TaskNode taskNode:taskNodes){
+                        tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
+                        if(DependResult.FAILED == tmpResult){
+                            break;
+                        }else{
+                            results.add(getDependTaskResult(taskNode.getName(),processInstance));
+                        }
                     }
-                }
-                if(taskInstance == null){
-                    // cannot find task in the process instance
-                    // maybe because process instance is running or failed.
-                     result = getDependResultByState(processInstance.getState());
+
+                    if(DependResult.FAILED == tmpResult){
+                        result = DependResult.FAILED;
+                    }else if(results.contains(DependResult.WAITING)){
+                        result = DependResult.WAITING;
+                    }else{
+                        result =  DependResult.SUCCESS;
+                    }
                 }else{
-                    result = getDependResultByState(taskInstance.getState());
+                    result = DependResult.FAILED;
                 }
+            }else{
+                result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
             }
             if(result != DependResult.SUCCESS){
                 break;
             }
         }
+        return result;
+    }
+
+    /**
+     * get depend task result
+     * @param taskName
+     * @param processInstance
+     * @return
+     */
+    private DependResult getDependTaskResult(String taskName, ProcessInstance processInstance) {
+        DependResult result = DependResult.FAILED;
+        TaskInstance taskInstance = null;
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
+
+        for(TaskInstance task : taskInstanceList){
+            if(task.getName().equals(taskName)){
+                taskInstance = task;
+                break;
+            }
+        }
+
+        if(taskInstance == null){
+            // cannot find task in the process instance
+            // maybe because process instance is running or failed.
+            result = getDependResultByProcessStateWhenTaskNull(processInstance.getState());
+        }else{
+            result = getDependResultByState(taskInstance.getState());
+        }
+
         return result;
     }
 
@@ -141,16 +182,16 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processDao.findLastRunningProcess(definitionId, dateInterval);
+        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval);
         if(runningProcess != null){
             return runningProcess;
         }
 
-        ProcessInstance lastSchedulerProcess = processDao.findLastSchedulerProcessInterval(
+        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(
                 definitionId, dateInterval
         );
 
-        ProcessInstance lastManualProcess = processDao.findLastManualProcessInterval(
+        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(
                 definitionId, dateInterval
         );
 
@@ -172,10 +213,28 @@ public class DependentExecute {
      */
     private DependResult getDependResultByState(ExecutionStatus state) {
 
-        if(state.typeIsRunning() || state == ExecutionStatus.SUBMITTED_SUCCESS || state == ExecutionStatus.WAITTING_THREAD){
+        if(state.typeIsRunning()
+                || state == ExecutionStatus.SUBMITTED_SUCCESS
+                || state == ExecutionStatus.WAITTING_THREAD){
             return DependResult.WAITING;
         }else if(state.typeIsSuccess()){
             return DependResult.SUCCESS;
+        }else{
+            return DependResult.FAILED;
+        }
+    }
+
+    /**
+     * get dependent result by task instance state when task instance is null
+     * @param state state
+     * @return DependResult
+     */
+    private DependResult getDependResultByProcessStateWhenTaskNull(ExecutionStatus state) {
+
+        if(state.typeIsRunning()
+                || state == ExecutionStatus.SUBMITTED_SUCCESS
+                || state == ExecutionStatus.WAITTING_THREAD){
+            return DependResult.WAITING;
         }else{
             return DependResult.FAILED;
         }
@@ -222,7 +281,7 @@ public class DependentExecute {
      * @param currentTime   current time
      * @return DependResult
      */
-    public DependResult getDependResultForItem(DependentItem item, Date currentTime){
+    private DependResult getDependResultForItem(DependentItem item, Date currentTime){
         String key = item.getKey();
         if(dependResultMap.containsKey(key)){
             return dependResultMap.get(key);

@@ -25,11 +25,11 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -63,37 +63,44 @@ public class DependentTask extends AbstractTask {
     private Date dependentDate;
 
     /**
-     * process dao
+     * process service
      */
-    private ProcessDao processDao;
+    private ProcessService processService;
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
-     * @param props     props
+     * @param taskExecutionContext     taskExecutionContext
      * @param logger    logger
      */
-    public DependentTask(TaskProps props, Logger logger) {
-        super(props, logger);
+    public DependentTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init(){
         logger.info("dependent task initialize");
 
-        this.dependentParameters = JSONUtils.parseObject(this.taskProps.getDependence(),
+        this.dependentParameters = JSONUtils.parseObject(null,
                 DependentParameters.class);
-
-        for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
-            this.dependentTaskList.add(new DependentExecute(
-                            taskModel.getDependItemList(), taskModel.getRelation()));
+        if(dependentParameters != null){
+            for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
+                this.dependentTaskList.add(new DependentExecute(
+                        taskModel.getDependItemList(), taskModel.getRelation()));
+            }
         }
 
-        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
 
-        if(taskProps.getScheduleTime() != null){
-            this.dependentDate = taskProps.getScheduleTime();
+        if(taskExecutionContext.getScheduleTime() != null){
+            this.dependentDate = taskExecutionContext.getScheduleTime();
         }else{
-            this.dependentDate = taskProps.getTaskStartTime();
+            this.dependentDate = taskExecutionContext.getStartTime();
         }
 
     }
@@ -101,13 +108,13 @@ public class DependentTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         try{
             TaskInstance taskInstance = null;
             while(Stopper.isRunning()){
-                taskInstance = processDao.findTaskInstanceById(this.taskProps.getTaskInstId());
+                taskInstance = processService.findTaskInstanceById(this.taskExecutionContext.getTaskInstanceId());
 
                 if(taskInstance == null){
                     exitStatusCode = -1;

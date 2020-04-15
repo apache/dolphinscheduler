@@ -35,12 +35,12 @@ public class TaskProps {
   /**
    * task node name
    **/
-  private String nodeName;
+  private String taskName;
 
   /**
    * task instance id
    **/
-  private int taskInstId;
+  private int taskInstanceId;
 
   /**
    * tenant code , execute task linux user
@@ -58,11 +58,6 @@ public class TaskProps {
   private String taskParams;
 
   /**
-   * task dir
-   **/
-  private String taskDir;
-
-  /**
    * queue
    **/
   private String queue;
@@ -78,7 +73,7 @@ public class TaskProps {
   private Map<String, String> definedParams;
 
   /**
-   * task path
+   * task app id
    */
   private String taskAppId;
 
@@ -111,6 +106,22 @@ public class TaskProps {
    */
   private CommandType cmdTypeIfComplement;
 
+
+  /**
+   *  host
+   */
+  private String host;
+
+  /**
+   *  log path
+   */
+  private String logPath;
+
+  /**
+   * execute path
+   */
+  private String executePath;
+
   /**
    * constructor
    */
@@ -118,39 +129,42 @@ public class TaskProps {
 
   /**
    * constructor
-   * @param taskParams          task params
-   * @param taskDir             task dir
-   * @param scheduleTime        schedule time
-   * @param nodeName            node name
-   * @param taskType            task type
-   * @param taskInstId          task instance id
-   * @param envFile             env file
-   * @param tenantCode          tenant code
-   * @param queue               queue
-   * @param taskStartTime       task start time
-   * @param definedParams       defined params
-   * @param dependence          dependence
-   * @param cmdTypeIfComplement cmd type if complement
+   * @param taskParams taskParams
+   * @param scheduleTime scheduleTime
+   * @param nodeName nodeName
+   * @param taskType taskType
+   * @param taskInstanceId taskInstanceId
+   * @param envFile envFile
+   * @param tenantCode tenantCode
+   * @param queue queue
+   * @param taskStartTime taskStartTime
+   * @param definedParams definedParams
+   * @param dependence dependence
+   * @param cmdTypeIfComplement cmdTypeIfComplement
+   * @param host host
+   * @param logPath logPath
+   * @param executePath executePath
    */
   public TaskProps(String taskParams,
-                   String taskDir,
                    Date scheduleTime,
                    String nodeName,
                    String taskType,
-                   int taskInstId,
+                   int taskInstanceId,
                    String envFile,
                    String tenantCode,
                    String queue,
                    Date taskStartTime,
                    Map<String, String> definedParams,
                    String dependence,
-                   CommandType cmdTypeIfComplement){
+                   CommandType cmdTypeIfComplement,
+                   String host,
+                   String logPath,
+                   String executePath){
     this.taskParams = taskParams;
-    this.taskDir = taskDir;
     this.scheduleTime = scheduleTime;
-    this.nodeName = nodeName;
+    this.taskName = nodeName;
     this.taskType = taskType;
-    this.taskInstId = taskInstId;
+    this.taskInstanceId = taskInstanceId;
     this.envFile = envFile;
     this.tenantCode = tenantCode;
     this.queue = queue;
@@ -158,7 +172,9 @@ public class TaskProps {
     this.definedParams = definedParams;
     this.dependence = dependence;
     this.cmdTypeIfComplement = cmdTypeIfComplement;
-
+    this.host = host;
+    this.logPath = logPath;
+    this.executePath = executePath;
   }
 
   public String getTenantCode() {
@@ -177,12 +193,12 @@ public class TaskProps {
     this.taskParams = taskParams;
   }
 
-  public String getTaskDir() {
-    return taskDir;
+  public String getExecutePath() {
+    return executePath;
   }
 
-  public void setTaskDir(String taskDir) {
-    this.taskDir = taskDir;
+  public void setExecutePath(String executePath) {
+    this.executePath = executePath;
   }
 
   public Map<String, String> getDefinedParams() {
@@ -202,20 +218,20 @@ public class TaskProps {
   }
 
 
-  public String getNodeName() {
-    return nodeName;
+  public String getTaskName() {
+    return taskName;
   }
 
-  public void setNodeName(String nodeName) {
-    this.nodeName = nodeName;
+  public void setTaskName(String taskName) {
+    this.taskName = taskName;
   }
 
-  public int getTaskInstId() {
-    return taskInstId;
+  public int getTaskInstanceId() {
+    return taskInstanceId;
   }
 
-  public void setTaskInstId(int taskInstId) {
-    this.taskInstId = taskInstId;
+  public void setTaskInstanceId(int taskInstanceId) {
+    this.taskInstanceId = taskInstanceId;
   }
 
   public String getQueue() {
@@ -289,6 +305,22 @@ public class TaskProps {
 
   public void setCmdTypeIfComplement(CommandType cmdTypeIfComplement) {
     this.cmdTypeIfComplement = cmdTypeIfComplement;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public String getLogPath() {
+    return logPath;
+  }
+
+  public void setLogPath(String logPath) {
+    this.logPath = logPath;
   }
 
   /**

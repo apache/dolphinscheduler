@@ -19,7 +19,7 @@
     <template slot="content">
       <div class="resource-rename-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -47,9 +47,9 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
+  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-
   export default {
     name: 'resource-file-rename',
     data () {
@@ -71,7 +71,7 @@
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
-              name: this.name,
+              fullName: localStore.getItem('currentDir')+'/'+this.name,
               type: 'FILE'
             })
           }
@@ -100,7 +100,6 @@
           } else {
             resolve()
           }
-
         })
       }
     },

@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +77,18 @@ public class PropertyUtils {
             return null;
         }
         return properties.getProperty(key.trim());
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static String getString(String key, String defaultVal) {
+        String val = properties.getProperty(key.trim());
+        return val == null ? defaultVal : val;
     }
 
     /**
@@ -205,8 +217,7 @@ public class PropertyUtils {
             return null;
         }
         try {
-            String[] propertyArray = value.split(splitStr);
-            return propertyArray;
+            return value.split(splitStr);
         } catch (PatternSyntaxException e) {
             logger.info(e.getMessage(),e);
         }

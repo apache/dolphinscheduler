@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Assert;
@@ -40,8 +40,8 @@ public class JSONUtilsTest {
         String jsonStr = "{\"id\":\"1001\",\"name\":\"Jobs\"}";
 
         Map<String,String> models = JSONUtils.toMap(jsonStr);
-        Assert.assertEquals(models.get("id"), "1001");
-        Assert.assertEquals(models.get("name"), "Jobs");
+        Assert.assertEquals("1001", models.get("id"));
+        Assert.assertEquals("Jobs", models.get("name"));
 
     }
 
@@ -53,9 +53,9 @@ public class JSONUtilsTest {
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
         String str = "{\"direct\":\"IN\",\"prop\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
-        Property property1 = JSONObject.parseObject(str, Property.class);
+        Property property1 = JSON.parseObject(str, Property.class);
         Direct direct = property1.getDirect();
-        Assert.assertEquals(direct , Direct.IN);
+        Assert.assertEquals(Direct.IN, direct);
     }
 
 
@@ -66,12 +66,12 @@ public class JSONUtilsTest {
         List<LinkedHashMap> maps = JSONUtils.toList(str,
                 LinkedHashMap.class);
 
-        Assert.assertEquals(maps.size(), 1);
-        Assert.assertEquals(maps.get(0).get("mysql service name"), "mysql200");
-        Assert.assertEquals(maps.get(0).get("mysql address"), "192.168.xx.xx");
-        Assert.assertEquals(maps.get(0).get("port"), "3306");
-        Assert.assertEquals(maps.get(0).get("no index of number"), "80");
-        Assert.assertEquals(maps.get(0).get("database client connections"), "190");
+        Assert.assertEquals(1, maps.size());
+        Assert.assertEquals("mysql200", maps.get(0).get("mysql service name"));
+        Assert.assertEquals("192.168.xx.xx", maps.get(0).get("mysql address"));
+        Assert.assertEquals("3306", maps.get(0).get("port"));
+        Assert.assertEquals("80", maps.get(0).get("no index of number"));
+        Assert.assertEquals("190", maps.get(0).get("database client connections"));
     }
 
     public String list2String(){
@@ -117,9 +117,9 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void testCheckJsonVaild() {
-        Assert.assertTrue(JSONUtils.checkJsonVaild("3"));
-        Assert.assertFalse(JSONUtils.checkJsonVaild(""));
+    public void testCheckJsonValid() {
+        Assert.assertTrue(JSONUtils.checkJsonValid("3"));
+        Assert.assertFalse(JSONUtils.checkJsonValid(""));
     }
 
     @Test

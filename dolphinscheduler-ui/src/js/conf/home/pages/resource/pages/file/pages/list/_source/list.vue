@@ -19,25 +19,28 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
+            <span>{{$t('Whether directory')}}</span>
+          </th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="100">
             <span>{{$t('Size')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -46,13 +49,16 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
               <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
             </span>
           </td>
-          <td><span class="ellipsis">{{item.fileName}}</span></td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span>{{item.directory? $t('Yes') : $t('No')}}</span>
+          </td>
+          <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
+          <td>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -89,6 +95,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
+                    :disabled="item.directory? true: false"
                     @click="_downloadFile(item)"
                     icon="ans-icon-download">
             </x-button>
@@ -127,7 +134,6 @@
   import { bytesToSize } from '@/module/util/util'
   import { downloadFile } from '@/module/download'
   import localStore from '@/module/util/localStorage'
-
   export default {
     name: 'file-manage-list',
     data () {
@@ -148,7 +154,12 @@
       },
       _go (item) {
         localStore.setItem('file', `${item.alias}|${item.size}`)
-        this.$router.push({ path: `/resource/file/list/${item.id}` })
+        if(item.directory) {
+          localStore.setItem('currentDir', `${item.fullName}`)
+          this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
+        } else {
+          this.$router.push({ path: `/resource/file/list/${item.id}` })
+        }
       },
       _downloadFile (item) {
         downloadFile('/dolphinscheduler/resources/download', {
@@ -166,7 +177,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()

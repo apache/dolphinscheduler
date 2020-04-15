@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * UDF type
  */
-@Getter
 public enum UdfType {
     /**
      * 0 hive; 1 spark
@@ -38,4 +36,23 @@ public enum UdfType {
     @EnumValue
     private final int code;
     private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
+
+    public static UdfType of(int type){
+        for(UdfType ut : values()){
+            if(ut.getCode() == type){
+                return ut;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
+
+
 }

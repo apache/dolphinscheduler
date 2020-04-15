@@ -37,15 +37,15 @@ const saveTargetarr = (valId, domId) => {
 }
 
 const rtBantpl = () => {
-  return `<i class="ans-icon-forbidden" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></i>`
+  return `<em class="ans-icon-forbidden" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></em>`
 }
 
 /**
  * return node html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber }) => {
   let tpl = ``
-  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
+  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
   tpl += `<div class="state-p"></div>`
   tpl += `<div class="icos icos-${taskType}"></div>`
@@ -73,6 +73,7 @@ const tasksAll = () => {
       id: e.attr('id'),
       name: e.find('.name-p').text(),
       targetarr: e.attr('data-targetarr') || '',
+      nodenumber: e.attr('data-nodenumber'),
       x: parseInt(e.css('left'), 10),
       y: parseInt(e.css('top'), 10)
     })
@@ -99,7 +100,7 @@ const setSvgColor = (e, color) => {
   // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
-      $(v).attr('fill', '#555').attr('stroke', '#555').attr('stroke-width', 2)
+      $(v).attr('fill', '#2d8cf0').attr('stroke', '#2d8cf0').attr('stroke-width', 2)
     })
   })
 

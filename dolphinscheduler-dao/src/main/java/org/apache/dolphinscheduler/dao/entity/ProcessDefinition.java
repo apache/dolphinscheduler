@@ -16,16 +16,15 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
 /**
  * process definition
  */
-@Data
 @TableName("t_ds_process_definition")
 public class ProcessDefinition {
     /**
@@ -160,6 +158,16 @@ public class ProcessDefinition {
      */
     private int tenantId;
 
+    /**
+     * modify user name
+     */
+    private String modifyBy;
+
+    /**
+     * resource ids
+     */
+    private String resourceIds;
+
 
     public String getName() {
         return name;
@@ -263,7 +271,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        this.globalParamList = JSONObject.parseArray(globalParams, Property.class);
+        this.globalParamList = JSON.parseArray(globalParams, Property.class);
         this.globalParams = globalParams;
     }
 
@@ -272,7 +280,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONObject.toJSONString(globalParamList);
+        this.globalParams = JSON.toJSONString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
@@ -280,7 +288,7 @@ public class ProcessDefinition {
         List<Property> propList;
 
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            propList = JSONObject.parseArray(globalParams, Property.class);
+            propList = JSON.parseArray(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 
@@ -331,40 +339,20 @@ public class ProcessDefinition {
         this.scheduleReleaseState = scheduleReleaseState;
     }
 
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
+    }
+
     public int getTimeout() {
         return timeout;
     }
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
-    }
-
-    @Override
-    public String toString() {
-        return "ProcessDefinition{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", version=" + version +
-                ", releaseState=" + releaseState +
-                ", projectId=" + projectId +
-                ", processDefinitionJson='" + processDefinitionJson + '\'' +
-                ", globalParams='" + globalParams + '\'' +
-                ", globalParamList=" + globalParamList +
-                ", globalParamMap=" + globalParamMap +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", flag=" + flag +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", projectName='" + projectName + '\'' +
-                ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", scheduleReleaseState=" + scheduleReleaseState +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                '}';
     }
 
     public int getTenantId() {
@@ -382,4 +370,44 @@ public class ProcessDefinition {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessDefinition{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", version=" + version +
+                ", releaseState=" + releaseState +
+                ", projectId=" + projectId +
+                ", processDefinitionJson='" + processDefinitionJson + '\'' +
+                ", description='" + description + '\'' +
+                ", globalParams='" + globalParams + '\'' +
+                ", globalParamList=" + globalParamList +
+                ", globalParamMap=" + globalParamMap +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                ", flag=" + flag +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", projectName='" + projectName + '\'' +
+                ", locations='" + locations + '\'' +
+                ", connects='" + connects + '\'' +
+                ", receivers='" + receivers + '\'' +
+                ", receiversCc='" + receiversCc + '\'' +
+                ", scheduleReleaseState=" + scheduleReleaseState +
+                ", timeout=" + timeout +
+                ", tenantId=" + tenantId +
+                ", modifyBy='" + modifyBy + '\'' +
+                ", resourceIds='" + resourceIds + '\'' +
+                '}';
+    }
+
 }

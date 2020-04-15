@@ -16,17 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.shell;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -43,11 +43,11 @@ public class ShellCommandExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellCommandExecutorTest.class);
 
-    private ProcessDao processDao = null;
+    private ProcessService processService = null;
 
     @Before
     public void before(){
-        processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Test
@@ -55,20 +55,20 @@ public class ShellCommandExecutorTest {
 
         TaskProps taskProps = new TaskProps();
         // processDefineId_processInstanceId_taskInstanceId
-        taskProps.setTaskDir("/opt/soft/program/tmp/dolphinscheduler/exec/flow/5/36/2864/7657");
+        taskProps.setExecutePath("/opt/soft/program/tmp/dolphinscheduler/exec/flow/5/36/2864/7657");
         taskProps.setTaskAppId("36_2864_7657");
         // set tenant -> task execute linux user
         taskProps.setTenantCode("hdfs");
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(7657);
+        taskProps.setTaskInstanceId(7657);
 
 
 
-        TaskInstance taskInstance = processDao.findTaskInstanceById(7657);
+        TaskInstance taskInstance = processService.findTaskInstanceById(7657);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 
@@ -79,7 +79,9 @@ public class ShellCommandExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+
+        AbstractTask task = null;
 
         logger.info("task info : {}", task);
 

@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 public class FuncUtils {
 
-    static public String mkString(Iterable<String> list, String split) {
+    public static String mkString(Iterable<String> list, String split) {
 
         if (null == list || StringUtils.isEmpty(split)){
             return null;

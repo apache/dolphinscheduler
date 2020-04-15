@@ -101,6 +101,15 @@
   .icos-HTTP {
     background: url("../img/toobar_HTTP.png") no-repeat 50% 50%;
   }
+  .icos-DATAX {
+    background: url("../img/toolbar_DATAX.png") no-repeat 50% 50%;
+  }
+  .icos-SQOOP {
+    background: url("../img/toolbar_SQOOP.png") no-repeat 50% 50%;
+  }
+  .icos-CONDITIONS {
+    background: url("../img/toobar_CONDITIONS.png") no-repeat 50% 50%;
+  }
   .toolbar {
     width: 60px;
     height: 100%;
@@ -121,12 +130,12 @@
     }
     .toolbar-btn {
       overflow: hidden;
-      padding: 11px 11px 0 11px;
+      padding: 8px 11px 0 11px;
       .bar-box {
         width: 36px;
         height: 36px;
         float: left;
-        margin-bottom: 11px;
+        margin-bottom: 3px;
         border-radius: 3px;
         .disabled {
           .icos {
@@ -157,6 +166,12 @@
       background: #F2F3F7;
       position: relative;
       border-radius: 0 3px 0 0;
+      .ans-btn-text {
+        color: #337ab7;
+        .ans-icon {
+          font-size: 16px;
+        }
+      }
       .assist-btn {
         position: absolute;
         left: 10px;
@@ -203,7 +218,7 @@
               color: #333;
             }
             &.active {
-              background: #e1e2e3;
+              // background: #e1e2e3;
               i {
                 color: #2d8cf0;
               }
@@ -231,7 +246,9 @@
     border-radius: 3px 3px 0px 0px;
   }
 }
-
+#screen {
+  margin-right: 5px;
+}
 .v-modal-custom-log {
   z-index: 101;
 }
@@ -309,14 +326,15 @@ svg path:hover {
   //min-width: calc(100% - 220px);
   width: 8000px;
   height: 5000px;
-  position: relative;
   svg:not(:root){
     z-index: 11;
   }
 }
 
 .jtk-demo-canvas {
+  position: relative;
   height: 100%;
+  display: flex;
 }
 
 .jtk-bootstrap {
@@ -357,10 +375,6 @@ svg path:hover {
 
 .jtk-demo-main .description li {
   list-style-type: disc !important;
-}
-
-.jtk-demo-canvas {
-  display: flex;
 }
 
 .canvas-wide {
@@ -459,6 +473,12 @@ svg path:hover {
   -webkit-transition: background-color 0.25s ease-in;
   -moz-transition: background-color 0.25s ease-in;
   transition: background-color 0.25s ease-in;
+  background-color: white;
+  opacity: 0.8;
+  padding: 0.3em;
+  border-radius: 0.5em;
+  border: 1px solid #346789;
+  cursor: pointer;
 }
 
 .aLabel.jtk-hover,
@@ -485,14 +505,6 @@ svg path:hover {
   }
 }
 
-.aLabel {
-  background-color: white;
-  opacity: 0.8;
-  padding: 0.3em;
-  border-radius: 0.5em;
-  border: 1px solid #346789;
-  cursor: pointer;
-}
 
 .jtk-ep {
   .ep {

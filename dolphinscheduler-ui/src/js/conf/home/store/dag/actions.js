@@ -110,6 +110,11 @@ export default {
         let processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
         // tasks info
         state.tasks = processDefinitionJson.tasks
+        // tasks cache
+        state.cacheTasks = {}
+        processDefinitionJson.tasks.forEach(v => {
+          state.cacheTasks[v.id] = v
+        })
         // global params
         state.globalParams = processDefinitionJson.globalParams
         // timeout
@@ -142,6 +147,11 @@ export default {
         let processInstanceJson = JSON.parse(res.data.processInstanceJson)
         // tasks info
         state.tasks = processInstanceJson.tasks
+        // tasks cache
+        state.cacheTasks = {}
+        processInstanceJson.tasks.forEach(v => {
+          state.cacheTasks[v.id] = v
+        })
         // global params
         state.globalParams = processInstanceJson.globalParams
         // timeout
@@ -150,7 +160,7 @@ export default {
         state.tenantId = processInstanceJson.tenantId
 
         //startup parameters
-        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
         state.startup.commandParam = JSON.parse(res.data.commandParam)
 
         resolve(res.data)
@@ -270,7 +280,7 @@ export default {
       resolve()
       return
     }
-    io.get(`projects/queryAllProjectList`, payload, res => {
+    io.get(`projects/query-project-list`, payload, res => {
       state.projectListS = res.data
       resolve(res.data)
   }).catch(res => {
@@ -317,6 +327,25 @@ export default {
         type: 'FILE'
       }, res => {
         state.resourcesListS = res.data
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * get jar
+   */
+  getResourcesListJar ({ state }) {
+    return new Promise((resolve, reject) => {
+      if (state.resourcesListJar.length) {
+        resolve()
+        return
+      }
+      io.get(`resources/list/jar`, {
+        type: 'FILE'
+      }, res => {
+        state.resourcesListJar = res.data
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -686,5 +715,14 @@ export default {
         reject(e)
       })
     })
-  }
+  },
+  getResourceId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`resources/queryResource`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
 }

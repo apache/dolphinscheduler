@@ -29,16 +29,16 @@
             <span>{{$t('View log')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('Download Log')">
-                <i class="ans-icon-download" style="font-size: 20px"></i>
+                <em class="ans-icon-download" style="font-size: 20px"></em>
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('Refresh Log')">
-                <i class="ans-icon-refresh"></i>
+                <em class="ans-icon-refresh"></em>
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('Enter full screen')">
-                <i class="ans-icon-max"></i>
+                <em class="ans-icon-max"></em>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
-                <i class="ans-icon-min"></i>
+                <em class="ans-icon-min"></em>
               </a>
             </div>
           </div>
@@ -170,7 +170,7 @@
        */
       _downloadLog () {
         downloadFile('/dolphinscheduler/log/download-log', {
-          taskInstId: this.stateId || this.logId
+          taskInstanceId: this.stateId || this.logId
         })
       },
       /**
@@ -256,9 +256,9 @@
     computed: {
       _rtParam () {
         return {
-          taskInstId: this.stateId || this.logId,
-          skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '0000' : 0}`),
-          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}0000`)
+          taskInstanceId: this.stateId || this.logId,
+          skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
+          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
         }
       }
     },
@@ -316,7 +316,7 @@
           }
           .refresh-log {
             >i {
-              font-size: 24px;
+              font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
@@ -353,7 +353,7 @@
             font-weight: bold;
             resize:none;
             line-height: 1.6;
-            padding: 6px;
+            padding: 0px;
           }
         }
       }

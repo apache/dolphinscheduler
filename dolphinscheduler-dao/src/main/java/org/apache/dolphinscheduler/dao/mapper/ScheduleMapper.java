@@ -60,4 +60,11 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      */
     List<Schedule> queryByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
 
+    /**
+     * query schedule list by process definition id
+     * @param processDefinitionId processDefinitionId
+     * @return schedule list
+     */
+    List<Schedule> queryReleaseSchedulerListByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
+
 }

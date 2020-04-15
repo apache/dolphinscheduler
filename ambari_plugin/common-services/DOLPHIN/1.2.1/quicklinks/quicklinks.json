@@ -1,0 +1,26 @@
+{
+  "name": "default",
+  "description": "default quick links configuration",
+  "configuration": {
+    "protocol":
+    {
+      "type":"http"
+    },
+
+    "links": [
+      {
+        "name": "dolphin-application-ui",
+        "label": "DolphinApplication UI",
+        "requires_user_name": "false",
+        "component_name": "DOLPHIN_API",
+        "url": "%@://%@:%@/dolphinscheduler/ui/view/login/index.html",
+        "port":{
+          "http_property": "server.port",
+          "http_default_port": "12345",
+          "regex": "^(\\d+)$",
+          "site": "dolphin-application-api"
+        }
+      }
+    ]
+  }
+}

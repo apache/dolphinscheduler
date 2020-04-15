@@ -17,11 +17,11 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -43,24 +43,24 @@ public class EnterpriseWeChatUtils {
 
     public static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatUtils.class);
 
-    private static final String enterpriseWeChatCorpId = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_CORP_ID);
+    private static final String ENTERPRISE_WE_CHAT_CORP_ID = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_CORP_ID);
 
-    private static final String enterpriseWeChatSecret = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_SECRET);
+    private static final String ENTERPRISE_WE_CHAT_SECRET = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_SECRET);
 
-    private static final String enterpriseWeChatTokenUrl = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
-    private static String enterpriseWeChatTokenUrlReplace = enterpriseWeChatTokenUrl
-            .replaceAll("\\$corpId", enterpriseWeChatCorpId)
-            .replaceAll("\\$secret", enterpriseWeChatSecret);
+    private static final String ENTERPRISE_WE_CHAT_TOKEN_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
+    private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL
+            .replaceAll("\\$corpId", ENTERPRISE_WE_CHAT_CORP_ID)
+            .replaceAll("\\$secret", ENTERPRISE_WE_CHAT_SECRET);
 
-    private static final String enterpriseWeChatPushUrl = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
+    private static final String ENTERPRISE_WE_CHAT_PUSH_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
 
-    private static final String enterpriseWeChatTeamSendMsg = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TEAM_SEND_MSG);
+    private static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TEAM_SEND_MSG);
 
-    private static final String enterpriseWeChatUserSendMsg = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
+    private static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
 
-    public static final String enterpriseWeChatAgentId = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID);
+    public static final String ENTERPRISE_WE_CHAT_AGENT_ID = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID);
 
-    public static final String enterpriseWeChatUsers = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS);
+    public static final String ENTERPRISE_WE_CHAT_USERS = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS);
 
     /**
      * get Enterprise WeChat is enable
@@ -86,20 +86,24 @@ public class EnterpriseWeChatUtils {
         String resp;
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
-        CloseableHttpResponse response = httpClient.execute(httpGet);
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, Constants.UTF_8);
-            EntityUtils.consume(entity);
-        } finally {
-            response.close();
-        }
+            HttpGet httpGet = new HttpGet(ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE);
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, Constants.UTF_8);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
 
-        Map<String, Object> map = JSON.parseObject(resp,
-                new TypeToken<Map<String, Object>>() {
-                }.getType());
-        return map.get("access_token").toString();
+            Map<String, Object> map = JSON.parseObject(resp,
+                    new TypeToken<Map<String, Object>>() {
+                    }.getType());
+            return map.get("access_token").toString();
+        } finally {
+            httpClient.close();
+        }
     }
 
     /**
@@ -110,7 +114,7 @@ public class EnterpriseWeChatUtils {
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", toParty)
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\$toParty", toParty)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -124,7 +128,7 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
-        return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", listParty)
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\$toParty", listParty)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -137,7 +141,7 @@ public class EnterpriseWeChatUtils {
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", toUser)
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\$toUser", toUser)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -151,7 +155,7 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
-        return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", listUser)
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\$toUser", listUser)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -165,22 +169,27 @@ public class EnterpriseWeChatUtils {
      * @throws IOException the IOException
      */
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
-        String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
+        String enterpriseWeChatPushUrlReplace = ENTERPRISE_WE_CHAT_PUSH_URL.replaceAll("\\$token", token);
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
-        httpPost.setEntity(new StringEntity(data, charset));
-        CloseableHttpResponse response = httpclient.execute(httpPost);
-        String resp;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, charset);
-            EntityUtils.consume(entity);
+            HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
+            httpPost.setEntity(new StringEntity(data, charset));
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, charset);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            logger.info("Enterprise WeChat send [{}], param:{}, resp:{}",
+                    ENTERPRISE_WE_CHAT_PUSH_URL, data, resp);
+            return resp;
         } finally {
-            response.close();
+            httpClient.close();
         }
-        logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
-        return resp;
     }
 
     /**
@@ -192,22 +201,22 @@ public class EnterpriseWeChatUtils {
     public static String markdownTable(String title,String content){
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
-        for (LinkedHashMap mapItems : mapItemsList){
 
-            Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+        if (null != mapItemsList) {
+            for (LinkedHashMap mapItems : mapItemsList){
+                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
 
-            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                while (iterator.hasNext()){
 
-            StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
-            while (iterator.hasNext()){
-
-                Map.Entry<String, String> entry = iterator.next();
-                t.append(Constants.MARKDOWN_QUOTE);
-                t.append(entry.getKey()).append(":").append(entry.getValue());
-                t.append(Constants.MARKDOWN_ENTER);
+                    Map.Entry<String, String> entry = iterator.next();
+                    t.append(Constants.MARKDOWN_QUOTE);
+                    t.append(entry.getKey()).append(":").append(entry.getValue());
+                    t.append(Constants.MARKDOWN_ENTER);
+                }
+                contents.append(t);
             }
-
-            contents.append(t);
         }
         return contents.toString();
     }

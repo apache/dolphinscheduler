@@ -67,7 +67,6 @@ Affirm.paramVerification = (name) => {
       if (!dagStore.name) {
         store.commit('dag/setName', `${uuid('dag_')}${uuid() + uuid()}`)
       }
-      flag = false
     } else {
       flag = true
     }
@@ -101,7 +100,7 @@ Affirm.isPop = (fn) => {
               Vue.$modal.destroy()
             })
           },
-          close () {
+          close () { 
             fn()
             Vue.$modal.destroy()
           }

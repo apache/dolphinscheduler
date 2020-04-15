@@ -17,17 +17,17 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -41,7 +41,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
-    protected static final DruidDataSource dataSource = getDataSource();
+    protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
     @Override
@@ -53,13 +53,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * get datasource
      * @return DruidDataSource
      */
-    public static DruidDataSource getDataSource(){
-        DruidDataSource dataSource = ConnectionFactory.getDataSource();
-        dataSource.setInitialSize(2);
-        dataSource.setMinIdle(2);
-        dataSource.setMaxActive(2);
-
-        return dataSource;
+    public static DataSource getDataSource(){
+        return ConnectionFactory.getInstance().getDataSource();
     }
 
     /**
@@ -84,7 +79,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             return null;
         }finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -156,14 +151,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -196,7 +193,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -313,7 +310,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (SQLException e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -321,14 +320,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -371,7 +372,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -400,7 +401,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + upgradeSQL, e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }

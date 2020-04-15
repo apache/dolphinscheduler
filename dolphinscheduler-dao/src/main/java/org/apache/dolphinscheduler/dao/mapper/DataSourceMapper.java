@@ -77,4 +77,15 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     List<DataSource> listAllDataSourceByType(@Param("type") Integer type);
 
 
+    /**
+     * list authorized UDF function
+     *
+     * @param userId userId
+     * @param dataSourceIds data source id array
+     * @param <T> T
+     * @return UDF function list
+     */
+    <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,@Param("dataSourceIds")T[] dataSourceIds);
+
+
 }

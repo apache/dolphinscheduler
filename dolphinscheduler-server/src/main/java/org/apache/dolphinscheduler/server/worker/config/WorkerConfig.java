@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,10 +17,13 @@
  */
 package org.apache.dolphinscheduler.server.worker.config;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
     @Value("${worker.exec.threads:100}")
@@ -31,11 +35,33 @@ public class WorkerConfig {
     @Value("${worker.fetch.task.num:3}")
     private int workerFetchTaskNum;
 
-    @Value("${worker.max.cpuload.avg:10}")
+    @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${master.reserved.memory:1}")
+    @Value("${worker.reserved.memory:0.5}")
     private double workerReservedMemory;
+
+    @Value("${worker.group: default}")
+    private String workerGroup;
+
+    @Value("${worker.listen.port: 1234}")
+    private int listenPort;
+
+    public int getListenPort() {
+        return listenPort;
+    }
+
+    public void setListenPort(int listenPort) {
+        this.listenPort = listenPort;
+    }
+
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
 
     public int getWorkerExecThreads() {
         return workerExecThreads;
@@ -70,6 +96,9 @@ public class WorkerConfig {
     }
 
     public int getWorkerMaxCpuloadAvg() {
+        if (workerMaxCpuloadAvg == -1){
+            return Constants.DEFAULT_WORKER_CPU_LOAD;
+        }
         return workerMaxCpuloadAvg;
     }
 

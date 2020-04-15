@@ -22,8 +22,8 @@
         select *
         from t_ds_resources
         where 1= 1
-        <if test="alias != null and alias != ''">
-            and alias = #{alias}
+        <if test="fullName != null and fullName != ''">
+            and full_name = #{fullName}
         </if>
         <if test="type != -1">
             and type = #{type}
@@ -39,7 +39,11 @@
         <if test="type != -1">
             and type=#{type}
         </if>
-        <if test="userId != 0">
+        <if test="userId != 0 and perm != 0">
+            and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId} and perm=#{perm}
+            union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        </if>
+        <if test="userId != 0 and perm == 0">
             and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
             union select id as resources_id  from t_ds_resources where user_id=#{userId})
         </if>
@@ -47,7 +51,7 @@
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where type=#{type}
+        where type=#{type} and pid=#{id}
         <if test="userId != 0">
             and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
             union select id as resources_id  from t_ds_resources where user_id=#{userId})
@@ -60,7 +64,7 @@
     <select id="queryAuthorizedResourceList" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select r.*
         from  t_ds_resources r,t_ds_relation_resources_user rel
-        where r.id = rel.resources_id AND rel.user_id = #{userId}
+        where r.id = rel.resources_id AND rel.user_id = #{userId} and perm=7
     </select>
     <select id="queryResourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
@@ -70,7 +74,74 @@
     <select id="queryTenantCodeByResourceName" resultType="java.lang.String">
         select tenant_code
         from t_ds_tenant t, t_ds_user u, t_ds_resources res
-        where t.id = u.tenant_id and u.id = res.user_id and res.type=0
-        and res.alias= #{resName}
+        where t.id = u.tenant_id and u.id = res.user_id and res.type=#{resType}
+        and res.full_name= #{resName}
+    </select>
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where type=0
+        and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId} and perm=7
+        union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="resNames != null and resNames != ''">
+            and full_name in
+            <foreach collection="resNames" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="listAuthorizedResourceById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId} and perm=7
+        union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="resIds != null and resIds != ''">
+            and id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    
+    <delete id="deleteIds" parameterType="java.lang.Integer">
+        delete from t_ds_resources where id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </delete>
+
+    <select id="listChildren" resultType="java.lang.Integer">
+        select id
+        from t_ds_resources
+        where pid = #{direcotyId}
+    </select>
+
+    <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where type = #{type}
+        and full_name = #{fullName}
+    </select>
+
+    <update id="batchUpdateResource" parameterType="java.util.List">
+        <foreach collection="resourceList" item="resource" index="index" open="" close="" separator =";">
+            update t_ds_resources
+            <set>
+                full_name=#{resource.fullName},
+                update_time=#{resource.updateTime}
+            </set>
+            <where>
+                id=#{resource.id}
+            </where>
+        </foreach>
+    </update>
+
+    <select id="listResourceByIds" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
     </select>
 </mapper>

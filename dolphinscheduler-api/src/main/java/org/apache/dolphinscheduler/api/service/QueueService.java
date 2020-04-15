@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
@@ -43,7 +44,7 @@ import java.util.Map;
 @Service
 public class QueueService extends BaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TenantService.class);
+    private static final Logger logger = LoggerFactory.getLogger(QueueService.class);
 
     @Autowired
     private QueueMapper queueMapper;
@@ -115,12 +116,12 @@ public class QueueService extends BaseService {
         }
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
             return result;
         }
 
@@ -163,6 +164,16 @@ public class QueueService extends BaseService {
             return result;
         }
 
+        if (StringUtils.isEmpty(queue)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
+            return result;
+        }
+
+        if (StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
+            return result;
+        }
+
         Queue queueObj = queueMapper.selectById(id);
         if (queueObj == null) {
             putMsg(result, Status.QUEUE_NOT_EXIST, id);
@@ -176,19 +187,16 @@ public class QueueService extends BaseService {
         }
 
         // check queue name is exist
-        if (!queueName.equals(queueObj.getQueueName())) {
-            if (checkQueueNameExist(queueName)) {
-                putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-                return result;
-            }
+        if (!queueName.equals(queueObj.getQueueName())
+                && checkQueueNameExist(queueName)) {
+            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+            return result;
         }
 
         // check queue value is exist
-        if (!queue.equals(queueObj.getQueue())) {
-            if (checkQueueExist(queue)) {
-                putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-                return result;
-            }
+        if (!queue.equals(queueObj.getQueue()) && checkQueueExist(queue)) {
+            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
+            return result;
         }
 
         // check old queue using by any user
@@ -222,12 +230,12 @@ public class QueueService extends BaseService {
         Result result = new Result();
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
             return result;
         }
 
@@ -257,7 +265,7 @@ public class QueueService extends BaseService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.queryAllQueueList(queue, null).size() > 0;
+        return CollectionUtils.isNotEmpty(queueMapper.queryAllQueueList(queue, null));
     }
 
     /**
@@ -268,7 +276,7 @@ public class QueueService extends BaseService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.queryAllQueueList(null, queueName).size() > 0;
+        return CollectionUtils.isNotEmpty(queueMapper.queryAllQueueList(null, queueName));
     }
 
     /**
@@ -280,7 +288,7 @@ public class QueueService extends BaseService {
      * @return true if need to update user
      */
     private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && userMapper.queryUserListByQueue(oldQueue).size() > 0;
+        return !oldQueue.equals(newQueue) && CollectionUtils.isNotEmpty(userMapper.queryUserListByQueue(oldQueue));
     }
 
 }

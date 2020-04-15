@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
@@ -28,7 +27,6 @@ import java.util.Date;
 /**
  * command
  */
-@Data
 @TableName("t_ds_command")
 public class Command {
 
@@ -110,13 +108,11 @@ public class Command {
     @TableField("update_time")
     private Date updateTime;
 
-
     /**
-     *
+     * worker group
      */
-    @TableField("worker_group_id")
-    private int workerGroupId;
-
+    @TableField(exist = false)
+    private String workerGroup;
 
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
@@ -256,15 +252,86 @@ public class Command {
         this.updateTime = updateTime;
     }
 
-
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Command command = (Command) o;
+
+        if (id != command.id) {
+            return false;
+        }
+        if (processDefinitionId != command.processDefinitionId) {
+            return false;
+        }
+        if (executorId != command.executorId) {
+            return false;
+        }
+        if (workerGroup != null ? workerGroup.equals(command.workerGroup) : command.workerGroup == null) {
+            return false;
+        }
+        if (commandType != command.commandType) {
+            return false;
+        }
+        if (commandParam != null ? !commandParam.equals(command.commandParam) : command.commandParam != null) {
+            return false;
+        }
+        if (taskDependType != command.taskDependType) {
+            return false;
+        }
+        if (failureStrategy != command.failureStrategy) {
+            return false;
+        }
+        if (warningType != command.warningType) {
+            return false;
+        }
+        if (warningGroupId != null ? !warningGroupId.equals(command.warningGroupId) : command.warningGroupId != null) {
+            return false;
+        }
+        if (scheduleTime != null ? !scheduleTime.equals(command.scheduleTime) : command.scheduleTime != null) {
+            return false;
+        }
+        if (startTime != null ? !startTime.equals(command.startTime) : command.startTime != null) {
+            return false;
+        }
+        if (processInstancePriority != command.processInstancePriority) {
+            return false;
+        }
+        return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (commandType != null ? commandType.hashCode() : 0);
+        result = 31 * result + processDefinitionId;
+        result = 31 * result + executorId;
+        result = 31 * result + (commandParam != null ? commandParam.hashCode() : 0);
+        result = 31 * result + (taskDependType != null ? taskDependType.hashCode() : 0);
+        result = 31 * result + (failureStrategy != null ? failureStrategy.hashCode() : 0);
+        result = 31 * result + (warningType != null ? warningType.hashCode() : 0);
+        result = 31 * result + (warningGroupId != null ? warningGroupId.hashCode() : 0);
+        result = 31 * result + (scheduleTime != null ? scheduleTime.hashCode() : 0);
+        result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
+        result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
+        return result;
+    }
     @Override
     public String toString() {
         return "Command{" +
@@ -281,7 +348,7 @@ public class Command {
                 ", startTime=" + startTime +
                 ", processInstancePriority=" + processInstancePriority +
                 ", updateTime=" + updateTime +
-                ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 '}';
     }
 }

@@ -23,33 +23,22 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.User;
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
 import java.util.*;
 
 
 /**
  */
-@Ignore
 public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
     public void testSendMails() {
-        String[] receivers = new String[]{"xxx@qq.com"};
-        String[] receiversCc = new String[]{"xxx@qq.com"};
+        String[] receivers = new String[]{"347801120@qq.com"};
+        String[] receiversCc = new String[]{"347801120@qq.com"};
 
         String content ="[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +
@@ -114,7 +103,7 @@ public class MailUtilsTest {
 
     @Test
     public void testSendTableMail(){
-        String[] mails = new String[]{"825193156@qq.com"};
+        String[] mails = new String[]{"347801120@qq.com"};
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TABLE);
@@ -148,8 +137,10 @@ public class MailUtilsTest {
      * Table
      */
     @Test
-    public void addAlertTable(){
+    public void testAddAlertTable(){
+        logger.info("testAddAlertTable");
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TABLE);
@@ -159,6 +150,7 @@ public class MailUtilsTest {
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
         alertDao.addAlert(alert);
+        logger.info("" +alert);
     }
 
     @Test
@@ -192,41 +184,6 @@ public class MailUtilsTest {
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
         MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.TABLEATTACHMENT);
-    }
-
-    @Test
-    public void template(){
-        Template MAIL_TEMPLATE;
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_21);
-        cfg.setDefaultEncoding(Constants.UTF_8);
-        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-        cfg.setTemplateLoader(stringTemplateLoader);
-        InputStreamReader isr = null;
-        try {
-            isr = new InputStreamReader(new FileInputStream(ResourceUtils.getFile(Constants.CLASSPATH_MAIL_TEMPLATES_ALERT_MAIL_TEMPLATE_FTL)),
-                    Constants.UTF_8);
-
-            MAIL_TEMPLATE = new Template("alert_mail_template", isr, cfg);
-        } catch (Exception e) {
-            MAIL_TEMPLATE = null;
-        } finally {
-            IOUtils.closeQuietly(isr);
-        }
-
-
-        StringWriter out = new StringWriter();
-        Map<String,String> map = new HashMap<>();
-        map.put(Constants.TITLE,"title_test");
-        try {
-            MAIL_TEMPLATE.process(map, out);
-            logger.info(out.toString());
-
-        } catch (TemplateException e) {
-            logger.error(e.getMessage(),e);
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        }
-
     }
 
 }

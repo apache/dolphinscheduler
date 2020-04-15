@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -25,13 +27,25 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+/**
+ *  command mapper test
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class CommandMapperTest {
 
 
@@ -41,23 +55,28 @@ public class CommandMapperTest {
     @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
 
+
     /**
-     * insert
-     * @return Command
+     * test insert
      */
-    private Command insertOne(){
-        //insertOne
-        Command command = new Command();
-        command.setCommandType(CommandType.START_PROCESS);
-        command.setProcessDefinitionId(1);
-        command.setExecutorId(4);
-        command.setProcessInstancePriority(Priority.MEDIUM);
-        command.setFailureStrategy(FailureStrategy.CONTINUE);
-        command.setWorkerGroupId(-1);
-        command.setWarningGroupId(1);
-        command.setUpdateTime(new Date());
-        commandMapper.insert(command);
-        return command;
+    @Test
+    public void testInsert(){
+        Command command = createCommand();
+        assertNotNull(command.getId());
+        assertThat(command.getId(),greaterThan(0));
+    }
+
+
+    /**
+     * test select by id
+     */
+    @Test
+    public void testSelectById() {
+        Command expectedCommand = createCommand();
+        //query
+        Command actualCommand = commandMapper.selectById(expectedCommand.getId());
+
+        assertEquals(expectedCommand, actualCommand);
     }
 
     /**
@@ -65,13 +84,18 @@ public class CommandMapperTest {
      */
     @Test
     public void testUpdate(){
-        //insertOne
-        Command command = insertOne();
-        //update
-        command.setStartTime(new Date());
-        int update = commandMapper.updateById(command);
-        Assert.assertEquals(update, 1);
-        commandMapper.deleteById(command.getId());
+
+        Command expectedCommand = createCommand();
+
+        // update the command time if current command if recover from waiting
+        expectedCommand.setUpdateTime(DateUtils.getCurrentDate());
+
+        commandMapper.updateById(expectedCommand);
+
+        Command actualCommand = commandMapper.selectById(expectedCommand.getId());
+
+        assertEquals(expectedCommand,actualCommand);
+
     }
 
     /**
@@ -79,33 +103,37 @@ public class CommandMapperTest {
      */
     @Test
     public void testDelete(){
+        Command expectedCommand = createCommand();
 
-        Command Command = insertOne();
-        int delete = commandMapper.deleteById(Command.getId());
-        Assert.assertEquals(delete, 1);
+        commandMapper.deleteById(expectedCommand.getId());
+
+        Command actualCommand = commandMapper.selectById(expectedCommand.getId());
+
+        assertNull(actualCommand);
     }
 
-    /**
-     * test query
-     */
-    @Test
-    public void testQuery() {
-        Command command = insertOne();
-        //query
-        List<Command> commands = commandMapper.selectList(null);
-        Assert.assertNotEquals(commands.size(), 0);
-        commandMapper.deleteById(command.getId());
-    }
+
 
     /**
      * test query all
      */
     @Test
     public void testGetAll() {
-        Command command = insertOne();
-        List<Command> commands = commandMapper.selectList(null);
-        Assert.assertNotEquals(commands.size(), 0);
-        commandMapper.deleteById(command.getId());
+        Integer count = 10;
+
+        Map<Integer, Command> commandMap = createCommandMap(count);
+
+
+        List<Command> actualCommands = commandMapper.selectList(null);
+
+        assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
+
+        for (Command actualCommand : actualCommands){
+            Command expectedCommand = commandMap.get(actualCommand.getId());
+            if (expectedCommand != null){
+                assertEquals(expectedCommand,actualCommand);
+            }
+        }
     }
 
     /**
@@ -113,28 +141,14 @@ public class CommandMapperTest {
      */
     @Test
     public void testGetOneToRun() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setName("ut test");
-        processDefinition.setProjectId(1);
-        processDefinition.setFlag(Flag.YES);
-        processDefinitionMapper.insert(processDefinition);
 
-        Command command = new Command();
-        command.setCommandType(CommandType.START_PROCESS);
-        command.setProcessDefinitionId(processDefinition.getId());
-        command.setExecutorId(4);
-        command.setProcessInstancePriority(Priority.MEDIUM);
-        command.setFailureStrategy(FailureStrategy.CONTINUE);
-        command.setWorkerGroupId(-1);
-        command.setWarningGroupId(1);
-        command.setUpdateTime(new Date());
-        commandMapper.insert(command);
+        ProcessDefinition processDefinition = createProcessDefinition();
 
-        Command command2 = commandMapper.getOneToRun();
-        Assert.assertNotEquals(command2, null);
-        commandMapper.deleteById(command.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
+        Command expectedCommand = createCommand(CommandType.START_PROCESS,processDefinition.getId());
+
+        Command actualCommand = commandMapper.getOneToRun();
+
+        assertNotNull(actualCommand);
     }
 
     /**
@@ -142,35 +156,112 @@ public class CommandMapperTest {
      */
     @Test
     public void testCountCommandState() {
-        Command command = insertOne();
+        Integer count = 10;
 
-        //insertOne
+        ProcessDefinition processDefinition = createProcessDefinition();
+
+        CommandCount expectedCommandCount = createCommandMap(count, CommandType.START_PROCESS, processDefinition.getId());
+
+        Integer[] projectIdArray = {processDefinition.getProjectId()};
+
+        Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
+
+        Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
+
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectIdArray);
+
+        assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
+    }
+
+
+    /**
+     * create command map
+     * @param count map count
+     * @param commandType comman type
+     * @param processDefinitionId process definition id
+     * @return command map
+     */
+    private CommandCount createCommandMap(
+            Integer count,
+            CommandType commandType,
+            Integer processDefinitionId){
+
+        CommandCount commandCount = new CommandCount();
+
+        for (int i = 0 ;i < count ;i++){
+            createCommand(commandType,processDefinitionId);
+        }
+        commandCount.setCommandType(commandType);
+        commandCount.setCount(count);
+
+        return commandCount;
+    }
+
+    /**
+     *  create process definition
+     * @return process definition
+     */
+    private ProcessDefinition createProcessDefinition(){
         ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setName("def 1");
-        processDefinition.setProjectId(1010);
-        processDefinition.setUserId(101);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        processDefinition.setName("ut test");
+        processDefinition.setProjectId(1);
+        processDefinition.setFlag(Flag.YES);
+
         processDefinitionMapper.insert(processDefinition);
 
-        command.setProcessDefinitionId(processDefinition.getId());
-        commandMapper.updateById(command);
-
-
-        List<CommandCount> commandCounts = commandMapper.countCommandState(
-                4, null, null, new Integer[0]
-        );
-
-        Integer[] projectIdArray = new Integer[2];
-        projectIdArray[0] = processDefinition.getProjectId();
-        projectIdArray[1] = 200;
-        List<CommandCount> commandCounts2 = commandMapper.countCommandState(
-                4, null, null, projectIdArray
-        );
-
-        commandMapper.deleteById(command.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        Assert.assertNotEquals(commandCounts.size(), 0);
-        Assert.assertNotEquals(commandCounts2.size(), 0);
+        return processDefinition;
     }
+
+    /**
+     * create command map
+     * @param count map count
+     * @return command map
+     */
+    private Map<Integer,Command> createCommandMap(Integer count){
+        Map<Integer,Command> commandMap = new HashMap<>();
+
+        for (int i = 0; i < count ;i++){
+            Command command = createCommand();
+            commandMap.put(command.getId(),command);
+        }
+        return commandMap;
+    }
+
+
+    /**
+     * create command
+     * @return
+     */
+    private Command createCommand(){
+        return createCommand(CommandType.START_PROCESS,1);
+    }
+
+    /**
+     * create command
+     * @return Command
+     */
+    private Command createCommand(CommandType commandType,Integer processDefinitionId){
+
+        Command command = new Command();
+        command.setCommandType(commandType);
+        command.setProcessDefinitionId(processDefinitionId);
+        command.setExecutorId(4);
+        command.setCommandParam("test command param");
+        command.setTaskDependType(TaskDependType.TASK_ONLY);
+        command.setFailureStrategy(FailureStrategy.CONTINUE);
+        command.setWarningType(WarningType.ALL);
+        command.setWarningGroupId(1);
+        command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
+        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
+        command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
+        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        commandMapper.insert(command);
+
+        return command;
+    }
+
+
+
 }

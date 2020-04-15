@@ -64,7 +64,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             }
             setTaskInstanceState();
             waitTaskQuit();
-            subProcessInstance = processDao.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+            subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
 
             // at the end of the subflow , the task state is changed to the subflow state
             if(subProcessInstance != null){
@@ -72,19 +72,20 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                     this.taskInstance.setState(ExecutionStatus.KILL);
                 }else{
                     this.taskInstance.setState(subProcessInstance.getState());
-                    result = true;
                 }
             }
             taskInstance.setEndTime(new Date());
-            processDao.updateTaskInstance(taskInstance);
+            processService.updateTaskInstance(taskInstance);
             logger.info("subflow task :{} id:{}, process id:{}, exec thread completed ",
                     this.taskInstance.getName(),taskInstance.getId(), processInstance.getId() );
             result = true;
 
         }catch (Exception e){
-            logger.error("exception: "+ e.getMessage(),e);
-            logger.error("wait task quit failed, instance id:{}, task id:{}",
-                    processInstance.getId(), taskInstance.getId());
+            logger.error("exception: ",e);
+            if (null != taskInstance) {
+                logger.error("wait task quit failed, instance id:{}, task id:{}",
+                        processInstance.getId(), taskInstance.getId());
+            }
         }
         return result;
     }
@@ -94,15 +95,15 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      *  set task instance state
      * @return
      */
-    private Boolean setTaskInstanceState(){
-        subProcessInstance = processDao.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+    private boolean setTaskInstanceState(){
+        subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
             return false;
         }
 
         taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
         taskInstance.setStartTime(new Date());
-        processDao.updateTaskInstance(taskInstance);
+        processService.updateTaskInstance(taskInstance);
         return true;
     }
 
@@ -110,7 +111,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      *  updateProcessInstance parent state
      */
     private void updateParentProcessState(){
-        ProcessInstance parentProcessInstance = processDao.findProcessInstanceById(this.processInstance.getId());
+        ProcessInstance parentProcessInstance = processService.findProcessInstanceById(this.processInstance.getId());
 
         if(parentProcessInstance == null){
             logger.error("parent work flow instance is null ,  please check it! work flow id {}", processInstance.getId());
@@ -130,8 +131,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
         if (taskInstance.getState().typeIsFinished()) {
             logger.info("sub work flow task {} already complete. task state:{}, parent work flow instance state:{}",
                     this.taskInstance.getName(),
-                    this.taskInstance.getState().toString(),
-                    this.processInstance.getState().toString());
+                    this.taskInstance.getState(),
+                    this.processInstance.getState());
             return;
         }
         while (Stopper.isRunning()) {
@@ -144,7 +145,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                     continue;
                 }
             }
-            subProcessInstance = processDao.findProcessInstanceById(subProcessInstance.getId());
+            subProcessInstance = processService.findProcessInstanceById(subProcessInstance.getId());
             updateParentProcessState();
             if (subProcessInstance.getState().typeIsFinished()){
                 break;
@@ -170,7 +171,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
-        processDao.updateProcessInstance(subProcessInstance);
+        processService.updateProcessInstance(subProcessInstance);
     }
 
     /**
@@ -182,6 +183,6 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
-        processDao.updateProcessInstance(subProcessInstance);
+        processService.updateProcessInstance(subProcessInstance);
     }
 }

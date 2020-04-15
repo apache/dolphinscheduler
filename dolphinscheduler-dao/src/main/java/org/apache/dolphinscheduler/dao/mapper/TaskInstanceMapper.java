@@ -16,13 +16,12 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -64,6 +63,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceId") Integer processInstanceId,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
+                                                    @Param("executorId") int executorId,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("startTime") Date startTime,
