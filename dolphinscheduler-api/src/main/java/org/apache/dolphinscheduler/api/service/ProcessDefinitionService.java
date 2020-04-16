@@ -173,8 +173,10 @@ public class ProcessDefinitionService extends BaseDAGService {
         for(TaskNode taskNode : tasks){
             String taskParameter = taskNode.getParams();
             AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
-            Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
-            resourceIds.addAll(tempSet);
+            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
+                resourceIds.addAll(tempSet);
+            }
         }
 
         StringBuilder sb = new StringBuilder();
