@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -23,6 +24,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
@@ -33,7 +38,6 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -135,6 +139,7 @@ public class SqlTask extends AbstractTask {
             executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
+
         } catch (Exception e) {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             logger.error("sql task error", e);
@@ -171,7 +176,9 @@ public class SqlTask extends AbstractTask {
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
-
+        //new
+        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime(), paramsMap);
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -207,11 +214,8 @@ public class SqlTask extends AbstractTask {
         try {
             // if upload resource is HDFS and kerberos startup
             CommonUtils.loadKerberosConf();
-
-
             // create connection
             connection = createConnection();
-
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection,createFuncs);
@@ -219,13 +223,12 @@ public class SqlTask extends AbstractTask {
 
             // pre sql
             preSql(connection,preStatementsBinds);
-
-
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
-            resultSet = stmt.executeQuery();
+
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
+                resultSet = stmt.executeQuery();
                 resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
@@ -348,7 +351,6 @@ public class SqlTask extends AbstractTask {
             connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                     baseDataSource.getUser(),
                     baseDataSource.getPassword());
-
         }
         return connection;
     }
@@ -424,7 +426,7 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<String>();
+        List<String> receviersList = new ArrayList<>();
         for(User user:users){
             receviersList.add(user.getEmail().trim());
         }
@@ -438,7 +440,7 @@ public class SqlTask extends AbstractTask {
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<String>();
+        List<String> receviersCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
@@ -452,7 +454,7 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
                     receviersCcList, title, content, ShowType.valueOf(showTypeName));
-            if(!(Boolean) mailResult.get(STATUS)){
+            if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{

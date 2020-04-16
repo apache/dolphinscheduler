@@ -685,7 +685,7 @@ public final class Constants {
      * application regex
      */
     public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
-    public static final String PID = "pid";
+    public static final String PID = OSUtils.isWindows() ? "handle" : "pid";
     /**
      * month_begin
      */
@@ -739,6 +739,7 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
+    public static final String DEPENDENT_ALL = "ALL";
 
 
     /**
@@ -750,6 +751,11 @@ public final class Constants {
      * kerberos
      */
     public static final String KERBEROS = "kerberos";
+
+    /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
 
     /**
      * java.security.krb5.conf
@@ -899,7 +905,8 @@ public final class Constants {
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
-    public static final String JDBC_ORACLE = "jdbc:oracle:thin:@//";
+    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
+    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
 
@@ -933,4 +940,18 @@ public final class Constants {
     public static final String DEFAULT_WORKER_GROUP = "default";
 
     public static final Integer TASK_INFO_LENGTH = 5;
+
+    /**
+     * new
+     * schedule time
+     */
+    public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
+    /**
+     * authorize writable perm
+     */
+    public static final int AUTHORIZE_WRITABLE_PERM=7;
+    /**
+     * authorize readable perm
+     */
+    public static final int AUTHORIZE_READABLE_PERM=4;
 }

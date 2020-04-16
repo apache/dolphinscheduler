@@ -18,10 +18,7 @@
 package org.apache.dolphinscheduler.server.builder;
 
 import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.*;
 
 /**
  *  TaskExecutionContext builder
@@ -50,6 +47,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
+        taskExecutionContext.setResources(taskInstance.getResources());
         return this;
     }
 
@@ -110,11 +108,22 @@ public class TaskExecutionContextBuilder {
     /**
      * build procedureTask related info
      *
-     * @param procedureTaskExecutionContext
-     * @return
+     * @param procedureTaskExecutionContext procedureTaskExecutionContext
+     * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildProcedureTaskRelatedInfo(ProcedureTaskExecutionContext procedureTaskExecutionContext){
         taskExecutionContext.setProcedureTaskExecutionContext(procedureTaskExecutionContext);
+        return this;
+    }
+
+    /**
+     * build sqoopTask related info
+     *
+     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildSqoopTaskRelatedInfo(SqoopTaskExecutionContext sqoopTaskExecutionContext){
+        taskExecutionContext.setSqoopTaskExecutionContext(sqoopTaskExecutionContext);
         return this;
     }
 

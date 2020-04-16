@@ -68,7 +68,9 @@
           // start date
           startDate: '',
           // end date
-          endDate: ''
+          endDate: '',
+          // Exectuor Name
+          executorName: ''
         }
       }
     },

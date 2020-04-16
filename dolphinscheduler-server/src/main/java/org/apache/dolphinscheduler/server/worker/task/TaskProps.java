@@ -73,7 +73,7 @@ public class TaskProps {
   private Map<String, String> definedParams;
 
   /**
-   * task path
+   * task app id
    */
   private String taskAppId;
 

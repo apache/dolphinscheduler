@@ -25,7 +25,7 @@
 	</parent>
 	<artifactId>dolphinscheduler-server</artifactId>
 	<name>dolphinscheduler-server</name>
-	<url>http://maven.apache.org</url>
+
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -82,6 +82,12 @@
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-recipes</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.zookeeper</groupId>
+					<artifactId>zookeeper</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.zookeeper</groupId>

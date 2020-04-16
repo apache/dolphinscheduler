@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -75,6 +76,7 @@ public class ProcedureTask extends AbstractTask {
 
         this.procedureParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
 
+
         // check parameters
         if (!procedureParameters.checkParameters()) {
             throw new RuntimeException("procedure task params is not valid");
@@ -98,9 +100,11 @@ public class ProcedureTask extends AbstractTask {
         try {
             // load class
             DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
+
             // get datasource
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
+
 
             // get jdbc connection
             connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
@@ -135,6 +139,7 @@ public class ProcedureTask extends AbstractTask {
 
             // outParameterMap
             Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap, userDefParamsList);
+
 
             stmt.executeUpdate();
 
@@ -280,31 +285,31 @@ public class ProcedureTask extends AbstractTask {
     private void getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
         switch (dataType){
             case VARCHAR:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getString(index));
+                logger.info("out prameter varchar key : {} , value : {}",prop,stmt.getString(index));
                 break;
             case INTEGER:
-                logger.info("out prameter key : {} , value : {}", prop, stmt.getInt(index));
+                logger.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 break;
             case LONG:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getLong(index));
+                logger.info("out prameter long key : {} , value : {}",prop,stmt.getLong(index));
                 break;
             case FLOAT:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getFloat(index));
+                logger.info("out prameter float key : {} , value : {}",prop,stmt.getFloat(index));
                 break;
             case DOUBLE:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getDouble(index));
+                logger.info("out prameter double key : {} , value : {}",prop,stmt.getDouble(index));
                 break;
             case DATE:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getDate(index));
+                logger.info("out prameter date key : {} , value : {}",prop,stmt.getDate(index));
                 break;
             case TIME:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getTime(index));
+                logger.info("out prameter time key : {} , value : {}",prop,stmt.getTime(index));
                 break;
             case TIMESTAMP:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getTimestamp(index));
+                logger.info("out prameter timestamp key : {} , value : {}",prop,stmt.getTimestamp(index));
                 break;
             case BOOLEAN:
-                logger.info("out prameter key : {} , value : {}",prop, stmt.getBoolean(index));
+                logger.info("out prameter boolean key : {} , value : {}",prop, stmt.getBoolean(index));
                 break;
             default:
                 break;

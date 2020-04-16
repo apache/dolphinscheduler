@@ -22,17 +22,18 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -47,7 +48,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * TaskUpdateQueue consumer
@@ -64,7 +71,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue taskPriorityQueue;
 
     /**
      * processService
@@ -89,7 +96,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         while (Stopper.isRunning()){
             try {
                 // if not task , blocking here
-                String taskPriorityInfo = taskUpdateQueue.take();
+                String taskPriorityInfo = taskPriorityQueue.take();
 
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
 
@@ -110,13 +117,20 @@ public class TaskPriorityQueueConsumer extends Thread{
     private Boolean dispatch(int taskInstanceId){
         TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        try {
-            return dispatcher.dispatch(executionContext);
-        } catch (ExecuteException e) {
-            logger.error("execute exception", e);
-            return false;
-        }
+        Boolean result = false;
+        while (Stopper.isRunning()){
+            try {
+                result =  dispatcher.dispatch(executionContext);
+            } catch (ExecuteException e) {
+                logger.error("dispatch error",e);
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+            }
 
+            if (result){
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -126,6 +140,12 @@ public class TaskPriorityQueueConsumer extends Thread{
      */
     protected TaskExecutionContext getTaskExecutionContext(int taskInstanceId){
         TaskInstance taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstanceId);
+
+        // task type
+        TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
+
+        // task node
+        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
         Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
@@ -145,14 +165,15 @@ public class TaskPriorityQueueConsumer extends Thread{
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setExecutePath(getExecLocalPath(taskInstance));
+        taskInstance.setResources(getResourceFullNames(taskNode));
+
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
+        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
 
-        TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
 
-        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
         // SQL task
         if (taskType == TaskType.SQL){
             setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
@@ -170,6 +191,9 @@ public class TaskPriorityQueueConsumer extends Thread{
             setProcedureTaskRelation(procedureTaskExecutionContext, taskNode);
         }
 
+        if (taskType == TaskType.SQOOP){
+            setSqoopTaskRelation(sqoopTaskExecutionContext,taskNode);
+        }
 
 
         return TaskExecutionContextBuilder.get()
@@ -179,6 +203,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
+                .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
                 .create();
     }
 
@@ -206,13 +231,45 @@ public class TaskPriorityQueueConsumer extends Thread{
         DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
 
 
-        dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-        dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-        dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        if (dataSource != null){
+            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
+            dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        }
 
-        dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-        dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-        dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        if (dataTarget != null){
+            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        }
+    }
+
+
+    /**
+     * set datax task relation
+     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
+        SqoopParameters sqoopParameters = JSONObject.parseObject(taskNode.getParams(), SqoopParameters.class);
+
+        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+
+        DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
+        DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
+
+        if (dataSource != null){
+            sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
+            sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        }
+
+        if (dataTarget != null){
+            sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
+            sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        }
     }
 
     /**
@@ -269,5 +326,38 @@ public class TaskPriorityQueueConsumer extends Thread{
             return true;
         }
         return false;
+    }
+
+
+    /**
+     *  create project resource files
+     */
+    private List<String> getResourceFullNames(TaskNode taskNode){
+
+        Set<Integer> resourceIdsSet = new HashSet<>();
+        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
+
+        if (baseParam != null) {
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
+            if (projectResourceFiles != null) {
+                Stream<Integer> resourceInfotream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
+                resourceIdsSet.addAll(resourceInfotream.collect(Collectors.toSet()));
+
+            }
+        }
+
+        if (CollectionUtils.isEmpty(resourceIdsSet)){
+            return null;
+        }
+
+        Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
+
+        List<Resource> resources = processService.listResourceByIds(resourceIds);
+
+        List<String> resourceFullNames = resources.stream()
+                .map(resourceInfo -> resourceInfo.getFullName())
+                .collect(Collectors.toList());
+
+        return resourceFullNames;
     }
 }

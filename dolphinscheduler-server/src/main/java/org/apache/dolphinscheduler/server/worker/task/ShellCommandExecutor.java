@@ -18,11 +18,12 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -34,9 +35,14 @@ import java.util.function.Consumer;
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
-     * sh
+     * For Unix-like, using sh
      */
     public static final String SH = "sh";
+
+    /**
+     * For Windows, using cmd.exe
+     */
+    public static final String CMD = "cmd.exe";
 
     /**
      * constructor
@@ -63,7 +69,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected String commandInterpreter() {
-        return SH;
+        return OSUtils.isWindows() ? CMD : SH;
     }
 
 
@@ -75,28 +81,34 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("tenantCode user:{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getTaskAppId());
+        logger.info("tenantCode user:{}, task dir:{}", taskExecutionContext.getTenantCode(),
+                taskExecutionContext.getTaskAppId());
 
         // create if non existence
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("create command file:{}", commandFile);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("#!/bin/sh\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
-
-            if (taskExecutionContext.getEnvFile() != null) {
-                sb.append("source " + taskExecutionContext.getEnvFile() + "\n");
+            if (OSUtils.isWindows()) {
+                sb.append("@echo off\n");
+                sb.append("cd /d %~dp0\n");
+                if (taskExecutionContext.getEnvFile() != null) {
+                    sb.append("call ").append(taskExecutionContext.getEnvFile()).append("\n");
+                }
+            } else {
+                sb.append("#!/bin/sh\n");
+                sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+                sb.append("cd $BASEDIR\n");
+                if (taskExecutionContext.getEnvFile() != null) {
+                    sb.append("source ").append(taskExecutionContext.getEnvFile()).append("\n");
+                }
             }
 
-            sb.append("\n\n");
             sb.append(execCommand);
-            logger.info("command : {}",sb.toString());
+            logger.info("command : {}", sb.toString());
 
             // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(),
-                    Charset.forName("UTF-8"));
+            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
     }
 

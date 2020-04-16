@@ -75,7 +75,7 @@ public final class Preconditions {
      * @param errorMessageArgs The arguments for the error message, to be inserted into the
      *                         message template for the {@code %s} placeholders.
      *
-     * @param <T>
+     * @param <T> T
      * @return The object reference itself (generically typed).
      */
     public static <T> T checkNotNull(T reference,

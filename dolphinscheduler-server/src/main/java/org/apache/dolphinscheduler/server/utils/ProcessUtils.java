@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -298,7 +298,7 @@ public class ProcessUtils {
         File f = new File(commandFile);
 
         if (!f.exists()) {
-          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
 
         String runCmd = "sh " + commandFile;

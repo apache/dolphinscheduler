@@ -26,13 +26,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ErrorCommandMapperTest {
 
     @Autowired
@@ -57,30 +61,9 @@ public class ErrorCommandMapperTest {
         return errorCommand;
     }
 
-    /**
-     * test update
-     */
-    @Test
-    public void testUpdate(){
-        //insertOne
-        ErrorCommand errorCommand = insertOne();
-        //update
-        errorCommand.setUpdateTime(new Date());
-        int update = errorCommandMapper.updateById(errorCommand);
-        Assert.assertEquals(update, 1);
-        errorCommandMapper.deleteById(errorCommand.getId());
-    }
 
-    /**
-     * test delete
-     */
-    @Test
-    public void testDelete(){
 
-        ErrorCommand errorCommand = insertOne();
-        int delete = errorCommandMapper.deleteById(errorCommand.getId());
-        Assert.assertEquals(delete, 1);
-    }
+
 
     /**
      * test query
@@ -103,8 +86,8 @@ public class ErrorCommandMapperTest {
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
                 null,
-                 null,
-                          new Integer[0]
+                null,
+                new Integer[0]
         );
 
         Integer[] projectIdArray = new Integer[2];
@@ -116,8 +99,6 @@ public class ErrorCommandMapperTest {
                 projectIdArray
         );
 
-        errorCommandMapper.deleteById(errorCommand.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertNotEquals(commandCounts.size(), 0);
         Assert.assertNotEquals(commandCounts2.size(), 0);
     }

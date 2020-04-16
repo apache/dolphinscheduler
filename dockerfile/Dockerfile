@@ -15,122 +15,81 @@
 # limitations under the License.
 #
 
-FROM ubuntu:18.04
+FROM nginx:alpine
 
-ENV LANG=C.UTF-8
-ENV DEBIAN_FRONTEND=noninteractive
+ARG VERSION
 
-ARG version
-ARG tar_version
+ENV TZ Asia/Shanghai
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
 
-#1,install jdk
+#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip tini kazoo.
+#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+RUN apk update && \
+    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip tini && \
+    apk add --update procps && \
+    openrc boot && \
+    pip install kazoo
 
-RUN apt-get update \
-    && apt-get -y install openjdk-8-jdk \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+#2. install jdk
+RUN apk add openjdk8
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
-
-#install wget
-RUN apt-get update && \
-        apt-get -y install wget
-#2,install ZK
-
+#3. install zk
 RUN cd /opt && \
-    wget https://www-us.apache.org/dist/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz  && \
-    tar -zxvf zookeeper-3.4.14.tar.gz  && \
-    mv zookeeper-3.4.14 zookeeper && \
-    rm -rf ./zookeeper-*tar.gz && \
+    wget https://downloads.apache.org/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz && \
+    tar -zxvf apache-zookeeper-3.5.7-bin.tar.gz && \
+    mv apache-zookeeper-3.5.7-bin zookeeper && \
     mkdir -p /tmp/zookeeper && \
+    rm -rf ./zookeeper-*tar.gz && \
     rm -rf /opt/zookeeper/conf/zoo_sample.cfg
+ADD ./conf/zookeeper/zoo.cfg /opt/zookeeper/conf
+ENV ZK_HOME /opt/zookeeper
+ENV PATH $ZK_HOME/bin:$PATH
 
-ADD ./dockerfile/conf/zookeeper/zoo.cfg /opt/zookeeper/conf
-ENV ZK_HOME=/opt/zookeeper
-ENV PATH $PATH:$ZK_HOME/bin
+#4. install pg
+RUN apk add postgresql postgresql-contrib
 
-#3,install maven
-RUN cd /opt && \
-    wget http://apache-mirror.rbc.ru/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && \
-    tar -zxvf apache-maven-3.3.9-bin.tar.gz && \
-    mv apache-maven-3.3.9 maven && \
-    rm -rf ./apache-maven-*tar.gz && \
-    rm -rf /opt/maven/conf/settings.xml
-ADD ./dockerfile/conf/maven/settings.xml /opt/maven/conf
-ENV MAVEN_HOME=/opt/maven
-ENV PATH $PATH:$MAVEN_HOME/bin
+#5. add dolphinscheduler
+ADD ./apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz /opt/
+RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin/ /opt/dolphinscheduler/
+ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#4,install node
-RUN cd /opt && \
-    wget https://nodejs.org/download/release/v8.9.4/node-v8.9.4-linux-x64.tar.gz && \
-    tar -zxvf node-v8.9.4-linux-x64.tar.gz && \
-    mv node-v8.9.4-linux-x64 node && \
-    rm -rf ./node-v8.9.4-*tar.gz
-ENV NODE_HOME=/opt/node
-ENV PATH $PATH:$NODE_HOME/bin
+#6. modify nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
+    rm -rf /etc/nginx/conf.d/*
+ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
-#5,install postgresql
-RUN apt-get update && \
-    apt-get install -y postgresql postgresql-contrib sudo && \
-    sed -i 's/localhost/*/g' /etc/postgresql/10/main/postgresql.conf
+#7. add configuration and modify permissions and set soft links
+ADD ./checkpoint.sh /root/checkpoint.sh
+ADD ./startup-init-conf.sh /root/startup-init-conf.sh
+ADD ./startup.sh /root/startup.sh
+ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
+ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+RUN chmod +x /root/checkpoint.sh && \
+    chmod +x /root/startup-init-conf.sh && \
+    chmod +x /root/startup.sh && \
+    chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
+    chmod +x /opt/dolphinscheduler/script/*.sh && \
+    chmod +x /opt/dolphinscheduler/bin/*.sh && \
+    chmod +x /opt/zookeeper/bin/*.sh && \
+    dos2unix /root/checkpoint.sh && \
+    dos2unix /root/startup-init-conf.sh && \
+    dos2unix /root/startup.sh && \
+    dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
+    dos2unix /opt/dolphinscheduler/script/*.sh && \
+    dos2unix /opt/dolphinscheduler/bin/*.sh && \
+    dos2unix /opt/zookeeper/bin/*.sh && \
+    rm -rf /bin/sh && \
+    ln -s /bin/bash /bin/sh && \
+    mkdir -p /tmp/xls
 
-#6,install nginx
-RUN apt-get update && \
-  apt-get install -y nginx && \
-  rm -rf /var/lib/apt/lists/* && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
+#8. remove apk index cache
+RUN rm -rf /var/cache/apk/*
 
-#7,install sudo,python,vim,ping and ssh command
-RUN apt-get update && \
-  apt-get -y install sudo && \
-  apt-get -y install python && \
-  apt-get -y install vim && \
-  apt-get -y install iputils-ping && \
-  apt-get -y install net-tools && \
-  apt-get -y install openssh-server && \
-  apt-get -y install python-pip && \
-  pip install kazoo
+#9. expose port
+EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
 
-#8,add dolphinscheduler source code to /opt/dolphinscheduler_source
-ADD . /opt/dolphinscheduler_source
-
-
-#9,backend compilation
-RUN cd /opt/dolphinscheduler_source && \
-    mvn clean package -Prelease -Dmaven.test.skip=true
-
-#10,frontend compilation
-RUN chmod -R 777 /opt/dolphinscheduler_source/dolphinscheduler-ui && \
-    cd /opt/dolphinscheduler_source/dolphinscheduler-ui && \
-    rm -rf /opt/dolphinscheduler_source/dolphinscheduler-ui/node_modules && \
-    npm install node-sass --unsafe-perm && \
-    npm install && \
-    npm run build
-
-#11,modify dolphinscheduler configuration file
-#backend configuration
-RUN tar -zxvf /opt/dolphinscheduler_source/dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin.tar.gz -C /opt && \
-    mv /opt/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin /opt/dolphinscheduler && \
-    rm -rf /opt/dolphinscheduler/conf
-
-ADD ./dockerfile/conf/dolphinscheduler/conf /opt/dolphinscheduler/conf
-#frontend nginx configuration
-ADD ./dockerfile/conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
-
-#12,open port
-EXPOSE 2181 2888 3888 3306 80 12345 8888
-
-COPY ./dockerfile/startup.sh /root/startup.sh
-#13,modify permissions and set soft links
-RUN chmod +x /root/startup.sh && \
-  chmod +x /opt/dolphinscheduler/script/create-dolphinscheduler.sh && \
-  chmod +x /opt/zookeeper/bin/zkServer.sh && \
-  chmod +x /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh && \
-  rm -rf /bin/sh && \
-  ln -s /bin/bash /bin/sh && \
-  mkdir -p /tmp/xls
-
-
-ENTRYPOINT ["/root/startup.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]

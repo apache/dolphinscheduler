@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
@@ -91,13 +91,13 @@ public class ParameterUtilsTest {
         globalParamList.add(property);
 
         String result2 =  ParameterUtils.curingGlobalParams(null,globalParamList,CommandType.START_CURRENT_TASK_PROCESS,scheduleTime);
-        Assert.assertEquals(result2, JSONObject.toJSONString(globalParamList));
+        Assert.assertEquals(result2, JSON.toJSONString(globalParamList));
 
         String result3 =  ParameterUtils.curingGlobalParams(globalParamMap,globalParamList,CommandType.START_CURRENT_TASK_PROCESS,null);
-        Assert.assertEquals(result3, JSONObject.toJSONString(globalParamList));
+        Assert.assertEquals(result3, JSON.toJSONString(globalParamList));
 
         String result4 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
-        Assert.assertEquals(result4, JSONObject.toJSONString(globalParamList));
+        Assert.assertEquals(result4, JSON.toJSONString(globalParamList));
 
         //test var $ startsWith
         globalParamMap.put("bizDate","${system.biz.date}");
