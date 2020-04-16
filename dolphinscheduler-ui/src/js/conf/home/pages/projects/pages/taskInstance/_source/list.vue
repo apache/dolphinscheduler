@@ -28,6 +28,9 @@
           <th scope="col">
             <span>{{$t('Process Instance')}}</span>
           </th>
+          <th scope="col" width="70">
+            <span>{{$t('Executor')}}</span>
+          </th>
           <th scope="col" width="90">
             <span>{{$t('Node Type')}}</span>
           </th>
@@ -40,13 +43,13 @@
           <th scope="col" width="140">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th scope="col" width="140">
+          <th scope="col" width="125">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th scope="col" width="110">
+          <th scope="col" width="130">
             <span>{{$t('host')}}</span>
           </th>
-          <th scope="col" width="74">
+          <th scope="col" width="70">
             <span>{{$t('Duration')}}(s)</span>
           </th>
           <th scope="col" width="84">
@@ -64,6 +67,10 @@
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
           <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td>
+            <span v-if="item.executorName">{{item.executorName}}</span>
+            <span v-else>-</span>
+          </td>
           <td><span>{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
           <td>

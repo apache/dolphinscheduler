@@ -18,12 +18,14 @@ package org.apache.dolphinscheduler.server.worker.task.flink;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.server.utils.FlinkArgsUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
@@ -70,6 +72,8 @@ public class FlinkTask extends AbstractYarnTask {
       throw new RuntimeException("flink task params is not valid");
     }
     flinkParameters.setQueue(taskExecutionContext.getQueue());
+    setMainJarName();
+
 
     if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
       String args = flinkParameters.getMainArgs();
@@ -112,6 +116,28 @@ public class FlinkTask extends AbstractYarnTask {
     logger.info("flink task command : {}", command);
 
     return command;
+  }
+
+  @Override
+  protected void setMainJarName() {
+    // main jar
+    ResourceInfo mainJar = flinkParameters.getMainJar();
+    if (mainJar != null) {
+      int resourceId = mainJar.getId();
+      String resourceName;
+      if (resourceId == 0) {
+        resourceName = mainJar.getRes();
+      } else {
+        Resource resource = processService.getResourceById(flinkParameters.getMainJar().getId());
+        if (resource == null) {
+          logger.error("resource id: {} not exist", resourceId);
+          throw new RuntimeException(String.format("resource id: %d not exist", resourceId));
+        }
+        resourceName = resource.getFullName().replaceFirst("/", "");
+      }
+      mainJar.setRes(resourceName);
+      flinkParameters.setMainJar(mainJar);
+    }
   }
 
   @Override

@@ -87,4 +87,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
    * @throws Exception exception
    */
   protected abstract String buildCommand() throws Exception;
+
+  /**
+   * set main jar name
+   */
+  protected abstract void setMainJarName();
 }

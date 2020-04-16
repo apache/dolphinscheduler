@@ -334,6 +334,25 @@ export default {
     })
   },
   /**
+   * get jar
+   */
+  getResourcesListJar ({ state }) {
+    return new Promise((resolve, reject) => {
+      if (state.resourcesListJar.length) {
+        resolve()
+        return
+      }
+      io.get(`resources/list/jar`, {
+        type: 'FILE'
+      }, res => {
+        state.resourcesListJar = res.data
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
    * Get process instance
    */
   getProcessInstance ({ state }, payload) {
@@ -696,5 +715,14 @@ export default {
         reject(e)
       })
     })
-  }
+  },
+  getResourceId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`resources/queryResource`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
 }

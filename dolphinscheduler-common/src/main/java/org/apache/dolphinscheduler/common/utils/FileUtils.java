@@ -46,7 +46,7 @@ public class FileUtils {
 
         String fileSuffix = "";
         if (StringUtils.isNotEmpty(filename)) {
-            int lastIndex = filename.lastIndexOf(".");
+            int lastIndex = filename.lastIndexOf('.');
             if (lastIndex > 0) {
                 fileSuffix = filename.substring(lastIndex + 1);
             }
@@ -351,10 +351,8 @@ public class FileUtils {
             }
         } else {
             File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
+            if (parent != null && !parent.mkdirs() && !parent.isDirectory()) {
                     throw new IOException("Directory '" + parent + "' could not be created");
-                }
             }
         }
         return new FileOutputStream(file, append);

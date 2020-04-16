@@ -118,16 +118,26 @@ public class ThreadUtils {
                 .build();
         return Executors.newFixedThreadPool(threadsNum, threadFactory);
     }
-
     /**
      * Wrapper over ScheduledThreadPoolExecutor
      * @param threadName threadName
      * @param corePoolSize corePoolSize
      * @return ScheduledExecutorService
      */
-    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName,int corePoolSize) {
+    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName, int corePoolSize) {
+        return newThreadScheduledExecutor(threadName, corePoolSize, true);
+    }
+
+    /**
+     * Wrapper over ScheduledThreadPoolExecutor
+     * @param threadName threadName
+     * @param corePoolSize corePoolSize
+     * @param isDaemon isDaemon
+     * @return ScheduledThreadPoolExecutor
+     */
+    public static ScheduledExecutorService newThreadScheduledExecutor(String threadName, int corePoolSize, boolean isDaemon) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
+                .setDaemon(isDaemon)
                 .setNameFormat(threadName)
                 .build();
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(corePoolSize, threadFactory);
@@ -137,11 +147,10 @@ public class ThreadUtils {
         return executor;
     }
 
-
     /**
      * get thread info
      * @param t t
-     * @return ThreadInfo
+     * @return thread info
      */
     public static ThreadInfo getThreadInfo(Thread t) {
         long tid = t.getId();
@@ -213,5 +222,15 @@ public class ThreadUtils {
             return Long.toString(id);
         }
         return id + " (" + name + ")";
+    }
+
+    /**
+     * sleep
+     * @param millis millis
+     */
+    public static void sleep(final long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final InterruptedException ignore) {}
     }
 }
