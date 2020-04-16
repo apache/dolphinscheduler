@@ -164,7 +164,7 @@ BEGIN
           AND TABLE_NAME='t_ds_process_instance'
           AND COLUMN_NAME ='worker_group')
       THEN
-         ALTER TABLE t_ds_process_instance ADD COLUMN worker_group varchar(255) DEFAULT null;
+         ALTER TABLE t_ds_process_instance ADD COLUMN worker_group varchar(64) DEFAULT null;
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -207,7 +207,7 @@ BEGIN
           AND TABLE_NAME='t_ds_task_instance'
           AND COLUMN_NAME ='worker_group')
       THEN
-         ALTER TABLE t_ds_task_instance ADD COLUMN worker_group varchar(255) DEFAULT null;
+         ALTER TABLE t_ds_task_instance ADD COLUMN worker_group varchar(64) DEFAULT null;
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -249,7 +249,7 @@ BEGIN
           AND TABLE_NAME='t_ds_schedules'
           AND COLUMN_NAME ='worker_group')
       THEN
-         ALTER TABLE t_ds_schedules ADD COLUMN worker_group varchar(255) DEFAULT null;
+         ALTER TABLE t_ds_schedules ADD COLUMN worker_group varchar(64) DEFAULT null;
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -291,7 +291,7 @@ BEGIN
           AND TABLE_NAME='t_ds_command'
           AND COLUMN_NAME ='worker_group')
       THEN
-         ALTER TABLE t_ds_command ADD COLUMN worker_group varchar(255) DEFAULT null;
+         ALTER TABLE t_ds_command ADD COLUMN worker_group varchar(64) DEFAULT null;
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -333,7 +333,7 @@ BEGIN
           AND TABLE_NAME='t_ds_error_command'
           AND COLUMN_NAME ='worker_group')
       THEN
-         ALTER TABLE t_ds_error_command ADD COLUMN worker_group varchar(255) DEFAULT null;
+         ALTER TABLE t_ds_error_command ADD COLUMN worker_group varchar(64) DEFAULT null;
        END IF;
 END;
 $$ LANGUAGE plpgsql;

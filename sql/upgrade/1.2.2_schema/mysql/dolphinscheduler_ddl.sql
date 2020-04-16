@@ -167,7 +167,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_process_instance_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_process_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_process_instance ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -207,7 +207,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_task_instance_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_task_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_task_instance ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -247,7 +247,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_schedules_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_schedules ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_schedules ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -287,7 +287,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_command_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_command ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_command ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -327,7 +327,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_error_command_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_error_command ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_error_command ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
