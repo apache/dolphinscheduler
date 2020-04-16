@@ -134,10 +134,6 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(user,2,startDate,endDate);
         Assert.assertTrue(result.isEmpty());
 
-        //COUNT_PROCESS_INSTANCE_STATE_ERROR
-        result = dataAnalysisService.countProcessInstanceStateByProject(user,1,startDate,endDate);
-        Assert.assertEquals(Status.COUNT_PROCESS_INSTANCE_STATE_ERROR,result.get(Constants.STATUS));
-
         //SUCCESS
         Mockito.when(processInstanceMapper.countInstanceStateByUser(DateUtils.getScheduleDate(startDate),
                 DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(getTaskInstanceStateCounts());
