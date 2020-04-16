@@ -45,7 +45,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * logger of MasterBaseTaskExecThread
      */
-    protected Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
 
     /**
@@ -76,7 +76,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * master config
      */
-    private MasterConfig masterConfig;
+    protected MasterConfig masterConfig;
 
     /**
      * taskUpdateQueue
