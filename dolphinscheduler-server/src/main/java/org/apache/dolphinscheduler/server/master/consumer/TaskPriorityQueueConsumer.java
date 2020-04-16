@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -122,9 +123,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 result =  dispatcher.dispatch(executionContext);
             } catch (ExecuteException e) {
                 logger.error("dispatch error",e);
-                try {
-                    Thread.sleep(SLEEP_TIME_MILLIS);
-                } catch (InterruptedException e1) {}
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
             if (result){
