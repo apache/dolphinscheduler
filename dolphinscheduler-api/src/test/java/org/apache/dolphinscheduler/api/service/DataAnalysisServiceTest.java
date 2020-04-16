@@ -114,9 +114,6 @@ public class DataAnalysisServiceTest {
         Map<String, Object> result = dataAnalysisService.countTaskStateByProject(user, 2, startDate, endDate);
         Assert.assertTrue(result.isEmpty());
 
-        // task instance state count error
-        result = dataAnalysisService.countTaskStateByProject(user, 1, startDate, endDate);
-        Assert.assertEquals(Status.TASK_INSTANCE_STATE_COUNT_ERROR,result.get(Constants.STATUS));
 
         //SUCCESS
         Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(DateUtils.getScheduleDate(startDate),
