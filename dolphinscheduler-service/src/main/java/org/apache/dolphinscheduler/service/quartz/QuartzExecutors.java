@@ -89,9 +89,10 @@ public class QuartzExecutors {
       synchronized (QuartzExecutors.class) {
         // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
         if (INSTANCE == null) {
-          INSTANCE = new QuartzExecutors();
+          QuartzExecutors quartzExecutors = new QuartzExecutors();
           //finish QuartzExecutors init
-          INSTANCE.init();
+          quartzExecutors.init();
+          INSTANCE = quartzExecutors;
         }
       }
     }
@@ -268,7 +269,7 @@ public class QuartzExecutors {
       }
 
     } catch (SchedulerException e) {
-      logger.error(String.format("delete job : %s failed",jobName), e);
+      logger.error("delete job : {} failed",jobName, e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -292,7 +293,7 @@ public class QuartzExecutors {
 
       return scheduler.deleteJobs(jobKeys);
     } catch (SchedulerException e) {
-      logger.error(String.format("delete all jobs in job group: %s failed",jobGroupName), e);
+      logger.error("delete all jobs in job group: {} failed",jobGroupName, e);
     } finally {
       lock.writeLock().unlock();
     }

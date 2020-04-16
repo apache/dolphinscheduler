@@ -21,7 +21,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -81,11 +80,9 @@ public class TaskExecuteThread implements Runnable {
             // task node
             TaskNode taskNode = JSONObject.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
-            // get resource files
-            List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
-                    resourceFiles,
+                    taskExecutionContext.getResources(),
                     taskExecutionContext.getTenantCode(),
                     logger);
 
@@ -203,24 +200,6 @@ public class TaskExecuteThread implements Runnable {
 
 
     /**
-     *  create project resource files
-     */
-    private List<String> createProjectResFiles(TaskNode taskNode) throws Exception{
-
-        Set<String> projectFiles = new HashSet<>();
-        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-
-        if (baseParam != null) {
-            List<String> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
-                projectFiles.addAll(projectResourceFiles);
-            }
-        }
-
-        return new ArrayList<>(projectFiles);
-    }
-
-    /**
      * download resource file
      *
      * @param execLocalPath
@@ -231,12 +210,16 @@ public class TaskExecuteThread implements Runnable {
                                   List<String> projectRes,
                                   String tenantCode,
                                   Logger logger) throws Exception {
+        if (CollectionUtils.isEmpty(projectRes)){
+            return;
+        }
+
         for (String resource : projectRes) {
             File resFile = new File(execLocalPath, resource);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tenantCode, resource);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, resource);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resource, false, true);

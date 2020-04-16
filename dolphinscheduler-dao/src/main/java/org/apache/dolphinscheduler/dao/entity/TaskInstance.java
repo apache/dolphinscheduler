@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * task instance
@@ -46,6 +47,8 @@ public class TaskInstance implements Serializable {
      * task name
      */
     private String name;
+
+
 
     /**
      * task type
@@ -191,6 +194,31 @@ public class TaskInstance implements Serializable {
      * workerGroup
      */
     private String workerGroup;
+
+
+    /**
+     * executor id
+     */
+    private int executorId;
+
+    /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
+
+    @TableField(exist = false)
+    private List<String> resources;
+
+
+
+    public void init(String host,Date startTime,String executePath){
+        this.host = host;
+        this.startTime = startTime;
+        this.executePath = executePath;
+    }
+
 
     public ProcessInstance getProcessInstance() {
         return processInstance;
@@ -349,8 +377,8 @@ public class TaskInstance implements Serializable {
     }
 
 
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
+    public boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
     }
 
     public String getDependency(){
@@ -402,13 +430,38 @@ public class TaskInstance implements Serializable {
         this.retryInterval = retryInterval;
     }
 
-    public Boolean isTaskComplete() {
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
+    public List<String> getResources() {
+        return resources;
+    }
+
+    public void setResources(List<String> resources) {
+        this.resources = resources;
+    }
+
     /**
      * determine if you can try again
      * @return can try result
@@ -445,20 +498,20 @@ public class TaskInstance implements Serializable {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
-    }
-
     public String getWorkerGroup() {
         return workerGroup;
     }
 
     public void setWorkerGroup(String workerGroup) {
         this.workerGroup = workerGroup;
+    }
+
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
     }
 
     @Override
@@ -493,6 +546,8 @@ public class TaskInstance implements Serializable {
                 ", processInstancePriority=" + processInstancePriority +
                 ", dependentResult='" + dependentResult + '\'' +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 '}';
     }
 }

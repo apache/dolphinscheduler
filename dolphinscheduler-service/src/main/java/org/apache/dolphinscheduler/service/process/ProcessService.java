@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.process;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang.ArrayUtils;
@@ -110,12 +111,12 @@ public class ProcessService {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         //cannot construct process instance, return null;
         if(processInstance == null){
-            logger.error("scan command, command parameter is error: %s", command.toString());
+            logger.error("scan command, command parameter is error: {}", command);
             moveToErrorCommand(command, "process instance is null");
             return null;
         }
         if(!checkThreadNum(command, validThreadNum)){
-            logger.info("there is not enough thread for this command: {}",command.toString() );
+            logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
         processInstance.setCommandType(command.getCommandType());
@@ -201,7 +202,7 @@ public class ProcessService {
         CommandType commandType = command.getCommandType();
 
         if(cmdTypeMap.containsKey(commandType)){
-            JSONObject cmdParamObj = (JSONObject) JSONObject.parse(command.getCommandParam());
+            JSONObject cmdParamObj = (JSONObject) JSON.parse(command.getCommandParam());
             JSONObject tempObj;
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
@@ -209,7 +210,7 @@ public class ProcessService {
             // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
-                    tempObj = (JSONObject) JSONObject.parse(tmpCommand.getCommandParam());
+                    tempObj = (JSONObject) JSON.parse(tmpCommand.getCommandParam());
                     if(tempObj != null && processInstanceId == tempObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING)){
                         isNeedCreate = false;
                         break;
@@ -227,6 +228,30 @@ public class ProcessService {
      */
     public ProcessInstance findProcessInstanceDetailById(int processId){
         return processInstanceMapper.queryDetailById(processId);
+    }
+
+    /**
+     * get task node list by definitionId
+     * @param defineId
+     * @return
+     */
+    public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
+        ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
+        if (processDefinition == null) {
+            logger.info("process define not exists");
+            return null;
+        }
+
+        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+
+        //process data check
+        if (null == processData) {
+            logger.error("process data is null");
+            return null;
+        }
+
+        return processData.getTasks();
     }
 
     /**
@@ -303,7 +328,7 @@ public class ProcessService {
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
                 if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
-                    SubProcessParameters subProcessParam = JSONObject.parseObject(parameter, SubProcessParameters.class);
+                    SubProcessParameters subProcessParam = JSON.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
@@ -471,7 +496,7 @@ public class ProcessService {
             if(cmdParam == null
                     || !cmdParam.containsKey(Constants.CMDPARAM_START_NODE_NAMES)
                     || cmdParam.get(Constants.CMDPARAM_START_NODE_NAMES).isEmpty()){
-                logger.error(String.format("command node depend type is %s, but start nodes is null ", command.getTaskDependType().toString()));
+                logger.error("command node depend type is {}, but start nodes is null ", command.getTaskDependType());
                 return false;
             }
         }
@@ -494,7 +519,7 @@ public class ProcessService {
         if(command.getProcessDefinitionId() != 0){
             processDefinition = processDefineMapper.selectById(command.getProcessDefinitionId());
             if(processDefinition == null){
-                logger.error(String.format("cannot find the work process define! define id : %d", command.getProcessDefinitionId()));
+                logger.error("cannot find the work process define! define id : {}", command.getProcessDefinitionId());
                 return null;
             }
         }
@@ -944,6 +969,7 @@ public class ProcessService {
                 }
             }
         }
+        taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
         taskInstance.setSubmitTime(new Date());
@@ -953,7 +979,6 @@ public class ProcessService {
         }
         return taskInstance;
     }
-
 
 
     /**
@@ -978,42 +1003,6 @@ public class ProcessService {
                 .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getId()).append(Constants.UNDERLINE)
                 .append(taskInstance.getWorkerGroup());
-
-        /*if(StringUtils.isNotBlank(taskWorkerGroup)){
-            //not to find data from db
-            WorkerGroup workerGroup = queryWorkerGroupById(taskWorkerGroupId);
-            if(workerGroup == null ){
-                logger.info("task {} cannot find the worker group, use all worker instead.", taskInstance.getId());
-
-                sb.append(Constants.DEFAULT_WORKER_ID);
-                return sb.toString();
-            }
-
-            String ips = workerGroup.getIpList();
-
-            if(StringUtils.isBlank(ips)){
-                logger.error("task:{} worker group:{} parameters(ip_list) is null, this task would be running on all workers",
-                        taskInstance.getId(), workerGroup.getId());
-                sb.append(Constants.DEFAULT_WORKER_ID);
-                return sb.toString();
-            }
-
-            StringBuilder ipSb = new StringBuilder(100);
-            String[] ipArray = ips.split(COMMA);
-
-            for (String ip : ipArray) {
-               long ipLong = IpUtils.ipToLong(ip);
-                ipSb.append(ipLong).append(COMMA);
-            }
-
-            if(ipSb.length() > 0) {
-                ipSb.deleteCharAt(ipSb.length() - 1);
-            }
-
-            sb.append(ipSb);
-        }else{
-            sb.append(Constants.DEFAULT_WORKER_ID);
-        }*/
 
         return  sb.toString();
     }
@@ -1088,7 +1077,6 @@ public class ProcessService {
 
         String taskZkInfo = taskZkInfo(taskInstance);
 
-//        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
         return false;
     }
 
@@ -1519,10 +1507,11 @@ public class ProcessService {
     /**
      * find tenant code by resource name
      * @param resName resource name
+     * @param resourceType resource type
      * @return tenant code
      */
-    public String queryTenantCodeByResName(String resName){
-        return resourceMapper.queryTenantCodeByResourceName(resName);
+    public String queryTenantCodeByResName(String resName,ResourceType resourceType){
+        return resourceMapper.queryTenantCodeByResourceName(resName, resourceType.ordinal());
     }
 
     /**
@@ -1754,9 +1743,17 @@ public class ProcessService {
             Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
 
             switch (authorizationType){
-                case RESOURCE_FILE:
-                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
+                case RESOURCE_FILE_ID:
+                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedResourceFiles);
+                    break;
+                case RESOURCE_FILE_NAME:
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getFullName()).collect(toSet());
                     originResSet.removeAll(authorizedResources);
+                    break;
+                case UDF_FILE:
+                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfFiles);
                     break;
                 case DATASOURCE:
                     Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());
@@ -1781,6 +1778,25 @@ public class ProcessService {
      */
     public User getUserById(int userId){
         return userMapper.queryDetailsById(userId);
+    }
+
+    /**
+     * get resource by resoruce id
+     * @param resoruceId resource id
+     * @return Resource
+     */
+    public Resource getResourceById(int resoruceId){
+        return resourceMapper.selectById(resoruceId);
+    }
+
+
+    /**
+     * list resources by ids
+     * @param resIds resIds
+     * @return resource list
+     */
+    public List<Resource> listResourceByIds(Integer[] resIds){
+        return resourceMapper.listResourceByIds(resIds);
     }
 
 

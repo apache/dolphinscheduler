@@ -43,13 +43,11 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
-    private PropertyUtils(){
-        init();
+    private PropertyUtils() {
+        throw new IllegalStateException("PropertyUtils class");
     }
 
-    private void init(){
+    static {
         String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
@@ -137,7 +135,7 @@ public class PropertyUtils {
      * @param key property name
      * @return property value
      */
-    public static Boolean getBoolean(String key) {
+    public static boolean getBoolean(String key) {
         String value = properties.getProperty(key.trim());
         if(null != value){
             return Boolean.parseBoolean(value);

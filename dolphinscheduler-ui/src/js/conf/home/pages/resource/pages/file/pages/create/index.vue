@@ -96,6 +96,8 @@
         description: '',
         fileTypeList: filtTypeArr,
         content: '',
+        pid: -1,
+        currentDir: '/',
         spinnerLoading: false
       }
     },
@@ -107,6 +109,8 @@
           this.spinnerLoading = true
           this.createResourceFile({
             type: 'FILE',
+            pid: this.pid,
+            currentDir: this.currentDir,
             fileName: this.fileName,
             suffix: this.suffix,
             description: this.description,
@@ -130,6 +134,10 @@
         }
         if (!editor.getValue()) {
           this.$message.warning(`${i18n.$t('Please enter the resource content')}`)
+          return false
+        }
+        if (editor.doc.size>3000) {
+          this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
           return false
         }
 

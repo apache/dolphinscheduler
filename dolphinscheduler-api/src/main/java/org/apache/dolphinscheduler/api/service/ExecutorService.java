@@ -98,7 +98,7 @@ public class ExecutorService extends BaseService{
                                                    String receivers, String receiversCc, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
-        // timeout is valid
+        // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
@@ -242,7 +242,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             default:
-                logger.error(String.format("unknown execute type : %s", executeType.toString()));
+                logger.error("unknown execute type : {}", executeType);
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
 
                 break;
@@ -259,10 +259,7 @@ public class ExecutorService extends BaseService{
         // checkTenantExists();
         Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(),
                 processDefinition.getUserId());
-        if(tenant == null){
-            return false;
-        }
-        return true;
+        return tenant != null;
     }
 
     /**
@@ -298,6 +295,7 @@ public class ExecutorService extends BaseService{
                 if (executionStatus.typeIsPause()|| executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
+                break;
             default:
                 break;
         }
@@ -369,7 +367,7 @@ public class ExecutorService extends BaseService{
      * @return check result code
      */
     public Map<String, Object> startCheckByProcessDefinedId(int processDefineId) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
 
         if (processDefineId == 0){
             logger.error("process definition id is null");
@@ -378,10 +376,9 @@ public class ExecutorService extends BaseService{
         List<Integer> ids = new ArrayList<>();
         processService.recurseFindSubProcessId(processDefineId, ids);
         Integer[] idArray = ids.toArray(new Integer[ids.size()]);
-        if (ids.size() > 0){
-            List<ProcessDefinition> processDefinitionList;
-            processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
-            if (processDefinitionList != null && processDefinitionList.size() > 0){
+        if (!ids.isEmpty()){
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
+            if (processDefinitionList != null){
                 for (ProcessDefinition processDefinition : processDefinitionList){
                     /**
                      * if there is no online process, exit directly
@@ -438,37 +435,20 @@ public class ExecutorService extends BaseService{
 
     /**
      * create command
-     *
-     * @param commandType
-     * @param processDefineId
-     * @param nodeDep
-     * @param failureStrategy
-     * @param startNodeList
-     * @param schedule
-     * @param warningType
-     * @param excutorId
-     * @param warningGroupId
-     * @param runMode
-     * @return
+     * @param commandType commandType
+     * @param processDefineId processDefineId
+     * @param nodeDep nodeDep
+     * @param failureStrategy failureStrategy
+     * @param startNodeList startNodeList
+     * @param schedule schedule
+     * @param warningType warningType
+     * @param executorId executorId
+     * @param warningGroupId warningGroupId
+     * @param runMode runMode
+     * @param processInstancePriority processInstancePriority
+     * @param workerGroup workerGroup
+     * @return command id
      * @throws ParseException
-     */
-
-    /**
-     * create commonad
-     * @param commandType       command type
-     * @param processDefineId   process define id
-     * @param nodeDep           node dependency
-     * @param failureStrategy   failure strategy
-     * @param startNodeList     start node list
-     * @param schedule          schedule
-     * @param warningType       warning type
-     * @param executorId        executor id
-     * @param warningGroupId    warning group id
-     * @param runMode           run mode
-     * @param processInstancePriority   process instance priority
-     * @param workerGroup     worker group
-     * @return create command result
-     * @throws ParseException parse exception
      */
     private int createCommand(CommandType commandType, int processDefineId,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
@@ -517,6 +497,7 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(null != start && null != end && start.before(end)){

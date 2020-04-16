@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,16 +30,8 @@ import java.sql.SQLException;
  */
 public class PostgresqlUpgradeDao extends UpgradeDao {
 
-    public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
-    private static final String schema = getSchema();
-
-    /**
-     * init
-     */
-    @Override
-    protected void init() {
-
-    }
+    public static final Logger logger = LoggerFactory.getLogger(PostgresqlUpgradeDao.class);
+    private static final String SCHEMA = getSchema();
 
     /**
      * postgresql upgrade dao holder
@@ -57,16 +48,6 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
 
     public static final PostgresqlUpgradeDao getInstance() {
         return PostgresqlUpgradeDaoHolder.INSTANCE;
-    }
-
-
-    /**
-     * init schema
-     * @param initSqlPath initSqlPath
-     */
-    @Override
-    public void initSchema(String initSqlPath) {
-        super.initSchema(initSqlPath);
     }
 
     /**
@@ -108,18 +89,14 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         try {
             conn = dataSource.getConnection();
 
-            rs = conn.getMetaData().getTables(null, schema, tableName, null);
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            rs = conn.getMetaData().getTables(null, SCHEMA, tableName, null);
 
+            return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(rs, null, conn);
+            ConnectionUtils.releaseResource(rs, conn);
         }
 
     }
@@ -136,18 +113,13 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         ResultSet rs = null;
         try {
             conn = dataSource.getConnection();
-            rs = conn.getMetaData().getColumns(null,schema,tableName,columnName);
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-
+            rs = conn.getMetaData().getColumns(null, SCHEMA,tableName,columnName);
+            return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(rs, null, conn);
+            ConnectionUtils.releaseResource(rs, conn);
 
         }
 
