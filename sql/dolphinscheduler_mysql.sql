@@ -333,7 +333,7 @@ CREATE TABLE `t_ds_command` (
   `dependence` varchar(255) DEFAULT NULL COMMENT 'dependence',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group_id` int(11) DEFAULT '-1' COMMENT 'worker group id',
+  `worker_group` varchar(64)  COMMENT 'worker group',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -380,7 +380,7 @@ CREATE TABLE `t_ds_error_command` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `dependence` text COMMENT 'dependence',
   `process_instance_priority` int(11) DEFAULT NULL COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group_id` int(11) DEFAULT '-1' COMMENT 'worker group id',
+  `worker_group` varchar(64)  COMMENT 'worker group',
   `message` text COMMENT 'message',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
