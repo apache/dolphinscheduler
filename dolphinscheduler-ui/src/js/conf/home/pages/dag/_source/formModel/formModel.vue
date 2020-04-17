@@ -694,4 +694,9 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "./formModel";
+  .ans-radio-disabled {
+    .ans-radio-inner:after {
+      background-color: #6F8391
+    }
+  }
 </style>
