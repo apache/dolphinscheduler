@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.hadoop.conf.Configuration;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,7 +47,8 @@ public class HadoopUtilsTest {
 
     @Test
     public void getConfiguration(){
-        logger.info(HadoopUtils.getInstance().getConfiguration().get(Constants.HDFS_ROOT_USER));
+        Configuration conf = HadoopUtils.getInstance().getConfiguration();
+
     }
 
     @Test
@@ -79,6 +82,24 @@ public class HadoopUtilsTest {
     }
 
     @Test
+    public void getHdfsUserDir() throws IOException {
+        String result = HadoopUtils.getInstance().getHdfsUserDir("11000",1000);
+        Assert.assertEquals("/dolphinscheduler/11000/home/1000", result);
+    }
+
+    @Test
+    public void getHdfsUdfDir() throws IOException {
+        String result = HadoopUtils.getInstance().getHdfsUdfDir("11000");
+        Assert.assertEquals("/dolphinscheduler/11000/udfs", result);
+    }
+
+    @Test
+    public void getHdfsFileName() throws IOException {
+        String result = HadoopUtils.getInstance().getHdfsFileName(ResourceType.FILE,"11000","aa.txt");
+        Assert.assertEquals("/dolphinscheduler/resources/11000/aa.txt", result);
+    }
+
+    @Test
     public void isYarnEnabled() throws IOException {
         boolean result = HadoopUtils.getInstance().isYarnEnabled();
         Assert.assertEquals(false, result);
@@ -98,10 +119,8 @@ public class HadoopUtilsTest {
             logger.error(e.getMessage(),e);
         }
     }
-    @Test
-    public void testCapacity(){
 
-    }
+
     @Test
     public void testMove(){
         HadoopUtils instance = HadoopUtils.getInstance();
@@ -110,7 +129,6 @@ public class HadoopUtilsTest {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-
 
     }
 
