@@ -16,15 +16,19 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @Ignore
+//todo there is no hadoop environment
 public class HadoopUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
@@ -40,6 +44,47 @@ public class HadoopUtilsTest {
     }
 
     @Test
+    public void getConfiguration(){
+        logger.info(HadoopUtils.getInstance().getConfiguration().get(Constants.HDFS_ROOT_USER));
+    }
+
+    @Test
+    public void mkdir() throws IOException {
+       boolean result = HadoopUtils.getInstance().mkdir("/dolphinscheduler/hdfs");
+       Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void delete() throws IOException {
+        boolean result = HadoopUtils.getInstance().delete("/dolphinscheduler/hdfs",true);
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void exists() throws IOException {
+        boolean result = HadoopUtils.getInstance().exists("/dolphinscheduler/hdfs");
+        Assert.assertEquals(true, result);
+    }
+
+    @Test
+    public void getHdfsDataBasePath() throws IOException {
+        String result = HadoopUtils.getInstance().getHdfsDataBasePath();
+        Assert.assertEquals("/dolphinscheduler", result);
+    }
+
+    @Test
+    public void getHdfsResDir() throws IOException {
+        String result = HadoopUtils.getInstance().getHdfsResDir("11000");
+        Assert.assertEquals("/dolphinscheduler/resources/11000", result);
+    }
+
+    @Test
+    public void isYarnEnabled() throws IOException {
+        boolean result = HadoopUtils.getInstance().isYarnEnabled();
+        Assert.assertEquals(false, result);
+    }
+
+    @Test
     public void test() throws IOException {
         HadoopUtils.getInstance().copyLocalToHdfs("/root/teamviewer_13.1.8286.x86_64.rpm", "/journey", true, true);
     }
@@ -50,7 +95,7 @@ public class HadoopUtilsTest {
             byte[] bytes = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/35435.sh");
             logger.info(new String(bytes));
         } catch (Exception e) {
-
+            logger.error(e.getMessage(),e);
         }
     }
     @Test
@@ -81,8 +126,14 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    public void catFileTest()throws Exception{
+    public void catFileWithLimitTest()throws Exception{
         List<String> stringList = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
         logger.info(String.join(",",stringList));
+    }
+
+    @Test
+    public void catFileTest()throws Exception{
+        byte[] content = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py");
+        logger.info(Arrays.toString(content));
     }
 }
