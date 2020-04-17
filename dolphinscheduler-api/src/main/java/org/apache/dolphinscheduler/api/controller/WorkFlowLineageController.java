@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import io.swagger.annotations.ApiParam;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value="/list-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryWorkFlowLineageByName(@ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal,@ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
+    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal, @ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
         try {
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
@@ -56,7 +58,7 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value="/list-ids")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryWorkFlowLineageByIds(@ApiIgnore @RequestParam(value = "ids", required = false) String ids,@ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
+    public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestParam(value = "ids", required = false) String ids,@ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
 
         try {
             ids = ParameterUtils.handleEscapes(ids);
