@@ -914,7 +914,7 @@ public class MasterExecThread implements Runnable {
                     processInstance.getId(), processInstance.getName(),
                     processInstance.getState(), state,
                     processInstance.getCommandType());
-            processInstance.setState(state);
+
             ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
             instance.setState(state);
             instance.setProcessDefinition(processInstance.getProcessDefinition());
