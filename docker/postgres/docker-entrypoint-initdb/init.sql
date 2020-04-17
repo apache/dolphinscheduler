@@ -234,7 +234,7 @@ CREATE TABLE t_ds_command (
   dependence varchar(255) DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group_id int DEFAULT '-1' ,
+  worker_group varchar(64),
   PRIMARY KEY (id)
 ) ;
 
@@ -275,7 +275,7 @@ CREATE TABLE t_ds_error_command (
   update_time timestamp DEFAULT NULL ,
   dependence text ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group_id int DEFAULT '-1' ,
+  worker_group varchar(64),
   message text ,
   PRIMARY KEY (id)
 );
@@ -748,7 +748,7 @@ CREATE SEQUENCE  t_ds_worker_server_id_sequence;
 ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
--- Records of t_ds_user，user : admin , password : dolphinscheduler123
+-- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
