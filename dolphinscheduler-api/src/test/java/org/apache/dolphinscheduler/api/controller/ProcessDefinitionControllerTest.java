@@ -17,314 +17,126 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * process definition controller test
  */
-public class ProcessDefinitionControllerTest extends AbstractControllerTest{
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class ProcessDefinitionControllerTest{
 
     private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
-//    @Test
-//    public void testCreateProcessDefinition() throws Exception {
-//        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
-//        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
-//
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("name","dag_test");
-//        paramsMap.add("processDefinitionJson",json);
-//        paramsMap.add("locations", locations);
-//        paramsMap.add("connects", "[]");
-//        paramsMap.add("description", "desc test");
-//
-//        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/save","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isCreated())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//    @Test
-//    public void testVerifyProcessDefinitionName() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("name","dag_test");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/verify-name","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.PROCESS_INSTANCE_EXIST.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testVerifyProcessDefinitionNameNotExit() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("name","dag_test_1");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/verify-name","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//
-//    @Test
-//    public void UpdateProcessDefinition() throws Exception {
-//        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
-//        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
-//
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("name","dag_test_update");
-//        paramsMap.add("id","91");
-//        paramsMap.add("processDefinitionJson",json);
-//        paramsMap.add("locations", locations);
-//        paramsMap.add("connects", "[]");
-//        paramsMap.add("description", "desc test update");
-//
-//        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/update","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//    @Test
-//    public void testReleaseProcessDefinition() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processId","91");
-//        paramsMap.add("releaseState",String.valueOf(ReleaseState.OFFLINE));
-//
-//        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/release","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//    @Test
-//    public void testQueryProcessDefinitionById() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processId","91");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/select-by-id","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testQueryProcessDefinitionList() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//
-//    @Test
-//    public void testQueryProcessDefinitionListPaging() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("pageNo","1");
-//        paramsMap.add("searchVal","test");
-//        paramsMap.add("userId","");
-//        paramsMap.add("pageSize", "1");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/list-paging","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testViewTree() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processId","91");
-//        paramsMap.add("limit","30");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/view-tree","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testGetNodeListByDefinitionId() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionId","40");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/gen-task-list","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testGetNodeListByDefinitionIdList() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionIdList","40,90,91");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/get-task-list","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//
-//    @Ignore
-//    @Test
-//    public void testExportProcessDefinitionById() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionId","91");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/export","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-////                .andExpect(status().isOk())
-////                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//    @Test
-//    public void testQueryProcessDefinitionAllByProjectId() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("projectId","9");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/queryProcessDefinitionAllByProjectId","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//
-//
-//    @Test
-//    public void testDeleteProcessDefinitionById() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionId","73");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/delete","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
-//
-//    @Test
-//    public void testBatchDeleteProcessDefinitionByIds() throws Exception {
-//        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-//        paramsMap.add("processDefinitionIds","54,62");
-//
-//        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/process/batch-delete","cxc_1113")
-//                .header(SESSION_ID, sessionId)
-//                .params(paramsMap))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-//                .andReturn();
-//
-//        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-//        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-//        logger.info(mvcResult.getResponse().getContentAsString());
-//    }
+    @InjectMocks
+    private ProcessDefinitionController processDefinitionController;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
+
+    protected User user;
+
+    @Before
+    public void before(){
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+
+        user = loginUser;
+    }
+
+    @Test
+    public void testCreateProcessDefinition() throws Exception {
+        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
+
+        String projectName = "test";
+        String name = "dag_test";
+        String description = "desc test";
+        String connects = "[]";
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+        result.put("processDefinitionId",1);
+
+        Mockito.when(processDefinitionService.createProcessDefinition(user, projectName, name, json,
+                description, locations, connects)).thenReturn(result);
+
+        Result response = processDefinitionController.createProcessDefinition(user, projectName, name, json,
+                locations, connects, description);
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
+    }
+
+    @Test
+    public void testVerifyProcessDefinitionName() throws Exception {
+
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROCESS_INSTANCE_EXIST);
+        String projectName = "test";
+        String name = "dag_test";
+
+        Mockito.when(processDefinitionService.verifyProcessDefinitionName(user,projectName,name)).thenReturn(result);
+
+        Result response = processDefinitionController.verifyProcessDefinitionName(user,projectName,name);
+        Assert.assertEquals(Status.PROCESS_INSTANCE_EXIST.getCode(),response.getCode().intValue());
+
+    }
+
+    @Test
+    public void UpdateProcessDefinition() throws Exception {
+
+        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
+        String projectName = "test";
+        String name = "dag_test";
+        String description = "desc test";
+        String connects = "[]";
+        int id = 1;
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+        result.put("processDefinitionId",1);
+
+        Mockito.when(processDefinitionService.updateProcessDefinition(user, projectName, id,name, json,
+                description, locations, connects)).thenReturn(result);
+
+        Result response = processDefinitionController.updateProcessDefinition(user, projectName, name,id, json,
+                locations, connects, description);
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testReleaseProcessDefinition() throws Exception {
+        String projectName = "test";
+        int id = 1;
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectName,id,ReleaseState.OFFLINE.ordinal())).thenReturn(result);
+        Result response = processDefinitionController.releaseProcessDefinition(user, projectName,id,ReleaseState.OFFLINE.ordinal());
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
 }
