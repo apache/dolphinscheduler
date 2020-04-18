@@ -293,7 +293,7 @@ export default {
    */
   getProcessByProjectId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/queryProccessDefinitionAllByProjectId`, payload, res => {
+      io.get(`projects/${state.projectName}/process/queryProcessDefinitionAllByProjectId`, payload, res => {
         resolve(res.data)
   }).catch(res => {
       reject(res)

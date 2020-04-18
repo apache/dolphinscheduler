@@ -223,4 +223,14 @@ public class ThreadUtils {
         }
         return id + " (" + name + ")";
     }
+
+    /**
+     * sleep
+     * @param millis millis
+     */
+    public static void sleep(final long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (final InterruptedException ignore) {}
+    }
 }
