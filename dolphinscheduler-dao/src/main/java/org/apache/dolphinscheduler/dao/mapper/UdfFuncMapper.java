@@ -91,7 +91,7 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @param   resourceIds  resource id array
      * @return  UDF function list
      */
-    List<UdfFunc> listUdfByResourceId(@Param("resourceIds") int[] resourceIds);
+    List<UdfFunc> listUdfByResourceId(@Param("resourceIds") Integer[] resourceIds);
 
     /**
      * list authorized UDF by resource id

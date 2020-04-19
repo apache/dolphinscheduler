@@ -22,7 +22,7 @@
           <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th scope="col">
+          <th scope="col" width="30">
             <span>{{$t('#')}}</span>
           </th>
           <th scope="col" width="70">
@@ -49,10 +49,10 @@
           <th scope="col" width="60">
             <span>{{$t('Run Times')}}</span>
           </th>
-          <th scope="col" width="100">
+          <th scope="col" width="125">
             <span>{{$t('host')}}</span>
           </th>
-          <th scope="col" width="60">
+          <th scope="col" width="55">
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
           <th scope="col" width="30">

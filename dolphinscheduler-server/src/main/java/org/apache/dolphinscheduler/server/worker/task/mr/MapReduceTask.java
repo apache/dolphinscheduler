@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.mr;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -25,10 +26,10 @@ import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -47,34 +48,43 @@ public class MapReduceTask extends AbstractYarnTask {
     private MapreduceParameters mapreduceParameters;
 
     /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
+    /**
      * constructor
-     * @param props     task props
+     * @param taskExecutionContext taskExecutionContext
      * @param logger    logger
      */
-    public MapReduceTask(TaskProps props, Logger logger) {
-        super(props, logger);
+    public MapReduceTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
 
-        logger.info("mapreduce task params {}", taskProps.getTaskParams());
+        logger.info("mapreduce task params {}", taskExecutionContext.getTaskParams());
 
-        this.mapreduceParameters = JSONUtils.parseObject(taskProps.getTaskParams(), MapreduceParameters.class);
+        this.mapreduceParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MapreduceParameters.class);
 
         // check parameters
         if (!mapreduceParameters.checkParameters()) {
             throw new RuntimeException("mapreduce task params is not valid");
         }
+
+        mapreduceParameters.setQueue(taskExecutionContext.getQueue());
         setMainJarName();
-        mapreduceParameters.setQueue(taskProps.getQueue());
+
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                taskProps.getDefinedParams(),
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
                 mapreduceParameters.getLocalParametersMap(),
-                taskProps.getCmdTypeIfComplement(),
-                taskProps.getScheduleTime());
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
+
         if (paramsMap != null){
             String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
             mapreduceParameters.setMainArgs(args);
@@ -95,7 +105,7 @@ public class MapReduceTask extends AbstractYarnTask {
         List<String> parameterList = buildParameters(mapreduceParameters);
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", parameterList),
-                taskProps.getDefinedParams());
+                taskExecutionContext.getDefinedParams());
         logger.info("mapreduce task command: {}", command);
 
         return command;

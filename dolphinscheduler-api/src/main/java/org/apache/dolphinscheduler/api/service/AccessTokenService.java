@@ -83,6 +83,9 @@ public class AccessTokenService extends BaseService {
     public Map<String, Object> createToken(int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
 
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User id should not less than or equals to 0.");
+        }
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
