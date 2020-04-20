@@ -132,7 +132,7 @@ public class TaskCallbackServiceTest {
         nettyRemotingServer.close();
         nettyRemotingClient.close();
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testSendAckWithIllegalArgumentException(){
         TaskExecuteAckCommand ackCommand = Mockito.mock(TaskExecuteAckCommand.class);
