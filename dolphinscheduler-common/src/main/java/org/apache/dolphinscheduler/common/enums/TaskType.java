@@ -39,7 +39,7 @@ public enum TaskType {
      */
     SHELL(0, "shell"),
     SQL(1, "sql"),
-    SUB_PROCESS(2, "sub process"),
+    SUB_PROCESS(2, "sub_process"),
     PROCEDURE(3, "procedure"),
     MR(4, "mr"),
     SPARK(5, "spark"),
