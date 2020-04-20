@@ -36,7 +36,6 @@ import java.util.Collection;
  *   enterprise.wechat.agent.id
  *   enterprise.wechat.users
  */
-@Ignore
 public class EnterpriseWeChatUtilsTest {
 
     private String agentId = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID); // app id
