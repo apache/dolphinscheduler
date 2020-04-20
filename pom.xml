@@ -747,7 +747,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
@@ -827,6 +826,9 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/common/utils/HadoopUtils.java</exclude>
+                    </excludes>
                     <!-- <skip>true</skip> -->
                 </configuration>
             </plugin>
