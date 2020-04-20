@@ -747,7 +747,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
@@ -782,6 +781,8 @@
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
+                        <include>**/server/master/DependentTaskTest.java</include>
+                        <include>**/server/master/ConditionsTaskTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
@@ -825,6 +826,9 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/common/utils/HadoopUtils.java</exclude>
+                    </excludes>
                     <!-- <skip>true</skip> -->
                 </configuration>
             </plugin>
