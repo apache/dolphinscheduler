@@ -100,9 +100,9 @@ public class ProcessDefinitionController extends BaseController {
      * @param loginUser   login user
      * @param projectName project name
      * @param processId   process definition id
-     * @return process definition detail
+     * @return copy result code
      */
-    @ApiOperation(value = "queryProcessDefinitionById", notes= "QUERY_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiOperation(value = "copyProcessDefinition", notes= "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
