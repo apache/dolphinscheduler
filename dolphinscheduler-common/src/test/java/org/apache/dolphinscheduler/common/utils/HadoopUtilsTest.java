@@ -16,18 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +51,7 @@ public class HadoopUtilsTest {
         boolean result = false;
         try {
             result = hadoopUtils.rename("/dolphinscheduler/hdfs1","/dolphinscheduler/hdfs2");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
         Assert.assertEquals(true, result);
@@ -71,7 +69,7 @@ public class HadoopUtilsTest {
         boolean result = false;
         try {
             result = hadoopUtils.mkdir("/dolphinscheduler/hdfs");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         Assert.assertEquals(true, result);
@@ -82,7 +80,7 @@ public class HadoopUtilsTest {
         boolean result = false;
         try {
             result = hadoopUtils.delete("/dolphinscheduler/hdfs",true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         Assert.assertEquals(true, result);
@@ -93,7 +91,7 @@ public class HadoopUtilsTest {
         boolean result = false;
         try {
             result = hadoopUtils.exists("/dolphinscheduler/hdfs");
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
         Assert.assertEquals(true, result);
@@ -167,7 +165,11 @@ public class HadoopUtilsTest {
 
     @Test
     public void getApplicationStatus() {
-        logger.info(hadoopUtils.getApplicationStatus("application_1542010131334_0029").toString());
+        try {
+            logger.info(hadoopUtils.getApplicationStatus("application_1542010131334_0029").toString());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Test
@@ -178,13 +180,13 @@ public class HadoopUtilsTest {
 
     @Test
     public void catFileWithLimitTest() {
-        List<String> stringList = null;
+        List<String> stringList = new ArrayList<>();
         try {
             stringList = hadoopUtils.catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
+            logger.info(String.join(",",stringList));
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        logger.info(String.join(",",stringList));
     }
 
     @Test
