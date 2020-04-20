@@ -32,6 +32,7 @@ import java.util.List;
 
 public class DependentUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(ShellExecutorTest.class);
+
     @Test
     public void getDependResultForRelation() {
         //failed
