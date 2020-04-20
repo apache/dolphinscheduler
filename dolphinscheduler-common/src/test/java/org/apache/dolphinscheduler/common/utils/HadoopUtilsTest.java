@@ -37,14 +37,25 @@ public class HadoopUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtilsTest.class);
     private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
+
     @Test
     public void getActiveRMTest() {
-        logger.info(hadoopUtils.getAppAddress("http://ark1:8088/ws/v1/cluster/apps/%s","192.168.xx.xx,192.168.xx.xx"));
+        try{
+            hadoopUtils.getAppAddress("http://ark1:8088/ws/v1/cluster/apps/%s","192.168.xx.xx,192.168.xx.xx");
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 
     @Test
-    public void rename() throws IOException {
-        boolean result = hadoopUtils.rename("/dolphinscheduler/hdfs1","/dolphinscheduler/hdfs2");
+    public void rename()  {
+
+        boolean result = false;
+        try {
+            result = hadoopUtils.rename("/dolphinscheduler/hdfs1","/dolphinscheduler/hdfs2");
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+        }
         Assert.assertEquals(true, result);
     }
 
@@ -56,62 +67,81 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    public void mkdir() throws IOException {
-        boolean result = hadoopUtils.mkdir("/dolphinscheduler/hdfs");
+    public void mkdir()  {
+        boolean result = false;
+        try {
+            result = hadoopUtils.mkdir("/dolphinscheduler/hdfs");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Assert.assertEquals(true, result);
     }
 
     @Test
-    public void delete() throws IOException {
-        boolean result = hadoopUtils.delete("/dolphinscheduler/hdfs",true);
+    public void delete() {
+        boolean result = false;
+        try {
+            result = hadoopUtils.delete("/dolphinscheduler/hdfs",true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Assert.assertEquals(true, result);
     }
 
     @Test
-    public void exists() throws IOException {
-        boolean result = hadoopUtils.exists("/dolphinscheduler/hdfs");
+    public void exists() {
+        boolean result = false;
+        try {
+            result = hadoopUtils.exists("/dolphinscheduler/hdfs");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Assert.assertEquals(true, result);
     }
 
     @Test
-    public void getHdfsDataBasePath() throws IOException {
+    public void getHdfsDataBasePath() {
         String result = hadoopUtils.getHdfsDataBasePath();
         Assert.assertEquals("/dolphinscheduler", result);
     }
 
     @Test
-    public void getHdfsResDir() throws IOException {
+    public void getHdfsResDir() {
         String result = hadoopUtils.getHdfsResDir("11000");
         Assert.assertEquals("/dolphinscheduler/resources/11000", result);
     }
 
     @Test
-    public void getHdfsUserDir() throws IOException {
+    public void getHdfsUserDir() {
         String result = hadoopUtils.getHdfsUserDir("11000",1000);
         Assert.assertEquals("/dolphinscheduler/11000/home/1000", result);
     }
 
     @Test
-    public void getHdfsUdfDir() throws IOException {
+    public void getHdfsUdfDir()  {
         String result = hadoopUtils.getHdfsUdfDir("11000");
         Assert.assertEquals("/dolphinscheduler/11000/udfs", result);
     }
 
     @Test
-    public void getHdfsFileName() throws IOException {
+    public void getHdfsFileName() {
         String result = hadoopUtils.getHdfsFileName(ResourceType.FILE,"11000","aa.txt");
         Assert.assertEquals("/dolphinscheduler/resources/11000/aa.txt", result);
     }
 
     @Test
-    public void isYarnEnabled() throws IOException {
+    public void isYarnEnabled() {
         boolean result = hadoopUtils.isYarnEnabled();
         Assert.assertEquals(false, result);
     }
 
     @Test
-    public void test() throws IOException {
-        hadoopUtils.copyLocalToHdfs("/root/teamviewer_13.1.8286.x86_64.rpm", "/journey", true, true);
+    public void test() {
+        try {
+            hadoopUtils.copyLocalToHdfs("/root/teamviewer_13.1.8286.x86_64.rpm", "/journey", true, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -147,14 +177,24 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    public void catFileWithLimitTest()throws Exception{
-        List<String> stringList = hadoopUtils.catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
+    public void catFileWithLimitTest() {
+        List<String> stringList = null;
+        try {
+            stringList = hadoopUtils.catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info(String.join(",",stringList));
     }
 
     @Test
-    public void catFileTest()throws Exception{
-        byte[] content = hadoopUtils.catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py");
+    public void catFileTest() {
+        byte[] content = new byte[0];
+        try {
+            content = hadoopUtils.catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         logger.info(Arrays.toString(content));
     }
 }
