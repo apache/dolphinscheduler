@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Ignore
+
 //todo there is no hadoop environment
 public class HadoopUtilsTest {
 
