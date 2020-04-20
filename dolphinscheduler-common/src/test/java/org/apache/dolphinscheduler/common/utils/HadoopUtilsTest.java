@@ -54,7 +54,7 @@ public class HadoopUtilsTest {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
-        Assert.assertEquals(true, result);
+        Assert.assertEquals(false, result);
     }
 
 
@@ -72,7 +72,7 @@ public class HadoopUtilsTest {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        Assert.assertEquals(true, result);
+        Assert.assertEquals(false, result);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class HadoopUtilsTest {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        Assert.assertEquals(true, result);
+        Assert.assertEquals(false, result);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class HadoopUtilsTest {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        Assert.assertEquals(true, result);
+        Assert.assertEquals(false, result);
     }
 
     @Test
