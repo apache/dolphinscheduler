@@ -721,6 +721,7 @@
                         <include>**/api/service/UserAlertGroupServiceTest.java</include>
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
+                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
