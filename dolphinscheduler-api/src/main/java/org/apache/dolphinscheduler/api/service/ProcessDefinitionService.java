@@ -287,12 +287,12 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
-     * query datail of process definition
+     * copy process definition
      *
      * @param loginUser login user
      * @param projectName project name
      * @param processId process definition id
-     * @return process definition detail
+     * @return copy result code
      */
     public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException{
 

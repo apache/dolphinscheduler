@@ -95,7 +95,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition
+     * copy process definition
      *
      * @param loginUser   login user
      * @param projectName project name
