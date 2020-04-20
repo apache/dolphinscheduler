@@ -761,6 +761,7 @@
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
+                        <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
@@ -826,9 +827,6 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
-                    <excludes>
-                        <exclude>**/common/utils/HadoopUtils.java</exclude>
-                    </excludes>
                     <!-- <skip>true</skip> -->
                 </configuration>
             </plugin>
