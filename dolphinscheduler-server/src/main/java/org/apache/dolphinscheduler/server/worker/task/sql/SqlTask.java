@@ -78,7 +78,7 @@ public class SqlTask extends AbstractTask {
     /**
      * default query sql limit
      */
-    private final static int LIMIT = 10000;
+    private static final int LIMIT = 10000;
 
     public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
