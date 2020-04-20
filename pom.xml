@@ -827,6 +827,9 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>**/common/utils/HadoopUtils.java</exclude>
+                    </excludes>
                     <!-- <skip>true</skip> -->
                 </configuration>
             </plugin>
