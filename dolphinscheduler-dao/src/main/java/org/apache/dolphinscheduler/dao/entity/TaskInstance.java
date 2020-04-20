@@ -377,9 +377,6 @@ public class TaskInstance implements Serializable {
     }
 
 
-    public boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
-    }
 
     public String getDependency(){
 
@@ -456,6 +453,18 @@ public class TaskInstance implements Serializable {
 
     public List<String> getResources() {
         return resources;
+    }
+
+    public boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isDependTask(){
+        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isConditionsTask(){
+        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
 
     public void setResources(List<String> resources) {
