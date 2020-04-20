@@ -27,7 +27,7 @@
             and  tepd.name like concat('%', #{searchVal}, '%')
         </if>
     </select>
-    <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage">
+    <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage" databaseId="mysql">
         select tepd.id as work_flow_id,tepd.name as work_flow_name,
                (case when json_extract(tepd.process_definition_json, '$**.dependItemList') is not null then 1 else 0 end) as is_depend_work_flow,
                           json_extract(tepd.process_definition_json, '$**.definitionId') as source_work_flow_id,
@@ -46,10 +46,58 @@
             </foreach>
         </if>
     </select>
-    <select id="querySourceTarget" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelation">
+
+    <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowLineage" databaseId="pg">
+        select a.work_flow_id,
+               a.work_flow_name,
+               a.is_depend_work_flow,
+               array_agg(a.source_id) as source_id,
+               a.work_flow_publish_status,
+               a.schedule_start_time,
+               a.schedule_end_time,
+               a.crontab,
+               a.schedule_publish_status
+         from (
+               select tepd.id as work_flow_id,tepd.name as work_flow_name,
+                      case when tepd.process_definition_json::json#>'{tasks,1,dependence}' is not null then 1 else 0 end as is_depend_work_flow,
+                      (json_array_elements(tepd.process_definition_json::json#>'{tasks}')#>>'{dependence,dependTaskList,0,dependItemList,0,definitionId}') as source_id,
+                      tepd.release_state as work_flow_publish_status,
+                      tes.start_time as schedule_start_time,
+                      tes.end_time as schedule_end_time,
+                      tes.crontab as crontab,
+                      tes.release_state as schedule_publish_status
+                 from t_ds_process_definition tepd
+                 left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+                 where tepd.project_id = #{projectId}
+                 <if test="ids != null and ids.size()>0">
+                     and  tepd.id in
+                     <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
+                     #{i}
+                     </foreach>
+                </if>
+             ) a
+        where (a.is_depend_work_flow = 1 and source_id is not null) or (a.is_depend_work_flow = 0)
+        group by a.work_flow_id,a.work_flow_name,a.is_depend_work_flow,a.work_flow_publish_status,a.schedule_start_time,
+                 a.schedule_end_time,a.crontab,a.schedule_publish_status
+    </select>
+
+    <select id="querySourceTarget" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelation" databaseId="mysql">
         select id as target_work_flow_id,#{id} as source_work_flow_id
         from t_ds_process_definition t
         where json_extract(t.process_definition_json, '$**.dependItemList') is not null
           and find_in_set(#{id}, replace(replace(replace(json_extract(t.process_definition_json, '$**.definitionId'), '[', ''),']', ''), ' ', '')) > 0
     </select>
+
+    <select id="querySourceTarget" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelation" databaseId="pg">
+        select a.work_flow_id as target_work_flow_id,
+               a.source_id as source_work_flow_id
+         from (
+               select tepd.id as work_flow_id,
+                      (json_array_elements(tepd.process_definition_json::json#>'{tasks}')#>>'{dependence,dependTaskList,0,dependItemList,0,definitionId}') as source_id
+                 from t_ds_process_definition tepd
+                 left join t_ds_schedules tes on tepd.id = tes.process_definition_id
+                where tepd.project_id = 1) a
+        where source_id = #{id}::text;
+    </select>
+
 </mapper>

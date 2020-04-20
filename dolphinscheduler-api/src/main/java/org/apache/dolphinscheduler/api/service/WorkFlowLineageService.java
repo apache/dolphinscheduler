@@ -40,17 +40,19 @@ public class WorkFlowLineageService extends BaseService {
         return result;
     }
 
-    private List<WorkFlowRelation> getWorkFlowRelationRecursion(Set<Integer> ids, List<WorkFlowRelation> workFlowRelations) {
+    private List<WorkFlowRelation> getWorkFlowRelationRecursion(Set<Integer> ids, List<WorkFlowRelation> workFlowRelations,Set<Integer> sourceIds) {
         for(int id : ids) {
+            sourceIds.addAll(ids);
             List<WorkFlowRelation> workFlowRelationsTmp = workFlowLineageMapper.querySourceTarget(id);
-
             if(workFlowRelationsTmp != null && !workFlowRelationsTmp.isEmpty()) {
                 Set<Integer> idsTmp = new HashSet<>();
                 for(WorkFlowRelation workFlowRelation:workFlowRelationsTmp) {
-                    idsTmp.add(workFlowRelation.getTargetWorkFlowId());
+                    if(!sourceIds.contains(workFlowRelation.getTargetWorkFlowId())){
+                        idsTmp.add(workFlowRelation.getTargetWorkFlowId());
+                    }
                 }
                 workFlowRelations.addAll(workFlowRelationsTmp);
-                getWorkFlowRelationRecursion(idsTmp, workFlowRelations);
+                getWorkFlowRelationRecursion(idsTmp, workFlowRelations,sourceIds);
             }
         }
         return workFlowRelations;
@@ -69,10 +71,11 @@ public class WorkFlowLineageService extends BaseService {
             idsV = ids;
         }
         List<WorkFlowRelation> workFlowRelations = new ArrayList<>();
-        getWorkFlowRelationRecursion(idsV, workFlowRelations);
+        Set<Integer> sourceIds = new HashSet<>();
+        getWorkFlowRelationRecursion(idsV, workFlowRelations, sourceIds);
 
         Set<Integer> idSet = new HashSet<>();
-        //如果传入参数不为空，则需要补充下游工作流明细属性
+        //If the incoming parameter is not empty, you need to add downstream workflow detail attributes
         if(ids != null && !ids.isEmpty()) {
             for(WorkFlowRelation workFlowRelation : workFlowRelations) {
                 idSet.add(workFlowRelation.getTargetWorkFlowId());
