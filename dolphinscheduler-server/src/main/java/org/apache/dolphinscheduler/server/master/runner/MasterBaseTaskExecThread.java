@@ -16,11 +16,15 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -41,7 +45,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * logger of MasterBaseTaskExecThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
 
     /**
      * process service
@@ -71,7 +76,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * master config
      */
-    private MasterConfig masterConfig;
+    protected MasterConfig masterConfig;
 
     /**
      * taskUpdateQueue
@@ -80,12 +85,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
+    public MasterBaseTaskExecThread(TaskInstance taskInstance){
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
-        this.processInstance = processInstance;
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
@@ -123,7 +126,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             try {
                 if(!submitDB){
                     // submit task to db
-                    task = processService.submitTask(taskInstance, processInstance);
+                    task = processService.submitTask(taskInstance);
                     if(task != null && task.getId() != 0){
                         submitDB = true;
                     }
@@ -159,7 +162,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     public Boolean dispatchTask(TaskInstance taskInstance) {
 
         try{
-            if(taskInstance.isSubProcess()){
+            if(taskInstance.isConditionsTask()
+                    || taskInstance.isDependTask()
+                    || taskInstance.isSubProcess()){
                 return true;
             }
             if(taskInstance.getState().typeIsFinished()){
@@ -233,7 +238,39 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
+        this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }
+
+    /**
+     * get task log path
+     * @return log path
+     */
+    public String getTaskLogPath(TaskInstance task) {
+        String logPath;
+        try{
+            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                    .getLogger("ROOT")
+                    .getAppender("TASKLOGFILE"))
+                    .getDiscriminator()).getLogBase();
+            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+                logPath =  baseLog + Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }else{
+                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                        baseLog +  Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }
+        }catch (Exception e){
+            logger.error("logger", e);
+            logPath = "";
+        }
+        return logPath;
+    }
+
 
 }
