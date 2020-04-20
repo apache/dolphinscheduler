@@ -29,7 +29,30 @@
         </encoder>
     </appender>
 
-
+    <conversionRule conversionWord="messsage"
+                    converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+    <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+            <key>taskAppId</key>
+            <logBase>${log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
+                <file>${log.base}/${taskAppId}.log</file>
+                <encoder>
+                    <pattern>
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %messsage%n
+                    </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
     <!-- master server logback config start -->
     <appender name="MASTERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-master.log</file>
@@ -52,6 +75,7 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>
     </root>
 
