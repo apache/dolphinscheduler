@@ -112,8 +112,13 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
-    public Map<String, Object> createProcessDefinition(User loginUser, String projectName, String name,
-                                                       String processDefinitionJson, String desc, String locations, String connects) throws JsonProcessingException {
+    public Map<String, Object> createProcessDefinition(User loginUser,
+                                                       String projectName,
+                                                       String name,
+                                                       String processDefinitionJson,
+                                                       String desc,
+                                                       String locations,
+                                                       String connects) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -279,6 +284,41 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    /**
+     * query datail of process definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return process definition detail
+     */
+    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException{
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
+            return result;
+        } else {
+           return createProcessDefinition(
+                   loginUser,
+                   projectName,
+                   processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
+                   processDefinition.getProcessDefinitionJson(),
+                   processDefinition.getDescription(),
+                   processDefinition.getLocations(),
+                   processDefinition.getConnects());
+        }
     }
 
     /**
