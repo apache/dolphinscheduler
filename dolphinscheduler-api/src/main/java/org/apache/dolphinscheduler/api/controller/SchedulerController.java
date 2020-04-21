@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -111,6 +112,63 @@ public class SchedulerController extends BaseController {
         return returnDataList(result);
     }
 
+
+
+
+    /**
+     * create schedule
+     *
+     * @param loginUser               login user
+     * @param projectName             project name
+     * @param processDefinitionIds     process definition id
+     * @param schedule                scheduler
+     * @param warningType             warning type
+     * @param warningGroupId          warning group id
+     * @param failureStrategy         failure strategy
+     * @param processInstancePriority process instance priority
+     * @param receivers               receivers
+     * @param receiversCc             receivers cc
+     * @param workerGroup             worker group
+     * @return create result code
+     */
+    @ApiOperation(value = "createSchedule", notes = "CREATE_SCHEDULE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type = "WarningType"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type = "FailureStrategy"),
+            @ApiImplicitParam(name = "receivers", value = "RECEIVERS", type = "String"),
+            @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", type = "String"),
+            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
+    })
+
+    @PostMapping("/createBatch")
+    @ResponseStatus(HttpStatus.CREATED)
+    @SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
+    public Result createScheduleBatch(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+            @RequestParam(value = "processDefinitionIds") String processDefinitionIds,
+            @RequestParam(value = "schedule") String schedule,
+            @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+            @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
+            @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
+            @RequestParam(value = "receivers", required = false) String receivers,
+            @RequestParam(value = "receiversCc", required = false) String receiversCc,
+            @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+            @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) throws IOException {
+        logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
+                        "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
+                loginUser.getUserName(), projectName, processDefinitionIds, schedule, warningType, warningGroupId,
+                failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
+        Map<String, Object> result = schedulerService.insertScheduleBatch(loginUser, projectName, processDefinitionIds, schedule,
+                warningType, warningGroupId, failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
+
+        return returnDataList(result);
+    }
+
+
     /**
      * updateProcessInstance schedule
      *
@@ -140,6 +198,7 @@ public class SchedulerController extends BaseController {
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type = "Priority"),
     })
     @PostMapping("/update")
+    @ResponseStatus(HttpStatus.CREATED)
     public Result updateSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                  @RequestParam(value = "id") Integer id,
