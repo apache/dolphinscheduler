@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.alert.template;
 
 import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
-import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +27,6 @@ public class AlertTemplateFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertTemplateFactory.class);
 
-    private static final String alertTemplate = PropertyUtils.getString(Constants.ALERT_TEMPLATE);
-
     private AlertTemplateFactory(){}
 
     /**
@@ -39,16 +34,6 @@ public class AlertTemplateFactory {
      * @return a template, default is DefaultHTMLTemplate
      */
     public static AlertTemplate getMessageTemplate() {
-
-        if(StringUtils.isEmpty(alertTemplate)){
-            return new DefaultHTMLTemplate();
-        }
-
-        switch (alertTemplate){
-            case "html":
-                return new DefaultHTMLTemplate();
-            default:
-                throw new IllegalArgumentException(String.format("not support alert template: %s",alertTemplate));
-        }
+        return new DefaultHTMLTemplate();
     }
 }
