@@ -48,7 +48,7 @@ public class EnterpriseWeChatUtils {
     private static final String ENTERPRISE_WE_CHAT_SECRET = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_SECRET);
 
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
-    private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL
+    private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL == null ? null : ENTERPRISE_WE_CHAT_TOKEN_URL
             .replaceAll("\\$corpId", ENTERPRISE_WE_CHAT_CORP_ID)
             .replaceAll("\\$secret", ENTERPRISE_WE_CHAT_SECRET);
 
@@ -266,5 +266,4 @@ public class EnterpriseWeChatUtils {
         return result;
 
     }
-
 }
