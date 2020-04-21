@@ -17,9 +17,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExtPlatformService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -73,20 +76,14 @@ public class ExtPlatformController extends BaseController{
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(CREATE_EXTPLAFTORM_ERROR)
     public Result createExtPlatform(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "name") String name,
                                                        @RequestParam(value = "platformType")  int extPlatformType,
                                                        @RequestParam(value = "connectParam") String connectParam,
                                                        @RequestParam(value = "description",required = false) String description) {
-        try {
-
-            Map<String, Object> result = extPlatformService.createExtPlatform(loginUser,name,extPlatformType,connectParam,description);
-            return returnDataList(result);
-
-        }catch (Exception e){
-            logger.error(Status.CREATE_EXTPLAFTORM_ERROR.getMsg(),e);
-            return error(Status.CREATE_EXTPLAFTORM_ERROR.getCode(), Status.CREATE_EXTPLAFTORM_ERROR.getMsg());
-        }
+        Map<String, Object> result = extPlatformService.createExtPlatform(loginUser,name,extPlatformType,connectParam,description);
+        return returnDataList(result);
     }
 
 
@@ -107,24 +104,20 @@ public class ExtPlatformController extends BaseController{
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_EXTPLAFTORM_LIST_PAGING_ERROR)
     public Result queryExtPlatformlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestParam("pageNo") Integer pageNo,
                                                      @RequestParam(value = "searchVal", required = false) String searchVal,
                                                      @RequestParam("pageSize") Integer pageSize){
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(),pageNo,searchVal,pageSize);
-        try{
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if(result.get(Constants.STATUS) != Status.SUCCESS){
-                return returnDataListPaging(result);
-            }
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = extPlatformService.queryExtPlatformList(loginUser, searchVal, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if(result.get(Constants.STATUS) != Status.SUCCESS){
             return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_EXTPLAFTORM_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_EXTPLAFTORM_LIST_PAGING_ERROR.getCode(), Status.QUERY_EXTPLAFTORM_LIST_PAGING_ERROR.getMsg());
         }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = extPlatformService.queryExtPlatformList(loginUser, searchVal, pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
 
@@ -137,15 +130,11 @@ public class ExtPlatformController extends BaseController{
     @ApiOperation(value = "queryExtPlatformlist", notes= "QUERY_EXTPLAFTORM_LIST_NOTES")
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_EXTPLAFTORM_LIST_ERROR)
     public Result queryExtPlatformlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
         logger.info("login user {}, query extPlatform list", loginUser.getUserName());
-        try{
-            Map<String, Object> result = extPlatformService.queryExtPlatformList(loginUser);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getCode(), Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg());
-        }
+        Map<String, Object> result = extPlatformService.queryExtPlatformList(loginUser);
+        return returnDataList(result);
     }
 
 
@@ -170,6 +159,7 @@ public class ExtPlatformController extends BaseController{
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_EXTPLAFTORM_ERROR)
     public Result updateExtPlatform(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam(value = "id") int id,
                                                         @RequestParam(value = "name") String name,
@@ -177,13 +167,8 @@ public class ExtPlatformController extends BaseController{
                                                         @RequestParam(value = "connectParam") String connectParam,
                                                         @RequestParam(value = "description",required = false) String description) {
 
-        try {
-            Map<String, Object> result = extPlatformService.updateExtPlatform(loginUser,id,name,extPlatformType,connectParam,description);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.UPDATE_EXTPLAFTORM_ERROR.getMsg(),e);
-            return error(Status.UPDATE_EXTPLAFTORM_ERROR.getCode(), Status.UPDATE_EXTPLAFTORM_ERROR.getMsg());
-        }
+        Map<String, Object> result = extPlatformService.updateExtPlatform(loginUser,id,name,extPlatformType,connectParam,description);
+        return returnDataList(result);
     }
 
     /**
@@ -200,16 +185,12 @@ public class ExtPlatformController extends BaseController{
     })
     @PostMapping(value = "/selectExtPlatformById")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_EXTPLAFTORM_BY_ID_ERROR)
     public Result selectExtPlatformById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "id") int id) {
         logger.info("login user {}, delete extPlatform, extPlatformId: {},", loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result = extPlatformService.selectById(loginUser,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getCode(), Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = extPlatformService.selectById(loginUser,id);
+        return returnDataList(result);
     }
 
 
@@ -229,16 +210,12 @@ public class ExtPlatformController extends BaseController{
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_EXTPLAFTORM_BY_ID_ERROR)
     public Result deleteExtPlatformById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete extPlatform, extPlatformId: {},", loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result = extPlatformService.deleteExtPlatformById(loginUser,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getCode(), Status.DELETE_EXTPLAFTORM_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = extPlatformService.deleteExtPlatformById(loginUser,id);
+        return returnDataList(result);
     }
 
 
@@ -255,18 +232,14 @@ public class ExtPlatformController extends BaseController{
     })
     @GetMapping(value = "/verify-extPlatform-name")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_EXTPLAFTORM_NAME_ERROR)
     public Result verifyExtPlatformName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value ="extPlatformName") String extPlatformName
     ) {
 
-        try{
-            logger.info("login user {}, verfiy extPlatform code: {}",
-                    loginUser.getUserName(),extPlatformName);
-            return extPlatformService.verifyExtPlatformName(extPlatformName);
-        }catch (Exception e){
-            logger.error(Status.VERIFY_EXTPLAFTORM_NAME_ERROR.getMsg(),e);
-            return error(Status.VERIFY_EXTPLAFTORM_NAME_ERROR.getCode(), Status.VERIFY_EXTPLAFTORM_NAME_ERROR.getMsg());
-        }
+        logger.info("login user {}, verfiy extPlatform code: {}",
+                loginUser.getUserName(),extPlatformName);
+        return extPlatformService.verifyExtPlatformName(extPlatformName);
     }
 
 
@@ -279,17 +252,11 @@ public class ExtPlatformController extends BaseController{
     @ApiOperation(value = "queryExtlist", notes= "QUERY_EXT_LIST_NOTES")
     @GetMapping(value="/extlist")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_EXTPLAFTORM_LIST_ERROR)
     public Result queryExtlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser, int id){
         logger.info("login user {}, query extPlatform list", loginUser.getUserName());
-        try{
-
-            Result result= extPlatformService.queryExtlist(loginUser, id);
-
-            return result ;
-        }catch (Exception e){
-            logger.error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getCode(), Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg());
-        }
+        Result result= extPlatformService.queryExtlist(loginUser, id);
+        return result ;
     }
 
 
@@ -302,16 +269,10 @@ public class ExtPlatformController extends BaseController{
     @ApiOperation(value = "queryDetail", notes= "QUERY_EXT_LIST_NOTES")
     @GetMapping(value="/extDetail")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_EXTPLAFTORM_LIST_ERROR)
     public Result queryExtDetail(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser, String connectParam){
         logger.info("login user {}, query extPlatform list", loginUser.getUserName());
-        try{
-
-            Result result= extPlatformService.queryExtDetail(loginUser,connectParam);
-
-            return result ;
-        }catch (Exception e){
-            logger.error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_EXTPLAFTORM_LIST_ERROR.getCode(), Status.QUERY_EXTPLAFTORM_LIST_ERROR.getMsg());
-        }
+        Result result= extPlatformService.queryExtDetail(loginUser,connectParam);
+        return result ;
     }
 }

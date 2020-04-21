@@ -17,9 +17,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExtService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -69,17 +72,11 @@ public class ExtController extends BaseController{
     })
     @PostMapping(value = "/getClusterInfo")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(INTERNAL_SERVER_ERROR_ARGS)
     public Result getClusterInfo(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "ip",required = false) String ip) {
-        try {
-
-            Result result = extService.getClusterInfo(ip);
-            return result;
-
-        }catch (Exception e){
-            logger.error(Status.CREATE_TENANT_ERROR.getMsg(),e);
-            return error(Status.CREATE_TENANT_ERROR.getCode(), Status.CREATE_TENANT_ERROR.getMsg());
-        }
+        Result result = extService.getClusterInfo(ip);
+        return result;
     }
 
 

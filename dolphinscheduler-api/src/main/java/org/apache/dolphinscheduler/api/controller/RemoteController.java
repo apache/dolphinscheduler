@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
@@ -40,7 +41,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RestController
 @RequestMapping("remote")
@@ -90,25 +95,21 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/process/save")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(CREATE_PROCESS_DEFINITION)
     public Result createProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam(value = "name", required = true) String name,
             @RequestParam(value = "processDefinitionJson", required = true) String json,
             @RequestParam(value = "locations", required = true) String locations,
             @RequestParam(value = "connects", required = true) String connects,
-            @RequestParam(value = "description", required = false) String description) {
+            @RequestParam(value = "description", required = false) String description) throws JsonProcessingException {
 
-        try {
-            logger.info("login user {}, create  process definition, project name: {}, process definition name: {}, " +
-                            "process_definition_json: {}, desc: {} locations:{}, connects:{}",
-                    loginUser.getUserName(), projectName, name, json, description, locations, connects);
-            Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
-                    description, locations, connects);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(Status.CREATE_PROCESS_DEFINITION.getMsg(), e);
-            return error(Status.CREATE_PROCESS_DEFINITION.getCode(), Status.CREATE_PROCESS_DEFINITION.getMsg());
-        }
+        logger.info("login user {}, create  process definition, project name: {}, process definition name: {}, " +
+                        "process_definition_json: {}, desc: {} locations:{}, connects:{}",
+                loginUser.getUserName(), projectName, name, json, description, locations, connects);
+        Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
+                description, locations, connects);
+        return returnDataList(result);
     }
 
     /**
@@ -125,18 +126,14 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value = "/projects/{projectName}/process/verify-name")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR)
     public Result verifyProccessDefinitionName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName,
             @RequestParam(value = "name", required = true) String name){
-        try {
-            logger.info("verify process definition name unique, user:{}, project name:{}, process definition name:{}",
-                    loginUser.getUserName(), projectName, name);
-            Map<String, Object> result = processDefinitionService.verifyProccessDefinitionName(loginUser, projectName, name);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR.getMsg(),e);
-            return error(Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR.getCode(), Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR.getMsg());
-        }
+        logger.info("verify process definition name unique, user:{}, project name:{}, process definition name:{}",
+                loginUser.getUserName(), projectName, name);
+        Map<String, Object> result = processDefinitionService.verifyProcessDefinitionName(loginUser, projectName, name);
+        return returnDataList(result);
     }
 
     /**
@@ -163,6 +160,7 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/process/update")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
     public Result updateProccessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName,
             @RequestParam(value = "name", required = true) String name,
@@ -172,17 +170,12 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "connects", required = false) String connects,
             @RequestParam(value = "description", required = false) String description) {
 
-        try {
-            logger.info("login user {}, update process define, project name: {}, process define name: {}, " +
-                            "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
-                    loginUser.getUserName(), projectName, name, processDefinitionJson,description, locations, connects);
-            Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
-                    processDefinitionJson, description, locations, connects);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.UPDATE_PROCESS_DEFINITION_ERROR.getMsg(),e);
-            return error(Status.UPDATE_PROCESS_DEFINITION_ERROR.getCode(), Status.UPDATE_PROCESS_DEFINITION_ERROR.getMsg());
-        }
+        logger.info("login user {}, update process define, project name: {}, process define name: {}, " +
+                        "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
+                loginUser.getUserName(), projectName, name, processDefinitionJson,description, locations, connects);
+        Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
+                processDefinitionJson, description, locations, connects);
+        return returnDataList(result);
     }
 
 
@@ -204,20 +197,16 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/process/release")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
     public Result releaseProccessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName,
             @RequestParam(value = "processId", required = true) int processId,
             @RequestParam(value = "releaseState", required = true) int releaseState) {
 
-        try {
-            logger.info("login user {}, release process definition, project name: {}, release state: {}",
-                    loginUser.getUserName(), projectName, releaseState);
-            Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, processId, releaseState);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.RELEASE_PROCESS_DEFINITION_ERROR.getMsg(),e);
-            return error(Status.RELEASE_PROCESS_DEFINITION_ERROR.getCode(), Status.RELEASE_PROCESS_DEFINITION_ERROR.getMsg());
-        }
+        logger.info("login user {}, release process definition, project name: {}, release state: {}",
+                loginUser.getUserName(), projectName, releaseState);
+        Map<String, Object> result = processDefinitionService.releaseProcessDefinition(loginUser, projectName, processId, releaseState);
+        return returnDataList(result);
     }
 
 
@@ -236,19 +225,15 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/process/select-by-id")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
     public Result queryProccessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName,
             @RequestParam("processId") Integer processId
     ){
-        try{
-            logger.info("query datail of process definition, login user:{}, project name:{}, process definition id:{}",
-                    loginUser.getUserName(), projectName, processId);
-            Map<String, Object> result = processDefinitionService.queryProccessDefinitionById(loginUser, projectName, processId);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR.getMsg(),e);
-            return error(Status.QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR.getCode(), Status.QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR.getMsg());
-        }
+        logger.info("query datail of process definition, login user:{}, project name:{}, process definition id:{}",
+                loginUser.getUserName(), projectName, processId);
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
+        return returnDataList(result);
     }
 
 
@@ -262,18 +247,14 @@ public class RemoteController extends BaseController{
     @ApiOperation(value = "queryProccessDefinitionList", notes= "QUERY_PROCCESS_DEFINITION_LIST_NOTES")
     @GetMapping(value="/projects/{projectName}/process/list")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     public Result queryProccessDefinitionList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName
     ){
-        try{
-            logger.info("query proccess definition list, login user:{}, project name:{}",
-                    loginUser.getUserName(), projectName);
-            Map<String, Object> result = processDefinitionService.queryProccessDefinitionList(loginUser, projectName);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_PROCCESS_DEFINITION_LIST.getMsg(),e);
-            return error(Status.QUERY_PROCCESS_DEFINITION_LIST.getCode(), Status.QUERY_PROCCESS_DEFINITION_LIST.getMsg());
-        }
+        logger.info("query proccess definition list, login user:{}, project name:{}",
+                loginUser.getUserName(), projectName);
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectName);
+        return returnDataList(result);
     }
 
     /**
@@ -295,25 +276,21 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/process/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR)
     public Result queryProcessDefinitionListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME",required = true) @PathVariable String projectName,
             @RequestParam("pageNo") Integer pageNo,
             @RequestParam(value = "searchVal", required = false) String searchVal,
             @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
             @RequestParam("pageSize") Integer pageSize){
-        try{
-            logger.info("query proccess definition list paging, login user:{}, project name:{}", loginUser.getUserName(), projectName);
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if(result.get(Constants.STATUS) != Status.SUCCESS){
-                return returnDataListPaging(result);
-            }
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
+        logger.info("query proccess definition list paging, login user:{}, project name:{}", loginUser.getUserName(), projectName);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if(result.get(Constants.STATUS) != Status.SUCCESS){
             return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_PROCCESS_DEFINITION_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_PROCCESS_DEFINITION_LIST_PAGING_ERROR.getCode(), Status.QUERY_PROCCESS_DEFINITION_LIST_PAGING_ERROR.getMsg());
         }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
+        return returnDataListPaging(result);
     }
 
     /**
@@ -330,19 +307,15 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/process/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_PROCESS_DEFINE_BY_ID_ERROR)
     public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processDefinitionId") Integer processDefinitionId
     ){
-        try{
-            logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId);
-            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg());
-        }
+        logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
+                loginUser.getUserName(), projectName, processDefinitionId);
+        Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+        return returnDataList(result);
     }
 
 
@@ -384,6 +357,7 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/instance/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryProcessInstanceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
@@ -395,19 +369,14 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "endDate", required = false) String endTime,
             @RequestParam("pageNo") Integer pageNo,
             @RequestParam("pageSize") Integer pageSize){
-        try{
-            logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
-                            "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName,stateType,host,
-                    startTime, endTime, pageNo, pageSize);
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = processInstanceService.queryProcessInstanceList(
-                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
-            return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR.getCode(), Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR.getMsg());
-        }
+        logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
+                        "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
+                loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName,stateType,host,
+                startTime, endTime, pageNo, pageSize);
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        Map<String, Object> result = processInstanceService.queryProcessInstanceList(
+                loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
     /**
@@ -424,19 +393,15 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/instance/task-list-by-process-id")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
     public Result queryTaskListByProcessId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processInstanceId") Integer processInstanceId
-    ) {
-        try{
-            logger.info("query task instance list by process instance id, login user:{}, project name:{}, process instance id:{}",
-                    loginUser.getUserName(), projectName, processInstanceId);
-            Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR.getMsg(),e);
-            return error(QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR.getCode(), QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR.getMsg());
-        }
+    ) throws IOException {
+        logger.info("query task instance list by process instance id, login user:{}, project name:{}, process instance id:{}",
+                loginUser.getUserName(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
+        return returnDataList(result);
     }
 
     /**
@@ -465,6 +430,7 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value="/projects/{projectName}/instance/update")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_PROCESS_INSTANCE_ERROR)
     public Result updateProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam( value = "processInstanceJson", required = false) String processInstanceJson,
@@ -474,19 +440,14 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "locations", required = false) String locations,
             @RequestParam(value = "connects", required = false) String connects,
             @RequestParam( value = "flag", required = false) Flag flag
-    ){
-        try{
-            logger.info("updateProcessInstance process instance, login user:{}, project name:{}, process instance json:{}," +
-                            "process instance id:{}, schedule time:{}, sync define:{}, flag:{}, locations:{}, connects:{}",
-                    loginUser.getUserName(), projectName, processInstanceJson, processInstanceId, scheduleTime,
-                    syncDefine, flag, locations, connects);
-            Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
-                    processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(UPDATE_PROCESS_INSTANCE_ERROR.getMsg(),e);
-            return error(Status.UPDATE_PROCESS_INSTANCE_ERROR.getCode(), Status.UPDATE_PROCESS_INSTANCE_ERROR.getMsg());
-        }
+    ) throws ParseException {
+        logger.info("updateProcessInstance process instance, login user:{}, project name:{}, process instance json:{}," +
+                        "process instance id:{}, schedule time:{}, sync define:{}, flag:{}, locations:{}, connects:{}",
+                loginUser.getUserName(), projectName, processInstanceJson, processInstanceId, scheduleTime,
+                syncDefine, flag, locations, connects);
+        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
+                processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
+        return returnDataList(result);
     }
 
     /**
@@ -503,19 +464,15 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/instance/select-by-id")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result queryProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processInstanceId") Integer processInstanceId
     ){
-        try{
-            logger.info("query process instance detail by id, login user:{},project name:{}, process instance id:{}",
-                    loginUser.getUserName(), projectName, processInstanceId);
-            Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(QUERY_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
-            return error(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR.getMsg());
-        }
+        logger.info("query process instance detail by id, login user:{},project name:{}, process instance id:{}",
+                loginUser.getUserName(), projectName, processInstanceId);
+        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
+        return returnDataList(result);
     }
 
     /**
@@ -533,20 +490,16 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/projects/{projectName}/instance/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processInstanceId") Integer processInstanceId
     ){
-        try{
-            logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
-                    loginUser.getUserName(), projectName, processInstanceId);
+        logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
+                loginUser.getUserName(), projectName, processInstanceId);
 
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+        return returnDataList(result);
     }
 
 
@@ -588,6 +541,7 @@ public class RemoteController extends BaseController{
     })
     @GetMapping("/projects/{projectName}/task-instance/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     public Result queryTaskListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
@@ -601,17 +555,12 @@ public class RemoteController extends BaseController{
             @RequestParam("pageNo") Integer pageNo,
             @RequestParam("pageSize") Integer pageSize){
 
-        try{
-            logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
-                    projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = taskInstanceService.queryTaskListPaging(
-                    loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
-            return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_TASK_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_TASK_LIST_PAGING_ERROR.getCode(), Status.QUERY_TASK_LIST_PAGING_ERROR.getMsg());
-        }
+        logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
+                projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        Map<String, Object> result = taskInstanceService.queryTaskListPaging(
+                loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+        return returnDataListPaging(result);
 
     }
 
@@ -662,6 +611,7 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/executors/start-process-instance")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(START_PROCESS_INSTANCE_ERROR)
     public Result startProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam(value = "processDefinitionId") int processDefinitionId,
@@ -677,27 +627,22 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "runMode", required = false) RunMode runMode,
             @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
             @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-            @RequestParam(value = "timeout", required = false) Integer timeout) {
-        try {
-            logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
-                            + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
-                    loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
-                    failureStrategy, startNodeList, taskDependType, warningType, workerGroup,receivers,receiversCc,runMode,processInstancePriority,
-                    workerGroup, timeout);
+            @RequestParam(value = "timeout", required = false) Integer timeout) throws ParseException {
+        logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
+                        + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
+                        + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
+                loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
+                failureStrategy, startNodeList, taskDependType, warningType, workerGroup,receivers,receiversCc,runMode,processInstancePriority,
+                workerGroup, timeout);
 
-            if (timeout == null) {
-                timeout = Constants.MAX_TASK_TIMEOUT;
-            }
-
-            Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
-                    startNodeList, taskDependType, warningType,
-                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroup, timeout);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(Status.START_PROCESS_INSTANCE_ERROR.getMsg(),e);
-            return error(Status.START_PROCESS_INSTANCE_ERROR.getCode(), Status.START_PROCESS_INSTANCE_ERROR.getMsg());
+        if (timeout == null) {
+            timeout = Constants.MAX_TASK_TIMEOUT;
         }
+
+        Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
+                startNodeList, taskDependType, warningType,
+                warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroup, timeout);
+        return returnDataList(result);
     }
 
     /**
@@ -716,20 +661,16 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/executors/execute")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
             @RequestParam("processInstanceId") Integer processInstanceId,
             @RequestParam("executeType") ExecuteType executeType
     ) {
-        try {
-            logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                    loginUser.getUserName(), projectName, processInstanceId, executeType);
-            Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(Status.EXECUTE_PROCESS_INSTANCE_ERROR.getMsg(),e);
-            return error(Status.EXECUTE_PROCESS_INSTANCE_ERROR.getCode(), Status.EXECUTE_PROCESS_INSTANCE_ERROR.getMsg());
-        }
+        logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
+                loginUser.getUserName(), projectName, processInstanceId, executeType);
+        Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
+        return returnDataList(result);
     }
 
     /**
@@ -745,17 +686,12 @@ public class RemoteController extends BaseController{
     })
     @PostMapping(value = "/projects/{projectName}/executors/start-check")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
     public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "processDefinitionId") int processDefinitionId) {
         logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionId);
-        try {
-            Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
-            return returnDataList(result);
-
-        } catch (Exception e) {
-            logger.error(Status.CHECK_PROCESS_DEFINITION_ERROR.getMsg(),e);
-            return error(Status.CHECK_PROCESS_DEFINITION_ERROR.getCode(), Status.CHECK_PROCESS_DEFINITION_ERROR.getMsg());
-        }
+        Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
+        return returnDataList(result);
     }
 
 
@@ -783,6 +719,7 @@ public class RemoteController extends BaseController{
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
     @PostMapping(value = "/resources/create")
+    @ApiException(CREATE_RESOURCE_ERROR)
     public Result createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "type") ResourceType type,
             @RequestParam(value ="name") String alias,
@@ -790,14 +727,9 @@ public class RemoteController extends BaseController{
             @RequestParam("file") MultipartFile file,
             @RequestParam(value ="pid") int pid,
             @RequestParam(value ="currentDir") String currentDir) {
-        try {
-            logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
-                    loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
-            return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir);
-        } catch (Exception e) {
-            logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
-            return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
-        }
+        logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
+                loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
+        return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir);
     }
 
     /**
@@ -819,19 +751,15 @@ public class RemoteController extends BaseController{
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true,dataType = "MultipartFile")
     })
     @PostMapping(value = "/resources/update")
+    @ApiException(UPDATE_RESOURCE_ERROR)
     public Result updateResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value ="id") int resourceId,
             @RequestParam(value = "type") ResourceType type,
             @RequestParam(value ="name")String alias,
             @RequestParam(value = "description", required = false) String description) {
-        try {
-            logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
-                    loginUser.getUserName(),type, alias, description);
-            return resourceService.updateResource(loginUser,resourceId,alias,description,type);
-        } catch (Exception e) {
-            logger.error(UPDATE_RESOURCE_ERROR.getMsg(),e);
-            return error(Status.UPDATE_RESOURCE_ERROR.getCode(), Status.UPDATE_RESOURCE_ERROR.getMsg());
-        }
+        logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
+                loginUser.getUserName(),type, alias, description);
+        return resourceService.updateResource(loginUser,resourceId,alias,description,type);
     }
 
     /**
@@ -847,17 +775,13 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/resources/list")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_RESOURCES_LIST_ERROR)
     public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value ="type") ResourceType type
     ){
-        try{
-            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type);
-            Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(QUERY_RESOURCES_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_RESOURCES_LIST_ERROR.getCode(), Status.QUERY_RESOURCES_LIST_ERROR.getMsg());
-        }
+        logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type);
+        Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
+        return returnDataList(result);
     }
 
     /**
@@ -880,6 +804,7 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value="/resources/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_RESOURCES_LIST_PAGING)
     public Result queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value ="type") ResourceType type,
             @RequestParam(value ="id") int id,
@@ -887,21 +812,16 @@ public class RemoteController extends BaseController{
             @RequestParam(value = "searchVal", required = false) String searchVal,
             @RequestParam("pageSize") Integer pageSize
     ){
-        try{
-            logger.info("query resource list, login user:{}, resource type:{}, search value:{}",
-                    loginUser.getUserName(), type, searchVal);
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if(result.get(Constants.STATUS) != Status.SUCCESS){
-                return returnDataListPaging(result);
-            }
-
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = resourceService.queryResourceListPaging(loginUser,id,type,searchVal,pageNo, pageSize);
+        logger.info("query resource list, login user:{}, resource type:{}, search value:{}",
+                loginUser.getUserName(), type, searchVal);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if(result.get(Constants.STATUS) != Status.SUCCESS){
             return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(QUERY_RESOURCES_LIST_PAGING.getMsg(),e);
-            return error(Status.QUERY_RESOURCES_LIST_PAGING.getCode(), Status.QUERY_RESOURCES_LIST_PAGING.getMsg());
         }
+
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = resourceService.queryResourceListPaging(loginUser,id,type,searchVal,pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
 
@@ -918,17 +838,13 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value = "/resources/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_RESOURCE_ERROR)
     public Result deleteResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value ="id") int resourceId
-    ) {
-        try{
-            logger.info("login user {}, delete resource id: {}",
-                    loginUser.getUserName(),resourceId);
-            return resourceService.delete(loginUser,resourceId);
-        }catch (Exception e){
-            logger.error(DELETE_RESOURCE_ERROR.getMsg(),e);
-            return error(Status.DELETE_RESOURCE_ERROR.getCode(), Status.DELETE_RESOURCE_ERROR.getMsg());
-        }
+    ) throws Exception {
+        logger.info("login user {}, delete resource id: {}",
+                loginUser.getUserName(),resourceId);
+        return resourceService.delete(loginUser,resourceId);
     }
 
 
@@ -947,19 +863,16 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value = "/resources/verify-name")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR)
     public Result verifyResourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value ="fullName") String fullName,
             @RequestParam(value ="type") ResourceType type
     ) {
-        try {
-            logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                    loginUser.getUserName(), fullName,type);
+        logger.info("login user {}, verfiy resource alias: {},resource type: {}",
+                loginUser.getUserName(), fullName, type);
 
-            return resourceService.verifyResourceName(fullName,type,loginUser);
-        } catch (Exception e) {
-            logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
-            return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());
-        }
+        return resourceService.verifyResourceName(fullName, type, loginUser);
+
     }
 
 
@@ -977,26 +890,17 @@ public class RemoteController extends BaseController{
     })
     @GetMapping(value = "/resources/download")
     @ResponseBody
+    @ApiException(DOWNLOAD_RESOURCE_FILE_ERROR)
     public ResponseEntity downloadResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "id") int resourceId) {
-        try{
-            logger.info("login user {}, download resource : {}",
-                    loginUser.getUserName(), resourceId);
-            Resource file = resourceService.downloadResource(resourceId);
-            if (file == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.RESOURCE_NOT_EXIST.getMsg());
-            }
-            return ResponseEntity
-                    .ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-                    .body(file);
-        }catch (RuntimeException e){
-            logger.error(e.getMessage(),e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }catch (Exception e){
-            logger.error(DOWNLOAD_RESOURCE_FILE_ERROR.getMsg(),e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.DOWNLOAD_RESOURCE_FILE_ERROR.getMsg());
+            @RequestParam(value = "id") int resourceId) throws Exception {
+        Resource file = resourceService.downloadResource(resourceId);
+        if (file == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.RESOURCE_NOT_EXIST.getMsg());
         }
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
+                .body(file);
     }
 
 

@@ -17,9 +17,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerCalendarService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -72,19 +75,13 @@ public class SchedulerCalendarController extends BaseController{
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(CREATE_SCHEDULE_ERROR)
     public Result createCalendar(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "name") String name,
                                                        @RequestParam(value = "calendarInfo") String calendarInfo,
-                                                       @RequestParam(value = "description",required = false) String description) {
-        try {
-
-            Map<String, Object> result = schedulerCalendarService.createCalendar(loginUser,name,calendarInfo,description);
-            return returnDataList(result);
-
-        }catch (Exception e){
-            logger.error(Status.CREATE_CALENDAR_ERROR.getMsg(),e);
-            return error(Status.CREATE_CALENDAR_ERROR.getCode(), Status.CREATE_CALENDAR_ERROR.getMsg());
-        }
+                                                       @RequestParam(value = "description",required = false) String description) throws Exception {
+        Map<String, Object> result = schedulerCalendarService.createCalendar(loginUser,name,calendarInfo,description);
+        return returnDataList(result);
     }
 
 
@@ -105,24 +102,20 @@ public class SchedulerCalendarController extends BaseController{
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_CALENDAR_LIST_PAGING_ERROR)
     public Result queryCalendarlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestParam("pageNo") Integer pageNo,
                                                      @RequestParam(value = "searchVal", required = false) String searchVal,
                                                      @RequestParam("pageSize") Integer pageSize){
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(),pageNo,searchVal,pageSize);
-        try{
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if(result.get(Constants.STATUS) != Status.SUCCESS){
-                return returnDataListPaging(result);
-            }
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = schedulerCalendarService.queryCalendarList(loginUser, searchVal, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if(result.get(Constants.STATUS) != Status.SUCCESS){
             return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_CALENDAR_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_CALENDAR_LIST_PAGING_ERROR.getCode(), Status.QUERY_CALENDAR_LIST_PAGING_ERROR.getMsg());
         }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = schedulerCalendarService.queryCalendarList(loginUser, searchVal, pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
 
@@ -135,15 +128,10 @@ public class SchedulerCalendarController extends BaseController{
     @ApiOperation(value = "queryCalendarlist", notes= "QUERY_CALENDAR_LIST_NOTES")
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_CALENDAR_LIST_ERROR)
     public Result queryCalendarlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {}, query calendar list", loginUser.getUserName());
-        try{
-            Map<String, Object> result = schedulerCalendarService.queryCalendarList(loginUser);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_CALENDAR_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_CALENDAR_LIST_ERROR.getCode(), Status.QUERY_CALENDAR_LIST_ERROR.getMsg());
-        }
+        Map<String, Object> result = schedulerCalendarService.queryCalendarList(loginUser);
+        return returnDataList(result);
     }
 
 
@@ -169,19 +157,15 @@ public class SchedulerCalendarController extends BaseController{
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_CALENDAR_ERROR)
     public Result updateCalendar(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "id") int id,
                                                        @RequestParam(value = "name") String name,
                                                        @RequestParam(value = "calendarInfo") String calendarInfo,
                                                        @RequestParam(value = "description",required = false) String description) {
 
-        try {
-            Map<String, Object> result = schedulerCalendarService.updateCalendar(loginUser,id,name, calendarInfo, description);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.UPDATE_CALENDAR_ERROR.getMsg(),e);
-            return error(Status.UPDATE_CALENDAR_ERROR.getCode(), Status.UPDATE_CALENDAR_ERROR.getMsg());
-        }
+        Map<String, Object> result = schedulerCalendarService.updateCalendar(loginUser,id,name, calendarInfo, description);
+        return returnDataList(result);
     }
 
     /**
@@ -198,16 +182,12 @@ public class SchedulerCalendarController extends BaseController{
     })
     @PostMapping(value = "/selectCalendarById")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_CALENDAR_BY_ID_ERROR)
     public Result selectCalendarById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete calendar, calendarId: {},", loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result = schedulerCalendarService.selectById(loginUser,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_CALENDAR_BY_ID_ERROR.getCode(), Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = schedulerCalendarService.selectById(loginUser,id);
+        return returnDataList(result);
     }
 
 
@@ -227,16 +207,12 @@ public class SchedulerCalendarController extends BaseController{
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_CALENDAR_BY_ID_ERROR)
     public Result deleteCalendarById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete calendar, calendarId: {},", loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result = schedulerCalendarService.deleteCalendarById(loginUser,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_CALENDAR_BY_ID_ERROR.getCode(), Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = schedulerCalendarService.deleteCalendarById(loginUser,id);
+        return returnDataList(result);
     }
 
 
@@ -253,18 +229,14 @@ public class SchedulerCalendarController extends BaseController{
     })
     @GetMapping(value = "/verify-calendar-name")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_CALENDAR_NAME_ERROR)
     public Result verifyCalendarName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value ="calendarName") String calendarName
     ) {
 
-        try{
-            logger.info("login user {}, verfiy calendar code: {}",
-                    loginUser.getUserName(),calendarName);
-            return schedulerCalendarService.verifyCalendarName(calendarName);
-        }catch (Exception e){
-            logger.error(Status.VERIFY_CALENDAR_NAME_ERROR.getMsg(),e);
-            return error(Status.VERIFY_CALENDAR_NAME_ERROR.getCode(), Status.VERIFY_CALENDAR_NAME_ERROR.getMsg());
-        }
+        logger.info("login user {}, verfiy calendar code: {}",
+                loginUser.getUserName(),calendarName);
+        return schedulerCalendarService.verifyCalendarName(calendarName);
     }
 
 
@@ -283,18 +255,13 @@ public class SchedulerCalendarController extends BaseController{
     })
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(RELEASE_CALENDAR_ERROR)
     public Result releaseCalendar(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "id", required = true) int id,
             @RequestParam(value = "releaseState", required = true) int releaseState) {
 
-        try {
-
-            Map<String, Object> result = schedulerCalendarService.releaseCalendar(loginUser, id, releaseState);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.RELEASE_CALENDAR_ERROR.getMsg(),e);
-            return error(Status.RELEASE_CALENDAR_ERROR.getCode(), Status.RELEASE_CALENDAR_ERROR.getMsg());
-        }
+        Map<String, Object> result = schedulerCalendarService.releaseCalendar(loginUser, id, releaseState);
+        return returnDataList(result);
     }
 
 }

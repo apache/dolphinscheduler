@@ -17,9 +17,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.GlobalVariableService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -70,20 +73,14 @@ public class GlobalVariableController extends BaseController{
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(CREATE_VARIABLE_ERROR)
     public Result createVariable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "projectId",required = true) Integer projectId,
                                                        @RequestParam(value = "name",required = true) String name,
                                                        @RequestParam(value = "key",required = true) String key,
                                                        @RequestParam(value = "value",required = true) String value) {
-        try {
-
-            Map<String, Object> result = globalVariableService.createVariable(loginUser,projectId,name,key,value);
-            return returnDataList(result);
-
-        }catch (Exception e){
-            logger.error(Status.CREATE_VARIABLE_ERROR.getMsg(),e);
-            return error(Status.CREATE_VARIABLE_ERROR.getCode(), Status.CREATE_VARIABLE_ERROR.getMsg());
-        }
+        Map<String, Object> result = globalVariableService.createVariable(loginUser,projectId,name,key,value);
+        return returnDataList(result);
     }
 
 
@@ -105,6 +102,7 @@ public class GlobalVariableController extends BaseController{
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_VARIABLE_LIST_PAGING_ERROR)
     public Result queryVariablelistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestParam(value = "projectId",required = true) Integer projectId,
                                                      @RequestParam("pageNo") Integer pageNo,
@@ -112,18 +110,13 @@ public class GlobalVariableController extends BaseController{
                                                      @RequestParam("pageSize") Integer pageSize){
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(),pageNo,searchVal,pageSize);
-        try{
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if(result.get(Constants.STATUS) != Status.SUCCESS){
-                return returnDataListPaging(result);
-            }
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = globalVariableService.queryVariableList(loginUser, searchVal,projectId, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if(result.get(Constants.STATUS) != Status.SUCCESS){
             return returnDataListPaging(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_VARIABLE_LIST_PAGING_ERROR.getMsg(),e);
-            return error(Status.QUERY_VARIABLE_LIST_PAGING_ERROR.getCode(), Status.QUERY_VARIABLE_LIST_PAGING_ERROR.getMsg());
         }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = globalVariableService.queryVariableList(loginUser, searchVal,projectId, pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
 
@@ -136,16 +129,12 @@ public class GlobalVariableController extends BaseController{
     @ApiOperation(value = "queryVariablelist", notes= "QUERY_GLOBAL_VARIABLE_LIST_NOTES")
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_VARIABLE_LIST_ERROR)
     public Result queryVariablelist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser ,
                                      @RequestParam(value = "projectId",required = true) Integer projectId){
         logger.info("login user {}, query variable list", loginUser.getUserName());
-        try{
-            Map<String, Object> result = globalVariableService.queryVariableList(loginUser,projectId,null);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_VARIABLE_LIST_ERROR.getMsg(),e);
-            return error(Status.QUERY_VARIABLE_LIST_ERROR.getCode(), Status.QUERY_VARIABLE_LIST_ERROR.getMsg());
-        }
+        Map<String, Object> result = globalVariableService.queryVariableList(loginUser,projectId,null);
+        return returnDataList(result);
     }
 
     /**
@@ -169,6 +158,7 @@ public class GlobalVariableController extends BaseController{
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_VARIABLE_ERROR)
     public Result updateVariable(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam(value = "id") int id,
                                                         @RequestParam(value = "projectId",required = true) Integer projectId,
@@ -176,13 +166,8 @@ public class GlobalVariableController extends BaseController{
                                                         @RequestParam(value = "key",required = true) String key,
                                                         @RequestParam(value = "value",required = true) String value)  {
 
-        try {
-            Map<String, Object> result = globalVariableService.updateVariable(loginUser,id,name,key,value);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.UPDATE_VARIABLE_ERROR.getMsg(),e);
-            return error(Status.UPDATE_VARIABLE_ERROR.getCode(), Status.UPDATE_VARIABLE_ERROR.getMsg());
-        }
+        Map<String, Object> result = globalVariableService.updateVariable(loginUser,id,name,key,value);
+        return returnDataList(result);
     }
 
     /**
@@ -200,17 +185,13 @@ public class GlobalVariableController extends BaseController{
     })
     @PostMapping(value = "/selectVariableById")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_VARIABLE_BY_ID_ERROR)
     public Result selectVariableById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "projectId") int projectId,
-            @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete variable, projectId: {} , variableId: {},", loginUser.getUserName(), projectId,id);
-        try {
-            Map<String, Object> result = globalVariableService.selectById(loginUser,projectId,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_VARIABLE_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_VARIABLE_BY_ID_ERROR.getCode(), Status.DELETE_VARIABLE_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = globalVariableService.selectById(loginUser,projectId,id);
+        return returnDataList(result);
     }
 
 
@@ -230,16 +211,12 @@ public class GlobalVariableController extends BaseController{
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_VARIABLE_BY_ID_ERROR)
     public Result deleteVariableById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) throws Exception {
         logger.info("login user {}, delete variable, variableId: {},", loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result = globalVariableService.deleteVariableById(loginUser,id);
-            return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.DELETE_VARIABLE_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_VARIABLE_BY_ID_ERROR.getCode(), Status.DELETE_VARIABLE_BY_ID_ERROR.getMsg());
-        }
+        Map<String, Object> result = globalVariableService.deleteVariableById(loginUser,id);
+        return returnDataList(result);
     }
 
     /**
@@ -255,19 +232,15 @@ public class GlobalVariableController extends BaseController{
     })
     @GetMapping(value = "/verify-variable-key")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_VARIABLE_NAME_ERROR)
     public Result verifyVariableCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value ="projectId") int projectId,
                                    @RequestParam(value ="variableKey") String variableKey
     ) {
 
-        try{
-            logger.info("login user {}, verfiy variable projectId: {} ,  key: {} ",
-                    loginUser.getUserName(),projectId,variableKey);
-            return globalVariableService.verifyVariableKey(projectId,variableKey);
-        }catch (Exception e){
-            logger.error(Status.VERIFY_VARIABLE_NAME_ERROR.getMsg(),e);
-            return error(Status.VERIFY_VARIABLE_NAME_ERROR.getCode(), Status.VERIFY_VARIABLE_NAME_ERROR.getMsg());
-        }
+        logger.info("login user {}, verfiy variable projectId: {} ,  key: {} ",
+                loginUser.getUserName(),projectId,variableKey);
+        return globalVariableService.verifyVariableKey(projectId,variableKey);
     }
 
 
