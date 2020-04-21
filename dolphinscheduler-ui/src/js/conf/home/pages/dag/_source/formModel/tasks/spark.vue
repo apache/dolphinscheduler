@@ -169,7 +169,7 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -351,8 +351,8 @@
           }
           let noResources = [{
             id: -1,
-            name: $t('No resources'),
-            fullName: '/'+$t('No resources'),
+            name: $t('Unauthorized or deleted resources'),
+            fullName: '/'+$t('Unauthorized or deleted resources'),
             children: []
           }]
           if(optionsCmp.length>0) {
