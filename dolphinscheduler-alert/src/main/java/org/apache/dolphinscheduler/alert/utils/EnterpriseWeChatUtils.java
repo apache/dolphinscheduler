@@ -266,10 +266,4 @@ public class EnterpriseWeChatUtils {
         return result;
 
     }
-
-    public static void main(String[] args) {
-        Boolean enable = EnterpriseWeChatUtils.isEnable();
-        System.out.println(enable);
-    }
-
 }

@@ -79,6 +79,7 @@ public class EnterpriseWeChatUtilsTest {
         List<String> parties = new ArrayList<>();
         parties.add(toParty);
         parties.add("test1");
+
         String sendMsg = EnterpriseWeChatUtils.makeTeamSendMsg(parties, enterpriseWechatSecret, msg);
         Assert.assertTrue(sendMsg.contains(toParty));
         Assert.assertTrue(sendMsg.contains(enterpriseWechatSecret));
@@ -86,9 +87,22 @@ public class EnterpriseWeChatUtilsTest {
     }
 
     @Test
-    public void tesMakeUserSendMsg(){
+    public void tesMakeUserSendMsg1(){
         String sendMsg = EnterpriseWeChatUtils.makeUserSendMsg(enterpriseWechatUsers, enterpriseWechatAgentId, msg);
         Assert.assertTrue(sendMsg.contains(enterpriseWechatUsers));
+        Assert.assertTrue(sendMsg.contains(enterpriseWechatAgentId));
+        Assert.assertTrue(sendMsg.contains(msg));
+    }
+
+    @Test
+    public void tesMakeUserSendMsg2(){
+        List<String> users = new ArrayList<>();
+        users.add("user1");
+        users.add("user2");
+
+        String sendMsg = EnterpriseWeChatUtils.makeUserSendMsg(users, enterpriseWechatAgentId, msg);
+        Assert.assertTrue(sendMsg.contains(users.get(0)));
+        Assert.assertTrue(sendMsg.contains(users.get(1)));
         Assert.assertTrue(sendMsg.contains(enterpriseWechatAgentId));
         Assert.assertTrue(sendMsg.contains(msg));
     }
