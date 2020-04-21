@@ -41,7 +41,7 @@ public class HttpUtils {
 	/**
 	 * get http request content
 	 * @param url url
-	 * @return http response
+	 * @return http get request response content
 	 */
 	public static String get(String url){
 		CloseableHttpClient httpclient = HttpClients.createDefault();

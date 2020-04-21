@@ -795,14 +795,13 @@ public class ProcessService {
      * submit task to db
      * submit sub process to command
      * @param taskInstance taskInstance
-     * @param processInstance processInstance
      * @return task instance
      */
     @Transactional(rollbackFor = Exception.class)
-    public TaskInstance submitTask(TaskInstance taskInstance, ProcessInstance processInstance){
-        logger.info("start submit task : {}, instance id:{}, state: {}, ",
-                taskInstance.getName(), processInstance.getId(), processInstance.getState() );
-        processInstance = this.findProcessInstanceDetailById(processInstance.getId());
+    public TaskInstance submitTask(TaskInstance taskInstance){
+        ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+        logger.info("start submit task : {}, instance id:{}, state: {}",
+                taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
         //submit to db
         TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
         if(task == null){
@@ -1650,13 +1649,14 @@ public class ProcessService {
     /**
      * find last running process instance
      * @param definitionId  process definition id
-     * @param dateInterval dateInterval
+     * @param startTime start time
+     * @param endTime end time
      * @return process instance
      */
-    public ProcessInstance findLastRunningProcess(int definitionId, DateInterval dateInterval) {
+    public ProcessInstance findLastRunningProcess(int definitionId, Date startTime, Date endTime) {
         return processInstanceMapper.queryLastRunningProcess(definitionId,
-                dateInterval.getStartTime(),
-                dateInterval.getEndTime(),
+                startTime,
+                endTime,
                 stateArray);
     }
 
@@ -1812,6 +1812,23 @@ public class ProcessService {
         return resourceMapper.listResourceByIds(resIds);
     }
 
+    /**
+     * format task app id in task instance
+     * @param taskInstance
+     * @return
+     */
+    public String formatTaskAppId(TaskInstance taskInstance){
+        ProcessDefinition definition = this.findProcessDefineById(taskInstance.getProcessDefinitionId());
+        ProcessInstance processInstanceById = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+
+        if(definition == null || processInstanceById == null){
+            return "";
+        }
+        return String.format("%s_%s_%s",
+                definition.getId(),
+                processInstanceById.getId(),
+                taskInstance.getId());
+    }
 
     /**
      * @param schedule
