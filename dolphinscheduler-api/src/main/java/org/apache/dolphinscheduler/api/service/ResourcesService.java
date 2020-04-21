@@ -652,7 +652,7 @@ public class ResourcesService extends BaseService {
     public Result verifyResourceName(String fullName, ResourceType type,User loginUser) {
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        /*if (checkResourceExists(fullName, 0, type.ordinal())) {
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, fullName);
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -675,7 +675,7 @@ public class ResourcesService extends BaseService {
             }else{
                 putMsg(result,Status.TENANT_NOT_EXIST);
             }
-        }*/
+        }
 
 
         return result;
