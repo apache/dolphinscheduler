@@ -387,7 +387,7 @@
       .logo-m {
         width: 36px;
         height: 36px;
-        background: url("./m_logo.png");
+        // background: url("./m_logo.png");
         margin: 0 auto;
         position: relative;
         top: 12px;
