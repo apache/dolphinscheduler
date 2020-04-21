@@ -101,9 +101,9 @@ public class ErrorCommand {
     private String message;
 
     /**
-     * worker group id
+     * worker group
      */
-    private int workerGroupId;
+    private String workerGroup;
 
     public ErrorCommand(){}
 
@@ -257,17 +257,25 @@ public class ErrorCommand {
         this.updateTime = updateTime;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
-        return "Command{" +
+        return "ErrorCommand{" +
                 "id=" + id +
                 ", commandType=" + commandType +
                 ", processDefinitionId=" + processDefinitionId +
@@ -281,17 +289,8 @@ public class ErrorCommand {
                 ", startTime=" + startTime +
                 ", processInstancePriority=" + processInstancePriority +
                 ", updateTime=" + updateTime +
-                ", message=" + message +
+                ", message='" + message + '\'' +
+                ", workerGroup='" + workerGroup + '\'' +
                 '}';
     }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-
 }

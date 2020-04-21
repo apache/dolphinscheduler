@@ -76,7 +76,8 @@ public class CommandMapperTest {
         //query
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertEquals(expectedCommand, actualCommand);
+        assertNotNull(actualCommand);
+        assertEquals(expectedCommand.getProcessDefinitionId(), actualCommand.getProcessDefinitionId());
     }
 
     /**
@@ -94,7 +95,8 @@ public class CommandMapperTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertEquals(expectedCommand,actualCommand);
+        assertNotNull(actualCommand);
+        assertEquals(expectedCommand.getUpdateTime(),actualCommand.getUpdateTime());
 
     }
 
@@ -127,13 +129,6 @@ public class CommandMapperTest {
         List<Command> actualCommands = commandMapper.selectList(null);
 
         assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
-
-        for (Command actualCommand : actualCommands){
-            Command expectedCommand = commandMap.get(actualCommand.getId());
-            if (expectedCommand != null){
-                assertEquals(expectedCommand,actualCommand);
-            }
-        }
     }
 
     /**

@@ -423,6 +423,7 @@ public class UsersService extends BaseService {
      * @param projectIds project id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -472,6 +473,7 @@ public class UsersService extends BaseService {
      * @param resourceIds resource id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -484,16 +486,19 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        String[] resourceFullIdArr = resourceIds.split(",");
-        // need authorize resource id set
         Set<Integer> needAuthorizeResIds = new HashSet();
-        for (String resourceFullId : resourceFullIdArr) {
-            String[] resourceIdArr = resourceFullId.split("-");
-            for (int i=0;i<=resourceIdArr.length-1;i++) {
-                int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
-                needAuthorizeResIds.add(resourceIdValue);
+        if (StringUtils.isNotBlank(resourceIds)) {
+            String[] resourceFullIdArr = resourceIds.split(",");
+            // need authorize resource id set
+            for (String resourceFullId : resourceFullIdArr) {
+                String[] resourceIdArr = resourceFullId.split("-");
+                for (int i=0;i<=resourceIdArr.length-1;i++) {
+                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                    needAuthorizeResIds.add(resourceIdValue);
+                }
             }
         }
+
 
         //get the authorized resource id list by user id
         List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
@@ -565,6 +570,7 @@ public class UsersService extends BaseService {
      * @param udfIds udf id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>(5);
 
@@ -611,6 +617,7 @@ public class UsersService extends BaseService {
      * @param datasourceIds  data source id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
