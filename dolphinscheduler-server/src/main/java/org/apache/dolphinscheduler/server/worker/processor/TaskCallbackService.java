@@ -96,8 +96,9 @@ public class TaskCallbackService {
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
         logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
-        Set<String> masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
+        Set<String> masterNodes = null;
         while (Stopper.isRunning()) {
+            masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
                 logger.error("no available master node");
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
