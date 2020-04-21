@@ -760,8 +760,9 @@
                         <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/HadoopUtilsTest.java</include>
+                        <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
-                        <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
