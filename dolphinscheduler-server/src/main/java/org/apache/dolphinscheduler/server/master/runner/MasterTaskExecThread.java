@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.slf4j.Logger;
 
 
 import com.alibaba.fastjson.JSON;
@@ -28,7 +27,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -38,7 +36,6 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -47,12 +44,6 @@ import java.util.Date;
  * master task exec thread
  */
 public class MasterTaskExecThread extends MasterBaseTaskExecThread {
-
-    /**
-     * logger of MasterTaskExecThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
-
 
     /**
      * taskInstance state manager
@@ -65,10 +56,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        super(taskInstance, processInstance);
+    public MasterTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
     }

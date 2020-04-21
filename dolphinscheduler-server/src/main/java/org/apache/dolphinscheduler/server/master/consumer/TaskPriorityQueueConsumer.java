@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -53,6 +54,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
+
 /**
  * TaskUpdateQueue consumer
  */
@@ -68,7 +71,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskUpdateQueue;
+    private TaskPriorityQueue taskPriorityQueue;
 
     /**
      * processService
@@ -93,7 +96,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         while (Stopper.isRunning()){
             try {
                 // if not task , blocking here
-                String taskPriorityInfo = taskUpdateQueue.take();
+                String taskPriorityInfo = taskPriorityQueue.take();
 
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
 
@@ -114,13 +117,20 @@ public class TaskPriorityQueueConsumer extends Thread{
     private Boolean dispatch(int taskInstanceId){
         TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        try {
-            return dispatcher.dispatch(executionContext);
-        } catch (ExecuteException e) {
-            logger.error("execute exception", e);
-            return false;
-        }
+        Boolean result = false;
+        while (Stopper.isRunning()){
+            try {
+                result =  dispatcher.dispatch(executionContext);
+            } catch (ExecuteException e) {
+                logger.error("dispatch error",e);
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+            }
 
+            if (result){
+                break;
+            }
+        }
+        return result;
     }
 
     /**
