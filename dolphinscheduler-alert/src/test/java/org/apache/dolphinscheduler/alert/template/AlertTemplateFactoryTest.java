@@ -47,7 +47,6 @@ public class AlertTemplateFactoryTest {
     public void testGetMessageTemplate(){
 
         PowerMockito.mockStatic(PropertyUtils.class);
-        when(PropertyUtils.getString(Constants.ALERT_TEMPLATE)).thenReturn("html");
 
         AlertTemplate defaultTemplate = AlertTemplateFactory.getMessageTemplate();
 

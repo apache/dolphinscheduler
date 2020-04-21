@@ -694,6 +694,7 @@
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <include>**/api/enums/testGetEnum.java</include>
                         <include>**/api/enums/StatusTest.java</include>
+                        <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
                         <include>**/api/security/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigTest.java</include>
@@ -720,12 +721,14 @@
                         <include>**/api/service/UserAlertGroupServiceTest.java</include>
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
+                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
+                        <include>**/api/utils/ResultTest.java</include>
                         <include>**/common/graph/DAGTest.java</include>
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
@@ -744,7 +747,6 @@
                         <include>**/common/utils/DependentUtilsTest.java</include>
                         <include>**/common/utils/EncryptionUtilsTest.java</include>
                         <include>**/common/utils/FileUtilsTest.java</include>
-                        <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/IpUtilsTest.java</include>
                         <include>**/common/utils/JSONUtilsTest.java</include>
                         <include>**/common/utils/LoggerUtilsTest.java</include>
@@ -758,6 +760,8 @@
                         <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/HadoopUtilsTest.java</include>
+                        <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
@@ -779,6 +783,8 @@
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
+                        <include>**/server/master/DependentTaskTest.java</include>
+                        <include>**/server/master/ConditionsTaskTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>

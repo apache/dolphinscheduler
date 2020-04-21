@@ -14,26 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.template;
+package org.apache.dolphinscheduler.api.exceptions;
 
-import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.api.enums.Status;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * the alert template factory
+ * controller exception annotation
  */
-public class AlertTemplateFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertTemplateFactory.class);
-
-    private AlertTemplateFactory(){}
-
-    /**
-     * get a template from alert.properties conf file
-     * @return a template, default is DefaultHTMLTemplate
-     */
-    public static AlertTemplate getMessageTemplate() {
-        return new DefaultHTMLTemplate();
-    }
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface ApiException {
+    Status value();
 }

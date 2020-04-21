@@ -77,8 +77,6 @@ public class Constants {
 
     public static final int NUMBER_1000 = 1000;
 
-    public static final String ALERT_TEMPLATE = "alert.template";
-
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
     public static final String SPRING_DATASOURCE_URL = "spring.datasource.url";
