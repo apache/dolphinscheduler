@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.dependent;
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -23,9 +23,11 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -108,31 +110,7 @@ public class DependentExecute {
             }
             // need to check workflow for updates, so get all task and check the task state
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
-                List<TaskNode> taskNodes =
-                        processService.getTaskNodeListByDefinitionId(dependentItem.getDefinitionId());
-
-                if(taskNodes != null && taskNodes.size() > 0){
-                    List<DependResult> results = new ArrayList<>();
-                    DependResult tmpResult =  DependResult.FAILED;
-                    for(TaskNode taskNode:taskNodes){
-                        tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
-                        if(DependResult.FAILED == tmpResult){
-                            break;
-                        }else{
-                            results.add(getDependTaskResult(taskNode.getName(),processInstance));
-                        }
-                    }
-
-                    if(DependResult.FAILED == tmpResult){
-                        result = DependResult.FAILED;
-                    }else if(results.contains(DependResult.WAITING)){
-                        result = DependResult.WAITING;
-                    }else{
-                        result =  DependResult.SUCCESS;
-                    }
-                }else{
-                    result = DependResult.FAILED;
-                }
+                result = dependResultByProcessInstance(processInstance);
             }else{
                 result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
             }
@@ -144,13 +122,39 @@ public class DependentExecute {
     }
 
     /**
+     * depend type = depend_all
+     * skip the condition tasks.
+     * judge all the task
+     * @return
+     */
+    private DependResult dependResultByProcessInstance(ProcessInstance processInstance){
+        DependResult result = DependResult.FAILED;
+        List<TaskNode> taskNodes =
+                processService.getTaskNodeListByDefinitionId(processInstance.getProcessDefinitionId());
+        if(CollectionUtils.isEmpty(taskNodes)) {
+            return result;
+        }
+        for(TaskNode taskNode:taskNodes){
+            if(taskNode.isConditionsTask()
+                    || DagHelper.haveConditionsAfterNode(taskNode.getName(), taskNodes)){
+                continue;
+            }
+            DependResult tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
+            if(DependResult.SUCCESS != tmpResult){
+                return tmpResult;
+            }
+        }
+        return DependResult.SUCCESS;
+    }
+
+    /**
      * get depend task result
      * @param taskName
      * @param processInstance
      * @return
      */
     private DependResult getDependTaskResult(String taskName, ProcessInstance processInstance) {
-        DependResult result = DependResult.FAILED;
+        DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 
@@ -182,7 +186,7 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval);
+        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval.getStartTime(), dateInterval.getEndTime());
         if(runningProcess != null){
             return runningProcess;
         }

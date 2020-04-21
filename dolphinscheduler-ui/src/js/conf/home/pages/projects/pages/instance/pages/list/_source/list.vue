@@ -311,9 +311,9 @@
     name: 'list',
     data () {
       return {
-        // 数据
+        // data
         list: [],
-        // 按钮类型
+        // btn type
         buttonType: '',
         strDelete: '',
         checkAll: false
