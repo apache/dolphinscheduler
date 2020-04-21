@@ -50,6 +50,7 @@ public class ResourceTreeVisitor implements Visitor{
      * visit
      * @return resoruce component
      */
+    @Override
     public ResourceComponent visit() {
         ResourceComponent rootDirectory = new Directory();
         for (Resource resource : resourceList) {
