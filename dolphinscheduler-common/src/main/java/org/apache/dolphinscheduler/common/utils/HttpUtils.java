@@ -21,6 +21,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -84,6 +85,65 @@ public class HttpUtils {
 			if (!httpget.isAborted()) {
 				httpget.releaseConnection();
 				httpget.abort();
+			}
+
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return responseContent;
+	}
+
+
+	/**
+	 * post http request content
+	 * @param url url
+	 * @return http response
+	 */
+	public static String post(String url){
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+
+		HttpPost httppost = new HttpPost(url);
+		/** set timeout、request time、socket timeout */
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+				.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+				.setSocketTimeout(Constants.SOCKET_TIMEOUT)
+				.setRedirectsEnabled(true)
+				.build();
+		httppost.setConfig(requestConfig);
+		String responseContent = null;
+		CloseableHttpResponse response = null;
+
+		try {
+			response = httpclient.execute(httppost);
+			//check response status is 200
+			if (response.getStatusLine().getStatusCode() == 200) {
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					responseContent = EntityUtils.toString(entity, Constants.UTF_8);
+				}else{
+					logger.warn("http entity is null");
+				}
+			}else{
+				logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
+			}
+		}catch (Exception e){
+			logger.error(e.getMessage(),e);
+		}finally {
+			try {
+				if (response != null) {
+					EntityUtils.consume(response.getEntity());
+					response.close();
+				}
+			} catch (IOException e) {
+				logger.error(e.getMessage(),e);
+			}
+
+			if (!httppost.isAborted()) {
+				httppost.releaseConnection();
+				httppost.abort();
 			}
 
 			try {

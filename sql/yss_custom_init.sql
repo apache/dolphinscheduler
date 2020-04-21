@@ -50,9 +50,24 @@ CREATE TABLE `t_yss_global_variable` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `global_variable_key` (`key`)
+  UNIQUE KEY `global_variable_key` (`key_data`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+
+DROP TABLE IF EXISTS `t_yss_ext_platform`;
+CREATE TABLE `t_yss_ext_platform` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `name` varchar(100) NOT NULL COMMENT 'ext platform name',
+  `platform_type` tinyint(4) DEFAULT 0 COMMENT 'ext platform type: 0 template',
+  `connect_param` varchar(255) NOT NULL COMMENT 'connect param,  json data ',
+  `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `description` varchar(200) DEFAULT NULL COMMENT 'ext platform description',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ext_platform_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

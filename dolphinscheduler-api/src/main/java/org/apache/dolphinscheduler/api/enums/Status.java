@@ -285,6 +285,19 @@ public enum Status {
 
 
 
+    EXTPLAFTORM_NAME_EXIST(60300, "ext platform name already exists", "第三方平台名称已存在"),
+    EXTPLAFTORM_NOT_EXIST(60301, "ext platform {0} not exists", "第三方平台[{0}]不存在"),
+    CREATE_EXTPLAFTORM_ERROR(60302, "create ext platform error", "创建第三方平台异常"),
+    QUERY_EXTPLAFTORM_LIST_PAGING_ERROR(60303,"query ext platform  list paging error", "获取第三方平台列表异常."),
+    QUERY_EXTPLAFTORM_LIST_ERROR(60304,"query ext platform list error", "查询第三方平台列表错误"),
+
+    UPDATE_EXTPLAFTORM_ERROR(60305,"update ext platform  error", "更新第三方平台错误"),
+    DELETE_EXTPLAFTORM_BY_ID_ERROR(60306,"delete ext platform  error", "删除第三方平台错误"),
+    VERIFY_EXTPLAFTORM_NAME_ERROR(60307,"verify ext platform name error", "验证第三方平台名称错误"),
+    RELEASE_EXTPLAFTORM_ERROR(60308,"release ext platform error", "上线第三方平台错误"),
+    SELECT_EXTPLAFTORM_BY_ID_ERROR(60310,"select ext platform  error", "查询第三方平台数据错误"),
+
+
     //----------- Create by ZhangLong :   2020年04月08日15:59:14    -----------------
 
     ;

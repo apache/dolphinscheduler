@@ -75,10 +75,10 @@ public class SchedulerCalendarController extends BaseController{
     public Result createCalendar(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "name") String name,
                                                        @RequestParam(value = "calendarInfo") String calendarInfo,
-                                                       @RequestParam(value = "description",required = false) String desc) {
+                                                       @RequestParam(value = "description",required = false) String description) {
         try {
 
-            Map<String, Object> result = schedulerCalendarService.createCalendar(loginUser,name,calendarInfo,desc);
+            Map<String, Object> result = schedulerCalendarService.createCalendar(loginUser,name,calendarInfo,description);
             return returnDataList(result);
 
         }catch (Exception e){
@@ -244,23 +244,23 @@ public class SchedulerCalendarController extends BaseController{
      * verify calendar code
      *
      * @param loginUser login user
-     * @param calendarCode calendar code
+     * @param calendarName calendar code
      * @return true if calendar code can user, otherwise return false
      */
-    @ApiOperation(value = "verifyCalendarCode", notes= "VERIFY_CALENDAR_CODE_NOTES")
+    @ApiOperation(value = "verifyCalendarName", notes= "VERIFY_CALENDAR_NAME_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "calendarCode", value = "CALENDAR_CODE", required = true, dataType = "String")
+            @ApiImplicitParam(name = "calendarName", value = "CALENDAR_NAME", required = true, dataType = "String")
     })
-    @GetMapping(value = "/verify-calendar-code")
+    @GetMapping(value = "/verify-calendar-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result verifyCalendarCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value ="calendarCode") String calendarCode
+    public Result verifyCalendarName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @RequestParam(value ="calendarName") String calendarName
     ) {
 
         try{
             logger.info("login user {}, verfiy calendar code: {}",
-                    loginUser.getUserName(),calendarCode);
-            return schedulerCalendarService.verifyCalendarName(calendarCode);
+                    loginUser.getUserName(),calendarName);
+            return schedulerCalendarService.verifyCalendarName(calendarName);
         }catch (Exception e){
             logger.error(Status.VERIFY_CALENDAR_NAME_ERROR.getMsg(),e);
             return error(Status.VERIFY_CALENDAR_NAME_ERROR.getCode(), Status.VERIFY_CALENDAR_NAME_ERROR.getMsg());
