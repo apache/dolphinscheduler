@@ -137,7 +137,7 @@ public class ExtPlatformService extends BaseService{
     }
 
     Page<ExtPlatform> page = new Page(pageNo, pageSize);
-    IPage<ExtPlatform> extPlatformIPage = schedulerExtPlatformMapper.queryExtPlatformPaging(page, searchVal);
+    IPage<ExtPlatform> extPlatformIPage = schedulerExtPlatformMapper.queryExtPlatformPaging(page, searchVal,loginUser.getId());
     PageInfo<ExtPlatform> pageInfo = new PageInfo<>(pageNo, pageSize);
     pageInfo.setTotalCount((int)extPlatformIPage.getTotal());
     pageInfo.setLists(extPlatformIPage.getRecords());
@@ -266,7 +266,7 @@ public class ExtPlatformService extends BaseService{
   public Map<String, Object> queryExtPlatformList(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<ExtPlatform> resourceList = schedulerExtPlatformMapper.queryByExtPlatformName(null);
+    List<ExtPlatform> resourceList = schedulerExtPlatformMapper.queryExtPlatformList(loginUser.getId());
     if (CollectionUtils.isNotEmpty(resourceList)) {
       result.put(Constants.DATA_LIST, resourceList);
       putMsg(result, Status.SUCCESS);

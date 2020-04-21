@@ -40,12 +40,21 @@ public interface ExtPlatformMapper extends BaseMapper<ExtPlatform> {
      * @return tenant IPage
      */
     IPage<ExtPlatform> queryExtPlatformPaging(IPage<ExtPlatform> page,
-            @Param("searchVal") String searchVal);
+            @Param("searchVal") String searchVal ,@Param("userId") int userId);
+
     /**
      * query ExtPlatform by name
      * @param  name
      * @return ExtPlatform list
      */
     List<ExtPlatform> queryByExtPlatformName(@Param("name") String name);
-    
+
+    /**
+     * query ExtPlatform List
+     * @param  name
+     * @return ExtPlatform list
+     */
+    List<ExtPlatform> queryExtPlatformList(@Param("userId")  int userId);
+
+
 }

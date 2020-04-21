@@ -112,4 +112,30 @@ public class ExtPlatformControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
+
+
+    @Test
+    public void testList() throws Exception {
+
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+
+
+        MvcResult mvcResult = mockMvc.perform(get("/platform/list")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        System.out.println(JSONUtils.toJsonString(result));
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
+
+
 }

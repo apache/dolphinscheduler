@@ -26,6 +26,7 @@
         <if test="searchVal != null and searchVal != ''">
             and  t.name like concat('%', #{searchVal}, '%')
         </if>
+        and  t.user_id =  #{userId}
         order by  t.update_time desc
     </select>
 
@@ -37,6 +38,10 @@
     </select>
 
 
-
+    <select id="queryExtPlatformList" resultType="org.apache.dolphinscheduler.dao.entity.ExtPlatform">
+        select *
+        from t_yss_ext_platform
+        where user_id =  #{userId}
+    </select>
 
 </mapper>
