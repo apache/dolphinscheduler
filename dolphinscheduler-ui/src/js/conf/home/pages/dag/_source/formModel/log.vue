@@ -170,7 +170,7 @@
        */
       _downloadLog () {
         downloadFile('/dolphinscheduler/log/download-log', {
-          taskInstId: this.stateId || this.logId
+          taskInstanceId: this.stateId || this.logId
         })
       },
       /**
@@ -256,7 +256,7 @@
     computed: {
       _rtParam () {
         return {
-          taskInstId: this.stateId || this.logId,
+          taskInstanceId: this.stateId || this.logId,
           skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
           limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
         }

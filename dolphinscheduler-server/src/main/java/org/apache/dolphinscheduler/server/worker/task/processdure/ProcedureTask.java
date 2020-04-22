@@ -17,11 +17,10 @@
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
@@ -29,12 +28,9 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -56,64 +52,59 @@ public class ProcedureTask extends AbstractTask {
     private ProcedureParameters procedureParameters;
 
     /**
-     *  process service
+     * base datasource
      */
-    private ProcessService processService;
+    private BaseDataSource baseDataSource;
+
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
-     * @param taskProps task props
+     * @param taskExecutionContext taskExecutionContext
      * @param logger    logger
      */
-    public ProcedureTask(TaskProps taskProps, Logger logger) {
-        super(taskProps, logger);
+    public ProcedureTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
 
-        logger.info("procedure task params {}", taskProps.getTaskParams());
+        this.taskExecutionContext = taskExecutionContext;
 
-        this.procedureParameters = JSON.parseObject(taskProps.getTaskParams(), ProcedureParameters.class);
+        logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
+
+        this.procedureParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+
 
         // check parameters
         if (!procedureParameters.checkParameters()) {
             throw new RuntimeException("procedure task params is not valid");
         }
-
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
-        logger.info("processdure type : {}, datasource : {}, method : {} , localParams : {}",
+        logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        DataSource dataSource = processService.findDataSourceById(procedureParameters.getDatasource());
-        if (dataSource == null){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            throw new IllegalArgumentException("datasource not found");
-        }
-
-        logger.info("datasource name : {} , type : {} , desc : {} ,  user_id : {} , parameter : {}",
-                dataSource.getName(),
-                dataSource.getType(),
-                dataSource.getNote(),
-                dataSource.getUserId(),
-                dataSource.getConnectionParams());
-
         Connection connection = null;
         CallableStatement stmt = null;
         try {
             // load class
-            DataSourceFactory.loadClass(dataSource.getType());
+            DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
+
             // get datasource
-            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
-                    dataSource.getConnectionParams());
+            baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
+                    taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
+
 
             // get jdbc connection
             connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
@@ -123,11 +114,11 @@ public class ProcedureTask extends AbstractTask {
 
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                    taskProps.getDefinedParams(),
+            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                    taskExecutionContext.getDefinedParams(),
                     procedureParameters.getLocalParametersMap(),
-                    taskProps.getCmdTypeIfComplement(),
-                    taskProps.getScheduleTime());
+                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                    taskExecutionContext.getScheduleTime());
 
 
             Collection<Property> userDefParamsList = null;
@@ -136,87 +127,149 @@ public class ProcedureTask extends AbstractTask {
                 userDefParamsList = procedureParameters.getLocalParametersMap().values();
             }
 
-            String method = "";
-            // no parameters
-            if (CollectionUtils.isEmpty(userDefParamsList)){
-                method = "{call " + procedureParameters.getMethod() + "}";
-            }else { // exists parameters
-                int size = userDefParamsList.size();
-                StringBuilder parameter = new StringBuilder();
-                parameter.append("(");
-                for (int i = 0 ;i < size - 1; i++){
-                    parameter.append("?,");
-                }
-                parameter.append("?)");
-                method = "{call " + procedureParameters.getMethod() + parameter.toString()+ "}";
-            }
+            String method = getCallMethod(userDefParamsList);
 
             logger.info("call method : {}",method);
+
             // call method
             stmt = connection.prepareCall(method);
-            if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
-            }
-            Map<Integer,Property> outParameterMap = new HashMap<>();
-            if (CollectionUtils.isNotEmpty(userDefParamsList)){
-                int index = 1;
-                for (Property property : userDefParamsList){
-                    logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
-                            ,property.getProp(),
-                            property.getDirect(),
-                            property.getType(),
-                            property.getValue());
-                    // set parameters
-                    if (property.getDirect().equals(Direct.IN)){
-                        ParameterUtils.setInParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
-                    }else if (property.getDirect().equals(Direct.OUT)){
-                        setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
-                        property.setValue(paramsMap.get(property.getProp()).getValue());
-                        outParameterMap.put(index,property);
-                    }
-                    index++;
-                }
-            }
+
+            // set timeout
+            setTimeout(stmt);
+
+            // outParameterMap
+            Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap, userDefParamsList);
+
 
             stmt.executeUpdate();
 
             /**
              *  print the output parameters to the log
              */
-            Iterator<Map.Entry<Integer, Property>> iter = outParameterMap.entrySet().iterator();
-            while (iter.hasNext()){
-                Map.Entry<Integer, Property> en = iter.next();
+            printOutParameter(stmt, outParameterMap);
 
-                int index = en.getKey();
-                Property property = en.getValue();
-                String prop = property.getProp();
-                DataType dataType = property.getType();
-                // get output parameter
-                getOutputParameter(stmt, index, prop, dataType);
-            }
-
-            exitStatusCode = 0;
+            setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
         }catch (Exception e){
-            logger.error(e.getMessage(),e);
-            exitStatusCode = -1;
-            throw new RuntimeException(String.format("process interrupted. exit status code is %d",exitStatusCode));
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
+            logger.error("procedure task error",e);
+            throw e;
         }
         finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (SQLException e) {
-                    exitStatusCode = -1;
-                    logger.error(e.getMessage(),e);
-                }
+            close(stmt,connection);
+        }
+    }
+
+    /**
+     * get call method
+     * @param userDefParamsList userDefParamsList
+     * @return method
+     */
+    private String getCallMethod(Collection<Property> userDefParamsList) {
+        String method;// no parameters
+        if (CollectionUtils.isEmpty(userDefParamsList)){
+            method = "{call " + procedureParameters.getMethod() + "}";
+        }else { // exists parameters
+            int size = userDefParamsList.size();
+            StringBuilder parameter = new StringBuilder();
+            parameter.append("(");
+            for (int i = 0 ;i < size - 1; i++){
+                parameter.append("?,");
             }
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    exitStatusCode = -1;
-                    logger.error(e.getMessage(), e);
+            parameter.append("?)");
+            method = "{call " + procedureParameters.getMethod() + parameter.toString()+ "}";
+        }
+        return method;
+    }
+
+    /**
+     * print outParameter
+     * @param stmt CallableStatement
+     * @param outParameterMap outParameterMap
+     * @throws SQLException
+     */
+    private void printOutParameter(CallableStatement stmt,
+                                   Map<Integer, Property> outParameterMap) throws SQLException {
+        Iterator<Map.Entry<Integer, Property>> iter = outParameterMap.entrySet().iterator();
+        while (iter.hasNext()){
+            Map.Entry<Integer, Property> en = iter.next();
+
+            int index = en.getKey();
+            Property property = en.getValue();
+            String prop = property.getProp();
+            DataType dataType = property.getType();
+            // get output parameter
+            getOutputParameter(stmt, index, prop, dataType);
+        }
+    }
+
+    /**
+     * get output parameter
+     *
+     * @param stmt CallableStatement
+     * @param paramsMap paramsMap
+     * @param userDefParamsList userDefParamsList
+     * @return outParameterMap
+     * @throws Exception
+     */
+    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt,
+                                                      Map<String, Property> paramsMap,
+                                                      Collection<Property> userDefParamsList) throws Exception {
+        Map<Integer,Property> outParameterMap = new HashMap<>();
+        if (userDefParamsList != null && userDefParamsList.size() > 0){
+            int index = 1;
+            for (Property property : userDefParamsList){
+                logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
+                        ,property.getProp(),
+                        property.getDirect(),
+                        property.getType(),
+                        property.getValue());
+                // set parameters
+                if (property.getDirect().equals(Direct.IN)){
+                    ParameterUtils.setInParameter(index, stmt, property.getType(), paramsMap.get(property.getProp()).getValue());
+                }else if (property.getDirect().equals(Direct.OUT)){
+                    setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                    property.setValue(paramsMap.get(property.getProp()).getValue());
+                    outParameterMap.put(index,property);
                 }
+                index++;
+            }
+        }
+        return outParameterMap;
+    }
+
+    /**
+     * set timtou
+     * @param stmt CallableStatement
+     * @throws SQLException
+     */
+    private void setTimeout(CallableStatement stmt) throws SQLException {
+        Boolean failed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED;
+        Boolean warnfailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+        if(failed || warnfailed){
+            stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
+        }
+    }
+
+    /**
+     * close jdbc resource
+     *
+     * @param stmt
+     * @param connection
+     */
+    private void close(PreparedStatement stmt,
+                       Connection connection){
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+
+            }
+        }
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
             }
         }
     }

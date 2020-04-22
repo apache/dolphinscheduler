@@ -242,7 +242,7 @@ public class ResourcesServiceTest {
         User loginUser = new User();
         loginUser.setId(0);
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 0)).thenReturn(getResourceList());
+        Mockito.when(resourcesMapper.queryResourceListAuthored(0, 0,0)).thenReturn(getResourceList());
         Map<String, Object> result = resourcesService.queryResourceList(loginUser, ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
  */
 public class OracleDataSource extends BaseDataSource {
 
-    private static final Logger logger = LoggerFactory.getLogger(OracleDataSource.class);
-
     private DbConnectType type;
 
     public DbConnectType getType() {
@@ -48,10 +46,24 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
+     * gets the JDBC url for the data source connection
+     * @return jdbc url
+     */
+    @Override
+    public String getJdbcUrl() {
+        String jdbcUrl = getAddress();
+        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
+            jdbcUrl += "/";
+        }
+        return jdbcUrl;
+    }
+
+    /**
      * @return db type
      */
     @Override
     public DbType dbTypeSelector() {
         return DbType.ORACLE;
     }
+
 }
