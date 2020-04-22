@@ -27,6 +27,8 @@ public enum Status {
 
     SUCCESS(0, "success", "成功"),
 
+    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
+
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
     USER_NAME_EXIST(10003, "user name already exists", "用户名已存在"),
@@ -134,7 +136,7 @@ public enum Status {
     UPDATE_PROCESS_DEFINITION_ERROR(10107,"update process definition error", "更新工作流定义错误"),
     RELEASE_PROCESS_DEFINITION_ERROR(10108,"release process definition error", "上线工作流错误"),
     QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR(10109,"query datail of process definition error", "查询工作流详细信息错误"),
-    QUERY_PROCCESS_DEFINITION_LIST(10110,"query proccess definition list", "查询工作流列表错误"),
+    QUERY_PROCESS_DEFINITION_LIST(10110,"query process definition list", "查询工作流列表错误"),
     ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR(10111,"encapsulation treeview structure error", "查询工作流树形图数据错误"),
     GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR(10112,"get tasks list by process definition id error", "查询工作流定义节点信息错误"),
     QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR(10113,"query process instance list paging error", "分页查询工作流实例列表错误"),
@@ -146,7 +148,7 @@ public enum Status {
     QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR(10119,"query parent process instance detail info by sub process instance id error", "查询子流程该工作流实例错误"),
     QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR(10120,"query process instance all variables error", "查询工作流自定义变量信息错误"),
     ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR(10121,"encapsulation process instance gantt structure error", "查询工作流实例甘特图数据错误"),
-    QUERY_PROCCESS_DEFINITION_LIST_PAGING_ERROR(10122,"query proccess definition list paging error", "分页查询工作流定义列表错误"),
+    QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR(10122,"query process definition list paging error", "分页查询工作流定义列表错误"),
     SIGN_OUT_ERROR(10123,"sign out error", "退出错误"),
     TENANT_CODE_HAS_ALREADY_EXISTS(10124,"tenant code has already exists", "租户编码已存在"),
     IP_IS_EMPTY(10125,"ip is empty", "IP地址不能为空"),
@@ -190,6 +192,7 @@ public enum Status {
     UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}","udf函数绑定了资源文件[{0}]"),
     RESOURCE_IS_USED(20014, "resource file is used by process definition","资源文件被上线的流程定义使用了"),
     PARENT_RESOURCE_NOT_EXIST(20015, "parent resource not exist","父资源文件不存在"),
+    RESOURCE_NOT_EXIST_OR_NO_PERMISSION(20016, "resource not exist or no permission,please view the task node and remove error resource","请检查任务节点并移除无权限或者已删除的资源"),
 
 
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
