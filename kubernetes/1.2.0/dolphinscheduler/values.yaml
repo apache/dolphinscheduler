@@ -27,7 +27,7 @@ timezone: "Asia/Shanghai"
 image:
   registry: "docker.io"
   repository: "dolphinscheduler"
-  tag: "1.2.1"
+  tag: "1.2.0"
   pullPolicy: "IfNotPresent"
 
 imagePullSecrets: []
@@ -56,6 +56,8 @@ externalDatabase:
 zookeeper:
   enabled: true
   taskQueue: "zookeeper"
+  service:
+    port: "2181"
   persistence:
     enabled: false
     size: "20Gi"
