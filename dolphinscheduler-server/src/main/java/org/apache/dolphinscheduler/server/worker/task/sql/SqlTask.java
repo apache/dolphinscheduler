@@ -214,11 +214,8 @@ public class SqlTask extends AbstractTask {
         try {
             // if upload resource is HDFS and kerberos startup
             CommonUtils.loadKerberosConf();
-
-
             // create connection
             connection = createConnection();
-
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection,createFuncs);
@@ -226,13 +223,12 @@ public class SqlTask extends AbstractTask {
 
             // pre sql
             preSql(connection,preStatementsBinds);
-
-
             stmt = prepareStatementAndBind(connection, mainSqlBinds);
-            resultSet = stmt.executeQuery();
+
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
+                resultSet = stmt.executeQuery();
                 resultProcess(resultSet);
 
             } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {

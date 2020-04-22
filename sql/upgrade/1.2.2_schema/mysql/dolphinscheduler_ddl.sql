@@ -167,7 +167,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_process_instance_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_process_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_process_instance ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -207,7 +207,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_task_instance_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_task_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_task_instance ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -247,7 +247,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_schedules_A_worker_group()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='worker_group')
    THEN
-         ALTER TABLE t_ds_schedules ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+         ALTER TABLE t_ds_schedules ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
        END IF;
  END;
 
@@ -277,4 +277,83 @@ delimiter ;
 CALL dc_dolphin_T_t_ds_schedules_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_schedules_D_worker_group_id;
 
+-- ac_dolphin_T_t_ds_command_A_worker_group
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_command_A_worker_group;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_command_A_worker_group()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group')
+   THEN
+         ALTER TABLE t_ds_command ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_dolphin_T_t_ds_command_A_worker_group;
+DROP PROCEDURE ac_dolphin_T_t_ds_command_A_worker_group;
+
+-- dc_dolphin_T_t_ds_command_D_worker_group_id
+drop PROCEDURE if EXISTS dc_dolphin_T_t_ds_command_D_worker_group_id;
+delimiter d//
+CREATE PROCEDURE dc_dolphin_T_t_ds_command_D_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_command DROP COLUMN worker_group_id;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL dc_dolphin_T_t_ds_command_D_worker_group_id;
+DROP PROCEDURE dc_dolphin_T_t_ds_command_D_worker_group_id;
+
+-- ac_dolphin_T_t_ds_error_command_A_worker_group
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_error_command_A_worker_group;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_error_command_A_worker_group()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_error_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group')
+   THEN
+         ALTER TABLE t_ds_error_command ADD `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_dolphin_T_t_ds_error_command_A_worker_group;
+DROP PROCEDURE ac_dolphin_T_t_ds_error_command_A_worker_group;
+
+-- dc_dolphin_T_t_ds_error_command_D_worker_group_id
+drop PROCEDURE if EXISTS dc_dolphin_T_t_ds_error_command_D_worker_group_id;
+delimiter d//
+CREATE PROCEDURE dc_dolphin_T_t_ds_error_command_D_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_error_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_error_command DROP COLUMN worker_group_id;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL dc_dolphin_T_t_ds_error_command_D_worker_group_id;
+DROP PROCEDURE dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 
