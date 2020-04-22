@@ -22,8 +22,8 @@ zookeeper.quorum=${ZOOKEEPER_QUORUM}
 #zookeeper.dolphinscheduler.root=/dolphinscheduler
 
 # dolphinscheduler failover directory
-#zookeeper.session.timeout=300
-#zookeeper.connection.timeout=300
+#zookeeper.session.timeout=60000
+#zookeeper.connection.timeout=30000
 #zookeeper.retry.base.sleep=100
 #zookeeper.retry.max.sleep=30000
-#zookeeper.retry.maxtime=5
+#zookeeper.retry.maxtime=10
