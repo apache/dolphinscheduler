@@ -52,7 +52,7 @@ sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.
 sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
-sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 
