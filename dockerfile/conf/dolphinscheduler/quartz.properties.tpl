@@ -19,39 +19,36 @@
 # Configure Main Scheduler Properties
 #============================================================================
 #org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
-# postgre
-org.quartz.dataSource.myDs.driver = org.postgresql.Driver
-org.quartz.dataSource.myDs.URL = jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}?characterEncoding=utf8
-org.quartz.dataSource.myDs.user = ${POSTGRESQL_USERNAME}
-org.quartz.dataSource.myDs.password = ${POSTGRESQL_PASSWORD}
-org.quartz.scheduler.instanceName = DolphinScheduler
-org.quartz.scheduler.instanceId = AUTO
-org.quartz.scheduler.makeSchedulerThreadDaemon = true
-org.quartz.jobStore.useProperties = false
+#org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+
+#org.quartz.scheduler.instanceName = DolphinScheduler
+#org.quartz.scheduler.instanceId = AUTO
+#org.quartz.scheduler.makeSchedulerThreadDaemon = true
+#org.quartz.jobStore.useProperties = false
 
 #============================================================================
 # Configure ThreadPool
 #============================================================================
-org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
-org.quartz.threadPool.makeThreadsDaemons = true
-org.quartz.threadPool.threadCount = 25
-org.quartz.threadPool.threadPriority = 5
+
+#org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+#org.quartz.threadPool.makeThreadsDaemons = true
+#org.quartz.threadPool.threadCount = 25
+#org.quartz.threadPool.threadPriority = 5
 
 #============================================================================
 # Configure JobStore
 #============================================================================
-org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
-org.quartz.jobStore.tablePrefix = QRTZ_
-org.quartz.jobStore.isClustered = true
-org.quartz.jobStore.misfireThreshold = 60000
-org.quartz.jobStore.clusterCheckinInterval = 5000
-org.quartz.jobStore.acquireTriggersWithinLock=true
-org.quartz.jobStore.dataSource = myDs
+
+#org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+
+#org.quartz.jobStore.tablePrefix = QRTZ_
+#org.quartz.jobStore.isClustered = true
+#org.quartz.jobStore.misfireThreshold = 60000
+#org.quartz.jobStore.clusterCheckinInterval = 5000
+#org.quartz.jobStore.acquireTriggersWithinLock=true
+#org.quartz.jobStore.dataSource = myDs
 
 #============================================================================
-# Configure Datasources  
+# Configure Datasources
 #============================================================================
-org.quartz.dataSource.myDs.connectionProvider.class = org.apache.dolphinscheduler.service.quartz.DruidConnectionProvider
-org.quartz.dataSource.myDs.maxConnections = 10
-org.quartz.dataSource.myDs.validationQuery = select 1
+#org.quartz.dataSource.myDs.connectionProvider.class = org.apache.dolphinscheduler.service.quartz.DruidConnectionProvider
