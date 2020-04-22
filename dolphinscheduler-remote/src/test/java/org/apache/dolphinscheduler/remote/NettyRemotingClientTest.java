@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public class NettyRemotingClientTest {
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
         Command commandPing = Ping.create();
         try {
-            Command response = client.sendSync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
+            Command response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
             Assert.assertEquals(commandPing.getOpaque(), response.getOpaque());
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class NettyRemotingClientTest {
         Command commandPing = Ping.create();
         try {
             final AtomicLong opaque = new AtomicLong(0);
-            client.sendAsync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
+            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
                 @Override
                 public void operationComplete(ResponseFuture responseFuture) {
                     opaque.set(responseFuture.getOpaque());

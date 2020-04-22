@@ -108,13 +108,11 @@ public class Command {
     @TableField("update_time")
     private Date updateTime;
 
-
     /**
-     *
+     * worker group
      */
-    @TableField("worker_group_id")
-    private int workerGroupId;
-
+    @TableField("worker_group")
+    private String workerGroup;
 
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
@@ -254,13 +252,12 @@ public class Command {
         this.updateTime = updateTime;
     }
 
-
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     @Override
@@ -283,7 +280,7 @@ public class Command {
         if (executorId != command.executorId) {
             return false;
         }
-        if (workerGroupId != command.workerGroupId) {
+        if (workerGroup != null ? workerGroup.equals(command.workerGroup) : command.workerGroup == null) {
             return false;
         }
         if (commandType != command.commandType) {
@@ -332,10 +329,9 @@ public class Command {
         result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
         result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + workerGroupId;
+        result = 31 * result + (workerGroup != null ? workerGroup.hashCode() : 0);
         return result;
     }
-
     @Override
     public String toString() {
         return "Command{" +
@@ -352,7 +348,7 @@ public class Command {
                 ", startTime=" + startTime +
                 ", processInstancePriority=" + processInstancePriority +
                 ", updateTime=" + updateTime +
-                ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 '}';
     }
 }

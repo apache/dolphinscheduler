@@ -29,6 +29,12 @@ public class DataSourceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSourceFactory.class);
 
+  /**
+   * getDatasource
+   * @param dbType dbType
+   * @param parameter parameter
+   * @return getDatasource
+   */
   public static BaseDataSource getDatasource(DbType dbType, String parameter) {
     try {
       switch (dbType) {
