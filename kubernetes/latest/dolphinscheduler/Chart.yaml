@@ -21,8 +21,8 @@ description: Dolphin Scheduler is a distributed and easy-to-expand visual DAG wo
 home: https://dolphinscheduler.apache.org
 icon: https://dolphinscheduler.apache.org/img/hlogo_colorful.svg
 keywords:
-  - dolphinscheduler
-  - Scheduler
+- dolphinscheduler
+- Scheduler
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -35,18 +35,18 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.0
+version: 1.1.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 1.2.1
+appVersion: latest
 
 dependencies:
-  - name: postgresql
-    version: 8.x.x
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled
-  - name: zookeeper
-    version: 5.x.x
-    repository: https://charts.bitnami.com/bitnami
-    condition: redis.enabled
+- name: postgresql
+  version: 8.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+- name: zookeeper
+  version: 5.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled

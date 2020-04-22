@@ -17,37 +17,37 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  name: {{ include "dolphinscheduler.fullname" . }}-master
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: worker
+    app.kubernetes.io/component: master
 spec:
-  podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
-  replicas: {{ .Values.worker.replicas }}
+  podManagementPolicy: {{ .Values.master.podManagementPolicy }}
+  replicas: {{ .Values.master.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
       app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/managed-by: {{ .Release.Service }}
-      app.kubernetes.io/component: worker
-  serviceName: {{ template "dolphinscheduler.fullname" . }}-worker-headless
+      app.kubernetes.io/component: master
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-master-headless
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
-        app.kubernetes.io/component: worker
+        app.kubernetes.io/component: master
     spec:
-      {{- if .Values.worker.affinity }}
-      affinity: {{- toYaml .Values.worker.affinity | nindent 8 }}
+      {{- if .Values.master.affinity }}
+      affinity: {{- toYaml .Values.master.affinity | nindent 8 }}
       {{- end }}
-      {{- if .Values.worker.nodeSelector }}
-      nodeSelector: {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
+      {{- if .Values.master.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.master.nodeSelector | nindent 8 }}
       {{- end }}
-      {{- if .Values.worker.tolerations }}
+      {{- if .Values.master.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
@@ -104,42 +104,67 @@ spec:
               value: {{ .Values.externalDatabase.port }}
               {{- end }}
       containers:
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker
+        - name: {{ include "dolphinscheduler.fullname" . }}-master
           image: {{ include "dolphinscheduler.image.repository" . | quote }}
           args:
-            - "worker-server"
+            - "master-server"
           ports:
-            - containerPort: 50051
-              name: "logs-port"
+            - containerPort: 8888
+              name: unused-tcp-port
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: TZ
               value: {{ .Values.timezone }}
-            - name: WORKER_EXEC_THREADS
+            - name: MASTER_EXEC_THREADS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_EXEC_THREADS
+            - name: MASTER_EXEC_TASK_NUM
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_EXEC_TASK_NUM
+            - name: MASTER_HEARTBEAT_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_HEARTBEAT_INTERVAL
+            - name: MASTER_TASK_COMMIT_RETRYTIMES
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_TASK_COMMIT_RETRYTIMES
+            - name: MASTER_TASK_COMMIT_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_TASK_COMMIT_INTERVAL
+            - name: MASTER_MAX_CPULOAD_AVG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_MAX_CPULOAD_AVG
+            - name: MASTER_RESERVED_MEMORY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_RESERVED_MEMORY
+            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_EXEC_THREADS
-            - name: WORKER_FETCH_TASK_NUM
+                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+            - name: DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_FETCH_TASK_NUM
-            - name: WORKER_HEARTBEAT_INTERVAL
+                  key: DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH
+            - name: DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_HEARTBEAT_INTERVAL
-            - name: WORKER_MAX_CPULOAD_AVG
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_MAX_CPULOAD_AVG
-            - name: WORKER_RESERVED_MEMORY
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ include "dolphinscheduler.fullname" . }}-worker
-                  key: WORKER_RESERVED_MEMORY
+                  key: DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH
             - name: POSTGRESQL_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
@@ -167,7 +192,7 @@ spec:
                   {{- else }}
                   name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
                   key: db-password
-            {{- end }}
+                  {{- end }}
             - name: TASK_QUEUE
               {{- if .Values.zookeeper.enabled }}
               value: {{ .Values.zookeeper.taskQueue }}
@@ -176,100 +201,62 @@ spec:
               {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
-              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperQuorum }}
               {{- end }}
-          {{- if .Values.worker.livenessProbe.enabled }}
+          {{- if .Values.master.livenessProbe.enabled }}
           livenessProbe:
             exec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
-            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.worker.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+                - master-server
+            initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.master.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.master.livenessProbe.failureThreshold }}
           {{- end }}
-          {{- if .Values.worker.readinessProbe.enabled }}
+          {{- if .Values.master.readinessProbe.enabled }}
           readinessProbe:
             exec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
-            initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.worker.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
+                - master-server
+            initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.master.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.master.readinessProbe.failureThreshold }}
           {{- end }}
           volumeMounts:
-            - mountPath: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
-              name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
-              name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-            - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
-              subPath: "dolphinscheduler_env.sh"
-              name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
+              name: {{ include "dolphinscheduler.fullname" . }}-master
       volumes:
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
-          {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-master
+          {{- if .Values.master.persistentVolumeClaim.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-data
+            claimName: {{ include "dolphinscheduler.fullname" . }}-master
           {{- else }}
           emptyDir: {}
           {{- end }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-          {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
-          configMap:
-            defaultMode: 0777
-            name: {{ include "dolphinscheduler.fullname" . }}-worker
-            items:
-              - key: dolphinscheduler_env.sh
-                path: dolphinscheduler_env.sh
-  {{- if .Values.worker.persistentVolumeClaim.enabled }}
+  {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
-    {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
     - metadata:
-        name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+        name: {{ include "dolphinscheduler.fullname" . }}-master
         labels:
-          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
           app.kubernetes.io/instance: {{ .Release.Name }}
           app.kubernetes.io/managed-by: {{ .Release.Service }}
       spec:
         accessModes:
-          {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
+          {{- range .Values.master.persistentVolumeClaim.accessModes }}
           - {{ . | quote }}
-        {{- end }}
-        storageClassName: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storageClassName | quote }}
+          {{- end }}
+        storageClassName: {{ .Values.master.persistentVolumeClaim.storageClassName | quote }}
         resources:
           requests:
-            storage: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storage | quote }}
-    {{- end }}
-    {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
-    - metadata:
-        name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-        labels:
-          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-          app.kubernetes.io/instance: {{ .Release.Name }}
-          app.kubernetes.io/managed-by: {{ .Release.Service }}
-      spec:
-        accessModes:
-          {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
-          - {{ . | quote }}
-        {{- end }}
-        storageClassName: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storageClassName | quote }}
-        resources:
-          requests:
-            storage: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storage | quote }}
-    {{- end }}
+            storage: {{ .Values.master.persistentVolumeClaim.storage | quote }}
   {{- end }}
