@@ -27,7 +27,7 @@ timezone: "Asia/Shanghai"
 image:
   registry: "docker.io"
   repository: "dolphinscheduler"
-  tag: "1.2.1"
+  tag: "1.3.0"
   pullPolicy: "IfNotPresent"
 
 imagePullSecrets: []
