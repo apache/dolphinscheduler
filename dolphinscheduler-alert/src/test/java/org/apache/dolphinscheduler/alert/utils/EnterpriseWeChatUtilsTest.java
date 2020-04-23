@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,11 +55,19 @@ public class EnterpriseWeChatUtilsTest {
     private static final String enterpriseWechatUsers="LiGang,journey";
     private static final String msg = "hello world";
 
+    private static final String enterpriseWechatTeamSendMsg = "{\\\"toparty\\\":\\\"$toParty\\\",\\\"agentid\\\":\\\"$agentId\\\",\\\"msgtype\\\":\\\"text\\\",\\\"text\\\":{\\\"content\\\":\\\"$msg\\\"},\\\"safe\\\":\\\"0\\\"}";
+    private static final String enterpriseWechatUserSendMsg = "{\\\"touser\\\":\\\"$toUser\\\",\\\"agentid\\\":\\\"$agentId\\\",\\\"msgtype\\\":\\\"markdown\\\",\\\"markdown\\\":{\\\"content\\\":\\\"$msg\\\"}}";
+
+    @Before
+    public void init(){
+        PowerMockito.mockStatic(PropertyUtils.class);
+        Mockito.when(PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE)).thenReturn(true);
+        Mockito.when(PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG)).thenReturn(enterpriseWechatUserSendMsg);
+        Mockito.when(PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TEAM_SEND_MSG)).thenReturn(enterpriseWechatTeamSendMsg);
+    }
 
     @Test
     public void testIsEnable(){
-        PowerMockito.mockStatic(PropertyUtils.class);
-        Mockito.when(PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE)).thenReturn(true);
         Boolean weChartEnable = EnterpriseWeChatUtils.isEnable();
         Assert.assertTrue(weChartEnable);
     }
@@ -88,6 +97,7 @@ public class EnterpriseWeChatUtilsTest {
 
     @Test
     public void tesMakeUserSendMsg1(){
+
         String sendMsg = EnterpriseWeChatUtils.makeUserSendMsg(enterpriseWechatUsers, enterpriseWechatAgentId, msg);
         Assert.assertTrue(sendMsg.contains(enterpriseWechatUsers));
         Assert.assertTrue(sendMsg.contains(enterpriseWechatAgentId));
