@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -234,9 +235,6 @@ public class ResourcesService extends BaseService {
         }
 
         Date now = new Date();
-
-
-
         Resource resource = new Resource(pid,name,fullName,false,desc,file.getOriginalFilename(),loginUser.getId(),type,file.getSize(),now,now);
 
         try {
@@ -342,7 +340,6 @@ public class ResourcesService extends BaseService {
         String originResourceName = resource.getAlias();
         if (!resource.isDirectory()) {
             //get the file suffix
-
             String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
 
             //if the name without suffix then add it ,else use the origin name
@@ -352,7 +349,7 @@ public class ResourcesService extends BaseService {
         }
 
         // updateResource data
-        List<Integer> childrenResource = listAllChildren(resource);
+        List<Integer> childrenResource = listAllChildren(resource,false);
         String oldFullName = resource.getFullName();
         Date now = new Date();
 
@@ -385,16 +382,16 @@ public class ResourcesService extends BaseService {
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-            throw new RuntimeException(Status.UPDATE_RESOURCE_ERROR.getMsg());
+            throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
         }
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name)) {
             return result;
         }
 
-        // get file hdfs path
-        // delete hdfs file by type
+        // get the path of origin file in hdfs
         String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        // get the path of dest file in hdfs
         String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
 
         try {
@@ -408,6 +405,7 @@ public class ResourcesService extends BaseService {
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
             putMsg(result,Status.HDFS_COPY_FAIL);
+            throw new ServiceException(Status.HDFS_COPY_FAIL);
         }
 
         return result;
@@ -543,34 +541,6 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * get all resources
-     * @param loginUser     login user
-     * @return all resource set
-     */
-    /*private Set<Resource> getAllResources(User loginUser, ResourceType type) {
-        int userId = loginUser.getId();
-        boolean listChildren = true;
-        if(isAdmin(loginUser)){
-            userId = 0;
-            listChildren = false;
-        }
-        List<Resource> resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        Set<Resource> allResourceList = new HashSet<>(resourceList);
-        if (listChildren) {
-            Set<Integer> authorizedIds = new HashSet<>();
-            List<Resource> authorizedDirecoty = resourceList.stream().filter(t->t.getUserId() != loginUser.getId() && t.isDirectory()).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(authorizedDirecoty)) {
-                for(Resource resource : authorizedDirecoty){
-                    authorizedIds.addAll(listAllChildren(resource));
-                }
-                List<Resource> childrenResources = resourcesMapper.listResourceByIds(authorizedIds.toArray(new Integer[authorizedIds.size()]));
-                allResourceList.addAll(childrenResources);
-            }
-        }
-        return allResourceList;
-    }*/
-
-    /**
      * query resource list
      *
      * @param loginUser login user
@@ -580,8 +550,11 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal(),0);
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
         List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
@@ -631,7 +604,7 @@ public class ResourcesService extends BaseService {
         Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
-        List<Integer> allChildren = listAllChildren(resource);
+        List<Integer> allChildren = listAllChildren(resource,true);
         Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
 
         //if resource type is UDF,need check whether it is bound by UDF functon
@@ -1193,12 +1166,13 @@ public class ResourcesService extends BaseService {
 
     /**
      * list all children id
-     * @param resource resource
+     * @param resource    resource
+     * @param containSelf whether add self to children list
      * @return all children id
      */
-    List<Integer> listAllChildren(Resource resource){
+    List<Integer> listAllChildren(Resource resource,boolean containSelf){
         List<Integer> childList = new ArrayList<>();
-        if (resource.getId() != -1) {
+        if (resource.getId() != -1 && containSelf) {
             childList.add(resource.getId());
         }
 
