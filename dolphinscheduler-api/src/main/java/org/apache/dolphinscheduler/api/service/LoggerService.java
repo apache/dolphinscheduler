@@ -65,24 +65,23 @@ public class LoggerService {
 
     TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
-    if (taskInstance == null){
+    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())){
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
     }
 
-    String host = Host.of(taskInstance.getHost()).getIp();
-    if(StringUtils.isEmpty(host)){
-      return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
-    }
-
+    String host = getHost(taskInstance.getHost());
 
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
+
     String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
     result.setData(log);
-    logger.info(log);
     return result;
   }
+
+
+
 
   /**
    * get log size
@@ -92,10 +91,24 @@ public class LoggerService {
    */
   public byte[] getLogBytes(int taskInstId) {
     TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
-    if (taskInstance == null){
-      throw new RuntimeException("task instance is null");
+    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())){
+      throw new RuntimeException("task instance is null or host is null");
     }
-    String host = Host.of(taskInstance.getHost()).getIp();
+    String host = getHost(taskInstance.getHost());
+
     return logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath());
+  }
+
+
+  /**
+   * get host
+   * @param address address
+   * @return old version return true ,otherwise return false
+   */
+  private String getHost(String address){
+    if (Host.isOldVersion(address)){
+      return address;
+    }
+    return Host.of(address).getIp();
   }
 }
