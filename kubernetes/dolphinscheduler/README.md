@@ -16,7 +16,7 @@ To install the chart with the release name `my-release`:
 
 ```bash
 $ git clone https://github.com/apache/incubator-dolphinscheduler.git
-$ cd incubator-dolphinscheduler/kubernetes/${VERSION}/dolphinscheduler
+$ cd incubator-dolphinscheduler/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
 $ helm install --name dolphinscheduler .
