@@ -35,40 +35,29 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
-source /etc/profile
-
-export JAVA_HOME=$JAVA_HOME
-#export JAVA_HOME=/opt/soft/jdk
 export HOSTNAME=`hostname`
 
-export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
-export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
-export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
-export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
+DOLPHINSCHEDULER_LIB_JARS={{dolphin_lib_jars}}
 
-export DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
-export STOP_TIMEOUT=5
+DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms4g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
+STOP_TIMEOUT=5
 
-if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
-  mkdir $DOLPHINSCHEDULER_LOG_DIR
-fi
-
-log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
-pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
+log={{dolphin_log_dir}}/dolphinscheduler-$command-$HOSTNAME.out
+pid={{dolphin_pidfile_dir}}/$command.pid
 
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-master.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-worker.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-alert.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
@@ -79,7 +68,6 @@ fi
 
 case $startStop in
   (start)
-    [ -w "$DOLPHINSCHEDULER_PID_DIR" ] ||  mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
 
     if [ -f $pid ]; then
       if kill -0 `cat $pid` > /dev/null 2>&1; then
@@ -90,10 +78,10 @@ case $startStop in
 
     echo starting $command, logging to $log
 
-    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath {{dolphin_conf_dir}}:{{dolphin_lib_jars}} $CLASS"
 
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
+    echo "nohup java $exec_command > $log 2>&1 < /dev/null &"
+    nohup java $exec_command > $log 2>&1 < /dev/null &
     echo $! > $pid
     ;;
 

@@ -695,6 +695,7 @@
                         <include>**/api/enums/testGetEnum.java</include>
                         <include>**/api/enums/StatusTest.java</include>
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
+                        <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
                         <include>**/api/security/PasswordAuthenticatorTest.java</include>
                         <include>**/api/security/SecurityConfigTest.java</include>
