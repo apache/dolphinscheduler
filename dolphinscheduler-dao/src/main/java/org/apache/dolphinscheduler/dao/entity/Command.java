@@ -111,7 +111,7 @@ public class Command {
     /**
      * worker group
      */
-    @TableField(exist = false)
+    @TableField("worker_group")
     private String workerGroup;
 
     public Command() {

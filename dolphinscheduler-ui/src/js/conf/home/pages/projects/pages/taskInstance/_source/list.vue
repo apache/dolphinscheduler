@@ -43,13 +43,13 @@
           <th scope="col" width="140">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th scope="col" width="140">
+          <th scope="col" width="125">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th scope="col" width="110">
+          <th scope="col" width="130">
             <span>{{$t('host')}}</span>
           </th>
-          <th scope="col" width="74">
+          <th scope="col" width="70">
             <span>{{$t('Duration')}}(s)</span>
           </th>
           <th scope="col" width="84">

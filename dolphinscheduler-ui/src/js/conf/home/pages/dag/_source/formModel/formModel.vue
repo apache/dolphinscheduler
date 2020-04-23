@@ -611,25 +611,27 @@
           this.failedBranch = o.conditionResult.failedNode[0]
         }
           // If the workergroup has been deleted, set the default workergroup
-          var hasMatch = false;
-          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroup = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroup == workerGroup) {
-              hasMatch = true;
-              break;
-            }
+        var hasMatch = false;
+        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup == workerGroup) {
+            hasMatch = true;
+            break;
           }
+        }
 
-          if(!hasMatch){
-            this.workerGroup = 'default'
-          }else{
-            this.workerGroup = o.workerGroup
-          }
+        if(!hasMatch){
+          this.workerGroup = 'default'
+        } else {
+          this.workerGroup = o.workerGroup
+        }
 
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
 
+      } else {
+        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
       this.isContentBox = true
     },
@@ -694,4 +696,9 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "./formModel";
+  .ans-radio-disabled {
+    .ans-radio-inner:after {
+      background-color: #6F8391
+    }
+  }
 </style>
