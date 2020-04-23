@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -381,7 +382,7 @@ public class ResourcesService extends BaseService {
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-            throw new RuntimeException(Status.UPDATE_RESOURCE_ERROR.getMsg());
+            throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
         }
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name)) {
@@ -404,7 +405,7 @@ public class ResourcesService extends BaseService {
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
             putMsg(result,Status.HDFS_COPY_FAIL);
-            throw new RuntimeException(Status.HDFS_COPY_FAIL.getMsg());
+            throw new ServiceException(Status.HDFS_COPY_FAIL);
         }
 
         return result;
