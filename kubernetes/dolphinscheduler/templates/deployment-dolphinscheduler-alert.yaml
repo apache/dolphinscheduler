@@ -195,7 +195,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
+                - AlertServer
             initialDelaySeconds: {{ .Values.alert.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.livenessProbe.timeoutSeconds }}
@@ -208,7 +208,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
+                - AlertServer
             initialDelaySeconds: {{ .Values.alert.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.alert.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.alert.readinessProbe.timeoutSeconds }}
