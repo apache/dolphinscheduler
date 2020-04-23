@@ -91,6 +91,16 @@ public class Host implements Serializable {
         return host;
     }
 
+    /**
+     * whether old version
+     * @param address address
+     * @return old version is true , otherwise is false
+     */
+    public static Boolean isOldVersion(String address){
+        String[] parts = address.split(":");
+        return parts.length != 2 ? true : false;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
