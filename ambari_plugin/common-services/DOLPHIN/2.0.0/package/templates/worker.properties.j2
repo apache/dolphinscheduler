@@ -15,15 +15,6 @@
 # limitations under the License.
 #
 
-# zookeeper cluster.  multiple are separated by commas.  eg. 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181
-zookeeper.quorum=localhost:2181
-
-# dolphinscheduler root directory
-#zookeeper.dolphinscheduler.root=/dolphinscheduler
-
-# dolphinscheduler failover directory
-#zookeeper.session.timeout=60000
-#zookeeper.connection.timeout=30000
-#zookeeper.retry.base.sleep=100
-#zookeeper.retry.max.sleep=30000
-#zookeeper.retry.maxtime=10
+{% for key, value in dolphin_worker_map.iteritems() -%}
+  {{key}}={{value}}
+{% endfor %}
