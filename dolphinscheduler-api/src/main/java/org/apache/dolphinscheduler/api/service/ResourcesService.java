@@ -550,8 +550,11 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-
-        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal(),0);
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
         List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
