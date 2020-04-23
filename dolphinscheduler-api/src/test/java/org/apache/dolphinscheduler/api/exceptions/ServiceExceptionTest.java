@@ -23,12 +23,24 @@ import org.junit.Test;
 public class ServiceExceptionTest {
     @Test
     public void getCodeTest(){
-        ServiceException serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
+        ServiceException serviceException = new ServiceException();
+        Assert.assertNull(serviceException.getCode());
+
+        serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
+        Assert.assertNotNull(serviceException.getCode());
+
+        serviceException = new ServiceException(10012, "alarm group already exists");
         Assert.assertNotNull(serviceException.getCode());
     }
     @Test
     public void getMessageTest(){
-        ServiceException serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
+        ServiceException serviceException = new ServiceException();
+        Assert.assertNull(serviceException.getMessage());
+
+        serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
+        Assert.assertNotNull(serviceException.getMessage());
+
+        serviceException = new ServiceException(10012, "alarm group already exists");
         Assert.assertNotNull(serviceException.getMessage());
     }
 }

@@ -27,12 +27,7 @@ public class ServiceException extends RuntimeException {
     /**
      * code
      */
-    private int code;
-
-    /**
-     * message
-     */
-    private String message;
+    private Integer code;
 
     public ServiceException() {
     }
@@ -42,7 +37,7 @@ public class ServiceException extends RuntimeException {
         this.code = status.getCode();
     }
 
-    public ServiceException(int code,String message) {
+    public ServiceException(Integer code,String message) {
         super(message);
         this.code = code;
     }
@@ -51,8 +46,8 @@ public class ServiceException extends RuntimeException {
         super(message);
     }
 
-    public int getCode() {
-        return code;
+    public Integer getCode() {
+        return this.code;
     }
 
     public void setCode(Integer code) {
