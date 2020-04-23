@@ -107,7 +107,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <jacoco.version>0.8.4</jacoco.version>
@@ -683,68 +683,150 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/common/utils/*.java</include>
-                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
-                        <include>**/common/log/*.java</include>
-                        <include>**/common/threadutils/*.java</include>
-                        <include>**/common/graph/*.java</include>
-                        <include>**/common/queue/*.java</include>
-                        <include>**/common/task/FlinkParametersTest.java</include>
-                        <include>**/common/task/SqoopParameterEntityTest.java</include>
-                        <include>**/api/utils/CheckUtilsTest.java</include>
-                        <include>**/api/utils/FileUtilsTest.java</include>
-                        <include>**/api/utils/FourLetterWordTest.java</include>
-                        <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
-                        <include>**/api/utils/exportprocess/DependentParamTest.java</include>
-                        <include>**/api/enums/*.java</include>
-                        <include>**/api/controller/DataSourceControllerTest.java</include>
-                        <include>**/api/service/AccessTokenServiceTest.java</include>
-                        <include>**/api/service/QueueServiceTest.java</include>
-                        <include>**/api/service/MonitorServiceTest.java</include>
-                        <include>**/api/service/SessionServiceTest.java</include>
-                        <include>**/api/service/UsersServiceTest.java</include>
-                        <include>**/api/service/TenantServiceTest.java</include>
-                        <include>**/api/service/WorkerGroupServiceTest.java</include>
-                        <include>**/api/service/AlertGroupServiceTest.java</include>
-                        <include>**/api/service/UserAlertGroupServiceTest.java</include>
-                        <include>**/api/service/ProjectServiceTest.java</include>
-                        <include>**/api/service/ProcessDefinitionServiceTest.java</include>
-                        <include>**/api/service/UdfFuncServiceTest.java</include>
-                        <include>**/api/service/ResourcesServiceTest.java</include>
-                        <include>**/api/service/ExecutorService2Test.java</include>
-                        <include>**/api/service/BaseServiceTest.java</include>
-                        <include>**/api/service/BaseDAGServiceTest.java</include>
-                        <include>**/api/service/LoggerServiceTest.java</include>
-                        <include>**/api/service/DataAnalysisServiceTest.java</include>
-                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
-                        <include>**/api/service/TaskInstanceServiceTest.java</include>
+                        <include>**/alert/template/AlertTemplateFactoryTest.java</include>
+                        <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
+                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
-                        <include>**/alert/utils/PropertyUtilsTest.java</include>
-                        <include>**/server/utils/SparkArgsUtilsTest.java</include>
-                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
-                        <include>**/server/utils/ParamUtilsTest.java</include>
-                        <include>**/server/master/MasterExecThreadTest.java</include>
+                        <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
+                        <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
+                        <include>**/api/enums/testGetEnum.java</include>
+                        <include>**/api/enums/StatusTest.java</include>
+                        <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
+                        <include>**/api/exceptions/ServiceExceptionTest.java</include>
+                        <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
+                        <include>**/api/security/PasswordAuthenticatorTest.java</include>
+                        <include>**/api/security/SecurityConfigTest.java</include>
+                        <include>**/api/service/AccessTokenServiceTest.java</include>
+                        <include>**/api/service/AlertGroupServiceTest.java</include>
+                        <include>**/api/service/BaseDAGServiceTest.java</include>
+                        <include>**/api/service/BaseServiceTest.java</include>
+                        <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/DataSourceServiceTest.java</include>
+                        <include>**/api/service/ExecutorService2Test.java</include>
+                        <include>**/api/service/ExecutorServiceTest.java</include>
+                        <include>**/api/service/LoggerServiceTest.java</include>
+                        <include>**/api/service/MonitorServiceTest.java</include>
+                        <include>**/api/service/ProcessDefinitionServiceTest.java</include>
+                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
+                        <include>**/api/service/ProjectServiceTest.java</include>
+                        <include>**/api/service/QueueServiceTest.java</include>
+                        <include>**/api/service/ResourcesServiceTest.java</include>
+                        <include>**/api/service/SchedulerServiceTest.java</include>
+                        <include>**/api/service/SessionServiceTest.java</include>
+                        <include>**/api/service/TaskInstanceServiceTest.java</include>
+                        <include>**/api/service/TenantServiceTest.java</include>
+                        <include>**/api/service/UdfFuncServiceTest.java</include>
+                        <include>**/api/service/UserAlertGroupServiceTest.java</include>
+                        <include>**/api/service/UsersServiceTest.java</include>
+                        <include>**/api/service/WorkerGroupServiceTest.java</include>
+                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
+                        <include>**/api/utils/exportprocess/DependentParamTest.java</include>
+                        <include>**/api/utils/CheckUtilsTest.java</include>
+                        <include>**/api/utils/FileUtilsTest.java</include>
+                        <include>**/api/utils/CheckUtilsTest.java</include>
+                        <include>**/api/utils/CheckUtilsTest.java</include>
+                        <include>**/api/utils/ResultTest.java</include>
+                        <include>**/common/graph/DAGTest.java</include>
+                        <include>**/common/os/OshiTest.java</include>
+                        <include>**/common/os/OSUtilsTest.java</include>
+                        <include>**/common/shell/ShellExecutorTest.java</include>
+                        <include>**/common/task/EntityTestUtils.java</include>
+                        <include>**/common/task/FlinkParametersTest.java</include>
+                        <include>**/common/task/SqoopParameterEntityTest.java</include>
+                        <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
+                        <include>**/common/threadutils/ThreadUtilsTest.java</include>
+                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
+                        <include>**/common/utils/CollectionUtilsTest.java</include>
+                        <include>**/common/utils/CommonUtilsTest.java</include>
+                        <include>**/common/utils/DateUtilsTest.java</include>
+                        <include>**/common/utils/DependentUtilsTest.java</include>
+                        <include>**/common/utils/EncryptionUtilsTest.java</include>
+                        <include>**/common/utils/FileUtilsTest.java</include>
+                        <include>**/common/utils/IpUtilsTest.java</include>
+                        <include>**/common/utils/JSONUtilsTest.java</include>
+                        <include>**/common/utils/LoggerUtilsTest.java</include>
+                        <include>**/common/utils/OSUtilsTest.java</include>
+                        <include>**/common/utils/ParameterUtilsTest.java</include>
+                        <include>**/common/utils/PreconditionsTest.java</include>
+                        <include>**/common/utils/PropertyUtilsTest.java</include>
+                        <include>**/common/utils/SchemaUtilsTest.java</include>
+                        <include>**/common/utils/ScriptRunnerTest.java</include>
+                        <include>**/common/utils/SensitiveLogUtilsTest.java</include>
+                        <include>**/common/utils/StringTest.java</include>
+                        <include>**/common/utils/StringUtilsTest.java</include>
+                        <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/HadoopUtilsTest.java</include>
+                        <include>**/common/utils/HttpUtilsTest.java</include>
+                        <include>**/common/ConstantsTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
-                        <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
-                        <include>**/dao/entity/TaskInstanceTest.java</include>
-                        <include>**/dao/cron/CronUtilsTest.java</include>
-                        <include>**/dao/utils/DagHelperTest.java</include>
-                        <include>**/alert/template/AlertTemplateFactoryTest.java</include>
-                        <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
-                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
-                        <include>**/server/worker/task/shell/ShellTaskTest.java</include>
-                        <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
-                        <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
+                        <include>**/dao/mapper/ConnectionFactoryTest.java</include>
+                        <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/remote/FastJsonSerializerTest.java</include>
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/remote/ResponseFutureTest.java</include>
+                        <include>**/server/log/MasterLogFilterTest.java</include>
+                        <include>**/server/log/SensitiveDataConverterTest.java</include>
+                        <include>**/server/log/TaskLogDiscriminatorTest.java</include>
+                        <include>**/server/log/TaskLogFilterTest.java</include>
+                        <include>**/server/log/WorkerLogFilterTest.java</include>
+                        <include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/AlertManagerTest.java</include>
+                        <include>**/server/master/MasterCommandTest.java</include>
+                        <include>**/server/master/DependentTaskTest.java</include>
+                        <include>**/server/master/ConditionsTaskTest.java</include>
+                        <include>**/server/master/MasterExecThreadTest.java</include>
+                        <include>**/server/master/ParamsTest.java</include>
+                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
+                        <include>**/server/utils/ExecutionContextTestUtils.java</include>
+                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
+                        <include>**/server/utils/ParamUtilsTest.java</include>
+                        <include>**/server/utils/ProcessUtilsTest.java</include>
+                        <include>**/server/utils/SparkArgsUtilsTest.java</include>
+                        <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
+                        <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
+                        <include>**/server/worker/sql/SqlExecutorTest.java</include>
+                        <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/task/EnvFileTest.java</include>
+                        <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/EnvFileTest.java</include>
+                        <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
-                        <include>**/dao/datasource/BaseDataSourceTest.java</include>
-                        <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/service/zk/ZKServerTest.java</include>
+                        <include>**/service/queue/TaskUpdateQueueTest.java</include>
+
+                        <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ErrorCommandMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectUserMapperTest.java</include>
+                        <include>**/dao/mapper/QueueMapperTest.java</include>
+                        <!--<include>**/dao/mapper/ResourceMapperTest.java</include>-->
+                        <include>**/dao/mapper/ResourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ScheduleMapperTest.java</include>
+                        <include>**/dao/mapper/SessionMapperTest.java</include>
+                        <include>**/dao/mapper/TaskInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/TenantMapperTest.java</include>
+                        <include>**/dao/mapper/UdfFuncMapperTest.java</include>
+                        <include>**/dao/mapper/UDFUserMapperTest.java</include>
+                        <include>**/dao/mapper/UserAlertGroupMapperTest.java</include>
+                        <include>**/dao/mapper/UserMapperTest.java</include>
+                        <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
@@ -798,6 +880,8 @@
                         <exclude>**/docs/**</exclude>
                         <exclude>**/*.babelrc</exclude>
                         <exclude>**/*.eslintrc</exclude>
+                        <exclude>**/.mvn/jvm.config</exclude>
+                        <exclude>**/.mvn/wrapper/maven-wrapper.properties</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
