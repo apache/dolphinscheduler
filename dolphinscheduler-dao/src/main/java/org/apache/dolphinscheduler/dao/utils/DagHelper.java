@@ -361,4 +361,48 @@ public class DagHelper {
         processDag.setNodes(taskNodeList);
         return processDag;
     }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  DAG<String, TaskNode, TaskNodeRelation> dag
+                                            ){
+        boolean result = false;
+        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeName);
+        if(CollectionUtils.isEmpty(subsequentNodes)){
+            return result;
+        }
+        for(String nodeName : subsequentNodes){
+            TaskNode taskNode = dag.getNode(nodeName);
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  List<TaskNode> taskNodes
+    ){
+        boolean result = false;
+        if(CollectionUtils.isEmpty(taskNodes)){
+            return result;
+        }
+        for(TaskNode taskNode : taskNodes){
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
+    }
 }
