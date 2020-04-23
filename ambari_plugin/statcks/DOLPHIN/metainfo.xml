@@ -20,7 +20,7 @@
   <services>
     <service>
       <name>DOLPHIN</name>
-      <extends>common-services/DOLPHIN/1.2.1</extends>
+      <extends>common-services/DOLPHIN/2.0.0</extends>
     </service>
   </services>
 </metainfo>

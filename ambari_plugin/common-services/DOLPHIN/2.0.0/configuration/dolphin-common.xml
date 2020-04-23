@@ -16,74 +16,7 @@
   -->
 <configuration>
     <property>
-        <name>dolphinscheduler.queue.impl</name>
-        <value>zookeeper</value>
-        <description>
-            Task queue implementation, default "zookeeper"
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.dolphinscheduler.root</name>
-        <value>/dolphinscheduler</value>
-        <description>
-            dolphinscheduler root directory
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.session.timeout</name>
-        <value>300</value>
-        <value-attributes>
-            <type>int</type>
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.connection.timeout</name>
-        <value>30000</value>
-        <value-attributes>
-            <type>int</type>
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.retry.base.sleep</name>
-        <value>100</value>
-        <value-attributes>
-            <type>int</type>
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.retry.max.sleep</name>
-        <value>30000</value>
-        <value-attributes>
-            <type>int</type>
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>zookeeper.retry.maxtime</name>
-        <value>10</value>
-        <value-attributes>
-            <type>int</type>
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-
-    <property>
-        <name>res.upload.startup.type</name>
+        <name>resource.storage.type</name>
         <display-name>Choose Resource Upload Startup Type</display-name>
         <description>
             Resource upload startup type : HDFS,S3,NONE
@@ -110,20 +43,10 @@
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
-        <name>hdfs.root.user</name>
-        <value>hdfs</value>
-        <description>
-            Users who have permission to create directories under the HDFS root path
-        </description>
-        <on-ambari-upgrade add="true"/>
-    </property>
-    <property>
-        <name>data.store2hdfs.basepath</name>
+        <name>resource.upload.path</name>
         <value>/dolphinscheduler</value>
         <description>
-            Data base dir, resource file will store to this hadoop hdfs path, self configuration,
-            please make sure the directory exists on hdfs and have read write permissions。
-            "/dolphinscheduler" is recommended
+            resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
@@ -131,11 +54,11 @@
         <name>data.basedir.path</name>
         <value>/tmp/dolphinscheduler</value>
         <description>
-            User data directory path, self configuration,
-            please make sure the directory exists and have read write permissions
+            user data local directory path, please make sure the directory exists and have read write permissions
         </description>
         <on-ambari-upgrade add="true"/>
     </property>
+
     <property>
         <name>hadoop.security.authentication.startup.state</name>
         <value>false</value>
@@ -153,7 +76,7 @@
             </entries>
             <selection-cardinality>1</selection-cardinality>
         </value-attributes>
-        <on-ambari-upgrade add="true"/>
+        <description>whether kerberos starts</description>
     </property>
     <property>
         <name>java.security.krb5.conf.path</name>
@@ -183,6 +106,13 @@
         <name>resource.view.suffixs</name>
         <value>txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties</value>
         <description></description>
+    </property>
+    <property>
+        <name>hdfs.root.user</name>
+        <value>hdfs</value>
+        <description>
+            Users who have permission to create directories under the HDFS root path
+        </description>
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
@@ -220,13 +150,9 @@
         <on-ambari-upgrade add="true"/>
     </property>
     <property>
-        <name>loggerserver.rpc.port</name>
-        <value>50051</value>
-        <value-attributes>
-            <type>int</type>F
-        </value-attributes>
-        <description>
-        </description>
-        <on-ambari-upgrade add="true"/>
+        <name>kerberos.expire.time</name>
+        <value>7</value>
+        <description></description>
     </property>
+
 </configuration>
