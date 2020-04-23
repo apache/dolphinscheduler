@@ -1,0 +1,116 @@
+#!/bin/sh
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+usage="Usage: dolphinscheduler-daemon.sh (start|stop) <command> "
+
+# if no args specified, show usage
+if [ $# -le 1 ]; then
+  echo $usage
+  exit 1
+fi
+
+startStop=$1
+shift
+command=$1
+shift
+
+echo "Begin $startStop $command......"
+
+BIN_DIR=`dirname $0`
+BIN_DIR=`cd "$BIN_DIR"; pwd`
+DOLPHINSCHEDULER_HOME=$BIN_DIR/..
+
+export HOSTNAME=`hostname`
+
+DOLPHINSCHEDULER_LIB_JARS={{dolphin_lib_jars}}
+
+DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms4g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
+STOP_TIMEOUT=5
+
+log={{dolphin_log_dir}}/dolphinscheduler-$command-$HOSTNAME.out
+pid={{dolphin_pidfile_dir}}/$command.pid
+
+cd $DOLPHINSCHEDULER_HOME
+
+if [ "$command" = "api-server" ]; then
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-api.xml -Dspring.profiles.active=api"
+  CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
+elif [ "$command" = "master-server" ]; then
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-master.xml -Ddruid.mysql.usePingMethod=false"
+  CLASS=org.apache.dolphinscheduler.server.master.MasterServer
+elif [ "$command" = "worker-server" ]; then
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-worker.xml -Ddruid.mysql.usePingMethod=false"
+  CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
+elif [ "$command" = "alert-server" ]; then
+  LOG_FILE="-Dlogging.config={{dolphin_conf_dir}}/logback-alert.xml"
+  CLASS=org.apache.dolphinscheduler.alert.AlertServer
+elif [ "$command" = "logger-server" ]; then
+  CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
+else
+  echo "Error: No command named \`$command' was found."
+  exit 1
+fi
+
+case $startStop in
+  (start)
+
+    if [ -f $pid ]; then
+      if kill -0 `cat $pid` > /dev/null 2>&1; then
+        echo $command running as process `cat $pid`.  Stop it first.
+        exit 1
+      fi
+    fi
+
+    echo starting $command, logging to $log
+
+    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath {{dolphin_conf_dir}}:{{dolphin_lib_jars}} $CLASS"
+
+    echo "nohup java $exec_command > $log 2>&1 < /dev/null &"
+    nohup java $exec_command > $log 2>&1 < /dev/null &
+    echo $! > $pid
+    ;;
+
+  (stop)
+
+      if [ -f $pid ]; then
+        TARGET_PID=`cat $pid`
+        if kill -0 $TARGET_PID > /dev/null 2>&1; then
+          echo stopping $command
+          kill $TARGET_PID
+          sleep $STOP_TIMEOUT
+          if kill -0 $TARGET_PID > /dev/null 2>&1; then
+            echo "$command did not stop gracefully after $STOP_TIMEOUT seconds: killing with kill -9"
+            kill -9 $TARGET_PID
+          fi
+        else
+          echo no $command to stop
+        fi
+        rm -f $pid
+      else
+        echo no $command to stop
+      fi
+      ;;
+
+  (*)
+    echo $usage
+    exit 1
+    ;;
+
+esac
+
+echo "End $startStop $command."
