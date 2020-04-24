@@ -44,7 +44,7 @@
     <m-list-box>
       <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
-        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :value-consists-of="valueConsistsOf"  :placeholder="$t('Please enter main jar package')">
+        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails"  :placeholder="$t('Please enter main jar package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -424,6 +424,14 @@
           float: left;
           margin-right: 4px;
         }
+      }
+    }
+  }
+  .vue-treeselect--disabled {
+    .vue-treeselect__control {
+      background-color: #ecf3f8;
+      .vue-treeselect__single-value {
+        color: #6d859e;
       }
     }
   }

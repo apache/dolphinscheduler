@@ -14,23 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if .Values.worker.configmap }}
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
-    app.kubernetes.io/instance: {{ .Release.Name }}-worker-headless
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  clusterIP: "None"
-  ports:
-    - port: 50051
-      targetPort: logs-port
-      protocol: TCP
-      name: logs-port
-  selector:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: worker
+data:
+  WORKER_EXEC_THREADS: {{ .Values.worker.configmap.WORKER_EXEC_THREADS | quote }}
+  WORKER_HEARTBEAT_INTERVAL: {{ .Values.worker.configmap.WORKER_HEARTBEAT_INTERVAL | quote }}
+  WORKER_FETCH_TASK_NUM: {{ .Values.worker.configmap.WORKER_FETCH_TASK_NUM | quote }}
+  WORKER_MAX_CPULOAD_AVG: {{ .Values.worker.configmap.WORKER_MAX_CPULOAD_AVG | quote }}
+  WORKER_RESERVED_MEMORY: {{ .Values.worker.configmap.WORKER_RESERVED_MEMORY | quote }}
+  WORKER_LISTEN_PORT: {{ .Values.worker.configmap.WORKER_LISTEN_PORT | quote }}
+  WORKER_GROUP: {{ .Values.worker.configmap.WORKER_GROUP | quote }}
+  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
+  dolphinscheduler_env.sh: |-
+  {{- range .Values.worker.configmap.DOLPHINSCHEDULER_ENV }}
+    {{ . }}
+  {{- end }}
+{{- end }}
