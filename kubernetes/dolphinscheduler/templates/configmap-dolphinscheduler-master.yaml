@@ -31,4 +31,6 @@ data:
   MASTER_TASK_COMMIT_INTERVAL: {{ .Values.master.configmap.MASTER_TASK_COMMIT_INTERVAL | quote }}
   MASTER_MAX_CPULOAD_AVG: {{ .Values.master.configmap.MASTER_MAX_CPULOAD_AVG | quote }}
   MASTER_RESERVED_MEMORY: {{ .Values.master.configmap.MASTER_RESERVED_MEMORY | quote }}
+  MASTER_LISTEN_PORT: {{ .Values.master.configmap.MASTER_LISTEN_PORT | quote }}
+  DOLPHINSCHEDULER_DATA_BASEDIR_PATH: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
 {{- end }}
