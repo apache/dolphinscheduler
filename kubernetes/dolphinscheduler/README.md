@@ -16,7 +16,9 @@ To install the chart with the release name `my-release`:
 
 ```bash
 $ git clone https://github.com/apache/incubator-dolphinscheduler.git
-$ cd incubator-dolphinscheduler
+$ cd incubator-dolphinscheduler/kubernetes/dolphinscheduler
+$ helm repo add bitnami https://charts.bitnami.com/bitnami
+$ helm dependency update .
 $ helm install --name dolphinscheduler .
 ```
 These commands deploy Dolphin Scheduler on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists the parameters that can be configured during installation.

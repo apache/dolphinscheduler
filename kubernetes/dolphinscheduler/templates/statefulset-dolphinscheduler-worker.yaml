@@ -109,6 +109,8 @@ spec:
           args:
             - "worker-server"
           ports:
+            - containerPort: {{ .Values.worker.configmap.WORKER_LISTEN_PORT }}
+              name: "worker-port"
             - containerPort: 50051
               name: "logs-port"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -140,6 +142,21 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: WORKER_RESERVED_MEMORY
+            - name: WORKER_LISTEN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_LISTEN_PORT
+            - name: WORKER_GROUP
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_GROUP
+            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
             - name: POSTGRESQL_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
@@ -168,12 +185,6 @@ spec:
                   name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
                   key: db-password
             {{- end }}
-            - name: TASK_QUEUE
-              {{- if .Values.zookeeper.enabled }}
-              value: {{ .Values.zookeeper.taskQueue }}
-              {{- else }}
-              value: {{ .Values.externalZookeeper.taskQueue }}
-              {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
               value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
@@ -186,7 +197,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
+                - WorkerServer
             initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
@@ -199,7 +210,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - worker-server
+                - WorkerServer
             initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
@@ -247,7 +258,7 @@ spec:
           app.kubernetes.io/managed-by: {{ .Release.Service }}
       spec:
         accessModes:
-          {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
+        {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
           - {{ . | quote }}
         {{- end }}
         storageClassName: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storageClassName | quote }}
@@ -264,7 +275,7 @@ spec:
           app.kubernetes.io/managed-by: {{ .Release.Service }}
       spec:
         accessModes:
-          {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
+        {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
           - {{ . | quote }}
         {{- end }}
         storageClassName: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storageClassName | quote }}
