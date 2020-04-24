@@ -95,6 +95,30 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
+     * copy process definition
+     *
+     * @param loginUser   login user
+     * @param projectName project name
+     * @param processId   process definition id
+     * @return copy result code
+     */
+    @ApiOperation(value = "copyProcessDefinition", notes= "COPY_PROCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+    })
+    @PostMapping(value = "/copy")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(COPY_PROCESS_DEFINITION_ERROR)
+    public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @RequestParam(value = "processId", required = true) int processId) throws JsonProcessingException {
+        logger.info("copy process definition, login user:{}, project name:{}, process definition id:{}",
+                loginUser.getUserName(), projectName, processId);
+        Map<String, Object> result = processDefinitionService.copyProcessDefinition(loginUser, projectName, processId);
+        return returnDataList(result);
+    }
+
+    /**
      * verify process definition name unique
      *
      * @param loginUser   login user
