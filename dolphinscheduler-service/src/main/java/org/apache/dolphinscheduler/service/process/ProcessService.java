@@ -1021,9 +1021,9 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState){
         ExecutionStatus state = taskInstance.getState();
         if(
-            // running or killed
-            // the task already exists in task queue
-            // return state
+                // running or killed
+                // the task already exists in task queue
+                // return state
                 state == ExecutionStatus.RUNNING_EXEUTION
                         || state == ExecutionStatus.KILL
                         || checkTaskExistsInTaskQueue(taskInstance)
@@ -1208,7 +1208,7 @@ public class ProcessService {
      * @return task instance list
      */
     public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId){
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
+         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
     }
 
     /**
