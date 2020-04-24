@@ -1,0 +1,9 @@
+dependencies:
+- name: postgresql
+  version: 8.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
+- name: zookeeper
+  version: 5.x.x
+  repository: https://charts.bitnami.com/bitnami
+  condition: redis.enabled
