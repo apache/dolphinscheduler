@@ -25,10 +25,10 @@ metadata:
 spec:
   clusterIP: "None"
   ports:
-    - port: 8888
-      targetPort: tcp-port
+    - port: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+      targetPort: master-port
       protocol: TCP
-      name: unused-tcp-port
+      name: master-port
   selector:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
     app.kubernetes.io/instance: {{ .Release.Name }}
