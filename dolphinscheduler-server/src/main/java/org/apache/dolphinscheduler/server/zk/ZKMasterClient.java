@@ -298,6 +298,9 @@ public class ZKMasterClient extends AbstractZKClient {
 		logger.info("start worker[{}] failover ...", workerHost);
 
 		List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
+
+		logger.info("需要容错的任务是: " + needFailoverTaskInstanceList);
+
 		for(TaskInstance taskInstance : needFailoverTaskInstanceList){
 			if(needCheckWorkerAlive){
 				if(!checkTaskInstanceNeedFailover(taskInstance)){
@@ -317,6 +320,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			// only kill yarn job if exists , the local thread has exited
 			ProcessUtils.killYarnJob(taskExecutionContext);
 
+			logger.info("修改任务的状态为容错的任务实例是: " + taskInstance);
 			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
 			processService.saveTaskInstance(taskInstance);
 		}
@@ -332,6 +336,8 @@ public class ZKMasterClient extends AbstractZKClient {
 		logger.info("start master failover ...");
 
 		List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
+
+		logger.info("需要容错的流程是: " + needFailoverProcessInstanceList);
 
 		//updateProcessInstance host is null and insert into command
 		for(ProcessInstance processInstance : needFailoverProcessInstanceList){

@@ -1445,6 +1445,7 @@ public class ProcessService {
         cmd.setCommandParam(String.format("{\"%s\":%d}", Constants.CMDPARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
+        logger.info("路程容错插入的command  : " + cmd);
         createCommand(cmd);
     }
 
