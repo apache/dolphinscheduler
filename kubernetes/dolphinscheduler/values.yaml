@@ -27,7 +27,7 @@ timezone: "Asia/Shanghai"
 image:
   registry: "docker.io"
   repository: "dolphinscheduler"
-  tag: "1.2.1"
+  tag: "1.3.0"
   pullPolicy: "IfNotPresent"
 
 imagePullSecrets: []
@@ -56,6 +56,8 @@ externalDatabase:
 zookeeper:
   enabled: true
   taskQueue: "zookeeper"
+  service:
+    port: "2181"
   persistence:
     enabled: false
     size: "20Gi"
@@ -91,6 +93,7 @@ master:
     MASTER_TASK_COMMIT_INTERVAL: "1000"
     MASTER_MAX_CPULOAD_AVG: "100"
     MASTER_RESERVED_MEMORY: "0.1"
+    MASTER_LISTEN_PORT: "5678"
   livenessProbe:
     enabled: true
     initialDelaySeconds: "30"
@@ -156,6 +159,8 @@ worker:
     WORKER_FETCH_TASK_NUM: "3"
     WORKER_MAX_CPULOAD_AVG: "100"
     WORKER_RESERVED_MEMORY: "0.1"
+    WORKER_LISTEN_PORT: "1234"
+    WORKER_GROUP: "default"
     DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     DOLPHINSCHEDULER_ENV:
     - "export HADOOP_HOME=/opt/soft/hadoop"
