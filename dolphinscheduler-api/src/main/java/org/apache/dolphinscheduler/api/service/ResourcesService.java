@@ -47,6 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -361,10 +362,11 @@ public class ResourcesService extends BaseService {
         try {
             resourcesMapper.updateById(resource);
             if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
+                String matcherFullName = Matcher.quoteReplacement(fullName);
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
+                    t.setFullName(t.getFullName().replaceFirst(oldFullName, matcherFullName));
                     t.setUpdateTime(now);
                     return t;
                 }).collect(Collectors.toList());
@@ -401,6 +403,7 @@ public class ResourcesService extends BaseService {
             } else {
                 logger.error("{} not exist", originHdfsFileName);
                 putMsg(result,Status.RESOURCE_NOT_EXIST);
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST);
             }
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
