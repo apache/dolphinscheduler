@@ -623,7 +623,7 @@ CREATE TABLE t_ds_user (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   queue varchar(64) DEFAULT NULL ,
-  state int(1) DEFAULT 1 ,
+  state int DEFAULT 1 ,
   PRIMARY KEY (id)
 );
 

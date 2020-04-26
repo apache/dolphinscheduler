@@ -376,7 +376,7 @@ BEGIN
           AND TABLE_NAME='t_ds_user'
           AND COLUMN_NAME ='state')
       THEN
-         ALTER TABLE t_ds_user ADD COLUMN state int(1) DEFAULT 1;
+         ALTER TABLE t_ds_user ADD COLUMN state int DEFAULT 1;
        END IF;
 END;
 $$ LANGUAGE plpgsql;
