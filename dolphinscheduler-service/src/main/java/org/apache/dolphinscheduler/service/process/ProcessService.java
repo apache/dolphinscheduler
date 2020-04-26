@@ -119,6 +119,10 @@ public class ProcessService {
             logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
+        if (command.getCommandType().equals(processInstance.getCommandType())){
+            delCommandByid(command.getId());
+            return null;
+        }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
