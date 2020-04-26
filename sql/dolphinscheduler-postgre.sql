@@ -238,7 +238,6 @@ CREATE TABLE t_ds_command (
   PRIMARY KEY (id)
 ) ;
 
-CREATE UNIQUE INDEX uk_command_type_process_definition_id ON t_ds_command (command_type,process_definition_id);
 --
 -- Table structure for table t_ds_datasource
 --

@@ -364,18 +364,3 @@ select dc_dolphin_T_t_ds_error_command_D_worker_group_id();
 DROP FUNCTION dc_dolphin_T_t_ds_error_command_D_worker_group_id();
 
 
--- dc_dolphin_T_t_ds_command_D_uk_command_type_process_definition_id
-drop PROCEDURE if EXISTS ai_dolphin_T_t_ds_command_A_uk;
-delimiter d//
-CREATE PROCEDURE ai_dolphin_T_t_ds_command_A_uk()
-   BEGIN
-       CREATE UNIQUE INDEX uk_command_type_process_definition_id ON t_ds_command (command_type,process_definition_id);
- END;
-
-d//
-
-delimiter ;
-select ai_dolphin_T_t_ds_command_A_uk;
-DROP PROCEDURE ai_dolphin_T_t_ds_command_A_uk;
-
-
