@@ -70,10 +70,10 @@ initZK() {
             while ! nc -z ${line%:*} ${line#*:}; do
                 counter=$((counter+1))
                 if [ $counter == 30 ]; then
-                    log "Error: Couldn't connect to zookeeper."
+                    echo "Error: Couldn't connect to zookeeper."
                     exit 1
                 fi
-                log "Trying to connect to zookeeper at ${line}. Attempt $counter."
+                echo "Trying to connect to zookeeper at ${line}. Attempt $counter."
                 sleep 5
             done
         done
