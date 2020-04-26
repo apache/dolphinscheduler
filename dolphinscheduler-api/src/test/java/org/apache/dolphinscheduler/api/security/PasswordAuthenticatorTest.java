@@ -67,6 +67,7 @@ public class PasswordAuthenticatorTest {
         mockUser.setEmail("test@test.com");
         mockUser.setUserPassword("test");
         mockUser.setId(1);
+        mockUser.setState(1);
 
         mockSession = new Session();
         mockSession.setId(UUID.randomUUID().toString());

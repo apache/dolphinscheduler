@@ -483,6 +483,7 @@ public class UsersServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         user.setUserName("userTest0001");
         user.setUserPassword("userTest0001");
+        user.setState(1);
         return user;
     }
 

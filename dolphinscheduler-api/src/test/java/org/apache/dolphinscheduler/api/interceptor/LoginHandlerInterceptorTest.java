@@ -68,5 +68,10 @@ public class LoginHandlerInterceptorTest {
         when(request.getHeader("token")).thenReturn(token);
         when(userMapper.queryUserByToken(token)).thenReturn(mockUser);
         Assert.assertTrue(interceptor.preHandle(request, response, null));
+
+        // test disable user
+        mockUser.setState(0);
+        when(authenticator.getAuthUser(request)).thenReturn(mockUser);
+        Assert.assertFalse(interceptor.preHandle(request, response, null));
     }
 }
