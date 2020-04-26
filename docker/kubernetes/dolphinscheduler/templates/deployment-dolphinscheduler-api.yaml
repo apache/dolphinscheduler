@@ -99,19 +99,19 @@ spec:
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
               {{- else }}
               value: {{ .Values.externalDatabase.host | quote }}
-            {{- end }}
+              {{- end }}
             - name: POSTGRESQL_PORT
               {{- if .Values.postgresql.enabled }}
               value: "5432"
               {{- else }}
               value: {{ .Values.externalDatabase.port }}
-            {{- end }}
+              {{- end }}
             - name: POSTGRESQL_USERNAME
               {{- if .Values.postgresql.enabled }}
               value: {{ .Values.postgresql.postgresqlUsername }}
               {{- else }}
               value: {{ .Values.externalDatabase.username | quote }}
-            {{- end }}
+              {{- end }}
             - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -122,6 +122,12 @@ spec:
                   name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
                   key: db-password
                   {{- end }}
+            - name: POSTGRESQL_DATABASE
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlDatabase }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.database | quote }}
+              {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
               value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
