@@ -131,19 +131,3 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- $name := default "/tmp/dolphinscheduler" .Values.worker.configmap.DOLPHINSCHEDULER_DATA_BASEDIR_PATH -}}
 {{- printf "%s" $name | trunc 63 | trimSuffix "/" -}}
 {{- end -}}
-
-{{/*
-Create a default dolphinscheduler worker data download dir.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "dolphinscheduler.worker.data.download.dir" -}}
-{{- printf "%s%s" (include "dolphinscheduler.worker.base.dir" .) "/download" -}}
-{{- end -}}
-
-{{/*
-Create a default dolphinscheduler worker process exec dir.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "dolphinscheduler.worker.process.exec.dir" -}}
-{{- printf "%s%s" (include "dolphinscheduler.worker.base.dir" .) "/exec" -}}
-{{- end -}}

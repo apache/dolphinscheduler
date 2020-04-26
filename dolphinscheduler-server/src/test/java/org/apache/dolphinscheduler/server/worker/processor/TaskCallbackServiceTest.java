@@ -133,8 +133,6 @@ public class TaskCallbackServiceTest {
         nettyRemotingClient.close();
     }
 
-
-
     @Test(expected = IllegalArgumentException.class)
     public void testSendAckWithIllegalArgumentException(){
         TaskExecuteAckCommand ackCommand = Mockito.mock(TaskExecuteAckCommand.class);
@@ -178,39 +176,40 @@ public class TaskCallbackServiceTest {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testSendAckWithIllegalStateException2(){
-        masterRegistry.registry();
-        final NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(30000);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
-        nettyRemotingServer.start();
+//    @Test(expected = IllegalStateException.class)
+//    public void testSendAckWithIllegalStateException2(){
+//        masterRegistry.registry();
+//        final NettyServerConfig serverConfig = new NettyServerConfig();
+//        serverConfig.setListenPort(30000);
+//        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
+//        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
+//        nettyRemotingServer.start();
+//
+//        final NettyClientConfig clientConfig = new NettyClientConfig();
+//        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
+//        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
+//        taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
+//        channel.close();
+//        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
+//        ackCommand.setTaskInstanceId(1);
+//        ackCommand.setStartTime(new Date());
+//
+//        nettyRemotingServer.close();
+//
+//        taskCallbackService.sendAck(1, ackCommand.convert2Command());
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Stopper.stop();
+//
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-        final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
-        taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-        channel.close();
-        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
-        ackCommand.setTaskInstanceId(1);
-        ackCommand.setStartTime(new Date());
-
-        nettyRemotingServer.close();
-
-        taskCallbackService.sendAck(1, ackCommand.convert2Command());
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Stopper.stop();
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

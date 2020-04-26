@@ -199,6 +199,47 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    public void testCopyProcessDefinition()  throws Exception{
+        String projectName = "project_test1";
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+
+        Project project = getProject(projectName);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>(5);
+        //project check auth success, instance not exist
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+
+        ProcessDefinition definition = getProcessDefinition();
+        definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
+        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
+        definition.setConnects("[]");
+        //instance exit
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
+
+        Map<String, Object> createProcessResult = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.createProcessDefinition(
+                loginUser,
+                definition.getProjectName(),
+                definition.getName(),
+                definition.getProcessDefinitionJson(),
+                definition.getDescription(),
+                definition.getLocations(),
+                definition.getConnects())).thenReturn(createProcessResult);
+
+        Map<String, Object> successRes = processDefinitionService.copyProcessDefinition(loginUser,
+                "project_test1", 46);
+
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
     public void deleteProcessDefinitionByIdTest() throws Exception {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
@@ -770,12 +811,14 @@ public class ProcessDefinitionServiceTest {
      * @return ProcessDefinition
      */
     private ProcessDefinition getProcessDefinition(){
+
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectId(2);
         processDefinition.setTenantId(1);
         processDefinition.setDescription("");
+
         return  processDefinition;
     }
 
