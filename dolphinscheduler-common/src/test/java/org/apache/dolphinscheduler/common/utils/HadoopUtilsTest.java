@@ -68,7 +68,7 @@ public class HadoopUtilsTest {
     public void mkdir()  {
         boolean result = false;
         try {
-            result = hadoopUtils.mkdir("/journey/test");
+            result = hadoopUtils.mkdir("/dolphinscheduler/hdfs");
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
