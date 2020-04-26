@@ -174,6 +174,21 @@ public class ProcessDefinitionControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
 
+    @Test
+    public void testCopyProcessDefinition() throws Exception {
+
+        String projectName = "test";
+        int id = 1;
+
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.copyProcessDefinition(user, projectName,id)).thenReturn(result);
+        Result response = processDefinitionController.copyProcessDefinition(user, projectName,id);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
 
     @Test
     public void testQueryProcessDefinitionList() throws Exception {
