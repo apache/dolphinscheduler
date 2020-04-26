@@ -103,7 +103,7 @@
                     <osFamily>any</osFamily>
                     <packages>
                         <package>
-                            <name>apache-dolphinscheduler-incubating-1.2.1*</name>
+                            <name>apache-dolphinscheduler-incubating-1.3.0*</name>
                         </package>
                     </packages>
                 </osSpecific>

@@ -38,7 +38,7 @@
         "enabled": true,
         "source": {
           "type": "SCRIPT",
-          "path": "DOLPHIN/2.0.0/package/alerts/alert_dolphin_scheduler_status.py",
+          "path": "DOLPHIN/1.3.0/package/alerts/alert_dolphin_scheduler_status.py",
           "parameters": [
 
             {
@@ -71,7 +71,7 @@
         "enabled": true,
         "source": {
           "type": "SCRIPT",
-          "path": "DOLPHIN/2.0.0/package/alerts/alert_dolphin_scheduler_status.py",
+          "path": "DOLPHIN/1.3.0/package/alerts/alert_dolphin_scheduler_status.py",
           "parameters": [
 
             {
@@ -104,7 +104,7 @@
         "enabled": true,
         "source": {
           "type": "SCRIPT",
-          "path": "DOLPHIN/2.0.0/package/alerts/alert_dolphin_scheduler_status.py",
+          "path": "DOLPHIN/1.3.0/package/alerts/alert_dolphin_scheduler_status.py",
           "parameters": [
 
             {
@@ -137,7 +137,7 @@
         "enabled": true,
         "source": {
           "type": "SCRIPT",
-          "path": "DOLPHIN/2.0.0/package/alerts/alert_dolphin_scheduler_status.py",
+          "path": "DOLPHIN/1.3.0/package/alerts/alert_dolphin_scheduler_status.py",
           "parameters": [
 
             {
