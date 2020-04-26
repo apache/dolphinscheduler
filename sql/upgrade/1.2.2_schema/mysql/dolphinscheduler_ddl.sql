@@ -367,7 +367,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_user_A_state()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='state')
    THEN
-         ALTER TABLE t_ds_user ADD `state` int(1) DEFAULT 1 COMMENT 'state 0:off 1:on';
+         ALTER TABLE t_ds_user ADD `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable';
        END IF;
  END;
 

@@ -171,13 +171,11 @@ public enum Status {
     DELETE_TENANT_BY_ID_FAIL(10142,"delete tenant by id fail, for there are {0} process instances in executing using it", "删除租户失败，有[{0}]个运行中的工作流实例正在使用"),
     DELETE_TENANT_BY_ID_FAIL_DEFINES(10143,"delete tenant by id fail, for there are {0} process definitions using it", "删除租户失败，有[{0}]个工作流定义正在使用"),
     DELETE_TENANT_BY_ID_FAIL_USERS(10144,"delete tenant by id fail, for there are {0} users using it", "删除租户失败，有[{0}]个用户正在使用"),
-
     DELETE_WORKER_GROUP_BY_ID_FAIL(10145,"delete worker group by id fail, for there are {0} process instances in executing using it", "删除Worker分组失败，有[{0}]个运行中的工作流实例正在使用"),
-
     QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
-
-    USER_DISABLED(10148,"The current user is disabled", "当前用户已停用"),
+    COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
+    USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
