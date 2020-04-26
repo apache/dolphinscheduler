@@ -57,6 +57,7 @@ public class LoginHandlerInterceptorTest {
         User mockUser = new User();
         mockUser.setId(1);
         mockUser.setUserType(UserType.GENERAL_USER);
+        mockUser.setState(1);
 
         // test no token
         when(authenticator.getAuthUser(request)).thenReturn(mockUser);
