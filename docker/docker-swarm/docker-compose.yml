@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-version: "3"
+version: "3.4"
 
 networks:
   dolphinscheduler-postgresql:
@@ -41,7 +41,10 @@ volumes:
   dolphinscheduler-master:
   dolphinscheduler-worker-data:
   dolphinscheduler-worker-logs:
+
+configs:
   dolphinscheduler-worker-task-env:
+    file: ./dolphinscheduler_env.sh
 
 services:
 
@@ -136,6 +139,7 @@ services:
     volumes:
     - dolphinscheduler-frontend:/var/log/nginx
     networks:
+    - dolphinscheduler-frontend
     - dolphinscheduler-api
 
   dolphinscheduler-alert:
@@ -209,7 +213,8 @@ services:
     - dolphinscheduler-zookeeper
     volumes: 
     - dolphinscheduler-master:/opt/dolphinscheduler/logs
-    networks: 
+    networks:
+    - dolphinscheduler-master
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
 
@@ -247,7 +252,10 @@ services:
     volumes: 
     - dolphinscheduler-worker-data:/tmp/dolphinscheduler
     - dolphinscheduler-worker-logs:/opt/dolphinscheduler/logs
-    - dolphinscheduler-worker-task-env:/opt/dolphinscheduler/conf/env/
-    networks: 
+    configs:
+    - source: dolphinscheduler-worker-task-env
+      target: /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
+    networks:
+    - dolphinscheduler-worker
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
