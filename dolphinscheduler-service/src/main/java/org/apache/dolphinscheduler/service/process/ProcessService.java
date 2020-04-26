@@ -119,7 +119,7 @@ public class ProcessService {
             logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
-        if (command.getCommandType().equals(processInstance.getCommandType())){
+        if (processInstance.getCommandType().equals(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)){
             delCommandByid(command.getId());
             return null;
         }
