@@ -98,7 +98,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if(executorRef == null){
             executorRef = nettyRemotingServer.getDefaultExecutor();
         }
-        this.processors.putIfAbsent(commandType, new Pair<NettyRequestProcessor, ExecutorService>(processor, executorRef));
+        this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
     }
 
     /**
@@ -117,7 +117,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     try {
                         pair.getLeft().process(channel, msg);
                     } catch (Throwable ex) {
-                        logger.error("process msg {} error : {}", msg, ex);
+                        logger.error("process msg {} error", msg, ex);
                     }
                 }
             };
@@ -158,14 +158,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (!ch.isWritable()) {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is not writable, over high water level : {}",
-                        new Object[]{ch, config.getWriteBufferHighWaterMark()});
+                        ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is writable, to low water : {}",
-                        new Object[]{ch, config.getWriteBufferLowWaterMark()});
+                        ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);
         }

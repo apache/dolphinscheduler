@@ -90,7 +90,7 @@
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
         </div>
 
@@ -333,7 +333,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1,
+        workerGroup: 'default',
         stateList:[
           {
             value: 'success',
@@ -430,7 +430,7 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
@@ -455,7 +455,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -470,7 +470,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -519,7 +519,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -611,25 +611,27 @@
           this.failedBranch = o.conditionResult.failedNode[0]
         }
           // If the workergroup has been deleted, set the default workergroup
-          var hasMatch = false;
-          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroupId == workerGroupId) {
-              hasMatch = true;
-              break;
-            }
+        var hasMatch = false;
+        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup == workerGroup) {
+            hasMatch = true;
+            break;
           }
+        }
 
-          if(!hasMatch){
-            this.workerGroupId = -1
-          }else{
-            this.workerGroupId = o.workerGroupId
-          }
+        if(!hasMatch){
+          this.workerGroup = 'default'
+        } else {
+          this.workerGroup = o.workerGroup
+        }
 
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
 
+      } else {
+        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
       this.isContentBox = true
     },
@@ -663,7 +665,7 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId,
+          workerGroup: this.workerGroup,
           successBranch: this.successBranch,
           failedBranch: this.failedBranch
         }
@@ -694,4 +696,9 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "./formModel";
+  .ans-radio-disabled {
+    .ans-radio-inner:after {
+      background-color: #6F8391
+    }
+  }
 </style>

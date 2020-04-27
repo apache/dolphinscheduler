@@ -90,6 +90,7 @@ export default {
       })
     })
   },
+
   /**
    * Get process definition DAG diagram details
    */
@@ -127,6 +128,22 @@ export default {
       })
     })
   },
+
+/**
+   * Get process definition DAG diagram details
+   */
+  copyProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/process/copy`, {
+        processId: payload.processId
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
   /**
    * Get the process instance DAG diagram details
    */
@@ -160,7 +177,7 @@ export default {
         state.tenantId = processInstanceJson.tenantId
 
         //startup parameters
-        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
         state.startup.commandParam = JSON.parse(res.data.commandParam)
 
         resolve(res.data)
@@ -293,7 +310,7 @@ export default {
    */
   getProcessByProjectId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/${state.projectName}/process/queryProccessDefinitionAllByProjectId`, payload, res => {
+      io.get(`projects/${state.projectName}/process/queryProcessDefinitionAllByProjectId`, payload, res => {
         resolve(res.data)
   }).catch(res => {
       reject(res)
@@ -327,6 +344,25 @@ export default {
         type: 'FILE'
       }, res => {
         state.resourcesListS = res.data
+        resolve(res.data)
+      }).catch(res => {
+        reject(res)
+      })
+    })
+  },
+  /**
+   * get jar
+   */
+  getResourcesListJar ({ state }) {
+    return new Promise((resolve, reject) => {
+      if (state.resourcesListJar.length) {
+        resolve()
+        return
+      }
+      io.get(`resources/list/jar`, {
+        type: 'FILE'
+      }, res => {
+        state.resourcesListJar = res.data
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -696,5 +732,14 @@ export default {
         reject(e)
       })
     })
-  }
+  },
+  getResourceId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`resources/queryResource`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
 }

@@ -30,6 +30,15 @@ export default {
       })
     })
   },
+  getResourceId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`resources/queryResource`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
   getResourcesList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`resources/list`, payload, res => {
@@ -154,6 +163,18 @@ export default {
   createResourceFile ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`resources/online-create`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Resource online create folder
+   */
+  createResourceFolder ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`resources/directory/create`, payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

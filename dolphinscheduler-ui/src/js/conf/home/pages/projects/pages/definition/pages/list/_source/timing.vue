@@ -109,7 +109,7 @@
         {{$t('Worker group')}}
       </div>
       <div class="cont">
-        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+        <m-worker-groups v-model="workerGroup"></m-worker-groups>
       </div>
     </div>
     <div class="clearfix list">
@@ -186,7 +186,7 @@
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1,
+        workerGroup: 'default',
         previewTimes: []
       }
     },
@@ -232,7 +232,7 @@
             warningGroupId: this.warningGroupId =='' ? 0 : this.warningGroupId,
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || '',
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup
           }
           let msg = ''
 
@@ -344,7 +344,7 @@
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
-        this.workerGroupId = item.workerGroupId || -1
+        this.workerGroup = item.workerGroup || 'default'
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
@@ -412,5 +412,12 @@
     .list-box {
       padding: 0;
     }
+  }
+  .x-date-packer-panel .x-date-packer-day .lattice label.bg-hover {
+    background: #00BFFF!important; 
+    margin-top: -4px;
+  }
+  .x-date-packer-panel .x-date-packer-day .lattice em:hover {
+    background: #0098e1!important; 
   }
 </style>

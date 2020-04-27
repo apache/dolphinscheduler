@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
@@ -102,7 +103,11 @@ public class ExcelUtils {
 
                for (int i = 0; i < headerList.size(); i++) {
                    sheet.setColumnWidth(i, headerList.get(i).length() * 800);
+               }
 
+               File file = new File(xlsFilePath);
+               if (!file.exists()) {
+                   file.mkdirs();
                }
 
                //setting file output
