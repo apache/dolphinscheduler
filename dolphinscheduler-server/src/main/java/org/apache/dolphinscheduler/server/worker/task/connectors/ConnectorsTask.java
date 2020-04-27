@@ -22,8 +22,6 @@ public class ConnectorsTask extends AbstractTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
-    private volatile boolean done ;
-
     /**
      * init Connectors config
      */
@@ -66,8 +64,6 @@ public class ConnectorsTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         //任务初始化状态
-        done= false ;
-
         String result  = null;
 
         //构建请求参数
@@ -94,7 +90,7 @@ public class ConnectorsTask extends AbstractTask {
 
 
 
-        while (!done){
+        while (!cancel){
 
             //创建任务
             result = HttpUtils.request("GET",connectorsParameters.getStatusUrl(),null,null,bodyParams);
@@ -103,7 +99,7 @@ public class ConnectorsTask extends AbstractTask {
                 Map<String,Object> res = JSONUtils.parseObject(result,Map.class);
 
                 if(null == res.get("status") || "FAILED".equals(res.get("status")) ){
-                    done = true ;
+                    cancel = true ;
                     this.cancelApplication(true);
 
                     //获取错误详情
@@ -113,12 +109,12 @@ public class ConnectorsTask extends AbstractTask {
                 }
 
                 if( "DESTROYED".equals(res.get("status"))){
-                    done = true ;
+                    cancel = true ;
                     logger.warn("this connectorsTask [ {} ]  is destroyed . " ,connectorsParameters.getName() );
                 }
 
                 if( "FINISH".equals(res.get("status"))){
-                    done = true ;
+                    cancel = true ;
                     logger.info("this connectorsTask [ {} ]  is finished . " ,connectorsParameters.getName() );
                 }
             }
