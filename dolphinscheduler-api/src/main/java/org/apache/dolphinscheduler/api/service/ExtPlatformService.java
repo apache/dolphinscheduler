@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -378,15 +379,13 @@ public class ExtPlatformService extends BaseService{
   private String doRequest(ExtPlatformParam extPlatformParam) {
 
     String responseContent = null ;
-    if(ExtHttpType.GET.getCode() == extPlatformParam.getUrlType()){
-      responseContent = HttpUtils.get(extPlatformParam.getUrl());
-    }
-    if(ExtHttpType.POST.getCode() == extPlatformParam.getUrlType()){
-      responseContent = HttpUtils.post(extPlatformParam.getUrl());
+    try {
+      responseContent = HttpUtils.request(ExtHttpType.getDescp(extPlatformParam.getUrlType()),extPlatformParam.getUrl(),null , null , null);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
 
     return responseContent;
-
 
   }
 

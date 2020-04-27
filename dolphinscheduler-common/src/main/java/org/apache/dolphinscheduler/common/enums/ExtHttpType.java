@@ -48,6 +48,16 @@ public enum ExtHttpType {
         return null;
     }
 
+    public static String getDescp(int code){
+        for (ExtHttpType e: ExtHttpType.values()) {
+            if(e.ordinal() == code) {
+                return e.getDescp();
+            }
+        }
+        //For values out of enum scope
+        return null;
+    }
+
     public int getCode() {
         return code;
     }

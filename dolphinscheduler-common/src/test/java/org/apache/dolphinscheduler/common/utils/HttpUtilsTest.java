@@ -16,6 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
@@ -43,4 +47,7 @@ public class HttpUtilsTest {
 		result = HttpUtils.get("https://123.333.111.33/ccc");
 		Assert.assertNull(result);
 	}
+
+
+
 }
