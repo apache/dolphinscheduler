@@ -77,7 +77,7 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-d
 ### How to Build
 
 ```bash
-mvn clean install -Prelease
+./mvnw clean install -Prelease
 ```
 
 Artifact:

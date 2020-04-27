@@ -426,6 +426,7 @@ public class ProcessBuilderForWin32 {
         static final ProcessBuilderForWin32.NullInputStream INSTANCE = new ProcessBuilderForWin32.NullInputStream();
         private NullInputStream() {}
         public int read()      { return -1; }
+        @Override
         public int available() { return 0; }
     }
 
@@ -462,7 +463,7 @@ public class ProcessBuilderForWin32 {
      *
      * @since 1.7
      */
-    public static abstract class Redirect {
+    public abstract static class Redirect {
         /**
          * The type of a {@link ProcessBuilderForWin32.Redirect}.
          */
@@ -494,7 +495,7 @@ public class ProcessBuilderForWin32 {
              * {@link ProcessBuilderForWin32.Redirect#appendTo Redirect.appendTo(File)}.
              */
             APPEND
-        };
+        }
 
         /**
          * Returns the type of this {@code Redirect}.
@@ -568,6 +569,7 @@ public class ProcessBuilderForWin32 {
                 throw new NullPointerException();
             return new ProcessBuilderForWin32.Redirect() {
                 public Type type() { return Type.READ; }
+                @Override
                 public File file() { return file; }
                 public String toString() {
                     return "redirect to read from file \"" + file + "\"";
@@ -595,10 +597,12 @@ public class ProcessBuilderForWin32 {
                 throw new NullPointerException();
             return new ProcessBuilderForWin32.Redirect() {
                 public Type type() { return Type.WRITE; }
+                @Override
                 public File file() { return file; }
                 public String toString() {
                     return "redirect to write to file \"" + file + "\"";
                 }
+                @Override
                 boolean append() { return false; }
             };
         }
@@ -626,10 +630,12 @@ public class ProcessBuilderForWin32 {
                 throw new NullPointerException();
             return new ProcessBuilderForWin32.Redirect() {
                 public Type type() { return Type.APPEND; }
+                @Override
                 public File file() { return file; }
                 public String toString() {
                     return "redirect to append to file \"" + file + "\"";
                 }
+                @Override
                 boolean append() { return true; }
             };
         }

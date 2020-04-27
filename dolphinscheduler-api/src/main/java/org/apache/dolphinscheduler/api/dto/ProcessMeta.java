@@ -97,17 +97,9 @@ public class ProcessMeta {
     private String scheduleProcessInstancePriority;
 
     /**
-     * worker group id
-     */
-    private Integer scheduleWorkerGroupId;
-
-    /**
      * worker group name
      */
     private String scheduleWorkerGroupName;
-
-    public ProcessMeta() {
-    }
 
     public String getProjectName() {
         return projectName;
@@ -227,14 +219,6 @@ public class ProcessMeta {
 
     public void setScheduleProcessInstancePriority(String scheduleProcessInstancePriority) {
         this.scheduleProcessInstancePriority = scheduleProcessInstancePriority;
-    }
-
-    public Integer getScheduleWorkerGroupId() {
-        return scheduleWorkerGroupId;
-    }
-
-    public void setScheduleWorkerGroupId(int scheduleWorkerGroupId) {
-        this.scheduleWorkerGroupId = scheduleWorkerGroupId;
     }
 
     public String getScheduleWorkerGroupName() {

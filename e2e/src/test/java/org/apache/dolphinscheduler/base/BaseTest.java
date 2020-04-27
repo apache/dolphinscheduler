@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.base;
 
 
-import org.apache.dolphinscheduler.page.LoginPage;
 import org.apache.dolphinscheduler.util.PropertiesReader;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.*;
@@ -28,6 +27,7 @@ import java.util.Properties;
 /**
  *  base test class
  */
+@Test(groups={"functionTests"})
 public class BaseTest {
     /**
      * properties
@@ -43,7 +43,7 @@ public class BaseTest {
     /**
      * driver
      */
-    public WebDriver driver;
+    public static WebDriver driver;
 
     /**
      * Executed before executing a test suite 
@@ -54,7 +54,7 @@ public class BaseTest {
      */
     @BeforeSuite(alwaysRun = true)
     @Parameters({"propertiesPath"})
-    public void beforeSuite(@Optional("src/test/resources/config/config.properties") String propertiesPath) throws IOException {
+    public void beforeSuite(@Optional("src/test/resources/config/config.properties") String propertiesPath) throws Exception {
         // read properties
         properties = PropertiesReader.readProperties(propertiesPath);
     }
@@ -70,14 +70,13 @@ public class BaseTest {
         driver = baseDriver.getDriver();
     }
 
+
+
     /**
      * Executed before executing a class method in a test case
      */
     @BeforeClass(alwaysRun = true)
-    public void setUp() throws IOException, InterruptedException {
-        LoginPage loginPage = new LoginPage(driver);
-        loginPage.jumpPage();
-        loginPage.login();
+    public void setUp() throws Exception {
     }
 
 
@@ -85,7 +84,7 @@ public class BaseTest {
      * Execute after executing a class method in a test case
      */
     @AfterClass(alwaysRun = true)
-    public void afterClass() {
+    public void afterClass() throws InterruptedException {
         // logout
     }
 
@@ -102,6 +101,6 @@ public class BaseTest {
      * Execute after executing a testsuite
      */
     @AfterSuite(alwaysRun = true)
-    public void afterSuite() {
+    public void afterSuite() throws InterruptedException {
     }
 }

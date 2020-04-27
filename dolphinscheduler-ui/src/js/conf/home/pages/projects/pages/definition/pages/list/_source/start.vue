@@ -76,7 +76,7 @@
         {{$t('Worker group')}}
       </div>
       <div class="cont">
-        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+        <m-worker-groups v-model="workerGroup"></m-worker-groups>
       </div>
     </div>
     <div class="clearfix list">
@@ -192,7 +192,8 @@
         receiversCc: [],
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1
+        workerGroup: 'default'
+
       }
     },
     props: {
@@ -222,7 +223,7 @@
           processInstancePriority: this.processInstancePriority,
           receivers: this.receivers.join(',') || '',
           receiversCc: this.receiversCc.join(',') || '',
-          workerGroupId: this.workerGroupId
+          workerGroup: this.workerGroup
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
@@ -274,8 +275,21 @@
     },
     created () {
       this.warningType = this.warningTypeList[0].id
+      this.workflowName = this.item.name
 
       this._getReceiver()
+      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (stateWorkerGroupsList.length) {
+        this.workerGroup = stateWorkerGroupsList[0].id
+      } else {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.$nextTick(() => {
+            if(res.length>0) {
+              this.workerGroup = res[0].id
+            }
+          })
+        })
+      }
     },
     mounted () {
       this._getNotifyGroupList().then(() => {

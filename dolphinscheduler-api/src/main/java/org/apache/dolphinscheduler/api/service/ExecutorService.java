@@ -85,7 +85,7 @@ public class ExecutorService extends BaseService{
      * @param receivers             receivers
      * @param receiversCc           receivers cc
      * @param processInstancePriority process instance priority
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group name
      * @param runMode run mode
      * @param timeout               timeout
      * @return execute process instance code
@@ -96,9 +96,9 @@ public class ExecutorService extends BaseService{
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
-                                                   Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
+                                                   Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
-        // timeout is valid
+        // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
@@ -128,7 +128,7 @@ public class ExecutorService extends BaseService{
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode,processInstancePriority, workerGroupId);
+                warningGroupId, runMode,processInstancePriority, workerGroup);
         if(create > 0 ){
             /**
              * according to the process definition ID updateProcessInstance and CC recipient
@@ -225,20 +225,14 @@ public class ExecutorService extends BaseService{
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
                     putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());
                 } else {
-                    processInstance.setCommandType(CommandType.STOP);
-                    processInstance.addHistoryCmd(CommandType.STOP);
-                    processService.updateProcessInstance(processInstance);
-                    result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_STOP);
+                    result = updateProcessInstancePrepare(processInstance, CommandType.STOP, ExecutionStatus.READY_STOP);
                 }
                 break;
             case PAUSE:
                 if (processInstance.getState() == ExecutionStatus.READY_PAUSE) {
                     putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());
                 } else {
-                    processInstance.setCommandType(CommandType.PAUSE);
-                    processInstance.addHistoryCmd(CommandType.PAUSE);
-                    processService.updateProcessInstance(processInstance);
-                    result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_PAUSE);
+                    result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE, ExecutionStatus.READY_PAUSE);
                 }
                 break;
             default:
@@ -308,22 +302,27 @@ public class ExecutorService extends BaseService{
     }
 
     /**
-     * update process instance state
+     *  prepare to update process instance command type and status
      *
-     * @param processInstanceId process instance id
+     * @param processInstance process instance
+     * @param commandType command type
      * @param executionStatus execute status
      * @return update result
      */
-    private Map<String, Object> updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
+    private Map<String, Object> updateProcessInstancePrepare(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus) {
         Map<String, Object> result = new HashMap<>(5);
 
-        int update = processService.updateProcessInstanceState(processInstanceId, executionStatus);
+        processInstance.setCommandType(commandType);
+        processInstance.addHistoryCmd(commandType);
+        processInstance.setState(executionStatus);
+        int update = processService.updateProcessInstance(processInstance);
+
+        // determine whether the process is normal
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
-
         return result;
     }
 
@@ -435,25 +434,26 @@ public class ExecutorService extends BaseService{
 
     /**
      * create command
-     *
-     * @param commandType
-     * @param processDefineId
-     * @param nodeDep
-     * @param failureStrategy
-     * @param startNodeList
-     * @param schedule
-     * @param warningType
-     * @param excutorId
-     * @param warningGroupId
-     * @param runMode
-     * @return
+     * @param commandType commandType
+     * @param processDefineId processDefineId
+     * @param nodeDep nodeDep
+     * @param failureStrategy failureStrategy
+     * @param startNodeList startNodeList
+     * @param schedule schedule
+     * @param warningType warningType
+     * @param executorId executorId
+     * @param warningGroupId warningGroupId
+     * @param runMode runMode
+     * @param processInstancePriority processInstancePriority
+     * @param workerGroup workerGroup
+     * @return command id
      * @throws ParseException
      */
     private int createCommand(CommandType commandType, int processDefineId,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
-                              int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
+                              int executorId, int warningGroupId,
+                              RunMode runMode,Priority processInstancePriority, String workerGroup) throws ParseException {
 
         /**
          * instantiate command schedule instance
@@ -481,10 +481,10 @@ public class ExecutorService extends BaseService{
             command.setWarningType(warningType);
         }
         command.setCommandParam(JSONUtils.toJson(cmdParam));
-        command.setExecutorId(excutorId);
+        command.setExecutorId(executorId);
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
-        command.setWorkerGroupId(workerGroupId);
+        command.setWorkerGroup(workerGroup);
 
         Date start = null;
         Date end = null;
@@ -496,9 +496,10 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-            if(null != start && null != end && start.before(end)){
+            if(null != start && null != end && !start.after(end)){
                 if(runMode == RunMode.RUN_MODE_SERIAL){
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));

@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Stopper {
 
-	private static volatile AtomicBoolean signal = new AtomicBoolean(false);
+	private static AtomicBoolean signal = new AtomicBoolean(false);
 	
 	public static final boolean isStopped(){
 		return signal.get();
@@ -34,6 +34,6 @@ public class Stopper {
 	}
 	
 	public static final void stop(){
-		signal.getAndSet(true);
+		signal.set(true);
 	}
 }

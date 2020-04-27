@@ -27,13 +27,15 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * task instance
  */
 @TableName("t_ds_task_instance")
-public class TaskInstance {
+public class TaskInstance implements Serializable {
 
     /**
      * id
@@ -45,6 +47,8 @@ public class TaskInstance {
      * task name
      */
     private String name;
+
+
 
     /**
      * task type
@@ -154,20 +158,17 @@ public class TaskInstance {
 
     /**
      * duration
-     * @return
      */
     @TableField(exist = false)
     private Long duration;
 
     /**
      * max retry times
-     * @return
      */
     private int maxRetryTimes;
 
     /**
      * task retry interval, unit: minute
-     * @return
      */
     private int retryInterval;
 
@@ -184,17 +185,16 @@ public class TaskInstance {
 
     /**
      * dependent state
-     * @return
      */
     @TableField(exist = false)
     private String dependentResult;
 
 
     /**
-     * worker group id
-     * @return
+     * workerGroup
      */
-    private int workerGroupId;
+    private String workerGroup;
+
 
     /**
      * executor id
@@ -208,8 +208,12 @@ public class TaskInstance {
     private String executorName;
 
 
+    @TableField(exist = false)
+    private List<String> resources;
 
-    public void  init(String host,Date startTime,String executePath){
+
+
+    public void init(String host,Date startTime,String executePath){
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
@@ -373,9 +377,6 @@ public class TaskInstance {
     }
 
 
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.getDescp().equals(this.taskType);
-    }
 
     public String getDependency(){
 
@@ -442,13 +443,34 @@ public class TaskInstance {
         this.executorName = executorName;
     }
 
-    public Boolean isTaskComplete() {
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
+    public List<String> getResources() {
+        return resources;
+    }
+
+    public boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isDependTask(){
+        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isConditionsTask(){
+        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public void setResources(List<String> resources) {
+        this.resources = resources;
+    }
+
     /**
      * determine if you can try again
      * @return can try result
@@ -485,12 +507,12 @@ public class TaskInstance {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public String getDependentResult() {
@@ -532,7 +554,7 @@ public class TaskInstance {
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
                 ", dependentResult='" + dependentResult + '\'' +
-                ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 ", executorId=" + executorId +
                 ", executorName='" + executorName + '\'' +
                 '}';

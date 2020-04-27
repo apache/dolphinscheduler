@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TaskRecordControllerTest extends AbstractControllerTest {
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskRecordControllerTest.class);
 
     @Test
     public void testQueryTaskRecordListPaging() throws Exception {

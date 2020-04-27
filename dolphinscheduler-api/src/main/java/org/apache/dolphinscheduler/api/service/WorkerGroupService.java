@@ -28,14 +28,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * work group service
@@ -49,6 +47,9 @@ public class WorkerGroupService extends BaseService {
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     /**
      * create or update a worker group
@@ -111,7 +112,7 @@ public class WorkerGroupService extends BaseService {
 
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
 
-        if(workerGroupList.size() > 0 ){
+        if(CollectionUtils.isNotEmpty(workerGroupList)){
             // new group has same name..
             if(workerGroup.getId() == 0){
                 return true;
@@ -180,9 +181,22 @@ public class WorkerGroupService extends BaseService {
      * @return all worker group list
      */
     public Map<String,Object> queryAllGroup() {
-        Map<String, Object> result = new HashMap<>(5);
-        List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
-        result.put(Constants.DATA_LIST, workerGroupList);
+        Map<String, Object> result = new HashMap<>();
+        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
+        List<String> workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
+
+        // available workerGroup list
+        List<String> availableWorkerGroupList = new ArrayList<>();
+
+        for (String workerGroup : workerGroupList){
+            String workerGroupPath= workerPath + "/" + workerGroup;
+            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
+            if (CollectionUtils.isNotEmpty(childrenNodes)){
+                availableWorkerGroupList.add(workerGroup);
+            }
+        }
+
+        result.put(Constants.DATA_LIST, availableWorkerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

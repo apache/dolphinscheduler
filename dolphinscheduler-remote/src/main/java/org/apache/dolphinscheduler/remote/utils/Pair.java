@@ -50,4 +50,8 @@ public class Pair<L, R> {
     public void setRight(R right) {
         this.right = right;
     }
+
+    public static <L, R> Pair of(L left, R right){
+        return new Pair(left, right);
+    }
 }

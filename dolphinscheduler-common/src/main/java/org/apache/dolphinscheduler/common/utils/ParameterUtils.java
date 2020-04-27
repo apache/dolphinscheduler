@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
@@ -23,7 +24,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -77,6 +77,45 @@ public class ParameterUtils {
 
     return parameterString;
   }
+
+  /**
+   * new
+   * convert parameters place holders
+   *
+   * @param parameterString parameter
+   * @param parameterMap parameter map
+   * @return convert parameters place holders
+   */
+  public static String convertParameterPlaceholders2(String parameterString, Map<String, String> parameterMap) {
+    if (StringUtils.isEmpty(parameterString)) {
+      return parameterString;
+    }
+    //Get current time, schedule execute time
+    String cronTimeStr = parameterMap.get(Constants.PARAMETER_SHECDULE_TIME);
+    Date cronTime = null;
+
+    if (StringUtils.isNotEmpty(cronTimeStr)) {
+      try {
+        cronTime = DateUtils.parseDate(cronTimeStr, new String[]{Constants.PARAMETER_FORMAT_TIME});
+
+      } catch (ParseException e) {
+        logger.error(String.format("parse %s exception", cronTimeStr), e);
+      }
+    } else {
+      cronTime = new Date();
+    }
+
+    // replace variable ${} form,refers to the replacement of system variables and custom variables
+    parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+
+    // replace time $[...] form, eg. $[yyyyMMdd]
+    if (cronTime != null) {
+      parameterString = TimePlaceholderUtils.replacePlaceholders(parameterString, cronTime, true);
+
+    }
+    return parameterString;
+  }
+
 
   /**
    *  set in parameter
@@ -157,7 +196,7 @@ public class ParameterUtils {
         property.setValue(val);
       }
     }
-    return JSONObject.toJSONString(globalParamList);
+    return JSON.toJSONString(globalParamList);
   }
 
 
@@ -172,5 +211,45 @@ public class ParameterUtils {
       return inputString.replace("%", "////%");
     }
     return inputString;
+  }
+
+  /**
+   * new
+   * $[yyyyMMdd] replace scheduler time
+   * @param text
+   * @param paramsMap
+   * @return
+   */
+  public static String replaceScheduleTime(String text, Date scheduleTime, Map<String, Property> paramsMap) {
+    if (paramsMap != null) {
+      //if getScheduleTime null ,is current date
+      if (null == scheduleTime) {
+        scheduleTime = new Date();
+      }
+      String dateTime = org.apache.dolphinscheduler.common.utils.DateUtils.format(scheduleTime, Constants.PARAMETER_FORMAT_TIME);
+      Property p = new Property();
+      p.setValue(dateTime);
+      p.setProp(Constants.PARAMETER_SHECDULE_TIME);
+      paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+      text = ParameterUtils.convertParameterPlaceholders2(text, convert(paramsMap));
+    }
+    return text;
+  }
+
+
+  /**
+   * format convert
+   * @param paramsMap params map
+   * @return Map of converted
+   * see org.apache.dolphinscheduler.server.utils.ParamUtils.convert
+   */
+  public static Map<String,String> convert(Map<String,Property> paramsMap){
+    Map<String,String> map = new HashMap<>();
+    Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
+    while (iter.hasNext()){
+      Map.Entry<String, Property> en = iter.next();
+      map.put(en.getKey(),en.getValue().getValue());
+    }
+    return map;
   }
 }

@@ -17,12 +17,15 @@
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -37,7 +40,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters) {
+    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
 
         StringBuilder result = new StringBuilder();
         try{
@@ -45,13 +48,13 @@ public class MysqlTargetGenerator implements ITargetGenerator {
             TargetMysqlParameter targetMysqlParameter =
                     JSONUtils.parseObject(sqoopParameters.getTargetParams(),TargetMysqlParameter.class);
 
+            SqoopTaskExecutionContext sqoopTaskExecutionContext = taskExecutionContext.getSqoopTaskExecutionContext();
+
             if(targetMysqlParameter != null && targetMysqlParameter.getTargetDatasource() != 0){
 
-                ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
-                DataSource dataSource= processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
                 // get datasource
-                BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
-                        dataSource.getConnectionParams());
+                BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.of(sqoopTaskExecutionContext.getTargetType()),
+                        sqoopTaskExecutionContext.getTargetConnectionParams());
 
                 if(baseDataSource != null){
                     result.append(" --connect ")
@@ -75,12 +78,11 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                         result.append(" --lines-terminated-by '").append(targetMysqlParameter.getLinesTerminated()).append("'");
                     }
 
-                    if(targetMysqlParameter.isUpdate()){
-                        if(StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())&&
-                                StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())){
-                            result.append(" --update-key ").append(targetMysqlParameter.getTargetUpdateKey())
-                                  .append(" --update-mode ").append(targetMysqlParameter.getTargetUpdateMode());
-                        }
+                    if(targetMysqlParameter.isUpdate()
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())){
+                        result.append(" --update-key ").append(targetMysqlParameter.getTargetUpdateKey())
+                              .append(" --update-mode ").append(targetMysqlParameter.getTargetUpdateMode());
                     }
                 }
             }

@@ -162,18 +162,6 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 用户数据目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler`。
 
-**`DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH`**
-
-用户数据下载目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler/download`。
-
-**`DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH`**
-
-任务执行目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler/exec`。
-
-**`TASK_QUEUE`**
-
-配置`master-server`和`worker-serverr`的`Zookeeper`任务队列名， 默认值 `zookeeper`。
-
 **`ZOOKEEPER_QUORUM`**
 
 配置`master-server`和`worker-serverr`的`Zookeeper`地址, 默认值 `127.0.0.1:2181`。
@@ -208,6 +196,10 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`master-server`的保留内存，默认值 `0.1`。
 
+**`MASTER_LISTEN_PORT`**
+
+配置`master-server`的端口，默认值 `5678`。
+
 **`WORKER_EXEC_THREADS`**
 
 配置`worker-server`中的执行线程数量，默认值 `100`。
@@ -227,6 +219,14 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 **`WORKER_RESERVED_MEMORY`**
 
 配置`worker-server`的保留内存，默认值 `0.1`。
+
+**`WORKER_LISTEN_PORT`**
+
+配置`worker-server`的端口，默认值 `1234`。
+
+**`WORKER_GROUP`**
+
+配置`worker-server`的分组，默认值 `default`。
 
 **`XLS_FILE_PATH`**
 
