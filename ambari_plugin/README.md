@@ -3,7 +3,7 @@
 ##### 备注
 
 1. 本文档适用于对Ambari中基本了解的用户
-2. 本文档是对已安装Ambari服务添加Dolphin Scheduler(2.0版本)服务的说明
+2. 本文档是对已安装Ambari服务添加Dolphin Scheduler(1.3.0版本)服务的说明
 
 ##### 一  安装准备
 
