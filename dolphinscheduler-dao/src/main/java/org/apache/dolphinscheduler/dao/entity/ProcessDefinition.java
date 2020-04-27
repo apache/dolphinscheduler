@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -163,6 +163,11 @@ public class ProcessDefinition {
      */
     private String modifyBy;
 
+    /**
+     * resource ids
+     */
+    private String resourceIds;
+
 
     public String getName() {
         return name;
@@ -266,7 +271,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        this.globalParamList = JSONObject.parseArray(globalParams, Property.class);
+        this.globalParamList = JSON.parseArray(globalParams, Property.class);
         this.globalParams = globalParams;
     }
 
@@ -275,7 +280,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSONObject.toJSONString(globalParamList);
+        this.globalParams = JSON.toJSONString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
@@ -283,7 +288,7 @@ public class ProcessDefinition {
         List<Property> propList;
 
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            propList = JSONObject.parseArray(globalParams, Property.class);
+            propList = JSON.parseArray(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 
@@ -332,6 +337,14 @@ public class ProcessDefinition {
 
     public void setScheduleReleaseState(ReleaseState scheduleReleaseState) {
         this.scheduleReleaseState = scheduleReleaseState;
+    }
+
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
     }
 
     public int getTimeout() {
@@ -393,6 +406,8 @@ public class ProcessDefinition {
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
                 ", modifyBy='" + modifyBy + '\'' +
+                ", resourceIds='" + resourceIds + '\'' +
                 '}';
     }
+
 }

@@ -20,9 +20,10 @@ package org.apache.dolphinscheduler.common.process;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Property {
+public class Property implements Serializable {
   /**
    * key
    */

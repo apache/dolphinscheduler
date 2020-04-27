@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -85,13 +85,13 @@ public class MasterExecThreadTest {
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-31 23:00:00");
-        Mockito.when(processInstance.getCommandParam()).thenReturn(JSONObject.toJSONString(cmdParam));
+        Mockito.when(processInstance.getCommandParam()).thenReturn(JSON.toJSONString(cmdParam));
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService));
+        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService,null));
         // prepareProcess init dag
         Field dag = MasterExecThread.class.getDeclaredField("dag");
         dag.setAccessible(true);

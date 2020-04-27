@@ -1,0 +1,292 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: worker
+spec:
+  podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      app.kubernetes.io/component: worker
+  serviceName: {{ template "dolphinscheduler.fullname" . }}-worker-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/component: worker
+    spec:
+      {{- if .Values.worker.affinity }}
+      affinity: {{- toYaml .Values.worker.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init-zookeeper
+          image: busybox:1.31.0
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
+                  while ! nc -z ${line%:*} ${line#*:}; do
+                      counter=$((counter+1))
+                      if [ $counter == 5 ]; then
+                          echo "Error: Couldn't connect to zookeeper."
+                          exit 1
+                      fi
+                      echo "Trying to connect to zookeeper at ${line}. Attempt $counter."
+                      sleep 60
+                  done
+              done
+          env:
+            - name: ZOOKEEPER_QUORUM
+              {{- if .Values.zookeeper.enabled }}
+              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              {{- else }}
+              value: {{ .Values.externalZookeeper.zookeeperQuorum }}
+              {{- end }}
+        - name: init-postgresql
+          image: busybox:1.31.0
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+                  counter=$((counter+1))
+                  if [ $counter == 5 ]; then
+                      echo "Error: Couldn't connect to postgresql."
+                      exit 1
+                  fi
+                  echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+                  sleep 60
+              done
+          env:
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+              {{- end }}
+      containers:
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker
+          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          args:
+            - "worker-server"
+          ports:
+            - containerPort: {{ .Values.worker.configmap.WORKER_LISTEN_PORT }}
+              name: "worker-port"
+            - containerPort: 50051
+              name: "logs-port"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
+            - name: WORKER_EXEC_THREADS
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_EXEC_THREADS
+            - name: WORKER_FETCH_TASK_NUM
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_FETCH_TASK_NUM
+            - name: WORKER_HEARTBEAT_INTERVAL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_HEARTBEAT_INTERVAL
+            - name: WORKER_MAX_CPULOAD_AVG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_MAX_CPULOAD_AVG
+            - name: WORKER_RESERVED_MEMORY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_RESERVED_MEMORY
+            - name: WORKER_LISTEN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_LISTEN_PORT
+            - name: WORKER_GROUP
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_GROUP
+            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+              {{- end }}
+            - name: POSTGRESQL_USERNAME
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlUsername }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.username | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.postgresql.enabled }}
+                  name: {{ template "dolphinscheduler.postgresql.fullname" . }}
+                  key: postgresql-password
+                  {{- else }}
+                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
+                  key: db-password
+                  {{- end }}
+            - name: POSTGRESQL_DATABASE
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlDatabase }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.database | quote }}
+              {{- end }}
+            - name: ZOOKEEPER_QUORUM
+              {{- if .Values.zookeeper.enabled }}
+              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              {{- else }}
+              value: {{ .Values.externalZookeeper.zookeeperQuorum }}
+              {{- end }}
+          {{- if .Values.worker.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - /root/checkpoint.sh
+                - WorkerServer
+            initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.worker.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - /root/checkpoint.sh
+                - WorkerServer
+            initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.worker.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.worker.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: {{ include "dolphinscheduler.worker.base.dir" . | quote }}
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+            - mountPath: "/opt/dolphinscheduler/logs"
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+            - mountPath: "/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"
+              subPath: "dolphinscheduler_env.sh"
+              name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
+      volumes:
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: {{ include "dolphinscheduler.fullname" . }}-worker-configmap
+          configMap:
+            defaultMode: 0777
+            name: {{ include "dolphinscheduler.fullname" . }}-worker
+            items:
+              - key: dolphinscheduler_env.sh
+                path: dolphinscheduler_env.sh
+  {{- if .Values.worker.persistentVolumeClaim.enabled }}
+  volumeClaimTemplates:
+    {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}
+    - metadata:
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+        labels:
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-data
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+      spec:
+        accessModes:
+        {{- range .Values.worker.persistentVolumeClaim.dataPersistentVolume.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        storageClassName: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.worker.persistentVolumeClaim.dataPersistentVolume.storage | quote }}
+    {{- end }}
+    {{- if .Values.worker.persistentVolumeClaim.logsPersistentVolume.enabled }}
+    - metadata:
+        name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+        labels:
+          app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+      spec:
+        accessModes:
+        {{- range .Values.worker.persistentVolumeClaim.logsPersistentVolume.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        storageClassName: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storage | quote }}
+    {{- end }}
+  {{- end }}
