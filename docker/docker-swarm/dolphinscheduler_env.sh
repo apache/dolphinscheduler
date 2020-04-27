@@ -15,6 +15,6 @@
 # limitations under the License.
 #
 
-export PYTHON_HOME=/usr
+export PYTHON_HOME=/usr/bin/python2
 export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
-export PATH=$PYTHON_HOME/bin:$JAVA_HOME/bin:$PATH
+export PATH=$PYTHON_HOME:$JAVA_HOME/bin:$PATH
