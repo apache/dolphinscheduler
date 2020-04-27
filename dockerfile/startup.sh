@@ -25,7 +25,9 @@ DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 # start postgresql
 initPostgreSQL() {
     echo "checking postgresql"
-    if [ -n "$(ifconfig | grep ${POSTGRESQL_HOST})" ]; then
+    if [[ "${POSTGRESQL_HOST}" = "127.0.0.1" || "${POSTGRESQL_HOST}" = "localhost" ]]; then
+        export PGPORT=${POSTGRESQL_PORT}
+
         echo "start postgresql service"
         rc-service postgresql restart
 
@@ -47,10 +49,21 @@ initPostgreSQL() {
         sudo -u postgres psql -tAc "grant all privileges on database dolphinscheduler to ${POSTGRESQL_USERNAME}"
     fi
 
+    echo "test postgresql service"
+    while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+        counter=$((counter+1))
+        if [ $counter == 30 ]; then
+            echo "Error: Couldn't connect to postgresql."
+            exit 1
+        fi
+        echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+        sleep 5
+    done
+
     echo "connect postgresql service"
-    v=$(sudo -u postgres PGPASSWORD=${POSTGRESQL_PASSWORD} psql -h ${POSTGRESQL_HOST} -U ${POSTGRESQL_USERNAME} -d dolphinscheduler -tAc "select 1")
+    v=$(sudo -u postgres PGPASSWORD=${POSTGRESQL_PASSWORD} psql -h ${POSTGRESQL_HOST} -p ${POSTGRESQL_PORT} -U ${POSTGRESQL_USERNAME} -d dolphinscheduler -tAc "select 1")
     if [ "$(echo '${v}' | grep 'FATAL' | wc -l)" -eq 1 ]; then
-        echo "Can't connect to database...${v}"
+        echo "Error: Can't connect to database...${v}"
         exit 1
     fi
 
