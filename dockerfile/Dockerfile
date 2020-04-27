@@ -25,9 +25,9 @@ ENV DEBIAN_FRONTEND noninteractive
 
 #1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip tini kazoo.
 #If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
-#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
-    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip tini && \
+    apk add dos2unix shadow bash openrc python python3 sudo vim wget iputils net-tools openssh-server py2-pip tini && \
     apk add --update procps && \
     openrc boot && \
     pip install kazoo
@@ -38,8 +38,9 @@ ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
 #3. install zk
+COPY apache-zookeeper-3.5.7-bin.tar.gz /opt/
 RUN cd /opt && \
-    wget https://downloads.apache.org/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz && \
+#    wget https://downloads.apache.org/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz && \
     tar -zxvf apache-zookeeper-3.5.7-bin.tar.gz && \
     mv apache-zookeeper-3.5.7-bin zookeeper && \
     mkdir -p /tmp/zookeeper && \
