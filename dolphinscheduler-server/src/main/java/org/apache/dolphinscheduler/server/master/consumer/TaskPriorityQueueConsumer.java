@@ -126,7 +126,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
-            if (result && taskInstanceIsFinalState(taskInstanceId)){
+            if (result || taskInstanceIsFinalState(taskInstanceId)){
                 break;
             }
         }
