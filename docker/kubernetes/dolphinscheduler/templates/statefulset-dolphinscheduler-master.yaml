@@ -109,8 +109,8 @@ spec:
           args:
             - "master-server"
           ports:
-            - containerPort: 8888
-              name: unused-tcp-port
+            - containerPort: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+              name: "master-port"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: TZ
@@ -150,6 +150,16 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-master
                   key: MASTER_RESERVED_MEMORY
+            - name: MASTER_LISTEN_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: MASTER_LISTEN_PORT
+            - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-master
+                  key: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
             - name: POSTGRESQL_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
@@ -178,11 +188,11 @@ spec:
                   name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
                   key: db-password
                   {{- end }}
-            - name: TASK_QUEUE
-              {{- if .Values.zookeeper.enabled }}
-              value: {{ .Values.zookeeper.taskQueue }}
+            - name: POSTGRESQL_DATABASE
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlDatabase }}
               {{- else }}
-              value: {{ .Values.externalZookeeper.taskQueue }}
+              value: {{ .Values.externalDatabase.database | quote }}
               {{- end }}
             - name: ZOOKEEPER_QUORUM
               {{- if .Values.zookeeper.enabled }}
@@ -196,7 +206,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - master-server
+                - MasterServer
             initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
@@ -209,7 +219,7 @@ spec:
               command:
                 - sh
                 - /root/checkpoint.sh
-                - master-server
+                - MasterServer
             initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}

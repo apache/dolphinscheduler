@@ -14,23 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-master-headless
-  labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master-headless
-    app.kubernetes.io/instance: {{ .Release.Name }}-master-headless
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-spec:
-  clusterIP: "None"
-  ports:
-    - port: 8888
-      targetPort: tcp-port
-      protocol: TCP
-      name: unused-tcp-port
-  selector:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app.kubernetes.io/component: master
+
+{% for key, value in dolphin_common_map.iteritems() -%}
+  {{key}}={{value}}
+{% endfor %}

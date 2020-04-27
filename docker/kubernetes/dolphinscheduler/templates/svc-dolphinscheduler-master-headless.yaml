@@ -14,21 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.master.configmap }}
 apiVersion: v1
-kind: ConfigMap
+kind: Service
 metadata:
-  name: {{ include "dolphinscheduler.fullname" . }}-master
+  name: {{ include "dolphinscheduler.fullname" . }}-master-headless
   labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master-headless
+    app.kubernetes.io/instance: {{ .Release.Name }}-master-headless
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  clusterIP: "None"
+  ports:
+    - port: {{ .Values.master.configmap.MASTER_LISTEN_PORT }}
+      targetPort: master-port
+      protocol: TCP
+      name: master-port
+  selector:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
-data:
-  MASTER_EXEC_THREADS: {{ .Values.master.configmap.MASTER_EXEC_THREADS | quote }}
-  MASTER_EXEC_TASK_NUM: {{ .Values.master.configmap.MASTER_EXEC_TASK_NUM | quote }}
-  MASTER_HEARTBEAT_INTERVAL: {{ .Values.master.configmap.MASTER_HEARTBEAT_INTERVAL | quote }}
-  MASTER_TASK_COMMIT_RETRYTIMES: {{ .Values.master.configmap.MASTER_TASK_COMMIT_RETRYTIMES | quote }}
-  MASTER_TASK_COMMIT_INTERVAL: {{ .Values.master.configmap.MASTER_TASK_COMMIT_INTERVAL | quote }}
-  MASTER_MAX_CPULOAD_AVG: {{ .Values.master.configmap.MASTER_MAX_CPULOAD_AVG | quote }}
-  MASTER_RESERVED_MEMORY: {{ .Values.master.configmap.MASTER_RESERVED_MEMORY | quote }}
-{{- end }}
+    app.kubernetes.io/component: master
