@@ -579,17 +579,23 @@
 			</exclusions>
 		</dependency>
 
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-annotation</artifactId>
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-annotation</artifactId>
 			<version>${mybatis-plus.version}</version>
 			<scope>compile</scope>
-        </dependency>
+		</dependency>
 
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>${codehaus.janino.version}</version>
 		</dependency>
+
 	</dependencies>
 </project>
