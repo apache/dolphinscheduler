@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 
-import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
  *  taks callback service
@@ -94,15 +96,12 @@ public class TaskCallbackService {
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
         logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
-        Set<String> masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
+        Set<String> masterNodes = null;
         while (Stopper.isRunning()) {
+            masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
                 logger.error("no available master node");
-                try {
-                    Thread.sleep(1000);
-                }catch (Exception e){
-
-                }
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }else {
                 break;
             }

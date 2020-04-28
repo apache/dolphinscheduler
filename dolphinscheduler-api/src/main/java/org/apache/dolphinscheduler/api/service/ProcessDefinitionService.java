@@ -112,8 +112,13 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
-    public Map<String, Object> createProcessDefinition(User loginUser, String projectName, String name,
-                                                       String processDefinitionJson, String desc, String locations, String connects) throws JsonProcessingException {
+    public Map<String, Object> createProcessDefinition(User loginUser,
+                                                       String projectName,
+                                                       String name,
+                                                       String processDefinitionJson,
+                                                       String desc,
+                                                       String locations,
+                                                       String connects) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -173,8 +178,10 @@ public class ProcessDefinitionService extends BaseDAGService {
         for(TaskNode taskNode : tasks){
             String taskParameter = taskNode.getParams();
             AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
-            Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
-            resourceIds.addAll(tempSet);
+            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
+                resourceIds.addAll(tempSet);
+            }
         }
 
         StringBuilder sb = new StringBuilder();
@@ -189,13 +196,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition list
+     * query process definition list
      *
      * @param loginUser login user
      * @param projectName project name
      * @return definition list
      */
-    public Map<String, Object> queryProccessDefinitionList(User loginUser, String projectName) {
+    public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -215,7 +222,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition list paging
+     * query process definition list paging
      *
      * @param loginUser login user
      * @param projectName project name
@@ -257,7 +264,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processId process definition id
      * @return process definition detail
      */
-    public Map<String, Object> queryProccessDefinitionById(User loginUser, String projectName, Integer processId) {
+    public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
 
 
         Map<String, Object> result = new HashMap<>(5);
@@ -277,6 +284,41 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    /**
+     * copy process definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return copy result code
+     */
+    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException{
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        } else {
+           return createProcessDefinition(
+                   loginUser,
+                   projectName,
+                   processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
+                   processDefinition.getProcessDefinitionJson(),
+                   processDefinition.getDescription(),
+                   processDefinition.getLocations(),
+                   processDefinition.getConnects());
+        }
     }
 
     /**
@@ -363,7 +405,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param name name
      * @return true if process definition name not exists, otherwise false
      */
-    public Map<String, Object> verifyProccessDefinitionName(User loginUser, String projectName, String name) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, String projectName, String name) {
 
         Map<String, Object> result = new HashMap<>();
             Project project = projectMapper.queryByName(projectName);
@@ -1036,12 +1078,12 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition all by project id
+     * query process definition all by project id
      *
      * @param projectId project id
      * @return process definitions in the project
      */
-    public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
+    public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
         HashMap<String, Object> result = new HashMap<>(5);
 

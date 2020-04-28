@@ -106,14 +106,12 @@ public class DataAnalysisService extends BaseService{
         List<ExecuteStatusCount> taskInstanceStateCounts =
                 taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds);
 
-        if (taskInstanceStateCounts != null && !taskInstanceStateCounts.isEmpty()) {
+        if (taskInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.TASK_INSTANCE_STATE_COUNT_ERROR);
         }
-        return  result;
+        return result;
     }
 
     private void putErrorRequestParamsMsg(Map<String, Object> result) {
@@ -153,14 +151,12 @@ public class DataAnalysisService extends BaseService{
                 processInstanceMapper.countInstanceStateByUser(start, end,
                         projectIdArray);
 
-        if (processInstanceStateCounts != null && !processInstanceStateCounts.isEmpty()) {
+        if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.COUNT_PROCESS_INSTANCE_STATE_ERROR);
         }
-        return  result;
+        return result;
     }
 
 
@@ -234,7 +230,7 @@ public class DataAnalysisService extends BaseService{
         // count error command state
         List<CommandCount> errorCommandStateCounts =
                 errorCommandMapper.countCommandState(
-                         start, end, projectIdArray);
+                        start, end, projectIdArray);
 
         //
         Map<CommandType,Map<String,Integer>> dataMap = new HashMap<>();

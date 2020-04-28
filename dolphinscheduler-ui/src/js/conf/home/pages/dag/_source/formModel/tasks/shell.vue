@@ -34,7 +34,7 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="options" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+        <treeselect  v-model="resourceList" :multiple="true" :options="options" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -396,5 +396,12 @@
     right: -12px;
     top: -16px;
   }
-
+  .vue-treeselect--disabled {
+    .vue-treeselect__control {
+      background-color: #ecf3f8;
+      .vue-treeselect__single-value {
+        color: #6d859e;
+      }
+    }
+  }
 </style>
