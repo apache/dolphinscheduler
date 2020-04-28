@@ -84,6 +84,7 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
+              sessionStorage.setItem('isLeft',1);
               if (res.data.hasOwnProperty("sessionId")) {
                 let sessionId=res.data.sessionId
                 sessionStorage.setItem("sessionId", sessionId)
