@@ -866,6 +866,22 @@
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>${apache.rat.version}</version>
                 <configuration>
+                    <excludeSubProjects>false</excludeSubProjects>
+                    <addDefaultLicenseMatchers>false</addDefaultLicenseMatchers>
+                    <licenses>
+                        <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+                            <licenseFamilyCategory>AL20</licenseFamilyCategory>
+                            <licenseFamilyName>Apache License, 2.0</licenseFamilyName>
+                            <patterns>
+                                <pattern>Licensed to the Apache Software Foundation (ASF)</pattern>
+                            </patterns>
+                        </license>
+                    </licenses>
+                    <licenseFamilies>
+                        <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
+                            <familyName>Apache License, 2.0</familyName>
+                        </licenseFamily>
+                    </licenseFamilies>
                     <excludes>
                         <exclude>**/node_modules/**</exclude>
                         <exclude>**/node/**</exclude>
@@ -884,7 +900,7 @@
                         <exclude>**/*.babelrc</exclude>
                         <exclude>**/*.eslintrc</exclude>
                         <exclude>**/.mvn/jvm.config</exclude>
-                        <exclude>**/.mvn/wrapper/maven-wrapper.properties</exclude>
+                        <exclude>**/.mvn/wrapper/**</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
