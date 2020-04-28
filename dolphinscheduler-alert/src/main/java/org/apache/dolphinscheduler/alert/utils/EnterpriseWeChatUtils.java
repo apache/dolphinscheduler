@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
+import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -253,14 +254,13 @@ public class EnterpriseWeChatUtils {
 
     /**
      * Determine the mardown style based on the show type of the alert
-     * @param alert the alert
      * @return the markdown alert table/text
      */
-    public static String markdownByAlert(Alert alert){
+    public static String markdownByAlert(AlertData alert){
         String result = "";
-        if (alert.getShowType() == ShowType.TABLE) {
+        if (alert.getShowType().equals(ShowType.TABLE.getDescp())) {
             result = markdownTable(alert.getTitle(),alert.getContent());
-        }else if(alert.getShowType() == ShowType.TEXT){
+        }else if(alert.getShowType().equals(ShowType.TEXT.getDescp())){
             result = markdownText(alert.getTitle(),alert.getContent());
         }
         return result;
