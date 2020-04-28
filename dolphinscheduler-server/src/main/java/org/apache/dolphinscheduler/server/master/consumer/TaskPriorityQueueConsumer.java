@@ -140,7 +140,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return taskInstance is final state
      */
-    private Boolean taskInstanceIsFinalState(int taskInstanceId){
+    public Boolean taskInstanceIsFinalState(int taskInstanceId){
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
         return taskInstance.getState().typeIsFinished();
     }
