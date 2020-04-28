@@ -120,17 +120,29 @@ public class TaskPriorityQueueConsumer extends Thread{
         Boolean result = false;
         while (Stopper.isRunning()){
             try {
-                result =  dispatcher.dispatch(executionContext);
+                result = dispatcher.dispatch(executionContext);
             } catch (ExecuteException e) {
                 logger.error("dispatch error",e);
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
-            if (result){
+            if (result || taskInstanceIsFinalState(taskInstanceId)){
                 break;
             }
         }
         return result;
+    }
+
+
+    /**
+     * taskInstance is final state
+     * success，failure，kill，stop，pause，threadwaiting is final state
+     * @param taskInstanceId taskInstanceId
+     * @return taskInstance is final state
+     */
+    public Boolean taskInstanceIsFinalState(int taskInstanceId){
+        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        return taskInstance.getState().typeIsFinished();
     }
 
     /**
