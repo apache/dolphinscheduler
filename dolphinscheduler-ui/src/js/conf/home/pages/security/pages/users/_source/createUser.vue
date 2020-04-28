@@ -150,7 +150,7 @@
 
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
-        
+
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         // user name
@@ -194,7 +194,7 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
-          
+
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -229,12 +229,18 @@
       },
       _submit () {
         this.$refs['popup'].spinnerLoading = true
+
+        let queueCode = '';
+        //get queue code
+        if (this.queueName != ''){
+          queueCode = this.queueList.length > 0 ? _.find(this.queueList, ['id', this.queueName]).code : ''
+        }
         let param = {
           userName: this.userName,
           userPassword: this.userPassword,
           tenantId: this.tenantId,
           email: this.email,
-          queue: this.queueList.length>0? _.find(this.queueList, ['id', this.queueName]).code : '',
+          queue: queueCode,
           phone: this.phone
         }
 
