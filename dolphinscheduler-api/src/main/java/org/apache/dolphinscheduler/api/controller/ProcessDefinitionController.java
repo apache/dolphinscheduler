@@ -470,9 +470,37 @@ public class ProcessDefinitionController extends BaseController {
         try {
             logger.info("export process definition by id, login user:{}, project name:{}, process definition id:{}",
                     loginUser.getUserName(), projectName, processDefinitionId);
-            processDefinitionService.exportProcessDefinitionById(loginUser, projectName, processDefinitionId, response);
+            processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, String.valueOf(processDefinitionId), response);
         } catch (Exception e) {
             logger.error(Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(), e);
+        }
+    }
+
+    /**
+     * batch export process definition by ids
+     *
+     * @param loginUser           login user
+     * @param projectName         project name
+     * @param processDefinitionIds process definition ids
+     * @param response            response
+     */
+
+    @ApiOperation(value = "batchExportProcessDefinitionByIds", notes= "BATCH_EXPORT_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
+    })
+    @GetMapping(value = "/batch-export")
+    @ResponseBody
+    public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @PathVariable String projectName,
+                                                  @RequestParam("processDefinitionIds") String processDefinitionIds,
+                                                  HttpServletResponse response) {
+        try {
+            logger.info("batch export process definition by ids, login user:{}, project name:{}, process definition ids:{}",
+                    loginUser.getUserName(), projectName, processDefinitionIds);
+            processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, processDefinitionIds, response);
+        } catch (Exception e) {
+            logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
         }
     }
 
