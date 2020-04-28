@@ -1,0 +1,167 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-api
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      app.kubernetes.io/component: api
+  strategy:
+    type: {{ .Values.api.strategy.type | quote }}
+    rollingUpdate:
+      maxSurge: {{ .Values.api.strategy.rollingUpdate.maxSurge | quote }}
+      maxUnavailable: {{ .Values.api.strategy.rollingUpdate.maxUnavailable | quote }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/component: api
+    spec:
+      {{- if .Values.api.affinity }}
+      affinity: {{- toYaml .Values.api.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.api.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init-postgresql
+          image: busybox:1.31.0
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+                  counter=$((counter+1))
+                  if [ $counter == 5 ]; then
+                      echo "Error: Couldn't connect to postgresql."
+                      exit 1
+                  fi
+                  echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+                  sleep 60
+              done
+          env:
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+            {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+            {{- end }}
+      containers:
+        - name: {{ include "dolphinscheduler.fullname" . }}-api
+          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          args:
+            - "api-server"
+          ports:
+            - containerPort: 12345
+              name: tcp-port
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+              {{- end }}
+            - name: POSTGRESQL_USERNAME
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlUsername }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.username | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.postgresql.enabled }}
+                  name: {{ template "dolphinscheduler.postgresql.fullname" . }}
+                  key: postgresql-password
+                  {{- else }}
+                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
+                  key: db-password
+                  {{- end }}
+            - name: POSTGRESQL_DATABASE
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlDatabase }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.database | quote }}
+              {{- end }}
+            - name: ZOOKEEPER_QUORUM
+              {{- if .Values.zookeeper.enabled }}
+              value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
+              {{- else }}
+              value: {{ .Values.externalZookeeper.zookeeperQuorum }}
+              {{- end }}
+          {{- if .Values.api.livenessProbe.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: 12345
+            initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.api.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.api.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.api.readinessProbe.enabled }}
+          readinessProbe:
+            tcpSocket:
+              port: 12345
+            initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.api.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.api.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "/opt/dolphinscheduler/logs"
+              name: {{ include "dolphinscheduler.fullname" . }}-api
+      volumes:
+        - name: {{ include "dolphinscheduler.fullname" . }}-api
+          {{- if .Values.api.persistentVolumeClaim.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-api
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

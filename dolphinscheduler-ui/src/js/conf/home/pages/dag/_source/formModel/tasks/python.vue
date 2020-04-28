@@ -333,3 +333,13 @@
     components: { mLocalParams, mListBox, mResources,Treeselect }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss" scope>
+  .vue-treeselect--disabled {
+    .vue-treeselect__control {
+      background-color: #ecf3f8;
+      .vue-treeselect__single-value {
+        color: #6d859e;
+      }
+    }
+  }
+</style>
