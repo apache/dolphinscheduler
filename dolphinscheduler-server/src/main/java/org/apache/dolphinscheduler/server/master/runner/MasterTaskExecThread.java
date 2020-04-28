@@ -215,7 +215,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * @param taskInstanceWorkerGroup taskInstanceWorkerGroup
      * @return whether exists
      */
-    private Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup){
+    public Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup){
         Set<String> workerGroups = zookeeperRegistryCenter.getWorkerGroupDirectly();
         // not worker group
         if (CollectionUtils.isEmpty(workerGroups)){

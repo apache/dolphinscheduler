@@ -44,12 +44,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 
-/**
- * @Author: Tboy
- */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
-        NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueImpl.class, TaskPriorityQueueConsumer.class,
+        NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
         ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class TaskPriorityQueueConsumerTest {
 
