@@ -90,6 +90,7 @@ export default {
       })
     })
   },
+
   /**
    * Get process definition DAG diagram details
    */
@@ -127,6 +128,22 @@ export default {
       })
     })
   },
+
+/**
+   * Get process definition DAG diagram details
+   */
+  copyProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/process/copy`, {
+        processId: payload.processId
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
   /**
    * Get the process instance DAG diagram details
    */

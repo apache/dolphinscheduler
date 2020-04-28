@@ -764,6 +764,7 @@
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
+                        <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
@@ -777,6 +778,8 @@
                         <include>**/server/log/TaskLogDiscriminatorTest.java</include>
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
+                        <include>**/server/master/consumer/TaskPriorityQueueConsumerTest.java</include>
+                        <include>**/server/master/runner/MasterTaskExecThreadTest.java</include>
                         <include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
