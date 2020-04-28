@@ -27,7 +27,7 @@ ENV DEBIAN_FRONTEND noninteractive
 #If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
 #RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
-    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip tini && \
+    apk add dos2unix shadow bash openrc python python3 sudo vim wget iputils net-tools openssh-server py2-pip tini && \
     apk add --update procps && \
     openrc boot && \
     pip install kazoo
@@ -67,6 +67,7 @@ ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
 ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
+ADD ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
 ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
 RUN chmod +x /root/checkpoint.sh && \
     chmod +x /root/startup-init-conf.sh && \
