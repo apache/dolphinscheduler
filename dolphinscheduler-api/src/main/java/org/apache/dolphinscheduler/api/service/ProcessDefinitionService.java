@@ -719,12 +719,14 @@ public class ProcessDefinitionService extends BaseDAGService {
         String processMetaJson = FileUtils.file2String(file);
         List<ProcessMeta> processMetaList = JSON.parseArray(processMetaJson,ProcessMeta.class);
 
+        //check file content
+        if (null == processMetaList || processMetaList.size() <=0) {
+            putMsg(result, Status.DATA_IS_NULL, "fileContent");
+            return result;
+        }
+
         for(ProcessMeta processMeta:processMetaList){
-            //check file content
-            if (null == processMeta) {
-                putMsg(result, Status.DATA_IS_NULL, "fileContent");
-                return result;
-            }
+
             if (StringUtils.isEmpty(processMeta.getProjectName())) {
                 putMsg(result, Status.DATA_IS_NULL, "projectName");
                 return result;
