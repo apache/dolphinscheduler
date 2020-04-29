@@ -18,12 +18,14 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -111,7 +113,7 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void UpdateProcessDefinition() throws Exception {
+    public void updateProcessDefinition() throws Exception {
 
         String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
@@ -284,6 +286,50 @@ public class ProcessDefinitionControllerTest{
 
         Mockito.when(processDefinitionService.getTaskNodeListByDefinitionIdList(idList)).thenReturn(result);
         Result response = processDefinitionController.getNodeListByDefinitionIdList(user,projectName,idList);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testQueryProcessDefinitionAllByProjectId() throws Exception{
+        int projectId = 1;
+        Map<String,Object> result = new HashMap<>();
+        putMsg(result,Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.queryProcessDefinitionAllByProjectId(projectId)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionAllByProjectId(user,projectId);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testViewTree() throws Exception{
+        String projectName = "test";
+        int processId = 1;
+        int limit = 2;
+        Map<String,Object> result = new HashMap<>();
+        putMsg(result,Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.viewTree(processId,limit)).thenReturn(result);
+        Result response = processDefinitionController.viewTree(user,projectName,processId,limit);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testQueryProcessDefinitionListPaging() throws Exception{
+        String projectName = "test";
+        int pageNo = 1;
+        int pageSize = 10;
+        String searchVal = "";
+        int userId = 1;
+
+        Map<String,Object> result = new HashMap<>();
+        putMsg(result,Status.SUCCESS);
+        result.put(Constants.DATA_LIST,new PageInfo<Resource>(1,10));
+
+        Mockito.when(processDefinitionService.queryProcessDefinitionListPaging(user,projectName, searchVal, pageNo, pageSize, userId)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionListPaging(user,projectName,pageNo,searchVal,userId,pageSize);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
