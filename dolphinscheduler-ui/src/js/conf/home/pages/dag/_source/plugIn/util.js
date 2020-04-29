@@ -23,7 +23,7 @@ import store from '@/conf/home/store'
  * Node, to array
  */
 const rtTargetarrArr = (id) => {
-  let ids = $(`#${id}`).attr('data-targetarr')
+  const ids = $(`#${id}`).attr('data-targetarr')
   return ids ? ids.split(',') : []
 }
 
@@ -31,8 +31,8 @@ const rtTargetarrArr = (id) => {
  * Store node id to targetarr
  */
 const saveTargetarr = (valId, domId) => {
-  let $target = $(`#${domId}`)
-  let targetStr = $target.attr('data-targetarr') ? $target.attr('data-targetarr') + `,${valId}` : `${valId}`
+  const $target = $(`#${domId}`)
+  const targetStr = $target.attr('data-targetarr') ? $target.attr('data-targetarr') + `,${valId}` : `${valId}`
   $target.attr('data-targetarr', targetStr)
 }
 
@@ -44,20 +44,20 @@ const rtBantpl = () => {
  * return node html
  */
 const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber }) => {
-  let tpl = ``
+  let tpl = ''
   tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
-  tpl += `<div>`
-  tpl += `<div class="state-p"></div>`
+  tpl += '<div>'
+  tpl += '<div class="state-p"></div>'
   tpl += `<div class="icos icos-${taskType}"></div>`
   tpl += `<span class="name-p">${name}</span>`
-  tpl += `</div>`
-  tpl += `<div class="ep"></div>`
-  tpl += `<div class="ban-p">`
+  tpl += '</div>'
+  tpl += '<div class="ep"></div>'
+  tpl += '<div class="ban-p">'
   if (runFlag === 'FORBIDDEN') {
     tpl += rtBantpl()
   }
-  tpl += `</div>`
-  tpl += `</div>`
+  tpl += '</div>'
+  tpl += '</div>'
 
   return tpl
 }
@@ -66,9 +66,9 @@ const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag
  * Get all tasks nodes
  */
 const tasksAll = () => {
-  let a = []
+  const a = []
   $('#canvas .w').each(function (idx, elem) {
-    let e = $(elem)
+    const e = $(elem)
     a.push({
       id: e.attr('id'),
       name: e.find('.name-p').text(),
@@ -117,10 +117,10 @@ const setSvgColor = (e, color) => {
  * Get all node ids
  */
 const allNodesId = () => {
-  let idArr = []
+  const idArr = []
   $('.w').each((i, o) => {
-    let $obj = $(o)
-    let $span = $obj.find('.name-p').text()
+    const $obj = $(o)
+    const $span = $obj.find('.name-p').text()
     if ($span) {
       idArr.push({
         id: $obj.attr('id'),

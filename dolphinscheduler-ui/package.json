@@ -8,6 +8,7 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
     "clean": "rimraf dist",
     "start": "npm run dev",
+    "lint": "eslint ./src --fix",
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
@@ -50,6 +51,13 @@
     "css-loader": "^0.28.8",
     "cssnano": "4.1.10",
     "env-parse": "^1.0.5",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^5.0.2",
     "globby": "^8.0.1",
     "html-loader": "^0.5.5",
