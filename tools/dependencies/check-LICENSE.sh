@@ -25,7 +25,7 @@ tar -zxf dolphinscheduler-dist/target/apache-dolphinscheduler*-bin.tar.gz --stri
 # licenses
 ./mvnw --batch-mode --quiet -Dexec.executable='echo' -Dexec.args='${project.artifactId}-${project.version}.jar' exec:exec > self-modules.txt
 
-ls dist/lib > all-dependencies.txt
+ls dist/lib | tee all-dependencies.txt
 
 # Exclude all self modules(jars) to generate all third-party dependencies
 grep -vf self-modules.txt all-dependencies.txt > third-party-dependencies.txt
