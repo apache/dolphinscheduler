@@ -37,7 +37,7 @@
         </div>
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('Table')}}</x-checkbox>
+            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
             <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
           </x-checkbox-group>
         </div>
