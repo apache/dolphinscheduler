@@ -54,9 +54,6 @@ public class AlertData {
      */
     private String receiversCc;
 
-    public AlertData() {
-    }
-
     public int getId() {
         return id;
     }
@@ -129,13 +126,4 @@ public class AlertData {
         return this;
     }
 
-    public AlertData(int id, String title, String content, String log, int alertGroupId, String receivers, String receiversCc) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.log = log;
-        this.alertGroupId = alertGroupId;
-        this.receivers = receivers;
-        this.receiversCc = receiversCc;
-    }
 }
