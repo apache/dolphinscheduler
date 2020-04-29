@@ -56,9 +56,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Compile
-        run: mvn -B clean compile package -Prelease -Dmaven.test.skip=true
       - name: Check license
         run: ./mvnw -B apache-rat:check
+      - name: Compile
+        run: mvn -B clean compile install -Prelease -Dmaven.test.skip=true
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
