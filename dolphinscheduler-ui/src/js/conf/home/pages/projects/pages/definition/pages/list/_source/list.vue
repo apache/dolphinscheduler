@@ -328,15 +328,15 @@
 
       _export (item) {
         this.exportDefinition({
-          processDefinitionId: item.id,
-          processDefinitionName: item.name
+          processDefinitionIds: item.id,
+          fileName: item.name
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
 
       _batchExport () {
-        this.batchExportDefinition({
+        this.exportDefinition({
           processDefinitionIds: this.strSelectIds,
           fileName: "process_"+new Date().getTime()
         }).then(res => {

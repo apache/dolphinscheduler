@@ -348,14 +348,4 @@ public class ProcessDefinitionControllerTest{
         processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
     }
 
-    @Test
-    public void testExportProcessDefinitionById() throws Exception{
-        int processDefinitionId = 1;
-        String projectName = "test";
-        HttpServletResponse response = new MockHttpServletResponse();
-        ProcessDefinitionService service = new ProcessDefinitionService();
-        ProcessDefinitionService spy = Mockito.spy(service);
-        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionId+"", response);
-        processDefinitionController.exportProcessDefinitionById(user, projectName, processDefinitionId, response);
-    }
 }

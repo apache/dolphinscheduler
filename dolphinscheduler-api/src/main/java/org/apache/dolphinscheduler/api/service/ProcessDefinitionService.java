@@ -592,7 +592,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
             }
 
-            if(processDefinitionList.size() > 0){
+            if(!processDefinitionList.isEmpty()){
                 response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
                 response.setHeader("Content-Disposition", "attachment;filename=" + projectName+"_"+"process_"+System.currentTimeMillis()+".json");
                 BufferedOutputStream buff = null;
@@ -600,7 +600,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 try {
                     out = response.getOutputStream();
                     buff = new BufferedOutputStream(out);
-                    buff.write(JSONUtils.toJson(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+                    buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
                     buff.flush();
                     buff.close();
                 } catch (IOException e) {

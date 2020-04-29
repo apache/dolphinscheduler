@@ -449,34 +449,6 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * export process definition by id
-     *
-     * @param loginUser           login user
-     * @param projectName         project name
-     * @param processDefinitionId process definition id
-     * @param response            response
-     */
-
-    @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCESS_DEFINITION_BY_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
-    })
-    @GetMapping(value = "/export")
-    @ResponseBody
-    public void exportProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable String projectName,
-                                            @RequestParam("processDefinitionId") Integer processDefinitionId,
-                                            HttpServletResponse response) {
-        try {
-            logger.info("export process definition by id, login user:{}, project name:{}, process definition id:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId);
-            processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, String.valueOf(processDefinitionId), response);
-        } catch (Exception e) {
-            logger.error(Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(), e);
-        }
-    }
-
-    /**
      * batch export process definition by ids
      *
      * @param loginUser           login user
@@ -489,10 +461,10 @@ public class ProcessDefinitionController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
     })
-    @GetMapping(value = "/batch-export")
+    @GetMapping(value = "/export")
     @ResponseBody
     public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @PathVariable String projectName,
+                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("processDefinitionIds") String processDefinitionIds,
                                                   HttpServletResponse response) {
         try {
