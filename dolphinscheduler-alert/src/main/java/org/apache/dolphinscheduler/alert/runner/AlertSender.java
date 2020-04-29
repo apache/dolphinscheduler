@@ -54,9 +54,7 @@ public class AlertSender {
     }
 
     public void run() {
-
         List<User> users;
-
         Map<String, Object> retMaps = null;
         for (Alert alert : alertList) {
             users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
@@ -85,7 +83,10 @@ public class AlertSender {
             AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL);
             retMaps = emailPlugin.process(alertInfo);
 
-            if (retMaps == null || !Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
+            if (retMaps == null) {
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
+                logger.info("alert send error : return value is null");
+            } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
                 logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
             } else {
@@ -96,17 +97,4 @@ public class AlertSender {
 
     }
 
-    /**
-     * get a list of SMS users
-     *
-     * @param users
-     * @return
-     */
-    private List<String> getReciversForSMS(List<User> users) {
-        List<String> list = new ArrayList<>();
-        for (User user : users) {
-            list.add(user.getPhone());
-        }
-        return list;
-    }
 }

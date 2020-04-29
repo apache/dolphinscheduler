@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
@@ -67,15 +66,17 @@ public class EnterpriseWeChatUtils {
      * get Enterprise WeChat is enable
      * @return isEnable
      */
-    public static Boolean isEnable(){
-        Boolean isEnable = false;
+    public static boolean isEnable(){
+        Boolean isEnable = null;
         try {
             isEnable = PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
+        if (isEnable == null) {
+            return false;
+        }
         return isEnable;
-
     }
 
     /**

@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -56,15 +55,10 @@ public class AlertServer {
     };
 
     public AlertServer() {
-        try {
-            alertPluginManager =
-                    new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
-            // add default alert plugins
-            alertPluginManager.addPlugin(new EmailAlertPlugin());
-        } catch (MalformedURLException e) {
-            logger.error("Failed to start alert server", e);
-            System.exit(1);
-        }
+        alertPluginManager =
+                new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
+        // add default alert plugins
+        alertPluginManager.addPlugin(new EmailAlertPlugin());
     }
 
     public synchronized static AlertServer getInstance() {

@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 
 import java.util.List;
 import java.util.Map;

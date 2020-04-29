@@ -42,12 +42,30 @@ public class FilePluginManager implements PluginManager {
 
     private Map<String, PluginClassLoader> classLoaderMap = new ConcurrentHashMap<>();
 
-    public FilePluginManager(String dirPath, String[] whitePrefixes, String[] excludePrefixes) throws MalformedURLException {
+    private String[] whitePrefixes;
+
+    private String[] excludePrefixes;
+
+    public FilePluginManager(String dirPath, String[] whitePrefixes, String[] excludePrefixes) {
+        this.whitePrefixes = whitePrefixes;
+        this.excludePrefixes = excludePrefixes;
+        try {
+            load(dirPath);
+        } catch (MalformedURLException e) {
+            logger.error("load plugins failed.", e);
+        }
+    }
+
+    private void load(String dirPath) throws MalformedURLException {
         logger.info("start to load jar files in {}", dirPath);
+        if (dirPath == null) {
+            logger.error("not a valid path - {}", dirPath);
+            return;
+        }
         File[] files = new File(dirPath).listFiles();
         if (files == null) {
             logger.error("not a valid path - {}", dirPath);
-            System.exit(1);
+            return;
         }
         for (File file : files) {
             if (file.isDirectory() && !file.getPath().endsWith(Constants.PLUGIN_JAR_SUFFIX)) {

@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -65,14 +66,15 @@ public class EmailAlertPluginTest {
                 .setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", " +
                         "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]")
                 .setLog("test log")
-                .setReceivers("bitace@163.com")
-                .setReceiversCc("bitace@163.com")
+                .setReceivers("xx@xx.com")
+                .setReceiversCc("xx@xx.com")
                 .setShowType(ShowType.TEXT.getDescp())
                 .setTitle("test title");
 
         alertInfo.setAlertData(alertData);
-        List<String> list = new ArrayList<String>(){{ add("bitace@163.com"); }};
+        List<String> list = new ArrayList<String>(){{ add("xx@xx.com"); }};
         alertInfo.addProp("receivers", list);
-        plugin.process(alertInfo);
+        Map<String, Object> ret = plugin.process(alertInfo);
+        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
     }
 }

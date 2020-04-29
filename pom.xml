@@ -350,7 +350,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
-                <!--                <scope>test</scope>-->
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
@@ -694,6 +694,7 @@
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <include>**/api/enums/testGetEnum.java</include>
@@ -769,6 +770,8 @@
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
+                        <include>**/common/plugin/FilePluginManagerTest</include>
+                        <include>**/common/plugin/PluginClassLoaderTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
@@ -835,6 +838,9 @@
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
+                        <include>**/plugin/model/AlertDataTest.java</include>
+                        <include>**/plugin/model/AlertInfoTest.java</include>
+                        <include>**/plugin/utils/PropertyUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -980,5 +986,4 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-plugin-api</module>
     </modules>
-
 </project>
