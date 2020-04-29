@@ -342,7 +342,6 @@
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
-          this.$message.success(res.msg)
           this.strSelectIds = ''
         }).catch(e => {
           this.strSelectIds = ''

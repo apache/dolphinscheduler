@@ -35,6 +35,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockHttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -332,5 +334,28 @@ public class ProcessDefinitionControllerTest{
         Result response = processDefinitionController.queryProcessDefinitionListPaging(user,projectName,pageNo,searchVal,userId,pageSize);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testBatchExportProcessDefinitionByIds() throws Exception{
+
+        String processDefinitionIds = "1,2";
+        String projectName = "test";
+        HttpServletResponse response = new MockHttpServletResponse();
+        ProcessDefinitionService service = new ProcessDefinitionService();
+        ProcessDefinitionService spy = Mockito.spy(service);
+        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
+        processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
+    }
+
+    @Test
+    public void testExportProcessDefinitionById() throws Exception{
+        int processDefinitionId = 1;
+        String projectName = "test";
+        HttpServletResponse response = new MockHttpServletResponse();
+        ProcessDefinitionService service = new ProcessDefinitionService();
+        ProcessDefinitionService spy = Mockito.spy(service);
+        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionId+"", response);
+        processDefinitionController.exportProcessDefinitionById(user, projectName, processDefinitionId, response);
     }
 }
