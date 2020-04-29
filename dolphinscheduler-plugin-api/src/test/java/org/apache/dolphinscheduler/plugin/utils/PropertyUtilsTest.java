@@ -63,7 +63,7 @@ public class PropertyUtilsTest {
     @Test
     public void testGetLong() {
         long result = PropertyUtils.getLong("test.long");
-        assertSame(result, 100L);
+        assertSame(100L, result);
     }
 
     /**
@@ -74,7 +74,7 @@ public class PropertyUtilsTest {
 
         //If key is undefine in alert.properties, and there is a defaultval, then return defaultval
         double result = PropertyUtils.getDouble("abc", 5.0);
-        assertEquals(result, 5.0, 0);
+        assertEquals(5.0, result, 0);
 
         result = PropertyUtils.getDouble("cba", 5.0);
         assertEquals(3.1, result, 0.01);

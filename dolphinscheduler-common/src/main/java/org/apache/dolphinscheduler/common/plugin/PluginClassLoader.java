@@ -85,6 +85,9 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     private boolean fromWhitePrefix(String name) {
+        if (this.whitePrefixes == null) {
+            return false;
+        }
         for (String whitePrefix : this.whitePrefixes) {
             if (name.startsWith(whitePrefix)) {
                 return true;
@@ -94,6 +97,9 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     private boolean fromExcludePrefix(String name) {
+        if (this.excludePrefixes == null) {
+            return false;
+        }
         for (String excludePrefix : this.excludePrefixes) {
             if (name.startsWith(excludePrefix)) {
                 return true;
@@ -139,9 +145,7 @@ public class PluginClassLoader extends URLClassLoader {
     public URL getResource(String name) {
         URL res = null;
 
-        if (res == null) {
-            res = findResource(name);
-        }
+        res = findResource(name);
         if (res == null) {
             res = super.getResource(name);
         }
