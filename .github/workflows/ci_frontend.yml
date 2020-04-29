@@ -48,9 +48,9 @@ jobs:
       - name: Compile
         run: |
           cd dolphinscheduler-ui
-          npm run lint
           npm install node-sass --unsafe-perm
           npm install
+          npm run lint
           npm run build
 
   License-check:
