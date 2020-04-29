@@ -19,12 +19,16 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -37,7 +41,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.omg.CORBA.Any;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -172,10 +175,29 @@ public class ResourcesServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(),result.getMsg());
 
+        //RESOURCE_NOT_EXIST
+        user.setId(1);
+        Mockito.when(userMapper.queryDetailsById(1)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        PowerMockito.when(HadoopUtils.getHdfsFileName(Mockito.any(), Mockito.any(),Mockito.anyString())).thenReturn("test1");
+
+        try {
+            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any())).thenReturn(false);
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+        }
+        result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF);
+        Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
+
         //SUCCESS
         user.setId(1);
         Mockito.when(userMapper.queryDetailsById(1)).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        try {
+            Mockito.when(HadoopUtils.getInstance().exists(Mockito.any())).thenReturn(true);
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+        }
 
         result = resourcesService.updateResource(user,1,"ResourcesServiceTest.jar","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
@@ -199,21 +221,16 @@ public class ResourcesServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(),result.getMsg());
 
-        //RESOURCE_NOT_EXIST
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        PowerMockito.when(HadoopUtils.getHdfsResourceFileName(Mockito.any(), Mockito.any())).thenReturn("test1");
-
-        try {
-            Mockito.when(hadoopUtils.exists("test")).thenReturn(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.UDF);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
 
         //SUCCESS
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(HadoopUtils.getHdfsResourceFileName(Mockito.any(), Mockito.any())).thenReturn("test");
+        try {
+            PowerMockito.when(HadoopUtils.getInstance().copy(Mockito.anyString(),Mockito.anyString(),true,true)).thenReturn(true);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+
         result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest1.jar",ResourceType.UDF);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());

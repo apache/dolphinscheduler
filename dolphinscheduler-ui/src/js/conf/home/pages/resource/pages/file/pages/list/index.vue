@@ -38,7 +38,7 @@
       <template v-if="!fileResourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading">
+      <m-spin :is-spin="isLoading" :is-left="isLeft">
       </m-spin>
     </template>
   </m-list-construction>
@@ -67,7 +67,8 @@
           pageNo: 1,
           searchVal: '',
           type: 'FILE'
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -91,6 +92,11 @@
         this.searchParams.pageSize = val
       },
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
           if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
@@ -124,6 +130,9 @@
     },
     mounted () {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
