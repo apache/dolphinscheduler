@@ -59,6 +59,6 @@ jobs:
       - name: Compile
         run: mvn -B clean compile package -Prelease -Dmaven.test.skip=true
       - name: Check license
-        run: |
-          mvn -B apache-rat:check
-          bash -ex tools/dependencies/check-LICENSE.sh
+        run: ./mvnw -B apache-rat:check
+      - name: Check dependency license
+        run: tools/dependencies/check-LICENSE.sh
