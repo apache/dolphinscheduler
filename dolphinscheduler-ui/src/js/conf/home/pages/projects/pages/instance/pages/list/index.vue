@@ -204,6 +204,7 @@
     }
     .table-box {
       .fixed {
+        table-layout: auto;
         tr {
           th:last-child,td:last-child {
             background: inherit;
