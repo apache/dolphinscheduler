@@ -365,6 +365,7 @@ public class SchedulerService extends BaseService {
 
         if (masterServers.size() == 0) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
+            return result;
         }
 
         // set status
