@@ -571,6 +571,10 @@ public class ProcessDefinitionService extends BaseDAGService {
      */
     public void batchExportProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds, HttpServletResponse response){
 
+        if(StringUtils.isEmpty(processDefinitionIds)){
+            return;
+        }
+
         //export project info
         Project project = projectMapper.queryByName(projectName);
 
@@ -578,46 +582,47 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
 
-        if(resultStatus == Status.SUCCESS){
-            List<ProcessMeta> processDefinitionList = new ArrayList<>();
-            if (StringUtils.isNotEmpty(processDefinitionIds)) {
-                String[] processDefinitionIdArray = processDefinitionIds.split(",");
-                for (String strProcessDefinitionId : processDefinitionIdArray) {
-                    //get workflow info
-                    int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
-                    ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
-                    if (null != processDefinition) {
-                        processDefinitionList.add(exportProcessMetaData(processDefinitionId, processDefinition));
+        if(resultStatus != Status.SUCCESS){
+            return;
+        }
+
+        List<ProcessMeta> processDefinitionList = new ArrayList<>();
+
+        String[] processDefinitionIdArray = processDefinitionIds.split(",");
+        for (String strProcessDefinitionId : processDefinitionIdArray) {
+            //get workflow info
+            int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+            ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+            if (null != processDefinition) {
+                processDefinitionList.add(exportProcessMetaData(processDefinitionId, processDefinition));
+            }
+        }
+
+        if(CollectionUtils.isNotEmpty(processDefinitionList)){
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+            BufferedOutputStream buff = null;
+            ServletOutputStream out = null;
+            try {
+                out = response.getOutputStream();
+                buff = new BufferedOutputStream(out);
+                buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+                buff.flush();
+                buff.close();
+            } catch (IOException e) {
+                logger.warn("export process fail", e);
+            }finally {
+                if (null != buff) {
+                    try {
+                        buff.close();
+                    } catch (Exception e) {
+                        logger.warn("export process buffer not close", e);
                     }
                 }
-            }
-
-            if(!processDefinitionList.isEmpty()){
-                response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                BufferedOutputStream buff = null;
-                ServletOutputStream out = null;
-                try {
-                    out = response.getOutputStream();
-                    buff = new BufferedOutputStream(out);
-                    buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
-                    buff.flush();
-                    buff.close();
-                } catch (IOException e) {
-                    logger.warn("export process fail", e);
-                }finally {
-                    if (null != buff) {
-                        try {
-                            buff.close();
-                        } catch (Exception e) {
-                            logger.warn("export process buffer not close", e);
-                        }
-                    }
-                    if (null != out) {
-                        try {
-                            out.close();
-                        } catch (Exception e) {
-                            logger.warn("export process output stream not close", e);
-                        }
+                if (null != out) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        logger.warn("export process output stream not close", e);
                     }
                 }
             }
@@ -719,7 +724,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         List<ProcessMeta> processMetaList = JSON.parseArray(processMetaJson,ProcessMeta.class);
 
         //check file content
-        if (null == processMetaList || processMetaList.size() <=0) {
+        if (CollectionUtils.isEmpty(processMetaList)) {
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
