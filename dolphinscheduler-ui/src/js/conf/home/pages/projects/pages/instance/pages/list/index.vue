@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 <template>
+  <div class="wrap-table">
   <m-list-construction :title="$t('Process Instance')">
     <template slot="conditions">
       <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
@@ -33,6 +34,7 @@
       <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -196,4 +198,28 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  .wrap-table {
+    .table-box {
+      overflow-y: scroll;
+    }
+    .table-box {
+      .fixed {
+        tr {
+          th:last-child,td:last-child {
+            background: inherit;
+            width: 230px;
+            height: 40px;
+            line-height: 40px;
+            border-left:1px solid #ecf3ff;
+            position: absolute;
+            right: 0;
+            z-index: 2;
+          }
+          th:nth-last-child(2) {
+            padding-right: 260px;
+          }
+        }
+      }
+    }
+  }
 </style>
