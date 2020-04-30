@@ -143,13 +143,20 @@
     created () {
       let o = this.backfillItem
       let dependentResult = $(`#${o.id}`).data('dependent-result') || {}
+      
       // Does not represent an empty object backfill
       if (!_.isEmpty(o)) {
         this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
         this.dependTaskList = _.cloneDeep(o.dependence.dependTaskList) || []
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
-        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState))
+        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
+          $(`#${o.id}`).siblings().each(function(){
+            if(v1.depTasks == $(this).text()) {
+              v1.state = $(this).attr('data-dependent-depstate')
+            }
+          });
+        }))
       }
     },
     mounted () {
