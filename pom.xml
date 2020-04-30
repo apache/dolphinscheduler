@@ -15,7 +15,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -203,6 +202,11 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-plugin-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -690,6 +694,7 @@
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <include>**/api/enums/testGetEnum.java</include>
@@ -765,6 +770,8 @@
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
+                        <include>**/common/plugin/FilePluginManagerTest</include>
+                        <include>**/common/plugin/PluginClassLoaderTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
@@ -831,6 +838,9 @@
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
+                        <include>**/plugin/model/AlertDataTest.java</include>
+                        <include>**/plugin/model/AlertInfoTest.java</include>
+                        <include>**/plugin/utils/PropertyUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -974,6 +984,6 @@
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
+        <module>dolphinscheduler-plugin-api</module>
     </modules>
-
 </project>
