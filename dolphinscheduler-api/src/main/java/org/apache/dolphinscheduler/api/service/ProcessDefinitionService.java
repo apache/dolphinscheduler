@@ -594,7 +594,6 @@ public class ProcessDefinitionService extends BaseDAGService {
 
             if(!processDefinitionList.isEmpty()){
                 response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                response.setHeader("Content-Disposition", "attachment;filename=" + projectName+"_"+"process_"+System.currentTimeMillis()+".json");
                 BufferedOutputStream buff = null;
                 ServletOutputStream out = null;
                 try {
