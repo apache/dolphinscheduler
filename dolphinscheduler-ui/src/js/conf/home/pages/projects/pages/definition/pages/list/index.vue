@@ -35,7 +35,7 @@
       <template v-if="!processListP.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
 </template>
@@ -64,7 +64,8 @@
           pageNo: 1,
           searchVal: '',
           userId: ''
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -98,6 +99,11 @@
        * get data list
        */
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getProcessListP(this.searchParams).then(res => {
           if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
@@ -132,6 +138,9 @@
     },
     mounted() {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
