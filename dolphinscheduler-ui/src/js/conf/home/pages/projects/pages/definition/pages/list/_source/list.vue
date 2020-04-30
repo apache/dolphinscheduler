@@ -25,7 +25,7 @@
           <th scope="col" width="40">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" width="200">
             <span>{{$t('Process Name')}}</span>
           </th>
           <th scope="col" width="50">
@@ -37,13 +37,13 @@
           <th scope="col" width="130">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" width="150">
             <span>{{$t('Description')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" width="80">
             <span>{{$t('Modify User')}}</span>
           </th>
-          <th scope="col" width="90">
+          <th scope="col" width="80">
             <span>{{$t('Timing state')}}</span>
           </th>
           <th scope="col" width="300">
