@@ -176,8 +176,7 @@
         }
       })
     },
-    mounted () {
-    },
+    mounted () {},
     components: {}
   }
 </script>
