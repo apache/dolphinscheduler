@@ -25,7 +25,7 @@
           <th scope="col" width="30">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col" width="70">
+          <th scope="col" width="200">
             <span>{{$t('Process Name')}}</span>
           </th>
           <th scope="col" width="60">
@@ -56,7 +56,9 @@
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
           <th scope="col" width="30">
-            <span>{{$t('State')}}</span>
+            <div style="width: 30px">
+              <span>{{$t('State')}}</span>
+            </div>
           </th>
           <th scope="col" width="210">
             <span>{{$t('Operation')}}</span>
