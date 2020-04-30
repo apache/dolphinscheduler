@@ -28,8 +28,8 @@
       <template v-if="isInstance">
         <span class="instance-state">
           <em class="iconfont ans-icon-success-solid" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
-          <em class="iconfont ans-icon-clock" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
-          <em class="iconfont ans-icon-fail-solid" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
+          <em class="iconfont ans-icon-clock" :class="'icon-' + el.state" v-if="el.state === 'RUNNING_EXEUTION'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
+          <em class="iconfont ans-icon-fail-solid" :class="'icon-' + el.state" v-if="el.state === 'FAILURE'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
         </span>
       </template>
       <span class="operation">
@@ -176,8 +176,7 @@
         }
       })
     },
-    mounted () {
-    },
+    mounted () {},
     components: {}
   }
 </script>
