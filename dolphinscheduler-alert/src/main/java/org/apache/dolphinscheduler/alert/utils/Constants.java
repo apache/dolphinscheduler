@@ -156,4 +156,21 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
+
+    /**
+     * plugin config
+     */
+    public static final String PLUGIN_DIR = "plugin.dir";
+
+    public static final String PLUGIN_DEFAULT_EMAIL = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_EN = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
+
+    public static final String RETMAP_MSG = "msg";
 }
