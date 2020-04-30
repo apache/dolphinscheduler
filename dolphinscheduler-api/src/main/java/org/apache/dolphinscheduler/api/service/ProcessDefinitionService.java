@@ -755,7 +755,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             try {
                 createProcessResult = createProcessDefinition(loginUser
                         ,currentProjectName,
-                        processDefinitionName,
+                        processDefinitionName+"_import_"+System.currentTimeMillis(),
                         importProcessParam,
                         processMeta.getProcessDefinitionDescription(),
                         processMeta.getProcessDefinitionLocations(),
