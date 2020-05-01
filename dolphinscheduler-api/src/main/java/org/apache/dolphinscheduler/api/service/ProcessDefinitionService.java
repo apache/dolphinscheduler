@@ -586,8 +586,21 @@ public class ProcessDefinitionService extends BaseDAGService {
             return;
         }
 
-        List<ProcessMeta> processDefinitionList = new ArrayList<>();
+        List<ProcessMeta> processDefinitionList =
+                getProcessDefinitionList(processDefinitionIds);
 
+        if(CollectionUtils.isNotEmpty(processDefinitionList)){
+            downloadProcessDefinitionFile(response, processDefinitionList);
+        }
+    }
+
+    /**
+     * get process definition list by ids
+     * @param processDefinitionIds
+     * @return
+     */
+    private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds){
+        List<ProcessMeta> processDefinitionList = new ArrayList<>();
         String[] processDefinitionIdArray = processDefinitionIds.split(",");
         for (String strProcessDefinitionId : processDefinitionIdArray) {
             //get workflow info
@@ -598,32 +611,39 @@ public class ProcessDefinitionService extends BaseDAGService {
             }
         }
 
-        if(CollectionUtils.isNotEmpty(processDefinitionList)){
-            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-            BufferedOutputStream buff = null;
-            ServletOutputStream out = null;
-            try {
-                out = response.getOutputStream();
-                buff = new BufferedOutputStream(out);
-                buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
-                buff.flush();
-                buff.close();
-            } catch (IOException e) {
-                logger.warn("export process fail", e);
-            }finally {
-                if (null != buff) {
-                    try {
-                        buff.close();
-                    } catch (Exception e) {
-                        logger.warn("export process buffer not close", e);
-                    }
+        return processDefinitionList;
+    }
+
+    /**
+     * download the process definition file
+     * @param response
+     * @param processDefinitionList
+     */
+    private void downloadProcessDefinitionFile(HttpServletResponse response, List<ProcessMeta> processDefinitionList) {
+        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        BufferedOutputStream buff = null;
+        ServletOutputStream out = null;
+        try {
+            out = response.getOutputStream();
+            buff = new BufferedOutputStream(out);
+            buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+            buff.flush();
+            buff.close();
+        } catch (IOException e) {
+            logger.warn("export process fail", e);
+        }finally {
+            if (null != buff) {
+                try {
+                    buff.close();
+                } catch (Exception e) {
+                    logger.warn("export process buffer not close", e);
                 }
-                if (null != out) {
-                    try {
-                        out.close();
-                    } catch (Exception e) {
-                        logger.warn("export process output stream not close", e);
-                    }
+            }
+            if (null != out) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                    logger.warn("export process output stream not close", e);
                 }
             }
         }
