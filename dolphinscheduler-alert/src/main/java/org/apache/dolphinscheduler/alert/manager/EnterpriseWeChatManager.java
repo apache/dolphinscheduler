@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
-import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,18 +35,18 @@ public class EnterpriseWeChatManager {
     private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
     /**
      * Enterprise We Chat send
-     * @param alert the alert
+     * @param alertInfo the alert info
      * @param token the token
      * @return the send result
      */
-    public Map<String,Object> send(Alert alert, String token){
+    public Map<String,Object> send(AlertInfo alertInfo, String token){
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
         String agentId = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_AGENT_ID;
         String users = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_USERS;
         List<String> userList = Arrays.asList(users.split(","));
-        logger.info("send message {}",alert);
-        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alert));
+        logger.info("send message {}", alertInfo.getAlertData().getTitle());
+        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alertInfo.getAlertData()));
         try {
             EnterpriseWeChatUtils.sendEnterpriseWeChat(Constants.UTF_8, msg, token);
         } catch (IOException e) {
