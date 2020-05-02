@@ -751,17 +751,8 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         for(ProcessMeta processMeta:processMetaList){
 
-            if (StringUtils.isEmpty(processMeta.getProjectName())) {
-                putMsg(result, Status.DATA_IS_NULL, "projectName");
-                return result;
-            }
-            if (StringUtils.isEmpty(processMeta.getProcessDefinitionName())) {
-                putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
-                return result;
-            }
-            if (StringUtils.isEmpty(processMeta.getProcessDefinitionJson())) {
-                putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
-                return result;
+            if(checkImportanceParams(processMeta,result)){
+               return result;
             }
 
             //deal with process name
@@ -813,6 +804,29 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         return result;
+    }
+
+    /**
+     * check importance params
+     * @param processMeta
+     * @param result
+     * @return
+     */
+    private boolean checkImportanceParams(ProcessMeta processMeta,Map<String, Object> result){
+        if (StringUtils.isEmpty(processMeta.getProjectName())) {
+            putMsg(result, Status.DATA_IS_NULL, "projectName");
+            return true;
+        }
+        if (StringUtils.isEmpty(processMeta.getProcessDefinitionName())) {
+            putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
+            return true;
+        }
+        if (StringUtils.isEmpty(processMeta.getProcessDefinitionJson())) {
+            putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
+            return true;
+        }
+
+        return false;
     }
 
     /**
