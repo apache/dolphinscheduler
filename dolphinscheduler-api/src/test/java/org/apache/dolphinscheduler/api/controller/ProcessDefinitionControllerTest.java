@@ -346,7 +346,6 @@ public class ProcessDefinitionControllerTest{
         ProcessDefinitionService spy = Mockito.spy(service);
         Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
         processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
-        Assert.assertEquals(Status.SUCCESS.getCode(),0);
     }
 
 }

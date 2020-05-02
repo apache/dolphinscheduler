@@ -751,59 +751,128 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         for(ProcessMeta processMeta:processMetaList){
 
-            if(checkImportanceParams(processMeta,result)){
-               return result;
-            }
-
-            //deal with process name
-            String processDefinitionName = processMeta.getProcessDefinitionName();
-            //use currentProjectName to query
-            Project targetProject = projectMapper.queryByName(currentProjectName);
-            if(null != targetProject){
-                processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
-                        processDefinitionName, 1);
-            }
-
-            //add special task param
-            String importProcessParam = addImportTaskNodeParam(loginUser, processMeta.getProcessDefinitionJson(), targetProject);
-
-            Map<String, Object> createProcessResult;
-            try {
-                createProcessResult = createProcessDefinition(loginUser
-                        ,currentProjectName,
-                        processDefinitionName+"_import_"+System.currentTimeMillis(),
-                        importProcessParam,
-                        processMeta.getProcessDefinitionDescription(),
-                        processMeta.getProcessDefinitionLocations(),
-                        processMeta.getProcessDefinitionConnects());
-            } catch (JsonProcessingException e) {
-                logger.error("import process meta json data: {}", e.getMessage(), e);
-                putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+            if (!checkAndImportProcessDefinition(loginUser, currentProjectName, result, processMeta)){
                 return result;
-            }
-
-            putMsg(result, Status.SUCCESS);
-            //create process definition
-            Integer processDefinitionId = null;
-            if (null != createProcessResult && Objects.nonNull(createProcessResult.get("processDefinitionId"))) {
-                processDefinitionId = Integer.parseInt(createProcessResult.get("processDefinitionId").toString());
-            }
-            //scheduler param
-            if (null != processMeta.getScheduleCrontab() && null != processDefinitionId) {
-                int scheduleInsert = importProcessSchedule(loginUser,
-                        currentProjectName,
-                        processMeta,
-                        processDefinitionName,
-                        processDefinitionId);
-
-                if (0 == scheduleInsert) {
-                    putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
-                    return result;
-                }
             }
         }
 
         return result;
+    }
+
+    /**
+     * check and import process definition
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @return
+     */
+    private boolean checkAndImportProcessDefinition(User loginUser, String currentProjectName, Map<String, Object> result, ProcessMeta processMeta) {
+
+        if(!checkImportanceParams(processMeta,result)){
+            return false;
+        }
+
+        //deal with process name
+        String processDefinitionName = processMeta.getProcessDefinitionName();
+        //use currentProjectName to query
+        Project targetProject = projectMapper.queryByName(currentProjectName);
+        if(null != targetProject){
+            processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
+                    processDefinitionName, 1);
+        }
+
+        // get create process result
+        Map<String, Object> createProcessResult =
+                getCreateProcessResult(loginUser,
+                        currentProjectName,
+                        result,
+                        processMeta,
+                        processDefinitionName,
+                        addImportTaskNodeParam(loginUser, processMeta.getProcessDefinitionJson(), targetProject));
+
+        if(createProcessResult == null){
+            return false;
+        }
+
+        //create process definition
+        Integer processDefinitionId =
+                Objects.isNull(createProcessResult.get("processDefinitionId"))?
+                        null:Integer.parseInt(createProcessResult.get("processDefinitionId").toString());
+
+        //scheduler param
+        return getImportProcessScheduleResult(loginUser,
+                currentProjectName,
+                result,
+                processMeta,
+                processDefinitionName,
+                processDefinitionId);
+
+    }
+
+    /**
+     * get create process result
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @param processDefinitionName
+     * @param importProcessParam
+     * @return
+     */
+    private Map<String, Object> getCreateProcessResult(User loginUser,
+                                                       String currentProjectName,
+                                                       Map<String, Object> result,
+                                                       ProcessMeta processMeta,
+                                                       String processDefinitionName,
+                                                       String importProcessParam){
+        Map<String, Object> createProcessResult = null;
+        try {
+            createProcessResult = createProcessDefinition(loginUser
+                    ,currentProjectName,
+                    processDefinitionName+"_import_"+System.currentTimeMillis(),
+                    importProcessParam,
+                    processMeta.getProcessDefinitionDescription(),
+                    processMeta.getProcessDefinitionLocations(),
+                    processMeta.getProcessDefinitionConnects());
+            putMsg(result, Status.SUCCESS);
+        } catch (JsonProcessingException e) {
+            logger.error("import process meta json data: {}", e.getMessage(), e);
+            putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+        }
+
+        return createProcessResult;
+    }
+
+    /**
+     * get import process schedule result
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @param processDefinitionName
+     * @param processDefinitionId
+     * @return
+     */
+    private boolean getImportProcessScheduleResult(User loginUser,
+                                                   String currentProjectName,
+                                                   Map<String, Object> result,
+                                                   ProcessMeta processMeta,
+                                                   String processDefinitionName,
+                                                   Integer processDefinitionId) {
+        if (null != processMeta.getScheduleCrontab() && null != processDefinitionId) {
+            int scheduleInsert = importProcessSchedule(loginUser,
+                    currentProjectName,
+                    processMeta,
+                    processDefinitionName,
+                    processDefinitionId);
+
+            if (0 == scheduleInsert) {
+                putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -815,18 +884,18 @@ public class ProcessDefinitionService extends BaseDAGService {
     private boolean checkImportanceParams(ProcessMeta processMeta,Map<String, Object> result){
         if (StringUtils.isEmpty(processMeta.getProjectName())) {
             putMsg(result, Status.DATA_IS_NULL, "projectName");
-            return true;
+            return false;
         }
         if (StringUtils.isEmpty(processMeta.getProcessDefinitionName())) {
             putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
-            return true;
+            return false;
         }
         if (StringUtils.isEmpty(processMeta.getProcessDefinitionJson())) {
             putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
