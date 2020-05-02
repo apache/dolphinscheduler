@@ -23,7 +23,7 @@
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -34,17 +34,17 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="router.history.current.name !== 'account'">
-          <template slot="name"><b>*</b>{{$t('Password')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Password')}}</template>
           <template slot="content">
             <x-input
-                    type="input"
+                    type="password"
                     v-model="userPassword"
                     :placeholder="$t('Please enter your password')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
-          <template slot="name"><b>*</b>{{$t('Tenant')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Tenant')}}</template>
           <template slot="content">
             <x-select v-model="tenantId">
               <x-option
@@ -61,8 +61,8 @@
           <template slot="content">
             <x-select v-model="queueName">
               <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
-                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></i>
-                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></i>
+                <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
+                <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
               </x-input>
               <x-option
                       v-for="city in queueList"
@@ -74,7 +74,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Email')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Email')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -150,6 +150,8 @@
 
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
+        
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         // user name
         if (!this.userName.replace(/\s*/g,"")) {
@@ -157,10 +159,18 @@
           return false
         }
         // password
-        if (!this.userPassword && !this.item) {
-          this.$message.warning(`${i18n.$t('Please enter your password')}`)
-          return false
+        if (this.userPassword!='' && this.item) {
+          if(!regPassword.test(this.userPassword)) {
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+            return false
+          }
+        } else if(!this.item){
+          if(!regPassword.test(this.userPassword)) {
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+            return false
+          }
         }
+
         // email
         if (!this.email) {
           this.$message.warning(`${i18n.$t('Please enter email')}`)
@@ -184,6 +194,7 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
+          
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -223,7 +234,7 @@
           userPassword: this.userPassword,
           tenantId: this.tenantId,
           email: this.email,
-          queue: this.queueList[this.queueName].code,
+          queue: this.queueList.length>0? _.find(this.queueList, ['id', this.queueName]).code : '',
           phone: this.phone
         }
 
@@ -266,7 +277,11 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.tenantId = this.item.tenantId
-          this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+          if(this.queueList.length>0) {
+            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+          } else {
+            this.queueName = ''
+          }
         }
       }
     },

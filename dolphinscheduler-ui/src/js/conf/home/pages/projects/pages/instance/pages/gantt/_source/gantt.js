@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import _ from 'lodash'
-import $ from 'jquery'
 import * as d3 from 'd3'
 import { formatDate } from '@/module/filter/filter'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
@@ -25,7 +24,7 @@ let Gantt = function () {
   this.tasks = []
   this.width = null
   this.height = null
-  this.tasksName = []
+  this.taskNames = []
   this.tickFormat = `%H:%M:%S`
   this.margin = {
     top: 10,
@@ -40,8 +39,12 @@ let Gantt = function () {
 Gantt.prototype.init = function ({ el, tasks }) {
   this.el = el
   this.tasks = tasks
-  this.tasksName = _.map(_.cloneDeep(tasks), v => v.taskName)
-  this.height = parseInt(this.tasksName.length * 30)
+  this.taskNames = _.map(_.cloneDeep(tasks), v => v.taskName)
+  this.taskNames = this.taskNames.reduce(function (prev, cur) {
+    prev.indexOf(cur) === -1 && prev.push(cur);
+    return prev;
+  },[])
+  this.height = parseInt(this.taskNames.length * 30)
   this.width = $(this.el).width() - this.margin.right - this.margin.left - 5
 
   this.x = d3.time.scale()
@@ -50,7 +53,7 @@ Gantt.prototype.init = function ({ el, tasks }) {
     .clamp(true)
 
   this.y = d3.scale.ordinal()
-    .domain(this.tasksName)
+    .domain(this.taskNames)
     .rangeRoundBands([ 0, this.height - this.margin.top - this.margin.bottom ], 0.1)
 
   this.xAxis = d3.svg.axis()
@@ -99,7 +102,7 @@ Gantt.prototype.initializeXAxis = function () {
     .clamp(true)
 
   this.y = d3.scale.ordinal()
-    .domain(this.tasksName)
+    .domain(this.taskNames)
     .rangeRoundBands([ 0, this.height - this.margin.top - this.margin.bottom ], 0.1)
 
   this.xAxis = d3.svg.axis()

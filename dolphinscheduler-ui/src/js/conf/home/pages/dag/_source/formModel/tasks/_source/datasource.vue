@@ -112,7 +112,23 @@
         })
       }
     },
-    watch: {},
+    computed: {
+      cacheParams () {
+        return {
+          type: this.type,
+          datasource: this.datasource
+        }
+      }
+    },
+    // Watch the cacheParams
+    watch: {
+      datasource (val) {
+        this.$emit('on-dsData', {
+          type: this.type,
+          datasource: val
+        });
+      }
+    },
     created () {
       let supportType = this.supportType || []
       this.typeList = _.cloneDeep(this.store.state.dag.dsTypeListS)
@@ -137,7 +153,8 @@
           })
         }
         this.$emit('on-dsData', {
-          type: this.type
+          type: this.type,
+          datasource: this.datasource
         })
       })
     },

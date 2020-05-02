@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import 'jquery-ui/ui/widgets/draggable'
+import 'jquery-ui/ui/widgets/droppable'
+import 'jquery-ui/ui/widgets/resizable'
 import Vue from 'vue'
-import $ from 'jquery'
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
@@ -25,6 +26,7 @@ import store from '@/conf/home/store'
 import router from '@/conf/home/router'
 import Permissions from '@/module/permissions'
 import { uuid, findComponentDownward } from '@/module/util/'
+
 import {
   tasksAll,
   rtTasksTpl,
@@ -56,15 +58,17 @@ let JSP = function () {
 /**
  * dag init
  */
-JSP.prototype.init = function ({ dag, instance }) {
+JSP.prototype.init = function ({ dag, instance, options }) {
   // Get the dag component instance
   this.dag = dag
   // Get jsplumb instance
   this.JspInstance = instance
+  // Get JSP options
+  this.options = options || {}
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
-    connector: 'Straight' // Line type
+    connector: 'Bezier' // Line type
   })
 
   // Initial configuration
@@ -131,15 +135,6 @@ JSP.prototype.draggable = function () {
       helper: 'clone',
       containment: $('.dag-model'),
       stop: function (e, ui) {
-        self.tasksEvent(selfId)
-
-        // Dom structure is not generated without pop-up form form
-        if ($(`#${selfId}`).html()) {
-          // dag event
-          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
-            id: selfId
-          })
-        }
       },
       drag: function () {
         $('body').find('.tooltip.fade.top.in').remove()
@@ -174,6 +169,16 @@ JSP.prototype.draggable = function () {
           self.initNode(thisDom[thisDom.length - 1])
         })
         selfId = id
+
+        self.tasksEvent(selfId)
+
+        // Dom structure is not generated without pop-up form form
+        if ($(`#${selfId}`).html()) {
+          // dag event
+          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
+            id: selfId
+          })
+        }
       }
     })
   }
@@ -193,7 +198,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag: v.runFlag
+      runFlag: v.runFlag,
+      nodenumber: locations[v.id]['nodenumber'],
     }))
 
     // contextmenu event
@@ -230,7 +236,7 @@ JSP.prototype.initNode = function (el) {
     filter: '.ep',
     anchor: 'Continuous',
     connectorStyle: {
-      stroke: '#555',
+      stroke: '#2d8cf0',
       strokeWidth: 2,
       outlineStroke: 'transparent',
       outlineWidth: 4
@@ -264,10 +270,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     let isTwo = store.state.dag.isDetails
 
     let html = [
-      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><i class="iconfont">&#xe60b;</i><span>${i18n.$t('Start')}</span></a>`,
-      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe601;</i><span>${i18n.$t('Edit')}</span></a>`,
-      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe61e;</i><span>${i18n.$t('Copy')}</span></a>`,
-      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe611;</i><span>${i18n.$t('Delete')}</span></a>`
+      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="ans-icon-play"></em><span>${i18n.$t('Start')}</span></a>`,
+      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-edit"></em><span>${i18n.$t('Edit')}</span></a>`,
+      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-copy"></em><span>${i18n.$t('Copy')}</span></a>`,
+      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-trash"></em><span>${i18n.$t('Delete')}</span></a>`
     ]
 
     let operationHtml = () => {
@@ -291,6 +297,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     if (isOne) {
       // start run
       $('#startRunning').on('click', () => {
+        let name = store.state.dag.name
         let id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
           let modal = Vue.$modal.dialog({
@@ -311,7 +318,8 @@ JSP.prototype.tasksContextmenu = function (event) {
                 },
                 props: {
                   item: {
-                    id: id
+                    id: id,
+                    name: name
                   },
                   startNodeList: $name,
                   sourceType: 'contextmenu'
@@ -324,7 +332,7 @@ JSP.prototype.tasksContextmenu = function (event) {
         })
       })
     }
-    if (!isTwo) {
+    if (!isTwo) { 
       // edit node
       $(`#editNodes`).click(ev => {
         findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({
@@ -372,7 +380,7 @@ JSP.prototype.tasksClick = function (e) {
     $('.w').removeClass('jtk-tasks-active')
     $(e.currentTarget).addClass('jtk-tasks-active')
     if ($connect) {
-      setSvgColor($connect, '#555')
+      setSvgColor($connect, '#2d8cf0')
       this.selectedElement.connect = null
     }
     this.selectedElement.id = $(e.currentTarget).attr('id')
@@ -431,19 +439,19 @@ JSP.prototype.handleEventPointer = function (is) {
     isClick: is,
     isAttachment: false
   })
-  wDom.removeClass('jtk-ep')
-  if (!is) {
-    wDom.removeClass('jtk-tasks-active')
-    this.selectedElement = {}
-    _.map($('#canvas svg'), v => {
-      if ($(v).attr('class')) {
-        _.map($(v).find('path'), v1 => {
-          $(v1).attr('fill', '#555')
-          $(v1).attr('stroke', '#555')
-        })
-      }
-    })
-  }
+  // wDom.removeClass('jtk-ep')
+  // if (!is) {
+  //   wDom.removeClass('jtk-tasks-active')
+  //   this.selectedElement = {}
+  //   _.map($('#canvas svg'), v => {
+  //     if ($(v).attr('class')) {
+  //       _.map($(v).find('path'), v1 => {
+  //         $(v1).attr('fill', '#555')
+  //         $(v1).attr('stroke', '#555')
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 /**
@@ -492,6 +500,9 @@ JSP.prototype.removeNodes = function ($id) {
 
   // delete dom
   $(`#${$id}`).remove()
+
+  // callback onRemoveNodes event
+  this.options&&this.options.onRemoveNodes&&this.options.onRemoveNodes($id)
 }
 
 /**
@@ -508,6 +519,9 @@ JSP.prototype.removeConnect = function ($connect) {
   if (targetarr.length) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
     $(`#${targetId}`).attr('data-targetarr', targetarr.toString())
+  }
+  if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS') {
+    $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))-1)
   }
   this.JspInstance.deleteConnection($connect)
 
@@ -564,6 +578,7 @@ JSP.prototype.copyNodes = function ($id) {
     [newId]: {
       name: newName,
       targetarr: '',
+      nodenumber: 0,
       x: newX,
       y: newY
     }
@@ -583,10 +598,10 @@ JSP.prototype.copyNodes = function ($id) {
 JSP.prototype.handleEventScreen = function ({ item, is }) {
   let screenOpen = true
   if (is) {
-    item.icon = '&#xe660;'
+    item.icon = 'ans-icon-min'
     screenOpen = true
   } else {
-    item.icon = '&#xe6e0;'
+    item.icon = 'ans-icon-max'
     screenOpen = false
   }
   let $mainLayoutModel = $('.main-layout-model')
@@ -650,6 +665,7 @@ JSP.prototype.saveStore = function () {
       locations[v.id] = {
         name: v.name,
         targetarr: v.targetarr,
+        nodenumber: v.nodenumber,
         x: v.x,
         y: v.y
       }
@@ -703,6 +719,12 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
+    if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber')==2) {
+      return false
+    } else {
+      $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
+    }
+
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
 
@@ -744,7 +766,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         source: sourceId,
         target: targetId,
         type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#555' }
+        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
       })
     })
   })

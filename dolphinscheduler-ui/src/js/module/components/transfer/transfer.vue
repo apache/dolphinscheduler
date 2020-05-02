@@ -31,12 +31,12 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">
             <ul>
-              <li v-for="(item,$index) in sourceList" :key="item.id" @click="_ckSource(item)">
+              <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
                 <span>{{item.name}}</span>
                 <a href="javascript:"></a>
               </li>
@@ -57,12 +57,12 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">
             <ul>
-              <li v-for="(item,$index) in targetList" :key="item.id" @click="_ckTarget(item)"><span>{{item.name}}</span></li>
+              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span>{{item.name}}</span></li>
             </ul>
           </div>
         </div>

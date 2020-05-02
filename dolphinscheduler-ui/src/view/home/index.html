@@ -19,7 +19,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <%- include('../common/meta.inc')%>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="标题">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telphone=no, email=no"/>
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="theme-color" content="#4a8dee">
+    <meta name="msapplication-navbutton-color" content="#4a8dee">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
+    <link rel="shortcut icon" href="<%= PUBLIC_PATH %>/images/favicon.ico"/>
     <title>DolphinScheduler</title>
   </head>
   <body>
@@ -33,7 +47,5 @@
         <span class="sp1">Loading ...</span>
       </div>
     </div>
-    <!-- built files will be auto injected -->
-    <%- include('../common/outro.inc')%>
   </body>
 </html>

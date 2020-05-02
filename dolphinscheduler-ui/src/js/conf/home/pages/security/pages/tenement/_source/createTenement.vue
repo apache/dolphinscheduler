@@ -23,29 +23,31 @@
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Tenant Code')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Tenant Code')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     :disabled="item ? true : false"
                     v-model="tenantCode"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Tenant Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Tenant Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="tenantName"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Queue')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueId">
               <x-option
@@ -123,7 +125,7 @@
               }
             })
             this.$nextTick(() => {
-              this.queueId = this.queueList[0]
+              this.queueId = this.queueList[0].id
             })
             resolve()
           })

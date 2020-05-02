@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -32,7 +31,6 @@ import java.util.Date;
  * schedule
  *
  */
-@Data
 @TableName("t_ds_schedules")
 public class Schedule {
 
@@ -124,9 +122,9 @@ public class Schedule {
   private Priority processInstancePriority;
 
   /**
-   *  worker group id
+   *  worker group
    */
-  private int workerGroupId;
+  private String workerGroup;
 
   public int getWarningGroupId() {
     return warningGroupId;
@@ -267,13 +265,12 @@ public class Schedule {
     this.processInstancePriority = processInstancePriority;
   }
 
-
-  public int getWorkerGroupId() {
-    return workerGroupId;
+  public String getWorkerGroup() {
+    return workerGroup;
   }
 
-  public void setWorkerGroupId(int workerGroupId) {
-    this.workerGroupId = workerGroupId;
+  public void setWorkerGroup(String workerGroup) {
+    this.workerGroup = workerGroup;
   }
 
   @Override
@@ -296,7 +293,7 @@ public class Schedule {
             ", releaseState=" + releaseState +
             ", warningGroupId=" + warningGroupId +
             ", processInstancePriority=" + processInstancePriority +
-            ", workerGroupId=" + workerGroupId +
+            ", workerGroup='" + workerGroup + '\'' +
             '}';
   }
 

@@ -30,7 +30,7 @@
       <template v-if="!taskInstanceList.length">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
 </template>
@@ -68,8 +68,11 @@
           // start date
           startDate: '',
           // end date
-          endDate: ''
-        }
+          endDate: '',
+          // Exectuor Name
+          executorName: ''
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -81,6 +84,7 @@
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.processInstanceId = ''
         if (this.searchParams.taskName) {
           this.searchParams.taskName = ''
         }
@@ -115,6 +119,11 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this._getList(flag)
       }, 100, {
         'leading': false,
@@ -134,6 +143,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
@@ -142,6 +152,7 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }

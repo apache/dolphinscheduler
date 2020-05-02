@@ -21,12 +21,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-@EnableSwagger2
+@ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+                pattern = "org.apache.dolphinscheduler.server.*"))
+
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {

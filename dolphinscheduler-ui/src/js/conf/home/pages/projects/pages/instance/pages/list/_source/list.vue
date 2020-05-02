@@ -19,43 +19,48 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th width="50">
+          <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th width="40">
+          <th scope="col" width="30">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col" width="200">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="70">
+          <th scope="col" width="60">
+            <span>{{$t('Executor')}}</span>
+          </th>
+          <th scope="col" width="70">
             <span>{{$t('Run Type')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Scheduling Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="60">
+          <th scope="col" width="60">
             <span>{{$t('Duration')}}s</span>
           </th>
-          <th width="60">
+          <th scope="col" width="60">
             <span>{{$t('Run Times')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="125">
             <span>{{$t('host')}}</span>
           </th>
-          <th width="60">
+          <th scope="col" width="55">
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
-          <th width="30">
-            <span>{{$t('State')}}</span>
+          <th scope="col" width="30">
+            <div style="width: 30px">
+              <span>{{$t('State')}}</span>
+            </div>
           </th>
-          <th width="210">
+          <th scope="col" width="210">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -66,6 +71,10 @@
           </td>
           <td>
             <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+          </td>
+          <td>
+            <span style="word-break: break-all" v-if="item.executorName">{{item.executorName}}</span>
+            <span v-else>-</span>
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
           <td>
@@ -99,7 +108,7 @@
                         data-toggle="tooltip"
                         :title="$t('Edit')"
                         @click="_reEdit(item)"
-                        icon="iconfont icon-bianjixiugai"
+                        icon="ans-icon-edit"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="info"
                         shape="circle"
@@ -107,7 +116,7 @@
                         data-toggle="tooltip"
                         :title="$t('Rerun')"
                         @click="_reRun(item,$index)"
-                        icon="iconfont icon-shuaxin"
+                        icon="ans-icon-refresh"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="success"
                         shape="circle"
@@ -115,7 +124,7 @@
                         data-toggle="tooltip"
                         :title="$t('Recovery Failed')"
                         @click="_restore(item,$index)"
-                        icon="iconfont icon-cuowuguanbishibai"
+                        icon="ans-icon-fail-empty"
                         :disabled="item.state !== 'FAILURE'"></x-button>
               <x-button type="error"
                         shape="circle"
@@ -123,7 +132,7 @@
                         data-toggle="tooltip"
                         :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
                         @click="_stop(item,$index)"
-                        :icon="item.state === 'STOP' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
+                        :icon="item.state === 'STOP' ? 'ans-icon-pause-solid' : 'ans-icon-stop'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
@@ -131,7 +140,7 @@
                         data-toggle="tooltip"
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
-                        :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting1'"
+                        :icon="item.state === 'PAUSE' ? 'ans-icon-pause-solid' : 'ans-icon-pause'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
@@ -144,7 +153,7 @@
                 </div>
                 <template slot="reference">
                   <x-button
-                          icon="iconfont icon-shanchu"
+                          icon="ans-icon-trash"
                           type="error"
                           shape="circle"
                           size="xsmall"
@@ -161,7 +170,7 @@
                         data-toggle="tooltip"
                         :title="$t('Gantt')"
                         @click="_gantt(item)"
-                        icon="iconfont icon-gantt">
+                        icon="ans-icon-gantt">
               </x-button>
 
             </div>
@@ -171,7 +180,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-bianjixiugai"
+                      icon="ans-icon-edit"
                       disabled="true">
               </x-button>
 
@@ -189,7 +198,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-shuaxin"
+                      icon="ans-icon-refresh"
                       disabled="true">
               </x-button>
 
@@ -207,7 +216,7 @@
                       type="success"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-cuowuguanbishibai"
+                      icon="ans-icon-fail-empty"
                       disabled="true">
               </x-button>
 
@@ -216,7 +225,7 @@
                       <!--type="error"-->
                       <!--shape="circle"-->
                       <!--size="xsmall"-->
-                      <!--icon="iconfont icon-zanting1"-->
+                      <!--icon="ans-icon-pause"-->
                       <!--disabled="true">-->
               <!--</x-button>-->
 
@@ -235,7 +244,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-ai06"
+                      icon="ans-icon-pause-solid"
                       disabled="true">
               </x-button>
               <!--Pause-->
@@ -244,7 +253,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-zanting1"
+                      icon="ans-icon-stop"
                       disabled="true">
               </x-button>
             <!--Stop-->
@@ -253,7 +262,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-zanting"
+                      icon="ans-icon-pause"
                       disabled="true">
               </x-button>
 
@@ -262,7 +271,7 @@
                       type="error"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-shanchu"
+                      icon="ans-icon-trash"
                       :disabled="true">
               </x-button>
 
@@ -271,7 +280,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-gantt"
+                      icon="ans-icon-gantt"
                       disabled="true">
               </x-button>
             </div>
@@ -304,9 +313,9 @@
     name: 'list',
     data () {
       return {
-        // 数据
+        // data
         list: [],
-        // 按钮类型
+        // btn type
         buttonType: '',
         strDelete: '',
         checkAll: false
@@ -330,7 +339,7 @@
        */
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="iconfont ${o.isSpin ? 'fa fa-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}">${o.icoUnicode}</em>`
+        return `<em class="ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       /**
        * Close the delete layer

@@ -16,48 +16,45 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-@Data
 @TableName("t_ds_alertgroup")
 public class AlertGroup {
-
-
     /**
      * primary key
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
     /**
-     * alert group name
+     * group_name
      */
+    @TableField(value = "group_name")
     private String groupName;
-
     /**
-     * alert group type
+     * group_type
      */
+    @TableField(value = "group_type")
     private AlertType groupType;
-
     /**
-     * alert group description
+     * description
      */
+    @TableField(value = "description")
     private String description;
-
     /**
-     * create time
+     * create_time
      */
+    @TableField(value = "create_time")
     private Date createTime;
-
     /**
-     * update time
+     * update_time
      */
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {
@@ -144,5 +141,17 @@ public class AlertGroup {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AlertGroup{" +
+                "id=" + id +
+                ", groupName='" + groupName + '\'' +
+                ", groupType=" + groupType +
+                ", description='" + description + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

@@ -24,9 +24,9 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,17 +78,17 @@ public class DagHelper {
         List<String> startNodeList = startNodeNameList;
 
         if(taskDependType != TaskDependType.TASK_POST
-                && startNodeList.size() == 0){
+                && CollectionUtils.isEmpty(startNodeList)){
             logger.error("start node list is empty! cannot continue run the process ");
             return destFlowNodeList;
         }
         List<TaskNode> destTaskNodeList = new ArrayList<>();
         List<TaskNode> tmpTaskNodeList = new ArrayList<>();
         if (taskDependType == TaskDependType.TASK_POST
-                && recoveryNodeNameList.size() > 0) {
+                && CollectionUtils.isNotEmpty(recoveryNodeNameList)) {
             startNodeList = recoveryNodeNameList;
         }
-        if (startNodeList == null || startNodeList.size() == 0) {
+        if (CollectionUtils.isEmpty(startNodeList)) {
             // no special designation start nodes
             tmpTaskNodeList = taskNodeList;
         } else {
@@ -96,7 +96,13 @@ public class DagHelper {
             for (String startNodeName : startNodeList) {
                 TaskNode startNode = findNodeByName(taskNodeList, startNodeName);
                 List<TaskNode> childNodeList = new ArrayList<>();
-                if (TaskDependType.TASK_POST == taskDependType) {
+                if (startNode == null) {
+                    logger.error("start node name [{}] is not in task node list [{}] ",
+                        startNodeName,
+                        taskNodeList
+                    );
+                    continue;
+                } else if (TaskDependType.TASK_POST == taskDependType) {
                     childNodeList = getFlowNodeListPost(startNode, taskNodeList);
                 } else if (TaskDependType.TASK_PRE == taskDependType) {
                     childNodeList = getFlowNodeListPre(startNode, recoveryNodeNameList, taskNodeList);
@@ -126,12 +132,9 @@ public class DagHelper {
         List<TaskNode> resultList = new ArrayList<>();
         for (TaskNode taskNode : taskNodeList) {
             List<String> depList = taskNode.getDepList();
-            if (depList != null) {
-                if (depList.contains(startNode.getName())) {
-                    resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList));
-                }
+            if (null != depList && null != startNode && depList.contains(startNode.getName())) {
+                resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList));
             }
-
         }
         resultList.add(startNode);
         return resultList;
@@ -149,9 +152,12 @@ public class DagHelper {
 
         List<TaskNode> resultList = new ArrayList<>();
 
-        List<String> depList = startNode.getDepList();
-        resultList.add(startNode);
-        if (depList == null || depList.size() == 0) {
+        List<String> depList = new ArrayList<>();
+        if (null != startNode) {
+            depList = startNode.getDepList();
+            resultList.add(startNode);
+        }
+        if (CollectionUtils.isEmpty(depList)) {
             return resultList;
         }
         for (String depNodeName : depList) {
@@ -180,7 +186,10 @@ public class DagHelper {
                                              TaskDependType depNodeType) throws Exception {
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        if (null != processData) {
+            taskNodeList = processData.getTasks();
+        }
         List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
         if (destTaskNodeList.isEmpty()) {
             return null;
@@ -201,7 +210,10 @@ public class DagHelper {
         Map<String, TaskNode> forbidTaskNodeMap = new ConcurrentHashMap<>();
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        if (null != processData) {
+            taskNodeList = processData.getTasks();
+        }
         for(TaskNode node : taskNodeList){
             if(node.isForbidden()){
                 forbidTaskNodeMap.putIfAbsent(node.getName(), node);
@@ -307,23 +319,90 @@ public class DagHelper {
 
         DAG<String,TaskNode,TaskNodeRelation> dag = new DAG<>();
 
-        /**
-         * add vertex
-         */
+        //add vertex
         if (CollectionUtils.isNotEmpty(processDag.getNodes())){
             for (TaskNode node : processDag.getNodes()){
                 dag.addNode(node.getName(),node);
             }
         }
 
-        /**
-         * add edge
-         */
+        //add edge
         if (CollectionUtils.isNotEmpty(processDag.getEdges())){
             for (TaskNodeRelation edge : processDag.getEdges()){
                 dag.addEdge(edge.getStartNode(),edge.getEndNode());
             }
         }
         return dag;
+    }
+
+    /**
+     * get process dag
+     * @param taskNodeList task node list
+     * @return Process dag
+     */
+    public static ProcessDag getProcessDag(List<TaskNode> taskNodeList) {
+        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
+
+        // Traverse node information and build relationships
+        for (TaskNode taskNode : taskNodeList) {
+            String preTasks = taskNode.getPreTasks();
+            List<String> preTasksList = JSONUtils.toList(preTasks, String.class);
+
+            // If the dependency is not empty
+            if (preTasksList != null) {
+                for (String depNode : preTasksList) {
+                    taskNodeRelations.add(new TaskNodeRelation(depNode, taskNode.getName()));
+                }
+            }
+        }
+
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(taskNodeList);
+        return processDag;
+    }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  DAG<String, TaskNode, TaskNodeRelation> dag
+                                            ){
+        boolean result = false;
+        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeName);
+        if(CollectionUtils.isEmpty(subsequentNodes)){
+            return result;
+        }
+        for(String nodeName : subsequentNodes){
+            TaskNode taskNode = dag.getNode(nodeName);
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  List<TaskNode> taskNodes
+    ){
+        boolean result = false;
+        if(CollectionUtils.isEmpty(taskNodes)){
+            return result;
+        }
+        for(TaskNode taskNode : taskNodes){
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
     }
 }

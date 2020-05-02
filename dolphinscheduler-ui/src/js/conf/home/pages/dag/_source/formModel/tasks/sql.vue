@@ -37,7 +37,7 @@
         </div>
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('Table')}}</x-checkbox>
+            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
             <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
           </x-checkbox-group>
         </div>
@@ -45,7 +45,7 @@
     </m-list-box>
     <template v-if="sqlType==0">
       <m-list-box>
-        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Title')}}</div>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
           <x-input
             type="input"
@@ -56,7 +56,7 @@
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Recipient')}}</div>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
         <div slot="content">
           <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
         </div>
@@ -318,6 +318,8 @@
        * Processing code highlighting
        */
       _handlerEditor () {
+        this._destroyEditor()
+
         // editor
         editor = codemirror('code-sql-mirror', {
           mode: 'sql',
@@ -332,8 +334,14 @@
           }
         }
 
+        this.changes = () => {
+          this._cacheParams()
+        }
+
         // Monitor keyboard
         editor.on('keypress', this.keypress)
+
+        editor.on('changes', this.changes)
 
         editor.setValue(this.sql)
 
@@ -351,6 +359,38 @@
           this.receivers = res.receivers && res.receivers.split(',') || []
           this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
         })
+      },
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          type: this.type,
+          datasource: this.rtDatasource,
+          sql: editor ? editor.getValue() : '',
+          udfs: this.udfs,
+          sqlType: this.sqlType,
+          title: this.title,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
+          showType: (() => {
+
+            let showType = this.showType
+            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+              return [showType[1], showType[0]].join(',')
+            } else {
+              return showType.join(',')
+            }
+          })(),
+          localParams: this.localParams,
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        });
+      },
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-sql-mirror'), 'changes', this.changes)
+        }
       }
     },
     watch: {
@@ -371,6 +411,10 @@
           this.connParams = ''
         }
       },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this._cacheParams()
+      }
     },
     created () {
       let o = this.backfillItem
@@ -396,7 +440,8 @@
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
-      if (!_.some(this.store.state.dag.tasks, { id: this.createNodeId }) &&
+      // read tasks from cache
+      if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
         this.router.history.current.name !== 'definition-create') {
         this._getReceiver()
       }
@@ -413,9 +458,35 @@
       if (editor) {
         editor.toTextArea() // Uninstall
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-sql-mirror'), 'changes', this.changes)
       }
     },
-    computed: {},
+    computed: {
+      cacheParams () {
+        return {
+          type: this.type,
+          datasource: this.rtDatasource,
+          udfs: this.udfs,
+          sqlType: this.sqlType,
+          title: this.title,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
+          showType: (() => {
+
+            let showType = this.showType
+            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+              return [showType[1], showType[0]].join(',')
+            } else {
+              return showType.join(',')
+            }
+          })(),
+          localParams: this.localParams,
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        }
+      }
+    },
     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>

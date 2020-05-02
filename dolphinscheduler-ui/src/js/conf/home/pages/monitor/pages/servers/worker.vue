@@ -18,7 +18,7 @@
   <m-list-construction :title="'Worker ' + $t('Manage')">
     <template slot="content">
       <div class="servers-wrapper" v-show="workerList.length">
-        <div class="row-box" v-for="(item,$index) in workerList">
+        <div class="row-box" v-for="(item,$index) in workerList" :key="$index">
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
@@ -48,7 +48,7 @@
             <div class="col-md-4">
               <div class="text-num-model">
                 <div class="value-p">
-                  <b :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</b>
+                  <strong :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</strong>
                 </div>
                 <div class="text-1">
                   loadAverage

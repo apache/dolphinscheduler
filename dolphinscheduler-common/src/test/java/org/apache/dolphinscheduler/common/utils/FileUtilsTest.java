@@ -18,11 +18,53 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(DateUtils.class)
 public class FileUtilsTest {
 
     @Test
     public void suffix() {
-        Assert.assertEquals(FileUtils.suffix("ninfor.java"),"java");
+        Assert.assertEquals("java", FileUtils.suffix("ninfor.java"));
+        Assert.assertEquals("", FileUtils.suffix(null));
+        Assert.assertEquals("", FileUtils.suffix(""));
+        Assert.assertEquals("", FileUtils.suffix("ninfor-java"));
+    }
+
+    @Test
+    public void testGetDownloadFilename() {
+        PowerMockito.mockStatic(DateUtils.class);
+        PowerMockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
+        Assert.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
+                FileUtils.getDownloadFilename("test"));
+    }
+
+    @Test
+    public void testGetUploadFilename() {
+        Assert.assertEquals("/tmp/dolphinscheduler/aaa/resources/bbb",
+                FileUtils.getUploadFilename("aaa","bbb"));
+    }
+
+    @Test
+    public void testGetProcessExecDir() {
+        String dir = FileUtils.getProcessExecDir(1,2,3, 4);
+        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3/4", dir);
+        dir = FileUtils.getProcessExecDir(1,2,3);
+        Assert.assertEquals("/tmp/dolphinscheduler/exec/process/1/2/3", dir);
+    }
+
+    @Test
+    public void testCreateWorkDirAndUserIfAbsent() {
+        try {
+            FileUtils.createWorkDirAndUserIfAbsent("/tmp/createWorkDirAndUserIfAbsent", "test123");
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
     }
 }

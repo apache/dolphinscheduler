@@ -19,31 +19,34 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th width="50">
+          <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th width="40">
+          <th scope="col" width="40">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col" width="200">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="50">
+          <th scope="col" width="50">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th>
+          <th scope="col" width="150">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="90">
+          <th scope="col" width="80">
+            <span>{{$t('Modify User')}}</span>
+          </th>
+          <th scope="col" width="80">
             <span>{{$t('Timing state')}}</span>
           </th>
-          <th width="240">
+          <th scope="col" width="300">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -69,7 +72,11 @@
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.modifyBy">{{item.modifyBy}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -78,12 +85,13 @@
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
           <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
-            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('下线')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-edit"><!--{{$t('编辑')}}--></x-button>
+            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-play"><!--{{$t('启动')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="ans-icon-timer"><!--{{$t('定时')}}--></x-button>
+            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="ans-icon-upward"><!--{{$t('下线')}}--></x-button>
+            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="ans-icon-downward"><!--{{$t('上线')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Copy')" @click="_copyProcess(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-copy"><!--{{$t('复制')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-datetime"><!--{{$t('定时管理')}}--></x-button>
             <x-poptip
               :ref="'poptip-delete-' + $index"
               placement="bottom-end"
@@ -95,7 +103,7 @@
               </div>
               <template slot="reference">
                 <x-button
-                  icon="iconfont icon-shanchu"
+                  icon="ans-icon-trash"
                   type="error"
                   shape="circle"
                   size="xsmall"
@@ -105,8 +113,8 @@
                 </x-button>
               </template>
             </x-poptip>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="iconfont icon-download"><!--{{$t('导出')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="ans-icon-node"><!--{{$t('树形图')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="ans-icon-download"><!--{{$t('导出')}}--></x-button>
 
           </td>
         </tr>
@@ -151,7 +159,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -299,6 +307,21 @@
           releaseState: 1
         })
       },
+      /**
+       * copy
+       */
+      _copyProcess (item) {
+        this.copyProcess({
+          processId: item.id
+        }).then(res => {
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
       _export (item) {
         this.exportDefinition({
           processDefinitionId: item.id,

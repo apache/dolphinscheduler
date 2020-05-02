@@ -83,6 +83,9 @@ public class AccessTokenService extends BaseService {
     public Map<String, Object> createToken(int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
 
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User id should not less than or equals to 0.");
+        }
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
@@ -154,8 +157,13 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> updateToken(int id,int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
-        AccessToken accessToken = new AccessToken();
-        accessToken.setId(id);
+
+        AccessToken accessToken = accessTokenMapper.selectById(id);
+        if (accessToken == null) {
+            logger.error("access token not exist,  access token id {}", id);
+            putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
+            return result;
+        }
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
         accessToken.setToken(token);

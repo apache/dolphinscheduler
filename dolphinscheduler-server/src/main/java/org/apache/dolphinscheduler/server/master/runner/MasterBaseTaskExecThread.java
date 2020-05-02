@@ -16,21 +16,26 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.utils.BeanContext;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 import java.util.concurrent.Callable;
+
 
 /**
  * master task exec base class
@@ -40,12 +45,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * logger of MasterBaseTaskExecThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
 
     /**
-     * process dao
+     * process service
      */
-    protected ProcessDao processDao;
+    protected ProcessService processService;
 
     /**
      * alert database access
@@ -63,41 +69,30 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     protected TaskInstance taskInstance;
 
     /**
-     * task queue
-     */
-    protected ITaskQueue taskQueue;
-
-    /**
      * whether need cancel
      */
     protected boolean cancel;
 
     /**
-     * load configuration file
+     * master config
      */
-    private static Configuration conf;
+    protected MasterConfig masterConfig;
 
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
-        } catch (ConfigurationException e) {
-            logger.error(e.getMessage(), e);
-            System.exit(1);
-        }
-    }
-
+    /**
+     * taskUpdateQueue
+     */
+    private TaskPriorityQueue taskUpdateQueue;
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        this.processDao = BeanContext.getBean(ProcessDao.class);
-        this.alertDao = BeanContext.getBean(AlertDao.class);
-        this.processInstance = processInstance;
-        this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
+    public MasterBaseTaskExecThread(TaskInstance taskInstance){
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
         this.cancel = false;
         this.taskInstance = taskInstance;
+        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
     }
 
     /**
@@ -120,27 +115,112 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @return TaskInstance
      */
     protected TaskInstance submit(){
-        Integer commitRetryTimes = conf.getInt(Constants.MASTER_COMMIT_RETRY_TIMES,
-                Constants.defaultMasterCommitRetryTimes);
-        Integer commitRetryInterval = conf.getInt(Constants.MASTER_COMMIT_RETRY_INTERVAL,
-                Constants.defaultMasterCommitRetryInterval);
+        Integer commitRetryTimes = masterConfig.getMasterTaskCommitRetryTimes();
+        Integer commitRetryInterval = masterConfig.getMasterTaskCommitInterval();
 
         int retryTimes = 1;
-
+        boolean submitDB = false;
+        boolean submitTask = false;
+        TaskInstance task = null;
         while (retryTimes <= commitRetryTimes){
             try {
-                TaskInstance task = processDao.submitTask(taskInstance, processInstance);
-                if(task != null){
+                if(!submitDB){
+                    // submit task to db
+                    task = processService.submitTask(taskInstance);
+                    if(task != null && task.getId() != 0){
+                        submitDB = true;
+                    }
+                }
+                if(submitDB && !submitTask){
+                    // dispatch task
+                    submitTask = dispatchTask(task);
+                }
+                if(submitDB && submitTask){
                     return task;
                 }
-                logger.error("task commit to mysql and queue failed , task has already retry {} times, please check the database", commitRetryTimes);
+                if(!submitDB){
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                }else if(!submitTask){
+                    logger.error("task commit  failed , taskId {} has already retry {} times, please check", taskInstance.getId(), retryTimes);
+                }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql and queue failed : " + e.getMessage(),e);
+                logger.error("task commit to mysql and dispatcht task failed",e);
             }
             retryTimes += 1;
         }
-        return null;
+        return task;
+    }
+
+
+
+    /**
+     * dispatcht task
+     * @param taskInstance taskInstance
+     * @return whether submit task success
+     */
+    public Boolean dispatchTask(TaskInstance taskInstance) {
+
+        try{
+            if(taskInstance.isConditionsTask()
+                    || taskInstance.isDependTask()
+                    || taskInstance.isSubProcess()){
+                return true;
+            }
+            if(taskInstance.getState().typeIsFinished()){
+                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                return true;
+            }
+            // task cannot submit when running
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
+                logger.info(String.format("submit to task, but task [%s] state already be running. ", taskInstance.getName()));
+                return true;
+            }
+            logger.info("task ready to submit: {}", taskInstance);
+
+            /**
+             *  taskPriorityInfo
+             */
+            String taskPriorityInfo = buildTaskPriorityInfo(processInstance.getProcessInstancePriority().getCode(),
+                    processInstance.getId(),
+                    taskInstance.getProcessInstancePriority().getCode(),
+                    taskInstance.getId(),
+                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+            taskUpdateQueue.put(taskPriorityInfo);
+            logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
+            return true;
+        }catch (Exception e){
+            logger.error("submit task  Exception: ", e);
+            logger.error("task error : %s", JSONUtils.toJson(taskInstance));
+            return false;
+        }
+    }
+
+
+    /**
+     *  buildTaskPriorityInfo
+     *
+     * @param processInstancePriority processInstancePriority
+     * @param processInstanceId processInstanceId
+     * @param taskInstancePriority taskInstancePriority
+     * @param taskInstanceId taskInstanceId
+     * @param workerGroup workerGroup
+     * @return TaskPriorityInfo
+     */
+    private String buildTaskPriorityInfo(int processInstancePriority,
+                                         int processInstanceId,
+                                         int taskInstancePriority,
+                                         int taskInstanceId,
+                                         String workerGroup){
+        return processInstancePriority +
+                UNDERLINE +
+                processInstanceId +
+                UNDERLINE +
+                taskInstancePriority +
+                UNDERLINE +
+                taskInstanceId +
+                UNDERLINE +
+                workerGroup;
     }
 
     /**
@@ -158,7 +238,39 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     @Override
     public Boolean call() throws Exception {
+        this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }
+
+    /**
+     * get task log path
+     * @return log path
+     */
+    public String getTaskLogPath(TaskInstance task) {
+        String logPath;
+        try{
+            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                    .getLogger("ROOT")
+                    .getAppender("TASKLOGFILE"))
+                    .getDiscriminator()).getLogBase();
+            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+                logPath =  baseLog + Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }else{
+                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                        baseLog +  Constants.SINGLE_SLASH +
+                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        task.getId() + ".log";
+            }
+        }catch (Exception e){
+            logger.error("logger", e);
+            logPath = "";
+        }
+        return logPath;
+    }
+
 
 }

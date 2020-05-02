@@ -33,7 +33,7 @@
                   v-if="$route.query.subProcessIds"
                   type="primary"
                   size="default"
-                  icon="fa fa-reply">
+                  icon="ans-icon-arrow-to-left">
             {{$t('Return_1')}}
           </x-button>
         </div>
@@ -42,8 +42,8 @@
             <a href="javascript:">
               <span>Node Type</span>
             </a>
-            <a href="javascript:" v-for="(k,v) in tasksType">
-              <i class="fa fa-circle" :style="{color:k.color}"></i>
+            <a href="javascript:" v-for="(k,v) in tasksType" :key="v">
+              <em class="ans-icon-circle-solid" :style="{color:k.color}"></em>
               <span>{{v}}</span>
             </a>
           </div>
@@ -51,8 +51,8 @@
             <a href="javascript:">
               <span>{{$t('Task Status')}}</span>
             </a>
-            <a href="javascript:" v-for="(item) in tasksState">
-              <i class="fa fa-square" :style="{color:item.color}"></i>
+            <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
+              <em class="ans-icon-rect-solid" :style="{color:item.color}"></em>
               <span>{{item.desc}}</span>
             </a>
           </div>

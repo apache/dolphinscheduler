@@ -1,7 +1,11 @@
-Dolphin Scheduler
+Dolphin Scheduler Official Website
+[dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
+[![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
+
 
 > Dolphin Scheduler for Big Data
 
@@ -13,7 +17,7 @@ Dolphin Scheduler
 
 ### Design features:
 
-A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
+A distributed and easy-to-extend visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
 Its main objectives are as follows:
 
  - Associate the Tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of task in real time.
@@ -41,43 +45,42 @@ HA is supported by itself | All process definition operations are visualized, dr
 Overload processing: Task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured, when too many tasks will be cached in the task queue, will not cause machine jam. | One-click deployment | Supports traditional shell tasks, and also support big data platform task scheduling: MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Procedure, Sub_Process |  |
 
 
-
-
 ### System partial screenshot
 
-![image](https://user-images.githubusercontent.com/48329107/61368744-1f5f3b00-a8c1-11e9-9cf1-10f8557a6b3b.png)
-
-![image](https://user-images.githubusercontent.com/48329107/61368966-9dbbdd00-a8c1-11e9-8dcc-a9469d33583e.png)
-
-![image](https://user-images.githubusercontent.com/48329107/61372146-f347b800-a8c8-11e9-8882-66e8934ada23.png)
-
-
+![home page](https://user-images.githubusercontent.com/15833811/75218288-bf286400-57d4-11ea-8263-d639c6511d5f.jpg)
+![dag](https://user-images.githubusercontent.com/15833811/75236750-3374fe80-57f9-11ea-857d-62a66a5a559d.png)
+![process definition list page](https://user-images.githubusercontent.com/15833811/75216886-6f479e00-57d0-11ea-92dd-66e7640a186f.png)
+![view task log online](https://user-images.githubusercontent.com/15833811/75216924-9900c500-57d0-11ea-91dc-3522a76bdbbe.png)
+![resource management](https://user-images.githubusercontent.com/15833811/75216984-be8dce80-57d0-11ea-840d-58546edc8788.png)
+![monitor](https://user-images.githubusercontent.com/59273635/75625839-c698a480-5bfc-11ea-8bbe-895b561b337f.png)
+![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
+![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
 ### Document
 
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
 
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
 
-- [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/user_doc/system-manual.html?_blank "System manual")
+- [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/system-manual.html?_blank "System manual")
 
-- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/release/upgrade.html?_blank "Upgrade document")
+- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/upgrade.html?_blank "Upgrade document")
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
-More documentation please refer to <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/quick-start.html" target="_blank">[DolphinScheduler online documentation]</a>
+More documentation please refer to <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/quick-start.html" target="_blank">[DolphinScheduler online documentation]</a>
 
 ### Recent R&D plan
 Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-dolphinscheduler/projects/1), Under the `In Develop` card is what is currently being developed, TODO card is to be done (including feature ideas)
 
-### How to contribute code
+### How to contribute
 
-Welcome to participate in contributing code, please refer to the process of submitting the code:
-[[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
+Welcome to participate in contributing, please refer to the process of submitting the code:
+[[How to contribute](https://dolphinscheduler.apache.org/en-us/docs/development/contribute.html)]
 
 ### How to Build
 
 ```bash
-mvn clean install -Prelease
+./mvnw clean install -Prelease
 ```
 
 Artifact:
@@ -95,17 +98,10 @@ It is because of the shoulders of these open source projects that the birth of t
 
 ### Get Help
 1. Submit an issue
-1. Mail list: dev@dolphinscheduler.apache.org. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list.
-1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
+1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
+1. Contact WeChat(dailidong66). This is just for Mandarin(CN) discussion.
 
 ### License
 Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
-
-
-
-
-
-
-
 
 

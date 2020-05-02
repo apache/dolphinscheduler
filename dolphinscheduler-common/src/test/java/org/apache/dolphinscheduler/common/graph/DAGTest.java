@@ -125,6 +125,10 @@ public class DAGTest {
     assertTrue(graph.containsEdge(1, 2));
     assertEquals(graph.getEdgesCount(), 1);
 
+    int node = 3;
+    graph.addNode(node, "v(3)");
+    assertFalse(graph.addEdge(node, node));
+
   }
 
 
@@ -345,6 +349,16 @@ public class DAGTest {
     logger.info(6 + "  previousNodesb: " + graph.getPreviousNodes(6));
     assertEquals(5, graph.getSubsequentNodes(2).toArray()[0]);
 
+  }
+
+  @Test
+  public void testTopologicalSort4() {
+    clear();
+    try {
+      graph.topologicalSort();
+    } catch (Exception e) {
+      assertTrue(e.getMessage().contains("serious error: graph has cycle"));
+    }
   }
 
 }

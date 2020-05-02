@@ -16,24 +16,25 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.job.db.*;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.datasource.*;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
@@ -304,7 +305,7 @@ public class DataSourceService extends BaseService{
         for (DataSource dataSource : dataSourceList) {
 
             String connectionParams  = dataSource.getConnectionParams();
-            JSONObject  object = JSONObject.parseObject(connectionParams);
+            JSONObject  object = JSON.parseObject(connectionParams);
             object.put(Constants.PASSWORD, Constants.XXXXXX);
             dataSource.setConnectionParams(JSONUtils.toJson(object));
 
@@ -368,11 +369,11 @@ public class DataSourceService extends BaseService{
         try {
             switch (dbType) {
                 case POSTGRESQL:
-                    datasource = JSONObject.parseObject(parameter, PostgreDataSource.class);
+                    datasource = JSON.parseObject(parameter, PostgreDataSource.class);
                     Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
                     break;
                 case MYSQL:
-                    datasource = JSONObject.parseObject(parameter, MySQLDataSource.class);
+                    datasource = JSON.parseObject(parameter, MySQLDataSource.class);
                     Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
                     break;
                 case HIVE:
@@ -387,27 +388,32 @@ public class DataSourceService extends BaseService{
                                     getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
                     }
                     if (dbType == DbType.HIVE){
-                        datasource = JSONObject.parseObject(parameter, HiveDataSource.class);
+                        datasource = JSON.parseObject(parameter, HiveDataSource.class);
                     }else if (dbType == DbType.SPARK){
-                        datasource = JSONObject.parseObject(parameter, SparkDataSource.class);
+                        datasource = JSON.parseObject(parameter, SparkDataSource.class);
                     }
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
                     break;
                 case CLICKHOUSE:
-                    datasource = JSONObject.parseObject(parameter, ClickHouseDataSource.class);
+                    datasource = JSON.parseObject(parameter, ClickHouseDataSource.class);
                     Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
                     break;
                 case ORACLE:
-                    datasource = JSONObject.parseObject(parameter, OracleDataSource.class);
+                    datasource = JSON.parseObject(parameter, OracleDataSource.class);
                     Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
                     break;
                 case SQLSERVER:
-                    datasource = JSONObject.parseObject(parameter, SQLServerDataSource.class);
+                    datasource = JSON.parseObject(parameter, SQLServerDataSource.class);
                     Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
+                    break;
+                case DB2:
+                    datasource = JSON.parseObject(parameter, DB2ServerDataSource.class);
+                    Class.forName(Constants.COM_DB2_JDBC_DRIVER);
                     break;
                 default:
                     break;
             }
+
             if(datasource != null){
                 connection = DriverManager.getConnection(datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
             }
@@ -468,12 +474,19 @@ public class DataSourceService extends BaseService{
      * @return datasource parameter
      */
     public String buildParameter(String name, String desc, DbType type, String host,
-                                 String port, String database,String principal,String userName,
-                                 String password, String other) {
+                                 String port, String database, String principal, String userName,
+                                 String password, DbConnectType connectType, String other) {
 
-        String address = buildAddress(type, host, port);
+        String address = buildAddress(type, host, port, connectType);
 
-        String jdbcUrl = address + "/" + database;
+        String jdbcUrl;
+        if (Constants.ORACLE.equals(type.name())
+                && connectType == DbConnectType.ORACLE_SID) {
+            jdbcUrl = address + ":" + database;
+        } else {
+            jdbcUrl = address + "/" + database;
+        }
+
         if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             jdbcUrl += ";principal=" + principal;
@@ -487,6 +500,7 @@ public class DataSourceService extends BaseService{
             separator = "&";
         } else if (Constants.HIVE.equals(type.name())
                 || Constants.SPARK.equals(type.name())
+                || Constants.DB2.equals(type.name())
                 || Constants.SQLSERVER.equals(type.name())) {
             separator = ";";
         }
@@ -502,28 +516,30 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
         if (other != null && !"".equals(other)) {
-            LinkedHashMap<String, String> map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
+            LinkedHashMap<String, String> map = JSON.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
             if (map.size() > 0) {
                 StringBuilder otherSb = new StringBuilder();
                 for (Map.Entry<String, String> entry: map.entrySet()) {
                     otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
                 }
-                otherSb.deleteCharAt(otherSb.length() - 1);
+                if (!Constants.DB2.equals(type.name())) {
+                    otherSb.deleteCharAt(otherSb.length() - 1);
+                }
                 parameterMap.put(Constants.OTHER, otherSb);
             }
 
         }
 
         if(logger.isDebugEnabled()){
-            logger.info("parameters map-----" + JSONObject.toJSONString(parameterMap));
+            logger.info("parameters map-----" + JSON.toJSONString(parameterMap));
         }
-        return JSONObject.toJSONString(parameterMap);
+        return JSON.toJSONString(parameterMap);
 
 
     }
 
-    private String buildAddress(DbType type, String host, String port) {
+    private String buildAddress(DbType type, String host, String port, DbConnectType connectType) {
         StringBuilder sb = new StringBuilder();
         if (Constants.MYSQL.equals(type.name())) {
             sb.append(Constants.JDBC_MYSQL);
@@ -544,10 +560,17 @@ public class DataSourceService extends BaseService{
             sb.append(Constants.JDBC_CLICKHOUSE);
             sb.append(host).append(":").append(port);
         } else if (Constants.ORACLE.equals(type.name())) {
-            sb.append(Constants.JDBC_ORACLE);
+            if (connectType == DbConnectType.ORACLE_SID) {
+                sb.append(Constants.JDBC_ORACLE_SID);
+            } else {
+                sb.append(Constants.JDBC_ORACLE_SERVICE_NAME);
+            }
             sb.append(host).append(":").append(port);
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
+            sb.append(host).append(":").append(port);
+        }else if (Constants.DB2.equals(type.name())) {
+            sb.append(Constants.JDBC_DB2);
             sb.append(host).append(":").append(port);
         }
 

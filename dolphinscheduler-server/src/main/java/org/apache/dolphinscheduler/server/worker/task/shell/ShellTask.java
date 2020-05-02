@@ -18,17 +18,19 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -52,46 +54,34 @@ public class ShellTask extends AbstractTask {
   private ShellParameters shellParameters;
 
   /**
-   * task dir
-   */
-  private String taskDir;
-
-  /**
    * shell command executor
    */
   private ShellCommandExecutor shellCommandExecutor;
 
   /**
-   * process database access
+   *  taskExecutionContext
    */
-  private ProcessDao processDao;
+  private TaskExecutionContext taskExecutionContext;
 
   /**
    * constructor
-   * @param taskProps task props
+   * @param taskExecutionContext taskExecutionContext
    * @param logger    logger
    */
-  public ShellTask(TaskProps taskProps, Logger logger) {
-    super(taskProps, logger);
+  public ShellTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
 
-    this.taskDir = taskProps.getTaskDir();
-
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskProps.getTaskDir(),
-            taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
-            taskProps.getTenantCode(),
-            taskProps.getEnvFile(),
-            taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(),
+    this.taskExecutionContext = taskExecutionContext;
+    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+            taskExecutionContext,
             logger);
-    this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
   }
 
   @Override
   public void init() {
-    logger.info("shell task params {}", taskProps.getTaskParams());
+    logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
-    shellParameters = JSONUtils.parseObject(taskProps.getTaskParams(), ShellParameters.class);
+    shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
 
     if (!shellParameters.checkParameters()) {
       throw new RuntimeException("shell task params is not valid");
@@ -102,10 +92,14 @@ public class ShellTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processDao);
+      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
     } catch (Exception e) {
-      logger.error("shell task failure", e);
-      exitStatusCode = -1;
+      logger.error("shell task error", e);
+      setExitStatusCode(Constants.EXIT_CODE_FAILURE);
+      throw e;
     }
   }
 
@@ -122,7 +116,10 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+    String fileName = String.format("%s/%s_node.sh",
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
+
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -130,30 +127,43 @@ public class ShellTask extends AbstractTask {
     }
 
     String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-
-
     /**
      *  combining local and global parameters
      */
-    Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(),
+    Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+            taskExecutionContext.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
-            taskProps.getCmdTypeIfComplement(),
-            taskProps.getScheduleTime());
+            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+            taskExecutionContext.getScheduleTime());
     if (paramsMap != null){
       script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
-
+    // new
+    // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+    if (paramsMap != null) {
+      if (taskExecutionContext.getScheduleTime() != null) {
+        String dateTime = DateUtils.format(taskExecutionContext.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
+        Property p = new Property();
+        p.setValue(dateTime);
+        p.setProp(Constants.PARAMETER_SHECDULE_TIME);
+        paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+      }
+      script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
+    }
 
     shellParameters.setRawScript(script);
 
     logger.info("raw script : {}", shellParameters.getRawScript());
-    logger.info("task dir : {}", taskDir);
+    logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
-    Files.createFile(path, attr);
+    if (OSUtils.isWindows()) {
+      Files.createFile(path);
+    } else {
+      Files.createFile(path, attr);
+    }
 
     Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
 
@@ -164,7 +174,5 @@ public class ShellTask extends AbstractTask {
   public AbstractParameters getParameters() {
     return shellParameters;
   }
-
-
 
 }

@@ -23,42 +23,42 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/home'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe61d;</i>{{$t('Home')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-home-empty"></em>{{$t('Home')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/projects'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe635;</i>{{$t('Project Manage')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-setting"></em>{{$t('Project Manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/resource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe768;</i>{{$t('Resources manage')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-folder-empty"></em>{{$t('Resources manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xeef4;</i>{{$t('Datasource manage')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-database"></em>{{$t('Datasource manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/monitor'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe65f;</i>{{$t('Monitor')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-monitor"></em>{{$t('Monitor')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
-            <span><i class="iconfont">&#xe671;</i>{{$t('Security')}}</span><b></b>
+            <span><em class="ansiconfont ans-icon-shield"></em>{{$t('Security')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
@@ -72,11 +72,11 @@
                 style="width: 80px"
                 trigger="click">
         <div class="lrns-list">
-          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList"><span>{{item.name}}</span></a>
+          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList" :key="$index"><span>{{item.name}}</span></a>
         </div>
         <div class="login-model" slot="reference">
           <span>{{activeLocale.name}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <em class="ans-icon-arrow-down"></em>
         </div>
       </x-poptip>
       </span>
@@ -87,24 +87,24 @@
               placement="bottom-end">
         <div class="lrns-list">
           <a href="javascript:" @click="_goAccount">
-            <i class="iconfont">&#xe629;</i>
+            <em class="ans-icon-user-empty"></em>
             <span>{{$t('User Information')}}</span>
           </a>
           <a href="javascript:" @click="_signOut">
-            <i class="iconfont">&#xe60c;</i>
+            <em class="ans-icon-off"></em>
             <span>{{$t('Logout')}}</span>
           </a>
         </div>
         <div class="login-model" slot="reference">
-          <i class="iconfont">&#xe638;</i>
+          <em class="ans-icon-user-solid"></em>
           <span>{{userInfo.userName}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <em class="ans-icon-arrow-down"></em>
         </div>
       </x-poptip>
     </div>
     <div class="file-update-model" @click="_toggleArchive" v-if="isUpdate">
       <div class="icon-cloud">
-        <i class="fa fa-cloud-upload"></i>
+        <em class="ans ans-icon-upload"></em>
       </div>
       <div class="progress-box">
         <m-progress-bar :value="progress" text-placement="bottom"></m-progress-bar>
@@ -112,35 +112,35 @@
     </div>
     <div class="adaptive-m-nav">
       <div class="m-nav-box ">
-        <a href="javascript:" @click="mIsNav = !mIsNav"><i class="iconfont">&#xe609;</i></a>
+        <a href="javascript:" @click="mIsNav = !mIsNav"><em class="ans-icon-database"></em></a>
       </div>
       <div class="m-title-box">
         <div class="logo-m"></div>
       </div>
       <div class="m-user-box">
-        <a href="javascript:" @click="_goAccount"><i class="iconfont">&#xe64a;</i></a>
+        <a href="javascript:" @click="_goAccount"><em class="ans-icon-user-empty"></em></a>
       </div>
       <transition name="slide-fade">
         <div class="m-nav-list" v-if="mIsNav">
           <ul @click="mIsNav = false">
             <router-link :to="{ path: '/home'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe61d;</i>
+              <em class="ans-icon-home-empty"></em>
               <span>{{$t('Home')}}</span>
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe635;</i>
+              <em class="ans-icon-setting"></em>
               <span>{{$t('Project manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe768;</i>
+              <em class="ans-icon-folder-empty"></em>
               <span>{{$t('Resources manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
-              <i class="iconfont">&#xeef4;</i>
+              <em class="ans-icon-database"></em>
               <span>{{$t('Datasource manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
-              <i class="iconfont">&#xe671;</i>
+              <em class="ans-icon-shield"></em>
               <span>{{$t('Security')}}</span>
             </router-link>
           </ul>
@@ -151,10 +151,12 @@
 </template>
 <script>
   import _ from 'lodash'
-  import cookie from '@/module/util/cookie'
+  import cookies from 'js-cookie'
   import { mapState, mapActions } from 'vuex'
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
+  import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
+  import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
@@ -260,6 +262,86 @@
           }
         })
       },
+      _fileChildUpdate (type,data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mFileChildUpdate, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                id: data
+              }
+            })
+          }
+        })
+      },
+      _resourceChildUpdate (type,data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mResourceChildUpdate, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                id: data
+              }
+            })
+          }
+        })
+      },
       /**
        * Upload popup layer display
        */
@@ -276,16 +358,16 @@
        * Language switching
        */
       _toggleLanguage (language) {
-        cookie.set('language', language, { path: '/' })
+        cookies.set('language', language, { path: '/' })
         setTimeout(() => {
           window.location.reload()
         }, 100)
       }
     },
     created () {
-      let language = cookie.get('language')
+      let language = cookies.get('language')
       this.activeLocale = language ? findLocale(language) : '中文'
-      this.docLink = NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
+      this.docLink = process.env.NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
     },
     computed: {
       ...mapState('user', ['userInfo'])
@@ -305,7 +387,6 @@
       .logo-m {
         width: 36px;
         height: 36px;
-        background: url("./m_logo.png");
         margin: 0 auto;
         position: relative;
         top: 12px;
@@ -349,7 +430,7 @@
               display: block;
               width: 106px;
               color: #fff;
-              .iconfont {
+              .ansiconfont {
                 vertical-align: -2px;
                 font-size: 22px;
                 margin-right: 4px;
@@ -431,7 +512,7 @@
         margin-right: 20px;
         cursor: pointer;
         margin-top: 16px;
-        i {
+        em {
           font-size: 18px;
           vertical-align: middle;
           color: #fff;

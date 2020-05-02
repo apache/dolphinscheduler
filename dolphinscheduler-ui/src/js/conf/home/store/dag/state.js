@@ -29,6 +29,8 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
+  // Node cache information, cache the previous input
+  cacheTasks: {},
   // Timeout alarm
   timeout: 0,
   // tenant id
@@ -51,6 +53,8 @@ export default {
   projectListS: [],
   // tasks resourcesList
   resourcesListS: [],
+  // tasks resourcesListJar
+  resourcesListJar: [],
   // tasks datasource Type
   dsTypeListS: [
     {
@@ -86,6 +90,11 @@ export default {
     {
       id: 6,
       code: 'SQLSERVER',
+      disabled: false
+    },
+    {
+      id: 7,
+      code: 'DB2',
       disabled: false
     }
   ],

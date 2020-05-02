@@ -16,12 +16,13 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class JSONUtils {
    */
   public static String toJsonString(Object object) {
     try{
-      return JSONObject.toJSONString(object,false);
+      return JSON.toJSONString(object,false);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
@@ -50,19 +51,19 @@ public class JSONUtils {
    * @param json the json
    * @param clazz c
    * @param <T> the generic clazz
-   * @return the result list
+   * @return the result list or empty list
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
-      return null;
+      return Collections.emptyList();
     }
     try {
-      return JSONArray.parseArray(json, clazz);
+      return JSON.parseArray(json, clazz);
     } catch (Exception e) {
       logger.error("JSONArray.parseArray exception!",e);
     }
 
-    return null;
+    return Collections.emptyList();
   }
 
 }

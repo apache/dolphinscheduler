@@ -19,13 +19,12 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
-source $workDir/../conf/config/run_config.conf
 source $workDir/../conf/config/install_config.conf
 
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
-        echo $master
+  echo "$master master server is stopping"
 	ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop master-server;"
 
 done
@@ -33,10 +32,9 @@ done
 workersHost=(${workers//,/ })
 for worker in ${workersHost[@]}
 do
-        echo $worker
-
-        ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
-        ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop logger-server;"
+  echo "$worker worker server is stopping"
+  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
+  ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop logger-server;"
 done
 
 ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop alert-server;"
@@ -44,8 +42,7 @@ ssh -p $sshPort $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
-        echo $apiServer
-
-        ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
+  echo "$apiServer worker server is stopping"
+  ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
 done
 

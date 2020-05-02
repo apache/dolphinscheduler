@@ -19,9 +19,10 @@ package org.apache.dolphinscheduler.common.task.spark;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * spark parameters
@@ -77,7 +78,7 @@ public class SparkParameters extends AbstractParameters {
   /**
    * resource list
    */
-  private List<ResourceInfo> resourceList;
+  private List<ResourceInfo> resourceList = new ArrayList<>();
 
   /**
    * The YARN queue to submit to
@@ -94,6 +95,11 @@ public class SparkParameters extends AbstractParameters {
    * 0 JAVA,1 SCALA,2 PYTHON
    */
   private ProgramType programType;
+
+  /**
+   * spark version
+   */
+  private String sparkVersion;
 
   public ResourceInfo getMainJar() {
     return mainJar;
@@ -200,20 +206,25 @@ public class SparkParameters extends AbstractParameters {
     this.programType = programType;
   }
 
-  @Override
-  public boolean checkParameters() {
-    return mainJar != null && programType != null;
+  public String getSparkVersion() {
+    return sparkVersion;
   }
 
+  public void setSparkVersion(String sparkVersion) {
+    this.sparkVersion = sparkVersion;
+  }
 
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList !=null ) {
-      this.resourceList.add(mainJar);
-      return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+  public boolean checkParameters() {
+    return mainJar != null && programType != null && sparkVersion != null;
+  }
+
+  @Override
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null && !resourceList.contains(mainJar)) {
+      resourceList.add(mainJar);
     }
-    return null;
+    return resourceList;
   }
 
 

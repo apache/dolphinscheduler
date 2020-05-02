@@ -66,6 +66,13 @@
       // Listening data source
       resourceList (a) {
         this.value = _.map(_.cloneDeep(a), v => v.res)
+      },
+      value (val) {
+        this.$emit('on-cache-resourcesData', _.map(val, v => {
+          return {
+            res: v
+          }
+        }))
       }
     },
     created () {

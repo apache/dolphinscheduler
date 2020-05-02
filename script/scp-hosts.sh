@@ -18,22 +18,24 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/run_config.conf
 source $workDir/../conf/config/install_config.conf
 
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-    if ! ssh -p $sshPort $host test -e $installPath; then
-      ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
-    fi
+  if ! ssh -p $sshPort $host test -e $installPath; then
+    ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+  fi
 
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/"
-	scp -P $sshPort -r $workDir/../bin  $host:$installPath
-	scp -P $sshPort -r $workDir/../conf  $host:$installPath
-	scp -P $sshPort -r $workDir/../lib   $host:$installPath
-	scp -P $sshPort -r $workDir/../script  $host:$installPath
-	scp -P $sshPort -r $workDir/../sql  $host:$installPath
-	scp -P $sshPort  $workDir/../install.sh  $host:$installPath
+  echo "scp dirs to $host/$installPath starting"
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
+
+  for dsDir in bin conf lib script sql ui install.sh
+  do
+    echo "start to scp $dsDir to $host/$installPath"
+    scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
+  done
+
+  echo "scp dirs to $host/$installPath complete"
 done

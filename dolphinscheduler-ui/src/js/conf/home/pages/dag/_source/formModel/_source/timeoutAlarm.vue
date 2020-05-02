@@ -49,7 +49,7 @@
       </div>
       <div class="cont-box">
         <label class="label-box">
-          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails" maxlength="9">
+          <x-input v-model="interval" style="width: 200px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
           </x-input>
         </label>

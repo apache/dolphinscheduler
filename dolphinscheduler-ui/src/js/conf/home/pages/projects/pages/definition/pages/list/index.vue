@@ -26,16 +26,16 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="processListP.length">
+      <template v-if="processListP.length || total>0">
         <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!processListP.length">
+      <template v-if="!processListP.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
 </template>
@@ -64,7 +64,8 @@
           pageNo: 1,
           searchVal: '',
           userId: ''
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -98,12 +99,21 @@
        * get data list
        */
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getProcessListP(this.searchParams).then(res => {
-          this.processListP = []
-          this.processListP = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.processListP = []
+            this.processListP = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })
@@ -128,6 +138,9 @@
     },
     mounted() {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
