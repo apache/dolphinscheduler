@@ -474,7 +474,6 @@ The following components are provided under a MIT 2.0 license. See project link 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jul-to-slf4j 1.7.25: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j/1.7.25, MIT
-    lombok 1.18.6: https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.6, MIT
     mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
     slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
 
