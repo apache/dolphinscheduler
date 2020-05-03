@@ -41,10 +41,10 @@ public class DingTalkUtils {
         String msgToJson = new DingTalkMsgFormatter(msg + "#" + keyword).toTextMsg();
         HttpPost httpPost = constructHttpPost(msgToJson, charset);
 
-        CloseableHttpClient httpClient = null;
+        CloseableHttpClient httpClient;
         if (isEnableProxy) {
-            httpClient = getProxyClient(proxy, port, user, passwd);
-            RequestConfig rcf = getProxyConfig(proxy, port);
+            httpClient = getProxyClient();
+            RequestConfig rcf = getProxyConfig();
             httpPost.setConfig(rcf);
         } else {
             httpClient = getDefaultClient();
@@ -72,22 +72,22 @@ public class DingTalkUtils {
         return post;
     }
 
-    //获取代理主机client
-    public static CloseableHttpClient getProxyClient(String proxyHost, int proxyPort, String proxyName, String proxyPwd) {
-        HttpHost proxy = new HttpHost(proxyHost, proxyPort);
+
+    private static CloseableHttpClient getProxyClient() {
+        HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxyName, proxyPwd));
+        provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, passwd));
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(provider).build();
         return httpClient;
     }
-    //获取默认主机client
-    public static CloseableHttpClient getDefaultClient() {
+
+    private static CloseableHttpClient getDefaultClient() {
         return HttpClients.createDefault();
     }
 
-    public static RequestConfig getProxyConfig(String proxyHost, int proxyPort) {
-        HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-        return RequestConfig.custom().setSocketTimeout(SOCKETTIMEOUT).setConnectTimeout(CONNECTTIMEOUT).setProxy(proxy).build();
+    private static RequestConfig getProxyConfig() {
+        HttpHost httpProxy = new HttpHost(proxy, port);
+        return RequestConfig.custom().setSocketTimeout(SOCKETTIMEOUT).setConnectTimeout(CONNECTTIMEOUT).setProxy(httpProxy).build();
     }
 
 }
