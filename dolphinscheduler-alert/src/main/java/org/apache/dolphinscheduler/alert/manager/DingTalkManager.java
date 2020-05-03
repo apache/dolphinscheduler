@@ -3,6 +3,7 @@ package org.apache.dolphinscheduler.alert.manager;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.DingTalkUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 public class DingTalkManager {
     private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
 
-    public Map<String,Object> send(Alert alert) {
+    public Map<String,Object> send(AlertInfo alert) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
         logger.info("send message {}",alert);
@@ -30,8 +31,8 @@ public class DingTalkManager {
         return retMap;
     }
 
-    private String buildMessage(Alert alert) {
-        String msg = alert.getContent();
+    private String buildMessage(AlertInfo alert) {
+        String msg = alert.getAlertData().getContent();
         return msg;
     }
 }

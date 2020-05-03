@@ -16,9 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.alert.manager.DingTalkManager;
 import org.apache.dolphinscheduler.alert.manager.EmailManager;
 import org.apache.dolphinscheduler.alert.manager.EnterpriseWeChatManager;
 import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.utils.DingTalkUtils;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -125,7 +127,7 @@ public class EmailAlertPlugin implements AlertPlugin {
             
            if (DingTalkUtils.isEnableDingTalk) {
                 logger.info("Ding Talk is enable!");
-                 dingTalkManager.send(alert);
+                 dingTalkManager.send(info);
               }
 
         } else {

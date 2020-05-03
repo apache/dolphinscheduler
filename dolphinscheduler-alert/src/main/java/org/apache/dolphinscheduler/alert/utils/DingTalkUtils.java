@@ -2,7 +2,6 @@ package org.apache.dolphinscheduler.alert.utils;
 
 
 import org.apache.http.HttpEntity;
-//import org.apache.http.client.methods.HttpPost;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -18,14 +17,14 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.IOException;
+
 
 public class DingTalkUtils {
     public static final Logger logger = LoggerFactory.getLogger(DingTalkUtils.class);
 
 
-    private static final boolean isEnableDingTalk = PropertyUtils.getBoolean(Constants.DINGTALK_ENABLE);
+    public static final boolean isEnableDingTalk = PropertyUtils.getBoolean(Constants.DINGTALK_ENABLE);
     private static final String dingTaskUrl = PropertyUtils.getString(Constants.DINGTALK_WEBHOOK);
     private static final String keyword = PropertyUtils.getString(Constants.DINGTALK_KEYWORD);
     private static final Boolean isEnableProxy = PropertyUtils.getBoolean(Constants.DINGTALK_PROXY_ENABLE);
