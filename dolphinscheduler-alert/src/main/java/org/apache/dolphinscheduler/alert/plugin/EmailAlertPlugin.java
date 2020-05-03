@@ -44,6 +44,7 @@ public class EmailAlertPlugin implements AlertPlugin {
 
     private static final EmailManager emailManager = new EmailManager();
     private static final EnterpriseWeChatManager weChatManager = new EnterpriseWeChatManager();
+    private static final DingTalkManager dingTalkManager = new DingTalkManager();
 
     public EmailAlertPlugin() {
         this.pluginName = new PluginName();
@@ -121,6 +122,11 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
+            
+           if (DingTalkUtils.isEnableDingTalk) {
+                logger.info("Ding Talk is enable!");
+                 dingTalkManager.send(alert);
+              }
 
         } else {
             retMaps.put(Constants.MESSAGE, "alert send error.");
