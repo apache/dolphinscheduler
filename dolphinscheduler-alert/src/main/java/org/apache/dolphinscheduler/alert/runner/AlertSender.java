@@ -73,6 +73,7 @@ public class AlertSender {
                     .setReceivers(alert.getReceivers())
                     .setReceiversCc(alert.getReceiversCc())
                     .setShowType(alert.getShowType().getDescp())
+                    .setAlertType(alert.getAlertType().getDescp())
                     .setTitle(alert.getTitle());
 
             AlertInfo alertInfo = new AlertInfo();

@@ -53,6 +53,10 @@ public class AlertData {
      * receivers_cc
      */
     private String receiversCc;
+    /**
+     * alert type
+     */
+    private String alertType;
 
     public int getId() {
         return id;
@@ -126,4 +130,12 @@ public class AlertData {
         return this;
     }
 
+    public String getAlertType() {
+        return alertType;
+    }
+
+    public AlertData setAlertType(String alertType) {
+        this.alertType = alertType;
+        return this;
+    }
 }
