@@ -19,7 +19,7 @@ public class DingTalkManager {
     public Map<String,Object> send(AlertInfo alert) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-        logger.info("send message {}",alert);
+        logger.info("send message {}", alert.getAlertData().getTitle());
         try {
             String msg = buildMessage(alert);
             DingTalkUtils.sendDingTalkMsg(msg, Constants.UTF_8);
