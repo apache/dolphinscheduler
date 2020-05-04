@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -34,6 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * DingTalkUtils utils
@@ -66,7 +70,7 @@ public class DingTalkUtils {
      * @throws IOException the IOException
      */
     public static String sendDingTalkMsg(String msg, String charset) throws IOException {
-        String msgToJson = new DingTalkMsgFormatter(msg + "#" + keyword).toTextMsg();
+        String msgToJson = textToJsonString(msg + "#" + keyword);
         HttpPost httpPost = constructHttpPost(msgToJson, charset);
 
         CloseableHttpClient httpClient;
@@ -119,6 +123,19 @@ public class DingTalkUtils {
     private static RequestConfig getProxyConfig() {
         HttpHost httpProxy = new HttpHost(proxy, port);
         return RequestConfig.custom().setSocketTimeout(SOCKETTIMEOUT).setConnectTimeout(CONNECTTIMEOUT).setProxy(httpProxy).build();
+    }
+
+    public static String textToJsonString(String text) {
+        Map<String, Object> items = new HashMap<String, Object>();
+        items.put("msgtype", "text");
+        Map<String, String> textContent = new HashMap<String, String>();
+        byte[] byt = StringUtils.getBytesUtf8(text);
+        String txt = StringUtils.newStringUtf8(byt);
+        textContent.put("content", txt);
+        items.put("text", textContent);
+
+        return JSON.toJSONString(items);
+
     }
 
 }

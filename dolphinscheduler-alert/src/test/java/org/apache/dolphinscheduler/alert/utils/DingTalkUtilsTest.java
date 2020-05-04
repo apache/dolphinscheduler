@@ -44,9 +44,9 @@ public class DingTalkUtilsTest {
 
     @Test
     @Ignore
-    public void testSendMsgByProxy() {
+    public void testSendMsg() {
         try {
-           String msgTosend = "msg to send by proxy";
+           String msgTosend = "msg to send";
            String rsp = DingTalkUtils.sendDingTalkMsg(msgTosend, Constants.UTF_8);
            logger.info("send msg result:{}",rsp);
             String errmsg = JSON.parseObject(rsp).getString("errmsg");
@@ -54,5 +54,21 @@ public class DingTalkUtilsTest {
         }  catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    @Test
+    public void testDingTalkMsgToJson() {
+        String jsonString = DingTalkUtils.textToJsonString("this is test");
+
+        logger.info(jsonString);
+        String expect = "{\"text\":{\"content\":\"this is test\"},\"msgtype\":\"text\"}";
+        Assert.assertEquals(expect, jsonString);
+    }
+    @Test
+    public void testDingTalkMsgUtf8() {
+        String msg = DingTalkUtils.textToJsonString("this is test:中文");
+
+        logger.info("test support utf8, actual:" + msg);
+        String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
+        Assert.assertEquals(expect, msg);
     }
 }
