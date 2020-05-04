@@ -126,7 +126,7 @@ public class EmailAlertPlugin implements AlertPlugin {
             }
             
            if (DingTalkUtils.isEnableDingTalk) {
-                logger.info("Ding Talk is enable!");
+                logger.info("Ding Talk is enable.");
                  dingTalkManager.send(info);
               }
 
