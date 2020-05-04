@@ -23,11 +23,11 @@ import static org.junit.Assert.*;
  * dingtalk.password=
  * dingtalk.isEnableProxy=false
  */
-@Ignore
 public class DingTalkUtilsTest {
     Logger logger = LoggerFactory.getLogger(DingTalkUtilsTest.class);
 
     @Test
+    @Ignore
     public void testSendMsgByProxy() {
         try {
            String msgTosend = "msg to send by proxy";
