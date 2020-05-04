@@ -19,7 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-
+/**
+ * DingTalkUtils utils
+ * support send msg to ding talk by robot message push function.
+ * support proxy setting
+ */
 public class DingTalkUtils {
     public static final Logger logger = LoggerFactory.getLogger(DingTalkUtils.class);
 
@@ -37,6 +41,14 @@ public class DingTalkUtils {
     private static final int SOCKETTIMEOUT = 5000;
     private static final int CONNECTTIMEOUT = 5000;
 
+    /**
+     * send message interface
+     * only support text message format now.
+     * @param msg message context to send
+     * @param charset charset type
+     * @return  result of sending msg
+     * @throws IOException the IOException
+     */
     public static String sendDingTalkMsg(String msg, String charset) throws IOException {
         String msgToJson = new DingTalkMsgFormatter(msg + "#" + keyword).toTextMsg();
         HttpPost httpPost = constructHttpPost(msgToJson, charset);
@@ -50,18 +62,21 @@ public class DingTalkUtils {
             httpClient = getDefaultClient();
         }
 
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        String resp;
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, charset);
-            EntityUtils.consume(entity);
-        } finally {
-            response.close();
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, charset);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            logger.info("Ding Talk send [{}], resp:{%s}", msg, resp);
+            return resp;
+        }  finally {
             httpClient.close();
         }
-        logger.info("Ding Talk send [{}], resp:{%s}", msg, resp);
-        return resp;
     }
 
     private static  HttpPost constructHttpPost(String msg, String charset) {
