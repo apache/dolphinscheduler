@@ -257,6 +257,7 @@
                                             </location>
                                             <includes>
                                                 <include>config/*.*</include>
+                                                <include>**/*.xml</include>
                                             </includes>
                                         </source>
 

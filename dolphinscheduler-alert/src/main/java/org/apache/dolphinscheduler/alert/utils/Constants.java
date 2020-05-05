@@ -77,8 +77,6 @@ public class Constants {
 
     public static final int NUMBER_1000 = 1000;
 
-    public static final String ALERT_TEMPLATE = "alert.template";
-
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
     public static final String SPRING_DATASOURCE_URL = "spring.datasource.url";
@@ -158,4 +156,21 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
+
+    /**
+     * plugin config
+     */
+    public static final String PLUGIN_DIR = "plugin.dir";
+
+    public static final String PLUGIN_DEFAULT_EMAIL = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_EN = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
+
+    public static final String RETMAP_MSG = "msg";
 }

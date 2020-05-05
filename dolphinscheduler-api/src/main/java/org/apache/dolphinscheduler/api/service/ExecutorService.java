@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -59,7 +60,7 @@ public class ExecutorService extends BaseService{
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private MonitorService monitorService;
 
 
     @Autowired
@@ -123,6 +124,14 @@ public class ExecutorService extends BaseService{
             return result;
         }
 
+        // check master server exists
+        List<Server> masterServers = monitorService.getServerListFromZK(true);
+
+
+        if (masterServers.size() == 0) {
+            putMsg(result, Status.MASTER_NOT_EXISTS);
+            return result;
+        }
         /**
          * create command
          */
@@ -499,7 +508,7 @@ public class ExecutorService extends BaseService{
         // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-            if(null != start && null != end && start.before(end)){
+            if(null != start && null != end && !start.after(end)){
                 if(runMode == RunMode.RUN_MODE_SERIAL){
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));

@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 <template>
+  <div class="wrap-table">
   <m-list-construction :title="$t('Process Instance')">
     <template slot="conditions">
       <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
@@ -30,9 +31,10 @@
       <template v-if="!processInstanceList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -74,7 +76,8 @@
           endDate: '',
           // Exectuor Name
           executorName: ''
-        }
+        },
+        isLeft: true
       }
     },
     props: {},
@@ -136,6 +139,11 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this._getProcessInstanceListP(flag)
       }, 100, {
         'leading': false,
@@ -183,10 +191,35 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  .wrap-table {
+    .table-box {
+      overflow-y: scroll;
+    }
+    .table-box {
+      .fixed {
+        tr {
+          th:last-child,td:last-child {
+            background: inherit;
+            width: 230px;
+            height: 40px;
+            line-height: 40px;
+            border-left:1px solid #ecf3ff;
+            position: absolute;
+            right: 0;
+            z-index: 2;
+          }
+          th:nth-last-child(2) {
+            padding-right: 260px;
+          }
+        }
+      }
+    }
+  }
 </style>
