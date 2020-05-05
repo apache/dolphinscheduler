@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
 public class DingTalkUtilsTest {
     Logger logger = LoggerFactory.getLogger(DingTalkUtilsTest.class);
 
-    private static final String mockUrl = "https://oapi.dingtalk.com/robot/send?access_token=7e6fd0ddc3ac24f07ab5ea943dd9d6486b4595a48245cc5d91814364aae432a3";
+    private static final String mockUrl = "https://oapi.dingtalk.com/robot/send?access_token=test";
     private static final String mockKeyWords = "onway";
     private static final String msg = "ding talk test";
 
@@ -59,20 +59,20 @@ public class DingTalkUtilsTest {
         Mockito.when(PropertyUtils.getInt(Constants.DINGTALK_PORT)).thenReturn(80);
     }
 
-    @Test
-    @Ignore
-    public void testSendMsg() {
-        try {
-           String msgTosend = "msg to send";
-            logger.info(PropertyUtils.getString(Constants.DINGTALK_WEBHOOK));
-           String rsp = DingTalkUtils.sendDingTalkMsg(msgTosend, Constants.UTF_8);
-           logger.info("send msg result:{}",rsp);
-            String errmsg = JSON.parseObject(rsp).getString("errmsg");
-            Assert.assertEquals("ok", errmsg);
-        }  catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Test
+//    @Ignore
+//    public void testSendMsg() {
+//        try {
+//           String msgTosend = "msg to send";
+//            logger.info(PropertyUtils.getString(Constants.DINGTALK_WEBHOOK));
+//           String rsp = DingTalkUtils.sendDingTalkMsg(msgTosend, Constants.UTF_8);
+//           logger.info("send msg result:{}",rsp);
+//            String errmsg = JSON.parseObject(rsp).getString("errmsg");
+//            Assert.assertEquals("ok", errmsg);
+//        }  catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Test
     public void testCreateDefaultClient() {
@@ -121,4 +121,5 @@ public class DingTalkUtilsTest {
         String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
         Assert.assertEquals(expect, msg);
     }
+
 }
