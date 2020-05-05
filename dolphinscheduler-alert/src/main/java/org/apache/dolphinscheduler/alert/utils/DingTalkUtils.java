@@ -47,7 +47,6 @@ import java.util.Map;
 public class DingTalkUtils {
     public static final Logger logger = LoggerFactory.getLogger(DingTalkUtils.class);
 
-
     public static final boolean isEnableDingTalk = PropertyUtils.getBoolean(Constants.DINGTALK_ENABLE);
     private static final String dingTaskUrl = PropertyUtils.getString(Constants.DINGTALK_WEBHOOK);
     private static final String keyword = PropertyUtils.getString(Constants.DINGTALK_KEYWORD);
@@ -56,10 +55,6 @@ public class DingTalkUtils {
     private static final String user = PropertyUtils.getString(Constants.DINGTALK_USER);
     private static final String passwd = PropertyUtils.getString(Constants.DINGTALK_PASSWORD);
     private static final Integer port = PropertyUtils.getInt(Constants.DINGTALK_PORT);
-
-
-    private static final int SOCKETTIMEOUT = 5000;
-    private static final int CONNECTTIMEOUT = 5000;
 
     /**
      * send message interface
@@ -99,7 +94,7 @@ public class DingTalkUtils {
         }
     }
 
-    private static  HttpPost constructHttpPost(String msg, String charset) {
+    public static HttpPost constructHttpPost(String msg, String charset) {
         HttpPost post =  new HttpPost(dingTaskUrl);
         StringEntity entity = new StringEntity(msg, charset);
         post.setEntity(entity);
@@ -108,7 +103,7 @@ public class DingTalkUtils {
     }
 
 
-    private static CloseableHttpClient getProxyClient() {
+    public static CloseableHttpClient getProxyClient() {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, passwd));
@@ -116,13 +111,13 @@ public class DingTalkUtils {
         return httpClient;
     }
 
-    private static CloseableHttpClient getDefaultClient() {
+    public static CloseableHttpClient getDefaultClient() {
         return HttpClients.createDefault();
     }
 
-    private static RequestConfig getProxyConfig() {
+    public static RequestConfig getProxyConfig() {
         HttpHost httpProxy = new HttpHost(proxy, port);
-        return RequestConfig.custom().setSocketTimeout(SOCKETTIMEOUT).setConnectTimeout(CONNECTTIMEOUT).setProxy(httpProxy).build();
+        return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
     public static String textToJsonString(String text) {
