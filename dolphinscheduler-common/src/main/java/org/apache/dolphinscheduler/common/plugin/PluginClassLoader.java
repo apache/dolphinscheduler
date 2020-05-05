@@ -49,7 +49,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-        logger.trace("Received request to load class '{}'", name);
+        logger.debug("Received request to load class '{}'", name);
         synchronized (getClassLoadingLock(name)) {
             if (name.startsWith(JAVA_PACKAGE_PREFIX) || name.startsWith(JAVAX_PACKAGE_PREFIX)) {
                 return findSystemClass(name);
@@ -60,6 +60,7 @@ public class PluginClassLoader extends URLClassLoader {
 
             // if the class is part of the plugin engine use parent class loader
             if (!isWhitePrefixes && isExcludePrefixed) {
+                logger.debug("Loaded class '{}' from parent class loader", name);
                 return getParent().loadClass(name);
             }
 

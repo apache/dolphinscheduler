@@ -850,6 +850,8 @@
                         <include>**/plugin/model/AlertDataTest.java</include>
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <include>**/plugin/utils/PropertyUtilsTest.java</include>
+                        <include>**/example/plugin/HelloworldAlertPluginTest.java</include>
+                        <include>**/example/plugin/HelloworldProviderTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -1010,5 +1012,6 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-plugin-api</module>
+        <module>examples</module>
     </modules>
 </project>
