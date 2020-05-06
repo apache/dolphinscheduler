@@ -19,34 +19,36 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th scope="col" width="40">
+          <th scope="col" style="min-width: 40px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <span>{{$t('State')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 150px">
             <span>{{$t('Description')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 70px">
             <span>{{$t('Modify User')}}</span>
           </th>
-          <th scope="col" width="90">
-            <span>{{$t('Timing state')}}</span>
+          <th scope="col" style="min-width: 70px">
+            <div style="width: 80px">
+              <span>{{$t('Timing state')}}</span>
+            </div>
           </th>
-          <th scope="col" width="300">
+          <th scope="col" style="min-width: 300px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -55,9 +57,9 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis">
-              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links">
+              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
                 {{item.name}}
               </router-link>
             </span>
@@ -121,7 +123,7 @@
       </table>
     </div>
     <x-poptip
-            v-show="strDelete !== ''"
+            v-show="strSelectIds !== ''"
             ref="poptipDeleteAll"
             placement="bottom-start"
             width="90">
@@ -134,6 +136,10 @@
         <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
+
+    <template v-if="strSelectIds !== ''">
+      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
+    </template>
 
   </div>
 </template>
@@ -149,7 +155,7 @@
     data () {
       return {
         list: [],
-        strDelete: '',
+        strSelectIds: '',
         checkAll: false
       }
     },
@@ -324,12 +330,28 @@
 
       _export (item) {
         this.exportDefinition({
-          processDefinitionId: item.id,
-          processDefinitionName: item.name
+          processDefinitionIds: item.id,
+          fileName: item.name
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
       },
+
+      _batchExport () {
+        this.exportDefinition({
+          processDefinitionIds: this.strSelectIds,
+          fileName: "process_"+new Date().getTime()
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.strSelectIds = ''
+        }).catch(e => {
+          this.strSelectIds = ''
+          this.checkAll = false
+          this.$message.error(e.msg)
+        })
+      },
+
       /**
        * Edit state
        */
@@ -362,7 +384,7 @@
             arr.push(item.id)
           }
         })
-        this.strDelete = _.join(arr, ',')
+        this.strSelectIds = _.join(arr, ',')
         if (v === false) {
           this.checkAll = false
         }
@@ -373,7 +395,7 @@
       _batchDelete () {
         this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteDefinition({
-          processDefinitionIds: this.strDelete
+          processDefinitionIds: this.strSelectIds
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
@@ -397,7 +419,7 @@
         deep: true
       },
       pageNo () {
-        this.strDelete = ''
+        this.strSelectIds = ''
       }
     },
     created () {

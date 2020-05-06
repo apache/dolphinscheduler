@@ -45,8 +45,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -315,7 +317,6 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-
         if (name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -323,9 +324,10 @@ public class ResourcesService extends BaseService {
 
         //check resource aleady exists
         String originFullName = resource.getFullName();
+        String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
-        if (!resource.getAlias().equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -336,8 +338,22 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isEmpty(tenantCode)){
             return result;
         }
+        // verify whether the resource exists in storage
+        // get the path of origin file in storage
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        try {
+            if (!HadoopUtils.getInstance().exists(originHdfsFileName)) {
+                logger.error("{} not exist", originHdfsFileName);
+                putMsg(result,Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+            throw new ServiceException(Status.HDFS_OPERATION_ERROR);
+        }
+
         String nameWithSuffix = name;
-        String originResourceName = resource.getAlias();
+
         if (!resource.isDirectory()) {
             //get the file suffix
             String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
@@ -361,10 +377,11 @@ public class ResourcesService extends BaseService {
         try {
             resourcesMapper.updateById(resource);
             if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
+                String matcherFullName = Matcher.quoteReplacement(fullName);
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
+                    t.setFullName(t.getFullName().replaceFirst(oldFullName, matcherFullName));
                     t.setUpdateTime(now);
                     return t;
                 }).collect(Collectors.toList());
@@ -389,19 +406,13 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        // get the path of origin file in hdfs
-        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
         // get the path of dest file in hdfs
         String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
 
+
         try {
-            if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
-                logger.info("hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
-                HadoopUtils.getInstance().copy(originHdfsFileName, destHdfsFileName, true, true);
-            } else {
-                logger.error("{} not exist", originHdfsFileName);
-                putMsg(result,Status.RESOURCE_NOT_EXIST);
-            }
+            logger.info("start hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
+            HadoopUtils.getInstance().copy(originHdfsFileName, destHdfsFileName, true, true);
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
             putMsg(result,Status.HDFS_COPY_FAIL);

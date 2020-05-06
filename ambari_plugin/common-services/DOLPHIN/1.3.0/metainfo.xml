@@ -22,7 +22,7 @@
             <name>DOLPHIN</name>
             <displayName>Dolphin Scheduler</displayName>
             <comment>分布式易扩展的可视化DAG工作流任务调度系统</comment>
-            <version>2.0.0</version>
+            <version>1.3.0</version>
             <components>
                 <component>
                     <name>DOLPHIN_MASTER</name>
@@ -103,7 +103,7 @@
                     <osFamily>any</osFamily>
                     <packages>
                         <package>
-                            <name>apache-dolphinscheduler-incubating-1.2.1*</name>
+                            <name>apache-dolphinscheduler-incubating-1.3.0*</name>
                         </package>
                     </packages>
                 </osSpecific>
