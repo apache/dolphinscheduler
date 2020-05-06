@@ -259,8 +259,15 @@
                 if (v2.name === v1.name) {
                   let dom = $(`#${v2.id}`)
                   let state = dom.find('.state-p')
+                  let depState = ''
+                   taskList.forEach(item=>{
+                    if(item.name==v1.name) {
+                      depState = item.state
+                    }
+                  })
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
+                  dom.attr('data-dependent-depState', depState)
                   state.append(`<strong class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></strong>`)
                   state.find('strong').attr('title', titleTpl(v2, v1.desc))
                 }
