@@ -69,6 +69,7 @@ export default {
   'Project Manage': '项目管理',
   'Create Project': '创建项目',
   'Cron Manage': '定时管理',
+  'Copy Workflow': '复制工作流',
   'Tenant Manage': '租户管理',
   'Create Tenant': '创建租户',
   'User Manage': '用户管理',
