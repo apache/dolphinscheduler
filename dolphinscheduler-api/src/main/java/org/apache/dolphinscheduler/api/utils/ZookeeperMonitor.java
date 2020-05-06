@@ -88,9 +88,9 @@ public class ZookeeperMonitor extends AbstractZKClient {
 				long sent = state.getSent();
 				long received = state.getReceived();
 				String mode =  state.getMode();
-				int minLatency =  state.getMinLatency();
-				int avgLatency = state.getAvgLatency();
-				int maxLatency = state.getMaxLatency();
+				float minLatency =  state.getMinLatency();
+				float avgLatency = state.getAvgLatency();
+				float maxLatency = state.getMaxLatency();
 				int nodeCount = state.getNodeCount();
 				int status = ok ? 1 : 0;
 				Date date = new Date();
