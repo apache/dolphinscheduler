@@ -65,10 +65,10 @@
           <td>
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td style="min-width: 200px;max-width: 300px;">
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
-          <td style="min-width: 200px;max-width: 300px;"><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis" :title="item.processInstanceName">{{item.processInstanceName}}</span></a></td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;"><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis" :title="item.processInstanceName">{{item.processInstanceName}}</span></a></td>
           <td>
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
