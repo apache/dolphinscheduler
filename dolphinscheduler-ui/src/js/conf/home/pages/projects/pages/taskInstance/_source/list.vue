@@ -22,10 +22,10 @@
           <th scope="col" style="min-width: 50px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col" style="min-width: 250px">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Name')}}</span>
           </th>
-          <th scope="col" style="min-width: 250px">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Instance')}}</span>
           </th>
           <th scope="col" style="min-width: 60px">
@@ -65,10 +65,10 @@
           <td>
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
-          <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;"><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis" :title="item.processInstanceName">{{item.processInstanceName}}</span></a></td>
           <td>
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
