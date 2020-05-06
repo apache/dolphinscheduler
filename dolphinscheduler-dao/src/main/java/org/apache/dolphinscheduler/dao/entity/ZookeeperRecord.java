@@ -56,17 +56,17 @@ public class ZookeeperRecord {
     /**
      * min Latency
      */
-    private int minLatency;
+    private float minLatency;
 
     /**
      * avg Latency
      */
-    private int avgLatency;
+    private float avgLatency;
 
     /**
      * max Latency
      */
-    private int maxLatency;
+    private float maxLatency;
 
     /**
      * node count
@@ -85,7 +85,7 @@ public class ZookeeperRecord {
     private int state;
 
 
-    public ZookeeperRecord(String hostname,int connections, int watches, long sent, long received, String mode, int minLatency, int avgLatency, int maxLatency, int nodeCount, int state,Date date) {
+    public ZookeeperRecord(String hostname,int connections, int watches, long sent, long received, String mode, float minLatency, float avgLatency, float maxLatency, int nodeCount, int state,Date date) {
         this.hostname = hostname;
         this.connections = connections;
         this.watches = watches;
@@ -149,23 +149,23 @@ public class ZookeeperRecord {
         this.mode = mode;
     }
 
-    public int getMinLatency() {
+    public float getMinLatency() {
         return minLatency;
     }
 
-    public void setMinLatency(int minLatency) {
+    public void setMinLatency(float minLatency) {
         this.minLatency = minLatency;
     }
 
-    public int getAvgLatency() {
+    public float getAvgLatency() {
         return avgLatency;
     }
 
-    public void setAvgLatency(int avgLatency) {
+    public void setAvgLatency(float avgLatency) {
         this.avgLatency = avgLatency;
     }
 
-    public int getMaxLatency() {
+    public float getMaxLatency() {
         return maxLatency;
     }
 
