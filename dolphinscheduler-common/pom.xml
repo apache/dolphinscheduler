@@ -33,11 +33,14 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.dolphinscheduler</groupId>
+			<artifactId>dolphinscheduler-plugin-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
