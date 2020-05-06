@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -120,14 +121,22 @@ public class EnterpriseWeChatUtilsTest {
     @Test
     public void testMarkdownByAlertForText(){
         Alert alertForText = createAlertForText();
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertForText);
+        AlertData alertData = new AlertData();
+        alertData.setTitle(alertForText.getTitle())
+                .setShowType(alertForText.getShowType().getDescp())
+                .setContent(alertForText.getContent());
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
         Assert.assertNotNull(result);
     }
 
     @Test
     public void testMarkdownByAlertForTable(){
         Alert alertForText = createAlertForTable();
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertForText);
+        AlertData alertData = new AlertData();
+        alertData.setTitle(alertForText.getTitle())
+                .setShowType(alertForText.getShowType().getDescp())
+                .setContent(alertForText.getContent());
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
         Assert.assertNotNull(result);
     }
 
