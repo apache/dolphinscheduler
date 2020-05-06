@@ -19,34 +19,36 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th scope="col" width="40">
+          <th scope="col" style="min-width: 40px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 200px">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <span>{{$t('State')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 150px">
             <span>{{$t('Description')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 70px">
             <span>{{$t('Modify User')}}</span>
           </th>
-          <th scope="col" width="90">
-            <span>{{$t('Timing state')}}</span>
+          <th scope="col" style="min-width: 70px">
+            <div style="width: 80px">
+              <span>{{$t('Timing state')}}</span>
+            </div>
           </th>
-          <th scope="col" width="300">
+          <th scope="col" style="min-width: 300px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

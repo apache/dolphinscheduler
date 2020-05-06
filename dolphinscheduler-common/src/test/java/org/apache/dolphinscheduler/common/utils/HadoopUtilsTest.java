@@ -128,6 +128,18 @@ public class HadoopUtilsTest {
     }
 
     @Test
+    public void getHdfsResourceFileName() {
+        String result = hadoopUtils.getHdfsResourceFileName("11000","aa.txt");
+        Assert.assertEquals("/dolphinscheduler/11000/resources/aa.txt", result);
+    }
+
+    @Test
+    public void getHdfsUdfFileName() {
+        String result = hadoopUtils.getHdfsFileName(ResourceType.UDF,"11000","aa.txt");
+        Assert.assertEquals("/dolphinscheduler/11000/udfs/aa.txt", result);
+    }
+
+    @Test
     public void isYarnEnabled() {
         boolean result = hadoopUtils.isYarnEnabled();
         Assert.assertEquals(false, result);
