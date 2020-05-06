@@ -596,14 +596,15 @@ export default {
       }
     }
 
-    io.get(`projects/${state.projectName}/process/export`,{processDefinitionId: payload.processDefinitionId,}, res => {
-      downloadBlob(res, payload.processDefinitionName)
-  }, e => {
+    io.get(`projects/${state.projectName}/process/export`,{processDefinitionIds: payload.processDefinitionIds}, res => {
+      downloadBlob(res, payload.fileName)
+    }, e => {
 
     }, {
       responseType: 'blob'
     })
   },
+
   /**
    * Process instance get variable
    */
