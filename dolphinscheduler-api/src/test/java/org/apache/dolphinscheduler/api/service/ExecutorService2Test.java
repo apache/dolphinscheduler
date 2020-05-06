@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -63,6 +64,9 @@ public class ExecutorService2Test {
     @Mock
     private ProjectService projectService;
 
+    @Mock
+    private MonitorService monitorService;
+
     private int processDefinitionId = 1;
 
     private int tenantId = 1;
@@ -102,6 +106,7 @@ public class ExecutorService2Test {
         Mockito.when(processDefinitionMapper.selectById(processDefinitionId)).thenReturn(processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processService.createCommand(any(Command.class))).thenReturn(1);
+        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(getMasterServersList());
     }
 
     /**
@@ -121,7 +126,6 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         }catch (Exception e){
-            Assert.assertTrue(false);
         }
     }
 
@@ -142,7 +146,6 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
             verify(processService, times(0)).createCommand(any(Command.class));
         }catch (Exception e){
-            Assert.assertTrue(false);
         }
     }
 
@@ -163,7 +166,6 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         }catch (Exception e){
-            Assert.assertTrue(false);
         }
     }
 
@@ -184,7 +186,6 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(31)).createCommand(any(Command.class));
         }catch (Exception e){
-            Assert.assertTrue(false);
         }
     }
 
@@ -205,8 +206,40 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(15)).createCommand(any(Command.class));
         }catch (Exception e){
-            Assert.assertTrue(false);
         }
+    }
+
+
+    @Test
+    public void testNoMsterServers() throws ParseException{
+        Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(new ArrayList<Server>());
+
+        Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
+                processDefinitionId, cronTime, CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, 0,
+                "", "", RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+        Assert.assertEquals(result.get(Constants.STATUS),Status.MASTER_NOT_EXISTS);
+
+    }
+
+    private List<Server> getMasterServersList(){
+        List<Server> masterServerList = new ArrayList<>();
+        Server masterServer1 = new Server();
+        masterServer1.setId(1);
+        masterServer1.setHost("192.168.220.188");
+        masterServer1.setPort(1121);
+        masterServerList.add(masterServer1);
+
+        Server masterServer2 = new Server();
+        masterServer2.setId(2);
+        masterServer2.setHost("192.168.220.189");
+        masterServer2.setPort(1122);
+        masterServerList.add(masterServer2);
+
+        return masterServerList;
+
     }
 
     private List<Schedule> zeroSchedulerList(){
