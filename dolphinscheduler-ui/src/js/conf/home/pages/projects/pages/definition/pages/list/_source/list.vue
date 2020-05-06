@@ -57,7 +57,7 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td style="min-width: 200px;max-width: 300px;">
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis">
               <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
                 {{item.name}}
