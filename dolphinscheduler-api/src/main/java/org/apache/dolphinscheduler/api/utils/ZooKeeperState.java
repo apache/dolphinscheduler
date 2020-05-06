@@ -33,7 +33,7 @@ public class ZooKeeperState {
 	private final String host;
 	private final int port;
 
-	private int minLatency = -1, avgLatency = -1, maxLatency = -1;
+	private float minLatency = -1, avgLatency = -1, maxLatency = -1;
 	private long received = -1;
 	private long sent = -1;
 	private int outStanding = -1;
@@ -60,9 +60,9 @@ public class ZooKeeperState {
 					String line = scannerForStat.nextLine();
 					if (line.startsWith("Latency min/avg/max:")) {
 						String[] latencys = getStringValueFromLine(line).split("/");
-						minLatency = Integer.parseInt(latencys[0]);
-						avgLatency = Integer.parseInt(latencys[1]);
-						maxLatency = Integer.parseInt(latencys[2]);
+						minLatency = Float.parseFloat(latencys[0]);
+						avgLatency = Float.parseFloat(latencys[1]);
+						maxLatency = Float.parseFloat(latencys[2]);
 					} else if (line.startsWith("Received:")) {
 						received = Long.parseLong(getStringValueFromLine(line));
 					} else if (line.startsWith("Sent:")) {
@@ -165,15 +165,15 @@ public class ZooKeeperState {
 		return port;
 	}
 
-	public int getMinLatency() {
+	public float getMinLatency() {
 		return minLatency;
 	}
 
-	public int getAvgLatency() {
+	public float getAvgLatency() {
 		return avgLatency;
 	}
 
-	public int getMaxLatency() {
+	public float getMaxLatency() {
 		return maxLatency;
 	}
 
