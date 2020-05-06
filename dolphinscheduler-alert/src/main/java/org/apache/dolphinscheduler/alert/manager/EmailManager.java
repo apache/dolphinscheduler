@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class EmailManager {
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receviersList,List<String> receviersCcList,String title,String content,ShowType showType){
+    public Map<String,Object> send(List<String> receviersList,List<String> receviersCcList,String title,String content,String showType){
 
         return MailUtils.sendMails(receviersList, receviersCcList, title, content, showType);
     }
@@ -48,7 +47,7 @@ public class EmailManager {
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receviersList,String title,String content,ShowType showType){
+    public Map<String,Object> send(List<String> receviersList,String title,String content,String showType){
 
         return MailUtils.sendMails(receviersList,title, content, showType);
     }
