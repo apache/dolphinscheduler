@@ -25,7 +25,7 @@
           <th scope="col" style="min-width: 40px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col" style="min-width: 200px">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Name')}}</span>
           </th>
           <th scope="col" style="min-width: 50px">
@@ -57,9 +57,9 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
+          <td style="min-width: 200px;max-width: 300px;">
             <span class="ellipsis">
-              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links">
+              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
                 {{item.name}}
               </router-link>
             </span>
