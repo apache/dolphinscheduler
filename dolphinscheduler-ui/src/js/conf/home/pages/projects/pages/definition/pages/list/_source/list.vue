@@ -166,6 +166,7 @@
     },
     methods: {
       ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -176,6 +177,7 @@
        * Start
        */
       _start (item) {
+        this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionId: item.id }).then(res => {
           let self = this
           let modal = this.$modal.dialog({
