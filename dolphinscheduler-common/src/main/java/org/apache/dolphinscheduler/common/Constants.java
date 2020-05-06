@@ -954,4 +954,11 @@ public final class Constants {
      * authorize readable perm
      */
     public static final int AUTHORIZE_READABLE_PERM=4;
+
+
+    /**
+     * plugin configurations
+     */
+    public static final String PLUGIN_JAR_SUFFIX = ".jar";
+
 }
