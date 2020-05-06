@@ -58,7 +58,7 @@ public class MailUtilsTest {
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(4);
 
-        MailUtils.sendMails(Arrays.asList(receivers),Arrays.asList(receiversCc),alert.getTitle(),alert.getContent(), ShowType.TEXT);
+        MailUtils.sendMails(Arrays.asList(receivers),Arrays.asList(receiversCc),alert.getTitle(),alert.getContent(), ShowType.TEXT.getDescp());
     }
 
 
@@ -70,7 +70,7 @@ public class MailUtilsTest {
         String[] mails = new String[]{"xx@xx.com"};
 
         for(Alert alert : alerts){
-            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), alert.getShowType());
+            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
         }
 
     }
@@ -111,7 +111,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
     }
 
     /**
@@ -170,7 +170,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.ATTACHMENT);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.ATTACHMENT.getDescp());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.TABLEATTACHMENT);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.TABLEATTACHMENT.getDescp());
     }
 
 }
