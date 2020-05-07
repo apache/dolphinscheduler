@@ -19,7 +19,7 @@ import i18n from '@/module/i18n'
 import config from '~/external/config'
 import Permissions from '@/module/permissions'
 
-let menu = {
+const menu = {
   projects: [
     {
       name: `${i18n.$t('Project Home')}`,
@@ -225,7 +225,7 @@ let menu = {
       icon: 'ans-icon-menu',
       children: [
         {
-          name: "Statistics",
+          name: 'Statistics',
           path: 'statistics',
           id: 0,
           disabled: true

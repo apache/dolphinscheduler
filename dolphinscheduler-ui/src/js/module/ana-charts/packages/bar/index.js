@@ -242,7 +242,7 @@ export default class Bar extends Base {
     } = this.settings
     const valueAxis = { type: 'value' }
     let yAxisModel = reverseAxis ? xAxis : valueAxis
-    let xAxisModel = reverseAxis ? valueAxis : xAxis
+    const xAxisModel = reverseAxis ? valueAxis : xAxis
     // Use custom Y-axis overlay
     if (yAxis) {
       yAxisModel = yAxis
@@ -267,7 +267,7 @@ export default class Bar extends Base {
 
     // time axis
     if (timelineOptions) {
-      let opts = {
+      const opts = {
         baseOption: {
           timeline: timelineOptions.timeline,
           tooltip: {
@@ -296,7 +296,7 @@ export default class Bar extends Base {
       // When the simple chart title is empty, the chart is vertically centered
       const top = !title && this.simple ? '3%' : 60
 
-      let opts = {
+      const opts = {
         title: {
           text: title
         },
