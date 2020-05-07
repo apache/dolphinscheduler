@@ -129,6 +129,6 @@
       this.list = this.workerGroupList
     },
     mounted () {},
-    components: { }
+    components: {},
   }
 </script>
