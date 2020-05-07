@@ -20,9 +20,9 @@
  */
 const bytesToSize = (bytes) => {
   if (bytes === 0) return '0 B'
-  let k = 1024, // or 1024
-    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-    i = Math.floor(Math.log(bytes) / Math.log(k))
+  const k = 1024 // or 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return parseInt((bytes / Math.pow(k, i)).toPrecision(3)) + ' ' + sizes[i]
 }
@@ -33,7 +33,7 @@ const bytesToSize = (bytes) => {
 const isJson = (str) => {
   if (typeof str === 'string') {
     try {
-      let obj = JSON.parse(str)
+      const obj = JSON.parse(str)
       if (typeof obj === 'object' && obj) {
         return true
       } else {
@@ -68,7 +68,6 @@ const syntaxHighlight = (json) => {
     return '<span class="' + cls + '">' + match + '</span>'
   })
 }
-
 
 export {
   bytesToSize,
