@@ -15,9 +15,6 @@
  * limitations under the License.
  */
 
-import merge from 'webpack-merge'
-import router from '@/conf/home/router'
-
 export function setUrlParams (o) {
   // router.push({
   //   query: merge(router.history.current.query, o)
