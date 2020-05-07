@@ -27,7 +27,7 @@ export default {
    */
   createDatasources ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`datasources/create`, payload, res => {
+      io.post('datasources/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -40,7 +40,7 @@ export default {
    */
   connectDatasources ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`datasources/connect`, payload, res => {
+      io.post('datasources/connect', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -53,7 +53,7 @@ export default {
    */
   getDatasourcesList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`datasources/list`, payload, res => {
+      io.get('datasources/list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -68,7 +68,7 @@ export default {
    */
   getDatasourcesListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`datasources/list-paging`, payload, res => {
+      io.get('datasources/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -80,7 +80,7 @@ export default {
    */
   deleteDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`datasources/delete`, payload, res => {
+      io.get('datasources/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -92,7 +92,7 @@ export default {
    */
   updateDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`datasources/update`, payload, res => {
+      io.post('datasources/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -101,7 +101,7 @@ export default {
   },
   getEditDatasource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`datasources/update-ui`, payload, res => {
+      io.post('datasources/update-ui', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -110,7 +110,7 @@ export default {
   },
   verifyName ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`datasources/verify-name`, payload, res => {
+      io.get('datasources/verify-name', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -119,7 +119,7 @@ export default {
   },
   getKerberosStartupState ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`datasources/kerberos-startup-state`, payload, res => {
+      io.get('datasources/kerberos-startup-state', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

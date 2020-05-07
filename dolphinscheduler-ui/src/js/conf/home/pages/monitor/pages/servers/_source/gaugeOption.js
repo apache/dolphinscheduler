@@ -30,21 +30,21 @@ export default function (value) {
             color: [
               [ 0.5, new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ // eslint-disable-line
                 offset: 1,
-                color:  '#1CAD52'// 50% Color in place
+                color: '#1CAD52'// 50% Color in place
               }, {
                 offset: 0.8,
-                color:  '#1CAD52'// 40% Color in place
-              }], false) ], // 100% Color in place
+                color: '#1CAD52'// 40% Color in place
+              }], false)], // 100% Color in place
               [ 0.7, new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ // eslint-disable-line
                 offset: 1,
-                color:  '#FFC539'// 70% Color in place
+                color: '#FFC539'// 70% Color in place
               }, {
                 offset: 0.8,
-                color:  '#FEEC49'// 66% Color in place
+                color: '#FEEC49'// 66% Color in place
               }, {
                 offset: 0,
-                color:  '#C7DD6B'// 50% Color in place
-              }], false) ],
+                color: '#C7DD6B'// 50% Color in place
+              }], false)],
               [ 0.9, new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ // eslint-disable-line
                 offset: 1,
                 color: '#E75F25' // 90% Color in place
@@ -54,14 +54,14 @@ export default function (value) {
               }, {
                 offset: 0,
                 color: '#FFC539' // 70% Color in place
-              }], false) ],
+              }], false)],
               [1, new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { // eslint-disable-line
                 offset: 0.2,
                 color: '#E75F25' // 92% Color in place
               }, {
                 offset: 0,
                 color: '#D9452C' // 90% Color in place
-              }], false) ]
+              }], false)]
             ],
             width: 10
           }
@@ -92,10 +92,10 @@ export default function (value) {
           show: true,
           lineStyle: { // Property linestyle controls line style
             color: [ // Dial Color
-              [ 0.5, '#20AE51' ], // 0-50%Color in place
-              [ 0.7, '#FFED44' ], // 51%-70%Color in place
-              [ 0.9, '#FF9618' ], // 70%-90%Color in place
-              [ 1,  '#DA462C']// 90%-100%Color in place
+              [0.5, '#20AE51'], // 0-50%Color in place
+              [0.7, '#FFED44'], // 51%-70%Color in place
+              [0.9, '#FF9618'], // 70%-90%Color in place
+              [1, '#DA462C']// 90%-100%Color in place
             ],
             width: 30// Dial width
           }
