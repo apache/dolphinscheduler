@@ -18,9 +18,9 @@
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
-        <template slot="button-group" v-if="isADMIN">
+        <!-- <template slot="button-group" v-if="isADMIN">
           <x-button type="ghost" size="small" @click="_create('')">{{$t('Create worker group')}}</x-button>
-        </template>
+        </template> -->
       </m-conditions>
     </template>
     <template slot="content">
