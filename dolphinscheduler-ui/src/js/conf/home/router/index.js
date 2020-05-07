@@ -426,7 +426,7 @@ const router = new Router({
       name: 'monitor',
       component: resolve => require(['../pages/monitor/index'], resolve),
       meta: {
-        title: `monitor`
+        title: 'monitor'
       },
       redirect: {
         name: 'servers-master'
@@ -453,7 +453,7 @@ const router = new Router({
           name: 'servers-alert',
           component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
           meta: {
-            title: `Alert`
+            title: 'Alert'
           }
         },
         {
@@ -461,7 +461,7 @@ const router = new Router({
           name: 'servers-rpcserver',
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
-            title: `Rpcserver`
+            title: 'Rpcserver'
           }
         },
         {
@@ -469,7 +469,7 @@ const router = new Router({
           name: 'servers-zookeeper',
           component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
           meta: {
-            title: `Zookeeper`
+            title: 'Zookeeper'
           }
         },
         {
@@ -477,7 +477,7 @@ const router = new Router({
           name: 'servers-apiserver',
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
           meta: {
-            title: `Apiserver`
+            title: 'Apiserver'
           }
         },
         {
@@ -485,7 +485,7 @@ const router = new Router({
           name: 'servers-db',
           component: resolve => require(['../pages/monitor/pages/servers/db'], resolve),
           meta: {
-            title: `DB`
+            title: 'DB'
           }
         },
         {
@@ -493,7 +493,7 @@ const router = new Router({
           name: 'statistics',
           component: resolve => require(['../pages/monitor/pages/servers/statistics'], resolve),
           meta: {
-            title: `statistics`
+            title: 'statistics'
           }
         }
       ]
@@ -502,7 +502,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  let $body = $('body')
+  const $body = $('body')
   $body.find('.tooltip.fade.top.in').remove()
   if (to.meta.title) {
     document.title = `${to.meta.title} - DolphinScheduler`

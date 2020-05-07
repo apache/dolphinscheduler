@@ -24,7 +24,7 @@ import store from '@/conf/home/store'
 /**
  * Prototype method
  */
-let Dag = function () {
+const Dag = function () {
   this.dag = {}
   this.instance = {}
 }
@@ -49,7 +49,7 @@ Dag.prototype.setConfig = function (o) {
  * create dag
  */
 Dag.prototype.create = function () {
-  let self = this
+  const self = this
   jsPlumb.ready(() => {
     JSP.init({
       dag: this.dag,
@@ -98,36 +98,35 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
  * Echo data display
  */
 Dag.prototype.backfill = function (arg) {
-  if(arg) {
+  if (arg) {
     let locationsValue = store.state.dag.locations
-    let locationsValue1 = store.state.dag.locations
-    let locationsValue2 = store.state.dag.locations
-    let arr = []
-    for (let i in locationsValue1) {
-      let objs = new Object();
+    const locationsValue1 = store.state.dag.locations
+    const locationsValue2 = store.state.dag.locations
+    const arr = []
+    for (const i in locationsValue1) {
+      const objs = {}
       objs.id = i
-      arr.push(Object.assign(objs,locationsValue1[i])); //Attributes
+      arr.push(Object.assign(objs, locationsValue1[i])) // Attributes
     }
-    let tmp = []
-    for(let i in locationsValue2) {
-      if(locationsValue2[i].targetarr !='' && locationsValue2[i].targetarr.split(',').length>1) {
+    const tmp = []
+    for (const i in locationsValue2) {
+      if (locationsValue2[i].targetarr !== '' && locationsValue2[i].targetarr.split(',').length > 1) {
         tmp.push(locationsValue2[i])
       }
     }
 
-    function copy (array) {
-      let newArray = []
-      for(let item of array) {
-        newArray.push(item);
+    const copy = function (array) {
+      const newArray = []
+      for (const item of array) {
+        newArray.push(item)
       }
-      return  newArray;
+      return newArray
     }
 
-
-    let newArr = copy(arr)
-    function getNewArr() {
-      for(let i= 0; i<newArr.length; i++) {
-        if(newArr[i].targetarr !='' && newArr[i].targetarr.split(',').length>1) {
+    const newArr = copy(arr)
+    const getNewArr = function () {
+      for (let i = 0; i < newArr.length; i++) {
+        if (newArr[i].targetarr !== '' && newArr[i].targetarr.split(',').length > 1) {
           newArr[i].targetarr = newArr[i].targetarr.split(',').shift()
         }
       }
@@ -141,154 +140,154 @@ Dag.prototype.backfill = function (arg) {
     * @param {String} idStr id key name
     * @param {String} childrenStr children key name
     */
-    function fommat({arrayList, pidStr = 'targetarr', idStr = 'id', childrenStr = 'children'}) {
-        let listOjb = {}; // Used to store objects of the form {key: obj}
-        let treeList = []; // An array to store the final tree structure data
-        // Transform the data into {key: obj} format, which is convenient for the following data processing
-        for (let i = 0; i < arrayList.length; i++) {
-            listOjb[arrayList[i][idStr]] = arrayList[i]
-        }
-        // Format data based on pid
-        for (let j = 0; j < arrayList.length; j++) {
-            // Determine if the parent exists
-            // let haveParent = arrayList[j].targetarr.split(',').length>1?listOjb[arrayList[j].targetarr.split(',')[0]]:listOjb[arrayList[j][pidStr]]
-            let haveParent = listOjb[arrayList[j][pidStr]]
-            if (haveParent) {
-                // If there is no parent children field, create a children field
-                !haveParent[childrenStr] && (haveParent[childrenStr] = [])
-                // Insert child in parent
-                haveParent[childrenStr].push(arrayList[j])
-            } else {
-                // If there is no parent, insert directly into the outermost layer
-                treeList.push(arrayList[j])
-            }
-        }
-        return treeList
+    const fommat = function ({ arrayList, pidStr = 'targetarr', idStr = 'id', childrenStr = 'children' }) {
+      const listOjb = {} // Used to store objects of the form {key: obj}
+      const treeList = [] // An array to store the final tree structure data
+      // Transform the data into {key: obj} format, which is convenient for the following data processing
+      for (let i = 0; i < arrayList.length; i++) {
+        listOjb[arrayList[i][idStr]] = arrayList[i]
       }
-      let datas = fommat({arrayList: newArr,pidStr: 'targetarr'})
-    // Count the number of leaf nodes
-      function getLeafCountTree(json) {
-        if(!json.children) {
-          json.colspan = 1;
-          return 1;
+      // Format data based on pid
+      for (let j = 0; j < arrayList.length; j++) {
+        // Determine if the parent exists
+        // let haveParent = arrayList[j].targetarr.split(',').length>1?listOjb[arrayList[j].targetarr.split(',')[0]]:listOjb[arrayList[j][pidStr]]
+        const haveParent = listOjb[arrayList[j][pidStr]]
+        if (haveParent) {
+          // If there is no parent children field, create a children field
+          !haveParent[childrenStr] && (haveParent[childrenStr] = [])
+          // Insert child in parent
+          haveParent[childrenStr].push(arrayList[j])
         } else {
-          let leafCount = 0;
-          for(let i = 0 ; i < json.children.length ; i++){
-            leafCount = leafCount + getLeafCountTree(json.children[i]);
-          }
-          json.colspan = leafCount;
-          return leafCount;
+          // If there is no parent, insert directly into the outermost layer
+          treeList.push(arrayList[j])
         }
       }
-      // Number of tree node levels
-      let countTree = getLeafCountTree(datas[0])
-      function getMaxFloor(treeData) {
-        let max = 0
-        function each (data, floor) {
-          data.forEach(e => {
-            e.floor = floor
-            e.x=floor*170
-            if (floor > max) {
-              max = floor
-            }
-            if (e.children) {
-              each(e.children, floor + 1)
-            }
-          })
+      return treeList
+    }
+    const datas = fommat({ arrayList: newArr, pidStr: 'targetarr' })
+    // Count the number of leaf nodes
+    const getLeafCountTree = function (json) {
+      if (!json.children) {
+        json.colspan = 1
+        return 1
+      } else {
+        let leafCount = 0
+        for (let i = 0; i < json.children.length; i++) {
+          leafCount = leafCount + getLeafCountTree(json.children[i])
         }
-          each(treeData,1)
-          return max
+        json.colspan = leafCount
+        return leafCount
+      }
+    }
+    // Number of tree node levels
+    const countTree = getLeafCountTree(datas[0])
+    const getMaxFloor = function (treeData) {
+      let max = 0
+      function each (data, floor) {
+        data.forEach(e => {
+          e.floor = floor
+          e.x = floor * 170
+          if (floor > max) {
+            max = floor
+          }
+          if (e.children) {
+            each(e.children, floor + 1)
+          }
+        })
+      }
+      each(treeData, 1)
+      return max
+    }
+    getMaxFloor(datas)
+    // The last child of each node
+    let lastchildren = []
+    const forxh = function (list) {
+      for (let i = 0; i < list.length; i++) {
+        const chlist = list[i]
+        if (chlist.children) {
+          forxh(chlist.children)
+        } else {
+          lastchildren.push(chlist)
         }
-        getMaxFloor(datas)
-        // The last child of each node
-        let lastchildren = [];
-        forxh(datas);
-        function forxh(list) {
-          for (let i = 0; i < list.length; i++) {
-            let chlist = list[i];
-            if (chlist.children) {
-              forxh(chlist.children);
-            } else {
-              lastchildren.push(chlist);
-            }
+      }
+    }
+    forxh(datas)
+    // Get all parent nodes above the leaf node
+    const treeFindPath = function (tree, func, path, n) {
+      if (!tree) return []
+      for (const data of tree) {
+        path.push(data.name)
+        if (func(data)) return path
+        if (data.children) {
+          const findChildren = treeFindPath(data.children, func, path, n)
+          if (findChildren.length) return findChildren
+        }
+        path.pop()
+      }
+      return []
+    }
+    const toLine = function (data) {
+      return data.reduce((arrData, { id, name, targetarr, x, y, children = [] }) =>
+        arrData.concat([{ id, name, targetarr, x, y }], toLine(children)), [])
+    }
+    const listarr = toLine(datas)
+    const listarrs = toLine(datas)
+    const dataObject = {}
+    for (let i = 0; i < listarrs.length; i++) {
+      delete (listarrs[i].id)
+    }
+
+    for (let a = 0; a < listarr.length; a++) {
+      dataObject[listarr[a].id] = listarrs[a]
+    }
+    // Comparison function
+    const createComparisonFunction = function (propertyName) {
+      return function (object1, object2) {
+        const value1 = object1[propertyName]
+        const value2 = object2[propertyName]
+
+        if (value1 < value2) {
+          return -1
+        } else if (value1 > value2) {
+          return 1
+        } else {
+          return 0
+        }
+      }
+    }
+
+    lastchildren = lastchildren.sort(createComparisonFunction('x'))
+
+    // Coordinate value of each leaf node
+    for (let a = 0; a < lastchildren.length; a++) {
+      dataObject[lastchildren[a].id].y = (a + 1) * 120
+    }
+    for (let i = 0; i < lastchildren.length; i++) {
+      const node = treeFindPath(datas, data => data.targetarr === lastchildren[i].targetarr, [], i + 1)
+      for (let j = 0; j < node.length; j++) {
+        for (let k = 0; k < listarrs.length; k++) {
+          if (node[j] === listarrs[k].name) {
+            listarrs[k].y = (i + 1) * 120
           }
         }
-        // Get all parent nodes above the leaf node
-        function treeFindPath (tree, func, path,n) {
-          if (!tree) return []
-          for (const data of tree) {
-            path.push(data.name)
-            if (func(data)) return path
-            if (data.children) {
-            const findChildren = treeFindPath(data.children, func, path,n)
-            if (findChildren.length) return findChildren
-            }
-            path.pop()
-          }
-          return []
+      }
+    }
+    for (let i = 0; i < tmp.length; i++) {
+      for (const objs in dataObject) {
+        if (tmp[i].name === dataObject[objs].name) {
+          dataObject[objs].targetarr = tmp[i].targetarr
         }
-        function toLine(data){
-          return data.reduce((arrData, {id, name, targetarr, x, y, children = []}) =>
-          arrData.concat([{id, name, targetarr, x, y}], toLine(children)), [])
-        }
-        let listarr = toLine(datas);
-        let listarrs = toLine(datas)
-        let dataObject = {}
-        for(let i = 0; i<listarrs.length; i++) {
-          delete(listarrs[i].id)
-        }
-
-        for(let a = 0; a<listarr.length; a++) {
-          dataObject[listarr[a].id] = listarrs[a]
-        }
-        // Comparison function
-        function createComparisonFunction(propertyName) {
-          return function (object1,object2) {
-            let value1 = object1[propertyName];
-            let value2 = object2[propertyName];
-
-            if (value1 < value2) {
-              return -1;
-            } else if (value1 > value2) {
-              return 1;
-            } else {
-              return 0;
-            }
-          };
-        }
-
-        lastchildren = lastchildren.sort(createComparisonFunction('x'))
-
-        // Coordinate value of each leaf node
-        for(let a = 0; a<lastchildren.length; a++) {
-          dataObject[lastchildren[a].id].y = (a+1)*120
-        }
-        for(let i =0 ; i<lastchildren.length; i++) {
-          let node = treeFindPath(datas, data=> data.targetarr===lastchildren[i].targetarr,[],i+1)
-          for(let j = 0; j<node.length; j++) {
-            for(let k= 0; k<listarrs.length; k++) {
-              if(node[j] == listarrs[k].name) {
-                listarrs[k].y = (i+1)*120
-              }
-            }
-          }
-        }
-        for(let i = 0; i<tmp.length; i++) {
-          for(let objs in dataObject) {
-           if(tmp[i].name == dataObject[objs].name) {
-            dataObject[objs].targetarr = tmp[i].targetarr
-           }
-          }
-        }
-        for(let a = 0; a<lastchildren.length; a++) {
-          dataObject[lastchildren[a].id].y = (a+1)*120
-        }
-        if(countTree>1) {
-          dataObject[Object.keys(locationsValue1)[0]].y = (countTree/2)*120+50
-        }
+      }
+    }
+    for (let a = 0; a < lastchildren.length; a++) {
+      dataObject[lastchildren[a].id].y = (a + 1) * 120
+    }
+    if (countTree > 1) {
+      dataObject[Object.keys(locationsValue1)[0]].y = (countTree / 2) * 120 + 50
+    }
 
     locationsValue = dataObject
-    let self = this
+    const self = this
     jsPlumb.ready(() => {
       JSP.init({
         dag: this.dag,
@@ -310,7 +309,7 @@ Dag.prototype.backfill = function (arg) {
       })
     })
   } else {
-    let self = this
+    const self = this
     jsPlumb.ready(() => {
       JSP.init({
         dag: this.dag,
