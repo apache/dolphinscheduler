@@ -19,5 +19,5 @@
  */
 export default {
   // task record switch
-  recordSwitch:false
+  recordSwitch: false
 }

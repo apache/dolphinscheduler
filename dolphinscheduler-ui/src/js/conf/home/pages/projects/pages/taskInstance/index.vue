@@ -15,24 +15,26 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Task Instance')">
-    <template slot="conditions">
-      <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
-    </template>
-    <template slot="content">
-      <template v-if="taskInstanceList.length">
-        <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
-        </m-list>
-        <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
-        </div>
+  <div class="wrap-taskInstance">
+    <m-list-construction :title="$t('Task Instance')">
+      <template slot="conditions">
+        <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
       </template>
-      <template v-if="!taskInstanceList.length">
-        <m-no-data></m-no-data>
+      <template slot="content">
+        <template v-if="taskInstanceList.length">
+          <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+          </m-list>
+          <div class="page-box">
+            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          </div>
+        </template>
+        <template v-if="!taskInstanceList.length">
+          <m-no-data></m-no-data>
+        </template>
+        <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
-    </template>
-  </m-list-construction>
+    </m-list-construction>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -71,7 +73,8 @@
           endDate: '',
           // Exectuor Name
           executorName: ''
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -118,6 +121,11 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this._getList(flag)
       }, 100, {
         'leading': false,
@@ -146,7 +154,36 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
+
+<style lang="scss" rel="stylesheet/scss">
+  .wrap-taskInstance {
+    .table-box {
+      overflow-y: scroll;
+    }
+    .table-box {
+      .fixed {
+        table-layout: auto;
+        tr {
+          th:last-child,td:last-child {
+            background: inherit;
+            width: 50px;
+            height: 40px;
+            line-height: 40px;
+            border-left:1px solid #ecf3ff;
+            position: absolute;
+            right: 0;
+            z-index: 2;
+          }
+          th:nth-last-child(2) {
+            padding-right: 80px;
+          }
+        }
+      }
+    }
+  }
+</style>

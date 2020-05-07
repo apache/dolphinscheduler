@@ -16,7 +16,6 @@
  */
 
 import i18n from '@/module/i18n'
-import Permissions from '@/module/permissions'
 
 /**
  * Operation bar config
@@ -26,7 +25,7 @@ import Permissions from '@/module/permissions'
  * @desc tooltip
  */
 const toolOper = (dagThis) => {
-  let disabled =!!dagThis.$store.state.dag.isDetails// Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
+  const disabled = !!dagThis.$store.state.dag.isDetails// Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
   return [
     {
       code: 'pointer',
@@ -67,7 +66,7 @@ const toolOper = (dagThis) => {
  * @desc tooltip
  * @code Backend definition identifier
  */
-let publishStatus = [
+const publishStatus = [
   {
     id: 0,
     desc: `${i18n.$t('Unpublished')}`,
@@ -90,7 +89,7 @@ let publishStatus = [
  * @desc tooltip
  * @code identifier
  */
-let runningType = [
+const runningType = [
   {
     desc: `${i18n.$t('Start Process')}`,
     code: 'START_PROCESS'
@@ -146,85 +145,85 @@ let runningType = [
  * @icoUnicode iconfont
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-let tasksState = {
-  'SUBMITTED_SUCCESS': {
+const tasksState = {
+  SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${i18n.$t('Submitted successfully')}`,
     color: '#A9A9A9',
     icoUnicode: 'ans-icon-dot-circle',
     isSpin: false
   },
-  'RUNNING_EXEUTION': {
+  RUNNING_EXEUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
     icoUnicode: 'ans-icon-gear',
     isSpin: true
   },
-  'READY_PAUSE': {
+  READY_PAUSE: {
     id: 2,
     desc: `${i18n.$t('Ready to pause')}`,
     color: '#07b1a3',
     icoUnicode: 'ans-icon-pause-solid',
     isSpin: false
   },
-  'PAUSE': {
+  PAUSE: {
     id: 3,
     desc: `${i18n.$t('Pause')}`,
     color: '#057c72',
     icoUnicode: 'ans-icon-pause',
     isSpin: false
   },
-  'READY_STOP': {
+  READY_STOP: {
     id: 4,
     desc: `${i18n.$t('Ready to stop')}`,
     color: '#FE0402',
     icoUnicode: 'ans-icon-coin',
     isSpin: false
   },
-  'STOP': {
+  STOP: {
     id: 5,
     desc: `${i18n.$t('Stop')}`,
     color: '#e90101',
     icoUnicode: 'ans-icon-stop',
     isSpin: false
   },
-  'FAILURE': {
+  FAILURE: {
     id: 6,
     desc: `${i18n.$t('failed')}`,
     color: '#000000',
     icoUnicode: 'ans-icon-fail-empty',
     isSpin: false
   },
-  'SUCCESS': {
+  SUCCESS: {
     id: 7,
     desc: `${i18n.$t('success')}`,
     color: '#33cc00',
     icoUnicode: 'ans-icon-success-empty',
     isSpin: false
   },
-  'NEED_FAULT_TOLERANCE': {
+  NEED_FAULT_TOLERANCE: {
     id: 8,
     desc: `${i18n.$t('Need fault tolerance')}`,
     color: '#FF8C00',
     icoUnicode: 'ans-icon-pen',
     isSpin: false
   },
-  'KILL': {
+  KILL: {
     id: 9,
     desc: `${i18n.$t('kill')}`,
     color: '#a70202',
     icoUnicode: 'ans-icon-minus-circle-empty',
     isSpin: false
   },
-  'WAITTING_THREAD': {
+  WAITTING_THREAD: {
     id: 10,
     desc: `${i18n.$t('Waiting for thread')}`,
     color: '#912eed',
     icoUnicode: 'ans-icon-sand-clock',
     isSpin: false
   },
-  'WAITTING_DEPEND': {
+  WAITTING_DEPEND: {
     id: 11,
     desc: `${i18n.$t('Waiting for dependence')}`,
     color: '#5101be',
@@ -239,61 +238,60 @@ let tasksState = {
  * @desc tooltip
  * @color color (tree and gantt)
  */
-let tasksType = {
-  'SHELL': {
+const tasksType = {
+  SHELL: {
     desc: 'SHELL',
     color: '#646464'
   },
-  'SUB_PROCESS': {
+  SUB_PROCESS: {
     desc: 'SUB_PROCESS',
     color: '#0097e0'
   },
-  'PROCEDURE': {
+  PROCEDURE: {
     desc: 'PROCEDURE',
     color: '#525CCD'
   },
-  'SQL': {
+  SQL: {
     desc: 'SQL',
     color: '#7A98A1'
   },
-  'SPARK': {
+  SPARK: {
     desc: 'SPARK',
     color: '#E46F13'
   },
-  'FLINK': {
+  FLINK: {
     desc: 'FLINK',
     color: '#E46F13'
   },
-  'MR': {
+  MR: {
     desc: 'MapReduce',
     color: '#A0A5CC'
   },
-  'PYTHON': {
+  PYTHON: {
     desc: 'PYTHON',
     color: '#FED52D'
   },
-  'DEPENDENT': {
+  DEPENDENT: {
     desc: 'DEPENDENT',
     color: '#2FBFD8'
   },
-  'HTTP': {
+  HTTP: {
     desc: 'HTTP',
     color: '#E46F13'
   },
-  'DATAX': {
+  DATAX: {
     desc: 'DataX',
     color: '#1fc747'
   },
-  'SQOOP': {
+  SQOOP: {
     desc: 'SQOOP',
     color: '#E46F13'
   },
-  'CONDITIONS': {
+  CONDITIONS: {
     desc: 'CONDITIONS',
     color: '#E46F13'
   }
 }
-
 
 export {
   toolOper,

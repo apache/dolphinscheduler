@@ -95,6 +95,30 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
+     * copy process definition
+     *
+     * @param loginUser   login user
+     * @param projectName project name
+     * @param processId   process definition id
+     * @return copy result code
+     */
+    @ApiOperation(value = "copyProcessDefinition", notes= "COPY_PROCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+    })
+    @PostMapping(value = "/copy")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(COPY_PROCESS_DEFINITION_ERROR)
+    public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @RequestParam(value = "processId", required = true) int processId) throws JsonProcessingException {
+        logger.info("copy process definition, login user:{}, project name:{}, process definition id:{}",
+                loginUser.getUserName(), projectName, processId);
+        Map<String, Object> result = processDefinitionService.copyProcessDefinition(loginUser, projectName, processId);
+        return returnDataList(result);
+    }
+
+    /**
      * verify process definition name unique
      *
      * @param loginUser   login user
@@ -425,30 +449,30 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * export process definition by id
+     * batch export process definition by ids
      *
      * @param loginUser           login user
      * @param projectName         project name
-     * @param processDefinitionId process definition id
+     * @param processDefinitionIds process definition ids
      * @param response            response
      */
 
-    @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiOperation(value = "batchExportProcessDefinitionByIds", notes= "BATCH_EXPORT_PROCESS_DEFINITION_BY_IDS_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
     })
     @GetMapping(value = "/export")
     @ResponseBody
-    public void exportProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable String projectName,
-                                            @RequestParam("processDefinitionId") Integer processDefinitionId,
-                                            HttpServletResponse response) {
+    public void batchExportProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                  @RequestParam("processDefinitionIds") String processDefinitionIds,
+                                                  HttpServletResponse response) {
         try {
-            logger.info("export process definition by id, login user:{}, project name:{}, process definition id:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId);
-            processDefinitionService.exportProcessDefinitionById(loginUser, projectName, processDefinitionId, response);
+            logger.info("batch export process definition by ids, login user:{}, project name:{}, process definition ids:{}",
+                    loginUser.getUserName(), projectName, processDefinitionIds);
+            processDefinitionService.batchExportProcessDefinitionByIds(loginUser, projectName, processDefinitionIds, response);
         } catch (Exception e) {
-            logger.error(Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(), e);
+            logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
         }
     }
 

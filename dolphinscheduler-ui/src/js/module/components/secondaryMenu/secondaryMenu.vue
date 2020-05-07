@@ -63,7 +63,8 @@
         menuList: menu(this.type),
         index: 0,
         id: this.$route.params.id,
-        isTogHide: false
+        isTogHide: false,
+        isLeft: true
       }
     },
     props: {
@@ -82,6 +83,11 @@
       },
       _toggleMenu () {
         this.isTogHide = !this.isTogHide
+        if(this.isTogHide) {
+          sessionStorage.setItem('isLeft',0)
+        } else {
+          sessionStorage.setItem('isLeft',1)
+        }
       }
     },
     mounted () {
