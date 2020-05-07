@@ -34,9 +34,9 @@
           <th>
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="70">
+          <!-- <th width="70">
             <span>{{$t('Operation')}}</span>
-          </th>
+          </th> -->
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
           <td>
@@ -48,7 +48,7 @@
             </span>
           </td>
           <td>
-            <span>{{item.ipList}}</span>
+            <span>{{item.ipList.join(',')}}</span>
           </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
@@ -58,7 +58,7 @@
             <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
             <span v-else>-</span>
           </td>
-          <td>
+          <!-- <td>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)">
             </x-button>
             <x-poptip
@@ -75,7 +75,7 @@
                 </x-button>
               </template>
             </x-poptip>
-          </td>
+          </td> -->
         </tr>
       </table>
     </div>
