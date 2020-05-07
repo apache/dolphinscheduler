@@ -173,7 +173,7 @@ export default {
   'Tenant Code': 'Tenant Code',
   'Tenant Name': 'Tenant Name',
   Queue: 'Queue',
-  'Please select a queue': 'Please select a queue',
+  'Please select a queue': 'default is tenant association queue',
   'Please enter the tenant code in English': 'Please enter the tenant code in English',
   'Please enter tenant code in English': 'Please enter tenant code in English',
   'Edit User': 'Edit User',
