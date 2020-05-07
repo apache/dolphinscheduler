@@ -19,7 +19,7 @@ import _ from 'lodash'
 import Vue from 'vue'
 import store from '@/conf/home/store'
 
-let Permissions = function () {
+const Permissions = function () {
   this.isAuth = true
 }
 
@@ -44,7 +44,7 @@ Permissions.prototype = {
           if ($(el).prop('tagName') === 'BUTTON') {
             $(el).attr('disabled', true)
           } else {
-            setTimeout(function(){el.parentNode.removeChild(el)},100)
+            setTimeout(function () { el.parentNode.removeChild(el) }, 100)
           }
         }
       }

@@ -23,7 +23,7 @@ export default {
    */
   getResourcesListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/list-paging`, payload, res => {
+      io.get('resources/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -32,7 +32,7 @@ export default {
   },
   getResourceId ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/queryResource`, payload, res => {
+      io.get('resources/queryResource', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -41,7 +41,7 @@ export default {
   },
   getResourcesList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/list`, payload, res => {
+      io.get('resources/list', payload, res => {
         resolve(res)
       }).catch(res => {
         reject(res)
@@ -53,7 +53,7 @@ export default {
    */
   deleteResource ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/delete`, payload, res => {
+      io.get('resources/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -65,7 +65,7 @@ export default {
    */
   resourceVerifyName ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/verify-name`, payload, res => {
+      io.get('resources/verify-name', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -77,7 +77,7 @@ export default {
    */
   getViewResources ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/view`, payload, res => {
+      io.get('resources/view', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -89,7 +89,7 @@ export default {
    */
   createUdfFunc ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/udf-func/create`, payload, res => {
+      io.post('resources/udf-func/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -101,7 +101,7 @@ export default {
    */
   updateUdfFunc ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/udf-func/update`, payload, res => {
+      io.post('resources/udf-func/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -113,7 +113,7 @@ export default {
    */
   verifyUdfFuncName ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/udf-func/verify-name`, payload, res => {
+      io.get('resources/udf-func/verify-name', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -126,7 +126,7 @@ export default {
    */
   deleteUdf ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/udf-func/delete`, payload, res => {
+      io.get('resources/udf-func/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -138,7 +138,7 @@ export default {
    */
   getUdfFuncListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`resources/udf-func/list-paging`, payload, res => {
+      io.get('resources/udf-func/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -150,7 +150,7 @@ export default {
    */
   updateContent ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/update-content`, payload, res => {
+      io.post('resources/update-content', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -162,7 +162,7 @@ export default {
    */
   createResourceFile ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/online-create`, payload, res => {
+      io.post('resources/online-create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -174,7 +174,7 @@ export default {
    */
   createResourceFolder ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/directory/create`, payload, res => {
+      io.post('resources/directory/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -186,7 +186,7 @@ export default {
    */
   resourceRename ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`resources/update`, payload, res => {
+      io.post('resources/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
