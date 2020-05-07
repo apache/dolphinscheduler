@@ -23,7 +23,7 @@ const DragZoom = function () {
 }
 
 DragZoom.prototype.init = function () {
-  let $canvas = $('#canvas')
+  const $canvas = $('#canvas')
   this.element = d3.select('#canvas')
   this.zoom = d3.behavior.zoom()
     .scaleExtent([0.5, 2])
@@ -34,6 +34,5 @@ DragZoom.prototype.init = function () {
     })
   this.element.call(this.zoom).on('dblclick.zoom', null)
 }
-
 
 export default new DragZoom()
