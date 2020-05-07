@@ -118,10 +118,10 @@ export default class Funnel extends Base {
    * Drawing charts
    */
   apply () {
-    let { title, series, legendData } = this.options
+    const { title, series, legendData } = this.options
 
     // Injection configuration to series
-    let { insertSeries } = this.settings
+    const { insertSeries } = this.settings
     let _series = series
     if (insertSeries && insertSeries.length && series.length) {
       _series = this.injectDataIntoSeries(insertSeries, _series)

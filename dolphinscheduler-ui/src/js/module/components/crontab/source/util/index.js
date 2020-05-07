@@ -23,37 +23,37 @@ import _ from 'lodash'
  * @param end End value
  */
 const range = (start, end) => {
-  let length = end - start + 1
+  const length = end - start + 1
   let step = start - 1
   return Array.apply(null, { length: length }).map(function (v, i) { step++; return step })
 }
 
-let selectList = {
-  '60': _.map(range(0, 59), v => {
+const selectList = {
+  60: _.map(range(0, 59), v => {
     return {
       value: v + '',
       label: v + ''
     }
   }),
-  '24': _.map(range(0, 23), v => {
+  24: _.map(range(0, 23), v => {
     return {
       value: v + '',
       label: v + ''
     }
   }),
-  '12': _.map(range(0, 12), v => {
+  12: _.map(range(0, 12), v => {
     return {
       value: v + '',
       label: v + ''
     }
   }),
-  'year': _.map(range(2018, 2030), v => {
+  year: _.map(range(2018, 2030), v => {
     return {
       value: v + '',
       label: v + ''
     }
   }),
-  'week': [
+  week: [
     {
       value: 1,
       label: '星期天'
@@ -83,7 +83,7 @@ let selectList = {
       label: '星期六'
     }
   ],
-  'specificWeek': [
+  specificWeek: [
     {
       value: 'SUN',
       label: 'SUN'
@@ -113,13 +113,13 @@ let selectList = {
       label: 'SAT'
     }
   ],
-  'day': _.map(range(1, 31), v => {
+  day: _.map(range(1, 31), v => {
     return {
       value: v + '',
       label: v + ''
     }
   }),
-  'lastWeeks': [
+  lastWeeks: [
     {
       value: '1L',
       label: '星期天'
@@ -161,8 +161,8 @@ const isStr = (str, v) => {
 
 const isWeek = (str) => {
   let flag = false
-  let data = str.split(',')
-  let isSpecificWeek = (key) => {
+  const data = str.split(',')
+  const isSpecificWeek = (key) => {
     return _.findIndex(selectList.specificWeek, v => v.value === key) !== -1
   }
   _.map(data, v => {
@@ -172,7 +172,6 @@ const isWeek = (str) => {
   })
   return flag
 }
-
 
 /**
  * template
@@ -205,7 +204,6 @@ const template = (string, ...args) => {
     }
   })
 }
-
 
 export {
   selectList,
