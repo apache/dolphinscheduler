@@ -22,7 +22,7 @@ import { tasksState } from '@/conf/home/pages/dag/_source/config'
  * Node prompt dom
  */
 const rtInstancesTooltip = (data) => {
-  let str = `<div style="text-align: left;word-break:break-all">`
+  let str = '<div style="text-align: left;word-break:break-all">'
   str += `id : ${data.id}</br>`
   str += `host : ${data.host}</br>`
   str += `name : ${data.name}</br>`
@@ -33,7 +33,7 @@ const rtInstancesTooltip = (data) => {
   str += `startTime : ${data.startTime ? formatDate(data.startTime) : '-'}</br>`
   str += `endTime : ${data.endTime ? formatDate(data.endTime) : '-'}</br>`
   str += `duration : ${data.duration}</br>`
-  str += `</div>`
+  str += '</div>'
   return str
 }
 
@@ -42,7 +42,7 @@ const rtInstancesTooltip = (data) => {
  * Easy to calculate the width dynamically
  */
 const rtCountMethod = list => {
-  let arr = []
+  const arr = []
   function count (list, t) {
     let toggle = false
     list.forEach(v => {

@@ -18,10 +18,10 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
+import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -66,15 +66,17 @@ public class EnterpriseWeChatUtils {
      * get Enterprise WeChat is enable
      * @return isEnable
      */
-    public static Boolean isEnable(){
-        Boolean isEnable = false;
+    public static boolean isEnable(){
+        Boolean isEnable = null;
         try {
             isEnable = PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
+        if (isEnable == null) {
+            return false;
+        }
         return isEnable;
-
     }
 
     /**
@@ -253,14 +255,13 @@ public class EnterpriseWeChatUtils {
 
     /**
      * Determine the mardown style based on the show type of the alert
-     * @param alert the alert
      * @return the markdown alert table/text
      */
-    public static String markdownByAlert(Alert alert){
+    public static String markdownByAlert(AlertData alert){
         String result = "";
-        if (alert.getShowType() == ShowType.TABLE) {
+        if (alert.getShowType().equals(ShowType.TABLE.getDescp())) {
             result = markdownTable(alert.getTitle(),alert.getContent());
-        }else if(alert.getShowType() == ShowType.TEXT){
+        }else if(alert.getShowType().equals(ShowType.TEXT.getDescp())){
             result = markdownText(alert.getTitle(),alert.getContent());
         }
         return result;

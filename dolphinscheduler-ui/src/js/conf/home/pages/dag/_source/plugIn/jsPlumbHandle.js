@@ -24,7 +24,6 @@ import { jsPlumb } from 'jsplumb'
 import DragZoom from './dragZoom'
 import store from '@/conf/home/store'
 import router from '@/conf/home/router'
-import Permissions from '@/module/permissions'
 import { uuid, findComponentDownward } from '@/module/util/'
 
 import {
@@ -32,10 +31,11 @@ import {
   rtTasksTpl,
   setSvgColor,
   saveTargetarr,
-  rtTargetarrArr } from './util'
+  rtTargetarrArr
+} from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
 
-let JSP = function () {
+const JSP = function () {
   this.dag = {}
   this.selectedElement = {}
 
@@ -75,7 +75,7 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   this.setConfig({
     isDrag: !store.state.dag.isDetails,
     isAttachment: false,
-    isNewNodes: !store.state.dag.isDetails,//Permissions.getAuth() === false ? false : !store.state.dag.isDetails,
+    isNewNodes: !store.state.dag.isDetails, // Permissions.getAuth() === false ? false : !store.state.dag.isDetails,
     isDblclick: true,
     isContextmenu: true,
     isClick: false
@@ -105,7 +105,7 @@ JSP.prototype.setConfig = function (o) {
  * Node binding event
  */
 JSP.prototype.tasksEvent = function (selfId) {
-  let tasks = $(`#${selfId}`)
+  const tasks = $(`#${selfId}`)
   // Bind right event
   tasks.on('contextmenu', e => {
     this.tasksContextmenu(e)
@@ -129,7 +129,7 @@ JSP.prototype.tasksEvent = function (selfId) {
 JSP.prototype.draggable = function () {
   if (this.config.isNewNodes) {
     let selfId
-    let self = this
+    const self = this
     $('.toolbar-btn .roundedRect').draggable({
       scope: 'plant',
       helper: 'clone',
@@ -146,7 +146,7 @@ JSP.prototype.draggable = function () {
       drop: function (ev, ui) {
         let id = 'tasks-' + Math.ceil(Math.random() * 100000) // eslint-disable-line
         // Get mouse coordinates
-        let left = parseInt(ui.offset.left - $(this).offset().left)
+        const left = parseInt(ui.offset.left - $(this).offset().left)
         let top = parseInt(ui.offset.top - $(this).offset().top) - 10
         if (top < 25) {
           top = 25
@@ -162,7 +162,7 @@ JSP.prototype.draggable = function () {
         }))
 
         // Get the generated node
-        let thisDom = jsPlumb.getSelector('.statemachine-demo .w')
+        const thisDom = jsPlumb.getSelector('.statemachine-demo .w')
 
         // Generating a connection node
         self.JspInstance.batch(() => {
@@ -193,13 +193,13 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
     $('#canvas').append(rtTasksTpl({
       id: v.id,
       name: v.name,
-      x: locations[v.id]['x'],
-      y: locations[v.id]['y'],
-      targetarr: locations[v.id]['targetarr'],
+      x: locations[v.id].x,
+      y: locations[v.id].y,
+      targetarr: locations[v.id].targetarr,
       isAttachment: this.config.isAttachment,
       taskType: v.type,
       runFlag: v.runFlag,
-      nodenumber: locations[v.id]['nodenumber'],
+      nodenumber: locations[v.id].nodenumber
     }))
 
     // contextmenu event
@@ -263,29 +263,29 @@ JSP.prototype.initNode = function (el) {
  */
 JSP.prototype.tasksContextmenu = function (event) {
   if (this.config.isContextmenu) {
-    let routerName = router.history.current.name
+    const routerName = router.history.current.name
     // state
-    let isOne = routerName === 'projects-definition-details' && this.dag.releaseState !== 'NOT_RELEASE'
+    const isOne = routerName === 'projects-definition-details' && this.dag.releaseState !== 'NOT_RELEASE'
     // hide
-    let isTwo = store.state.dag.isDetails
+    const isTwo = store.state.dag.isDetails
 
-    let html = [
+    const html = [
       `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="ans-icon-play"></em><span>${i18n.$t('Start')}</span></a>`,
       `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-edit"></em><span>${i18n.$t('Edit')}</span></a>`,
       `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-copy"></em><span>${i18n.$t('Copy')}</span></a>`,
       `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-trash"></em><span>${i18n.$t('Delete')}</span></a>`
     ]
 
-    let operationHtml = () => {
+    const operationHtml = () => {
       return html.splice(',')
     }
 
-    let e = event
-    let $id = e.currentTarget.id
-    let $contextmenu = $('#contextmenu')
-    let $name = $(`#${$id}`).find('.name-p').text()
-    let $left = e.pageX + document.body.scrollLeft - 5
-    let $top = e.pageY + document.body.scrollTop - 5
+    const e = event
+    const $id = e.currentTarget.id
+    const $contextmenu = $('#contextmenu')
+    const $name = $(`#${$id}`).find('.name-p').text()
+    const $left = e.pageX + document.body.scrollLeft - 5
+    const $top = e.pageY + document.body.scrollTop - 5
     $contextmenu.css({
       left: $left,
       top: $top,
@@ -297,10 +297,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     if (isOne) {
       // start run
       $('#startRunning').on('click', () => {
-        let name = store.state.dag.name
-        let id = router.history.current.params.id
+        const name = store.state.dag.name
+        const id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
-          let modal = Vue.$modal.dialog({
+          const modal = Vue.$modal.dialog({
             closable: false,
             showMask: true,
             escClose: true,
@@ -332,9 +332,9 @@ JSP.prototype.tasksContextmenu = function (event) {
         })
       })
     }
-    if (!isTwo) { 
+    if (!isTwo) {
       // edit node
-      $(`#editNodes`).click(ev => {
+      $('#editNodes').click(ev => {
         findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({
           id: $id,
           type: $(`#${$id}`).attr('data-tasks-type')
@@ -359,7 +359,7 @@ JSP.prototype.tasksContextmenu = function (event) {
 JSP.prototype.tasksDblclick = function (e) {
   // Untie event
   if (this.config.isDblclick) {
-    let id = $(e.currentTarget.offsetParent).attr('id')
+    const id = $(e.currentTarget.offsetParent).attr('id')
 
     findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({
       id: id,
@@ -373,10 +373,10 @@ JSP.prototype.tasksDblclick = function (e) {
  */
 JSP.prototype.tasksClick = function (e) {
   let $id
-  let self = this
-  let $body = $(`body`)
+  const self = this
+  const $body = $('body')
   if (this.config.isClick) {
-    let $connect = this.selectedElement.connect
+    const $connect = this.selectedElement.connect
     $('.w').removeClass('jtk-tasks-active')
     $(e.currentTarget).addClass('jtk-tasks-active')
     if ($connect) {
@@ -406,7 +406,7 @@ JSP.prototype.tasksClick = function (e) {
  * paste
  */
 JSP.prototype.removePaste = function () {
-  let $body = $(`body`)
+  const $body = $('body')
   // Unbind copy and paste events
   $body.unbind('copy').unbind('paste')
   // Remove selected node parameters
@@ -421,7 +421,7 @@ JSP.prototype.removePaste = function () {
 JSP.prototype.connectClick = function (e) {
   // Set svg color
   setSvgColor(e, '#0097e0')
-  let $id = this.selectedElement.id
+  const $id = this.selectedElement.id
   if ($id) {
     $(`#${$id}`).removeClass('jtk-tasks-active')
     this.selectedElement.id = null
@@ -434,24 +434,10 @@ JSP.prototype.connectClick = function (e) {
  * @param {Pointer}
  */
 JSP.prototype.handleEventPointer = function (is) {
-  let wDom = $('.w')
   this.setConfig({
     isClick: is,
     isAttachment: false
   })
-  // wDom.removeClass('jtk-ep')
-  // if (!is) {
-  //   wDom.removeClass('jtk-tasks-active')
-  //   this.selectedElement = {}
-  //   _.map($('#canvas svg'), v => {
-  //     if ($(v).attr('class')) {
-  //       _.map($(v).find('path'), v1 => {
-  //         $(v1).attr('fill', '#555')
-  //         $(v1).attr('stroke', '#555')
-  //       })
-  //     }
-  //   })
-  // }
 }
 
 /**
@@ -459,7 +445,7 @@ JSP.prototype.handleEventPointer = function (is) {
  * @param {Line}
  */
 JSP.prototype.handleEventLine = function (is) {
-  let wDom = $('.w')
+  const wDom = $('.w')
   this.setConfig({
     isAttachment: is
   })
@@ -471,8 +457,8 @@ JSP.prototype.handleEventLine = function (is) {
  * @param {Remove}
  */
 JSP.prototype.handleEventRemove = function () {
-  let $id = this.selectedElement.id || null
-  let $connect = this.selectedElement.connect || null
+  const $id = this.selectedElement.id || null
+  const $connect = this.selectedElement.connect || null
   if ($id) {
     this.removeNodes(this.selectedElement.id)
   } else {
@@ -489,9 +475,9 @@ JSP.prototype.handleEventRemove = function () {
 JSP.prototype.removeNodes = function ($id) {
   // Delete node processing(data-targetarr)
   _.map(tasksAll(), v => {
-    let targetarr = v.targetarr.split(',')
+    const targetarr = v.targetarr.split(',')
     if (targetarr.length) {
-      let newArr = _.filter(targetarr, v1 => v1 !== $id)
+      const newArr = _.filter(targetarr, v1 => v1 !== $id)
       $(`#${v.id}`).attr('data-targetarr', newArr.toString())
     }
   })
@@ -502,7 +488,7 @@ JSP.prototype.removeNodes = function ($id) {
   $(`#${$id}`).remove()
 
   // callback onRemoveNodes event
-  this.options&&this.options.onRemoveNodes&&this.options.onRemoveNodes($id)
+  this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
 }
 
 /**
@@ -513,15 +499,15 @@ JSP.prototype.removeConnect = function ($connect) {
     return
   }
   // Remove connections and remove node and node dependencies
-  let targetId = $connect.targetId
-  let sourceId = $connect.sourceId
+  const targetId = $connect.targetId
+  const sourceId = $connect.sourceId
   let targetarr = rtTargetarrArr(targetId)
   if (targetarr.length) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
     $(`#${targetId}`).attr('data-targetarr', targetarr.toString())
   }
-  if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS') {
-    $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))-1)
+  if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS') {
+    $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) - 1)
   }
   this.JspInstance.deleteConnection($connect)
 
@@ -533,24 +519,24 @@ JSP.prototype.removeConnect = function ($connect) {
  */
 JSP.prototype.copyNodes = function ($id) {
   let newNodeInfo = _.cloneDeep(_.find(store.state.dag.tasks, v => v.id === $id))
-  let newNodePors = store.state.dag.locations[$id]
+  const newNodePors = store.state.dag.locations[$id]
   // Unstored nodes do not allow replication
   if (!newNodePors) {
     return
   }
   // Generate random id
-  let newUuId = `${uuid() + uuid()}`
-  let id = newNodeInfo.id.length > 8 ? newNodeInfo.id.substr(0, 7) : newNodeInfo.id
-  let name = newNodeInfo.name.length > 8 ? newNodeInfo.name.substr(0, 7) : newNodeInfo.name
+  const newUuId = `${uuid() + uuid()}`
+  const id = newNodeInfo.id.length > 8 ? newNodeInfo.id.substr(0, 7) : newNodeInfo.id
+  const name = newNodeInfo.name.length > 8 ? newNodeInfo.name.substr(0, 7) : newNodeInfo.name
 
   // new id
-  let newId = `${id || ''}-${newUuId}`
+  const newId = `${id || ''}-${newUuId}`
   // new name
-  let newName = `${name || ''}-${newUuId}`
+  const newName = `${name || ''}-${newUuId}`
   // coordinate x
-  let newX = newNodePors.x + 100
+  const newX = newNodePors.x + 100
   // coordinate y
-  let newY = newNodePors.y + 40
+  const newY = newNodePors.y + 40
 
   // Generate template node
   $('#canvas').append(rtTasksTpl({
@@ -563,7 +549,7 @@ JSP.prototype.copyNodes = function ($id) {
   }))
 
   // Get the generated node
-  let thisDom = jsPlumb.getSelector('.statemachine-demo .w')
+  const thisDom = jsPlumb.getSelector('.statemachine-demo .w')
 
   // Copy node information
   newNodeInfo = Object.assign(newNodeInfo, {
@@ -604,7 +590,7 @@ JSP.prototype.handleEventScreen = function ({ item, is }) {
     item.icon = 'ans-icon-max'
     screenOpen = false
   }
-  let $mainLayoutModel = $('.main-layout-model')
+  const $mainLayoutModel = $('.main-layout-model')
   if (screenOpen) {
     $mainLayoutModel.addClass('dag-screen')
   } else {
@@ -619,21 +605,21 @@ JSP.prototype.handleEventScreen = function ({ item, is }) {
  */
 JSP.prototype.saveStore = function () {
   return new Promise((resolve, reject) => {
-    let connects = []
-    let locations = {}
-    let tasks = []
+    const connects = []
+    const locations = {}
+    const tasks = []
 
-    let is = (id) => {
+    const is = (id) => {
       return !!_.filter(tasksAll(), v => v.id === id).length
     }
 
     // task
     _.map(_.cloneDeep(store.state.dag.tasks), v => {
       if (is(v.id)) {
-        let preTasks = []
-        let id = $(`#${v.id}`)
-        let tar = id.attr('data-targetarr')
-        let idDep = tar ? id.attr('data-targetarr').split(',') : []
+        const preTasks = []
+        const id = $(`#${v.id}`)
+        const tar = id.attr('data-targetarr')
+        const idDep = tar ? id.attr('data-targetarr').split(',') : []
         if (idDep.length) {
           _.map(idDep, v1 => {
             preTasks.push($(`#${v1}`).find('.name-p').text())
@@ -655,11 +641,10 @@ JSP.prototype.saveStore = function () {
 
     _.map(this.JspInstance.getConnections(), v => {
       connects.push({
-        'endPointSourceId': v.sourceId,
-        'endPointTargetId': v.targetId
+        endPointSourceId: v.sourceId,
+        endPointTargetId: v.targetId
       })
     })
-
 
     _.map(tasksAll(), v => {
       locations[v.id] = {
@@ -670,7 +655,6 @@ JSP.prototype.saveStore = function () {
         y: v.y
       }
     })
-
 
     // Storage node
     store.commit('dag/setTasks', tasks)
@@ -692,14 +676,14 @@ JSP.prototype.saveStore = function () {
 
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
-    let sourceId = info['sourceId']// 出
-    let targetId = info['targetId']// 入
+    const sourceId = info.sourceId// 出
+    const targetId = info.targetId// 入
     /**
      * Recursive search for nodes
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (let i in arr) {
+      for (const i in arr) {
         if (arr[i] === targetId) {
           recursiveVal = targetId
         } else {
@@ -719,10 +703,10 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
-    if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber')==2) {
+    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber') === 2) {
       return false
     } else {
-      $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
+      $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) + 1)
     }
 
     // Storage node dependency information
@@ -744,7 +728,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
     locations: locations
   })
 
-  let wNodes = jsPlumb.getSelector('.statemachine-demo .w')
+  const wNodes = jsPlumb.getSelector('.statemachine-demo .w')
 
   // Backfill line
   this.JspInstance.batch(() => {

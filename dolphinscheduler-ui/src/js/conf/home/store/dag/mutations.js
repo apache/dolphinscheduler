@@ -100,27 +100,27 @@ export default {
    */
   resetParams (state, payload) {
     $('#canvas').html('')
-    state.globalParams = payload && payload.globalParams || []
-    state.tasks = payload && payload.tasks || []
-    state.name = payload && payload.name || ''
-    state.description = payload && payload.description || ''
-    state.timeout = payload && payload.timeout || 0
-    state.tenantId = payload && payload.tenantId || -1
-    state.processListS = payload && payload.processListS || []
-    state.resourcesListS = payload && payload.resourcesListS || []
-    state.resourcesListJar = payload && payload.resourcesListJar || []
-    state.projectListS = payload && payload.projectListS || []
-    state.isDetails = payload && payload.isDetails || false
-    state.runFlag = payload && payload.runFlag || ''
-    state.locations = payload && payload.locations || {}
-    state.connects = payload && payload.connects || []
+    state.globalParams = (payload && payload.globalParams) || []
+    state.tasks = (payload && payload.tasks) || []
+    state.name = (payload && payload.name) || ''
+    state.description = (payload && payload.description) || ''
+    state.timeout = (payload && payload.timeout) || 0
+    state.tenantId = (payload && payload.tenantId) || -1
+    state.processListS = (payload && payload.processListS) || []
+    state.resourcesListS = (payload && payload.resourcesListS) || []
+    state.resourcesListJar = (payload && payload.resourcesListJar) || []
+    state.projectListS = (payload && payload.projectListS) || []
+    state.isDetails = (payload && payload.isDetails) || false
+    state.runFlag = (payload && payload.runFlag) || ''
+    state.locations = (payload && payload.locations) || {}
+    state.connects = (payload && payload.connects) || []
   },
   /**
    * add task
    * object {}
    */
   addTasks (state, payload) {
-    let i = _.findIndex(state.tasks, v => v.id === payload.id)
+    const i = _.findIndex(state.tasks, v => v.id === payload.id)
     if (i !== -1) {
       state.tasks[i] = Object.assign(state.tasks[i], {}, payload)
     } else {
@@ -129,9 +129,9 @@ export default {
     if (state.cacheTasks[payload.id]) {
       state.cacheTasks[payload.id] = Object.assign(state.cacheTasks[payload.id], {}, payload)
     } else {
-      state.cacheTasks[payload.id] = payload;
+      state.cacheTasks[payload.id] = payload
     }
-    let dom = $(`#${payload.id}`)
+    const dom = $(`#${payload.id}`)
     state.locations[payload.id] = _.assign(state.locations[payload.id], {
       name: dom.find('.name-p').text(),
       targetarr: dom.attr('data-targetarr'),
@@ -149,7 +149,7 @@ export default {
     if (state.cacheTasks[payload.id]) {
       state.cacheTasks[payload.id] = Object.assign(state.cacheTasks[payload.id], {}, payload)
     } else {
-      state.cacheTasks[payload.id] = payload;
+      state.cacheTasks[payload.id] = payload
     }
   }
 }

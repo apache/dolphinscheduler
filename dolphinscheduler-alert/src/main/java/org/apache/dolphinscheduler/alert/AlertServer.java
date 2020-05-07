@@ -16,8 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.dolphinscheduler.alert.plugin.EmailAlertPlugin;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.plugin.FilePluginManager;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -41,34 +44,47 @@ public class AlertServer {
 
     private static AlertServer instance;
 
-    public AlertServer() {
+    private FilePluginManager alertPluginManager;
 
+    private static final String[] whitePrefixes = new String[]{"org.apache.dolphinscheduler.plugin.utils."};
+
+    private static final String[] excludePrefixes = new String[]{
+            "org.apache.dolphinscheduler.plugin.",
+            "ch.qos.logback.",
+            "org.slf4j."
+    };
+
+    public AlertServer() {
+        alertPluginManager =
+                new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
+        // add default alert plugins
+        alertPluginManager.addPlugin(new EmailAlertPlugin());
     }
 
-    public synchronized static AlertServer getInstance(){
+    public synchronized static AlertServer getInstance() {
         if (null == instance) {
             instance = new AlertServer();
         }
         return instance;
     }
 
-    public void start(){
+    public void start() {
         logger.info("alert server ready start ");
-        while (Stopper.isRunning()){
+        while (Stopper.isRunning()) {
             try {
                 Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
             } catch (InterruptedException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao);
+            alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
             alertSender.run();
         }
     }
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
     }
