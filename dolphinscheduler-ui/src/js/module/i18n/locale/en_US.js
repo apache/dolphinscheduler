@@ -69,6 +69,7 @@ export default {
   'Project Manage': 'Project',
   'Create Project': 'Create Project',
   'Cron Manage': 'Cron Manage',
+  'Copy Workflow': 'Copy Workflow',
   'Tenant Manage': 'Tenant Manage',
   'Create Tenant': 'Create Tenant',
   'User Manage': 'User Manage',
