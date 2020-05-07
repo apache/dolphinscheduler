@@ -162,7 +162,7 @@ export default class Line extends Base {
     } = this.settings
     const valueAxis = { type: 'value' }
     let yAxisModel = reverseAxis ? xAxis : valueAxis
-    let xAxisModel = reverseAxis ? valueAxis : xAxis
+    const xAxisModel = reverseAxis ? valueAxis : xAxis
     // Use custom Y-axis overlay
     if (yAxis) {
       yAxisModel = yAxis
@@ -175,7 +175,7 @@ export default class Line extends Base {
       _series = this.injectDataIntoSeries(insertSeries, _series)
     }
 
-    let opts = {
+    const opts = {
       title: {
         text: title
       },

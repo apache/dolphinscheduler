@@ -51,14 +51,13 @@ export function findComponentDownward (context, componentName) {
  *  uuid('v-ani-%{s}-translate')  // -> v-ani-xxx
  */
 export function uuid (prefix) {
-  let id = Math.floor(Math.random() * 10000).toString(36)
+  const id = Math.floor(Math.random() * 10000).toString(36)
   return prefix ? (
     ~prefix.indexOf('%{s}') ? (
       prefix.replace(/%\{s\}/g, id)
     ) : (prefix + id)
   ) : id
 }
-
 
 /**
  * template
@@ -92,4 +91,3 @@ export function template (string, ...args) {
     }
   })
 }
-
