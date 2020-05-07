@@ -35,7 +35,7 @@ if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
 sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=${datasourceDriverClassname}#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/dolphinscheduler?characterEncoding=UTF-8#g" conf/datasource.properties
+sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${password}#g" conf/datasource.properties
 
@@ -52,11 +52,8 @@ sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.
 sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
-sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.properties
-
+sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
-
-
 sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
