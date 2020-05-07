@@ -60,7 +60,7 @@
           <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueName">
-              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
+              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
                 <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
                 <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
               </x-input>
