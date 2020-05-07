@@ -92,32 +92,32 @@
       _onEdit (item) {
         this._create(item)
       },
-      _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateWorker, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
-      },
+      // _create (item) {
+      //   let self = this
+      //   let modal = this.$modal.dialog({
+      //     closable: false,
+      //     showMask: true,
+      //     escClose: true,
+      //     className: 'v-modal-custom',
+      //     transitionName: 'opacityp',
+      //     render (h) {
+      //       return h(mCreateWorker, {
+      //         on: {
+      //           onUpdate () {
+      //             self._debounceGET('false')
+      //             modal.remove()
+      //           },
+      //           close () {
+      //             modal.remove()
+      //           }
+      //         },
+      //         props: {
+      //           item: item
+      //         }
+      //       })
+      //     }
+      //   })
+      // },
       _getList (flag) {
         this.isLoading = !flag
         this.getWorkerGroups(this.searchParams).then(res => {
