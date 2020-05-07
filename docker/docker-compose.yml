@@ -23,6 +23,7 @@ services:
       - "2181:2181"
     environment:
       ZOO_MY_ID: 1
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
   db:
     image: postgres
     container_name: postgres
