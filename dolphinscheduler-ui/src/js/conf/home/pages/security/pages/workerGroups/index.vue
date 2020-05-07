@@ -141,8 +141,7 @@
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
-    created () {
-    },
+    created () {},
     mounted () {
       this.$modal.destroy()
     },
