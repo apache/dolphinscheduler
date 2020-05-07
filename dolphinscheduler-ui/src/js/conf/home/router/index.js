@@ -375,19 +375,19 @@ const router = new Router({
           }
         },
         {
-          path: '/security/worker-groups',
-          name: 'worker-groups-manage',
-          component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Worker group manage')}`
-          }
-        },
-        {
           path: '/security/token',
           name: 'token-manage',
           component: resolve => require(['../pages/security/pages/token/index'], resolve),
           meta: {
             title: `${i18n.$t('Token manage')}`
+          }
+        },
+        {
+          path: '/security/worker-groups',
+          name: 'worker-groups-manage',
+          component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Worker group manage')}`
           }
         }
       ]
