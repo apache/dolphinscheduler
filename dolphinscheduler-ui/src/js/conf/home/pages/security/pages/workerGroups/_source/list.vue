@@ -128,8 +128,7 @@
     created () {
       this.list = this.workerGroupList
     },
-    mounted () {
-    },
+    mounted () {},
     components: { }
   }
 </script>
