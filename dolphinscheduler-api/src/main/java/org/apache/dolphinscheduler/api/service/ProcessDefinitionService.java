@@ -782,6 +782,13 @@ public class ProcessDefinitionService extends BaseDAGService {
                     processDefinitionName, 1);
         }
 
+        //unique check
+        result = verifyProcessDefinitionName(loginUser, currentProjectName, processDefinitionName);
+        Status status = (Status) result.get(Constants.STATUS);
+        if (!Status.SUCCESS.equals(status)) {
+            return false;
+        }
+
         // get create process result
         Map<String, Object> createProcessResult =
                 getCreateProcessResult(loginUser,
