@@ -92,7 +92,7 @@
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="ans-icon-timer"><!--{{$t('定时')}}--></x-button>
             <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="ans-icon-upward"><!--{{$t('下线')}}--></x-button>
             <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="ans-icon-downward"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Copy')" @click="_copyProcess(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-copy"><!--{{$t('复制')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Copy Workflow')" @click="_copyProcess(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-copy"><!--{{$t('复制')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-datetime"><!--{{$t('定时管理')}}--></x-button>
             <x-poptip
               :ref="'poptip-delete-' + $index"
