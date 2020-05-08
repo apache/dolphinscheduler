@@ -17,11 +17,7 @@
 <template>
   <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions">
-        <!-- <template slot="button-group" v-if="isADMIN">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create worker group')}}</x-button>
-        </template> -->
-      </m-conditions>
+      <m-conditions @on-conditions="_onConditions"></m-conditions>
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length || total>0">
@@ -92,32 +88,32 @@
       _onEdit (item) {
         this._create(item)
       },
-      // _create (item) {
-      //   let self = this
-      //   let modal = this.$modal.dialog({
-      //     closable: false,
-      //     showMask: true,
-      //     escClose: true,
-      //     className: 'v-modal-custom',
-      //     transitionName: 'opacityp',
-      //     render (h) {
-      //       return h(mCreateWorker, {
-      //         on: {
-      //           onUpdate () {
-      //             self._debounceGET('false')
-      //             modal.remove()
-      //           },
-      //           close () {
-      //             modal.remove()
-      //           }
-      //         },
-      //         props: {
-      //           item: item
-      //         }
-      //       })
-      //     }
-      //   })
-      // },
+      _create (item) {
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'v-modal-custom',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mCreateWorker, {
+              on: {
+                onUpdate () {
+                  self._debounceGET('false')
+                  modal.remove()
+                },
+                close () {
+                  modal.remove()
+                }
+              },
+              props: {
+                item: item
+              }
+            })
+          }
+        })
+      },
       _getList (flag) {
         this.isLoading = !flag
         this.getWorkerGroups(this.searchParams).then(res => {
