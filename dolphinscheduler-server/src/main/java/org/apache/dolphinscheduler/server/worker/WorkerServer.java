@@ -124,9 +124,9 @@ public class WorkerServer implements IStoppable {
     private SpringApplicationContext springApplicationContext;
 
     /**
-     * master server startup
+     * worker server startup
      *
-     * master server not use web service
+     * worker server not use web service
      * @param args arguments
      */
     public static void main(String[] args) {
