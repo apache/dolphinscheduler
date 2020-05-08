@@ -80,8 +80,7 @@ public class ProcessInstanceServiceTest {
     @Mock
     LoggerService loggerService;
 
-    @Mock
-    WorkerGroupMapper workerGroupMapper;
+
 
     @Mock
     UsersService usersService;
@@ -486,7 +485,6 @@ public class ProcessInstanceServiceTest {
      */
     private WorkerGroup getWorkGroup() {
         WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setId(1);
         workerGroup.setName("test_workergroup");
         return workerGroup;
     }
