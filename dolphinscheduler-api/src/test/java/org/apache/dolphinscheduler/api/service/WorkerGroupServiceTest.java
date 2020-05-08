@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -51,8 +50,7 @@ public class WorkerGroupServiceTest {
 
     @InjectMocks
     private WorkerGroupService workerGroupService;
-    @Mock
-    private WorkerGroupMapper workerGroupMapper;
+
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
@@ -60,32 +58,6 @@ public class WorkerGroupServiceTest {
 
     private String groupName="groupName000001";
 
-    /**
-     *  create or update a worker group
-     */
-    @Test
-    public void testSaveWorkerGroup(){
-
-        User user = new User();
-        // general user add
-        user.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals( Status.USER_NO_OPERATION_PERM.getMsg(),(String) result.get(Constants.MSG));
-
-        //success
-        user.setUserType(UserType.ADMIN_USER);
-        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        // group name exist
-        Mockito.when(workerGroupMapper.selectById(2)).thenReturn(getWorkerGroup(2));
-        Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
-        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals(Status.NAME_EXIST,result.get(Constants.STATUS));
-
-    }
 
     /**
      *  query worker group paging
@@ -104,7 +76,6 @@ public class WorkerGroupServiceTest {
         Page<WorkerGroup> page = new Page<>(1,10);
         page.setRecords(getList());
         page.setSize(1L);
-        Mockito.when(workerGroupMapper.queryListPaging(Mockito.any(Page.class), Mockito.eq(groupName))).thenReturn(page);
         result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
@@ -112,24 +83,6 @@ public class WorkerGroupServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
 
-    /**
-     * delete group by id
-     */
-    @Test
-    public  void testDeleteWorkerGroupById(){
-
-        //DELETE_WORKER_GROUP_BY_ID_FAIL
-        Mockito.when(processInstanceMapper.queryByWorkerGroupIdAndStatus(1, Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),((Status) result.get(Constants.STATUS)).getCode());
-
-        //correct
-        result = workerGroupService.deleteWorkerGroupById(2);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-
-    }
 
     @Test
     public void testQueryAllGroup() throws Exception {
@@ -165,7 +118,6 @@ public class WorkerGroupServiceTest {
     private WorkerGroup getWorkerGroup(int id){
         WorkerGroup workerGroup = new WorkerGroup();
         workerGroup.setName(groupName);
-        workerGroup.setId(id);
         return workerGroup;
     }
     private WorkerGroup getWorkerGroup(){
