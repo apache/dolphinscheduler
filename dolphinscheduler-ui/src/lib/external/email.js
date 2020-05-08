@@ -14,4 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export default ["test@analysys.com.cn"]
+export default ['test@analysys.com.cn']

@@ -35,7 +35,7 @@ if [ $dbtype == "postgresql" ];then
   datasourceDriverClassname="org.postgresql.Driver"
 fi
 sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=${datasourceDriverClassname}#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/dolphinscheduler?characterEncoding=UTF-8#g" conf/datasource.properties
+sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/${dbname}?characterEncoding=UTF-8\&allowMultiQueries=true#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${password}#g" conf/datasource.properties
 
