@@ -113,10 +113,7 @@ public class DependencyConfig {
         return Mockito.mock(ResourceMapper.class);
     }
 
-    @Bean
-    public WorkerGroupMapper workerGroupMapper(){
-        return Mockito.mock(WorkerGroupMapper.class);
-    }
+
 
     @Bean
     public ErrorCommandMapper errorCommandMapper(){
