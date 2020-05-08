@@ -21,7 +21,7 @@ import { tasksAll } from './util'
 import html2canvas from 'html2canvas'
 import { findComponentDownward } from '@/module/util/'
 
-let DownChart = function () {
+const DownChart = function () {
   this.dag = {}
 }
 
@@ -31,10 +31,10 @@ let DownChart = function () {
 DownChart.prototype.maxVal = function () {
   return new Promise((resolve, reject) => {
     // All nodes
-    let tasksAllList = tasksAll()
-    let dom = $('.dag-container')
-    let y = parseInt(_.maxBy(tasksAllList, 'y').y + 60)
-    let x = parseInt(_.maxBy(tasksAllList, 'x').x + 100)
+    const tasksAllList = tasksAll()
+    const dom = $('.dag-container')
+    const y = parseInt(_.maxBy(tasksAllList, 'y').y + 60)
+    const x = parseInt(_.maxBy(tasksAllList, 'x').x + 100)
 
     resolve({
       width: (x > 600 ? x : dom.width()) + 100,
@@ -60,9 +60,9 @@ DownChart.prototype.download = function ({ dagThis }) {
       // svg handle
       const nodesToRecover = []
       const nodesToRemove = []
-      let parentNode = node.parentNode
-      let svg = node.outerHTML.trim()
-      let canvas = document.createElement('canvas')
+      const parentNode = node.parentNode
+      const svg = node.outerHTML.trim()
+      const canvas = document.createElement('canvas')
       canvg(canvas, svg)
       if (node.style.position) {
         canvas.style.position += node.style.position
@@ -102,10 +102,10 @@ DownChart.prototype.download = function ({ dagThis }) {
       heigth: height,
       useCORS: true // Enable cross-domain configuration
     }).then((canvas) => {
-      let name = `${this.dag.name}.png`
-      let url = canvas.toDataURL('image/png', 1)
+      const name = `${this.dag.name}.png`
+      const url = canvas.toDataURL('image/png', 1)
       setTimeout(() => {
-        let triggerDownload = $('<a>').attr('href', url).attr('download', name).appendTo('body')
+        const triggerDownload = $('<a>').attr('href', url).attr('download', name).appendTo('body')
         triggerDownload[0].click()
         triggerDownload.remove()
       }, 100)
