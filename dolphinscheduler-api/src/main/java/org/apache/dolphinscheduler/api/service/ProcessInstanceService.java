@@ -91,8 +91,7 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     LoggerService loggerService;
 
-    @Autowired
-    WorkerGroupMapper workerGroupMapper;
+
 
     @Autowired
     UsersService usersService;
