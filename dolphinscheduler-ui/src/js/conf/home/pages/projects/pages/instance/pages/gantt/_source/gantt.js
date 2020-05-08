@@ -19,13 +19,13 @@ import * as d3 from 'd3'
 import { formatDate } from '@/module/filter/filter'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
-let Gantt = function () {
+const Gantt = function () {
   this.el = ''
   this.tasks = []
   this.width = null
   this.height = null
   this.taskNames = []
-  this.tickFormat = `%H:%M:%S`
+  this.tickFormat = '%H:%M:%S'
   this.margin = {
     top: 10,
     right: 40,
@@ -41,20 +41,20 @@ Gantt.prototype.init = function ({ el, tasks }) {
   this.tasks = tasks
   this.taskNames = _.map(_.cloneDeep(tasks), v => v.taskName)
   this.taskNames = this.taskNames.reduce(function (prev, cur) {
-    prev.indexOf(cur) === -1 && prev.push(cur);
-    return prev;
-  },[])
+    prev.indexOf(cur) === -1 && prev.push(cur)
+    return prev
+  }, [])
   this.height = parseInt(this.taskNames.length * 30)
   this.width = $(this.el).width() - this.margin.right - this.margin.left - 5
 
   this.x = d3.time.scale()
-    .domain([ this.startTimeXAxis, this.endTimeXAxis ])
-    .range([ 0, this.width ])
+    .domain([this.startTimeXAxis, this.endTimeXAxis])
+    .range([0, this.width])
     .clamp(true)
 
   this.y = d3.scale.ordinal()
     .domain(this.taskNames)
-    .rangeRoundBands([ 0, this.height - this.margin.top - this.margin.bottom ], 0.1)
+    .rangeRoundBands([0, this.height - this.margin.top - this.margin.bottom], 0.1)
 
   this.xAxis = d3.svg.axis()
     .scale(this.x)
@@ -97,13 +97,13 @@ Gantt.prototype.compXAxisTimes = function () {
  */
 Gantt.prototype.initializeXAxis = function () {
   this.x = d3.time.scale()
-    .domain([ this.startTimeXAxis, this.endTimeXAxis ])
-    .range([ 0, this.width ])
+    .domain([this.startTimeXAxis, this.endTimeXAxis])
+    .range([0, this.width])
     .clamp(true)
 
   this.y = d3.scale.ordinal()
     .domain(this.taskNames)
-    .rangeRoundBands([ 0, this.height - this.margin.top - this.margin.bottom ], 0.1)
+    .rangeRoundBands([0, this.height - this.margin.top - this.margin.bottom], 0.1)
 
   this.xAxis = d3.svg.axis()
     .scale(this.x)
@@ -151,9 +151,9 @@ Gantt.prototype.drawChart = function () {
     .attr('transform', 'translate(0, ' + (this.height - this.margin.top - this.margin.bottom) + ')')
     .transition()
     .call(this.xAxis)
-    .selectAll("text")
-      .attr("transform", `rotate(-${this.width / ($('.tick').length - 1) > 50 ? 0 : Math.acos(this.width / ($('.tick').length - 1) / 50) * 57 })`)
-      .style("text-anchor", `${this.width / ($('.tick').length - 1) > 50 ? 'middle' : 'end'}`)
+    .selectAll('text')
+    .attr('transform', `rotate(-${this.width / ($('.tick').length - 1) > 50 ? 0 : Math.acos(this.width / ($('.tick').length - 1) / 50) * 57})`)
+    .style('text-anchor', `${this.width / ($('.tick').length - 1) > 50 ? 'middle' : 'end'}`)
 
   svg.append('g')
     .attr('class', 'y axis')
@@ -169,15 +169,14 @@ Gantt.prototype.drawChart = function () {
  * Tip prompt
  */
 Gantt.prototype.tip = function (d) {
-  let str = `<div style="text-align: left;word-break:break-all">`
+  let str = '<div style="text-align: left;word-break:break-all">'
   str += `taskName : ${d.taskName}</br>`
   str += `status : ${tasksState[d.status].desc} (${d.status})</br>`
   str += `startTime : ${formatDate(d.isoStart)}</br>`
   str += `endTime : ${formatDate(d.isoEnd)}</br>`
   str += `duration : ${d.duration}</br>`
-  str += `</div>`
+  str += '</div>'
   return str
 }
-
 
 export default new Gantt()

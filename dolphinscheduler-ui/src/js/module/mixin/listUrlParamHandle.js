@@ -23,7 +23,7 @@ import { setUrlParams } from '@/module/util/routerUtil'
 export default {
   watch: {
     // watch pageNo
-    'searchParams': {
+    searchParams: {
       deep: true,
       handler () {
         setUrlParams(this.searchParams)
@@ -48,8 +48,8 @@ export default {
     _debounceGET: _.debounce(function (flag) {
       this._getList(flag)
     }, 100, {
-      'leading': false,
-      'trailing': true
+      leading: false,
+      trailing: true
     })
   }
 }
