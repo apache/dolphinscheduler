@@ -101,9 +101,15 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        this.doAck(taskExecutionContext);
+        try {
+            this.doAck(taskExecutionContext);
+        }catch (Exception e){
+            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            this.doAck(taskExecutionContext);
+        }
+
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext,taskCallbackService));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
     }
 
     private void doAck(TaskExecutionContext taskExecutionContext){
