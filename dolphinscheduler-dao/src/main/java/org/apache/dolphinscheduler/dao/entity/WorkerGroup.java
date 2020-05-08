@@ -68,4 +68,6 @@ public class WorkerGroup {
     public void setIpList(List<String> ipList) {
         this.ipList = ipList;
     }
+
+
 }

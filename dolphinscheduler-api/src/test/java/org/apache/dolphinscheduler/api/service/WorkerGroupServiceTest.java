@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
@@ -53,39 +55,52 @@ public class WorkerGroupServiceTest {
 
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
+
     @Mock
     private ZookeeperCachedOperator zookeeperCachedOperator;
 
-    private String groupName="groupName000001";
 
+    @Before
+    public void init(){
+        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
+        zookeeperConfig.setDsRoot("/dolphinscheduler_qzw");
+        Mockito.when(zookeeperCachedOperator.getZookeeperConfig()).thenReturn(zookeeperConfig);
+
+        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
+
+        List<String> workerGroupStrList = new ArrayList<>();
+        workerGroupStrList.add("default");
+        workerGroupStrList.add("test");
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
+
+        List<String> defaultIpList = new ArrayList<>();
+        defaultIpList.add("192.168.220.188:1234");
+        defaultIpList.add("192.168.220.189:1234");
+
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultIpList);
+
+        Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultIpList.get(0))).thenReturn("0.02,0.23,0.03,2020-05-08 11:24:14,2020-05-08 14:22:24");
+    }
 
     /**
      *  query worker group paging
      */
     @Test
-    public  void testQueryAllGroupPaging(){
-
+    public void testQueryAllGroupPaging(){
         User user = new User();
         // general user add
-        user.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
-        logger.info(result.toString());
-        Assert.assertEquals((String) result.get(Constants.MSG), Status.USER_NO_OPERATION_PERM.getMsg());
+        user.setUserType(UserType.ADMIN_USER);
+        Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, null);
+        PageInfo<WorkerGroup> pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
+        Assert.assertEquals(pageInfo.getLists().size(),1);
     }
 
 
     @Test
     public void testQueryAllGroup() throws Exception {
-        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
-        zookeeperConfig.setDsRoot("/ds");
-        Mockito.when(zookeeperCachedOperator.getZookeeperConfig()).thenReturn(zookeeperConfig);
-        List<String> workerGroupStrList = new ArrayList<>();
-        workerGroupStrList.add("workerGroup1");
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(Mockito.anyString())).thenReturn(workerGroupStrList);
-
         Map<String, Object> result = workerGroupService.queryAllGroup();
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
+        Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
+        Assert.assertEquals(workerGroups.size(), 1);
     }
 
 
@@ -99,24 +114,5 @@ public class WorkerGroupServiceTest {
         processInstances.add(new ProcessInstance());
         return processInstances;
     }
-    /**
-     * get Group
-     * @return
-     */
-    private WorkerGroup getWorkerGroup(int id){
-        WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setName(groupName);
-        return workerGroup;
-    }
-    private WorkerGroup getWorkerGroup(){
-
-        return getWorkerGroup(1);
-    }
-
-   private List<WorkerGroup> getList(){
-        List<WorkerGroup> list = new ArrayList<>();
-        list.add(getWorkerGroup());
-        return list;
-   }
 
 }

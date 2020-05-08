@@ -115,7 +115,6 @@ public class WorkerGroupService extends BaseService {
 
         List<WorkerGroup> workerGroups = getWorkerGroups(false);
 
-
         Set<String> availableWorkerGroupSet = workerGroups.stream()
                 .map(workerGroup -> workerGroup.getName())
                 .collect(Collectors.toSet());
@@ -145,17 +144,15 @@ public class WorkerGroupService extends BaseService {
             List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
             if (CollectionUtils.isNotEmpty(childrenNodes)){
                 availableWorkerGroupList.add(workerGroup);
-
+                WorkerGroup wg = new WorkerGroup();
+                wg.setName(workerGroup);
                 if (isPaging){
-                    WorkerGroup wg = new WorkerGroup();
-                    wg.setName(workerGroup);
                     wg.setIpList(childrenNodes);
                     String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
                     wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[3]));
                     wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[4]));
-
-                    workerGroups.add(wg);
                 }
+                workerGroups.add(wg);
             }
         }
         return workerGroups;
