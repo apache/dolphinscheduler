@@ -17,10 +17,10 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ import java.util.List;
  *	monitor zookeeper info
  */
 @Component
-public class ZookeeperMonitor extends AbstractZKClient{
+public class ZookeeperMonitor extends AbstractZKClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
 
@@ -88,9 +88,9 @@ public class ZookeeperMonitor extends AbstractZKClient{
 				long sent = state.getSent();
 				long received = state.getReceived();
 				String mode =  state.getMode();
-				int minLatency =  state.getMinLatency();
-				int avgLatency = state.getAvgLatency();
-				int maxLatency = state.getMaxLatency();
+				float minLatency =  state.getMinLatency();
+				float avgLatency = state.getAvgLatency();
+				float maxLatency = state.getMaxLatency();
 				int nodeCount = state.getNodeCount();
 				int status = ok ? 1 : 0;
 				Date date = new Date();

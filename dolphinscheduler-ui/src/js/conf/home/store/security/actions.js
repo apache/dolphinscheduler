@@ -25,7 +25,7 @@ export default {
    * @param tenant/verifyTenantCode
    */
   verifyName ({ state }, payload) {
-    let o = {
+    const o = {
       user: {
         param: {
           userName: payload.userName
@@ -47,7 +47,7 @@ export default {
     }
 
     return new Promise((resolve, reject) => {
-      io.get(o[payload.type]['api'], o[payload.type]['param'], res => {
+      io.get(o[payload.type].api, o[payload.type].param, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -64,7 +64,7 @@ export default {
    */
   createUser ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`users/create`, payload, res => {
+      io.post('users/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -77,7 +77,7 @@ export default {
    */
   verifyUserName ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`users/verify-user-name`, payload, res => {
+      io.post('users/verify-user-name', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -92,7 +92,7 @@ export default {
    */
   getUsersListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`users/list-paging`, payload, res => {
+      io.get('users/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -104,7 +104,7 @@ export default {
    */
   getUsersList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`users/list`, payload, res => {
+      io.get('users/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -116,7 +116,7 @@ export default {
    */
   getUsersAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`users/list-all`, payload, res => {
+      io.get('users/list-all', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -134,7 +134,7 @@ export default {
    */
   updateUser ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`users/update`, payload, res => {
+      io.post('users/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -147,7 +147,7 @@ export default {
    */
   deleteUser ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`users/delete`, payload, res => {
+      io.post('users/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -158,12 +158,12 @@ export default {
    * Obtain authorized and unauthorized items
    */
   getAuthList ({ state }, payload) {
-    let o = {
+    const o = {
       type: payload.type,
       category: payload.category
     }
 
-    let param = {}
+    const param = {}
     // Manage user
     if (o.type === 'user') {
       param.alertgroupId = payload.id
@@ -174,6 +174,45 @@ export default {
     // Authorized project
     const p1 = new Promise((resolve, reject) => {
       io.get(`${o.category}/unauth-${o.type}`, param, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+    // Unauthorized project
+    const p2 = new Promise((resolve, reject) => {
+      io.get(`${o.category}/authed-${o.type}`, param, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+    return new Promise((resolve, reject) => {
+      Promise.all([p1, p2]).then(a => {
+        resolve(a)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  getResourceList ({ state }, payload) {
+    const o = {
+      type: payload.type,
+      category: payload.category
+    }
+
+    const param = {}
+    // Manage user
+    if (o.type === 'user') {
+      param.alertgroupId = payload.id
+    } else {
+      param.userId = payload.id
+    }
+
+    // Authorized project
+    const p1 = new Promise((resolve, reject) => {
+      io.get(`${o.category}/authorize-resource-tree`, param, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -215,7 +254,7 @@ export default {
    */
   getUsersDetails ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`users/select-by-id`, payload, res => {
+      io.post('users/select-by-id', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -227,7 +266,7 @@ export default {
    */
   getTenantListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`tenant/list-paging`, payload, res => {
+      io.get('tenant/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -239,8 +278,8 @@ export default {
    */
   getTenantList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`tenant/list`, payload, res => {
-        let list=res.data
+      io.get('tenant/list', payload, res => {
+        const list = res.data
         list.unshift({
           id: -1,
           tenantName: 'Default'
@@ -257,7 +296,7 @@ export default {
    */
   getQueueList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`queue/list`, payload, res => {
+      io.get('queue/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -269,7 +308,7 @@ export default {
    */
   createQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`tenant/create`, payload, res => {
+      io.post('tenant/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -281,7 +320,7 @@ export default {
    */
   updateQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`tenant/update`, payload, res => {
+      io.post('tenant/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -293,7 +332,7 @@ export default {
    */
   deleteQueue ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`tenant/delete`, payload, res => {
+      io.post('tenant/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -305,7 +344,7 @@ export default {
    */
   getAlertgroupP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`alert-group/list-paging`, payload, res => {
+      io.get('alert-group/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -317,7 +356,7 @@ export default {
    */
   getAlertgroup ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`alert-group/list`, payload, res => {
+      io.get('alert-group/list', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -329,7 +368,7 @@ export default {
    */
   createAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`alert-group/create`, payload, res => {
+      io.post('alert-group/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -341,7 +380,7 @@ export default {
    */
   updateAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`alert-group/update`, payload, res => {
+      io.post('alert-group/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -353,7 +392,7 @@ export default {
    */
   deleteAlertgrou ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`alert-group/delete`, payload, res => {
+      io.post('alert-group/delete', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -365,7 +404,7 @@ export default {
    */
   getProcessMasterList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`process/master/list`, payload, res => {
+      io.get('process/master/list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -377,7 +416,7 @@ export default {
    */
   getProcessWorkerList ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`process/worker/list`, payload, res => {
+      io.get('process/worker/list', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -389,7 +428,7 @@ export default {
    */
   getQueueListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`queue/list-paging`, payload, res => {
+      io.get('queue/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -401,7 +440,7 @@ export default {
    */
   createQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`queue/create`, payload, res => {
+      io.post('queue/create', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -413,7 +452,7 @@ export default {
    */
   updateQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`queue/update`, payload, res => {
+      io.post('queue/update', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -425,7 +464,7 @@ export default {
    */
   verifyQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`queue/verify-queue`, payload, res => {
+      io.post('queue/verify-queue', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -437,7 +476,7 @@ export default {
    */
   getWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`worker-group/list-paging`, payload, res => {
+      io.get('worker-group/list-paging', payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -449,12 +488,21 @@ export default {
    */
   getWorkerGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`worker-group/all-groups`, payload, res => {
+      io.get('worker-group/all-groups', payload, res => {
         let list = res.data
-        list.unshift({
-          id: -1,
-          name: 'Default'
-        })
+        if (list.length > 0) {
+          list = list.map(item => {
+            return {
+              id: item,
+              name: item
+            }
+          })
+        } else {
+          list.unshift({
+            id: 'default',
+            name: 'default'
+          })
+        }
         state.workerGroupsListAll = list
         resolve(list)
       }).catch(e => {
@@ -464,7 +512,7 @@ export default {
   },
   saveWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.post(`worker-group/save`, payload, res => {
+      io.post('worker-group/save', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -473,7 +521,7 @@ export default {
   },
   deleteWorkerGroups ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`worker-group/delete-by-id`, payload, res => {
+      io.get('worker-group/delete-by-id', payload, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

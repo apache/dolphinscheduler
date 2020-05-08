@@ -30,12 +30,12 @@
                 :value="[searchParams.startDate,searchParams.endDate]"
                 :panelNum="2">
           <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
-            <i slot="suffix"
+            <em slot="suffix"
                @click.stop="_dateEmpty()"
                class="ans-icon-fail-solid"
                v-show="value"
                style="font-size: 13px;cursor: pointer;margin-top: 1px;">
-            </i>
+            </em>
           </x-input>
         </x-datepicker>
       </div>
@@ -52,10 +52,13 @@
         </x-select>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.host" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
+        <x-input v-model.trim="searchParams.host" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
+        <x-input v-model.trim="searchParams.executorName" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('Executor')"></x-input>
+      </div>
+      <div class="list">
+        <x-input v-model.trim="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
       </div>
     </template>
   </m-conditions>
@@ -80,7 +83,9 @@
           // search value
           searchVal: '',
           // host
-          host: ''
+          host: '',
+          // executor name
+          executorName: ''
         }
       }
     },

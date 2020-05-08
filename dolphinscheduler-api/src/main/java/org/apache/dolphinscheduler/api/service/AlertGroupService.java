@@ -16,30 +16,24 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.*;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * alert group service
@@ -53,8 +47,7 @@ public class AlertGroupService extends BaseService{
     private AlertGroupMapper alertGroupMapper;
 
     @Autowired
-    private UserAlertGroupMapper userAlertGroupMapper;
-
+    private UserAlertGroupService userAlertGroupService;
     /**
      * query alert group list
      *
@@ -123,7 +116,7 @@ public class AlertGroupService extends BaseService{
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
 
-        // insert 
+        // insert
         int insert = alertGroupMapper.insert(alertGroup);
 
         if (insert > 0) {
@@ -200,7 +193,7 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
-        userAlertGroupMapper.deleteByAlertgroupId(id);
+        userAlertGroupService.deleteByAlertGroupId(id);
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -224,22 +217,26 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
-        userAlertGroupMapper.deleteByAlertgroupId(alertgroupId);
+        userAlertGroupService.deleteByAlertGroupId(alertgroupId);
         if (StringUtils.isEmpty(userIds)) {
             putMsg(result, Status.SUCCESS);
             return result;
         }
 
         String[] userIdsArr = userIds.split(",");
-
+        Date now = new Date();
+        List<UserAlertGroup> alertGroups = new ArrayList<>(userIds.length());
         for (String userId : userIdsArr) {
-            Date now = new Date();
             UserAlertGroup userAlertGroup = new UserAlertGroup();
             userAlertGroup.setAlertgroupId(alertgroupId);
             userAlertGroup.setUserId(Integer.parseInt(userId));
             userAlertGroup.setCreateTime(now);
             userAlertGroup.setUpdateTime(now);
-            userAlertGroupMapper.insert(userAlertGroup);
+            alertGroups.add(userAlertGroup);
+        }
+
+        if (CollectionUtils.isNotEmpty(alertGroups)) {
+            userAlertGroupService.saveBatch(alertGroups);
         }
 
         putMsg(result, Status.SUCCESS);
@@ -249,22 +246,11 @@ public class AlertGroupService extends BaseService{
     /**
      * verify group name exists
      *
-     * @param loginUser login user
      * @param groupName group name
      * @return check result code
      */
-    public Result verifyGroupName(User loginUser, String groupName) {
-        Result result = new Result();
+    public boolean existGroupName(String groupName) {
         List<AlertGroup> alertGroup = alertGroupMapper.queryByGroupName(groupName);
-        if (alertGroup != null && alertGroup.size() > 0) {
-            logger.error("group {} has exist, can't create again.", groupName);
-            result.setCode(Status.ALERT_GROUP_EXIST.getCode());
-            result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
-        } else {
-            result.setCode(Status.SUCCESS.getCode());
-            result.setMsg(Status.SUCCESS.getMsg());
-        }
-
-        return result;
+        return CollectionUtils.isNotEmpty(alertGroup);
     }
 }

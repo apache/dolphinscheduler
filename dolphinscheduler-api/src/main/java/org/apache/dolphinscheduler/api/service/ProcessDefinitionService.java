@@ -16,10 +16,21 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.utils.CheckUtils;
+import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.exportprocess.ProcessAddTaskParam;
+import org.apache.dolphinscheduler.api.utils.exportprocess.TaskNodeParamFactory;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -27,21 +38,14 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.dolphinscheduler.api.utils.CheckUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.service.permission.PermissionCheck;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +57,11 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID;
 
@@ -90,10 +94,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProcessDao processDao;
-
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private ProcessService processService;
 
     @Autowired
     private WorkerGroupMapper workerGroupMapper;
@@ -111,8 +112,13 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
-    public Map<String, Object> createProcessDefinition(User loginUser, String projectName, String name,
-                                                       String processDefinitionJson, String desc, String locations, String connects) throws JsonProcessingException {
+    public Map<String, Object> createProcessDefinition(User loginUser,
+                                                       String projectName,
+                                                       String name,
+                                                       String processDefinitionJson,
+                                                       String desc,
+                                                       String locations,
+                                                       String connects) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -142,10 +148,12 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
+        processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(globalParamsList)) {
             Set<Property> globalParamsSet = new HashSet<>(globalParamsList);
             globalParamsList = new ArrayList<>(globalParamsSet);
             processDefine.setGlobalParamList(globalParamsList);
@@ -159,15 +167,42 @@ public class ProcessDefinitionService extends BaseDAGService {
         return result;
     }
 
+    /**
+     * get resource ids
+     * @param processData process data
+     * @return resource ids
+     */
+    private String getResourceIds(ProcessData processData) {
+        List<TaskNode> tasks = processData.getTasks();
+        Set<Integer> resourceIds = new HashSet<>();
+        for(TaskNode taskNode : tasks){
+            String taskParameter = taskNode.getParams();
+            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
+            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
+                resourceIds.addAll(tempSet);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int i : resourceIds) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(i);
+        }
+        return sb.toString();
+    }
+
 
     /**
-     * query proccess definition list
+     * query process definition list
      *
      * @param loginUser login user
      * @param projectName project name
      * @return definition list
      */
-    public Map<String, Object> queryProccessDefinitionList(User loginUser, String projectName) {
+    public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -187,7 +222,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition list paging
+     * query process definition list paging
      *
      * @param loginUser login user
      * @param projectName project name
@@ -229,7 +264,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processId process definition id
      * @return process definition detail
      */
-    public Map<String, Object> queryProccessDefinitionById(User loginUser, String projectName, Integer processId) {
+    public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
 
 
         Map<String, Object> result = new HashMap<>(5);
@@ -249,6 +284,41 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         }
         return result;
+    }
+
+    /**
+     * copy process definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return copy result code
+     */
+    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException{
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        } else {
+           return createProcessDefinition(
+                   loginUser,
+                   projectName,
+                   processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
+                   processDefinition.getProcessDefinitionJson(),
+                   processDefinition.getDescription(),
+                   processDefinition.getLocations(),
+                   processDefinition.getConnects());
+        }
     }
 
     /**
@@ -281,20 +351,19 @@ public class ProcessDefinitionService extends BaseDAGService {
         if ((checkProcessJson.get(Constants.STATUS) != Status.SUCCESS)) {
             return checkProcessJson;
         }
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(id);
-        if (processDefinition == null) {
+        ProcessDefinition processDefine = processService.findProcessDefineById(id);
+        if (processDefine == null) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
             return result;
-        } else if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+        } else if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
-            putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefinition.getName());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefine.getName());
             return result;
         } else {
             putMsg(result, Status.SUCCESS);
         }
 
-        ProcessDefinition processDefine = processDao.findProcessDefineById(id);
         Date now = new Date();
 
         processDefine.setId(id);
@@ -307,10 +376,12 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
+        processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
-        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
+        if (CollectionUtils.isNotEmpty(processData.getGlobalParams())) {
             Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
         }
@@ -334,7 +405,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param name name
      * @return true if process definition name not exists, otherwise false
      */
-    public Map<String, Object> verifyProccessDefinitionName(User loginUser, String projectName, String name) {
+    public Map<String, Object> verifyProcessDefinitionName(User loginUser, String projectName, String name) {
 
         Map<String, Object> result = new HashMap<>();
             Project project = projectMapper.queryByName(projectName);
@@ -439,15 +510,35 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         ReleaseState state = ReleaseState.getEnum(releaseState);
+
+        // check state
+        if (null == state) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
+            return result;
+        }
+
         ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
         switch (state) {
-            case ONLINE: {
+            case ONLINE:
+                // To check resources whether they are already cancel authorized or deleted
+                String resourceIds = processDefinition.getResourceIds();
+                if (StringUtils.isNotBlank(resourceIds)) {
+                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resourceIdArray,loginUser.getId(),logger);
+                    try {
+                        permissionCheck.checkPermission();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(),e);
+                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION, "releaseState");
+                        return result;
+                    }
+                }
+
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 break;
-            }
-            case OFFLINE: {
+            case OFFLINE:
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
@@ -455,18 +546,16 @@ public class ProcessDefinitionService extends BaseDAGService {
                 );
 
                 for(Schedule schedule:scheduleList){
-                    logger.info("set schedule offline, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
+                    logger.info("set schedule offline, project id: {}, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.updateById(schedule);
                     SchedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
-            }
-            default: {
+            default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
                 return result;
-            }
         }
 
         putMsg(result, Status.SUCCESS);
@@ -474,290 +563,522 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
-     * export process definition by id
-     *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionId process definition id
-     * @param response response
+     * batch export process definition by ids
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @param response
      */
-    public void exportProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId, HttpServletResponse response) {
+    public void batchExportProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds, HttpServletResponse response){
+
+        if(StringUtils.isEmpty(processDefinitionIds)){
+            return;
+        }
+
+        //export project info
         Project project = projectMapper.queryByName(projectName);
 
+        //check user access for project
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus == Status.SUCCESS) {
+
+        if(resultStatus != Status.SUCCESS){
+            return;
+        }
+
+        List<ProcessMeta> processDefinitionList =
+                getProcessDefinitionList(processDefinitionIds);
+
+        if(CollectionUtils.isNotEmpty(processDefinitionList)){
+            downloadProcessDefinitionFile(response, processDefinitionList);
+        }
+    }
+
+    /**
+     * get process definition list by ids
+     * @param processDefinitionIds
+     * @return
+     */
+    private List<ProcessMeta> getProcessDefinitionList(String processDefinitionIds){
+        List<ProcessMeta> processDefinitionList = new ArrayList<>();
+        String[] processDefinitionIdArray = processDefinitionIds.split(",");
+        for (String strProcessDefinitionId : processDefinitionIdArray) {
+            //get workflow info
+            int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
             ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
-            if (processDefinition != null) {
-                JSONObject jsonObject = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson());
-                JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONObject taskNode = jsonArray.getJSONObject(i);
-                    if (taskNode.get("type") != null && taskNode.get("type") != "") {
-                        String taskType = taskNode.getString("type");
-                        if(taskType.equals(TaskType.SQL.name())  || taskType.equals(TaskType.PROCEDURE.name())){
-                            JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-                            DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
-                            if (dataSource != null) {
-                                sqlParameters.put("datasourceName", dataSource.getName());
-                            }
-                            taskNode.put("params", sqlParameters);
-                        }else if(taskType.equals(TaskType.DEPENDENT.name())){
-                            JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
-                            if(dependentParameters != null){
-                                JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
-                                for (int j = 0; j < dependTaskList.size(); j++) {
-                                    JSONObject dependentTaskModel = dependTaskList.getJSONObject(j);
-                                    JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
-                                    for (int k = 0; k < dependItemList.size(); k++) {
-                                        JSONObject dependentItem = dependItemList.getJSONObject(k);
-                                        int definitionId = dependentItem.getInteger("definitionId");
-                                        ProcessDefinition definition = processDefineMapper.queryByDefineId(definitionId);
-                                        if(definition != null){
-                                            dependentItem.put("projectName",definition.getProjectName());
-                                            dependentItem.put("definitionName",definition.getName());
-                                        }
-                                    }
-                                }
-                                taskNode.put("dependence", dependentParameters);
-                            }
-                        }
-                    }
-                }
-                jsonObject.put("tasks", jsonArray);
-                processDefinition.setProcessDefinitionJson(jsonObject.toString());
+            if (null != processDefinition) {
+                processDefinitionList.add(exportProcessMetaData(processDefinitionId, processDefinition));
+            }
+        }
 
-                Map<String, Object> row = new LinkedHashMap<>();
-                row.put("projectName", processDefinition.getProjectName());
-                row.put("processDefinitionName", processDefinition.getName());
-                row.put("processDefinitionJson", processDefinition.getProcessDefinitionJson());
-                row.put("processDefinitionDescription", processDefinition.getDescription());
-                row.put("processDefinitionLocations", processDefinition.getLocations());
-                row.put("processDefinitionConnects", processDefinition.getConnects());
+        return processDefinitionList;
+    }
 
-                List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
-                if (schedules.size() > 0) {
-                    Schedule schedule = schedules.get(0);
-                    row.put("scheduleWarningType", schedule.getWarningType());
-                    row.put("scheduleWarningGroupId", schedule.getWarningGroupId());
-                    row.put("scheduleStartTime", DateUtils.dateToString(schedule.getStartTime()));
-                    row.put("scheduleEndTime", DateUtils.dateToString(schedule.getEndTime()));
-                    row.put("scheduleCrontab", schedule.getCrontab());
-                    row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
-                    row.put("scheduleReleaseState", ReleaseState.OFFLINE);
-                    row.put("scheduleProcessInstancePriority", schedule.getProcessInstancePriority());
-                    if(schedule.getId() == -1){
-                        row.put("scheduleWorkerGroupId", -1);
-                    }else{
-                        WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
-                        if(workerGroup != null){
-                            row.put("scheduleWorkerGroupName", workerGroup.getName());
-                        }
-                    }
-
-                }
-                String rowsJson = JSONUtils.toJsonString(row);
-                response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                response.setHeader("Content-Disposition", "attachment;filename="+processDefinition.getName()+".json");
-                BufferedOutputStream buff = null;
-                ServletOutputStream out = null;
+    /**
+     * download the process definition file
+     * @param response
+     * @param processDefinitionList
+     */
+    private void downloadProcessDefinitionFile(HttpServletResponse response, List<ProcessMeta> processDefinitionList) {
+        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        BufferedOutputStream buff = null;
+        ServletOutputStream out = null;
+        try {
+            out = response.getOutputStream();
+            buff = new BufferedOutputStream(out);
+            buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+            buff.flush();
+            buff.close();
+        } catch (IOException e) {
+            logger.warn("export process fail", e);
+        }finally {
+            if (null != buff) {
                 try {
-                    out = response.getOutputStream();
-                    buff = new BufferedOutputStream(out);
-                    buff.write(rowsJson.getBytes("UTF-8"));
-                    buff.flush();
                     buff.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }finally {
-                    try {
-                        buff.close();
-                        out.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    logger.warn("export process buffer not close", e);
+                }
+            }
+            if (null != out) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                    logger.warn("export process output stream not close", e);
                 }
             }
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file) {
-        Map<String, Object> result = new HashMap<>(5);
+    /**
+     * get export process metadata string
+     * @param processDefinitionId process definition id
+     * @param processDefinition process definition
+     * @return export process metadata string
+     */
+    public String exportProcessMetaDataStr(Integer processDefinitionId, ProcessDefinition processDefinition) {
+        //create workflow json file
+        return JSONUtils.toJsonString(exportProcessMetaData(processDefinitionId,processDefinition));
+    }
 
-        JSONObject json = null;
-        try(InputStreamReader inputStreamReader = new InputStreamReader( file.getInputStream(), "UTF-8" )) {
-            BufferedReader streamReader = new BufferedReader(inputStreamReader);
-            StringBuilder respomseStrBuilder = new StringBuilder();
-            String inputStr = "";
-            while ((inputStr = streamReader.readLine())!= null){
-                respomseStrBuilder.append( inputStr );
+    /**
+     * get export process metadata string
+     * @param processDefinitionId process definition id
+     * @param processDefinition process definition
+     * @return export process metadata string
+     */
+    public ProcessMeta exportProcessMetaData(Integer processDefinitionId, ProcessDefinition processDefinition) {
+        //correct task param which has data source or dependent param
+        String correctProcessDefinitionJson = addExportTaskNodeSpecialParam(processDefinition.getProcessDefinitionJson());
+        processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
+
+        //export process metadata
+        ProcessMeta exportProcessMeta = new ProcessMeta();
+        exportProcessMeta.setProjectName(processDefinition.getProjectName());
+        exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
+        exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+        exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
+        exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
+
+        //schedule info
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        if (!schedules.isEmpty()) {
+            Schedule schedule = schedules.get(0);
+            exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
+            exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
+            exportProcessMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
+            exportProcessMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
+            exportProcessMeta.setScheduleCrontab(schedule.getCrontab());
+            exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
+            exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
+            exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
+            exportProcessMeta.setScheduleWorkerGroupName(schedule.getWorkerGroup());
+        }
+        //create workflow json file
+        return exportProcessMeta;
+    }
+
+    /**
+     * correct task param which has datasource or dependent
+     * @param processDefinitionJson processDefinitionJson
+     * @return correct processDefinitionJson
+     */
+    public String addExportTaskNodeSpecialParam(String processDefinitionJson) {
+        JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
+        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject taskNode = jsonArray.getJSONObject(i);
+            if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
+                String taskType = taskNode.getString("type");
+
+                ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+                if (null != addTaskParam) {
+                    addTaskParam.addExportSpecialParam(taskNode);
+                }
             }
-            json = JSONObject.parseObject( respomseStrBuilder.toString() );
-            if(json != null){
-                String projectName = null;
-                String processDefinitionName = null;
-                String processDefinitionJson = null;
-                String processDefinitionDesc = null;
-                String processDefinitionLocations = null;
-                String processDefinitionConnects = null;
+        }
+        jsonObject.put("tasks", jsonArray);
+        return jsonObject.toString();
+    }
 
-                String scheduleWarningType = null;
-                String scheduleWarningGroupId = null;
-                String scheduleStartTime = null;
-                String scheduleEndTime = null;
-                String scheduleCrontab = null;
-                String scheduleFailureStrategy = null;
-                String scheduleReleaseState = null;
-                String scheduleProcessInstancePriority = null;
-                String scheduleWorkerGroupId = null;
-                String scheduleWorkerGroupName = null;
+    /**
+     * check task if has sub process
+     * @param taskType task type
+     * @return if task has sub process return true else false
+     */
+    private boolean checkTaskHasSubProcess(String taskType) {
+        return taskType.equals(TaskType.SUB_PROCESS.name());
+    }
 
-                if (ObjectUtils.allNotNull(json.get("projectName"))) {
-                    projectName = json.get("projectName").toString();
-                } else {
-                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
-                    return result;
-                }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionName"))) {
-                    processDefinitionName = json.get("processDefinitionName").toString();
-                } else {
-                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
-                    return result;
-                }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionJson"))) {
-                    processDefinitionJson = json.get("processDefinitionJson").toString();
-                } else {
-                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
-                    return result;
-                }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionDescription"))) {
-                    processDefinitionDesc = json.get("processDefinitionDescription").toString();
-                }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionLocations"))) {
-                    processDefinitionLocations = json.get("processDefinitionLocations").toString();
-                }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionConnects"))) {
-                    processDefinitionConnects = json.get("processDefinitionConnects").toString();
-                }
+    /**
+     * import process definition
+     * @param loginUser login user
+     * @param file process metadata json file
+     * @param currentProjectName current project name
+     * @return import process
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
+        Map<String, Object> result = new HashMap<>(5);
+        String processMetaJson = FileUtils.file2String(file);
+        List<ProcessMeta> processMetaList = JSON.parseArray(processMetaJson,ProcessMeta.class);
 
-                Project project = projectMapper.queryByName(projectName);
-                if(project != null){
-                    processDefinitionName = recursionProcessDefinitionName(project.getId(), processDefinitionName, 1);
-                }
+        //check file content
+        if (CollectionUtils.isEmpty(processMetaList)) {
+            putMsg(result, Status.DATA_IS_NULL, "fileContent");
+            return result;
+        }
 
-                JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
-                JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
-                for (int j = 0; j < jsonArray.size(); j++) {
-                    JSONObject taskNode = jsonArray.getJSONObject(j);
-                    String taskType = taskNode.getString("type");
-                    if(taskType.equals(TaskType.SQL.name())  || taskType.equals(TaskType.PROCEDURE.name())) {
-                        JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-                        List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(sqlParameters.getString("datasourceName"));
-                        if (dataSources.size() > 0) {
-                            DataSource dataSource = dataSources.get(0);
-                            sqlParameters.put("datasource", dataSource.getId());
-                        }
-                        taskNode.put("params", sqlParameters);
-                    }else if(taskType.equals(TaskType.DEPENDENT.name())){
-                        JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
-                        if(dependentParameters != null){
-                            JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
-                            for (int h = 0; h < dependTaskList.size(); h++) {
-                                JSONObject dependentTaskModel = dependTaskList.getJSONObject(h);
-                                JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
-                                for (int k = 0; k < dependItemList.size(); k++) {
-                                    JSONObject dependentItem = dependItemList.getJSONObject(k);
-                                    Project dependentItemProject = projectMapper.queryByName(dependentItem.getString("projectName"));
-                                    if(dependentItemProject != null){
-                                        ProcessDefinition definition = processDefineMapper.queryByDefineName(dependentItemProject.getId(),dependentItem.getString("definitionName"));
-                                        if(definition != null){
-                                            dependentItem.put("projectId",dependentItemProject.getId());
-                                            dependentItem.put("definitionId",definition.getId());
-                                        }
-                                    }
-                                }
-                            }
-                            taskNode.put("dependence", dependentParameters);
-                        }
-                    }
-                }
-                jsonObject.put("tasks", jsonArray);
+        for(ProcessMeta processMeta:processMetaList){
 
-                Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,projectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
-                Integer processDefinitionId = null;
-                if (ObjectUtils.allNotNull(createProcessDefinitionResult.get("processDefinitionId"))) {
-                    processDefinitionId = Integer.parseInt(createProcessDefinitionResult.get("processDefinitionId").toString());
-                }
-                if (ObjectUtils.allNotNull(json.get("scheduleCrontab")) && processDefinitionId != null) {
-                    Date now = new Date();
-                    Schedule scheduleObj = new Schedule();
-                    scheduleObj.setProjectName(projectName);
-                    scheduleObj.setProcessDefinitionId(processDefinitionId);
-                    scheduleObj.setProcessDefinitionName(processDefinitionName);
-                    scheduleObj.setCreateTime(now);
-                    scheduleObj.setUpdateTime(now);
-                    scheduleObj.setUserId(loginUser.getId());
-                    scheduleObj.setUserName(loginUser.getUserName());
-
-
-                    scheduleCrontab = json.get("scheduleCrontab").toString();
-                    scheduleObj.setCrontab(scheduleCrontab);
-                    if (ObjectUtils.allNotNull(json.get("scheduleStartTime"))) {
-                        scheduleStartTime = json.get("scheduleStartTime").toString();
-                        scheduleObj.setStartTime(DateUtils.stringToDate(scheduleStartTime));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleEndTime"))) {
-                        scheduleEndTime = json.get("scheduleEndTime").toString();
-                        scheduleObj.setEndTime(DateUtils.stringToDate(scheduleEndTime));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleWarningType"))) {
-                        scheduleWarningType = json.get("scheduleWarningType").toString();
-                        scheduleObj.setWarningType(WarningType.valueOf(scheduleWarningType));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleWarningGroupId"))) {
-                        scheduleWarningGroupId = json.get("scheduleWarningGroupId").toString();
-                        scheduleObj.setWarningGroupId(Integer.parseInt(scheduleWarningGroupId));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleFailureStrategy"))) {
-                        scheduleFailureStrategy = json.get("scheduleFailureStrategy").toString();
-                        scheduleObj.setFailureStrategy(FailureStrategy.valueOf(scheduleFailureStrategy));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleReleaseState"))) {
-                        scheduleReleaseState = json.get("scheduleReleaseState").toString();
-                        scheduleObj.setReleaseState(ReleaseState.valueOf(scheduleReleaseState));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleProcessInstancePriority"))) {
-                        scheduleProcessInstancePriority = json.get("scheduleProcessInstancePriority").toString();
-                        scheduleObj.setProcessInstancePriority(Priority.valueOf(scheduleProcessInstancePriority));
-                    }
-                    if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupId"))) {
-                        scheduleWorkerGroupId = json.get("scheduleWorkerGroupId").toString();
-                        if(scheduleWorkerGroupId != null){
-                            scheduleObj.setWorkerGroupId(Integer.parseInt(scheduleWorkerGroupId));
-                        }else{
-                            if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupName"))) {
-                                scheduleWorkerGroupName = json.get("scheduleWorkerGroupName").toString();
-                                List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(scheduleWorkerGroupName);
-                                if(workerGroups.size() > 0){
-                                    scheduleObj.setWorkerGroupId(workerGroups.get(0).getId());
-                                }
-                            }
-                        }
-                    }
-                    scheduleMapper.insert(scheduleObj);
-                }
-            }else{
-                putMsg(result, Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR);
+            if (!checkAndImportProcessDefinition(loginUser, currentProjectName, result, processMeta)){
                 return result;
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
         }
-        putMsg(result, Status.SUCCESS);
+
         return result;
     }
 
+    /**
+     * check and import process definition
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @return
+     */
+    private boolean checkAndImportProcessDefinition(User loginUser, String currentProjectName, Map<String, Object> result, ProcessMeta processMeta) {
+
+        if(!checkImportanceParams(processMeta,result)){
+            return false;
+        }
+
+        //deal with process name
+        String processDefinitionName = processMeta.getProcessDefinitionName();
+        //use currentProjectName to query
+        Project targetProject = projectMapper.queryByName(currentProjectName);
+        if(null != targetProject){
+            processDefinitionName = recursionProcessDefinitionName(targetProject.getId(),
+                    processDefinitionName, 1);
+        }
+
+        //unique check
+        Map<String, Object> checkResult = verifyProcessDefinitionName(loginUser, currentProjectName, processDefinitionName);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (Status.SUCCESS.equals(status)) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            result.putAll(checkResult);
+            return false;
+        }
+
+        // get create process result
+        Map<String, Object> createProcessResult =
+                getCreateProcessResult(loginUser,
+                        currentProjectName,
+                        result,
+                        processMeta,
+                        processDefinitionName,
+                        addImportTaskNodeParam(loginUser, processMeta.getProcessDefinitionJson(), targetProject));
+
+        if(createProcessResult == null){
+            return false;
+        }
+
+        //create process definition
+        Integer processDefinitionId =
+                Objects.isNull(createProcessResult.get("processDefinitionId"))?
+                        null:Integer.parseInt(createProcessResult.get("processDefinitionId").toString());
+
+        //scheduler param
+        return getImportProcessScheduleResult(loginUser,
+                currentProjectName,
+                result,
+                processMeta,
+                processDefinitionName,
+                processDefinitionId);
+
+    }
+
+    /**
+     * get create process result
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @param processDefinitionName
+     * @param importProcessParam
+     * @return
+     */
+    private Map<String, Object> getCreateProcessResult(User loginUser,
+                                                       String currentProjectName,
+                                                       Map<String, Object> result,
+                                                       ProcessMeta processMeta,
+                                                       String processDefinitionName,
+                                                       String importProcessParam){
+        Map<String, Object> createProcessResult = null;
+        try {
+            createProcessResult = createProcessDefinition(loginUser
+                    ,currentProjectName,
+                    processDefinitionName+"_import_"+System.currentTimeMillis(),
+                    importProcessParam,
+                    processMeta.getProcessDefinitionDescription(),
+                    processMeta.getProcessDefinitionLocations(),
+                    processMeta.getProcessDefinitionConnects());
+            putMsg(result, Status.SUCCESS);
+        } catch (JsonProcessingException e) {
+            logger.error("import process meta json data: {}", e.getMessage(), e);
+            putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+        }
+
+        return createProcessResult;
+    }
+
+    /**
+     * get import process schedule result
+     * @param loginUser
+     * @param currentProjectName
+     * @param result
+     * @param processMeta
+     * @param processDefinitionName
+     * @param processDefinitionId
+     * @return
+     */
+    private boolean getImportProcessScheduleResult(User loginUser,
+                                                   String currentProjectName,
+                                                   Map<String, Object> result,
+                                                   ProcessMeta processMeta,
+                                                   String processDefinitionName,
+                                                   Integer processDefinitionId) {
+        if (null != processMeta.getScheduleCrontab() && null != processDefinitionId) {
+            int scheduleInsert = importProcessSchedule(loginUser,
+                    currentProjectName,
+                    processMeta,
+                    processDefinitionName,
+                    processDefinitionId);
+
+            if (0 == scheduleInsert) {
+                putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * check importance params
+     * @param processMeta
+     * @param result
+     * @return
+     */
+    private boolean checkImportanceParams(ProcessMeta processMeta,Map<String, Object> result){
+        if (StringUtils.isEmpty(processMeta.getProjectName())) {
+            putMsg(result, Status.DATA_IS_NULL, "projectName");
+            return false;
+        }
+        if (StringUtils.isEmpty(processMeta.getProcessDefinitionName())) {
+            putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
+            return false;
+        }
+        if (StringUtils.isEmpty(processMeta.getProcessDefinitionJson())) {
+            putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * import process add special task param
+     * @param loginUser login user
+     * @param processDefinitionJson process definition json
+     * @param targetProject target project
+     * @return import process param
+     */
+    private String addImportTaskNodeParam(User loginUser, String processDefinitionJson, Project targetProject) {
+        JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
+        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+        //add sql and dependent param
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject taskNode = jsonArray.getJSONObject(i);
+            String taskType = taskNode.getString("type");
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+            if (null != addTaskParam) {
+                addTaskParam.addImportSpecialParam(taskNode);
+            }
+        }
+
+        //recursive sub-process parameter correction map key for old process id value for new process id
+        Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
+
+        List<Object> subProcessList = jsonArray.stream()
+                .filter(elem -> checkTaskHasSubProcess(JSONUtils.parseObject(elem.toString()).getString("type")))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(subProcessList)) {
+            importSubProcess(loginUser, targetProject, jsonArray, subProcessIdMap);
+        }
+
+        jsonObject.put("tasks", jsonArray);
+        return jsonObject.toString();
+    }
+
+    /**
+     * import process schedule
+     * @param loginUser login user
+     * @param currentProjectName current project name
+     * @param processMeta process meta data
+     * @param processDefinitionName process definition name
+     * @param processDefinitionId process definition id
+     * @return insert schedule flag
+     */
+    public int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta,
+                                     String processDefinitionName, Integer processDefinitionId) {
+        Date now = new Date();
+        Schedule scheduleObj = new Schedule();
+        scheduleObj.setProjectName(currentProjectName);
+        scheduleObj.setProcessDefinitionId(processDefinitionId);
+        scheduleObj.setProcessDefinitionName(processDefinitionName);
+        scheduleObj.setCreateTime(now);
+        scheduleObj.setUpdateTime(now);
+        scheduleObj.setUserId(loginUser.getId());
+        scheduleObj.setUserName(loginUser.getUserName());
+
+        scheduleObj.setCrontab(processMeta.getScheduleCrontab());
+
+        if (null != processMeta.getScheduleStartTime()) {
+            scheduleObj.setStartTime(DateUtils.stringToDate(processMeta.getScheduleStartTime()));
+        }
+        if (null != processMeta.getScheduleEndTime()) {
+            scheduleObj.setEndTime(DateUtils.stringToDate(processMeta.getScheduleEndTime()));
+        }
+        if (null != processMeta.getScheduleWarningType()) {
+            scheduleObj.setWarningType(WarningType.valueOf(processMeta.getScheduleWarningType()));
+        }
+        if (null != processMeta.getScheduleWarningGroupId()) {
+            scheduleObj.setWarningGroupId(processMeta.getScheduleWarningGroupId());
+        }
+        if (null != processMeta.getScheduleFailureStrategy()) {
+            scheduleObj.setFailureStrategy(FailureStrategy.valueOf(processMeta.getScheduleFailureStrategy()));
+        }
+        if (null != processMeta.getScheduleReleaseState()) {
+            scheduleObj.setReleaseState(ReleaseState.valueOf(processMeta.getScheduleReleaseState()));
+        }
+        if (null != processMeta.getScheduleProcessInstancePriority()) {
+            scheduleObj.setProcessInstancePriority(Priority.valueOf(processMeta.getScheduleProcessInstancePriority()));
+        }
+
+        if (null != processMeta.getScheduleWorkerGroupName()) {
+            scheduleObj.setWorkerGroup(processMeta.getScheduleWorkerGroupName());
+        }
+
+        return scheduleMapper.insert(scheduleObj);
+    }
+
+    /**
+     * check import process has sub process
+     * recursion create sub process
+     * @param loginUser login user
+     * @param targetProject target project
+     * @param jsonArray process task array
+     * @param subProcessIdMap correct sub process id map
+     */
+    public void importSubProcess(User loginUser, Project targetProject, JSONArray jsonArray, Map<Integer, Integer> subProcessIdMap) {
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject taskNode = jsonArray.getJSONObject(i);
+            String taskType = taskNode.getString("type");
+
+            if (checkTaskHasSubProcess(taskType)) {
+                //get sub process info
+                JSONObject subParams = JSONUtils.parseObject(taskNode.getString("params"));
+                Integer subProcessId = subParams.getInteger("processDefinitionId");
+                ProcessDefinition subProcess = processDefineMapper.queryByDefineId(subProcessId);
+                //check is sub process exist in db
+                if (null != subProcess) {
+                    String subProcessJson = subProcess.getProcessDefinitionJson();
+                    //check current project has sub process
+                    ProcessDefinition currentProjectSubProcess = processDefineMapper.queryByDefineName(targetProject.getId(), subProcess.getName());
+
+                    if (null == currentProjectSubProcess) {
+                        JSONArray subJsonArray = (JSONArray) JSONUtils.parseObject(subProcess.getProcessDefinitionJson()).get("tasks");
+
+                        List<Object> subProcessList = subJsonArray.stream()
+                                .filter(item -> checkTaskHasSubProcess(JSONUtils.parseObject(item.toString()).getString("type")))
+                                .collect(Collectors.toList());
+
+                        if (CollectionUtils.isNotEmpty(subProcessList)) {
+                            importSubProcess(loginUser, targetProject, subJsonArray, subProcessIdMap);
+                            //sub process processId correct
+                            if (!subProcessIdMap.isEmpty()) {
+
+                                for (Map.Entry<Integer, Integer> entry : subProcessIdMap.entrySet()) {
+                                    String oldSubProcessId = "\"processDefinitionId\":" + entry.getKey();
+                                    String newSubProcessId = "\"processDefinitionId\":" + entry.getValue();
+                                    subProcessJson = subProcessJson.replaceAll(oldSubProcessId, newSubProcessId);
+                                }
+
+                                subProcessIdMap.clear();
+                            }
+                        }
+
+                        //if sub-process recursion
+                        Date now = new Date();
+                        //create sub process in target project
+                        ProcessDefinition processDefine = new ProcessDefinition();
+                        processDefine.setName(subProcess.getName());
+                        processDefine.setVersion(subProcess.getVersion());
+                        processDefine.setReleaseState(subProcess.getReleaseState());
+                        processDefine.setProjectId(targetProject.getId());
+                        processDefine.setUserId(loginUser.getId());
+                        processDefine.setProcessDefinitionJson(subProcessJson);
+                        processDefine.setDescription(subProcess.getDescription());
+                        processDefine.setLocations(subProcess.getLocations());
+                        processDefine.setConnects(subProcess.getConnects());
+                        processDefine.setTimeout(subProcess.getTimeout());
+                        processDefine.setTenantId(subProcess.getTenantId());
+                        processDefine.setGlobalParams(subProcess.getGlobalParams());
+                        processDefine.setCreateTime(now);
+                        processDefine.setUpdateTime(now);
+                        processDefine.setFlag(subProcess.getFlag());
+                        processDefine.setReceivers(subProcess.getReceivers());
+                        processDefine.setReceiversCc(subProcess.getReceiversCc());
+                        processDefineMapper.insert(processDefine);
+
+                        logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
+
+                        //modify task node
+                        ProcessDefinition newSubProcessDefine = processDefineMapper.queryByDefineName(processDefine.getProjectId(),processDefine.getName());
+
+                        if (null != newSubProcessDefine) {
+                            subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
+                            subParams.put("processDefinitionId", newSubProcessDefine.getId());
+                            taskNode.put("params", subParams);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
     /**
@@ -834,6 +1155,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
+        //process data check
+        if (null == processData) {
+            logger.error("process data is null");
+            putMsg(result,Status.DATA_IS_NOT_VALID, processDefinitionJson);
+            return result;
+        }
+
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
 
         result.put(Constants.DATA_LIST, taskNodeList);
@@ -855,14 +1183,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
-        List<String> definitionIdList = Arrays.asList(idList);
         List<Integer> idIntList = new ArrayList<>();
-        for(String definitionId : definitionIdList) {
+        for(String definitionId : idList) {
             idIntList.add(Integer.parseInt(definitionId));
         }
         Integer[] idArray = idIntList.toArray(new Integer[idIntList.size()]);
         List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(idArray);
-        if (processDefinitionList == null || processDefinitionList.size() ==0) {
+        if (CollectionUtils.isEmpty(processDefinitionList)) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);
             return result;
@@ -884,12 +1211,12 @@ public class ProcessDefinitionService extends BaseDAGService {
 
 
     /**
-     * query proccess definition all by project id
+     * query process definition all by project id
      *
      * @param projectId project id
      * @return process definitions in the project
      */
-    public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
+    public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
         HashMap<String, Object> result = new HashMap<>(5);
 
@@ -912,9 +1239,10 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> result = new HashMap<>();
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
-        if (processDefinition == null) {
+        if (null == processDefinition) {
             logger.info("process define not exists");
-            throw new RuntimeException("process define not exists");
+            putMsg(result,Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
+            return result;
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
         /**
@@ -1002,10 +1330,10 @@ public class ProcessDefinitionService extends BaseDAGService {
                     pTreeViewDto.getChildren().add(treeViewDto);
                 }
                 postNodeList = dag.getSubsequentNodes(nodeName);
-                if (postNodeList != null && postNodeList.size() > 0) {
+                if (CollectionUtils.isNotEmpty(postNodeList)) {
                     for (String nextNodeName : postNodeList) {
                         List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeName);
-                        if (treeViewDtoList != null && treeViewDtoList.size() > 0) {
+                        if (CollectionUtils.isNotEmpty(treeViewDtoList)) {
                             treeViewDtoList.add(treeViewDto);
                             waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
                         } else {
@@ -1017,7 +1345,6 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
                 runningNodeMap.remove(nodeName);
             }
-
             if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
                 break;
             } else {
@@ -1045,72 +1372,27 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        //check process data
+        if (null != processData) {
+            List<TaskNode> taskNodeList = processData.getTasks();
+            processDefinition.setGlobalParamList(processData.getGlobalParams());
+            ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
 
-        processDefinition.setGlobalParamList(processData.getGlobalParams());
-
-
-        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
-
-        // Traverse node information and build relationships
-        for (TaskNode taskNode : taskNodeList) {
-            String preTasks = taskNode.getPreTasks();
-            List<String> preTasksList = JSONUtils.toList(preTasks, String.class);
-
-            // If the dependency is not empty
-            if (preTasksList != null) {
-                for (String depNode : preTasksList) {
-                    taskNodeRelations.add(new TaskNodeRelation(depNode, taskNode.getName()));
-                }
-            }
+            // Generate concrete Dag to be executed
+            return DagHelper.buildDagGraph(processDag);
         }
 
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-
-
-        // Generate concrete Dag to be executed
-        return genDagGraph(processDag);
-
-
+        return new DAG<>();
     }
 
-    /**
-     * Generate the DAG of process
-     *
-     * @return DAG
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDag processDag) {
-        DAG<String, TaskNode, TaskNodeRelation> dag = new DAG<>();
 
-        /**
-         * Add the ndoes
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getNodes())) {
-            for (TaskNode node : processDag.getNodes()) {
-                dag.addNode(node.getName(), node);
-            }
-        }
-
-        /**
-         * Add the edges
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getEdges())) {
-            for (TaskNodeRelation edge : processDag.getEdges()) {
-                dag.addEdge(edge.getStartNode(), edge.getEndNode());
-            }
-        }
-
-        return dag;
-    }
 
 
     /**
      * whether the graph has a ring
      *
-     * @param taskNodeResponseList
-     * @return
+     * @param taskNodeResponseList task node response list
+     * @return if graph has cycle flag
      */
     private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
         DAG<String, TaskNode, String> graph = new DAG<>();
@@ -1139,7 +1421,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     private String recursionProcessDefinitionName(Integer projectId,String processDefinitionName,int num){
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(projectId, processDefinitionName);
         if (processDefinition != null) {
-            if(num>1){
+            if(num > 1){
                 String str = processDefinitionName.substring(0,processDefinitionName.length() - 3);
                 processDefinitionName = str + "("+num+")";
             }else{

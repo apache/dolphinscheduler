@@ -28,10 +28,11 @@ import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.common.utils.Preconditions.*;
 
 /**
  * monitor service
@@ -116,20 +117,10 @@ public class MonitorService extends BaseService{
   }
 
   public List<Server> getServerListFromZK(boolean isMaster){
-    List<Server> servers = new ArrayList<>();
-    ZookeeperMonitor zookeeperMonitor = null;
-    try{
-      zookeeperMonitor = new ZookeeperMonitor();
-      ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-      servers = zookeeperMonitor.getServersList(zkNodeType);
-    }catch (Exception e){
-      throw e;
-    }finally {
-      if(zookeeperMonitor != null){
-        zookeeperMonitor.close();
-      }
-    }
-    return servers;
+
+    checkNotNull(zookeeperMonitor);
+    ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
+    return zookeeperMonitor.getServersList(zkNodeType);
   }
 
 }

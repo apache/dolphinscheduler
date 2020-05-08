@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("org.apache.dolphinscheduler")
 public class RemoveZKNode implements CommandLineRunner {
 
-    private static Integer ARGS_LENGTH = 1;
+    private static final Integer ARGS_LENGTH = 1;
 
     private static final Logger logger = LoggerFactory.getLogger(RemoveZKNode.class);
 

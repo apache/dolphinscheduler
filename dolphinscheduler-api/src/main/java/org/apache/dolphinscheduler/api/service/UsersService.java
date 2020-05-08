@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -23,15 +25,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * user service
@@ -71,6 +69,9 @@ public class UsersService extends BaseService {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
 
     /**
@@ -114,6 +115,31 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        User user = createUser(userName, userPassword, email, tenantId, phone, queue);
+
+        Tenant tenant = tenantMapper.queryById(tenantId);
+        // resource upload startup
+        if (PropertyUtils.getResUploadStartupState()){
+            // if tenant not exists
+            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
+                createTenantDirIfNotExists(tenant.getTenantCode());
+            }
+            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
+            HadoopUtils.getInstance().mkdir(userPath);
+        }
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public User createUser(String userName,
+                                          String userPassword,
+                                          String email,
+                                          int tenantId,
+                                          String phone,
+                                          String queue) throws Exception {
         User user = new User();
         Date now = new Date();
 
@@ -133,21 +159,25 @@ public class UsersService extends BaseService {
 
         // save user
         userMapper.insert(user);
+        return user;
+    }
 
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()){
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
-        }
+    /**
+     * query user by id
+     * @param id id
+     * @return user info
+     */
+    public User queryUser(int id) {
+        return userMapper.selectById(id);
+    }
 
-        putMsg(result, Status.SUCCESS);
-        return result;
-
+    /**
+     * query user
+     * @param name name
+     * @return user info
+     */
+    public User queryUser(String name) {
+        return userMapper.queryByUserNameAccurately(name);
     }
 
     /**
@@ -160,6 +190,26 @@ public class UsersService extends BaseService {
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
         return userMapper.queryUserByNamePassword(name, md5);
+    }
+
+    /**
+     * get user id by user name
+     * @param name user name
+     * @return if name empty 0, user not exists -1, user exist user id
+     */
+    public int getUserIdByName(String name) {
+        //executor name query
+        int executorId = 0;
+        if (StringUtils.isNotEmpty(name)) {
+            User executor = queryUser(name);
+            if (null != executor) {
+                executorId = executor.getId();
+            } else {
+                executorId = -1;
+            }
+        }
+
+        return executorId;
     }
 
     /**
@@ -373,6 +423,7 @@ public class UsersService extends BaseService {
      * @param projectIds project id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -422,6 +473,7 @@ public class UsersService extends BaseService {
      * @param resourceIds resource id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -434,23 +486,74 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        Set<Integer> needAuthorizeResIds = new HashSet();
+        if (StringUtils.isNotBlank(resourceIds)) {
+            String[] resourceFullIdArr = resourceIds.split(",");
+            // need authorize resource id set
+            for (String resourceFullId : resourceFullIdArr) {
+                String[] resourceIdArr = resourceFullId.split("-");
+                for (int i=0;i<=resourceIdArr.length-1;i++) {
+                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                    needAuthorizeResIds.add(resourceIdValue);
+                }
+            }
+        }
+
+
+        //get the authorized resource id list by user id
+        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+
+        //get the unauthorized resource id list
+        oldAuthorizedResIds.removeAll(needAuthorizeResIds);
+
+        if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
+
+            // get all resource id of process definitions those is released
+            List<Map<String, Object>> list = processDefinitionMapper.listResources();
+            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Set<Integer> resourceIdSet = resourceProcessMap.keySet();
+
+            resourceIdSet.retainAll(oldAuthorizedResIds);
+            if (CollectionUtils.isNotEmpty(resourceIdSet)) {
+                logger.error("can't be deleted,because it is used of process definition");
+                for (Integer resId : resourceIdSet) {
+                    logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+                }
+                putMsg(result, Status.RESOURCE_IS_USED);
+                return result;
+            }
+
+        }
+
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
         }
 
-        String[] resourcesIdArr = resourceIds.split(",");
+        for (int resourceIdValue : needAuthorizeResIds) {
+            Resource resource = resourceMapper.selectById(resourceIdValue);
+            if (resource == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
 
-        for (String resourceId : resourcesIdArr) {
             Date now = new Date();
             ResourcesUser resourcesUser = new ResourcesUser();
             resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(Integer.parseInt(resourceId));
-            resourcesUser.setPerm(7);
+            resourcesUser.setResourcesId(resourceIdValue);
+            if (resource.isDirectory()) {
+                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
+            }else{
+                resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            }
+
             resourcesUser.setCreateTime(now);
             resourcesUser.setUpdateTime(now);
             resourcesUserMapper.insert(resourcesUser);
+
         }
 
         putMsg(result, Status.SUCCESS);
@@ -467,6 +570,7 @@ public class UsersService extends BaseService {
      * @param udfIds udf id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>(5);
 
@@ -513,6 +617,7 @@ public class UsersService extends BaseService {
      * @param datasourceIds  data source id array
      * @return grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);

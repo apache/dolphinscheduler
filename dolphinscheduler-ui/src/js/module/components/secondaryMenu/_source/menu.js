@@ -19,7 +19,7 @@ import i18n from '@/module/i18n'
 import config from '~/external/config'
 import Permissions from '@/module/permissions'
 
-let menu = {
+const menu = {
   projects: [
     {
       name: `${i18n.$t('Project Home')}`,
@@ -101,21 +101,21 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('Queue manage')}`,
-      id: 3,
-      path: 'queue-manage',
-      isOpen: true,
-      disabled: true,
-      icon: 'ans-icon-recycle',
-      children: []
-    },
-    {
       name: `${i18n.$t('Worker group manage')}`,
       id: 4,
       path: 'worker-groups-manage',
       isOpen: true,
       disabled: true,
       icon: 'ans-icon-diary',
+      children: []
+    },
+    {
+      name: `${i18n.$t('Queue manage')}`,
+      id: 3,
+      path: 'queue-manage',
+      isOpen: true,
+      disabled: true,
+      icon: 'ans-icon-recycle',
       children: []
     },
     {
@@ -148,13 +148,13 @@ let menu = {
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
-          path: 'resource-udf-resource',
+          path: 'resource-udf',
           id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
-          path: 'resource-udf-function',
+          path: 'resource-func',
           id: 1,
           disabled: true
         }
@@ -234,7 +234,7 @@ let menu = {
       icon: 'ans-icon-menu',
       children: [
         {
-          name: "Statistics",
+          name: 'Statistics',
           path: 'statistics',
           id: 0,
           disabled: true

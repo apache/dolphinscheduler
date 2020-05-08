@@ -474,7 +474,6 @@ The following components are provided under a MIT 2.0 license. See project link 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jul-to-slf4j 1.7.25: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j/1.7.25, MIT
-    lombok 1.18.6: https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.6, MIT
     mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
     slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
 
@@ -518,6 +517,8 @@ MIT licenses
     js-cookie 2.2.1: https://github.com/js-cookie/js-cookie MIT
     jsplumb 2.8.6: https://github.com/jsplumb/jsplumb MIT and GPLv2
     lodash 4.17.11: https://github.com/lodash/lodash MIT
+    normalize.css 8.0.1: https://github.com/necolas/normalize.css MIT
+    vue-treeselect 0.4.0: https://github.com/riophae/vue-treeselect MIT
     vue	2.5.17:	https://github.com/vuejs/vue	MIT
     vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
     vuex 3.0.0: https://github.com/vuejs/vuex MIT

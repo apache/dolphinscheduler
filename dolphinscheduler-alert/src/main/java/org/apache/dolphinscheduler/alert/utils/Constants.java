@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.alert.utils;
  * constants
  */
 public class Constants {
-
+    private Constants() {
+        throw new IllegalStateException("Constants class");
+    }
     /**
      * alert properties path
      */
@@ -115,8 +117,6 @@ public class Constants {
 
     public static final String DEVELOPMENT = "development";
 
-    public static final String CLASSPATH_MAIL_TEMPLATES_ALERT_MAIL_TEMPLATE_FTL = "classpath:mail_templates/alert_mail_template.ftl";
-
     public static final String TR = "<tr>";
 
     public static final String TD = "<td>";
@@ -133,7 +133,7 @@ public class Constants {
 
     public static final String TH_END = "</th>";
 
-    public static final int ALERT_SCAN_INTERVEL = 5000;
+    public static final int ALERT_SCAN_INTERVAL = 5000;
 
     public static final String MARKDOWN_QUOTE = ">";
 
@@ -156,4 +156,21 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
+
+    /**
+     * plugin config
+     */
+    public static final String PLUGIN_DIR = "plugin.dir";
+
+    public static final String PLUGIN_DEFAULT_EMAIL = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_EN = "email";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
+
+    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
+
+    public static final String RETMAP_MSG = "msg";
 }

@@ -20,6 +20,7 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
             <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
           </x-button-group>
@@ -27,17 +28,17 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="fileResourcesList.length">
-        <m-list :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+      <template v-if="fileResourcesList.length || total>0">
+        <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!fileResourcesList.length">
+      <template v-if="!fileResourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading">
+      <m-spin :is-spin="isLoading" :is-left="isLeft">
       </m-spin>
     </template>
   </m-list-construction>
@@ -61,11 +62,13 @@
         isLoading: false,
         fileResourcesList: [],
         searchParams: {
+          id: -1,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
           type: 'FILE'
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -89,11 +92,20 @@
         this.searchParams.pageSize = val
       },
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
-          this.fileResourcesList = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.fileResourcesList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })
@@ -101,6 +113,9 @@
       _updateList () {
         this.searchParams.pageNo = 1
         this.searchParams.searchVal = ''
+        this._debounceGET()
+      },
+       _onUpdate () {
         this._debounceGET()
       }
     },
@@ -115,6 +130,9 @@
     },
     mounted () {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }

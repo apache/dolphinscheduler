@@ -34,6 +34,8 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 public class FileUtils {
     public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
+    public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH,"/tmp/dolphinscheduler");
+
     /**
      * get file suffix
      *
@@ -44,7 +46,7 @@ public class FileUtils {
 
         String fileSuffix = "";
         if (StringUtils.isNotEmpty(filename)) {
-            int lastIndex = filename.lastIndexOf(".");
+            int lastIndex = filename.lastIndexOf('.');
             if (lastIndex > 0) {
                 fileSuffix = filename.substring(lastIndex + 1);
             }
@@ -59,7 +61,14 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        return String.format("%s/%s/%s", PropertyUtils.getString(DATA_DOWNLOAD_BASEDIR_PATH), DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -70,7 +79,13 @@ public class FileUtils {
      * @return local file path
      */
     public static String getUploadFilename(String tenantCode, String filename) {
-        return String.format("%s/%s/resources/%s", PropertyUtils.getString(DATA_BASEDIR_PATH), tenantCode, filename);
+        String fileName = String.format("%s/%s/resources/%s", DATA_BASEDIR, tenantCode, filename);
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -82,9 +97,14 @@ public class FileUtils {
      * @return directory of process execution
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
-
-        return String.format("%s/process/%s/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId),Integer.toString(taskInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -95,15 +115,21 @@ public class FileUtils {
      * @return directory of process instances
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
-        return String.format("%s/process/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixs() {
-        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS);
+        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS, RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE);
     }
 
     /**
@@ -325,10 +351,8 @@ public class FileUtils {
             }
         } else {
             File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
+            if (parent != null && !parent.mkdirs() && !parent.isDirectory()) {
                     throw new IOException("Directory '" + parent + "' could not be created");
-                }
             }
         }
         return new FileOutputStream(file, append);

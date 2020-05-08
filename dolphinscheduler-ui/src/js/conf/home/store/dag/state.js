@@ -18,7 +18,7 @@
 import localStore from '@/module/util/localStorage'
 
 // Get the name of the item currently clicked
-let projectName = localStore.getItem('projectName')
+const projectName = localStore.getItem('projectName')
 
 export default {
   // name
@@ -29,10 +29,12 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
+  // Node cache information, cache the previous input
+  cacheTasks: {},
   // Timeout alarm
   timeout: 0,
   // tenant id
-  tenantId:-1,
+  tenantId: -1,
   // Node location information
   locations: {},
   // Node-to-node connection
@@ -51,6 +53,8 @@ export default {
   projectListS: [],
   // tasks resourcesList
   resourcesListS: [],
+  // tasks resourcesListJar
+  resourcesListJar: [],
   // tasks datasource Type
   dsTypeListS: [
     {

@@ -21,6 +21,12 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        {{$t('Process Name')}}
+      </div>
+      <div style="line-height: 32px;">{{workflowName}}</div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
@@ -70,7 +76,7 @@
         {{$t('Worker group')}}
       </div>
       <div class="cont">
-        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+        <m-worker-groups v-model="workerGroup"></m-worker-groups>
       </div>
     </div>
     <div class="clearfix list">
@@ -83,8 +89,8 @@
                 v-model="warningGroupId"
                 :disabled="!notifyGroupList.length">
           <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
-            <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></i>
-            <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId"></i>
+            <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
+            <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId"></em>
           </x-input>
           <x-option
                   v-for="city in notifyGroupList"
@@ -135,7 +141,7 @@
       </div>
       <div class="clearfix list">
         <div class="text">
-          {{$t('Date')}}
+          {{$t('Schedule date')}}
         </div>
         <div class="cont">
           <x-datepicker
@@ -174,6 +180,7 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
+        workflowName: '',
         warningType: '',
         notifyGroupList: [],
         warningGroupId: '',
@@ -185,7 +192,8 @@
         receiversCc: [],
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1
+        workerGroup: 'default'
+
       }
     },
     props: {
@@ -215,7 +223,7 @@
           processInstancePriority: this.processInstancePriority,
           receivers: this.receivers.join(',') || '',
           receiversCc: this.receiversCc.join(',') || '',
-          workerGroupId: this.workerGroupId
+          workerGroup: this.workerGroup
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
@@ -267,8 +275,21 @@
     },
     created () {
       this.warningType = this.warningTypeList[0].id
+      this.workflowName = this.item.name
 
       this._getReceiver()
+      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (stateWorkerGroupsList.length) {
+        this.workerGroup = stateWorkerGroupsList[0].id
+      } else {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.$nextTick(() => {
+            if(res.length>0) {
+              this.workerGroup = res[0].id
+            }
+          })
+        })
+      }
     },
     mounted () {
       this._getNotifyGroupList().then(() => {
@@ -276,6 +297,7 @@
           this.warningGroupId = ''
         })
       })
+      this.workflowName = this.item.name
     },
     computed: {},
     components: { mEmail, mPriority, mWorkerGroups }

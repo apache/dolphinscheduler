@@ -16,19 +16,16 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * udf function
  */
-@Data
 @TableName("t_ds_udfs")
 public class UdfFunc {
     /**
@@ -189,24 +186,6 @@ public class UdfFunc {
     }
 
     @Override
-    public String toString() {
-        return "UdfFunc{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", funcName='" + funcName + '\'' +
-                ", className='" + className + '\'' +
-                ", argTypes='" + argTypes + '\'' +
-                ", database='" + database + '\'' +
-                ", description='" + description + '\'' +
-                ", resourceId=" + resourceId +
-                ", resourceName='" + resourceName + '\'' +
-                ", type=" + type +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -229,5 +208,23 @@ public class UdfFunc {
         int result = id;
         result = 31 * result + (funcName != null ? funcName.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "UdfFunc{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", funcName='" + funcName + '\'' +
+                ", className='" + className + '\'' +
+                ", argTypes='" + argTypes + '\'' +
+                ", database='" + database + '\'' +
+                ", description='" + description + '\'' +
+                ", resourceId=" + resourceId +
+                ", resourceName='" + resourceName + '\'' +
+                ", type=" + type +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

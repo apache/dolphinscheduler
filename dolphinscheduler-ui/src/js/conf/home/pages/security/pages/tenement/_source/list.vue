@@ -59,7 +59,7 @@
             </span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -135,7 +135,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
