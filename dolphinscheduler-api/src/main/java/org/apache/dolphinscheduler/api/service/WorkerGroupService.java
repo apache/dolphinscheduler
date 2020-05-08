@@ -88,8 +88,8 @@ public class WorkerGroupService extends BaseService {
                 searchValDataList = workerGroups;
             }
 
-            if (resultDataList.size() < pageSize){
-                toIndex = (pageNo - 1) * pageSize + resultDataList.size();
+            if (searchValDataList.size() < pageSize){
+                toIndex = (pageNo - 1) * pageSize + searchValDataList.size();
             }
             resultDataList = searchValDataList.subList(fromIndex, toIndex);
         }
