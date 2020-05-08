@@ -71,16 +71,6 @@ public class WorkerGroupServiceTest {
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.USER_NO_OPERATION_PERM.getMsg());
-        //success
-        user.setUserType(UserType.ADMIN_USER);
-        Page<WorkerGroup> page = new Page<>(1,10);
-        page.setRecords(getList());
-        page.setSize(1L);
-        result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        PageInfo<WorkerGroup>  pageInfo = (PageInfo<WorkerGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
 
 
@@ -96,8 +86,6 @@ public class WorkerGroupServiceTest {
         Map<String, Object> result = workerGroupService.queryAllGroup();
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        List<WorkerGroup> workerGroupList = (List<WorkerGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(workerGroupList.size()>0);
     }
 
 
