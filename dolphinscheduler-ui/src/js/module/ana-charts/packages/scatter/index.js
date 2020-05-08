@@ -120,7 +120,7 @@ export default class Scatter extends Base {
   apply () {
     const { title, series, legendData = [] } = this.options
 
-    let {
+    const {
       // Custom X axis
       xAxis,
       // Custom Y axis

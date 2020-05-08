@@ -60,8 +60,8 @@ export default class Pie extends Base {
     checkKeyInModel(data[0], textKey, dataKey)
 
     const legendData = []
-    let radius = ring ? ['50%', '70%'] : '60%'
-    let center = title ? ['50%', '60%'] : ['50%', '50%']
+    const radius = ring ? ['50%', '70%'] : '60%'
+    const center = title ? ['50%', '60%'] : ['50%', '50%']
     const series = [{
       radius: radius,
       center: center,
@@ -88,16 +88,16 @@ export default class Pie extends Base {
    * Drawing charts
    */
   apply () {
-    let { title, series, legendData } = this.options
+    const { title, series, legendData } = this.options
 
     // Injection configuration to series
-    let { insertSeries } = this.settings
+    const { insertSeries } = this.settings
     let _series = series
     if (insertSeries && insertSeries.length && series.length) {
       _series = this.injectDataIntoSeries(insertSeries, _series)
     }
 
-    let opts = {
+    const opts = {
       title: {
         text: title,
         x: 'center'

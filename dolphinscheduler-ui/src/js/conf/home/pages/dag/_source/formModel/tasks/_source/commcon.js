@@ -43,7 +43,7 @@ const cycleList = [
  * cycle value
  */
 const dateValueList = {
-  'hour': [
+  hour: [
     {
       value: 'last1Hour',
       label: `${i18n.$t('Last1Hour')}`
@@ -57,7 +57,7 @@ const dateValueList = {
       label: `${i18n.$t('Last3Hours')}`
     }
   ],
-  'day': [
+  day: [
     {
       value: 'today',
       label: `${i18n.$t('today')}`
@@ -79,7 +79,7 @@ const dateValueList = {
       label: `${i18n.$t('Last7Days')}`
     }
   ],
-  'week': [
+  week: [
     {
       value: 'thisWeek',
       label: `${i18n.$t('ThisWeek')}`
@@ -117,7 +117,7 @@ const dateValueList = {
       label: `${i18n.$t('LastSunday')}`
     }
   ],
-  'month': [
+  month: [
     {
       value: 'thisMonth',
       label: `${i18n.$t('ThisMonth')}`
@@ -221,15 +221,15 @@ const sqlTypeList = [
 const positionList = [
   {
     id: 'PARAMETER',
-    code: "Parameter"
+    code: 'Parameter'
   },
   {
     id: 'BODY',
-    code: "Body"
+    code: 'Body'
   },
   {
     id: 'HEADERS',
-    code: "Headers"
+    code: 'Headers'
   }
 ]
 const nodeStatusList = [
