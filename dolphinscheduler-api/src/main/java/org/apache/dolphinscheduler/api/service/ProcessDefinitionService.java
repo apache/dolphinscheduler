@@ -96,9 +96,6 @@ public class ProcessDefinitionService extends BaseDAGService {
     @Autowired
     private ProcessService processService;
 
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
-
     /**
      * create process definition
      *
@@ -310,14 +307,14 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
             return result;
         } else {
-           return createProcessDefinition(
-                   loginUser,
-                   projectName,
-                   processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
-                   processDefinition.getProcessDefinitionJson(),
-                   processDefinition.getDescription(),
-                   processDefinition.getLocations(),
-                   processDefinition.getConnects());
+            return createProcessDefinition(
+                    loginUser,
+                    projectName,
+                    processDefinition.getName()+"_copy_"+System.currentTimeMillis(),
+                    processDefinition.getProcessDefinitionJson(),
+                    processDefinition.getDescription(),
+                    processDefinition.getLocations(),
+                    processDefinition.getConnects());
         }
     }
 
@@ -408,19 +405,19 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> verifyProcessDefinitionName(User loginUser, String projectName, String name) {
 
         Map<String, Object> result = new HashMap<>();
-            Project project = projectMapper.queryByName(projectName);
+        Project project = projectMapper.queryByName(projectName);
 
-            Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-            Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-            if (resultEnum != Status.SUCCESS) {
-                return checkResult;
-            }
-            ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
-            if (processDefinition == null) {
-                putMsg(result, Status.SUCCESS);
-            } else {
-                putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
-            }
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        if (processDefinition == null) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
+        }
         return result;
     }
 

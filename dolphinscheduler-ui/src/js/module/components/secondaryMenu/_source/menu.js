@@ -101,6 +101,15 @@ const menu = {
       children: []
     },
     {
+      name: `${i18n.$t('Worker group manage')}`,
+      id: 4,
+      path: 'worker-groups-manage',
+      isOpen: true,
+      disabled: true,
+      icon: 'ans-icon-diary',
+      children: []
+    },
+    {
       name: `${i18n.$t('Queue manage')}`,
       id: 3,
       path: 'queue-manage',
