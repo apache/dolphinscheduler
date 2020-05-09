@@ -59,7 +59,7 @@ DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id;
 -- uc_dolphin_T_t_ds_task_instance_C_app_link
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_C_app_link;
 delimiter d//
-CREATE PROCEDURE uc_dolphin_T_uc_dolphin_T_t_ds_task_instance_C_app_linkt_ds_task_instance_C_app_link()
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link()
    BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_task_instance'
