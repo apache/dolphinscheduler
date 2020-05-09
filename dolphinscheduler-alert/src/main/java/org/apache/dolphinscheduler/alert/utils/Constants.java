@@ -162,7 +162,7 @@ public class Constants {
      */
     public static final String PLUGIN_DIR = "plugin.dir";
 
-    public static final String PLUGIN_DEFAULT_EMAIL = "email";
+    public static final String PLUGIN_DEFAULT_EMAIL_ID = "email";
 
     public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
 
