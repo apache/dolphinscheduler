@@ -634,6 +634,7 @@ public class ProcessService {
                     taskInstance.setFlag(Flag.NO);
                     this.updateTaskInstance(taskInstance);
                 }
+                initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
@@ -690,7 +691,9 @@ public class ProcessService {
 
         Date startComplementTime = DateUtils.parse(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
                 YYYY_MM_DD_HH_MM_SS);
-        processInstance.setScheduleTime(startComplementTime);
+        if(Flag.NO == processInstance.getIsSubProcess()) {
+            processInstance.setScheduleTime(startComplementTime);
+        }
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
