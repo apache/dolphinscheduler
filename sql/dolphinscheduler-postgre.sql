@@ -309,7 +309,8 @@ CREATE TABLE t_ds_process_definition (
   update_time timestamp DEFAULT NULL ,
   modify_by varchar(36) DEFAULT '' ,
   resource_ids varchar(64),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
 ) ;
 
 create index process_definition_index on t_ds_process_definition (project_id,id);
