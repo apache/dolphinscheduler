@@ -330,11 +330,13 @@ public class ProcessService {
 
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
-                if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
+                JSONObject parameterJson = JSONObject.parseObject(parameter);
+                if (parameterJson.getInteger(CMDPARAM_SUB_PROCESS_DEFINE_ID) != null){
                     SubProcessParameters subProcessParam = JSON.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
+
             }
         }
     }
