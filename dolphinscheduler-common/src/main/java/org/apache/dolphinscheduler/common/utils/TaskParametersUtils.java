@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.task.ssh.SSHParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, ConditionsParameters.class);
         case SQOOP:
           return JSONUtils.parseObject(parameter, SqoopParameters.class);
+        case SSH:
+          return JSONUtils.parseObject(parameter, SSHParameters.class);
         default:
           return null;
       }

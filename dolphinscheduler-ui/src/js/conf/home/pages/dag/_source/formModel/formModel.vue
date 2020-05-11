@@ -162,6 +162,14 @@
           ref="SHELL"
           :backfill-item="backfillItem">
         </m-shell>
+        <!-- ssh node -->
+        <m-shell
+          v-if="taskType === 'SSH'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SSH"
+          :backfill-item="backfillItem">
+        </m-shell>
         <!-- sub_process node -->
         <m-sub-process
           v-if="taskType === 'SUB_PROCESS'"
@@ -273,6 +281,7 @@
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
+  import mSSH from './tasks/ssh'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'

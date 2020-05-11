@@ -244,6 +244,10 @@ let tasksType = {
     desc: 'SHELL',
     color: '#646464'
   },
+  'SSH': {
+    desc: 'SSH',
+    color: '#646464'
+  },
   'SUB_PROCESS': {
     desc: 'SUB_PROCESS',
     color: '#0097e0'

@@ -49,7 +49,8 @@ public enum TaskType {
     HTTP(9, "http"),
     DATAX(10, "datax"),
     CONDITIONS(11, "conditions"),
-    SQOOP(12, "sqoop");
+    SQOOP(12, "sqoop"),
+    SSH(13, "ssh");
 
     TaskType(int code, String descp){
         this.code = code;
