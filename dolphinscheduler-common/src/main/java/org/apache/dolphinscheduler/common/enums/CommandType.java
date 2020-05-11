@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * command types
  */
@@ -66,11 +69,26 @@ public enum CommandType {
         return descp;
     }
 
-    public static CommandType of(Integer status){
-        for(CommandType cmdType : values()){
-            if(cmdType.getCode() == status){
-                return cmdType;
-            }
+    private static final Map<Integer, CommandType> COMMAND_TYPE_MAP = new HashMap<>();
+
+    static {
+        COMMAND_TYPE_MAP.put(0, START_PROCESS);
+        COMMAND_TYPE_MAP.put(1, START_CURRENT_TASK_PROCESS);
+        COMMAND_TYPE_MAP.put(2, RECOVER_TOLERANCE_FAULT_PROCESS);
+        COMMAND_TYPE_MAP.put(3, RECOVER_SUSPENDED_PROCESS);
+        COMMAND_TYPE_MAP.put(4, START_FAILURE_TASK_PROCESS);
+        COMMAND_TYPE_MAP.put(5, COMPLEMENT_DATA);
+        COMMAND_TYPE_MAP.put(6, SCHEDULER);
+        COMMAND_TYPE_MAP.put(7, REPEAT_RUNNING);
+        COMMAND_TYPE_MAP.put(8, PAUSE);
+        COMMAND_TYPE_MAP.put(9, STOP);
+        COMMAND_TYPE_MAP.put(10, RECOVER_WAITTING_THREAD);
+    }
+
+
+    public static CommandType of(Integer status) {
+        if (COMMAND_TYPE_MAP.containsKey(status)) {
+            return COMMAND_TYPE_MAP.get(status);
         }
         throw new IllegalArgumentException("invalid status : " + status);
     }
