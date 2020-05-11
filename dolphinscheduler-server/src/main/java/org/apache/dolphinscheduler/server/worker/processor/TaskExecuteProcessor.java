@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
+import com.github.rholder.retry.*;
+import com.google.common.base.Predicates;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -43,7 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  worker request processor
@@ -51,7 +56,17 @@ import java.util.concurrent.ExecutorService;
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
-
+    
+    /**
+     * default ack retryer which retry 3 times and delay with 1 second
+     */
+    private static final Retryer<Boolean> DEFAULT_ACK_RETRYER = RetryerBuilder
+            .<Boolean>newBuilder()
+            .retryIfResult(Predicates.equalTo(Boolean.FALSE))
+            .retryIfException()
+            .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
+            .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+            .build();
 
     /**
      *  thread executor service
@@ -68,6 +83,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
+    
     public TaskExecuteProcessor(){
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
@@ -100,22 +116,23 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
-
+        
+        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
+        
         try {
-            this.doAck(taskExecutionContext);
-        }catch (Exception e){
-            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            this.doAck(taskExecutionContext);
+            DEFAULT_ACK_RETRYER.call(doAck(taskCallbackService, ackCommand.getTaskInstanceId(), ackCommand.convert2Command()));
+            // submit task
+            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
+        } catch (ExecutionException | RetryException e) {
+            logger.error(e.getMessage(), e.getCause());
         }
-
-        // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
     }
 
-    private void doAck(TaskExecutionContext taskExecutionContext){
-        // tell master that task is in executing
-        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
+    private static Callable<Boolean> doAck(final TaskCallbackService taskExecuteProcessor, final int taskInstanceId, final Command ackCommand) {
+        return () -> {
+            taskExecuteProcessor.sendAck(taskInstanceId,ackCommand);
+            return true;
+        };
     }
 
     /**
