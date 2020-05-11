@@ -130,7 +130,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private static Callable<Boolean> doAck(final TaskCallbackService taskExecuteProcessor, final int taskInstanceId, final Command ackCommand) {
         return () -> {
-            taskExecuteProcessor.sendAck(taskInstanceId,ackCommand);
+            taskExecuteProcessor.sendAck(taskInstanceId, ackCommand);
             return true;
         };
     }
