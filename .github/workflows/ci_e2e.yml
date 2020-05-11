@@ -51,7 +51,7 @@ jobs:
           sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
       - name: Check Server Status
-        run: sh ./dockerfile/hooks/check
+        run: sh $(pwd)/docker/docker-swarm/check
       - name: Prepare e2e env
         run: |
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
