@@ -74,7 +74,7 @@ public class MailUtils {
      * @param showType the show type
      * @return the result map
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, String title, String content,String showType) {
+    public static Boolean sendMails(Collection<String> receivers, String title, String content,String showType) throws Exception {
         return sendMails(receivers, null, title, content, showType);
     }
 
@@ -87,22 +87,19 @@ public class MailUtils {
      * @param showType the show type
      * @return the send result
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
-        Map<String,Object> retMap = new HashMap<>();
-        retMap.put(Constants.STATUS, false);
+    public static Boolean sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType){
 
         // if there is no receivers && no receiversCc, no need to process
         if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
-            return retMap;
+            return Boolean.FALSE;
         }
 
         receivers.removeIf(StringUtils::isEmpty);
 
         if (showType.equals(ShowType.TABLE.getDescp()) || showType.equals(ShowType.TEXT.getDescp())) {
             // send email
-            HtmlEmail email = new HtmlEmail();
-
             try {
+            HtmlEmail email = new HtmlEmail();
                 Session session = getSession();
                 email.setMailSession(session);
                 email.setFrom(MAIL_SENDER);
@@ -121,25 +118,23 @@ public class MailUtils {
                     }
                 }
                 // sender mail
-                return getStringObjectMap(title, content, showType, retMap, email);
-            } catch (Exception e) {
-                handleException(receivers, retMap, e);
-            }
-        }else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
-            try {
-
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
-
-                attachment(receivers,receiversCc,title,content,partContent);
-
-                retMap.put(Constants.STATUS, true);
-                return retMap;
-            }catch (Exception e){
-                handleException(receivers, retMap, e);
-                return retMap;
+                return getStringObjectMap(title, content, showType, email);
+            } catch (EmailException e) {
+                e.printStackTrace();
             }
         }
-        return retMap;
+
+        if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
+
+            try {
+                attachment(receivers,receiversCc,title,content,partContent);
+            } catch (Exception e) {
+                logger.error("Send email to {} failed", receivers, e);
+            }
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
 
     }
 
@@ -285,12 +280,11 @@ public class MailUtils {
      * @param title the title
      * @param content the content
      * @param showType the showType
-     * @param retMap the result map
      * @param email the email
      * @return the result map
      * @throws EmailException
      */
-    private static Map<String, Object> getStringObjectMap(String title, String content, String showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
+    private static Boolean getStringObjectMap(String title, String content, String showType, HtmlEmail email) throws EmailException {
 
         /**
          * the subject of the message to be sent
@@ -308,9 +302,7 @@ public class MailUtils {
         // send
         email.send();
 
-        retMap.put(Constants.STATUS, true);
-
-        return retMap;
+        return Boolean.TRUE;
     }
 
     /**
@@ -327,18 +319,6 @@ public class MailUtils {
         }else{
             logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
-    }
-
-
-    /**
-     * handle exception
-     * @param receivers the receiver list
-     * @param retMap the result map
-     * @param e the exception
-     */
-    private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
-        logger.error("Send email to {} failed", receivers, e);
-        retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
 }

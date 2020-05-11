@@ -33,7 +33,7 @@ import java.util.*;
 
 /**
  * EmailAlertPlugin
- *
+ * <p>
  * This plugin is a default plugin, and mix up email and enterprise wechat, because adapt with former alert behavior
  */
 public class EmailAlertPlugin implements AlertPlugin {
@@ -92,22 +92,17 @@ public class EmailAlertPlugin implements AlertPlugin {
             retMaps.put(Constants.MESSAGE, "execution failure,At least one receiver address required.");
             return retMaps;
         }
-
-        retMaps = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
-                alert.getShowType());
-
-        //send flag
-        boolean flag = false;
-
-        if (retMaps == null) {
-            retMaps = new HashMap<>();
+        boolean flag;
+        try {
+            flag = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
+                    alert.getShowType());
+        } catch (Exception e) {
             retMaps.put(Constants.MESSAGE, "alert send error.");
             retMaps.put(Constants.STATUS, "false");
             logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
             return retMaps;
         }
 
-        flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
 
         if (flag) {
             logger.info("alert send success");
@@ -124,7 +119,7 @@ public class EmailAlertPlugin implements AlertPlugin {
 
         } else {
             retMaps.put(Constants.MESSAGE, "alert send error.");
-            logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+            logger.info("alert send error : {}", "alert send error.");
         }
 
         return retMaps;
