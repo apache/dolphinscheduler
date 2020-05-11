@@ -44,7 +44,7 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Build Image
         run: |
-          sh ./dockerfile/hooks/build
+          sh ./docker/build/hooks/build
       - name: Docker Run
         run: |
           export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
