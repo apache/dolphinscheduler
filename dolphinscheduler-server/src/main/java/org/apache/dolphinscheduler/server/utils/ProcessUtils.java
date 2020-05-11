@@ -47,6 +47,14 @@ public class ProcessUtils {
   private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
   /**
+   * Initialization regularization, solve the problem of pre-compilation performance,
+   * avoid the thread safety problem of multi-thread operation
+   */
+  private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
+
+  private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+
+  /**
    * build command line characters
    * @param commandList command list
    * @return command
@@ -356,10 +364,10 @@ public class ProcessUtils {
     // pstree pid get sub pids
     if (OSUtils.isMacOS()) {
       String pids = OSUtils.exeCmd("pstree -sp " + processId);
-      mat = Pattern.compile("-[+|-]-\\s(\\d+)").matcher(pids);
+      mat = MACPATTERN.matcher(pids);
     } else {
       String pids = OSUtils.exeCmd("pstree -p " + processId);
-      mat = Pattern.compile("(\\d+)").matcher(pids);
+      mat = WINDOWSATTERN.matcher(pids);
     }
 
     while (mat.find()){

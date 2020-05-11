@@ -95,7 +95,7 @@ public enum ExecutionStatus {
   * @return status
   */
    public boolean typeIsFailure(){
-     return this == FAILURE || this == NEED_FAULT_TOLERANCE;
+     return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
    }
 
  /**
