@@ -52,7 +52,7 @@ services:
       replicas: 1
 
   dolphinscheduler-api:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["api-server"]
     ports:
     - 12345:12345
@@ -79,7 +79,7 @@ services:
       replicas: 1
 
   dolphinscheduler-frontend:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["frontend"]
     ports:
     - 8888:8888
@@ -102,7 +102,7 @@ services:
       replicas: 1
 
   dolphinscheduler-alert:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["alert-server"]
     environment:
       TZ: Asia/Shanghai
@@ -140,7 +140,7 @@ services:
       replicas: 1
 
   dolphinscheduler-master:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["master-server"]
     ports: 
     - 5678:5678
@@ -174,7 +174,7 @@ services:
       replicas: 1
 
   dolphinscheduler-worker:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["worker-server"]
     ports: 
     - 1234:1234

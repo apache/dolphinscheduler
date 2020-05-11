@@ -30,7 +30,7 @@ fi
 if [ "${DOCKER_REPO}x" = "x" ]
 then
     echo "set default environment variable [DOCKER_REPO]"
-    export DOCKER_REPO='dolphinscheduler'
+    export DOCKER_REPO='apache/dolphinscheduler'
 fi
 
 echo "Version: $VERSION"
