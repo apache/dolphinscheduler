@@ -42,8 +42,8 @@ echo -e "Current Directory is $(pwd)\n"
 echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
 mvn -B clean compile package -Prelease -Dmaven.test.skip=true
 
-# mv dolphinscheduler-bin.tar.gz file to dockerfile directory
-echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/\n"
+# mv dolphinscheduler-bin.tar.gz file to docker/build directory
+echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/docker/build/\n"
 mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/
 
 # docker build
