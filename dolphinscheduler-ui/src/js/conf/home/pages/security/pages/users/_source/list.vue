@@ -40,7 +40,9 @@
           <th>
             <span>{{$t('Phone')}}</span>
           </th>
-
+          <th id="state">
+            <span>{{$t('State')}}</span>
+          </th>
           <th>
             <span>{{$t('Create Time')}}</span>
           </th>
@@ -70,6 +72,10 @@
           </td>
           <td>
             <span>{{item.phone || '-'}}</span>
+          </td>
+          <td>
+            <span v-if="item.state == 1">{{$t('Enable')}}</span>
+            <span v-else>{{$t('Disable')}}</span>
           </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
@@ -232,7 +238,7 @@
         getLeaf(data)
         return result
       },
-      _authFile (item, i) { 
+      _authFile (item, i) {
         this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getResourceList({
           id: item.id,
@@ -257,7 +263,7 @@
           })
           let fileTargetList = []
           let udfTargetList = []
-          
+
           let pathId = []
           data[1].forEach(v=>{
             let arr = []
