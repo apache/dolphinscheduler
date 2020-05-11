@@ -32,7 +32,6 @@ const handlerSuffix = {
   '.properties': 'textile'
 }
 
-
 export {
   handlerSuffix
 }

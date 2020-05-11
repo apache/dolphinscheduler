@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -59,7 +60,7 @@ public class ExecutorService extends BaseService{
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private MonitorService monitorService;
 
 
     @Autowired
@@ -123,6 +124,12 @@ public class ExecutorService extends BaseService{
             return result;
         }
 
+        // check master exists
+        if (!checkMasterExists(result)) {
+            return result;
+        }
+
+
         /**
          * create command
          */
@@ -143,6 +150,22 @@ public class ExecutorService extends BaseService{
         return result;
     }
 
+    /**
+     * check whether master exists
+     * @param result result
+     * @return master exists return true , otherwise return false
+     */
+    private boolean checkMasterExists(Map<String, Object> result) {
+        // check master server exists
+        List<Server> masterServers = monitorService.getServerListFromZK(true);
+
+        // no master
+        if (masterServers.size() == 0) {
+            putMsg(result, Status.MASTER_NOT_EXISTS);
+            return false;
+        }
+        return true;
+    }
 
 
     /**
@@ -185,6 +208,12 @@ public class ExecutorService extends BaseService{
         if (checkResult != null) {
             return checkResult;
         }
+
+        // check master exists
+        if (!checkMasterExists(result)) {
+            return result;
+        }
+
 
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (processInstance == null) {

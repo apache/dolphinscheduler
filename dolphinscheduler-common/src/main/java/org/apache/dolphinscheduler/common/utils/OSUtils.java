@@ -57,6 +57,12 @@ public class OSUtils {
 
   private OSUtils() {}
 
+  /**
+   * Initialization regularization, solve the problem of pre-compilation performance,
+   * avoid the thread safety problem of multi-thread operation
+   */
+  private static final Pattern PATTERN = Pattern.compile("\\s+");
+
 
   /**
    * get memory usage
@@ -219,8 +225,7 @@ public class OSUtils {
 
     List<String> users = new ArrayList<>();
     while (startPos <= endPos) {
-      Pattern pattern = Pattern.compile("\\s+");
-      users.addAll(Arrays.asList(pattern.split(lines[startPos])));
+      users.addAll(Arrays.asList(PATTERN.split(lines[startPos])));
       startPos++;
     }
 
@@ -313,7 +318,7 @@ public class OSUtils {
       String currentProcUserName = System.getProperty("user.name");
       String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
       String line = result.split("\n")[22];
-      String group = Pattern.compile("\\s+").split(line)[1];
+      String group = PATTERN.split(line)[1];
       if (group.charAt(0) == '*') {
         return group.substring(1);
       } else {

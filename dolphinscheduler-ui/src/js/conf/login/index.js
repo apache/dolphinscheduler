@@ -25,7 +25,7 @@ import 'ans-ui/lib/ans-ui.min.css'
 import ans from 'ans-ui/lib/ans-ui.min'
 
 import 'sass/conf/login/index.scss'
-import'bootstrap/dist/js/bootstrap.min.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
 
 Vue.use(ans)
 
@@ -41,7 +41,7 @@ new Vue({
   },
   methods: {
     initApp () {
-      let bootstrapTooltip = $.fn.tooltip.noConflict()
+      const bootstrapTooltip = $.fn.tooltip.noConflict()
       $.fn.tooltip = bootstrapTooltip
       $('body').tooltip({
         selector: '[data-toggle="tooltip"]',
