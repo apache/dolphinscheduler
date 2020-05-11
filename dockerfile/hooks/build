@@ -24,13 +24,13 @@ printenv
 if [ -z "${VERSION}" ]
 then
     echo "set default environment variable [VERSION]"
-    VERSION=$(cat $(pwd)/sql/soft_version)
+    export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
 fi
 
 if [ "${DOCKER_REPO}x" = "x" ]
 then
     echo "set default environment variable [DOCKER_REPO]"
-    DOCKER_REPO='dolphinscheduler'
+    export DOCKER_REPO='dolphinscheduler'
 fi
 
 echo "Version: $VERSION"
@@ -43,11 +43,11 @@ echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
 mvn -B clean compile package -Prelease -Dmaven.test.skip=true
 
 # mv dolphinscheduler-bin.tar.gz file to dockerfile directory
-echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/\n"
-mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/
+echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/\n"
+mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/
 
 # docker build
 echo -e "docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/dockerfile/\n"
-docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/dockerfile/
+sudo docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/dockerfile/
 
 echo "------ dolphinscheduler end   - build -------"

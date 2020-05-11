@@ -41,6 +41,7 @@ services:
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
     - dolphinscheduler-zookeeper:/bitnami/zookeeper
     networks:
@@ -70,7 +71,7 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - dolphinscheduler-api:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks: 
     - dolphinscheduler
 
@@ -93,7 +94,7 @@ services:
     depends_on:
     - dolphinscheduler-api
     volumes:
-    - dolphinscheduler-frontend:/var/log/nginx
+    - dolphinscheduler-logs:/var/log/nginx
     networks:
     - dolphinscheduler
 
@@ -131,7 +132,7 @@ services:
     depends_on:
     - dolphinscheduler-postgresql
     volumes: 
-    - dolphinscheduler-alert:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks: 
     - dolphinscheduler
 
@@ -166,7 +167,7 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes: 
-    - dolphinscheduler-master:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
@@ -209,7 +210,7 @@ services:
       source: dolphinscheduler-worker-data
       target: /tmp/dolphinscheduler
     - type: volume
-      source: dolphinscheduler-worker-logs
+      source: dolphinscheduler-logs
       target: /opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
@@ -221,12 +222,8 @@ networks:
 volumes:
   dolphinscheduler-postgresql:
   dolphinscheduler-zookeeper:
-  dolphinscheduler-api:
-  dolphinscheduler-frontend:
-  dolphinscheduler-alert:
-  dolphinscheduler-master:
   dolphinscheduler-worker-data:
-  dolphinscheduler-worker-logs:
+  dolphinscheduler-logs:
 
 configs:
   dolphinscheduler-worker-task-env:
