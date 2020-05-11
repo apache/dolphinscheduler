@@ -487,7 +487,6 @@ public class ProcessInstanceService extends BaseDAGService {
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
         processService.removeTaskLogFile(processInstanceId);
 
-
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 

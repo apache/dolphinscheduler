@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -309,6 +311,9 @@ public class ProcessService {
      * @param processInstanceId processInstanceId
      */
     public void removeTaskLogFile(Integer processInstanceId){
+
+        LogClientService logClient = new LogClientService();
+
         List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
         if (CollectionUtils.isEmpty(taskInstanceList)){
@@ -317,10 +322,11 @@ public class ProcessService {
 
         for (TaskInstance taskInstance : taskInstanceList){
             String taskLogPath = taskInstance.getLogPath();
-            File taskLogFile = new File(taskLogPath);
-            if (taskLogFile.exists()){
-                taskLogFile.delete();
-            }
+            String ip = Host.of(taskInstance.getHost()).getIp();
+            int port = Host.of(taskInstance.getHost()).getPort();
+
+            // remove task log from loggerserver
+            logClient.removeTaskLog(ip,port,taskLogPath);
         }
     }
 
