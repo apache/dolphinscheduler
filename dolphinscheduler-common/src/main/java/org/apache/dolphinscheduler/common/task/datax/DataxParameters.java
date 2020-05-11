@@ -187,7 +187,9 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        if (customConfig == null) return false;
+        if (customConfig == null) {
+            return false;
+        }
         if (customConfig == 0) {
             return dataSource != 0
                     && dataTarget != 0
