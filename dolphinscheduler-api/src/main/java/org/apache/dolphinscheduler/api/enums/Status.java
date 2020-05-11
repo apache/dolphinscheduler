@@ -175,6 +175,7 @@ public enum Status {
     QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
+    USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
