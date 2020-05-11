@@ -357,3 +357,23 @@ delimiter ;
 CALL dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 
+-- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND INDEX_NAME ='process_definition_unique')
+   THEN
+         ALTER TABLE t_ds_process_definition ADD UNIQUE KEY `process_definition_unique` (`name`,`project_id`);
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+
