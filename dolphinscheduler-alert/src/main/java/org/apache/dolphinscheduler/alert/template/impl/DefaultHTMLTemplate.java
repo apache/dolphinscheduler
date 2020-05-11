@@ -140,21 +140,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         checkNotNull(content);
         String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n",title);
 
-        return "<html>\n" +
-                "    <head>\n" +
-                "        <title>dolphinscheduler</title>\n" +
-                "        <meta name='Keywords' content=''>\n" +
-                "        <meta name='Description' content=''>\n" +
-                "        <style type=\"text/css\">\n" +
-                "            table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}\n" +
-                "            table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: right;}\n" +
-                "            table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: right;}\n" +
-                "        </style>\n" +
-                "    </head>\n" +
-                "    <body style=\"margin:0;padding:0\">\n" +
-                "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" + htmlTableThead + content +
-                "        </table>\n" +
-                "    </body>\n" +
-                "</html>";
+        return "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><html><head><title>dolphinscheduler</title><meta name='Keywords' content=''><meta name='Description' content=''><style type=\"text/css\">table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: left;}table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: left;}</style></head><body style=\"margin:0;padding:0\"><table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\"> " +htmlTableThead + content +"</table></body></html>";
     }
+
 }
