@@ -330,11 +330,13 @@ public class ProcessService {
 
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
-                if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
+                JSONObject parameterJson = JSONObject.parseObject(parameter);
+                if (parameterJson.getInteger(CMDPARAM_SUB_PROCESS_DEFINE_ID) != null){
                     SubProcessParameters subProcessParam = JSON.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
+
             }
         }
     }
@@ -634,6 +636,7 @@ public class ProcessService {
                     taskInstance.setFlag(Flag.NO);
                     this.updateTaskInstance(taskInstance);
                 }
+                initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
@@ -690,7 +693,9 @@ public class ProcessService {
 
         Date startComplementTime = DateUtils.parse(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
                 YYYY_MM_DD_HH_MM_SS);
-        processInstance.setScheduleTime(startComplementTime);
+        if(Flag.NO == processInstance.getIsSubProcess()) {
+            processInstance.setScheduleTime(startComplementTime);
+        }
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
