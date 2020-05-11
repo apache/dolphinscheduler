@@ -94,7 +94,8 @@ public class UsersService extends BaseService {
                                           String email,
                                           int tenantId,
                                           String phone,
-                                          String queue) throws Exception {
+                                          String queue,
+                                          int state) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
 
@@ -115,7 +116,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        User user = createUser(userName, userPassword, email, tenantId, phone, queue);
+        User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
@@ -139,7 +140,8 @@ public class UsersService extends BaseService {
                                           String email,
                                           int tenantId,
                                           String phone,
-                                          String queue) throws Exception {
+                                          String queue,
+                                          int state) throws Exception {
         User user = new User();
         Date now = new Date();
 
@@ -148,6 +150,7 @@ public class UsersService extends BaseService {
         user.setEmail(email);
         user.setTenantId(tenantId);
         user.setPhone(phone);
+        user.setState(state);
         // create general users, administrator users are currently built-in
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(now);
@@ -260,7 +263,8 @@ public class UsersService extends BaseService {
                                           String email,
                                           int tenantId,
                                           String phone,
-                                          String queue) throws Exception {
+                                          String queue,
+                                          int state) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
@@ -309,7 +313,9 @@ public class UsersService extends BaseService {
             }
             user.setPhone(phone);
         }
+
         user.setQueue(queue);
+        user.setState(state);
         Date now = new Date();
         user.setUpdateTime(now);
 
