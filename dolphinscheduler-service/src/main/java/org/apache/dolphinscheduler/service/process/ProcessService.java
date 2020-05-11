@@ -326,7 +326,7 @@ public class ProcessService {
                 continue;
             }
             String ip = Host.of(taskInstance.getHost()).getIp();
-            int port = Host.of(taskInstance.getHost()).getPort();
+            int port = Constants.RPC_PORT;
 
             // remove task log from loggerserver
             logClient.removeTaskLog(ip,port,taskLogPath);
