@@ -921,6 +921,7 @@ public class ProcessService {
         command.setCommandParam(processMapStr);
         command.setCommandType(commandType);
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
+        command.setWorkerGroup(parentProcessInstance.getWorkerGroup());
         createCommand(command);
         logger.info("sub process command created: {} ", command.toString());
     }
