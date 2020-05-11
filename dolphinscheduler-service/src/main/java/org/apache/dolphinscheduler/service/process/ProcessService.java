@@ -299,8 +299,8 @@ public class ProcessService {
         for(Integer subId : subProcessIdList){
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
-            deleteWorkProcessInstanceById(subId);
             removeTaskLogFile(subId);
+            deleteWorkProcessInstanceById(subId);
         }
         return 1;
     }
@@ -322,6 +322,9 @@ public class ProcessService {
 
         for (TaskInstance taskInstance : taskInstanceList){
             String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())){
+                continue;
+            }
             String ip = Host.of(taskInstance.getHost()).getIp();
             int port = Host.of(taskInstance.getHost()).getPort();
 

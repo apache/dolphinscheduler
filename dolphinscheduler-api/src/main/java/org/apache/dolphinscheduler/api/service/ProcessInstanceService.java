@@ -483,9 +483,10 @@ public class ProcessInstanceService extends BaseDAGService {
 
 
 
+        processService.removeTaskLogFile(processInstanceId);
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
-        processService.removeTaskLogFile(processInstanceId);
+
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
