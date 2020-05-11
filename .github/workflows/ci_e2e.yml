@@ -44,13 +44,12 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Build Image
         run: |
-          export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
           sh ./dockerfile/hooks/build
       - name: Docker Run
         run: |
           export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
           sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
-          docker-compose up -d
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up
       - name: Check Server Status
         run: sh ./dockerfile/hooks/check
       - name: Prepare e2e env
