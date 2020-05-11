@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -238,7 +239,7 @@ public class ProcessService {
      * @param defineId
      * @return
      */
-    public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
+    public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
@@ -293,12 +294,34 @@ public class ProcessService {
 
         List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
 
-        for(Integer subId : subProcessIdList ){
+        for(Integer subId : subProcessIdList){
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
             deleteWorkProcessInstanceById(subId);
+            removeTaskLogFile(subId);
         }
         return 1;
+    }
+
+
+    /**
+     * remove task log file
+     * @param processInstanceId processInstanceId
+     */
+    public void removeTaskLogFile(Integer processInstanceId){
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+
+        if (CollectionUtils.isEmpty(taskInstanceList)){
+            return;
+        }
+
+        for (TaskInstance taskInstance : taskInstanceList){
+            String taskLogPath = taskInstance.getLogPath();
+            File taskLogFile = new File(taskLogPath);
+            if (taskLogFile.exists()){
+                taskLogFile.delete();
+            }
+        }
     }
 
 

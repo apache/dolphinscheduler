@@ -476,8 +476,6 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstanceId);
-
         if (null == processInstance) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
@@ -487,6 +485,9 @@ public class ProcessInstanceService extends BaseDAGService {
 
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
+        processService.removeTaskLogFile(processInstanceId);
+
+
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 
