@@ -233,7 +233,7 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
 
-        Mockito.doReturn(dataSource).when(processService.findDataSourceById(1));
+        Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
 
         Thread.sleep(10000);
     }
