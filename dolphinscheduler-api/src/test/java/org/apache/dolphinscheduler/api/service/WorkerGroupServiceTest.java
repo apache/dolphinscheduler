@@ -26,10 +26,10 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
@@ -51,100 +52,55 @@ public class WorkerGroupServiceTest {
 
     @InjectMocks
     private WorkerGroupService workerGroupService;
-    @Mock
-    private WorkerGroupMapper workerGroupMapper;
+
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
+
     @Mock
     private ZookeeperCachedOperator zookeeperCachedOperator;
 
-    private String groupName="groupName000001";
 
-    /**
-     *  create or update a worker group
-     */
-    @Test
-    public void testSaveWorkerGroup(){
+    @Before
+    public void init(){
+        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
+        zookeeperConfig.setDsRoot("/dolphinscheduler_qzw");
+        Mockito.when(zookeeperCachedOperator.getZookeeperConfig()).thenReturn(zookeeperConfig);
 
-        User user = new User();
-        // general user add
-        user.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals( Status.USER_NO_OPERATION_PERM.getMsg(),(String) result.get(Constants.MSG));
+        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
 
-        //success
-        user.setUserType(UserType.ADMIN_USER);
-        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        // group name exist
-        Mockito.when(workerGroupMapper.selectById(2)).thenReturn(getWorkerGroup(2));
-        Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
-        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1");
-        logger.info(result.toString());
-        Assert.assertEquals(Status.NAME_EXIST,result.get(Constants.STATUS));
+        List<String> workerGroupStrList = new ArrayList<>();
+        workerGroupStrList.add("default");
+        workerGroupStrList.add("test");
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenReturn(workerGroupStrList);
 
+        List<String> defaultIpList = new ArrayList<>();
+        defaultIpList.add("192.168.220.188:1234");
+        defaultIpList.add("192.168.220.189:1234");
+
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath + "/default")).thenReturn(defaultIpList);
+
+        Mockito.when(zookeeperCachedOperator.get(workerPath + "/default" + "/" + defaultIpList.get(0))).thenReturn("0.02,0.23,0.03,2020-05-08 11:24:14,2020-05-08 14:22:24");
     }
 
     /**
      *  query worker group paging
      */
     @Test
-    public  void testQueryAllGroupPaging(){
-
+    public void testQueryAllGroupPaging(){
         User user = new User();
         // general user add
-        user.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
-        logger.info(result.toString());
-        Assert.assertEquals((String) result.get(Constants.MSG), Status.USER_NO_OPERATION_PERM.getMsg());
-        //success
         user.setUserType(UserType.ADMIN_USER);
-        Page<WorkerGroup> page = new Page<>(1,10);
-        page.setRecords(getList());
-        page.setSize(1L);
-        Mockito.when(workerGroupMapper.queryListPaging(Mockito.any(Page.class), Mockito.eq(groupName))).thenReturn(page);
-        result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        PageInfo<WorkerGroup>  pageInfo = (PageInfo<WorkerGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+        Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, null);
+        PageInfo<WorkerGroup> pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
+        Assert.assertEquals(pageInfo.getLists().size(),1);
     }
 
-    /**
-     * delete group by id
-     */
-    @Test
-    public  void testDeleteWorkerGroupById(){
-
-        //DELETE_WORKER_GROUP_BY_ID_FAIL
-        Mockito.when(processInstanceMapper.queryByWorkerGroupIdAndStatus(1, Constants.NOT_TERMINATED_STATES)).thenReturn(getProcessInstanceList());
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(1);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),((Status) result.get(Constants.STATUS)).getCode());
-
-        //correct
-        result = workerGroupService.deleteWorkerGroupById(2);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-
-    }
 
     @Test
     public void testQueryAllGroup() throws Exception {
-        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
-        zookeeperConfig.setDsRoot("/ds");
-        Mockito.when(zookeeperCachedOperator.getZookeeperConfig()).thenReturn(zookeeperConfig);
-        List<String> workerGroupStrList = new ArrayList<>();
-        workerGroupStrList.add("workerGroup1");
-        Mockito.when(zookeeperCachedOperator.getChildrenKeys(Mockito.anyString())).thenReturn(workerGroupStrList);
-
         Map<String, Object> result = workerGroupService.queryAllGroup();
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));
-        List<WorkerGroup> workerGroupList = (List<WorkerGroup>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(workerGroupList.size()>0);
+        Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
+        Assert.assertEquals(workerGroups.size(), 1);
     }
 
 
@@ -158,25 +114,5 @@ public class WorkerGroupServiceTest {
         processInstances.add(new ProcessInstance());
         return processInstances;
     }
-    /**
-     * get Group
-     * @return
-     */
-    private WorkerGroup getWorkerGroup(int id){
-        WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setName(groupName);
-        workerGroup.setId(id);
-        return workerGroup;
-    }
-    private WorkerGroup getWorkerGroup(){
-
-        return getWorkerGroup(1);
-    }
-
-   private List<WorkerGroup> getList(){
-        List<WorkerGroup> list = new ArrayList<>();
-        list.add(getWorkerGroup());
-        return list;
-   }
 
 }

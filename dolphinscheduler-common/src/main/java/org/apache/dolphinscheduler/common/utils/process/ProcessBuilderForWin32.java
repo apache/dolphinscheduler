@@ -189,8 +189,9 @@ public class ProcessBuilderForWin32 {
      * @throws NullPointerException if the argument is null
      */
     public ProcessBuilderForWin32(List<String> command) {
-        if (command == null)
+        if (command == null) {
             throw new NullPointerException();
+        }
         this.command = command;
     }
 
@@ -207,8 +208,9 @@ public class ProcessBuilderForWin32 {
      */
     public ProcessBuilderForWin32(String... command) {
         this.command = new ArrayList<>(command.length);
-        for (String arg : command)
+        for (String arg : command) {
             this.command.add(arg);
+        }
     }
 
     /**
@@ -238,8 +240,9 @@ public class ProcessBuilderForWin32 {
      * @throws NullPointerException if the argument is null
      */
     public ProcessBuilderForWin32 command(List<String> command) {
-        if (command == null)
+        if (command == null) {
             throw new NullPointerException();
+        }
         this.command = command;
         return this;
     }
@@ -257,8 +260,9 @@ public class ProcessBuilderForWin32 {
      */
     public ProcessBuilderForWin32 command(String... command) {
         this.command = new ArrayList<>(command.length);
-        for (String arg : command)
+        for (String arg : command) {
             this.command.add(arg);
+        }
         return this;
     }
 
@@ -344,11 +348,13 @@ public class ProcessBuilderForWin32 {
      */
     public Map<String,String> environment() {
         SecurityManager security = System.getSecurityManager();
-        if (security != null)
+        if (security != null) {
             security.checkPermission(new RuntimePermission("getenv.*"));
+        }
 
-        if (environment == null)
+        if (environment == null) {
             environment = ProcessEnvironmentForWin32.environment();
+        }
 
         assert environment != null;
 
@@ -369,15 +375,17 @@ public class ProcessBuilderForWin32 {
                 // for compatibility with old broken code.
 
                 // Silently discard any trailing junk.
-                if (envstring.indexOf((int) '\u0000') != -1)
+                if (envstring.indexOf((int) '\u0000') != -1) {
                     envstring = envstring.replaceFirst("\u0000.*", "");
+                }
 
                 int eqlsign =
                         envstring.indexOf('=', ProcessEnvironmentForWin32.MIN_NAME_LENGTH);
                 // Silently ignore envstrings lacking the required `='.
-                if (eqlsign != -1)
+                if (eqlsign != -1) {
                     environment.put(envstring.substring(0,eqlsign),
                             envstring.substring(eqlsign+1));
+                }
             }
         }
         return this;
@@ -425,6 +433,7 @@ public class ProcessBuilderForWin32 {
     static class NullInputStream extends InputStream {
         static final ProcessBuilderForWin32.NullInputStream INSTANCE = new ProcessBuilderForWin32.NullInputStream();
         private NullInputStream() {}
+        @Override
         public int read()      { return -1; }
         @Override
         public int available() { return 0; }
@@ -436,6 +445,7 @@ public class ProcessBuilderForWin32 {
     static class NullOutputStream extends OutputStream {
         static final ProcessBuilderForWin32.NullOutputStream INSTANCE = new ProcessBuilderForWin32.NullOutputStream();
         private NullOutputStream() {}
+        @Override
         public void write(int b) throws IOException {
             throw new IOException("Stream closed");
         }
@@ -516,7 +526,9 @@ public class ProcessBuilderForWin32 {
          * }</pre>
          */
         public static final ProcessBuilderForWin32.Redirect PIPE = new ProcessBuilderForWin32.Redirect() {
+            @Override
             public Type type() { return Type.PIPE; }
+            @Override
             public String toString() { return type().toString(); }};
 
         /**
@@ -531,7 +543,9 @@ public class ProcessBuilderForWin32 {
          * }</pre>
          */
         public static final ProcessBuilderForWin32.Redirect INHERIT = new ProcessBuilderForWin32.Redirect() {
+            @Override
             public Type type() { return Type.INHERIT; }
+            @Override
             public String toString() { return type().toString(); }};
 
         /**
@@ -565,12 +579,15 @@ public class ProcessBuilderForWin32 {
          * @return a redirect to read from the specified file
          */
         public static ProcessBuilderForWin32.Redirect from(final File file) {
-            if (file == null)
+            if (file == null) {
                 throw new NullPointerException();
+            }
             return new ProcessBuilderForWin32.Redirect() {
+                @Override
                 public Type type() { return Type.READ; }
                 @Override
                 public File file() { return file; }
+                @Override
                 public String toString() {
                     return "redirect to read from file \"" + file + "\"";
                 }
@@ -593,12 +610,15 @@ public class ProcessBuilderForWin32 {
          * @return a redirect to write to the specified file
          */
         public static ProcessBuilderForWin32.Redirect to(final File file) {
-            if (file == null)
+            if (file == null) {
                 throw new NullPointerException();
+            }
             return new ProcessBuilderForWin32.Redirect() {
+                @Override
                 public Type type() { return Type.WRITE; }
                 @Override
                 public File file() { return file; }
+                @Override
                 public String toString() {
                     return "redirect to write to file \"" + file + "\"";
                 }
@@ -626,12 +646,15 @@ public class ProcessBuilderForWin32 {
          * @return a redirect to append to the specified file
          */
         public static ProcessBuilderForWin32.Redirect appendTo(final File file) {
-            if (file == null)
+            if (file == null) {
                 throw new NullPointerException();
+            }
             return new ProcessBuilderForWin32.Redirect() {
+                @Override
                 public Type type() { return Type.APPEND; }
                 @Override
                 public File file() { return file; }
+                @Override
                 public String toString() {
                     return "redirect to append to file \"" + file + "\"";
                 }
@@ -647,14 +670,18 @@ public class ProcessBuilderForWin32 {
          * instances of the same type associated with non-null equal
          * {@code File} instances.
          */
+        @Override
         public boolean equals(Object obj) {
-            if (obj == this)
+            if (obj == this) {
                 return true;
-            if (! (obj instanceof ProcessBuilderForWin32.Redirect))
+            }
+            if (! (obj instanceof ProcessBuilderForWin32.Redirect)) {
                 return false;
+            }
             ProcessBuilderForWin32.Redirect r = (ProcessBuilderForWin32.Redirect) obj;
-            if (r.type() != this.type())
+            if (r.type() != this.type()) {
                 return false;
+            }
             assert this.file() != null;
             return this.file().equals(r.file());
         }
@@ -663,12 +690,14 @@ public class ProcessBuilderForWin32 {
          * Returns a hash code value for this {@code Redirect}.
          * @return a hash code value for this {@code Redirect}
          */
+        @Override
         public int hashCode() {
             File file = file();
-            if (file == null)
+            if (file == null) {
                 return super.hashCode();
-            else
+            } else {
                 return file.hashCode();
+            }
         }
 
         /**
@@ -679,10 +708,11 @@ public class ProcessBuilderForWin32 {
     }
 
     private ProcessBuilderForWin32.Redirect[] redirects() {
-        if (redirects == null)
-            redirects = new ProcessBuilderForWin32.Redirect[] {
-                    ProcessBuilderForWin32.Redirect.PIPE, ProcessBuilderForWin32.Redirect.PIPE, ProcessBuilderForWin32.Redirect.PIPE
+        if (redirects == null) {
+            redirects = new Redirect[] {
+                    Redirect.PIPE, Redirect.PIPE, Redirect.PIPE
             };
+        }
         return redirects;
     }
 
@@ -711,9 +741,10 @@ public class ProcessBuilderForWin32 {
      */
     public ProcessBuilderForWin32 redirectInput(ProcessBuilderForWin32.Redirect source) {
         if (source.type() == ProcessBuilderForWin32.Redirect.Type.WRITE ||
-                source.type() == ProcessBuilderForWin32.Redirect.Type.APPEND)
+                source.type() == ProcessBuilderForWin32.Redirect.Type.APPEND) {
             throw new IllegalArgumentException(
                     "Redirect invalid for reading: " + source);
+        }
         redirects()[0] = source;
         return this;
     }
@@ -741,9 +772,10 @@ public class ProcessBuilderForWin32 {
      * @since  1.7
      */
     public ProcessBuilderForWin32 redirectOutput(ProcessBuilderForWin32.Redirect destination) {
-        if (destination.type() == ProcessBuilderForWin32.Redirect.Type.READ)
+        if (destination.type() == ProcessBuilderForWin32.Redirect.Type.READ) {
             throw new IllegalArgumentException(
                     "Redirect invalid for writing: " + destination);
+        }
         redirects()[1] = destination;
         return this;
     }
@@ -775,9 +807,10 @@ public class ProcessBuilderForWin32 {
      * @since  1.7
      */
     public ProcessBuilderForWin32 redirectError(ProcessBuilderForWin32.Redirect destination) {
-        if (destination.type() == ProcessBuilderForWin32.Redirect.Type.READ)
+        if (destination.type() == ProcessBuilderForWin32.Redirect.Type.READ) {
             throw new IllegalArgumentException(
                     "Redirect invalid for writing: " + destination);
+        }
         redirects()[2] = destination;
         return this;
     }
@@ -1019,15 +1052,18 @@ public class ProcessBuilderForWin32 {
         String[] cmdarray = command.toArray(new String[command.size()]);
         cmdarray = cmdarray.clone();
 
-        for (String arg : cmdarray)
-            if (arg == null)
+        for (String arg : cmdarray) {
+            if (arg == null) {
                 throw new NullPointerException();
+            }
+        }
         // Throws IndexOutOfBoundsException if command is empty
         String prog = cmdarray[0];
 
         SecurityManager security = System.getSecurityManager();
-        if (security != null)
+        if (security != null) {
             security.checkExec(prog);
+        }
 
         String dir = directory == null ? null : directory.toString();
 

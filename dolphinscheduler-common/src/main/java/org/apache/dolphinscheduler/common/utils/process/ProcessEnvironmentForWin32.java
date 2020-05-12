@@ -27,22 +27,25 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     private static String validateName(String name) {
         // An initial `=' indicates a magic Windows variable name -- OK
         if (name.indexOf('=', 1)   != -1 ||
-                name.indexOf('\u0000') != -1)
+                name.indexOf('\u0000') != -1) {
             throw new IllegalArgumentException
                     ("Invalid environment variable name: \"" + name + "\"");
+        }
         return name;
     }
 
     private static String validateValue(String value) {
-        if (value.indexOf('\u0000') != -1)
+        if (value.indexOf('\u0000') != -1) {
             throw new IllegalArgumentException
                     ("Invalid environment variable value: \"" + value + "\"");
+        }
         return value;
     }
 
     private static String nonNullString(Object o) {
-        if (o == null)
+        if (o == null) {
             throw new NullPointerException();
+        }
         return (String) o;
     }
 
@@ -70,26 +73,38 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     private static class CheckedEntry implements Entry<String,String> {
         private final Entry<String,String> e;
         public CheckedEntry(Entry<String,String> e) {this.e = e;}
+        @Override
         public String getKey()   { return e.getKey();}
+        @Override
         public String getValue() { return e.getValue();}
+        @Override
         public String setValue(String value) {
             return e.setValue(validateValue(value));
         }
+        @Override
         public String toString() { return getKey() + "=" + getValue();}
+        @Override
         public boolean equals(Object o) {return e.equals(o);}
+        @Override
         public int hashCode()    {return e.hashCode();}
     }
 
     private static class CheckedEntrySet extends AbstractSet<Entry<String,String>> {
         private final Set<Entry<String,String>> s;
         public CheckedEntrySet(Set<Entry<String,String>> s) {this.s = s;}
+        @Override
         public int size()        {return s.size();}
+        @Override
         public boolean isEmpty() {return s.isEmpty();}
+        @Override
         public void clear()      {       s.clear();}
+        @Override
         public Iterator<Entry<String,String>> iterator() {
             return new Iterator<Entry<String,String>>() {
                 Iterator<Entry<String,String>> i = s.iterator();
+                @Override
                 public boolean hasNext() { return i.hasNext();}
+                @Override
                 public Entry<String,String> next() {
                     return new CheckedEntry(i.next());
                 }
@@ -104,18 +119,22 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
             nonNullString(e.getValue());
             return e;
         }
+        @Override
         public boolean contains(Object o) {return s.contains(checkedEntry(o));}
+        @Override
         public boolean remove(Object o)   {return s.remove(checkedEntry(o));}
     }
 
     private static class CheckedValues extends AbstractCollection<String> {
         private final Collection<String> c;
         public CheckedValues(Collection<String> c) {this.c = c;}
+        @Override
         public int size()                  {return c.size();}
         @Override
         public boolean isEmpty()           {return c.isEmpty();}
         @Override
         public void clear()                {       c.clear();}
+        @Override
         public Iterator<String> iterator() {return c.iterator();}
         @Override
         public boolean contains(Object o)  {return c.contains(nonNullString(o));}
@@ -126,11 +145,17 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     private static class CheckedKeySet extends AbstractSet<String> {
         private final Set<String> s;
         public CheckedKeySet(Set<String> s) {this.s = s;}
+        @Override
         public int size()                  {return s.size();}
+        @Override
         public boolean isEmpty()           {return s.isEmpty();}
+        @Override
         public void clear()                {       s.clear();}
+        @Override
         public Iterator<String> iterator() {return s.iterator();}
+        @Override
         public boolean contains(Object o)  {return s.contains(nonNullString(o));}
+        @Override
         public boolean remove(Object o)    {return s.remove(nonNullString(o));}
     }
     @Override
@@ -147,6 +172,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     }
 
     private static final class NameComparator implements Comparator<String> {
+        @Override
         public int compare(String s1, String s2) {
             // We can't use String.compareToIgnoreCase since it
             // canonicalizes to lower case, while Windows
@@ -163,7 +189,9 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
                     c2 = Character.toUpperCase(c2);
                     if (c1 != c2)
                         // No overflow because of numeric promotion
+                    {
                         return c1 - c2;
+                    }
                 }
             }
             return n1 - n2;
@@ -171,6 +199,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     }
 
     private static final class EntryComparator implements Comparator<Entry<String,String>> {
+        @Override
         public int compare(Entry<String,String> e1,
                            Entry<String,String> e2) {
             return nameComparator.compare(e1.getKey(), e2.getKey());
@@ -278,8 +307,9 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
     // add the environment variable to the child, if it exists in parent
     private static void addToEnvIfSet(StringBuilder sb, String name) {
         String s = getenv(name);
-        if (s != null)
+        if (s != null) {
             addToEnv(sb, name, s);
+        }
     }
 
     private static void addToEnv(StringBuilder sb, String name, String val) {

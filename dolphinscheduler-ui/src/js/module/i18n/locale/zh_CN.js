@@ -493,7 +493,7 @@ export default {
   'Statement cannot be empty': '语句不能为空',
   'Process Define Count': '工作流定义数',
   'Process Instance Running Count': '正在运行的流程数',
-  'Please select a queue': '请选择队列',
+  'Please select a queue': '默认为租户关联队列',
   'command number of waiting for running': '待执行的命令数',
   'failure command number': '执行失败的命令数',
   'tasks number of waiting running': '待运行任务数',
@@ -590,5 +590,7 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Successful branch flow and failed branch flow are required': '成功分支流转和失败分支流转必填',
   'Unauthorized or deleted resources': '未授权或已删除资源',
-  'Please delete all non-existent resources': '请删除所有未授权或已删除资源'
+  'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
+  'Enable': '启用',
+  'Disable': '停用'
 }
