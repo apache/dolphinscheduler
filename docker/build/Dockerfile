@@ -44,7 +44,6 @@ ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 #4. install pg
 RUN apk add postgresql postgresql-contrib
-
 #5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
