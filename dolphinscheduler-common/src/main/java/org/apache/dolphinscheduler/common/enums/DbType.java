@@ -61,17 +61,12 @@ public enum DbType {
     }
 
 
-    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap();
+    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap<>();
 
     static {
-        DB_TYPE_MAP.put(0,MYSQL);
-        DB_TYPE_MAP.put(1,POSTGRESQL);
-        DB_TYPE_MAP.put(2,HIVE);
-        DB_TYPE_MAP.put(3,SPARK);
-        DB_TYPE_MAP.put(4,CLICKHOUSE);
-        DB_TYPE_MAP.put(5,ORACLE);
-        DB_TYPE_MAP.put(6,SQLSERVER);
-        DB_TYPE_MAP.put(7,DB2);
+        for (DbType dbType:DbType.values()){
+            DB_TYPE_MAP.put(dbType.getCode(),dbType);
+        }
     }
 
     public static DbType of(int type){

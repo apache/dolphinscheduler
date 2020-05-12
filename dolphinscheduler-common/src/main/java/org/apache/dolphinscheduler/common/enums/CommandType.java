@@ -72,17 +72,9 @@ public enum CommandType {
     private static final Map<Integer, CommandType> COMMAND_TYPE_MAP = new HashMap<>();
 
     static {
-        COMMAND_TYPE_MAP.put(0, START_PROCESS);
-        COMMAND_TYPE_MAP.put(1, START_CURRENT_TASK_PROCESS);
-        COMMAND_TYPE_MAP.put(2, RECOVER_TOLERANCE_FAULT_PROCESS);
-        COMMAND_TYPE_MAP.put(3, RECOVER_SUSPENDED_PROCESS);
-        COMMAND_TYPE_MAP.put(4, START_FAILURE_TASK_PROCESS);
-        COMMAND_TYPE_MAP.put(5, COMPLEMENT_DATA);
-        COMMAND_TYPE_MAP.put(6, SCHEDULER);
-        COMMAND_TYPE_MAP.put(7, REPEAT_RUNNING);
-        COMMAND_TYPE_MAP.put(8, PAUSE);
-        COMMAND_TYPE_MAP.put(9, STOP);
-        COMMAND_TYPE_MAP.put(10, RECOVER_WAITTING_THREAD);
+        for (CommandType commandType : CommandType.values()) {
+            COMMAND_TYPE_MAP.put(commandType.code,commandType);
+        }
     }
 
 

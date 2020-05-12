@@ -67,19 +67,9 @@ public enum ExecutionStatus {
     private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP=new HashMap<>();
 
     static {
-        EXECUTION_STATUS_MAP.put(0,SUBMITTED_SUCCESS);
-        EXECUTION_STATUS_MAP.put(1,RUNNING_EXEUTION);
-        EXECUTION_STATUS_MAP.put(2,READY_PAUSE);
-        EXECUTION_STATUS_MAP.put(3,PAUSE);
-        EXECUTION_STATUS_MAP.put(4,READY_STOP);
-        EXECUTION_STATUS_MAP.put(5,STOP);
-        EXECUTION_STATUS_MAP.put(6,FAILURE);
-        EXECUTION_STATUS_MAP.put(7,SUCCESS);
-        EXECUTION_STATUS_MAP.put(8,NEED_FAULT_TOLERANCE);
-        EXECUTION_STATUS_MAP.put(9,KILL);
-        EXECUTION_STATUS_MAP.put(10,WAITTING_THREAD);
-        EXECUTION_STATUS_MAP.put(11,WAITTING_DEPEND);
-
+       for (ExecutionStatus executionStatus:ExecutionStatus.values()){
+           EXECUTION_STATUS_MAP.put(executionStatus.code,executionStatus);
+       }
     }
 
  /**
