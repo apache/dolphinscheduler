@@ -191,11 +191,6 @@ case "$1" in
         initNginx
         LOGFILE=/var/log/nginx/access.log
     ;;
-    (env)
-        initZK
-        initPostgreSQL
-        LOGFILE=/var/log/nginx/access.log
-    ;;
     (help)
         printUsage
         exit 1
