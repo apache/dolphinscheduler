@@ -76,7 +76,7 @@ public class RetryerUtils {
     }
 
     /**
-     * Use DEFAULT_RETRYER to invoke the Callable
+     * Use RETRYER to invoke the Callable
      *
      * @param callable    the callable
      * @param checkResult true means that retry callable before returning true
@@ -90,7 +90,7 @@ public class RetryerUtils {
     }
 
     /**
-     * Retry callable before returning true
+     * Use RETRYER to invoke the Callable before returning true
      *
      * @param callable the callable
      * @return the boolean
