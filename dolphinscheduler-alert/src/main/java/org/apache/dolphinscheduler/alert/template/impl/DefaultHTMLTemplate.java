@@ -35,6 +35,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
     public static final Logger logger = LoggerFactory.getLogger(DefaultHTMLTemplate.class);
 
+
     @Override
     public String getMessageFromTemplate(String content, ShowType showType,boolean showAll) {
 
@@ -140,7 +141,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         checkNotNull(content);
         String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n",title);
 
-        return "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><html><head><title>dolphinscheduler</title><meta name='Keywords' content=''><meta name='Description' content=''><style type=\"text/css\">table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: left;}table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: left;}</style></head><body style=\"margin:0;padding:0\"><table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\"> " +htmlTableThead + content +"</table></body></html>";
+        return Constants.HTML_HEADER_PREFIX +htmlTableThead + content + Constants.TABLE_BODY_HTML_TAIL;
     }
 
 }
