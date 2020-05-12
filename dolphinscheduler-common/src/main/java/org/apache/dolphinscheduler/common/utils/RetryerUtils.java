@@ -44,7 +44,7 @@ public class RetryerUtils {
 
     /**
      * Gets default retryer.
-     * the retryer will retry retry 3 times if exceptions throw
+     * the retryer will retry 3 times if exceptions throw
      * and wait 1 second between each retry
      *
      * @param checkResult true means the callable must return true before retrying
@@ -57,7 +57,7 @@ public class RetryerUtils {
 
     /**
      * Gets default retryer.
-     * the retryer will retry retry 3 times if exceptions throw
+     * the retryer will retry 3 times if exceptions throw
      * and wait 1 second between each retry
      *
      * @return the default retryer
