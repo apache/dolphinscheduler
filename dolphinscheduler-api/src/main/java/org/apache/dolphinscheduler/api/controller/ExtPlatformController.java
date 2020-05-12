@@ -150,7 +150,7 @@ public class ExtPlatformController extends BaseController{
      */
     @ApiOperation(value = "updateExtPlatform", notes= "UPDATE_EXTPLAFTORM_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "id", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "name", value = "EXTPLAFTORM_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "extPlatformType", value = "EXT_PLATFORM_TYPE", required = true, dataType ="int"),
             @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.158.20.23/list','urlType' : '0' "),
@@ -180,7 +180,7 @@ public class ExtPlatformController extends BaseController{
      */
     @ApiOperation(value = "selectExtPlatformById", notes= "GET_EXTPLAFTORM_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100")
 
     })
     @PostMapping(value = "/selectExtPlatformById")
@@ -205,7 +205,7 @@ public class ExtPlatformController extends BaseController{
      */
     @ApiOperation(value = "deleteExtPlatformById", notes= "DELETE_EXTPLAFTORM_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100")
 
     })
     @PostMapping(value = "/delete")

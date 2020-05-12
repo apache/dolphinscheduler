@@ -148,7 +148,7 @@ public class SchedulerCalendarController extends BaseController{
      */
     @ApiOperation(value = "updateCalendar", notes= "UPDATE_CALENDAR_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "id", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "name", value = "CALENDAR_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "calendarInfo", value = "CALENDARINFO", required = true, dataType ="String",example =
                     "{'startTime' : '2019-06-10 00:00:00','endTime' : '2019-06-13 00:00:00','extTime' : ['20190102','20190103','20190103']}"),
@@ -177,7 +177,7 @@ public class SchedulerCalendarController extends BaseController{
      */
     @ApiOperation(value = "selectCalendarById", notes= "GET_CALENDAR_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100")
 
     })
     @PostMapping(value = "/selectCalendarById")
