@@ -63,14 +63,12 @@ RUN chmod +x /root/checkpoint.sh && \
     chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     chmod +x /opt/dolphinscheduler/script/*.sh && \
     chmod +x /opt/dolphinscheduler/bin/*.sh && \
-    chmod +x /opt/zookeeper/bin/*.sh && \
     dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \
     dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     dos2unix /opt/dolphinscheduler/script/*.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
-    dos2unix /opt/zookeeper/bin/*.sh && \
     rm -rf /bin/sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls
