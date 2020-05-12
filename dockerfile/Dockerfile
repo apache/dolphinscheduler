@@ -42,12 +42,15 @@ ADD ./apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz 
 RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ /opt/dolphinscheduler/
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#4. modify nginx
+#4. install pg
+RUN apk add postgresql postgresql-contrib
+
+#5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
 ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
-#5. add configuration and modify permissions and set soft links
+#6. add configuration and modify permissions and set soft links
 ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
@@ -70,11 +73,11 @@ RUN chmod +x /root/checkpoint.sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls
 
-#6. remove apk index cache and disable coredup for sudo
+#7. remove apk index cache and disable coredup for sudo
 RUN rm -rf /var/cache/apk/* && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
 
-#7. expose port
+#8. expose port
 EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
 
 ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]
