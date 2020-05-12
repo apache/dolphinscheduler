@@ -37,32 +37,20 @@ RUN apk add openjdk8
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
-#3. install zk
-RUN cd /opt && \
-    wget https://downloads.apache.org/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz && \
-    tar -zxvf apache-zookeeper-3.5.7-bin.tar.gz && \
-    mv apache-zookeeper-3.5.7-bin zookeeper && \
-    mkdir -p /tmp/zookeeper && \
-    rm -rf ./zookeeper-*tar.gz && \
-    rm -rf /opt/zookeeper/conf/zoo_sample.cfg
-ADD ./conf/zookeeper/zoo.cfg /opt/zookeeper/conf
-ENV ZK_HOME /opt/zookeeper
-ENV PATH $ZK_HOME/bin:$PATH
-
-#4. install pg
+#3. install pg
 RUN apk add postgresql postgresql-contrib
 
-#5. add dolphinscheduler
+#4. add dolphinscheduler
 ADD ./apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz /opt/
 RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ /opt/dolphinscheduler/
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#6. modify nginx
+#5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
 ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
-#7. add configuration and modify permissions and set soft links
+#6. add configuration and modify permissions and set soft links
 ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
@@ -87,10 +75,10 @@ RUN chmod +x /root/checkpoint.sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls
 
-#8. remove apk index cache
+#7. remove apk index cache
 RUN rm -rf /var/cache/apk/*
 
-#9. expose port
+#8. expose port
 EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
 
 ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]
