@@ -32,7 +32,7 @@
     </select>
     <select id="queryUserPaging" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select u.id,u.user_name,u.user_password,u.user_type,u.email,u.phone,u.tenant_id,u.create_time,
-        u.update_time,t.tenant_name,
+        u.update_time,t.tenant_name,u.state,
         case when u.queue  <![CDATA[ <> ]]> '' then u.queue else q.queue_name end as queue, q.queue_name
         from t_ds_user u
         left join t_ds_tenant t on u.tenant_id=t.id
