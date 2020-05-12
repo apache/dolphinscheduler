@@ -105,6 +105,7 @@ public class JSONUtilsTest {
                 "{\n" + "\"foo\": \"bar\",\n" + "}", String.class));
 
         Assert.assertNull(JSONUtils.parseObject("", null));
+        Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
 
     @Test
