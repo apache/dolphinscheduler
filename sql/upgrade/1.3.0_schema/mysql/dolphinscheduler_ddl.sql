@@ -374,12 +374,10 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by()
 d//
 
 delimiter ;
-<<<<<<< HEAD:sql/upgrade/1.2.2_schema/mysql/dolphinscheduler_ddl.sql
 CALL ac_dolphin_T_t_ds_user_A_state;
 DROP PROCEDURE ac_dolphin_T_t_ds_user_A_state;
 
-=======
+delimiter ;
 CALL uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
 DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
->>>>>>> feature/docker_for_release:sql/upgrade/1.3.0_schema/mysql/dolphinscheduler_ddl.sql
 
