@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -238,7 +241,7 @@ public class ProcessService {
      * @param defineId
      * @return
      */
-    public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
+    public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
@@ -293,12 +296,41 @@ public class ProcessService {
 
         List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
 
-        for(Integer subId : subProcessIdList ){
+        for(Integer subId : subProcessIdList){
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
+            removeTaskLogFile(subId);
             deleteWorkProcessInstanceById(subId);
         }
         return 1;
+    }
+
+
+    /**
+     * remove task log file
+     * @param processInstanceId processInstanceId
+     */
+    public void removeTaskLogFile(Integer processInstanceId){
+
+        LogClientService logClient = new LogClientService();
+
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+
+        if (CollectionUtils.isEmpty(taskInstanceList)){
+            return;
+        }
+
+        for (TaskInstance taskInstance : taskInstanceList){
+            String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())){
+                continue;
+            }
+            String ip = Host.of(taskInstance.getHost()).getIp();
+            int port = Constants.RPC_PORT;
+
+            // remove task log from loggerserver
+            logClient.removeTaskLog(ip,port,taskLogPath);
+        }
     }
 
 
