@@ -92,8 +92,7 @@ public class ProcessService {
     @Autowired
     private ResourceMapper resourceMapper;
 
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -1683,15 +1682,7 @@ public class ProcessService {
         return queue;
     }
 
-    /**
-     * query worker group by id
-     * @param workerGroupId workerGroupId
-     * @return WorkerGroup
-     */
-    public WorkerGroup queryWorkerGroupById(int workerGroupId){
 
-        return workerGroupMapper.selectById(workerGroupId);
-    }
 
     /**
      * get task worker group

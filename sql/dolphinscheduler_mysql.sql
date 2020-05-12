@@ -415,6 +415,7 @@ CREATE TABLE `t_ds_process_definition` (
   `modify_by` varchar(255) DEFAULT NULL,
   `resource_ids` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_unique` (`name`,`project_id`),
   KEY `process_definition_index` (`project_id`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
