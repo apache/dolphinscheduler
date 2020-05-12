@@ -118,6 +118,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
+        <guava-retry.version>2.0.0</guava-retry.version>
     </properties>
 
     <dependencyManagement>
@@ -544,6 +545,12 @@
                 <artifactId>swagger-bootstrap-ui</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.github.rholder</groupId>
+                <artifactId>guava-retrying</artifactId>
+                <version>${guava-retry.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -770,6 +777,7 @@
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
+                        <include>**/common/utils/RetryerUtilsTest.java</include>
                         <include>**/common/plugin/FilePluginManagerTest</include>
                         <include>**/common/plugin/PluginClassLoaderTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
