@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
+import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.junit.Test;
@@ -82,42 +83,14 @@ public class DefaultHTMLTemplateTest{
 
     private String generateMockTableTypeResultByHand(){
 
-        return "<html>\n" +
-                "    <head>\n" +
-                "        <title>dolphinscheduler</title>\n" +
-                "        <meta name='Keywords' content=''>\n" +
-                "        <meta name='Description' content=''>\n" +
-                "        <style type=\"text/css\">\n" +
-                "            table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}\n" +
-                "            table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: right;}\n" +
-                "            table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: right;}\n" +
-                "        </style>\n" +
-                "    </head>\n" +
-                "    <body style=\"margin:0;padding:0\">\n" +
-                "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" +
+        return Constants.HTML_HEADER_PREFIX +
                 "<thead><tr><th>mysql service name</th><th>mysql address</th><th>port</th><th>no index of number</th><th>database client connections</th></tr></thead>\n" +
-                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>3306</td><td>80</td><td>190</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>3306</td><td>10</td><td>90</td></tr>        </table>\n" +
-                "    </body>\n" +
-                "</html>";
+                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>3306</td><td>80</td><td>190</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>3306</td><td>10</td><td>90</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
+
     }
 
     private String generateMockTextTypeResultByHand(){
 
-        return "<html>\n" +
-                "    <head>\n" +
-                "        <title>dolphinscheduler</title>\n" +
-                "        <meta name='Keywords' content=''>\n" +
-                "        <meta name='Description' content=''>\n" +
-                "        <style type=\"text/css\">\n" +
-                "            table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}\n" +
-                "            table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: right;}\n" +
-                "            table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: right;}\n" +
-                "        </style>\n" +
-                "    </head>\n" +
-                "    <body style=\"margin:0;padding:0\">\n" +
-                "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" +
-                "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"190\",\"port\":\"3306\",\"no index of number\":\"80\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"90\",\"port\":\"3306\",\"no index of number\":\"10\"}</td></tr>        </table>\n" +
-                "    </body>\n" +
-                "</html>";
+        return Constants.HTML_HEADER_PREFIX + "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"190\",\"port\":\"3306\",\"no index of number\":\"80\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"90\",\"port\":\"3306\",\"no index of number\":\"10\"}</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
     }
 }
