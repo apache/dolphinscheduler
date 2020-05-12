@@ -92,17 +92,9 @@ public class EmailAlertPlugin implements AlertPlugin {
             retMaps.put(Constants.MESSAGE, "execution failure,At least one receiver address required.");
             return retMaps;
         }
-        boolean flag;
-        try {
-            flag = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
-                    alert.getShowType());
-        } catch (Exception e) {
-            retMaps.put(Constants.MESSAGE, "alert send error.");
-            retMaps.put(Constants.STATUS, "false");
-            logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
-            return retMaps;
-        }
 
+        boolean flag = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
+                alert.getShowType());
 
         if (flag) {
             logger.info("alert send success");
@@ -116,12 +108,10 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
-
-        } else {
-            retMaps.put(Constants.MESSAGE, "alert send error.");
-            logger.info("alert send error : {}", "alert send error.");
         }
 
+        retMaps.put(Constants.MESSAGE, "alert send error.");
+        logger.info("alert send error : {}", "alert send error.");
         return retMaps;
     }
 
