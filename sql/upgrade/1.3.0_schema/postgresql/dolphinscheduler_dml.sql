@@ -16,3 +16,4 @@
 */
 UPDATE t_ds_resources SET pid=-1,is_directory=false WHERE pid IS NULL;
 UPDATE t_ds_resources SET full_name = concat('/',alias) WHERE pid=-1 and full_name IS NULL;
+UPDATE QRTZ_JOB_DETAILS SET JOB_CLASS_NAME='org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob' WHERE JOB_CLASS_NAME='org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob';
