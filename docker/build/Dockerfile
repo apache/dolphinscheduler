@@ -37,14 +37,13 @@ RUN apk add openjdk8
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
-#3. install pg
-RUN apk add postgresql postgresql-contrib
-
-#4. add dolphinscheduler
+#3. add dolphinscheduler
 ADD ./apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz /opt/
 RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ /opt/dolphinscheduler/
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
+#4. install pg
+RUN apk add postgresql postgresql-contrib
 #5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
@@ -73,8 +72,9 @@ RUN chmod +x /root/checkpoint.sh && \
     ln -s /bin/bash /bin/sh && \
     mkdir -p /tmp/xls
 
-#7. remove apk index cache
-RUN rm -rf /var/cache/apk/*
+#7. remove apk index cache and disable coredup for sudo
+RUN rm -rf /var/cache/apk/* && \
+    echo "Set disable_coredump false" >> /etc/sudo.conf
 
 #8. expose port
 EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888
