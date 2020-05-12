@@ -120,7 +120,7 @@ public class MailUtils {
                 // sender mail
                 return getStringObjectMap(title, content, showType, email);
             } catch (EmailException e) {
-                e.printStackTrace();
+                logger.error("Send email to {} failed", receivers, e);
             }
         }
 
