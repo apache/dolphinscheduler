@@ -70,7 +70,11 @@ public class MailUtilsTest {
         String[] mails = new String[]{"xx@xx.com"};
 
         for(Alert alert : alerts){
-            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
+            try {
+                MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -111,7 +115,11 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
+        try {
+            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
