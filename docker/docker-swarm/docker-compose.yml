@@ -41,13 +41,14 @@ services:
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
     - dolphinscheduler-zookeeper:/bitnami/zookeeper
     networks:
     - dolphinscheduler
 
   dolphinscheduler-api:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-api
     command: ["api-server"]
     ports:
@@ -70,12 +71,12 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - dolphinscheduler-api:/opt/dolphinscheduler/logs
-    networks: 
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    networks:
     - dolphinscheduler
 
   dolphinscheduler-frontend:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-frontend
     command: ["frontend"]
     ports:
@@ -93,12 +94,12 @@ services:
     depends_on:
     - dolphinscheduler-api
     volumes:
-    - dolphinscheduler-frontend:/var/log/nginx
+    - dolphinscheduler-logs:/var/log/nginx
     networks:
     - dolphinscheduler
 
   dolphinscheduler-alert:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-alert
     command: ["alert-server"]
     environment:
@@ -130,18 +131,18 @@ services:
       start_period: 30s
     depends_on:
     - dolphinscheduler-postgresql
-    volumes: 
-    - dolphinscheduler-alert:/opt/dolphinscheduler/logs
-    networks: 
+    volumes:
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    networks:
     - dolphinscheduler
 
   dolphinscheduler-master:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-master
     command: ["master-server"]
-    ports: 
+    ports:
     - 5678:5678
-    environment: 
+    environment:
       TZ: Asia/Shanghai
       MASTER_EXEC_THREADS: "100"
       MASTER_EXEC_TASK_NUM: "20"
@@ -162,16 +163,16 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    depends_on: 
+    depends_on:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
-    volumes: 
-    - dolphinscheduler-master:/opt/dolphinscheduler/logs
+    volumes:
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
   dolphinscheduler-worker:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-worker
     command: ["worker-server"]
     ports: 
@@ -209,7 +210,7 @@ services:
       source: dolphinscheduler-worker-data
       target: /tmp/dolphinscheduler
     - type: volume
-      source: dolphinscheduler-worker-logs
+      source: dolphinscheduler-logs
       target: /opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
@@ -221,12 +222,8 @@ networks:
 volumes:
   dolphinscheduler-postgresql:
   dolphinscheduler-zookeeper:
-  dolphinscheduler-api:
-  dolphinscheduler-frontend:
-  dolphinscheduler-alert:
-  dolphinscheduler-master:
   dolphinscheduler-worker-data:
-  dolphinscheduler-worker-logs:
+  dolphinscheduler-logs:
 
 configs:
   dolphinscheduler-worker-task-env:
