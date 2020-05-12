@@ -173,7 +173,7 @@ export default {
   'Tenant Code': 'Tenant Code',
   'Tenant Name': 'Tenant Name',
   Queue: 'Queue',
-  'Please select a queue': 'Please select a queue',
+  'Please select a queue': 'default is tenant association queue',
   'Please enter the tenant code in English': 'Please enter the tenant code in English',
   'Please enter tenant code in English': 'Please enter tenant code in English',
   'Edit User': 'Edit User',
@@ -590,5 +590,7 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
   'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required',
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
-  'Please delete all non-existent resources': 'Please delete all non-existent resources'
+  'Please delete all non-existent resources': 'Please delete all non-existent resources',
+  'Enable': 'Enable',
+  'Disable': 'Disable'
 }

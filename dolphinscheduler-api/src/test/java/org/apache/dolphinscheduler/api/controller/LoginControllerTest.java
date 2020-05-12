@@ -56,7 +56,6 @@ public class LoginControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
     public void testSignOut() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
