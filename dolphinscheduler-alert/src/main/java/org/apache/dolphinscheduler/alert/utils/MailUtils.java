@@ -74,7 +74,7 @@ public class MailUtils {
      * @param showType the show type
      * @return the result map
      */
-    public static Boolean sendMails(Collection<String> receivers, String title, String content,String showType) throws Exception {
+    public static Boolean sendMails(Collection<String> receivers, String title, String content,String showType){
         return sendMails(receivers, null, title, content, showType);
     }
 
@@ -120,7 +120,7 @@ public class MailUtils {
                 // sender mail
                 return getStringObjectMap(title, content, showType, email);
             } catch (EmailException e) {
-                logger.error("Send email to {} failed", receivers, e);
+                logger.error("Send table email to {} failed", receivers, e);
             }
         }
 
@@ -130,7 +130,7 @@ public class MailUtils {
             try {
                 attachment(receivers,receiversCc,title,content,partContent);
             } catch (Exception e) {
-                logger.error("Send email to {} failed", receivers, e);
+                logger.error("Send attachment email to {} failed", receivers, e);
             }
             return Boolean.TRUE;
         }
