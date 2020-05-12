@@ -363,24 +363,20 @@ delimiter ;
 select dc_dolphin_T_t_ds_error_command_D_worker_group_id();
 DROP FUNCTION dc_dolphin_T_t_ds_error_command_D_worker_group_id();
 
-
--- ac_dolphin_T_t_ds_user_A_state
-delimiter ;
-DROP FUNCTION IF EXISTS ac_dolphin_T_t_ds_user_A_state();
+-- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
 delimiter d//
-CREATE FUNCTION ac_dolphin_T_t_ds_user_A_state() RETURNS void AS $$
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_process_definition_unique() RETURNS void AS $$
 BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_user'
-          AND COLUMN_NAME ='state')
+       IF NOT EXISTS (SELECT 1 FROM pg_stat_all_indexes
+          WHERE relname='t_ds_process_definition'
+                            AND indexrelname ='process_definition_unique')
       THEN
-         ALTER TABLE t_ds_user ADD COLUMN state int DEFAULT 1;
+         ALTER TABLE t_ds_process_definition ADD CONSTRAINT process_definition_unique UNIQUE (name,project_id);
        END IF;
 END;
 $$ LANGUAGE plpgsql;
 d//
+
 delimiter ;
-select ac_dolphin_T_t_ds_user_A_state();
-DROP FUNCTION ac_dolphin_T_t_ds_user_A_state();
+SELECT uc_dolphin_T_t_ds_process_definition_A_process_definition_unique();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique();

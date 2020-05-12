@@ -24,31 +24,6 @@ DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 
 # start postgresql
 initPostgreSQL() {
-    echo "checking postgresql"
-    if [[ "${POSTGRESQL_HOST}" = "127.0.0.1" || "${POSTGRESQL_HOST}" = "localhost" ]]; then
-        export PGPORT=${POSTGRESQL_PORT}
-
-        echo "start postgresql service"
-        rc-service postgresql restart
-
-        # role if not exists, create
-        flag=$(sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='${POSTGRESQL_USERNAME}'")
-        if [ -z "${flag}" ]; then
-            echo "create user"
-            sudo -u postgres psql -tAc "create user ${POSTGRESQL_USERNAME} with password '${POSTGRESQL_PASSWORD}'"
-        fi
-
-        # database if not exists, create
-        flag=$(sudo -u postgres psql -tAc "select 1 from pg_database where datname='dolphinscheduler'")
-        if [ -z "${flag}" ]; then
-            echo "init db"
-            sudo -u postgres psql -tAc "create database dolphinscheduler owner ${POSTGRESQL_USERNAME}"
-        fi
-
-        # grant
-        sudo -u postgres psql -tAc "grant all privileges on database dolphinscheduler to ${POSTGRESQL_USERNAME}"
-    fi
-
     echo "test postgresql service"
     while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
         counter=$((counter+1))
@@ -73,24 +48,18 @@ initPostgreSQL() {
 
 # start zk
 initZK() {
-    echo -e "checking zookeeper"
-    if [[ "${ZOOKEEPER_QUORUM}" = "127.0.0.1:2181" || "${ZOOKEEPER_QUORUM}" = "localhost:2181" ]]; then
-        echo "start local zookeeper"
-        /opt/zookeeper/bin/zkServer.sh restart
-    else
-        echo "connect remote zookeeper"
-        echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
-            while ! nc -z ${line%:*} ${line#*:}; do
-                counter=$((counter+1))
-                if [ $counter == 30 ]; then
-                    echo "Error: Couldn't connect to zookeeper."
-                    exit 1
-                fi
-                echo "Trying to connect to zookeeper at ${line}. Attempt $counter."
-                sleep 5
-            done
+    echo "connect remote zookeeper"
+    echo "${ZOOKEEPER_QUORUM}" | awk -F ',' 'BEGIN{ i=1 }{ while( i <= NF ){ print $i; i++ } }' | while read line; do
+        while ! nc -z ${line%:*} ${line#*:}; do
+            counter=$((counter+1))
+            if [ $counter == 30 ]; then
+                echo "Error: Couldn't connect to zookeeper."
+                exit 1
+            fi
+            echo "Trying to connect to zookeeper at ${line}. Attempt $counter."
+            sleep 5
         done
-    fi
+    done
 }
 
 # start nginx

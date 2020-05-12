@@ -357,24 +357,29 @@ delimiter ;
 CALL dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 
--- ac_dolphin_T_t_ds_user_A_state
-drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_user_A_state;
+-- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
 delimiter d//
-CREATE PROCEDURE ac_dolphin_T_t_ds_user_A_state()
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by()
    BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_user'
+       IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
+           WHERE TABLE_NAME='t_ds_process_definition'
            AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='state')
+           AND INDEX_NAME ='process_definition_unique')
    THEN
-         ALTER TABLE t_ds_user ADD `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable';
+         ALTER TABLE t_ds_process_definition ADD UNIQUE KEY `process_definition_unique` (`name`,`project_id`);
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD:sql/upgrade/1.2.2_schema/mysql/dolphinscheduler_ddl.sql
 CALL ac_dolphin_T_t_ds_user_A_state;
 DROP PROCEDURE ac_dolphin_T_t_ds_user_A_state;
 
+=======
+CALL uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+>>>>>>> feature/docker_for_release:sql/upgrade/1.3.0_schema/mysql/dolphinscheduler_ddl.sql
 

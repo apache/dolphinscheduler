@@ -309,7 +309,8 @@ CREATE TABLE t_ds_process_definition (
   update_time timestamp DEFAULT NULL ,
   modify_by varchar(36) DEFAULT '' ,
   resource_ids varchar(64),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
 ) ;
 
 create index process_definition_index on t_ds_process_definition (project_id,id);
@@ -759,4 +760,4 @@ INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,upda
 INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('2.0.0');
+INSERT INTO t_ds_version(version) VALUES ('1.3.0');
