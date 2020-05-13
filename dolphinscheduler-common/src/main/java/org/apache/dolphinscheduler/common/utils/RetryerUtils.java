@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 import com.github.rholder.retry.*;
@@ -27,19 +28,23 @@ import java.util.concurrent.TimeUnit;
  * The Retryer util.
  */
 public class RetryerUtils {
-    private static Retryer<Boolean> DEFAULT_RETRYER_RESULT_CHECK;
-    private static Retryer<Boolean> DEFAULT_RETRYER_RESULT_NO_CHECK;
+    private static Retryer<Boolean> defaultRetryerResultCheck;
+    private static Retryer<Boolean> defaultRetryerResultNoCheck;
+
+    private RetryerUtils() {
+
+    }
 
     private static Retryer<Boolean> getDefaultRetryerResultNoCheck() {
-        if (DEFAULT_RETRYER_RESULT_NO_CHECK == null) {
-            DEFAULT_RETRYER_RESULT_NO_CHECK = RetryerBuilder
+        if (defaultRetryerResultNoCheck == null) {
+            defaultRetryerResultNoCheck = RetryerBuilder
                     .<Boolean>newBuilder()
                     .retryIfException()
                     .withWaitStrategy(WaitStrategies.fixedWait(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS))
                     .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                     .build();
         }
-        return DEFAULT_RETRYER_RESULT_NO_CHECK;
+        return defaultRetryerResultNoCheck;
     }
 
     /**
@@ -63,8 +68,8 @@ public class RetryerUtils {
      * @return the default retryer
      */
     public static Retryer<Boolean> getDefaultRetryer() {
-        if (DEFAULT_RETRYER_RESULT_CHECK == null) {
-            DEFAULT_RETRYER_RESULT_CHECK = RetryerBuilder
+        if (defaultRetryerResultCheck == null) {
+            defaultRetryerResultCheck = RetryerBuilder
                     .<Boolean>newBuilder()
                     .retryIfResult(Boolean.FALSE::equals)
                     .retryIfException()
@@ -72,7 +77,7 @@ public class RetryerUtils {
                     .withStopStrategy(StopStrategies.stopAfterAttempt(3))
                     .build();
         }
-        return DEFAULT_RETRYER_RESULT_CHECK;
+        return defaultRetryerResultCheck;
     }
 
     /**
