@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
@@ -46,6 +47,13 @@ public class PasswordAuthenticator implements Authenticator {
         if (user == null) {
             result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
             result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
+            return result;
+        }
+
+        // check user state
+        if (user.getState() == Flag.NO.ordinal()) {
+            result.setCode(Status.USER_DISABLED.getCode());
+            result.setMsg(Status.USER_DISABLED.getMsg());
             return result;
         }
 
