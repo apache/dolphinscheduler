@@ -20,6 +20,12 @@ workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/install_config.conf
 
+txt=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    txt="''"
+fi
+
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
@@ -33,6 +39,11 @@ do
 
   for dsDir in bin conf lib script sql ui install.sh
   do
+    # if worker in workersGroup
+    if [[ "${map[${host}]}" ]] && [[ "${dsDir}" -eq "conf" ]]; then
+      sed -i ${txt} "s#worker.group.*#worker.group=${map[${host}]}#g" $workDir/../conf/worker.properties
+    fi
+
     echo "start to scp $dsDir to $host/$installPath"
     scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
   done
