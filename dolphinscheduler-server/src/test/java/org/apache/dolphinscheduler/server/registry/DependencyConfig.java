@@ -20,11 +20,14 @@ package org.apache.dolphinscheduler.server.registry;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.RandomHostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -110,10 +113,7 @@ public class DependencyConfig {
         return Mockito.mock(ResourceMapper.class);
     }
 
-    @Bean
-    public WorkerGroupMapper workerGroupMapper(){
-        return Mockito.mock(WorkerGroupMapper.class);
-    }
+
 
     @Bean
     public ErrorCommandMapper errorCommandMapper(){
@@ -143,5 +143,10 @@ public class DependencyConfig {
     @Bean
     public TaskResponseService taskResponseService(){
         return Mockito.mock(TaskResponseService.class);
+    }
+
+    @Bean
+    public TaskPriorityQueue taskPriorityQueue(){
+        return new TaskPriorityQueueImpl();
     }
 }

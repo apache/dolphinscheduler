@@ -87,7 +87,7 @@ export default class Radar extends Base {
       targetSeries._raw.push(data[i])
 
       // index
-      let targetIndicator = indicator.find(i => i.name === textItem)
+      const targetIndicator = indicator.find(i => i.name === textItem)
       if (!targetIndicator) {
         indicator.push({ name: textItem })
       }

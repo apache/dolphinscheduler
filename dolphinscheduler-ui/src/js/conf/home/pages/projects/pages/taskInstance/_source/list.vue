@@ -19,43 +19,45 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th scope="col">
+          <th scope="col" style="min-width: 50px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Name')}}</span>
           </th>
-          <th scope="col">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Instance')}}</span>
           </th>
-          <th scope="col" width="70">
+          <th scope="col" style="min-width: 60px">
             <span>{{$t('Executor')}}</span>
           </th>
-          <th scope="col" width="90">
+          <th scope="col" style="min-width: 70px">
             <span>{{$t('Node Type')}}</span>
           </th>
-          <th scope="col" width="40">
+          <th scope="col" style="min-width: 30px">
             <span>{{$t('State')}}</span>
           </th>
-          <th scope="col" width="140">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Submit Time')}}</span>
           </th>
-          <th scope="col" width="140">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th scope="col" width="125">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th scope="col" width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('host')}}</span>
           </th>
-          <th scope="col" width="70">
+          <th scope="col" style="min-width: 70px">
             <span>{{$t('Duration')}}(s)</span>
           </th>
-          <th scope="col" width="84">
-            <span>{{$t('Retry Count')}}</span>
+          <th scope="col" style="min-width: 60px">
+            <div style="width: 50px">
+              <span>{{$t('Retry Count')}}</span>
+            </div>
           </th>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -63,10 +65,10 @@
           <td>
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
-          <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;"><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis" :title="item.processInstanceName">{{item.processInstanceName}}</span></a></td>
           <td>
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
