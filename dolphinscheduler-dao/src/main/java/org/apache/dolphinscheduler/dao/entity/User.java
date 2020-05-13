@@ -68,6 +68,11 @@ public class  User {
     private int tenantId;
 
     /**
+     * user state
+     */
+    private int state;
+
+    /**
      * tenant code
      */
     @TableField(exist = false)
@@ -219,6 +224,14 @@ public class  User {
         this.queue = queue;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -254,6 +267,7 @@ public class  User {
                 ", phone='" + phone + '\'' +
                 ", userType=" + userType +
                 ", tenantId=" + tenantId +
+                ", state=" + state +
                 ", tenantCode='" + tenantCode + '\'' +
                 ", tenantName='" + tenantName + '\'' +
                 ", queueName='" + queueName + '\'' +
