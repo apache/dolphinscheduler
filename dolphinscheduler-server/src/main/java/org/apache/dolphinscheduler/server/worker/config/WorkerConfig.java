@@ -38,7 +38,7 @@ public class WorkerConfig {
     @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${worker.reserved.memory:0.5}")
+    @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
 
     @Value("${worker.group: default}")

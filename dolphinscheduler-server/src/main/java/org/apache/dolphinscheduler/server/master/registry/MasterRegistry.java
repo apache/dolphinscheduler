@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +97,12 @@ public class MasterRegistry {
             }
         });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
-        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+                masterConfig.getMasterReservedMemory(),
+                masterConfig.getMasterMaxCpuloadAvg(),
+                getMasterPath(),
+                zookeeperRegistryCenter);
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
     }
 
@@ -127,25 +134,4 @@ public class MasterRegistry {
         return OSUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 
-    /**
-     * hear beat task
-     */
-    class HeartBeatTask implements Runnable{
-
-        @Override
-        public void run() {
-            try {
-                StringBuilder builder = new StringBuilder(100);
-                builder.append(OSUtils.cpuUsage()).append(COMMA);
-                builder.append(OSUtils.memoryUsage()).append(COMMA);
-                builder.append(OSUtils.loadAverage()).append(COMMA);
-                builder.append(startTime).append(COMMA);
-                builder.append(DateUtils.dateToString(new Date()));
-                String masterPath = getMasterPath();
-                zookeeperRegistryCenter.getZookeeperCachedOperator().update(masterPath, builder.toString());
-            } catch (Throwable ex){
-                logger.error("error write master heartbeat info", ex);
-            }
-        }
-    }
 }

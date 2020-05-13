@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -150,8 +151,13 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for(String node : nodes){
                         String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
-                        if(StringUtils.isNotEmpty(heartbeat) && heartbeat.contains(COMMA) && heartbeat.split(COMMA).length == 5){
+                        if(StringUtils.isNotEmpty(heartbeat)
+                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
                             String[] parts = heartbeat.split(COMMA);
+                            int status = Integer.parseInt(parts[8]);
+                            if (status == Constants.ABNORMAL_NODE_STATUS){
+                                continue;
+                            }
                             double cpu = Double.parseDouble(parts[0]);
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);

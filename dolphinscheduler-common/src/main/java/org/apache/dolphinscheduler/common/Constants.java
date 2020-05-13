@@ -507,7 +507,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 5;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 9;
 
 
     /**
@@ -783,10 +783,6 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
 
-    /**
-     * default worker group id
-     */
-    public static final int DEFAULT_WORKER_ID = -1;
 
     /**
      * loginUserFromKeytab path
@@ -960,5 +956,9 @@ public final class Constants {
      * plugin configurations
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
+
+
+    public static final int NORAML_NODE_STATUS = 0;
+    public static final int ABNORMAL_NODE_STATUS = 1;
 
 }
