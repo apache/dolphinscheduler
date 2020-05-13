@@ -93,13 +93,15 @@ public class ProcessImplForWin32 extends Process {
         if (append) {
             String path = f.getPath();
             SecurityManager sm = System.getSecurityManager();
-            if (sm != null)
+            if (sm != null) {
                 sm.checkWrite(path);
+            }
             long handle = openForAtomicAppend(path);
             final FileDescriptor fd = new FileDescriptor();
             setHandle(fd, handle);
             return AccessController.doPrivileged(
                     new PrivilegedAction<FileOutputStream>() {
+                        @Override
                         public FileOutputStream run() {
                             return new FileOutputStream(fd);
                         }
@@ -133,30 +135,30 @@ public class ProcessImplForWin32 extends Process {
             } else {
                 stdHandles = new long[3];
 
-                if (redirects[0] == ProcessBuilderForWin32.Redirect.PIPE)
+                if (redirects[0] == ProcessBuilderForWin32.Redirect.PIPE) {
                     stdHandles[0] = -1L;
-                else if (redirects[0] == ProcessBuilderForWin32.Redirect.INHERIT)
+                } else if (redirects[0] == ProcessBuilderForWin32.Redirect.INHERIT) {
                     stdHandles[0] = getHandle(FileDescriptor.in);
-                else {
+                } else {
                     f0 = new FileInputStream(redirects[0].file());
                     stdHandles[0] = getHandle(f0.getFD());
                 }
 
-                if (redirects[1] == ProcessBuilderForWin32.Redirect.PIPE)
+                if (redirects[1] == ProcessBuilderForWin32.Redirect.PIPE) {
                     stdHandles[1] = -1L;
-                else if (redirects[1] == ProcessBuilderForWin32.Redirect.INHERIT)
+                } else if (redirects[1] == ProcessBuilderForWin32.Redirect.INHERIT) {
                     stdHandles[1] = getHandle(FileDescriptor.out);
-                else {
+                } else {
                     f1 = newFileOutputStream(redirects[1].file(),
                             redirects[1].append());
                     stdHandles[1] = getHandle(f1.getFD());
                 }
 
-                if (redirects[2] == ProcessBuilderForWin32.Redirect.PIPE)
+                if (redirects[2] == ProcessBuilderForWin32.Redirect.PIPE) {
                     stdHandles[2] = -1L;
-                else if (redirects[2] == ProcessBuilderForWin32.Redirect.INHERIT)
+                } else if (redirects[2] == ProcessBuilderForWin32.Redirect.INHERIT) {
                     stdHandles[2] = getHandle(FileDescriptor.err);
-                else {
+                } else {
                     f2 = newFileOutputStream(redirects[2].file(),
                             redirects[2].append());
                     stdHandles[2] = getHandle(f2.getFD());
@@ -167,10 +169,19 @@ public class ProcessImplForWin32 extends Process {
         } finally {
             // In theory, close() can throw IOException
             // (although it is rather unlikely to happen here)
-            try { if (f0 != null) f0.close(); }
+            try { if (f0 != null) {
+                f0.close();
+            }
+            }
             finally {
-                try { if (f1 != null) f1.close(); }
-                finally { if (f2 != null) f2.close(); }
+                try { if (f1 != null) {
+                    f1.close();
+                }
+                }
+                finally { if (f2 != null) {
+                    f2.close();
+                }
+                }
             }
         }
 
@@ -193,8 +204,9 @@ public class ProcessImplForWin32 extends Process {
     private static String[] getTokensFromCommand(String command) {
         ArrayList<String> matchList = new ArrayList<>(8);
         Matcher regexMatcher = ProcessImplForWin32.LazyPattern.PATTERN.matcher(command);
-        while (regexMatcher.find())
+        while (regexMatcher.find()) {
             matchList.add(regexMatcher.group());
+        }
         return matchList.toArray(new String[matchList.size()]);
     }
 
@@ -378,8 +390,9 @@ public class ProcessImplForWin32 extends Process {
     // .bat files don't include backslashes as part of the quote
     private static int countLeadingBackslash(int verificationType,
                                              CharSequence input, int start) {
-        if (verificationType == VERIFICATION_CMD_BAT)
+        if (verificationType == VERIFICATION_CMD_BAT) {
             return 0;
+        }
         int j;
         for (j = start - 1; j >= 0 && input.charAt(j) == BACKSLASH; j--) {
             // just scanning backwards
@@ -417,8 +430,9 @@ public class ProcessImplForWin32 extends Process {
             String executablePath = new File(cmd[0]).getPath();
 
             // No worry about internal, unpaired ["], and redirection/piping.
-            if (needsEscaping(VERIFICATION_LEGACY, executablePath) )
+            if (needsEscaping(VERIFICATION_LEGACY, executablePath) ) {
                 executablePath = quoteString(executablePath);
+            }
 
             cmdstr = createCommandLine(
                     //legacy mode doesn't worry about extended verification
@@ -442,16 +456,18 @@ public class ProcessImplForWin32 extends Process {
                 // Restore original command line.
                 StringBuilder join = new StringBuilder();
                 // terminal space in command line is ok
-                for (String s : cmd)
+                for (String s : cmd) {
                     join.append(s).append(' ');
+                }
 
                 // Parse the command line again.
                 cmd = getTokensFromCommand(join.toString());
                 executablePath = getExecutablePath(cmd[0]);
 
                 // Check new executable name once more
-                if (security != null)
+                if (security != null) {
                     security.checkExec(executablePath);
+                }
             }
 
             // Quotation protects from interpretation of the [path] argument as
@@ -471,28 +487,29 @@ public class ProcessImplForWin32 extends Process {
 
         AccessController.doPrivileged(
                 new PrivilegedAction<Void>() {
+                    @Override
                     public Void run() {
-                        if (stdHandles[0] == -1L)
+                        if (stdHandles[0] == -1L) {
                             stdinStream = ProcessBuilderForWin32.NullOutputStream.INSTANCE;
-                        else {
+                        } else {
                             FileDescriptor stdinFd = new FileDescriptor();
                             setHandle(stdinFd, stdHandles[0]);
                             stdinStream = new BufferedOutputStream(
                                     new FileOutputStream(stdinFd));
                         }
 
-                        if (stdHandles[1] == -1L)
+                        if (stdHandles[1] == -1L) {
                             stdoutStream = ProcessBuilderForWin32.NullInputStream.INSTANCE;
-                        else {
+                        } else {
                             FileDescriptor stdoutFd = new FileDescriptor();
                             setHandle(stdoutFd, stdHandles[1]);
                             stdoutStream = new BufferedInputStream(
                                     new FileInputStream(stdoutFd));
                         }
 
-                        if (stdHandles[2] == -1L)
+                        if (stdHandles[2] == -1L) {
                             stderrStream = ProcessBuilderForWin32.NullInputStream.INSTANCE;
-                        else {
+                        } else {
                             FileDescriptor stderrFd = new FileDescriptor();
                             setHandle(stderrFd, stdHandles[2]);
                             stderrStream = new FileInputStream(stderrFd);
@@ -501,33 +518,41 @@ public class ProcessImplForWin32 extends Process {
                         return null; }});
     }
 
+    @Override
     public OutputStream getOutputStream() {
         return stdinStream;
     }
 
+    @Override
     public InputStream getInputStream() {
         return stdoutStream;
     }
 
+    @Override
     public InputStream getErrorStream() {
         return stderrStream;
     }
 
+    @Override
     protected void finalize() {
         closeHandle(handle);
     }
 
+    @Override
     public int exitValue() {
         int exitCode = getExitCodeProcess(handle);
-        if (exitCode == STILL_ACTIVE)
+        if (exitCode == STILL_ACTIVE) {
             throw new IllegalThreadStateException("process has not exited");
+        }
         return exitCode;
     }
 
+    @Override
     public int waitFor() throws InterruptedException {
         waitForInterruptibly(handle);
-        if (Thread.interrupted())
+        if (Thread.interrupted()) {
             throw new InterruptedException();
+        }
         return exitValue();
     }
 
@@ -535,8 +560,12 @@ public class ProcessImplForWin32 extends Process {
     public boolean waitFor(long timeout, TimeUnit unit)
             throws InterruptedException
     {
-        if (getExitCodeProcess(handle) != STILL_ACTIVE) return true;
-        if (timeout <= 0) return false;
+        if (getExitCodeProcess(handle) != STILL_ACTIVE) {
+            return true;
+        }
+        if (timeout <= 0) {
+            return false;
+        }
 
         long remainingNanos  = unit.toNanos(timeout);
         long deadline = System.nanoTime() + remainingNanos ;
@@ -545,8 +574,9 @@ public class ProcessImplForWin32 extends Process {
             // Round up to next millisecond
             long msTimeout = TimeUnit.NANOSECONDS.toMillis(remainingNanos + 999_999L);
             waitForTimeoutInterruptibly(handle, msTimeout);
-            if (Thread.interrupted())
+            if (Thread.interrupted()) {
                 throw new InterruptedException();
+            }
             if (getExitCodeProcess(handle) != STILL_ACTIVE) {
                 return true;
             }
@@ -556,6 +586,7 @@ public class ProcessImplForWin32 extends Process {
         return (getExitCodeProcess(handle) != STILL_ACTIVE);
     }
 
+    @Override
     public void destroy() { terminateProcess(handle); }
 
     @Override

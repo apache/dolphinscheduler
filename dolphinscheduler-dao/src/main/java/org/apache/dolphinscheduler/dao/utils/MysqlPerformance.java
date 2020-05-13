@@ -56,7 +56,7 @@ public class MysqlPerformance extends BaseDBPerformance{
 
             try (ResultSet rs1 = pstmt.executeQuery("show global variables")) {
                 while(rs1.next()){
-                    if(rs1.getString(VARIABLE_NAME).equalsIgnoreCase("MAX_CONNECTIONS")){
+                    if("MAX_CONNECTIONS".equalsIgnoreCase(rs1.getString(VARIABLE_NAME))){
                         monitorRecord.setMaxConnections( Long.parseLong(rs1.getString("value")));
                     }
                 }
@@ -64,11 +64,11 @@ public class MysqlPerformance extends BaseDBPerformance{
 
             try (ResultSet rs2 = pstmt.executeQuery("show global status")) {
                 while(rs2.next()){
-                    if(rs2.getString(VARIABLE_NAME).equalsIgnoreCase("MAX_USED_CONNECTIONS")){
+                    if("MAX_USED_CONNECTIONS".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
                         monitorRecord.setMaxUsedConnections(Long.parseLong(rs2.getString("value")));
-                    }else if(rs2.getString(VARIABLE_NAME).equalsIgnoreCase("THREADS_CONNECTED")){
+                    }else if("THREADS_CONNECTED".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
                         monitorRecord.setThreadsConnections(Long.parseLong(rs2.getString("value")));
-                    }else if(rs2.getString(VARIABLE_NAME).equalsIgnoreCase("THREADS_RUNNING")){
+                    }else if("THREADS_RUNNING".equalsIgnoreCase(rs2.getString(VARIABLE_NAME))){
                         monitorRecord.setThreadsRunningConnections(Long.parseLong(rs2.getString("value")));
                     }
                 }

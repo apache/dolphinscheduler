@@ -16,9 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.interceptor;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.httpclient.HttpStatus;
@@ -85,6 +87,14 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         return false;
       }
     }
+
+    // check user state
+    if (user.getState() == Flag.NO.ordinal()) {
+      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+      logger.info(Status.USER_DISABLED.getMsg());
+      return false;
+    }
+
     request.setAttribute(Constants.SESSION_USER, user);
     return true;
   }
