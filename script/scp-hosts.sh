@@ -40,8 +40,8 @@ do
   for dsDir in bin conf lib script sql ui install.sh
   do
     # if worker in workersGroup
-    if [[ "${map[${host}]}" ]] && [[ "${dsDir}" -eq "conf" ]]; then
-      sed -i ${txt} "s#worker.group.*#worker.group=${map[${host}]}#g" $workDir/../conf/worker.properties
+    if [[ "${workersGroup[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
+      sed -i ${txt} "s#worker.group.*#worker.group=${workersGroup[${host}]}#g" ${dsDir}/worker.properties
     fi
 
     echo "start to scp $dsDir to $host/$installPath"
