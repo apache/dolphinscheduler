@@ -74,6 +74,22 @@ public class ProcessDefinitionMapperTest {
     }
 
     /**
+     * insert
+     * @return ProcessDefinition
+     */
+    private ProcessDefinition insertTwo(){
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 2");
+        processDefinition.setProjectId(1010);
+        processDefinition.setUserId(101);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinitionMapper.insert(processDefinition);
+        return processDefinition;
+    }
+
+    /**
      * test update
      */
     @Test
@@ -177,7 +193,7 @@ public class ProcessDefinitionMapperTest {
     public void testQueryDefinitionListByIdList() {
 
         ProcessDefinition processDefinition = insertOne();
-        ProcessDefinition processDefinition1 = insertOne();
+        ProcessDefinition processDefinition1 = insertTwo();
 
         Integer[] array = new Integer[2];
         array[0] = processDefinition.getId();
