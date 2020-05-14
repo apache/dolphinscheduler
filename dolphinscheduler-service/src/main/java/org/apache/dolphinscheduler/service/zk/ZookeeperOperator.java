@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
+import org.apache.curator.framework.api.transaction.CuratorOp;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
@@ -171,7 +172,11 @@ public class ZookeeperOperator implements InitializingBean {
 
     public void update(final String key, final String value) {
         try {
-            zkClient.inTransaction().check().forPath(key).and().setData().forPath(key, value.getBytes(StandardCharsets.UTF_8)).and().commit();
+
+            CuratorOp check = zkClient.transactionOp().check().forPath(key);
+            CuratorOp setData = zkClient.transactionOp().setData().forPath(key, value.getBytes(StandardCharsets.UTF_8));
+            zkClient.transaction().forOperations(check, setData);
+
         } catch (Exception ex) {
             logger.error("update key : {} , value : {}", key, value, ex);
         }
