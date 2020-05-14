@@ -777,9 +777,12 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
+                        <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
                         <include>**/remote/FastJsonSerializerTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
+                        <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <include>**/server/log/TaskLogDiscriminatorTest.java</include>
