@@ -28,8 +28,7 @@ do
 
 done
 
-workersHost=(${workers//,/ })
-for worker in ${workersHost[@]}
+for worker in ${!workersGroup[*]}
 do
   echo "$worker worker server is starting"
 
