@@ -73,10 +73,21 @@
             <artifactId>quartz-jobs</artifactId>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>com.yss.henghe.platform.tools</groupId>-->
+<!--            <artifactId>CalendarExpressionParser</artifactId>-->
+<!--            <version>1.0-RELEASE</version>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>com.yss.henghe.platform.tools</groupId>
-            <artifactId>CalendarExpressionParser</artifactId>
-            <version>1.0-RELEASE</version>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.5</version>
         </dependency>
 
     </dependencies>

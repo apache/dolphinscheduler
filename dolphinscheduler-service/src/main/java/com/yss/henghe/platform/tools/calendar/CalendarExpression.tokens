@@ -1,0 +1,10 @@
+T__0=1
+T__1=2
+AND=3
+NOT=4
+OR=5
+NAME=6
+SPACES=7
+UNEXPECTED_CHAR=8
+'('=1
+')'=2
