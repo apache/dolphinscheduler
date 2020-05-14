@@ -377,6 +377,7 @@ BEGIN
           AND COLUMN_NAME ='state')
       THEN
          ALTER TABLE t_ds_user ADD COLUMN state int DEFAULT 1;
+         comment on column t_ds_user.state is 'state 0:disable 1:enable';
        END IF;
 END;
 $$ LANGUAGE plpgsql;
