@@ -154,6 +154,12 @@ public class LowerWeightHostManager extends CommonHostManager {
                         if(StringUtils.isNotEmpty(heartbeat)
                                 && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
                             String[] parts = heartbeat.split(COMMA);
+
+                            int status = Integer.parseInt(parts[8]);
+                            if (status == Constants.ABNORMAL_NODE_STATUS){
+                                continue;
+                            }
+
                             double cpu = Double.parseDouble(parts[0]);
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);
