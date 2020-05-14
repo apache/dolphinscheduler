@@ -16,9 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.alert.manager.DingTalkManager;
 import org.apache.dolphinscheduler.alert.manager.EmailManager;
 import org.apache.dolphinscheduler.alert.manager.EnterpriseWeChatManager;
 import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.utils.DingTalkUtils;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -44,6 +46,7 @@ public class EmailAlertPlugin implements AlertPlugin {
 
     private static final EmailManager emailManager = new EmailManager();
     private static final EnterpriseWeChatManager weChatManager = new EnterpriseWeChatManager();
+    private static final DingTalkManager dingTalkManager = new DingTalkManager();
 
     public EmailAlertPlugin() {
         this.pluginName = new PluginName();
@@ -121,6 +124,11 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
+            
+           if (DingTalkUtils.isEnableDingTalk) {
+                logger.info("Ding Talk is enable.");
+                 dingTalkManager.send(info);
+              }
 
         } else {
             retMaps.put(Constants.MESSAGE, "alert send error.");
