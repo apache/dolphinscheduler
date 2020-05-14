@@ -109,16 +109,16 @@ dolphinscheduler frontend
 
 ```bash
 $ cd path/incubator-dolphinscheduler
-$ sh ./dockerfile/hooks/build
+$ sh ./docker/build/hooks/build
 ```
 
 Windows系统, 如下:
 
 ```bat
-c:\incubator-dolphinscheduler>.\dockerfile\hooks\build.bat
+c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
-如果你不理解这些脚本 `./dockerfile/hooks/build` `./dockerfile/hooks/build.bat`，请阅读里面的内容。
+如果你不理解这些脚本 `./docker/build/hooks/build` `./docker/build/hooks/build.bat`，请阅读里面的内容。
 
 ## 环境变量
 
