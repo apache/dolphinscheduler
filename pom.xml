@@ -694,6 +694,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                       <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
