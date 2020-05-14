@@ -107,8 +107,8 @@ public class ResInfo {
         masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[0]),
                 Double.parseDouble(masterArray[1]),
                 Double.parseDouble(masterArray[2])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[3]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[4]));
+        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[6]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[7]));
         return masterServer;
     }
 

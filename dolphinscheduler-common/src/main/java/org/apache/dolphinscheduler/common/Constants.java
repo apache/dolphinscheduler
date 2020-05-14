@@ -961,4 +961,8 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
+    public static final int NORAML_NODE_STATUS = 0;
+    public static final int ABNORMAL_NODE_STATUS = 1;
+
+
 }
