@@ -80,7 +80,7 @@ public class AlertSender {
 
             alertInfo.addProp("receivers", receviersList);
 
-            AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL);
+            AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL_ID);
             retMaps = emailPlugin.process(alertInfo);
 
             if (retMaps == null) {

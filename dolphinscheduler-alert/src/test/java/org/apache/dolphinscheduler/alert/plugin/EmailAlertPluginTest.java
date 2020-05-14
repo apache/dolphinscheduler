@@ -47,7 +47,7 @@ public class EmailAlertPluginTest {
     @Test
     public void getId() {
         String id = plugin.getId();
-        assertEquals(Constants.PLUGIN_DEFAULT_EMAIL, id);
+        assertEquals(Constants.PLUGIN_DEFAULT_EMAIL_ID, id);
     }
 
     @Test
