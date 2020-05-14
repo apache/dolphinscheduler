@@ -30,6 +30,7 @@ services:
       POSTGRESQL_DATABASE: dolphinscheduler
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
+    - dolphinscheduler-postgresql-initdb:/docker-entrypoint-initdb.d
     networks:
     - dolphinscheduler
 
@@ -175,10 +176,10 @@ services:
     image: apache/dolphinscheduler:latest
     container_name: dolphinscheduler-worker
     command: ["worker-server"]
-    ports: 
+    ports:
     - 1234:1234
     - 50051:50051
-    environment: 
+    environment:
       TZ: Asia/Shanghai
       WORKER_EXEC_THREADS: "100"
       WORKER_HEARTBEAT_INTERVAL: "10"
@@ -221,6 +222,7 @@ networks:
 
 volumes:
   dolphinscheduler-postgresql:
+  dolphinscheduler-postgresql-initdb:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:

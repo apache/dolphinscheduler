@@ -44,4 +44,3 @@ do
   echo "$apiServer worker server is starting"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
 done
-
