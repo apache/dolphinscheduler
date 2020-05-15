@@ -57,7 +57,7 @@ public class EmailAlertPlugin implements AlertPlugin {
 
     @Override
     public String getId() {
-        return Constants.PLUGIN_DEFAULT_EMAIL;
+        return Constants.PLUGIN_DEFAULT_EMAIL_ID;
     }
 
     @Override
