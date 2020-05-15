@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.apache.dolphinscheduler.plugin.model.PluginName;
+import org.apache.dolphinscheduler.plugin.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ import java.util.*;
 
 /**
  * EmailAlertPlugin
- *
+ * <p>
  * This plugin is a default plugin, and mix up email and enterprise wechat, because adapt with former alert behavior
  */
 public class EmailAlertPlugin implements AlertPlugin {
@@ -66,8 +67,8 @@ public class EmailAlertPlugin implements AlertPlugin {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> process(AlertInfo info) {
-        Map<String, Object> retMaps = new HashMap<>();
+    public Result process(AlertInfo info) {
+        Result ret = new Result();
 
         AlertData alert = info.getAlertData();
 
@@ -91,30 +92,25 @@ public class EmailAlertPlugin implements AlertPlugin {
 
         if (CollectionUtils.isEmpty(receviersList) && CollectionUtils.isEmpty(receviersCcList)) {
             logger.warn("alert send error : At least one receiver address required");
-            retMaps.put(Constants.STATUS, "false");
-            retMaps.put(Constants.MESSAGE, "execution failure,At least one receiver address required.");
-            return retMaps;
+            ret.setIsSuccess(false)
+                    .setMessage("execution failure,At least one receiver address required.");
+            return ret;
         }
 
-        retMaps = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
+        ret = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
                 alert.getShowType());
 
-        //send flag
-        boolean flag = false;
-
-        if (retMaps == null) {
-            retMaps = new HashMap<>();
-            retMaps.put(Constants.MESSAGE, "alert send error.");
-            retMaps.put(Constants.STATUS, "false");
-            logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
-            return retMaps;
+        if (ret == null) {
+            ret = new Result();
+            ret.setIsSuccess(false)
+                    .setMessage("alert send error");
+            logger.info("alert send error : {}", ret.getMessage());
+            return ret;
         }
 
-        flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
-
-        if (flag) {
+        if (ret.getIsSuccess()) {
             logger.info("alert send success");
-            retMaps.put(Constants.MESSAGE, "email send success.");
+            ret.setMessage("email send success.");
             if (EnterpriseWeChatUtils.isEnable()) {
                 logger.info("Enterprise WeChat is enable!");
                 try {
@@ -124,18 +120,18 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
-            
-           if (DingTalkUtils.isEnableDingTalk) {
+
+            if (DingTalkUtils.isEnableDingTalk) {
                 logger.info("Ding Talk is enable.");
-                 dingTalkManager.send(info);
-              }
+                dingTalkManager.send(info);
+            }
 
         } else {
-            retMaps.put(Constants.MESSAGE, "alert send error.");
-            logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+            ret.setMessage("alert send error.");
+            logger.info("alert send error : {}", ret.getMessage());
         }
 
-        return retMaps;
+        return ret;
     }
 
 }

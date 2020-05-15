@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.apache.dolphinscheduler.plugin.model.PluginName;
+import org.apache.dolphinscheduler.plugin.model.Result;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -74,7 +75,7 @@ public class EmailAlertPluginTest {
         alertInfo.setAlertData(alertData);
         List<String> list = new ArrayList<String>(){{ add("xx@xx.com"); }};
         alertInfo.addProp("receivers", list);
-        Map<String, Object> ret = plugin.process(alertInfo);
-        assertFalse(Boolean.parseBoolean(String.valueOf(ret.get(Constants.STATUS))));
+        Result ret = plugin.process(alertInfo);
+        assertFalse(ret.getIsSuccess());
     }
 }

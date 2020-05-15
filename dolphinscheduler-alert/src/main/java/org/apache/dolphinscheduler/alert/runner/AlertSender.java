@@ -25,12 +25,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
+import org.apache.dolphinscheduler.plugin.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * alert sender
@@ -55,7 +55,6 @@ public class AlertSender {
 
     public void run() {
         List<User> users;
-        Map<String, Object> retMaps = null;
         for (Alert alert : alertList) {
             users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
 
@@ -82,16 +81,16 @@ public class AlertSender {
             alertInfo.addProp("receivers", receviersList);
 
             AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL_ID);
-            retMaps = emailPlugin.process(alertInfo);
+            Result ret = emailPlugin.process(alertInfo);
 
-            if (retMaps == null) {
+            if (ret == null) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
                 logger.info("alert send error : return value is null");
-            } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
-                logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+            } else if (!ret.getIsSuccess()) {
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, ret.getMessage(), alert.getId());
+                logger.info("alert send error : {}", ret.getMessage());
             } else {
-                alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, (String) retMaps.get(Constants.MESSAGE), alert.getId());
+                alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, ret.getMessage(), alert.getId());
                 logger.info("alert send success");
             }
         }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.plugin;
 import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
 import org.apache.dolphinscheduler.plugin.model.PluginName;
+import org.apache.dolphinscheduler.plugin.model.Result;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,8 +48,8 @@ public class FilePluginManagerTest {
             }
 
             @Override
-            public Map<String, Object> process(AlertInfo info) {
-                return new HashMap<>();
+            public Result process(AlertInfo info) {
+                return new Result();
             }
         };
     }

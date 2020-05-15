@@ -14,31 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.api;
+package org.apache.dolphinscheduler.plugin.model;
 
-import org.apache.dolphinscheduler.plugin.model.AlertInfo;
-import org.apache.dolphinscheduler.plugin.model.PluginName;
-import org.apache.dolphinscheduler.plugin.model.Result;
+public class Result {
+    private boolean isSuccess;
+    private String message;
 
-/**
- * Plugin
- */
-public interface AlertPlugin {
+    public boolean getIsSuccess() {
+        return isSuccess;
+    }
 
-    /**
-     * Get alert plugin id
-     *
-     * @return alert plugin id, which should be unique
-     */
-    String getId();
+    public Result setIsSuccess(boolean success) {
+        isSuccess = success;
+        return this;
+    }
 
-    /**
-     * Get alert plugin name, which will show in front end portal
-     *
-     * @return plugin name
-     */
-    PluginName getName();
+    public String getMessage() {
+        return message;
+    }
 
-    Result process(AlertInfo info);
-
+    public Result setMessage(String message) {
+        this.message = message;
+        return this;
+    }
 }
