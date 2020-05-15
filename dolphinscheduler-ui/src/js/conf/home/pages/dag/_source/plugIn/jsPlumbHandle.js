@@ -754,7 +754,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: $t('success'), location:0.5, id:"label"} ]]
+          overlays:[["Label", { label: i18n.$t('success'), location:0.5, id:"label"} ]]
         })
       } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
         this.JspInstance.connect({
@@ -763,7 +763,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#f14343' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: $t('failed'), location:0.5, id:"label"} ]]
+          overlays:[["Label", { label: i18n.$t('failed'), location:0.5, id:"label"} ]]
         })
       } else {
         this.JspInstance.connect({
