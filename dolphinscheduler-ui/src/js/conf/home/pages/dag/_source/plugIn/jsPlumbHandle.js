@@ -752,21 +752,26 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           source: sourceId,
           target: targetId,
           type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#4caf50' }
+          paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+          overlays:[["Label", { label: $t('success'), location:0.5, id:"label"} ]]
         })
       } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
         this.JspInstance.connect({
           source: sourceId,
           target: targetId,
           type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#f14343' }
+          paintStyle: { strokeWidth: 2, stroke: '#f14343' },
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+          overlays:[["Label", { label: $t('failed'), location:0.5, id:"label"} ]]
         })
       } else {
         this.JspInstance.connect({
           source: sourceId,
           target: targetId,
           type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
+          paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
         })
       }
     })
