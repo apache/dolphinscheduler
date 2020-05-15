@@ -360,7 +360,7 @@ DROP PROCEDURE dc_dolphin_T_t_ds_error_command_D_worker_group_id;
 -- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
 delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by()
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique()
    BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
            WHERE TABLE_NAME='t_ds_process_definition'
