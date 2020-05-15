@@ -54,7 +54,6 @@ const JSP = function () {
     isClick: false
   }
 }
-
 /**
  * dag init
  */
@@ -199,7 +198,9 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       isAttachment: this.config.isAttachment,
       taskType: v.type,
       runFlag: v.runFlag,
-      nodenumber: locations[v.id].nodenumber
+      nodenumber: locations[v.id].nodenumber,
+      successNode: v.conditionResult.successNode[0],
+      failedNode: v.conditionResult.failedNode[0]
     }))
 
     // contextmenu event
@@ -745,13 +746,29 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         sourceId = v.endPointSourceId
         targetId = v.endPointTargetId
       }
-
-      this.JspInstance.connect({
-        source: sourceId,
-        target: targetId,
-        type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
-      })
+      
+      if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-successnode') === $(`#${targetId}`).find('.name-p').text()) {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#4caf50' }
+        })
+      } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#f14343' }
+        })
+      } else {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
+        })
+      }
     })
   })
 
