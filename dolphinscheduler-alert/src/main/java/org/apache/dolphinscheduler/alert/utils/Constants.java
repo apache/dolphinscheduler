@@ -41,6 +41,8 @@ public class Constants {
 
     public static final String MESSAGE = "message";
 
+    public static final String EMAIL_MESSAGE="email_notify";
+
     public static final String MAIL_PROTOCOL = "mail.protocol";
 
     public static final String MAIL_SERVER_HOST = "mail.server.host";

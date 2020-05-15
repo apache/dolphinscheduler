@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import org.apache.dolphinscheduler.alert.exception.NotifyException;
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.template.AlertTemplateFactory;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -119,8 +120,8 @@ public class MailUtils {
                 }
                 // sender mail
                 return getStringObjectMap(title, content, showType, email);
-            } catch (EmailException e) {
-                logger.error("Send table email to {} failed", receivers, e);
+            } catch (Exception e) {
+                handleException(receivers, e);
             }
         }
 
@@ -130,7 +131,7 @@ public class MailUtils {
             try {
                 attachment(receivers,receiversCc,title,content,partContent);
             } catch (Exception e) {
-                logger.error("Send attachment email to {} failed", receivers, e);
+                handleException(receivers, e);
             }
             return Boolean.TRUE;
         }
@@ -319,6 +320,17 @@ public class MailUtils {
         }else{
             logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
+    }
+
+
+    /**
+     * handle exception
+     * @param receivers the receiver list
+     * @param e the exception
+     */
+    private static void handleException(Collection<String> receivers, Exception e) {
+        logger.error("Send email to {} failed", receivers, e);
+        throw new NotifyException(Constants.EMAIL_MESSAGE,"Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
 }

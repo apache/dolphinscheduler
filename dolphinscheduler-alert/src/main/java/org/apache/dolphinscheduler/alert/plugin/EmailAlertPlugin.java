@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.alert.exception.NotifyException;
 import org.apache.dolphinscheduler.alert.manager.DingTalkManager;
 import org.apache.dolphinscheduler.alert.manager.EmailManager;
 import org.apache.dolphinscheduler.alert.manager.EnterpriseWeChatManager;
@@ -95,12 +96,17 @@ public class EmailAlertPlugin implements AlertPlugin {
             retMaps.put(Constants.MESSAGE, "execution failure,At least one receiver address required.");
             return retMaps;
         }
-
-        boolean flag = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
-                alert.getShowType());
-
+        boolean flag;
+        try {
+            flag = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
+                    alert.getShowType());
+        }catch (NotifyException e){
+            retMaps.put(Constants.STATUS, "false");
+            retMaps.put(Constants.MESSAGE,e.getMessage());
+            return retMaps;
+        }
         if (flag) {
-          
+
             logger.info("alert send success");
             retMaps.put(Constants.MESSAGE, "email send success.");
             if (EnterpriseWeChatUtils.isEnable()) {
@@ -112,16 +118,16 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
-            
-           if (DingTalkUtils.isEnableDingTalk) {
+
+            if (DingTalkUtils.isEnableDingTalk) {
                 logger.info("Ding Talk is enable.");
-                 dingTalkManager.send(info);
-              }
+                dingTalkManager.send(info);
+            }
         } else {
             retMaps.put(Constants.MESSAGE, "alert send error.");
             logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
         }
-      
+
         return retMaps;
     }
 
