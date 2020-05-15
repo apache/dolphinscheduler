@@ -23,8 +23,27 @@ import org.junit.Test;
 
 public class LoggerServerTest {
 
+
     @Test
-    public void testLoggerServer(){
+    public void testRollViewLog(){
+        LoggerServer loggerServer = new LoggerServer();
+        loggerServer.start();
+
+        LogClientService logClientService = new LogClientService();
+        logClientService.rollViewLog("localhost", Constants.RPC_PORT,"/opt/demo.txt",0,1000);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+
+        }
+
+        loggerServer.stop();
+        logClientService.close();
+    }
+
+    @Test
+    public void testRemoveTaskLog(){
         LoggerServer loggerServer = new LoggerServer();
         loggerServer.start();
 
@@ -36,5 +55,8 @@ public class LoggerServerTest {
         } catch (InterruptedException e) {
 
         }
+
+        loggerServer.stop();
+        logClientService.close();
     }
 }
