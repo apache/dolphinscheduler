@@ -19,18 +19,15 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>examples</artifactId>
-        <version>1.2.1-SNAPSHOT</version>
-    </parent>
     <artifactId>helloworld-alert-plugin</artifactId>
     <name>helloworld-alert-plugin</name>
+    <version>1.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-plugin-api</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
