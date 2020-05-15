@@ -69,8 +69,8 @@ public class ExtPlatformController extends BaseController{
     @ApiOperation(value = "createExtPlatform", notes= "CREATE_EXTPLAFTORM_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "EXTPLAFTORM_NAME", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "extPlatformType", value = "EXT_PLATFORM_TYPE", required = true, dataType ="int"),
-            @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.158.20.23/list','urlType' : '0' "),
+            @ApiImplicitParam(name = "extPlatformType", value = "EXT_PLATFORM_TYPE", required = true, dataType ="int" , example = "0"),
+            @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.168.101.30:8011/list.json','urlType' : '0' } "),
             @ApiImplicitParam(name = "description", value = "EXTPLAFTORM_DESC", dataType ="String")
 
     })
@@ -79,7 +79,7 @@ public class ExtPlatformController extends BaseController{
     @ApiException(CREATE_EXTPLAFTORM_ERROR)
     public Result createExtPlatform(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam(value = "name") String name,
-                                                       @RequestParam(value = "platformType")  int extPlatformType,
+                                                       @RequestParam(value = "extPlatformType")  int extPlatformType,
                                                        @RequestParam(value = "connectParam") String connectParam,
                                                        @RequestParam(value = "description",required = false) String description) {
         Map<String, Object> result = extPlatformService.createExtPlatform(loginUser,name,extPlatformType,connectParam,description);
@@ -152,8 +152,8 @@ public class ExtPlatformController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "EXTPLAFTORM_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "name", value = "EXTPLAFTORM_NAME", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "extPlatformType", value = "EXT_PLATFORM_TYPE", required = true, dataType ="int"),
-            @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.158.20.23/list','urlType' : '0' "),
+            @ApiImplicitParam(name = "extPlatformType", value = "EXT_PLATFORM_TYPE", required = true, dataType ="int", example = "0"),
+            @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.168.101.30:8011/list.json','urlType' : '0' } "),
             @ApiImplicitParam(name = "description", value = "EXTPLAFTORM_DESC", dataType ="String")
 
     })
@@ -163,7 +163,7 @@ public class ExtPlatformController extends BaseController{
     public Result updateExtPlatform(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam(value = "id") int id,
                                                         @RequestParam(value = "name") String name,
-                                                        @RequestParam(value = "platformType")  int extPlatformType,
+                                                        @RequestParam(value = "extPlatformType")  int extPlatformType,
                                                         @RequestParam(value = "connectParam") String connectParam,
                                                         @RequestParam(value = "description",required = false) String description) {
 
@@ -228,7 +228,7 @@ public class ExtPlatformController extends BaseController{
      */
     @ApiOperation(value = "verifyExtPlatformName", notes= "VERIFY_EXTPLAFTORM_CODE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "verifyExtPlatformName", value = "EXTPLAFTORM_CODE", required = true, dataType = "String")
+            @ApiImplicitParam(name = "extPlatformName", value = "EXTPLAFTORM_CODE", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-extPlatform-name")
     @ResponseStatus(HttpStatus.OK)

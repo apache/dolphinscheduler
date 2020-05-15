@@ -70,7 +70,7 @@ public class ExtController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ip", value = "ip", required = false, dataType = "String"),
     })
-    @PostMapping(value = "/getClusterInfo")
+    @GetMapping(value = "/getClusterInfo")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(INTERNAL_SERVER_ERROR_ARGS)
     public Result getClusterInfo(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,

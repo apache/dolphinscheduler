@@ -253,7 +253,10 @@ public class ExtPlatformService extends BaseService{
     if (extPlatform == null){
       putMsg(result, Status.EXTPLAFTORM_NOT_EXIST);
       return result;
+    }else{
+      result.put(Constants.DATA_LIST,extPlatform);
     }
+
 
     putMsg(result, Status.SUCCESS);
     return result;

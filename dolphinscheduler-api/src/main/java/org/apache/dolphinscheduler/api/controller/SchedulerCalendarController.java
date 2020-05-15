@@ -202,7 +202,7 @@ public class SchedulerCalendarController extends BaseController{
      */
     @ApiOperation(value = "deleteCalendarById", notes= "DELETE_CALENDAR_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "ID", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100")
 
     })
     @PostMapping(value = "/delete")
