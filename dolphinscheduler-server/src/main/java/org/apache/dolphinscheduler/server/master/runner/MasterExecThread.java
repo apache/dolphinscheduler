@@ -805,7 +805,8 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0 || haveRetryTaskStandBy()){
+        if(activeTaskNode.size() > 0 || retryTaskExists()){
+            // active task and retry task exists
             return runningState(state);
         }
         // process failure
@@ -824,11 +825,12 @@ public class MasterExecThread implements Runnable {
         }
 
         // stop
+        List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
+        List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
         if(state == ExecutionStatus.READY_STOP){
-            List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
-            List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             if(CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
+                    || CollectionUtils.isNotEmpty(killList)
+                    || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -840,6 +842,9 @@ public class MasterExecThread implements Runnable {
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXEUTION;
+            }else if(CollectionUtils.isNotEmpty(killList)){
+                // tasks maybe killed manually
+                return ExecutionStatus.FAILURE;
             }else{
                 //  if the waiting queue is empty and the status is in progress, then success
                 return ExecutionStatus.SUCCESS;
@@ -853,7 +858,7 @@ public class MasterExecThread implements Runnable {
      * whether standby task list have retry tasks
      * @return
      */
-    private boolean haveRetryTaskStandBy() {
+    private boolean retryTaskExists() {
 
         boolean result = false;
 
