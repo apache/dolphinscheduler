@@ -592,5 +592,6 @@ export default {
   'Unauthorized or deleted resources': '未授权或已删除资源',
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'Enable': '启用',
-  'Disable': '停用'
+  'Disable': '停用',
+  'DependView': '依赖关系图'
 }

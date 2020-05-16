@@ -281,7 +281,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testUpdateProcessInstance() throws ParseException {
+    public void testUpdateProcessInstance() throws Exception {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>(5);

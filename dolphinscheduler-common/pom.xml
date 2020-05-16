@@ -594,5 +594,10 @@
 			<artifactId>janino</artifactId>
 			<version>${codehaus.janino.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+		</dependency>
 	</dependencies>
 </project>

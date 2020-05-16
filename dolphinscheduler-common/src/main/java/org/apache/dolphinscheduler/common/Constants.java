@@ -199,6 +199,10 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
+    /**
+     * dot .
+     */
+    public static final String DOT = ".";
 
     /**
      * comma ,
@@ -380,6 +384,11 @@ public final class Constants {
      * rpc port
      */
     public static final int RPC_PORT = 50051;
+
+    /**
+     * normal running task
+     */
+    public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
     /**
      * forbid running task
@@ -960,5 +969,20 @@ public final class Constants {
      * plugin configurations
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
+
+    /**
+     * default worker group id
+     */
+    public static final int DEFAULT_WORKER_GROUP_ID = -1;
+
+    /**
+     * depend check max retry times
+     */
+    public static final int DEPEND_CHECK_MAX_RETRY_TIMES = 120;
+
+    /**
+     * depend check retry interval minute
+     */
+    public static final int DEPEND_CHECK_RETRY_INTERVAL_MINUTE = 5;
 
 }

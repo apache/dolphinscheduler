@@ -740,7 +740,7 @@ public class ProcessDefinitionServiceTest {
      * @param processMetaJson process meta json
      * @throws IOException IO exception
      */
-    private void improssProcessCheckData(File file, User loginUser, String currentProjectName, String processMetaJson) throws IOException {
+    private void improssProcessCheckData(File file, User loginUser, String currentProjectName, String processMetaJson) throws Exception {
         //check null
         FileUtils.writeStringToFile(new File("/tmp/task.json"),processMetaJson);
 
@@ -761,7 +761,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testUpdateProcessDefinition () {
+    public void testUpdateProcessDefinition () throws Exception {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);

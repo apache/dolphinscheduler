@@ -243,7 +243,7 @@ public class ProjectController extends BaseController {
     @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("file") MultipartFile file,
-                                          @RequestParam("projectName") String projectName) {
+                                          @RequestParam("projectName") String projectName) throws Exception {
         logger.info("import process definition by id, login user:{}, project: {}",
                 loginUser.getUserName(), projectName);
         Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, file, projectName);

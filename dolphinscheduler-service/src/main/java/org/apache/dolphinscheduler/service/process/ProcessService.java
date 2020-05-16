@@ -1812,4 +1812,13 @@ public class ProcessService {
                 taskInstance.getId());
     }
 
+    /**
+     * query process definition info by target table keys
+     * @param targetTableKeys target table keys
+     * @return process instance
+     */
+    public List<ProcessDefinition> queryDefinitionByTargetTableKeys(String[] targetTableKeys){
+        return processDefineMapper.queryDefinitionByTargetTableKeys(targetTableKeys);
+    }
+
 }

@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JdbcUtils;
 import org.apache.dolphinscheduler.dao.datasource.*;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -216,7 +217,7 @@ public class DataSourceService extends BaseService{
         String other = datasourceForm.getOther();
         String address = datasourceForm.getAddress();
 
-        String[] hostsPorts = getHostsAndPort(address);
+        String[] hostsPorts = JdbcUtils.getHostsAndPort(address);
         // ip host
         String host = hostsPorts[0];
         // prot
@@ -668,29 +669,6 @@ public class DataSourceService extends BaseService{
         List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-
-    /**
-     * get host and port by address
-     *
-     * @param address
-     * @return sting array: [host,port]
-     */
-    private String[] getHostsAndPort(String address) {
-        String[] result = new String[2];
-        String[] tmpArray = address.split(Constants.DOUBLE_SLASH);
-        String hostsAndPorts = tmpArray[tmpArray.length - 1];
-        StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = hostsAndPorts.split(Constants.COMMA);
-        String port = hostPortArray[0].split(Constants.COLON)[1];
-        for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
-        }
-        hosts.deleteCharAt(hosts.length() - 1);
-        result[0] = hosts.toString();
-        result[1] = port;
         return result;
     }
 }

@@ -22,13 +22,21 @@ import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.DependentItem;
+import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.dependent.DependCheckUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -105,6 +113,11 @@ public class MasterExecThread implements Runnable {
      * depend failed task map
      */
     private Map<String, TaskInstance> dependFailedTask = new ConcurrentHashMap<>();
+
+    /**
+     * already check depend node map
+     */
+    private Map<String, TaskNode> alreadyCheckDependNodeMap = new ConcurrentHashMap<>();
 
     /**
      * forbidden task map
@@ -357,7 +370,11 @@ public class MasterExecThread implements Runnable {
         // generate process to get DAG info
         List<String> recoveryNameList = getRecoveryNodeNameList();
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
-        ProcessDag processDag = generateFlowDag(processInstance.getProcessInstanceJson(),
+
+        ProcessData processData = JSONUtils.parseObject(processInstance.getProcessInstanceJson(), ProcessData.class);
+        List<TaskNode> taskNodeList = analyseTaskNodeSqlDepend(processData.getTasks(), startNodeNameList);
+
+        ProcessDag processDag = generateFlowDag(taskNodeList,
                 startNodeNameList, recoveryNameList, processInstance.getTaskDependType());
         if(processDag == null){
             logger.error("processDag is null");
@@ -365,6 +382,141 @@ public class MasterExecThread implements Runnable {
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
+    }
+
+    private List<TaskNode> analyseTaskNodeSqlDepend(List<TaskNode> taskNodeList, List<String> startNodeNameList) {
+        for(TaskNode taskNode : taskNodeList) {
+            if (taskNode.isForbidden()) {
+                continue;
+            }
+
+            alreadyCheckDependNodeMap.put(processInstance.getProcessDefinitionId() + taskNode.getName(), taskNode);
+
+            if (startNodeNameList.contains(taskNode.getName()) && processInstance.getTaskDependType() != TaskDependType.TASK_PRE) {
+                taskNode.setPreTasks(null);
+            }
+        }
+
+        int nodeSize = taskNodeList.size();
+        for(int i = 0; i < nodeSize; i++) {
+            TaskNode taskNode = taskNodeList.get(i);
+
+            if (taskNode.isForbidden()) {
+                continue;
+            }
+
+            AbstractParameters parameters = JSONUtils.parseObject(taskNode.getParams(), SqlParameters.class);
+            if (parameters.getCheckDependFlag() == Flag.NO.ordinal()
+                    || StringUtils.isEmpty(parameters.getDependSqlTableKeys())) {
+                continue;
+            }
+
+            doAnalyseTaskNodeSqlDepend(taskNodeList, taskNode, taskNode);
+        }
+
+        return taskNodeList;
+    }
+
+    private void doAnalyseTaskNodeSqlDepend(List<TaskNode> taskNodeList, TaskNode analyseNode, TaskNode postNode) {
+        AbstractParameters parameters = TaskParametersUtils.getParameters(analyseNode.getType(), analyseNode.getParams());
+        if (StringUtils.isEmpty(parameters.getDependSqlTableKeys())) {
+            return;
+        }
+
+        logger.info("task {} start analyse depend : {}", analyseNode.getName(), parameters.getDependSqlTableKeys());
+
+        String[] dependSqlTableKeys = parameters.getDependSqlTableKeys().split(COMMA);
+        List<ProcessDefinition> processDefinitionList = processService.queryDefinitionByTargetTableKeys(dependSqlTableKeys);
+        if (CollectionUtils.isEmpty(processDefinitionList)) {
+            return;
+        }
+
+        for (ProcessDefinition processDefinition : processDefinitionList) {
+            String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+            ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+            List<TaskNode> depTaskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
+
+            for (TaskNode node : depTaskNodeList) {
+                if (!node.isForbidden() && DependCheckUtils.existDependRelation(node, dependSqlTableKeys)) {
+                    if (alreadyCheckDependNodeMap.containsKey(processDefinition.getId() + node.getName())) {
+                        TaskNode dependNode = alreadyCheckDependNodeMap.get(processDefinition.getId() + node.getName());
+
+                        // depend on oneself
+                        if (analyseNode.getName().equals(node.getName())) {
+                            continue;
+                        }
+
+                        setNodeDependItemList(dependNode, processDefinition.getId(), node.getName());
+                        addPostNodeDepList(postNode, dependNode);
+                        logger.info("new depend relation : {} -> {}", dependNode.getName(), postNode.getName());
+                        continue;
+                    }
+
+                    TaskNode dependNode = TaskNodeUtils.buildDependTaskNode(processDefinition.getId(), processDefinition.getName(), node.getId(), node.getName());
+                    setNodeDependItemList(dependNode, processDefinition.getId(), node.getName());
+                    taskNodeList.add(dependNode);
+                    addPostNodeDepList(postNode, dependNode);
+
+                    alreadyCheckDependNodeMap.put(processDefinition.getId() + node.getName(), dependNode);
+
+                    logger.info("new depend relation : {} -> {}", dependNode.getName(), postNode.getName());
+
+                    doAnalyseTaskNodeSqlDepend(taskNodeList, node, dependNode);
+                }
+            }
+        }
+    }
+
+    private void addPostNodeDepList(TaskNode postNode, TaskNode dependNode) {
+        if (CollectionUtils.isEmpty(postNode.getDepList())) {
+            List<String> depList = new ArrayList<>();
+            depList.add(dependNode.getName());
+            postNode.setDepList(depList);
+        } else {
+            List<String> depList = postNode.getDepList();
+
+            if (!depList.contains(dependNode.getName())) {
+                depList.add(dependNode.getName());
+                postNode.setDepList(depList);
+            }
+        }
+
+        logger.info("add depend relation : {} -> {}", dependNode.getName(), postNode.getName());
+    }
+
+    private void setNodeDependItemList(TaskNode taskNode, int processDefinitionId, String nodeName) {
+        DependentParameters dependentParameters;
+        if (StringUtils.isEmpty(taskNode.getDependence())) {
+            dependentParameters = new DependentParameters();
+        } else {
+            dependentParameters = JSONUtils.parseObject(taskNode.getDependence(), DependentParameters.class);
+        }
+
+        List<DependentTaskModel> dependTaskList;
+        if (CollectionUtils.isEmpty(dependentParameters.getDependTaskList())) {
+            dependTaskList = new ArrayList<>();
+        } else {
+            dependTaskList = dependentParameters.getDependTaskList();
+        }
+
+        DependentTaskModel dependentTaskModel = new DependentTaskModel();
+        List<DependentItem> dependItemList = new ArrayList<>();
+        dependItemList.add(buildDependentItem(processDefinitionId, nodeName));
+        dependentTaskModel.setDependItemList(dependItemList);
+        dependentTaskModel.setRelation(DependentRelation.AND);
+        dependTaskList.add(dependentTaskModel);
+        dependentParameters.setDependTaskList(dependTaskList);
+        dependentParameters.setRelation(DependentRelation.AND);
+        taskNode.setDependence(JSONUtils.writeValueAsString(dependentParameters));
+    }
+
+    private DependentItem buildDependentItem(int processDefinitionId, String nodeName) {
+        DependentItem dependentItem = new DependentItem();
+        dependentItem.setDefinitionId(processDefinitionId);
+        dependentItem.setDepTasks(nodeName);
+        dependentItem.setCycle(CycleEnum.DAY.toString().toLowerCase());
+        dependentItem.setDateValue("today");
+        return dependentItem;
     }
 
     /**
@@ -377,6 +529,7 @@ public class MasterExecThread implements Runnable {
         dependFailedTask.clear();
         completeTaskList.clear();
         errorTaskList.clear();
+        alreadyCheckDependNodeMap.clear();
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
         for(TaskInstance task : taskInstanceList){
             if(task.isTaskComplete()){
@@ -1226,10 +1379,10 @@ public class MasterExecThread implements Runnable {
      * @return ProcessDag           process dag
      * @throws Exception            exception
      */
-    public ProcessDag generateFlowDag(String processDefinitionJson,
+    public ProcessDag generateFlowDag(List<TaskNode> taskNodeList,
                                       List<String> startNodeNameList,
                                       List<String> recoveryNodeNameList,
                                       TaskDependType depNodeType)throws Exception{
-        return DagHelper.generateFlowDag(processDefinitionJson, startNodeNameList, recoveryNodeNameList, depNodeType);
+        return DagHelper.generateFlowDag(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
     }
 }

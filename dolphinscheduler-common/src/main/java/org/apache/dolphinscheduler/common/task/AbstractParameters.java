@@ -40,6 +40,21 @@ public abstract class AbstractParameters implements IParameters {
   public List<Property> localParams;
 
   /**
+   * check depend flag
+   */
+  private int checkDependFlag;
+
+  /**
+   * target table key
+   */
+  private String targetTableKey;
+
+  /**
+   * depend sql table keys
+   */
+  private String dependSqlTableKeys;
+
+  /**
    * get local parameters list
    * @return Property list
    */
@@ -49,6 +64,30 @@ public abstract class AbstractParameters implements IParameters {
 
   public void setLocalParams(List<Property> localParams) {
     this.localParams = localParams;
+  }
+
+  public int getCheckDependFlag() {
+    return checkDependFlag;
+  }
+
+  public void setCheckDependFlag(int checkDependFlag) {
+    this.checkDependFlag = checkDependFlag;
+  }
+
+  public String getTargetTableKey() {
+    return targetTableKey;
+  }
+
+  public void setTargetTableKey(String targetTableKey) {
+    this.targetTableKey = targetTableKey;
+  }
+
+  public String getDependSqlTableKeys() {
+    return dependSqlTableKeys;
+  }
+
+  public void setDependSqlTableKeys(String dependSqlTableKeys) {
+    this.dependSqlTableKeys = dependSqlTableKeys;
   }
 
   /**

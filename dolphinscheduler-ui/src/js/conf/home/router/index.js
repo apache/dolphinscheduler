@@ -115,6 +115,14 @@ const router = new Router({
               meta: {
                 title: `${i18n.$t('Scheduled task list')}`
               }
+            },
+            {
+              path: '/projects/definition/depend/tree/:id',
+              name: 'definition-tree-view-depend-index',
+              component: resolve => require(['../pages/projects/pages/definition/pages/tree/dependIndex'], resolve),
+              meta: {
+                title: `${i18n.$t('TreeView')}`
+              }
             }
           ]
         },

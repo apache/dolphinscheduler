@@ -185,11 +185,27 @@ public class DagHelper {
                                              List<String> recoveryNodeNameList,
                                              TaskDependType depNodeType) throws Exception {
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-
-        List<TaskNode> taskNodeList = new ArrayList<>();
-        if (null != processData) {
-            taskNodeList = processData.getTasks();
+        if (processData == null) {
+            return null;
         }
+
+        List<TaskNode> taskNodeList = processData.getTasks();
+        return generateFlowDag(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
+    }
+
+    /**
+     * generate dag by start nodes and recovery nodes
+     * @param taskNodeList taskNodeList
+     * @param startNodeNameList startNodeNameList
+     * @param recoveryNodeNameList recoveryNodeNameList
+     * @param depNodeType depNodeType
+     * @return process dag
+     * @throws Exception if error throws Exception
+     */
+    public static ProcessDag generateFlowDag(List<TaskNode> taskNodeList,
+                                             List<String> startNodeNameList,
+                                             List<String> recoveryNodeNameList,
+                                             TaskDependType depNodeType) throws Exception {
         List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
         if (destTaskNodeList.isEmpty()) {
             return null;

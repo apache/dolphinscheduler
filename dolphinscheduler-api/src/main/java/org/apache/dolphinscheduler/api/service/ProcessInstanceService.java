@@ -335,7 +335,7 @@ public class ProcessInstanceService extends BaseDAGService {
      */
     public Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                                      String processInstanceJson, String scheduleTime, Boolean syncDefine,
-                                                     Flag flag, String locations, String connects) throws ParseException {
+                                                     Flag flag, String locations, String connects) throws Exception {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
@@ -392,7 +392,8 @@ public class ProcessInstanceService extends BaseDAGService {
             if(tenant != null){
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
-            processInstance.setProcessInstanceJson(processInstanceJson);
+
+            processInstance.setProcessInstanceJson(processDefinitionService.refreshTaskNodeDependParams(processInstanceJson));
             processInstance.setGlobalParams(globalParams);
         }
 

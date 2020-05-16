@@ -89,6 +89,21 @@ public class SqlParameters extends AbstractParameters {
      */
     private String receiversCc;
 
+    /**
+     * target table
+     */
+    private String targetTable;
+
+    /**
+     * data target type，eg  MYSQL, POSTGRES, HIVE ...
+     */
+    private String dtType;
+
+    /**
+     * datatarget id
+     */
+    private int dataTarget;
+
     public String getType() {
         return type;
     }
@@ -192,6 +207,30 @@ public class SqlParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
+    }
+
+    public String getTargetTable() {
+        return targetTable;
+    }
+
+    public void setTargetTable(String targetTable) {
+        this.targetTable = targetTable;
+    }
+
+    public String getDtType() {
+        return dtType;
+    }
+
+    public void setDtType(String dtType) {
+        this.dtType = dtType;
+    }
+
+    public int getDataTarget() {
+        return dataTarget;
+    }
+
+    public void setDataTarget(int dataTarget) {
+        this.dataTarget = dataTarget;
     }
 
     @Override

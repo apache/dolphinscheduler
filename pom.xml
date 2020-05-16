@@ -70,7 +70,7 @@
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
         <fastjson.version>1.2.61</fastjson.version>
-        <druid.version>1.1.14</druid.version>
+        <druid.version>1.1.21</druid.version>
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.6</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>

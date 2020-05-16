@@ -96,4 +96,13 @@
         FROM t_ds_process_definition
         WHERE release_state = 1 and resource_ids is not null and resource_ids != ''
     </select>
+
+    <select id="queryDefinitionByTargetTableKeys" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select t1.id, t1.name, t1.project_id, t1.process_definition_json from t_ds_process_definition t1, t_ds_schedules t2
+        where t1.id = t2.process_definition_id and t1.release_state = 1 and t2.release_state = 1
+        and
+        <foreach collection="targetTableKeys" index="index" item="i" open="(" separator="or" close=")">
+            t1.process_definition_json like concat('%', replace(#{i}, 'depend', 'target'), '%')
+        </foreach>
+    </select>
 </mapper>

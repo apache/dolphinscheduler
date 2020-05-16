@@ -169,7 +169,7 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "locations", required = false) String locations,
                                         @RequestParam(value = "connects", required = false) String connects,
                                         @RequestParam(value = "flag", required = false) Flag flag
-    ) throws ParseException {
+    ) throws Exception {
         logger.info("updateProcessInstance process instance, login user:{}, project name:{}, process instance json:{}," +
                         "process instance id:{}, schedule time:{}, sync define:{}, flag:{}, locations:{}, connects:{}",
                 loginUser.getUserName(), projectName, processInstanceJson, processInstanceId, scheduleTime,

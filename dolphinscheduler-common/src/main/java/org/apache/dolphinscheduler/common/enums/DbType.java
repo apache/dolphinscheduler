@@ -67,4 +67,8 @@ public enum DbType {
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
+
+    public String getDesc() {
+        return this.descp;
+    }
 }

@@ -176,7 +176,7 @@ public class TaskNode {
     return preTasks;
   }
 
-  public void setPreTasks(String preTasks) throws IOException {
+  public void setPreTasks(String preTasks) {
     this.preTasks = preTasks;
     this.depList = JSONUtils.toList(preTasks, String.class);
   }
@@ -193,7 +193,7 @@ public class TaskNode {
     return depList;
   }
 
-  public void setDepList(List<String> depList) throws JsonProcessingException {
+  public void setDepList(List<String> depList) {
     this.depList = depList;
     this.preTasks = JSONUtils.toJson(depList);
   }
