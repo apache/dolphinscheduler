@@ -18,11 +18,19 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * data source of mySQL
  */
 public class MySQLDataSource extends BaseDataSource {
+
+  private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
+
+  private final String sensitiveParam = "autoDeserialize=true";
+
+  private final char symbol = '&';
 
   /**
    * gets the JDBC url for the data source connection
@@ -41,4 +49,39 @@ public class MySQLDataSource extends BaseDataSource {
     return DbType.MYSQL;
   }
 
+  @Override
+  protected String filterOther(String other){
+    if(other.contains(sensitiveParam)){
+      int index = other.indexOf(sensitiveParam);
+      String tmp = sensitiveParam;
+      if(other.charAt(index-1) == symbol){
+        tmp = symbol + tmp;
+      } else if(other.charAt(index + 1) == symbol){
+        tmp = tmp + symbol;
+      }
+      logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
+      other = other.replace(tmp, "");
+    }
+    logger.debug("other : {}", other);
+    return other;
+  }
+
+  @Override
+  public String getUser() {
+    if(user.contains(sensitiveParam)){
+      logger.warn("sensitive param : {} in username field is filtered", sensitiveParam);
+      user = user.replace(sensitiveParam, "");
+    }
+    logger.debug("username : {}", user);
+    return user;
+  }
+
+  @Override
+  public String getPassword() {
+    if(password.contains(sensitiveParam)){
+      logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
+      password = password.replace(sensitiveParam, "");
+    }
+    return password;
+  }
 }
