@@ -114,7 +114,7 @@ public class RetryerUtils {
      *
      * @param callable    the callable
      * @param checkResult whether check result
-     * @return the boolean
+     * @return if no exceptions ,it's result returned by callable ,else always false
      */
     public static boolean retryCallSilent(final Callable<Boolean> callable, boolean checkResult) {
         boolean result = false;
@@ -130,7 +130,7 @@ public class RetryerUtils {
      * Retry call silent without exceptions thrown
      *
      * @param callable the callable
-     * @return the boolean
+     * @return if no exceptions ,it's result returned by callable ,else always false
      */
     public static boolean retryCallSilent(final Callable<Boolean> callable) {
         return retryCallSilent(callable, true);
