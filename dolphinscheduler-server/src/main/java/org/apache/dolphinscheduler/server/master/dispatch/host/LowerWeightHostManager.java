@@ -107,9 +107,8 @@ public class LowerWeightHostManager extends CommonHostManager {
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
         if(CollectionUtils.isNotEmpty(workerHostWeights)){
             return selector.select(workerHostWeights).getHost();
-        } else{
-            return roundRobinHostManager.select(context);
         }
+        return new Host();
     }
 
     @Override
@@ -157,6 +156,8 @@ public class LowerWeightHostManager extends CommonHostManager {
 
                             int status = Integer.parseInt(parts[8]);
                             if (status == Constants.ABNORMAL_NODE_STATUS){
+                                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
+                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
                                 continue;
                             }
 
