@@ -69,7 +69,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     /**
      * worker host weights
      */
-    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeights;
+    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeightsMap;
 
     /**
      * worker group host lock
@@ -84,7 +84,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     @PostConstruct
     public void init(){
         this.selector = new LowerWeightRoundRobin();
-        this.workerHostWeights = new ConcurrentHashMap<>();
+        this.workerHostWeightsMap = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
         this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),35, 40, TimeUnit.SECONDS);
@@ -119,8 +119,8 @@ public class LowerWeightHostManager extends CommonHostManager {
     private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights){
         lock.lock();
         try {
-            workerHostWeights.clear();
-            workerHostWeights.putAll(workerHostWeights);
+            workerHostWeightsMap.clear();
+            workerHostWeightsMap.putAll(workerHostWeights);
         } finally {
             lock.unlock();
         }
@@ -129,7 +129,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     private Set<HostWeight> getWorkerHostWeights(String workerGroup){
         lock.lock();
         try {
-            return workerHostWeights.get(workerGroup);
+            return workerHostWeightsMap.get(workerGroup);
         } finally {
             lock.unlock();
         }
