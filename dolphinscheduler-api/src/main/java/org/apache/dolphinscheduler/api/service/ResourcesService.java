@@ -363,14 +363,14 @@ public class ResourcesService extends BaseService {
             //verify whether suffix is changed
             if (suffixIsChanged) {
                 //need verify whether this resource is authorized to other users
-                Map<String, Object> columnMap = new HashMap<String, Object>();
+                Map<String, Object> columnMap = new HashMap<>();
                 columnMap.put("resources_id", resourceId);
 
                 List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
                 if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-                    List<Integer> userIds = resourcesUsers.stream().map(t -> t.getUserId()).collect(Collectors.toList());
+                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getId).collect(Collectors.toList());
                     List<User> users = userMapper.selectBatchIds(userIds);
-                    String userNames = users.stream().map(t -> t.getUserName()).collect(Collectors.toList()).toString();
+                    String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
                     logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
                     putMsg(result,Status.RESOURCE_IS_AUTHORIZED,userNames);
                     return result;
