@@ -16,7 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,14 @@ public class CommonGenerator {
             if(sqoopParameters.getConcurrency() >0){
                 result.append(" -m ")
                         .append(sqoopParameters.getConcurrency());
+            }
+            if(CollectionUtils.isNotEmpty(sqoopParameters.localParams)){
+                for (Property property : sqoopParameters.localParams){
+                    result.append(" ").append(property.getProp());
+                    if(StringUtils.isNotEmpty(property.getValue())){
+                        result.append(" ").append(property.getValue());
+                    }
+                }
             }
         }catch (Exception e){
             logger.error(e.getMessage());
