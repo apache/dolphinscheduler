@@ -139,7 +139,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             } catch (Exception e) {
                 logger.error("task commit to mysql and dispatcht task failed", e);
             }
-            retryTimes++;
         }
         if (submitDB) {
             boolean submitTask = false;
