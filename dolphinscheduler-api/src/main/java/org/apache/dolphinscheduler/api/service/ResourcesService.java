@@ -349,22 +349,30 @@ public class ResourcesService extends BaseService {
             throw new ServiceException(Status.HDFS_OPERATION_ERROR);
         }
 
-        String nameWithSuffix = name;
-
         if (!resource.isDirectory()) {
             //get the origin file suffix
             String originSuffix = FileUtils.suffix(originFullName);
             String suffix = FileUtils.suffix(fullName);
-            if (!suffix.equals(originSuffix)) {
+            boolean suffixIsChanged = false;
+            if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            //verify whether suffix is changed
+            if (suffixIsChanged) {
                 //need verify whether this resource is authorized to other users
                 Map<String, Object> columnMap = new HashMap<String, Object>();
                 columnMap.put("resources_id", resourceId);
 
                 List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
                 if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-                    String users = resourcesUsers.stream().map(t -> t.getUserId()).collect(Collectors.toList()).toString();
-                    logger.error("resource is authorized to user {},suffix not allowed to be modified", users);
-                    putMsg(result,Status.RESOURCE_IS_AUTHORIZED,users);
+                    List<Integer> userIds = resourcesUsers.stream().map(t -> t.getUserId()).collect(Collectors.toList());
+                    List<User> users = userMapper.selectBatchIds(userIds);
+                    String userNames = users.stream().map(t -> t.getUserName()).collect(Collectors.toList()).toString();
+                    logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
+                    putMsg(result,Status.RESOURCE_IS_AUTHORIZED,userNames);
                     return result;
                 }
             }
