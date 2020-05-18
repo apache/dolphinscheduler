@@ -825,9 +825,9 @@ public class MasterExecThread implements Runnable {
         }
 
         // stop
-        List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
-        List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
         if(state == ExecutionStatus.READY_STOP){
+            List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
+            List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             if(CollectionUtils.isNotEmpty(stopList)
                     || CollectionUtils.isNotEmpty(killList)
                     || !isComplementEnd()){
@@ -839,10 +839,11 @@ public class MasterExecThread implements Runnable {
 
         // success
         if(state == ExecutionStatus.RUNNING_EXEUTION){
+            List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXEUTION;
-            }else if(CollectionUtils.isNotEmpty(killList)){
+            }else if(CollectionUtils.isNotEmpty(killTasks)){
                 // tasks maybe killed manually
                 return ExecutionStatus.FAILURE;
             }else{
