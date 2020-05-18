@@ -380,7 +380,6 @@ public class ResourcesService extends BaseService {
 
         // updateResource data
         List<Integer> childrenResource = listAllChildren(resource,false);
-        String oldFullName = resource.getFullName();
         Date now = new Date();
 
         resource.setAlias(name);
@@ -395,7 +394,7 @@ public class ResourcesService extends BaseService {
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(oldFullName, matcherFullName));
+                    t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                     t.setUpdateTime(now);
                     return t;
                 }).collect(Collectors.toList());
