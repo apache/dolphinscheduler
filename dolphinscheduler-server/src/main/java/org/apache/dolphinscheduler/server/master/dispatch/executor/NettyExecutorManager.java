@@ -84,8 +84,11 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      */
     @Override
     public Boolean execute(ExecutionContext context) throws ExecuteException {
-        LinkedList<String> allNodes = new LinkedList<>(getAllNodes(context));
-
+        LinkedList<String> allNodes = new LinkedList<>();
+        Set<String> nodes = getAllNodes(context);
+        if (nodes != null) {
+            allNodes.addAll(nodes);
+        }
         /**
          *  build command accord executeContext
          */
