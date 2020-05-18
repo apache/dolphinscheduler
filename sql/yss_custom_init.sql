@@ -71,13 +71,18 @@ CREATE TABLE `t_yss_ext_platform` (
 
 
 
-INSERT INTO `t_escheduler_user` VALUES ('1', 'sysadmin', '48a365b4ce1e322a55ae9017f3daf0c0', '1', 'xxx@qq.com', 'xx', '1',
- '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+
+ALTER TABLE `dolphinscheduler`.`t_ds_schedules` ADD COLUMN `scheduler_calendar` VARCHAR(255) NULL AFTER `crontab`;
+
+
+
+-------------------------------------
+INSERT INTO `t_ds_user` VALUES ('1', 'sysadmin', '48a365b4ce1e322a55ae9017f3daf0c0', '1', 'xxx@qq.com', 'xx', '1',
+'2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 INSERT INTO `t_ds_tenant` VALUES (1,'sysadmin','sysadmin','',1,'2020-04-13 09:06:41','2020-04-13 09:06:41');
 
-ALTER TABLE `dolphinscheduler`.`t_ds_schedules`
-ADD COLUMN `scheduler_calendar` VARCHAR(255) NULL AFTER `crontab`;
+-------------------------------------
 
 
 

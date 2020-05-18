@@ -358,9 +358,7 @@ public class ExtPlatformService extends BaseService{
       }
 
       ExtPlatformParam extPlatformParam = JSONUtils.parseObject(connectParam,ExtPlatformParam.class);
-      if(null == extPlatformParam ||
-              StringUtils.isBlank(extPlatformParam.getName()) ||
-              StringUtils.isBlank(extPlatformParam.getUrl())){
+      if(null == extPlatformParam || StringUtils.isBlank(extPlatformParam.getUrl())){
         return result;
       }
 

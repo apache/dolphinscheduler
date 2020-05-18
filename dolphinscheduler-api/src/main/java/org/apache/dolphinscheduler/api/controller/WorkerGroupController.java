@@ -38,12 +38,15 @@ import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 /**
  * worker group controller
  */
 @Api(tags = "WORKER_GROUP_TAG", position = 1)
 @RestController
 @RequestMapping("/worker-group")
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class WorkerGroupController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupController.class);
@@ -52,7 +55,35 @@ public class WorkerGroupController extends BaseController {
     WorkerGroupService workerGroupService;
 
 
+    /**
+     * create or update a worker group
+     *
+     * @param loginUser login user
+     * @param id        worker group id
+     * @param name      worker group name
+     * @param ipList    ip list
+     * @return create or update result code
+     */
+    @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType = "String")
+    })
+    @PostMapping(value = "/save")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(SAVE_ERROR)
+    public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                  @RequestParam(value = "id", required = false, defaultValue = "0") int id,
+                                  @RequestParam(value = "name") String name,
+                                  @RequestParam(value = "ipList") String ipList
+    ) {
+        logger.info("save worker group: login user {}, id:{}, name: {}, ipList: {} ",
+                loginUser.getUserName(), id, name, ipList);
 
+        Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser, id, name, ipList);
+        return returnDataList(result);
+    }
 
     /**
      * query worker groups paging
@@ -104,5 +135,28 @@ public class WorkerGroupController extends BaseController {
         return returnDataList(result);
     }
 
+    /**
+     * delete worker group by id
+     *
+     * @param loginUser login user
+     * @param id        group id
+     * @return delete result code
+     */
+    @ApiOperation(value = "deleteById", notes = "DELETE_WORKER_GROUP_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
 
+    })
+    @GetMapping(value = "/delete-by-id")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_WORKER_GROUP_FAIL)
+    public Result deleteById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                             @RequestParam("id") Integer id
+    ) {
+        logger.info("delete worker group: login user {}, id:{} ",
+                loginUser.getUserName(), id);
+
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(id);
+        return returnDataList(result);
+    }
 }

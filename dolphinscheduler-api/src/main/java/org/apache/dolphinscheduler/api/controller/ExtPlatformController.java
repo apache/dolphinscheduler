@@ -188,7 +188,7 @@ public class ExtPlatformController extends BaseController{
     @ApiException(DELETE_EXTPLAFTORM_BY_ID_ERROR)
     public Result selectExtPlatformById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @RequestParam(value = "id") int id) {
-        logger.info("login user {}, delete extPlatform, extPlatformId: {},", loginUser.getUserName(), id);
+        logger.info("login user {}, select extPlatform, extPlatformId: {},", loginUser.getUserName(), id);
         Map<String, Object> result = extPlatformService.selectById(loginUser,id);
         return returnDataList(result);
     }
@@ -223,12 +223,12 @@ public class ExtPlatformController extends BaseController{
      * verify extPlatform code
      *
      * @param loginUser login user
-     * @param extPlatformName extPlatform code
+     * @param extPlatformName extPlatform name
      * @return true if extPlatform code can user, otherwise return false
      */
     @ApiOperation(value = "verifyExtPlatformName", notes= "VERIFY_EXTPLAFTORM_CODE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "extPlatformName", value = "EXTPLAFTORM_CODE", required = true, dataType = "String")
+            @ApiImplicitParam(name = "extPlatformName", value = "EXTPLAFTORM_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-extPlatform-name")
     @ResponseStatus(HttpStatus.OK)
@@ -250,7 +250,7 @@ public class ExtPlatformController extends BaseController{
      * @return extPlatform list
      */
     @ApiOperation(value = "queryExtlist", notes= "QUERY_EXT_LIST_NOTES")
-    @GetMapping(value="/extlist")
+    @GetMapping(value="/extList")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXTPLAFTORM_LIST_ERROR)
     public Result queryExtlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser, int id){
@@ -267,6 +267,12 @@ public class ExtPlatformController extends BaseController{
      * @return extPlatform list
      */
     @ApiOperation(value = "queryDetail", notes= "QUERY_EXT_LIST_NOTES")
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "connectParam", value = "CONNECT_PARAM", required = true, dataType ="String",example = "{'url' : 'http://192.168.101.30:8011/ShellTask.json','urlType' : '0' } ")
+
+    })
+
     @GetMapping(value="/extDetail")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXTPLAFTORM_LIST_ERROR)
