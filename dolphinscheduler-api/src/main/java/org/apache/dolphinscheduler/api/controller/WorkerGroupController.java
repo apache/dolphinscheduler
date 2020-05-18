@@ -66,7 +66,7 @@ public class WorkerGroupController extends BaseController {
      */
     @ApiOperation(value = "saveWorkerGroup", notes = "CREATE_WORKER_GROUP_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "0", defaultValue = "0"),
             @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType = "String")
     })
@@ -96,9 +96,9 @@ public class WorkerGroupController extends BaseController {
      */
     @ApiOperation(value = "queryAllWorkerGroupsPaging", notes = "QUERY_WORKER_GROUP_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
-            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType = "String")
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType ="String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType ="Int",example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)

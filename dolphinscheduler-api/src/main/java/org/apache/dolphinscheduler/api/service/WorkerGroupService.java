@@ -35,8 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * work group service
@@ -51,9 +53,6 @@ public class WorkerGroupService extends BaseService {
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
-
-    @Autowired
-    protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     /**
      * create or update a worker group
@@ -185,22 +184,9 @@ public class WorkerGroupService extends BaseService {
      * @return all worker group list
      */
     public Map<String,Object> queryAllGroup() {
-        Map<String, Object> result = new HashMap<>();
-        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
-        List<String> workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
-
-        // available workerGroup list
-        List<String> availableWorkerGroupList = new ArrayList<>();
-
-        for (String workerGroup : workerGroupList){
-            String workerGroupPath= workerPath + "/" + workerGroup;
-            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
-            if (CollectionUtils.isNotEmpty(childrenNodes)){
-                availableWorkerGroupList.add(workerGroup);
-            }
-        }
-
-        result.put(Constants.DATA_LIST, availableWorkerGroupList);
+        Map<String, Object> result = new HashMap<>(5);
+        List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
+        result.put(Constants.DATA_LIST, workerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
