@@ -32,10 +32,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
@@ -352,24 +349,40 @@ public class ResourcesService extends BaseService {
             throw new ServiceException(Status.HDFS_OPERATION_ERROR);
         }
 
-        String nameWithSuffix = name;
-
         if (!resource.isDirectory()) {
-            //get the file suffix
-            String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
+            //get the origin file suffix
+            String originSuffix = FileUtils.suffix(originFullName);
+            String suffix = FileUtils.suffix(fullName);
+            boolean suffixIsChanged = false;
+            if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            //verify whether suffix is changed
+            if (suffixIsChanged) {
+                //need verify whether this resource is authorized to other users
+                Map<String, Object> columnMap = new HashMap<>();
+                columnMap.put("resources_id", resourceId);
 
-            //if the name without suffix then add it ,else use the origin name
-            if(!name.endsWith(suffix)){
-                nameWithSuffix = nameWithSuffix + suffix;
+                List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
+                if (CollectionUtils.isNotEmpty(resourcesUsers)) {
+                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getId).collect(Collectors.toList());
+                    List<User> users = userMapper.selectBatchIds(userIds);
+                    String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
+                    logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
+                    putMsg(result,Status.RESOURCE_IS_AUTHORIZED,userNames);
+                    return result;
+                }
             }
         }
 
         // updateResource data
         List<Integer> childrenResource = listAllChildren(resource,false);
-        String oldFullName = resource.getFullName();
         Date now = new Date();
 
-        resource.setAlias(nameWithSuffix);
+        resource.setAlias(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
@@ -381,7 +394,7 @@ public class ResourcesService extends BaseService {
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(oldFullName, matcherFullName));
+                    t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                     t.setUpdateTime(now);
                     return t;
                 }).collect(Collectors.toList());
