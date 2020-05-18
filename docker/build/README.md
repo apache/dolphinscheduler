@@ -109,16 +109,16 @@ In Unix-Like, Example:
 
 ```bash
 $ cd path/incubator-dolphinscheduler
-$ sh ./dockerfile/hooks/build
+$ sh ./docker/build/hooks/build
 ```
 
 In Windows, Example:
 
 ```bat
-c:\incubator-dolphinscheduler>.\dockerfile\hooks\build.bat
+c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 ```
 
-Please read `./dockerfile/hooks/build` `./dockerfile/hooks/build.bat` script files if you don't understand
+Please read `./docker/build/hooks/build` `./docker/build/hooks/build.bat` script files if you don't understand
 
 ## Environment Variables
 
