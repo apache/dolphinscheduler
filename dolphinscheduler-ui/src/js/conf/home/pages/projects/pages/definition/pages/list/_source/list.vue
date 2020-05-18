@@ -116,7 +116,7 @@
               </template>
             </x-poptip>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="ans-icon-node"><!--{{$t('树形图')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('DependView')" @click="_treeViewDepend(item)"  icon="iconfont icon-yilaiguanxi"><!--{{$t('依赖图')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('DependView')" @click="_treeViewDepend(item)"  icon="ans-icon-dependence"><!--{{$t('依赖图')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="ans-icon-download"><!--{{$t('导出')}}--></x-button>
           </td>
         </tr>

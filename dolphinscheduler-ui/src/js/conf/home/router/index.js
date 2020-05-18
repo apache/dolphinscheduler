@@ -121,7 +121,7 @@ const router = new Router({
               name: 'definition-tree-view-depend-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/dependIndex'], resolve),
               meta: {
-                title: `${i18n.$t('TreeView')}`
+                title: `${i18n.$t('DependView')}`
               }
             }
           ]

@@ -678,6 +678,18 @@ export default {
     })
   },
   /**
+   * tree chart (depend)
+   */
+  getViewTreeByDepend ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/view-tree-depend`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * gantt chart
    */
   getViewGantt ({ state }, payload) {
