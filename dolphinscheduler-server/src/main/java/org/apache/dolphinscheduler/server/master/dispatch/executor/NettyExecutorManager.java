@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
