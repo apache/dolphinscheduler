@@ -511,7 +511,7 @@ public class UsersService extends BaseService {
         if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
 
             // get all resource id of process definitions those is released
-            List<Map<String, Object>> list = processDefinitionMapper.listResources();
+            List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
             Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
