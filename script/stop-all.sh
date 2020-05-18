@@ -29,8 +29,7 @@ do
 
 done
 
-workersHost=(${workers//,/ })
-for worker in ${workersHost[@]}
+for worker in ${!workersGroup[*]}
 do
   echo "$worker worker server is stopping"
   ssh -p $sshPort $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop worker-server;"
@@ -45,4 +44,3 @@ do
   echo "$apiServer worker server is stopping"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
 done
-

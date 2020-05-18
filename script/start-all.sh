@@ -28,8 +28,7 @@ do
 
 done
 
-workersHost=(${workers//,/ })
-for worker in ${workersHost[@]}
+for worker in ${!workersGroup[*]}
 do
   echo "$worker worker server is starting"
 
@@ -45,4 +44,3 @@ do
   echo "$apiServer worker server is starting"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
 done
-
