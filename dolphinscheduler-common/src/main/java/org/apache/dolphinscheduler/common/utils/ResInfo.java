@@ -18,8 +18,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 
-import java.util.Date;
-
 /**
  *  heartbeat for ZK reigster res info
  */
@@ -109,6 +107,8 @@ public class ResInfo {
                 Double.parseDouble(masterArray[2])));
         masterServer.setCreateTime(DateUtils.stringToDate(masterArray[3]));
         masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[4]));
+        //set process id
+        masterServer.setId(Integer.parseInt(masterArray[5]));
         return masterServer;
     }
 

@@ -123,12 +123,15 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		String parentPath = getZNodeParentPath(zkNodeType);
 
 		List<Server> masterServers = new ArrayList<>();
-		int i = 0;
 		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
 			Server masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
-			masterServer.setZkDirectory(parentPath + "/"+ entry.getKey());
-			masterServer.setId(i);
-			i ++;
+			String key = entry.getKey();
+			masterServer.setZkDirectory(parentPath + "/"+ key);
+			//set host and port
+			String[] hostAndPort=key.split(COLON);
+			String[] hosts=hostAndPort[0].split(DIVISION_STRING);
+			masterServer.setHost(hosts[hosts.length-1]);// fetch the last one
+			masterServer.setPort(Integer.parseInt(hostAndPort[1]));
 			masterServers.add(masterServer);
 		}
 		return masterServers;

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -141,7 +142,7 @@ public class WorkerRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + workerConfig.getListenPort();
+        return OSUtils.getHost() + Constants.COLON + workerConfig.getListenPort();
     }
 
     /**
@@ -157,7 +158,9 @@ public class WorkerRegistry {
                 builder.append(OSUtils.memoryUsage()).append(COMMA);
                 builder.append(OSUtils.loadAverage()).append(COMMA);
                 builder.append(startTime).append(COMMA);
-                builder.append(DateUtils.dateToString(new Date()));
+                builder.append(DateUtils.dateToString(new Date())).append(COMMA);
+                //save process id
+                builder.append(OSUtils.getProcessID());
                 String workerPath = getWorkerPath();
                 zookeeperRegistryCenter.getZookeeperCachedOperator().update(workerPath, builder.toString());
             } catch (Throwable ex){
