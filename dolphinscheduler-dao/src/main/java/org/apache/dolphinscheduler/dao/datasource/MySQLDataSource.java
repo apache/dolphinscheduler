@@ -54,10 +54,10 @@ public class MySQLDataSource extends BaseDataSource {
     if(other.contains(sensitiveParam)){
       int index = other.indexOf(sensitiveParam);
       String tmp = sensitiveParam;
-      if(other.charAt(index-1) == symbol){
-        tmp = symbol + tmp;
-      } else if(other.charAt(index + 1) == symbol){
+      if(index == 0 || other.charAt(index + 1) == symbol){
         tmp = tmp + symbol;
+      } else if(other.charAt(index - 1) == symbol){
+        tmp = symbol + tmp;
       }
       logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
       other = other.replace(tmp, "");
