@@ -93,6 +93,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
         TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand,result);
         taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
+        taskExecutionContextCacheManager.removeByTaskInstanceId(taskKillResponseCommand.getTaskInstanceId());
     }
 
     /**
