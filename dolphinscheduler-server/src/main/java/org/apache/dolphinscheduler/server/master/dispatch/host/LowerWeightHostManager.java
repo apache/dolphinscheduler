@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -68,7 +69,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     /**
      * worker host weights
      */
-    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeights;
+    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeightsMap;
 
     /**
      * worker group host lock
@@ -83,7 +84,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     @PostConstruct
     public void init(){
         this.selector = new LowerWeightRoundRobin();
-        this.workerHostWeights = new ConcurrentHashMap<>();
+        this.workerHostWeightsMap = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
         this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),35, 40, TimeUnit.SECONDS);
@@ -106,9 +107,8 @@ public class LowerWeightHostManager extends CommonHostManager {
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
         if(CollectionUtils.isNotEmpty(workerHostWeights)){
             return selector.select(workerHostWeights).getHost();
-        } else{
-            return roundRobinHostManager.select(context);
         }
+        return new Host();
     }
 
     @Override
@@ -119,8 +119,8 @@ public class LowerWeightHostManager extends CommonHostManager {
     private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights){
         lock.lock();
         try {
-            workerHostWeights.clear();
-            workerHostWeights.putAll(workerHostWeights);
+            workerHostWeightsMap.clear();
+            workerHostWeightsMap.putAll(workerHostWeights);
         } finally {
             lock.unlock();
         }
@@ -129,7 +129,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     private Set<HostWeight> getWorkerHostWeights(String workerGroup){
         lock.lock();
         try {
-            return workerHostWeights.get(workerGroup);
+            return workerHostWeightsMap.get(workerGroup);
         } finally {
             lock.unlock();
         }
@@ -150,8 +150,17 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for(String node : nodes){
                         String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
-                        if(StringUtils.isNotEmpty(heartbeat) && heartbeat.contains(COMMA) && heartbeat.split(COMMA).length == 5){
+                        if(StringUtils.isNotEmpty(heartbeat)
+                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
                             String[] parts = heartbeat.split(COMMA);
+
+                            int status = Integer.parseInt(parts[8]);
+                            if (status == Constants.ABNORMAL_NODE_STATUS){
+                                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
+                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
+                                continue;
+                            }
+
                             double cpu = Double.parseDouble(parts[0]);
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);
