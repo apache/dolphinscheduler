@@ -36,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
+
+import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
 /**
  * worker registry test
  */
@@ -61,7 +63,7 @@ public class WorkerRegistryTest {
         String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (OSUtils.getHost() + ":" + workerConfig.getListenPort());
         TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
-        Assert.assertEquals(5, heartbeat.split(",").length);
+        Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
     }
 
     @Test
