@@ -37,6 +37,9 @@ public class MasterConfig {
     @Value("${master.task.commit.retryTimes:5}")
     private int masterTaskCommitRetryTimes;
 
+    @Value("${master.dispatch.task.num :3}")
+    private int masterDispatchTaskNumber;
+
     @Value("${master.task.commit.interval:1000}")
     private int masterTaskCommitInterval;
 
@@ -125,5 +128,13 @@ public class MasterConfig {
 
     public void setMasterReservedMemory(double masterReservedMemory) {
         this.masterReservedMemory = masterReservedMemory;
+    }
+
+    public int getMasterDispatchTaskNumber() {
+        return masterDispatchTaskNumber;
+    }
+
+    public void setMasterDispatchTaskNumber(int masterDispatchTaskNumber) {
+        this.masterDispatchTaskNumber = masterDispatchTaskNumber;
     }
 }

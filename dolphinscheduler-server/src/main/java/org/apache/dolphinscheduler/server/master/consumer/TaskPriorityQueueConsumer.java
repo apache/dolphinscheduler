@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -85,6 +86,13 @@ public class TaskPriorityQueueConsumer extends Thread{
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
     @PostConstruct
     public void init(){
         super.setName("TaskUpdateQueueConsumerThread");
@@ -95,12 +103,24 @@ public class TaskPriorityQueueConsumer extends Thread{
     public void run() {
         while (Stopper.isRunning()){
             try {
-                // if not task , blocking here
-                String taskPriorityInfo = taskPriorityQueue.take();
 
-                TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+                List<String> failedDispathTasks = new ArrayList<>();
 
-                dispatch(taskPriority.getTaskId());
+                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
+
+                for(int i = 0; i < fetchTaskNum; i++){
+                    // if not task , blocking here
+                    String taskPriorityInfo = taskPriorityQueue.take();
+                    TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+                    boolean dispatchResult = dispatch(taskPriority.getTaskId());
+                    if(!dispatchResult){
+                        failedDispathTasks.add(taskPriorityInfo);
+                    }
+                }
+                for(String taskPriorityInfo: failedDispathTasks){
+                    taskPriorityQueue.put(taskPriorityInfo);
+                }
+
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
             }
@@ -114,21 +134,18 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private Boolean dispatch(int taskInstanceId){
+    private boolean dispatch(int taskInstanceId){
         TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        Boolean result = false;
-        while (Stopper.isRunning()){
-            try {
-                result = dispatcher.dispatch(executionContext);
-            } catch (ExecuteException e) {
-                logger.error("dispatch error",e);
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }
-
-            if (result || taskInstanceIsFinalState(taskInstanceId)){
-                break;
-            }
+        boolean result = false;
+        try {
+            result = dispatcher.dispatch(executionContext);
+        } catch (ExecuteException e) {
+            logger.error("dispatch error",e);
+        }
+        if (!result && taskInstanceIsFinalState(taskInstanceId)){
+            // when task finish, ignore this task, there is no need to dispatch anymore
+            result = true;
         }
         return result;
     }
