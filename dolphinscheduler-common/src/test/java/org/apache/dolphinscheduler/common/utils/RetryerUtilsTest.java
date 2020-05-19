@@ -213,4 +213,113 @@ public class RetryerUtilsTest {
         testRetryExceptionWithPara(true);
         testRetryExceptionWithPara(false);
     }
+
+    @Test
+    public void testRetrySilent() {
+        try {
+            for (int execTarget = 1; execTarget <= 3; execTarget++) {
+                int finalExecTarget = execTarget;
+                int[] execTime = {0};
+                boolean result = RetryerUtils.retryCallSilent(() -> {
+                    execTime[0]++;
+                    return execTime[0] == finalExecTarget;
+                });
+                Assert.assertEquals(finalExecTarget, execTime[0]);
+                Assert.assertTrue(result);
+            }
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception " + e.getMessage());
+        }
+        int[] execTime = {0};
+        try {
+            boolean result = RetryerUtils.retryCallSilent(() -> {
+                execTime[0]++;
+                return execTime[0] == 4;
+            });
+            Assert.assertFalse(result);
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception  " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRetrySilentWithPara() {
+        try {
+            for (int execTarget = 1; execTarget <= 3; execTarget++) {
+                int finalExecTarget = execTarget;
+                int[] execTime = {0};
+                boolean result = RetryerUtils.retryCallSilent(() -> {
+                    execTime[0]++;
+                    return execTime[0] == finalExecTarget;
+                }, true);
+                Assert.assertEquals(finalExecTarget, execTime[0]);
+                Assert.assertTrue(result);
+            }
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception " + e.getMessage());
+        }
+        int[] execTime = {0};
+        try {
+            boolean result = RetryerUtils.retryCallSilent(() -> {
+                execTime[0]++;
+                return execTime[0] == 4;
+            }, true);
+            Assert.assertFalse(result);
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception  " + e.getMessage());
+        }
+    }
+    @Test
+    public void testRetrySilentNoCheckResult(){
+        try {
+            for (int execTarget = 1; execTarget <= 5; execTarget++) {
+                int[] execTime = {0};
+                boolean result = RetryerUtils.retryCallSilent(() -> {
+                    execTime[0]++;
+                    return execTime[0] > 1;
+                }, false);
+                Assert.assertEquals(1, execTime[0]);
+                Assert.assertFalse(result);
+            }
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception " + e.getMessage());
+        }
+    }
+    private void testRetrySilentExceptionWithPara(boolean checkResult) {
+        try {
+            for (int execTarget = 1; execTarget <= 3; execTarget++) {
+                int finalExecTarget = execTarget;
+                int[] execTime = {0};
+                boolean result = RetryerUtils.retryCallSilent(() -> {
+                    execTime[0]++;
+                    if (execTime[0] != finalExecTarget) {
+                        throw new IllegalArgumentException(String.valueOf(execTime[0]));
+                    }
+                    return true;
+                }, checkResult);
+                Assert.assertEquals(finalExecTarget, execTime[0]);
+                Assert.assertTrue(result);
+            }
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception " + e.getMessage());
+        }
+        int[] execTime = {0};
+        try {
+            boolean result = RetryerUtils.retryCallSilent(() -> {
+                execTime[0]++;
+                if (execTime[0] != 4) {
+                    throw new IllegalArgumentException(String.valueOf(execTime[0]));
+                }
+                return true;
+            }, checkResult);
+            Assert.assertFalse(result);
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception " + e.getMessage());
+        }
+    }
+    @Test
+    public void testRetrySilentException() {
+        testRetrySilentExceptionWithPara(true);
+        testRetrySilentExceptionWithPara(false);
+    }
 }
