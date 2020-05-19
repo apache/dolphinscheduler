@@ -141,8 +141,8 @@ public class TaskPriorityQueueConsumerTest {
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
         dataSource.setName("sqlDatasource");
-        dataSource.setType(DbType.MYSQL);
         dataSource.setUserId(2);
+        dataSource.setType(DbType.MYSQL);
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\",\"database\":\"dolphinscheduler_qiaozhanwei\",\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\",\"user\":\"root\",\"password\":\"root@123\"}");
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
