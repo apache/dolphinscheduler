@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.slf4j.Logger;
@@ -102,7 +103,13 @@ public class WorkerRegistry {
             }
         });
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
-        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
+
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+                workerConfig.getWorkerReservedMemory(),
+                workerConfig.getWorkerMaxCpuloadAvg(),
+                getWorkerPath(),
+                zookeeperRegistryCenter);
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, workerHeartbeatInterval, workerHeartbeatInterval, TimeUnit.SECONDS);
         logger.info("worker node : {} registry to ZK successfully with heartBeatInterval : {}s", address, workerHeartbeatInterval);
 
     }
@@ -142,27 +149,5 @@ public class WorkerRegistry {
      */
     private String getLocalAddress(){
         return OSUtils.getHost() + ":" + workerConfig.getListenPort();
-    }
-
-    /**
-     * hear beat task
-     */
-    class HeartBeatTask implements Runnable{
-
-        @Override
-        public void run() {
-            try {
-                StringBuilder builder = new StringBuilder(100);
-                builder.append(OSUtils.cpuUsage()).append(COMMA);
-                builder.append(OSUtils.memoryUsage()).append(COMMA);
-                builder.append(OSUtils.loadAverage()).append(COMMA);
-                builder.append(startTime).append(COMMA);
-                builder.append(DateUtils.dateToString(new Date()));
-                String workerPath = getWorkerPath();
-                zookeeperRegistryCenter.getZookeeperCachedOperator().update(workerPath, builder.toString());
-            } catch (Throwable ex){
-                logger.error("error write worker heartbeat info", ex);
-            }
-        }
     }
 }
