@@ -57,6 +57,12 @@ public interface TaskInstanceCacheManager {
     void cacheTaskInstance(TaskExecuteResponseCommand taskExecuteResponseCommand);
 
     /**
+     * cache taskInstance
+     * @param taskInstance
+     */
+    void cacheTaskInstance(TaskInstance taskInstance);
+
+    /**
      * remove taskInstance by taskInstanceId
      * @param taskInstanceId taskInstanceId
      */

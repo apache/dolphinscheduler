@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 
 import com.alibaba.fastjson.JSON;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -38,7 +37,6 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.Set;
@@ -101,6 +99,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
             logger.error("submit task instance to mysql and queue failed , please check and fix it");
             return result;
         }
+        // submit task success,cache it
+        taskInstanceCacheManager.cacheTaskInstance(taskInstance);
         if(!this.taskInstance.getState().typeIsFinished()) {
             result = waitTaskQuit();
         }
@@ -118,8 +118,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * @return true if task quit success
      */
     public Boolean waitTaskQuit(){
-        // query new state
-        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        // query new state from cache
+        taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
@@ -161,8 +161,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                         checkTimeout = false;
                     }
                 }
-                // updateProcessInstance task instance
-                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                // update processInstance and taskInstance
+                taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
