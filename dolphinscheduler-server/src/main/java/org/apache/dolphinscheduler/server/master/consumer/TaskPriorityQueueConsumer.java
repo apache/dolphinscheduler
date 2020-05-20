@@ -101,13 +101,11 @@ public class TaskPriorityQueueConsumer extends Thread{
 
     @Override
     public void run() {
+        List<String> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()){
             try {
-
-                List<String> failedDispatchTasks = new ArrayList<>();
-
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
-
+                failedDispatchTasks.clear();
                 for(int i = 0; i < fetchTaskNum; i++){
                     // if not task , blocking here
                     String taskPriorityInfo = taskPriorityQueue.take();
@@ -120,7 +118,6 @@ public class TaskPriorityQueueConsumer extends Thread{
                 for(String taskPriorityInfo: failedDispatchTasks){
                     taskPriorityQueue.put(taskPriorityInfo);
                 }
-
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
             }
@@ -135,10 +132,11 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @return result
      */
     private boolean dispatch(int taskInstanceId){
-        TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
-        ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
         boolean result = false;
         try {
+            TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
+            ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
+
             if (taskInstanceIsFinalState(taskInstanceId)){
                 // when task finish, ignore this task, there is no need to dispatch anymore
                 return true;
