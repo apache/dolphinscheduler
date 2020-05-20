@@ -33,7 +33,7 @@ public class RunConfig {
     @Value("${masters}")
     private String masters;
 
-    @Value("${workers}")
+    @Value("${workers:ds1}")
     private String workers;
 
     @Value("${alertServer}")
