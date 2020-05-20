@@ -104,7 +104,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         while (Stopper.isRunning()){
             try {
 
-                List<String> failedDispathTasks = new ArrayList<>();
+                List<String> failedDispatchTasks = new ArrayList<>();
 
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
 
@@ -114,10 +114,10 @@ public class TaskPriorityQueueConsumer extends Thread{
                     TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
                     boolean dispatchResult = dispatch(taskPriority.getTaskId());
                     if(!dispatchResult){
-                        failedDispathTasks.add(taskPriorityInfo);
+                        failedDispatchTasks.add(taskPriorityInfo);
                     }
                 }
-                for(String taskPriorityInfo: failedDispathTasks){
+                for(String taskPriorityInfo: failedDispatchTasks){
                     taskPriorityQueue.put(taskPriorityInfo);
                 }
 
@@ -139,13 +139,14 @@ public class TaskPriorityQueueConsumer extends Thread{
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
         boolean result = false;
         try {
-            result = dispatcher.dispatch(executionContext);
+            if (taskInstanceIsFinalState(taskInstanceId)){
+                // when task finish, ignore this task, there is no need to dispatch anymore
+                return true;
+            }else{
+                result = dispatcher.dispatch(executionContext);
+            }
         } catch (ExecuteException e) {
             logger.error("dispatch error",e);
-        }
-        if (!result && taskInstanceIsFinalState(taskInstanceId)){
-            // when task finish, ignore this task, there is no need to dispatch anymore
-            result = true;
         }
         return result;
     }
