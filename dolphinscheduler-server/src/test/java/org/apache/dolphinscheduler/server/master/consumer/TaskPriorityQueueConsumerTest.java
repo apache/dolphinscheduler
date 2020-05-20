@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.registry.DependencyConfig;
@@ -48,7 +49,7 @@ import java.util.Date;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
+        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class})
 public class TaskPriorityQueueConsumerTest {
 
 
