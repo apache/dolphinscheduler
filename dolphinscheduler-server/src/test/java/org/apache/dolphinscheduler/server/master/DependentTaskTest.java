@@ -107,6 +107,23 @@ public class DependentTaskTest {
         dependentTask.call();
 
         Assert.assertEquals(ExecutionStatus.SUCCESS, dependentTask.getTaskInstance().getState());
+
+        DateInterval dateInterval =DependentDateUtils.getTodayInterval(new Date()).get(0);
+        Mockito.when(processService
+                .findLastRunningProcess(4, dateInterval.getStartTime(),
+                        dateInterval.getEndTime()))
+                .thenReturn(findLastStopProcessInterval());
+        DependentTaskExecThread dependentFailure = new DependentTaskExecThread(taskInstance);
+        dependentFailure.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, dependentFailure.getTaskInstance().getState());
+    }
+
+    private ProcessInstance findLastStopProcessInterval(){
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(11);
+        processInstance.setProcessDefinitionId(4);
+        processInstance.setState(ExecutionStatus.STOP);
+        return  processInstance;
     }
 
     private ProcessInstance findLastProcessInterval(){
@@ -158,6 +175,7 @@ public class DependentTaskTest {
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;
     }
 
