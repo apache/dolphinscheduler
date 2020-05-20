@@ -56,7 +56,7 @@ jobs:
         run: |
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo dpkg -i google-chrome*.deb
+          sudo dpkg -i google-chrome*.deb --fix-missing
           sudo apt-get install -f -y
           wget -N https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
