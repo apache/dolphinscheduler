@@ -199,8 +199,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       taskType: v.type,
       runFlag: v.runFlag,
       nodenumber: locations[v.id].nodenumber,
-      successNode: v.conditionResult.successNode[0],
-      failedNode: v.conditionResult.failedNode[0]
+      successNode: v.conditionResult === undefined? '' : v.conditionResult.successNode[0],
+      failedNode: v.conditionResult === undefined? '' : v.conditionResult.failedNode[0]
     }))
 
     // contextmenu event
