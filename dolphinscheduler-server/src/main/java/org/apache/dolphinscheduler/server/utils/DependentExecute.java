@@ -135,23 +135,6 @@ public class DependentExecute {
             return DependResult.SUCCESS;
         }
         return DependResult.FAILED;
-
-//        List<TaskNode> taskNodes =
-//                processService.getTaskNodeListByDefinitionId(processInstance.getProcessDefinitionId());
-//        if(CollectionUtils.isEmpty(taskNodes)) {
-//            return DependResult.FAILED;
-//        }
-//        for(TaskNode taskNode:taskNodes){
-//            if(taskNode.isConditionsTask()
-//                    || DagHelper.haveConditionsAfterNode(taskNode.getName(), taskNodes)){
-//                continue;
-//            }
-//            DependResult tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
-//            if(DependResult.SUCCESS != tmpResult){
-//                return tmpResult;
-//            }
-//        }
-//        return DependResult.SUCCESS;
     }
 
     /**
