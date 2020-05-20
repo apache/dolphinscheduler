@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.monitor;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -52,7 +54,18 @@ public class RunConfig {
     }
 
     public String getWorkers() {
-        return workers;
+        StringBuilder sb = new StringBuilder(50);
+        if(StringUtils.isNotBlank(workers)){
+            String[] workersArr = workers.trim().split(Constants.COMMA);
+            for (String workerGroup : workersArr) {
+                sb.append(workerGroup.split(Constants.COLON)[0]).append(Constants.COMMA);
+            }
+        }
+        if( sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        return sb.toString();
     }
 
     public void setWorkers(String workers) {
