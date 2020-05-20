@@ -27,7 +27,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
@@ -55,6 +57,8 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     private Date dependentDate;
 
+    private final TaskInstanceCacheManager taskInstanceCacheManager;
+
     /**
      * constructor of MasterBaseTaskExecThread
      *
@@ -62,6 +66,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     public DependentTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
+        this.taskInstanceCacheManager= SpringApplicationContext.getBean(TaskInstanceCacheManager.class);
     }
 
 
@@ -70,6 +75,12 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         try{
             logger.info("dependent task start");
             this.taskInstance = submit();
+            if(this.taskInstance == null){
+                logger.error("submit task instance to mysql and queue failed , please check and fix it");
+                return false;
+            }
+            // submit task success,cache it
+            taskInstanceCacheManager.cacheTaskInstance(taskInstance);
             logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                     taskInstance.getProcessDefinitionId(),
                     taskInstance.getProcessInstanceId(),
@@ -80,6 +91,8 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             initDependParameters();
             waitTaskQuit();
             updateTaskState();
+            // remove cache
+            taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
         }catch (Exception e){
             logger.error("dependent task run exception" , e);
         }
@@ -147,7 +160,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                     break;
                 }
                 // updateProcessInstance task instance
-                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {

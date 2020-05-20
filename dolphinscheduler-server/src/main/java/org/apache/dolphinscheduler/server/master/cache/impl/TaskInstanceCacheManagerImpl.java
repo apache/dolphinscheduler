@@ -109,6 +109,18 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     }
 
     /**
+     * cache taskInstance
+     *
+     * @param taskInstance
+     */
+    @Override
+    public void cacheTaskInstance(TaskInstance taskInstance) {
+        if (taskInstance!=null&&taskInstance.getId()!=0){
+            taskInstanceCache.put(taskInstance.getId(),taskInstance);
+        }
+    }
+
+    /**
      * remove taskInstance by taskInstanceId
      * @param taskInstanceId taskInstanceId
      */

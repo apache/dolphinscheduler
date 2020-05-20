@@ -80,8 +80,6 @@ public class TaskAckProcessor implements NettyRequestProcessor {
         TaskExecuteAckCommand taskAckCommand = FastJsonSerializer.deserialize(command.getBody(), TaskExecuteAckCommand.class);
         logger.info("taskAckCommand : {}", taskAckCommand);
 
-        taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
-
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 
         ExecutionStatus ackStatus = ExecutionStatus.of(taskAckCommand.getStatus());
@@ -98,8 +96,10 @@ public class TaskAckProcessor implements NettyRequestProcessor {
 
         while (Stopper.isRunning()){
             TaskInstance taskInstance = processService.findTaskInstanceById(taskAckCommand.getTaskInstanceId());
-
-            if (taskInstance != null && ackStatus.typeIsRunning()){
+            // wait for the new state synchronization complete
+            if (taskInstance != null && taskInstance.getState().typeIsRunning()){
+                taskInstanceCacheManager.cacheTaskInstance(taskInstance);
+                logger.info("new task state synchronization complete");
                 break;
             }
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);

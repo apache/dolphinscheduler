@@ -81,12 +81,10 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         TaskExecuteResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), TaskExecuteResponseCommand.class);
         logger.info("received command : {}", responseCommand);
 
-        taskInstanceCacheManager.cacheTaskInstance(responseCommand);
-
         ExecutionStatus responseStatus = ExecutionStatus.of(responseCommand.getStatus());
 
         // TaskResponseEvent
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(responseStatus,
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
@@ -97,7 +95,11 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         while (Stopper.isRunning()){
             TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
 
-            if (taskInstance != null && responseStatus.typeIsFinished()){
+            // wait for the new state synchronization complete
+            if (taskInstance != null && taskInstance.getState().typeIsFinished()){
+                //update cache
+                taskInstanceCacheManager.cacheTaskInstance(taskInstance);
+                logger.info("new task state synchronization complete");
                 break;
             }
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
