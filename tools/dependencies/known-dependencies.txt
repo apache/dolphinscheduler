@@ -209,3 +209,4 @@ xml-apis-1.4.01.jar
 xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
+guava-retrying-2.0.0.jar
