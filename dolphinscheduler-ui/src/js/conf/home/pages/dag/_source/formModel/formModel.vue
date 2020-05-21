@@ -633,7 +633,7 @@
             break;
           }
         }
-        if(!hasMatch && o.workerGroupId==-1){
+        if(!hasMatch && o.workerGroupId!=undefined){
           this.workerGroup = 'default'
         } else {
           this.workerGroup = o.workerGroup
