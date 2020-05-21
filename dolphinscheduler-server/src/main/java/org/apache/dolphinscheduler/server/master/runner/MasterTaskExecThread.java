@@ -189,7 +189,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
             taskInstance.setState(ExecutionStatus.PAUSE);
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
-            return;
         }
     }
 
