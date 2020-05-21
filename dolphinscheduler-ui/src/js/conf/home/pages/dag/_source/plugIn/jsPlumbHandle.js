@@ -199,8 +199,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       taskType: v.type,
       runFlag: v.runFlag,
       nodenumber: locations[v.id].nodenumber,
-      successNode: v.conditionResult.successNode[0],
-      failedNode: v.conditionResult.failedNode[0]
+      successNode: v.conditionResult === undefined? '' : v.conditionResult.successNode[0],
+      failedNode: v.conditionResult === undefined? '' : v.conditionResult.failedNode[0]
     }))
 
     // contextmenu event
@@ -761,7 +761,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           source: sourceId,
           target: targetId,
           type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#f14343' },
+          paintStyle: { strokeWidth: 2, stroke: '#252d39' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
           overlays:[["Label", { label: i18n.$t('failed'), location:0.5, id:"label"} ]]
         })

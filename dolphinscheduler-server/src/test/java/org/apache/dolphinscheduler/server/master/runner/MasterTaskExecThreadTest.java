@@ -42,7 +42,7 @@ import java.util.Set;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class})
+        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class MasterTaskExecThreadTest {
 
     @Test

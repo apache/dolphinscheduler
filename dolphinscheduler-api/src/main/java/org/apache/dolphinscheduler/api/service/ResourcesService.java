@@ -368,7 +368,7 @@ public class ResourcesService extends BaseService {
 
                 List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
                 if (CollectionUtils.isNotEmpty(resourcesUsers)) {
-                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getId).collect(Collectors.toList());
+                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
                     List<User> users = userMapper.selectBatchIds(userIds);
                     String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
                     logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
