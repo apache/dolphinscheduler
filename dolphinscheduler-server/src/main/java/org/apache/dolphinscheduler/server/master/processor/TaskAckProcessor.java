@@ -70,7 +70,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
     }
 
     /**
-     *  task ack process
+     * task ack process
      * @param channel channel channel
      * @param command command TaskExecuteAckCommand
      */
