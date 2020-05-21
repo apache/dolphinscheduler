@@ -761,7 +761,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           source: sourceId,
           target: targetId,
           type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#f14343' },
+          paintStyle: { strokeWidth: 2, stroke: '#252d39' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
           overlays:[["Label", { label: i18n.$t('failed'), location:0.5, id:"label"} ]]
         })
