@@ -86,14 +86,14 @@ public enum ExecutionStatus {
    public boolean typeIsFinished(){
 
        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-               || typeIsWaittingThread();
+               || typeIsStop();
    }
 
     /**
      * status is waiting thread
      * @return status
      */
-   public boolean typeIsWaittingThread(){
+   public boolean typeIsWaitingThread(){
        return this == WAITTING_THREAD;
    }
 
@@ -104,6 +104,13 @@ public enum ExecutionStatus {
    public boolean typeIsPause(){
        return this == PAUSE;
    }
+    /**
+     * status is pause
+     * @return status
+     */
+    public boolean typeIsStop(){
+        return this == STOP;
+    }
 
     /**
      * status is running
