@@ -254,7 +254,7 @@ public class ProcessService {
         //process data check
         if (null == processData) {
             logger.error("process data is null");
-            return null;
+            return new ArrayList<>();
         }
 
         return processData.getTasks();
