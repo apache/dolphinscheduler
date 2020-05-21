@@ -9,11 +9,25 @@
 
 1. 准备RPM包
 
-   - 在源码dolphinscheduler-dist目录下执行命令```mvn -U clean install rpm:attached-rpm  -Prpmbuild  -Dmaven.test.skip=true -X```即可生成(在目录 dolphinscheduler-dist/target/rpm/apache-dolphinscheduler-incubating/RPMS/noarch 下)
+   - 在项目根目录下执行命令```mvn -U clean install  -Prpmbuild  -Dmaven.test.skip=true -X```即可生成(在目录 dolphinscheduler-dist/target/rpm/apache-dolphinscheduler-incubating/RPMS/noarch 下)
 
-2. 创建DS的安装用户--权限
+2. 创建DS的安装用户--安装目录(/opt/soft)有读写权限
 
-3. 初始化数据库信息
+3. rpm安装
+
+   - 手动安装（推荐）：
+      - copy准备的rpm包到集群的各个节点
+      - 用DS的安装用户执行: ```rpm -ivh apache-dolphinscheduler-incubating-xxx.noarch.rpm```
+   - ambar自动安装
+      - 集群的各个节点需要配置本地yum源
+      - copy准备的rpm包到各个节点本地yum源
+
+4. copy插件目录
+
+   - copy目录ambari_plugin/common-services/DOLPHIN到ambari-server/resources/common-services/下
+   - copy目录ambari_plugin/statcks/DOLPHIN到 ambari-server/resources/stacks/HDP/2.6/services/下--stack版本2.6根据实际情况选择
+
+5. 初始化数据库信息
 
    ```
    -- 创建Dolphin Scheduler的数据库：dolphinscheduler
