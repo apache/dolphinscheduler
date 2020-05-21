@@ -826,10 +826,7 @@ public final class Constants {
             ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
-    /**
-     * status
-     */
-    public static final String STATUS = "status";
+
 
     /**
      * message

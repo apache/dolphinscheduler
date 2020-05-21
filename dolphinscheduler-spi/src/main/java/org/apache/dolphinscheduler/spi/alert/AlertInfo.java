@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.model;
+package org.apache.dolphinscheduler.spi.alert;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,10 +24,13 @@ import java.util.Map;
  */
 public class AlertInfo {
 
+    /**
+     * all runtime parameters of alertplugin are here . eg : email receivers , email receiverCcs .
+     * each alert plugin can get the params they need from this map.
+     */
     private Map<String, Object> alertProps;
 
     private AlertData alertData;
-
 
     public AlertInfo() {
         this.alertProps = new HashMap<>();

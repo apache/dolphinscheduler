@@ -14,50 +14,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.plugin.model;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package org.apache.dolphinscheduler.spi.alert;
 
 /**
- * AlertInfo
+ * AlertData
  */
-public class AlertInfo {
+public class AlertData {
 
-    private Map<String, Object> alertProps;
+    /**
+     * alert primary key
+     */
+    private int id;
+    /**
+     * title
+     */
+    private String title;
+    /**
+     * content
+     */
+    private String content;
+    /**
+     * log
+     */
+    private String log;
 
-    private AlertData alertData;
-
-
-    public AlertInfo() {
-        this.alertProps = new HashMap<>();
+    public int getId() {
+        return id;
     }
 
-    public Map<String, Object> getAlertProps() {
-        return alertProps;
-    }
-
-    public AlertInfo setAlertProps(Map<String, Object> alertProps) {
-        this.alertProps = alertProps;
+    public AlertData setId(int id) {
+        this.id = id;
         return this;
     }
 
-    public AlertInfo addProp(String key, Object value) {
-        this.alertProps.put(key, value);
+    public String getTitle() {
+        return title;
+    }
+
+    public AlertData setTitle(String title) {
+        this.title = title;
         return this;
     }
 
-    public Object getProp(String key) {
-        return this.alertProps.get(key);
+    public String getContent() {
+        return content;
     }
 
-    public AlertData getAlertData() {
-        return alertData;
+    public AlertData setContent(String content) {
+        this.content = content;
+        return this;
     }
 
-    public AlertInfo setAlertData(AlertData alertData) {
-        this.alertData = alertData;
+    public String getLog() {
+        return log;
+    }
+
+    public AlertData setLog(String log) {
+        this.log = log;
         return this;
     }
 }

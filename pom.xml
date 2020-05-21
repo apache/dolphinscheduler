@@ -241,6 +241,12 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
                 <version>${curator.version}</version>
@@ -1010,5 +1016,8 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-plugin-api</module>
+        <module>dolphinscheduler-spi</module>
+        <module>dolphinscheduler-alert-plugin</module>
+        <module>dolphinscheduler-job-plugin</module>
     </modules>
 </project>
