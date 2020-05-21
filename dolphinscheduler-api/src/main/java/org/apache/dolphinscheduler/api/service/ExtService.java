@@ -76,6 +76,10 @@ public class ExtService extends BaseService{
       result = JSONUtils.parseObject(responseContent, Result.class);
     }
 
+    //todo 这里面要把本地worker服务的ip和集群服务器的ip做一个整理.
+    //     过滤出来可以用的信息.
+    //     worker节点和集群服务器的地址做个匹配,过滤掉无效信息.
+
 
     return result;
   }
