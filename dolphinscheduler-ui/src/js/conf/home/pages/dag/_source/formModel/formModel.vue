@@ -484,12 +484,26 @@
         }
         return true
       },
+      _verifWorkGroup() {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id == this.workerGroup;
+        });
+        if(item==undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false;
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
       _verification () {
         // Verify name
         if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if(!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
@@ -619,8 +633,7 @@
             break;
           }
         }
-
-        if(!hasMatch){
+        if(!hasMatch && o.workerGroupId==-1){
           this.workerGroup = 'default'
         } else {
           this.workerGroup = o.workerGroup
