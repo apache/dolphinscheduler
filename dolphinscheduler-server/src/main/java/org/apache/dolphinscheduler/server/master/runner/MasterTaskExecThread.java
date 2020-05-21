@@ -183,8 +183,11 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * pause task if task have not been dispatched to worker, do not dispatch anymore.
      *
      */
-    private void pauseTask() {
+    public void pauseTask() {
         taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(taskInstance == null){
+            return;
+        }
         if(StringUtils.isBlank(taskInstance.getHost())){
             taskInstance.setState(ExecutionStatus.PAUSE);
             taskInstance.setEndTime(new Date());
