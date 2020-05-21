@@ -123,8 +123,6 @@ public class DependentExecute {
 
     /**
      * depend type = depend_all
-     * skip the condition tasks.
-     * judge all the task
      * @return
      */
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance){
