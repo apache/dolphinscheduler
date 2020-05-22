@@ -72,20 +72,21 @@ public class ProcessDefinitionDao {
      */
     public void updateProcessDefinitionJson(Connection conn,Map<Integer,String> processDefinitionJsonMap){
         String sql = "UPDATE t_ds_process_definition SET process_definition_json=? where id=?";
-        PreparedStatement pstmt = null;
         try {
             for (Map.Entry<Integer, String> entry : processDefinitionJsonMap.entrySet()){
-                pstmt = conn.prepareStatement(sql);
-                pstmt.setString(1,entry.getValue());
-                pstmt.setInt(2,entry.getKey());
-                pstmt.executeUpdate();
+                try(PreparedStatement pstmt= conn.prepareStatement(sql)) {
+                    pstmt.setString(1,entry.getValue());
+                    pstmt.setInt(2,entry.getKey());
+                    pstmt.executeUpdate();
+                }
+
             }
 
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
-            ConnectionUtils.releaseResource(pstmt, conn);
+            ConnectionUtils.releaseResource(conn);
         }
     }
 }

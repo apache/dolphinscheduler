@@ -43,7 +43,7 @@ public class ProcessDefinitionDaoTest {
     public void testUpdateProcessDefinitionJson() throws Exception{
 
         Map<Integer,String> processDefinitionJsonMap = new HashMap<>();
-        processDefinitionJsonMap.put(2000,"test");
+        processDefinitionJsonMap.put(1,"test");
 
         processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),processDefinitionJsonMap);
 
