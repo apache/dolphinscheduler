@@ -107,6 +107,9 @@ public class TaskPriorityQueueConsumer extends Thread{
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for(int i = 0; i < fetchTaskNum; i++){
+                    if(taskPriorityQueue.size() <= 0){
+                        continue;
+                    }
                     // if not task , blocking here
                     String taskPriorityInfo = taskPriorityQueue.take();
                     TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
