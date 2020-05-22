@@ -17,7 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import junit.framework.Assert;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -27,17 +33,24 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
@@ -74,6 +87,74 @@ public class MasterTaskExecThreadTest {
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupNodesDirectly("test1")).thenReturn(workerGorups);
         MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(null);
         masterTaskExecThread.existsValidWorkerGroup("test1");
+    }
+
+    @Test
+    public void submitWaitComplete() throws Exception {
+        // prepare
+        ProcessInstance processInstance = processInstance();
+        TaskInstance taskInstance = taskInstance();
+
+        TaskInstanceCacheManagerImpl taskInstanceCacheManager = mock(TaskInstanceCacheManagerImpl.class);
+        ProcessService processService = mock(ProcessService.class);
+        MasterConfig masterConfig=mock(MasterConfig.class);
+        TaskPriorityQueue taskUpdateQueue=mock(TaskPriorityQueue.class);
+        AlertDao alertDao=mock(AlertDao.class);
+        NettyExecutorManager nettyExecutorManager=mock(NettyExecutorManager.class);
+        ZookeeperRegistryCenter zookeeperRegistryCenter=mock(ZookeeperRegistryCenter.class);
+
+        // mock constructor
+        ApplicationContext applicationContext = mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        when(applicationContext.getBean(MasterConfig.class)).thenReturn(masterConfig);
+        when(applicationContext.getBean(TaskPriorityQueue.class)).thenReturn(taskUpdateQueue);
+        when(applicationContext.getBean(AlertDao.class)).thenReturn(alertDao);
+        when(applicationContext.getBean(TaskInstanceCacheManagerImpl.class)).thenReturn(taskInstanceCacheManager);
+        when(applicationContext.getBean(NettyExecutorManager.class)).thenReturn(nettyExecutorManager);
+        when(applicationContext.getBean(ZookeeperRegistryCenter.class)).thenReturn(zookeeperRegistryCenter);
+
+        // when
+        when(processService.findProcessInstanceById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
+        when(masterConfig.getMasterTaskCommitRetryTimes()).thenReturn(Integer.valueOf(1));
+        when(masterConfig.getMasterTaskCommitInterval()).thenReturn(Integer.valueOf(1));
+        when(processService.submitTask(taskInstance)).thenReturn(taskInstance);
+        doNothing().when(taskInstanceCacheManager).cacheTaskInstance(taskInstance);
+        when(processService.updateTaskInstance(taskInstance)).thenReturn(true);
+
+        // this must be there after above method invoked
+        MasterTaskExecThread masterTaskExecThread=new MasterTaskExecThread(taskInstance);
+
+        // update task state
+        TaskInstance newTaskInstance = taskInstance();
+        newTaskInstance.setState(ExecutionStatus.SUCCESS);
+        when(taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId())).thenReturn(newTaskInstance);
+
+        // call
+        Boolean result = masterTaskExecThread.call();
+
+        // assert
+        Assert.assertEquals(result,true);
+    }
+
+
+    private ProcessInstance processInstance(){
+        ProcessInstance processInstance=new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setState(ExecutionStatus.SUCCESS);
+        return processInstance;
+    }
+
+    private TaskInstance taskInstance(){
+        TaskInstance taskInstance=new TaskInstance();
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setId(1);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setProcessInstancePriority(Priority.HIGH);
+        taskInstance.setTaskType(TaskType.HTTP.getDescp().toUpperCase());
+        taskInstance.setTaskJson("{}");
+        return taskInstance;
     }
 
 
