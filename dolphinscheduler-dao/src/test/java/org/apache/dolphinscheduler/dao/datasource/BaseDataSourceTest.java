@@ -116,7 +116,7 @@ public class BaseDataSourceTest {
   @Test
   public void testGetOracleJdbcUrl() {
 
-    //Method One:Oracle JDBC Thin ServiceName
+    //Oracle JDBC Thin ServiceName:Method One
     BaseDataSource oracleDataSource = new OracleDataSource();
     oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
     oracleDataSource.setDatabase("test");
@@ -129,7 +129,7 @@ public class BaseDataSourceTest {
     Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test",
             oracleDataSource.getJdbcUrl());
 
-    //Method Two:Oracle JDBC Thin ServiceName
+    //Oracle JDBC Thin ServiceName:Method Two
     oracleDataSource.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
     Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521/test",
             oracleDataSource.getJdbcUrl());
