@@ -14,31 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.shell;
+package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
+import javax.sql.DataSource;
+import java.util.Map;
 
-/**
- * SHELL Taks Test
- */
-public class ShellExecutorTest {
-    private static final Logger logger = LoggerFactory.getLogger(ShellExecutorTest.class);
+import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
+
+public class UpgradeDaoTest {
+    PostgresqlUpgradeDao postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
 
     @Test
-    public void execCommand() throws InterruptedException {
-
-        try {
-            String res = ShellExecutor.execCommand("groups");
-            logger.info("thread id:" + Thread.currentThread().getId() + ", result:" + res.substring(0, 5));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void testQueryQueryAllOldWorkerGroup() throws Exception{
+        postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
     }
 
 }
