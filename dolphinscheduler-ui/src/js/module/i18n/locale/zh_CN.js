@@ -168,7 +168,7 @@ export default {
   'Project Name': '项目名称',
   'Please enter name': '请输入名称',
   'Owned Users': '所属用户',
-  'Process Pid': '进程pid',
+  'Process Pid': '进程Pid',
   'Zk registration directory': 'zk注册目录',
   cpuUsage: 'cpuUsage',
   memoryUsage: 'memoryUsage',
