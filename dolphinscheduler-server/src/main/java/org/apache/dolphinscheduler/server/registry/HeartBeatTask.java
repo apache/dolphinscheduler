@@ -73,7 +73,9 @@ public class HeartBeatTask extends Thread{
             builder.append(reservedMemory).append(Constants.COMMA);
             builder.append(startTime).append(Constants.COMMA);
             builder.append(DateUtils.dateToString(new Date())).append(Constants.COMMA);
-            builder.append(status);
+            builder.append(status).append(COMMA);
+            //save process id
+            builder.append(OSUtils.getProcessID());
             zookeeperRegistryCenter.getZookeeperCachedOperator().update(heartBeatPath, builder.toString());
         } catch (Throwable ex){
             logger.error("error write heartbeat info", ex);
