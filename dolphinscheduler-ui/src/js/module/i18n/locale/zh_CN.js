@@ -421,9 +421,11 @@ export default {
   Running: '正在运行',
   'Waiting for dependency to complete': '等待依赖完成',
   Selected: '已选',
+  CurrentHour: '当前小时',
   Last1Hour: '前1小时',
   Last2Hours: '前2小时',
   Last3Hours: '前3小时',
+  Last24Hours: '前24小时',
   today: '今天',
   Last1Days: '昨天',
   Last2Days: '前两天',
@@ -590,5 +592,6 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Successful branch flow and failed branch flow are required': 'conditions节点成功和失败分支流转必填',
   'Unauthorized or deleted resources': '未授权或已删除资源',
-  'Please delete all non-existent resources': '请删除所有未授权或已删除资源'
+  'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
+  'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！'
 }
