@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -108,6 +109,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 failedDispatchTasks.clear();
                 for(int i = 0; i < fetchTaskNum; i++){
                     if(taskPriorityQueue.size() <= 0){
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                         continue;
                     }
                     // if not task , blocking here
