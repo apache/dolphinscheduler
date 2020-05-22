@@ -506,6 +506,7 @@ public class DataSourceService extends BaseService{
         }
 
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
+        parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);

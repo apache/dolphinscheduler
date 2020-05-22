@@ -52,10 +52,12 @@ public class OracleDataSource extends BaseDataSource {
     @Override
     public String getJdbcUrl() {
         String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
+        if (getType() == DbConnectType.ORACLE_SID) {
+            jdbcUrl += ":";
+        } else {
             jdbcUrl += "/";
         }
-        return jdbcUrl;
+        return jdbcUrl + getDatabase();
     }
 
     /**
