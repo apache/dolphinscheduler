@@ -58,6 +58,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
         ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class MasterTaskExecThreadTest {
 
+
     @Test
     public void testExistsValidWorkerGroup1(){
         ZookeeperRegistryCenter zookeeperRegistryCenter = Mockito.mock(ZookeeperRegistryCenter.class);
@@ -157,5 +158,36 @@ public class MasterTaskExecThreadTest {
         return taskInstance;
     }
 
+    @Test
+    public void testPauseTask(){
+
+
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        TaskInstance taskInstance = getTaskInstance();
+        Mockito.when(processService.findTaskInstanceById(252612))
+                .thenReturn(taskInstance);
+
+        Mockito.when(processService.updateTaskInstance(taskInstance))
+        .thenReturn(true);
+
+        MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
+        masterTaskExecThread.pauseTask();
+        org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
+    }
+
+    private TaskInstance getTaskInstance(){
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setId(252612);
+        taskInstance.setName("C");
+        taskInstance.setProcessInstanceId(10111);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        return taskInstance;
+    }
 
 }
