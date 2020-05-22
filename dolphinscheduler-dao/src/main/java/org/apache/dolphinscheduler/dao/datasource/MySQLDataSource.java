@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,9 @@ public class MySQLDataSource extends BaseDataSource {
 
   @Override
   protected String filterOther(String other){
+    if(StringUtils.isBlank(other)){
+        return "";
+    }
     if(other.contains(sensitiveParam)){
       int index = other.indexOf(sensitiveParam);
       String tmp = sensitiveParam;
