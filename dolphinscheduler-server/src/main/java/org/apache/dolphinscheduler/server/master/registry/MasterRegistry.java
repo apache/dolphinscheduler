@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
@@ -131,6 +132,7 @@ public class MasterRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+        return OSUtils.getHost() + Constants.COLON + masterConfig.getListenPort();
     }
+
 }

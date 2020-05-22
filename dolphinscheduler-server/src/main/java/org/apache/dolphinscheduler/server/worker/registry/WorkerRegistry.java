@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -148,6 +149,7 @@ public class WorkerRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + workerConfig.getListenPort();
+        return OSUtils.getHost() + Constants.COLON + workerConfig.getListenPort();
     }
+
 }
