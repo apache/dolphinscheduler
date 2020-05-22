@@ -118,8 +118,8 @@ public class TaskPriorityQueueConsumer extends Thread{
                         failedDispatchTasks.add(taskPriorityInfo);
                     }
                 }
-                for(String taskPriorityInfo: failedDispatchTasks){
-                    taskPriorityQueue.put(taskPriorityInfo);
+                for(String dispatchFailedTask : failedDispatchTasks){
+                    taskPriorityQueue.put(dispatchFailedTask);
                 }
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
