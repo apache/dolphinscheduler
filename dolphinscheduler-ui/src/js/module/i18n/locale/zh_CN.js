@@ -168,7 +168,7 @@ export default {
   'Project Name': '项目名称',
   'Please enter name': '请输入名称',
   'Owned Users': '所属用户',
-  'Process Pid': '进程pid',
+  'Process Pid': '进程Pid',
   'Zk registration directory': 'zk注册目录',
   cpuUsage: 'cpuUsage',
   memoryUsage: 'memoryUsage',
@@ -592,5 +592,6 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Successful branch flow and failed branch flow are required': 'conditions节点成功和失败分支流转必填',
   'Unauthorized or deleted resources': '未授权或已删除资源',
-  'Please delete all non-existent resources': '请删除所有未授权或已删除资源'
+  'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
+  'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！'
 }
