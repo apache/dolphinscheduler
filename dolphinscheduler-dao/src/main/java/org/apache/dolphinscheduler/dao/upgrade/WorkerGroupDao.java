@@ -43,7 +43,6 @@ public class WorkerGroupDao {
         String sql = String.format("select id,name from t_ds_worker_group");
         ResultSet rs = null;
         PreparedStatement pstmt = null;
-        String version = null;
         try {
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
@@ -54,7 +53,7 @@ public class WorkerGroupDao {
                 workerGroupMap.put(id,name);
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {

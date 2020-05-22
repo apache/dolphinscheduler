@@ -54,7 +54,7 @@ public class ProcessDefinitionDao {
                 processDefinitionJsonMap.put(id,processDefinitionJson);
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
@@ -81,7 +81,7 @@ public class ProcessDefinitionDao {
                 pstmt.executeUpdate();
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
