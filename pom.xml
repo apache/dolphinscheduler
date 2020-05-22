@@ -842,6 +842,7 @@
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
+                        <include>**/dao/upgrade/UpgradeDaoTest.java</include>
                         <include>**/plugin/model/AlertDataTest.java</include>
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <include>**/plugin/utils/PropertyUtilsTest.java</include>
