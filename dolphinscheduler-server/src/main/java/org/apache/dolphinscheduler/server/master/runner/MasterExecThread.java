@@ -452,7 +452,7 @@ public class MasterExecThread implements Runnable {
                         continue;
                     }
 
-                    TaskNode dependNode = TaskNodeUtils.buildDependTaskNode(processDefinition.getId(), processDefinition.getName(), node.getId(), node.getName());
+                    TaskNode dependNode = TaskNodeUtils.buildDependTaskNode(processDefinition.getName(), node.getName());
                     setNodeDependItemList(dependNode, processDefinition.getId(), node.getName());
                     taskNodeList.add(dependNode);
                     addPostNodeDepList(postNode, dependNode);
@@ -480,8 +480,6 @@ public class MasterExecThread implements Runnable {
                 postNode.setDepList(depList);
             }
         }
-
-        logger.info("add depend relation : {} -> {}", dependNode.getName(), postNode.getName());
     }
 
     private void setNodeDependItemList(TaskNode taskNode, int processDefinitionId, String nodeName) {
@@ -523,7 +521,6 @@ public class MasterExecThread implements Runnable {
      * init task queue
      */
     private void initTaskQueue(){
-
         taskFailedSubmit = false;
         activeTaskNode.clear();
         dependFailedTask.clear();
@@ -1372,7 +1369,7 @@ public class MasterExecThread implements Runnable {
 
     /**
      * generate flow dag
-     * @param processDefinitionJson process definition json
+     * @param taskNodeList          task node list
      * @param startNodeNameList     start node name list
      * @param recoveryNodeNameList  recovery node name list
      * @param depNodeType           depend node type

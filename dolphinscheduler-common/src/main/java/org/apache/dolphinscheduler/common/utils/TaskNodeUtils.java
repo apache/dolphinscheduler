@@ -12,10 +12,10 @@ public class TaskNodeUtils {
         return String.format("%s-%d", "tasks", 10000 + RandomUtils.nextInt(9999));
     }
 
-    public static TaskNode buildDependTaskNode(int dependProcessId, String dependProcessName, String dependNodeId, String dependNodeName) {
+    public static TaskNode buildDependTaskNode(String dependProcessName, String dependNodeName) {
         TaskNode node = new TaskNode();
-        node.setId(String.format("%d:%s", dependProcessId, dependNodeId));
-        node.setName(String.format("%s:%s", dependProcessName, dependNodeName));
+        node.setId(buildTaskId());
+        node.setName(String.format("project: %s process: %s", dependProcessName, dependNodeName));
         node.setType(TaskType.DEPENDENT.toString());
         node.setRunFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL);
         node.setMaxRetryTimes(Constants.DEPEND_CHECK_MAX_RETRY_TIMES);

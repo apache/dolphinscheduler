@@ -1712,7 +1712,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                         continue;
                     }
 
-                    TaskNode dependNode = TaskNodeUtils.buildDependTaskNode(processDefinition.getId(), processDefinition.getName(), node.getId(), node.getName());
+                    TaskNode dependNode = TaskNodeUtils.buildDependTaskNode(processDefinition.getName(), node.getName());
 
                     processDag.getNodes().add(dependNode);
                     processDag.getEdges().add(new TaskNodeRelation(dependNode.getName(), postNode.getName()));
