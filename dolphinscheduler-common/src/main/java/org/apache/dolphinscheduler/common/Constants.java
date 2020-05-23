@@ -978,11 +978,11 @@ public final class Constants {
     /**
      * depend check max retry times
      */
-    public static final int DEPEND_CHECK_MAX_RETRY_TIMES = 120;
+    public static final int DEPEND_CHECK_MAX_RETRY_TIMES = 240;
 
     /**
      * depend check retry interval minute
      */
-    public static final int DEPEND_CHECK_RETRY_INTERVAL_MINUTE = 5;
+    public static final int DEPEND_CHECK_RETRY_INTERVAL_MINUTE = 2;
 
 }

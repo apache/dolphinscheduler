@@ -138,6 +138,18 @@
         </div>
       </m-list-box>
     </div>
+    <m-list-box>
+      <div slot="text">
+        <span>{{$t('Check Dependency')}}</span>
+      </div>
+      <div slot="content">
+        <label class="label-box">
+          <div style="padding-top: 5px;">
+            <x-switch v-model="checkDependFlag" :disabled="isDetails"></x-switch>
+          </div>
+        </label>
+      </div>
+    </m-list-box>
   </div>
 </template>
 <script>
@@ -189,6 +201,8 @@
         // Custom parameter
         localParams: [],
         customConfig: 0,
+        // check depend flag
+        checkDependFlag: true
       }
     },
     mixins: [disabledState],
@@ -296,7 +310,8 @@
             jobSpeedByte: this.jobSpeedByte * 1024,
             jobSpeedRecord: this.jobSpeedRecord,
             preStatements: this.preStatements,
-            postStatements: this.postStatements
+            postStatements: this.postStatements,
+            checkDependFlag: this.checkDependFlag ? 1 : 0
           })
           return true
         }
@@ -371,7 +386,8 @@
           jobSpeedByte: this.jobSpeedByte * 1024,
           jobSpeedRecord: this.jobSpeedRecord,
           preStatements: this.preStatements,
-          postStatements: this.postStatements
+          postStatements: this.postStatements,
+          checkDependFlag: this.checkDependFlag
         });
       },
       _destroyEditor () {
@@ -408,6 +424,7 @@
           this.jobSpeedRecord = o.params.jobSpeedRecord || 0
           this.preStatements = o.params.preStatements || []
           this.postStatements = o.params.postStatements || []
+          this.checkDependFlag = o.params.checkDependFlag == 1 ? true : false
         } else {
           this.customConfig = 1
           this.enable = true

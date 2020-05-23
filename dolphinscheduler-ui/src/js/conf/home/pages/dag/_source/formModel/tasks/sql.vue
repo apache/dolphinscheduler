@@ -133,6 +133,18 @@
         </m-statement-list>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">
+        <span>{{$t('Check Dependency')}}</span>
+      </div>
+      <div slot="content">
+        <label class="label-box">
+          <div style="padding-top: 5px;">
+            <x-switch v-model="checkDependFlag" :disabled="isDetails"></x-switch>
+          </div>
+        </label>
+      </div>
+    </m-list-box>
   </div>
 </template>
 <script>
@@ -181,7 +193,9 @@
         // recipients
         receivers: [],
         // copy to
-        receiversCc: []
+        receiversCc: [],
+        // check depend flag
+        checkDependFlag: true
       }
     },
     mixins: [disabledState],
@@ -310,7 +324,8 @@
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
-          postStatements: this.postStatements
+          postStatements: this.postStatements,
+          checkDependFlag: this.checkDependFlag ? 1 : 0
         })
         return true
       },
@@ -382,7 +397,8 @@
           localParams: this.localParams,
           connParams: this.connParams,
           preStatements: this.preStatements,
-          postStatements: this.postStatements
+          postStatements: this.postStatements,
+          checkDependFlag: this.checkDependFlag
         });
       },
       _destroyEditor () {
@@ -439,6 +455,7 @@
         this.title = o.params.title || ''
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+        this.checkDependFlag = o.params.checkDependFlag == 1 ? true : false
       }
       // read tasks from cache
       if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&

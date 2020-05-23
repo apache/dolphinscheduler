@@ -593,5 +593,6 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
   'Disable': 'Disable',
-  'DependView': 'DependView'
+  'DependView': 'DependView',
+  'Check Dependency': 'Check Dependency'
 }
