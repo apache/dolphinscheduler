@@ -137,7 +137,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     Thread.sleep(commitRetryInterval);
                 }
             } catch (Exception e) {
-                logger.error("task commit to mysql and dispatcht task failed", e);
+                logger.error("task {} commit to mysql and dispatch task failed", task, e);
             }
         }
         if (submitDB) {
@@ -151,7 +151,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                         Thread.sleep(commitRetryInterval);
                     }
                 } catch (Exception e) {
-                    logger.error("task commit to mysql and dispatcht task failed", e);
+                    logger.error("task {} commit to mysql and dispatch task failed", task, e);
                 }
             }
         }
