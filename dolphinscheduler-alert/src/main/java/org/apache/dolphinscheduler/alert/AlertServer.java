@@ -16,15 +16,17 @@
  */
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.alert.plugin.EmailAlertPlugin;
+import org.apache.dolphinscheduler.alert.plugin.AlertChannelManager;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginLoader;
+import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.plugin.FilePluginManager;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,21 +46,23 @@ public class AlertServer {
 
     private static AlertServer instance;
 
-    private FilePluginManager alertPluginManager;
+    private AlertChannelManager alertChannelManager;
 
-    private static final String[] whitePrefixes = new String[]{"org.apache.dolphinscheduler.plugin.utils."};
-
-    private static final String[] excludePrefixes = new String[]{
-            "org.apache.dolphinscheduler.plugin.",
-            "ch.qos.logback.",
-            "org.slf4j."
-    };
+    private DolphinPluginManagerConfig dolphinPluginManagerConfig;
 
     public AlertServer() {
-        alertPluginManager =
-                new FilePluginManager(PropertyUtils.getString(Constants.PLUGIN_DIR), whitePrefixes, excludePrefixes);
-        // add default alert plugins
-        alertPluginManager.addPlugin(new EmailAlertPlugin());
+        alertChannelManager = new AlertChannelManager();
+        dolphinPluginManagerConfig = new DolphinPluginManagerConfig();
+        dolphinPluginManagerConfig.setPlugins(PropertyUtils.getString("alert.plugin.binding"));
+        if(StringUtils.isNotBlank(PropertyUtils.getString("alert.plugin.dir"))) {
+            dolphinPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString("alert.plugin.dir").trim());
+        }
+        AlertPluginLoader alertPluginLoader = new AlertPluginLoader(dolphinPluginManagerConfig, alertChannelManager);
+        try {
+            alertPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("load Alert Plugin Failed !");
+        }
     }
 
     public synchronized static AlertServer getInstance() {
@@ -78,7 +82,7 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
+            alertSender = new AlertSender(alerts, alertDao, alertChannelManager);
             alertSender.run();
         }
     }

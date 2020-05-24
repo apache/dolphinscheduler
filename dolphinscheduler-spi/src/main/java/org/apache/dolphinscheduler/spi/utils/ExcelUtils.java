@@ -50,7 +50,7 @@ public class ExcelUtils {
         List<LinkedHashMap> itemsList;
 
         //The JSONUtils.toList has been try catch ex
-        itemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        itemsList = JacksonUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)){
             logger.error("itemsList is null");

@@ -20,7 +20,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.enums.DbType;
@@ -456,11 +455,12 @@ public class SqlTask extends AbstractTask {
 
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
-                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
-            if(!(boolean) mailResult.get(STATUS)){
-                throw new RuntimeException("send mail failed!");
-            }
+//            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
+//                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
+//            if(!(boolean) mailResult.get(STATUS)){
+//                throw new RuntimeException("send mail failed!");
+//            }
+            //TODO AlertServer should provide a grpc interface, which is called when other services need to send alerts
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
             throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));

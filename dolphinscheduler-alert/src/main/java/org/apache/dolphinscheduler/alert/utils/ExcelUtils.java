@@ -46,8 +46,8 @@ public class ExcelUtils {
     public static void genExcelFile(String content,String title,String xlsFilePath){
         List<LinkedHashMap> itemsList;
 
-        //The JSONUtils.toList has been try catch ex
-        itemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        //The JacksonUtils.toList has been try catch ex
+        itemsList = JacksonUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)){
             logger.error("itemsList is null");

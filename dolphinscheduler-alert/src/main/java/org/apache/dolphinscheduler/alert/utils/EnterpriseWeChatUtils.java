@@ -201,7 +201,7 @@ public class EnterpriseWeChatUtils {
      * @return markdown table content
      */
     public static String markdownTable(String title,String content){
-        List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        List<LinkedHashMap> mapItemsList = JacksonUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
 
         if (null != mapItemsList) {
@@ -233,7 +233,7 @@ public class EnterpriseWeChatUtils {
         if (StringUtils.isNotEmpty(content)){
             List<String> list;
             try {
-                list = JSONUtils.toList(content,String.class);
+                list = JacksonUtils.toList(content,String.class);
             }catch (Exception e){
                 logger.error("json format exception",e);
                 return null;

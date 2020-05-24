@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.alert;
 
+import org.apache.dolphinscheduler.spi.params.AbsPluginParams;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +45,9 @@ public interface AlertChannelFactory {
     String getNameEn();
 
     /**
-     * id needs to be filled in the configuration file and is used by pluginload to determine whether to enable the plugin
+     * id should be used as the configuration file name of the plugin.
+     * eg: If you develop and use an alert plugin named email_alert, you should add a configuration file in the conf/alert directory as email_alert.properties
+     * and the name of the file should be equal to the return value of the 'getId()' method , like 'email_alert'
      * @return
      */
     String getId();
@@ -52,7 +57,12 @@ public interface AlertChannelFactory {
      * Returns the configurable parameters that this plugin needs to display on the web ui
      * @return
      */
-    String getParams();
+    List<AbsPluginParams> getParams();
 
+    /**
+     * The parameters configured in the alert / xxx.properties file will be in the config map
+     * @param config
+     * @return
+     */
     AlertChannel create(Map<String, String> config);
 }

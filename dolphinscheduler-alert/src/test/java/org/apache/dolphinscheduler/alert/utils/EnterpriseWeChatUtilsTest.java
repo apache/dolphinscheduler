@@ -16,23 +16,19 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -181,7 +177,7 @@ public class EnterpriseWeChatUtilsTest {
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0, map1);
         maps.add(1, map2);
-        String mapjson = JSONUtils.toJsonString(maps);
+        String mapjson = JacksonUtils.toJsonString(maps);
         return mapjson;
     }
 
