@@ -5,10 +5,12 @@ import org.apache.dolphinscheduler.common.utils.PluginPropertiesUtil;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
+import org.apache.dolphinscheduler.spi.params.AbsPluginParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkState;
@@ -78,6 +80,13 @@ public class AlertChannelManager {
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
         checkState(alertChannelFactory != null, "Alert Plugin '%s' is not registered", name);
+
+        List<AbsPluginParams> params = alertChannelFactory.getParams();
+        String nameCh = alertChannelFactory.getNameCh();
+        String nameEn = alertChannelFactory.getNameEn();
+
+        //TODO I think params, nameCh, nameEn should save in mysql .
+        //TODO Then the Web UI can get the configured Alert Plugin and disable there name , params.
 
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(alertChannelFactory.getClass().getClassLoader())) {
             AlertChannel alertChannel = alertChannelFactory.create(ImmutableMap.copyOf(properties));
