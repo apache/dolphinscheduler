@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * data source of Oracle

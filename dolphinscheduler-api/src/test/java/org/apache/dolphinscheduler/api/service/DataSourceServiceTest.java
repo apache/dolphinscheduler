@@ -34,8 +34,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.common.enums.DbConnectType.ORACLE_SERVICE_NAME;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DataSourceServiceTest {
