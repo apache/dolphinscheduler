@@ -44,7 +44,7 @@
 
  
 
-##### 二  Ambari Install Dolphin Scheduler
+#### Ambari Install Dolphin Scheduler
 
 1. Install  Dolphin Scheduler on ambari web interface
 
@@ -88,7 +88,7 @@
 
 #### Add components to the node through Ambari -- for example, add a DS Worker
 
-**NOTE**: DS Logger is the installation dependent component of DS Worker in Dolphin's Ambari installation (need to add installation first; Prevent the Job log on the corresponding Worker from being checked)
+***NOTE***: DS Logger is the installation dependent component of DS Worker in Dolphin's Ambari installation (need to add installation first; Prevent the Job log on the corresponding Worker from being checked)
 
 1. Locate the component node to add -- for example, node ark3
 
