@@ -56,6 +56,7 @@ public class UdfFunc {
     /**
      * udf data base
      */
+    @TableField("`database`")
     private String database;
 
     /**
