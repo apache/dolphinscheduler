@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.junit.Assert;
@@ -41,23 +42,23 @@ public class OracleDataSourceTest {
         oracleDataSource.setUser("test");
         String expected1 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
         String actual1 = oracleDataSource.getJdbcUrl();
-        Assert.assertEquals(expected1, actual1);
+        Assert.assertEquals(actual1, expected1);
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
         String expected2 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
         String actual2 = oracleDataSource.getJdbcUrl();
-        Assert.assertEquals(expected2, actual2);
+        Assert.assertEquals(actual2, expected2);
 
         //Oracle JDBC Thin ServiceName:Method Two
         oracleDataSource.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
         String expected3 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
         String actual3 = oracleDataSource.getJdbcUrl();
-        Assert.assertEquals(expected3, actual3);
+        Assert.assertEquals(actual3, expected3);
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
         String expected4 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
         String actual4 = oracleDataSource.getJdbcUrl();
-        Assert.assertEquals(expected4, actual4);
+        Assert.assertEquals(actual4, expected4);
 
         //Oracle JDBC Thin using SID
         OracleDataSource oracleDataSource2 = new OracleDataSource();
@@ -68,12 +69,12 @@ public class OracleDataSourceTest {
         oracleDataSource2.setUser("test");
         String expected5 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
         String actual5 = oracleDataSource2.getJdbcUrl();
-        Assert.assertEquals(expected5, actual5);
+        Assert.assertEquals(actual5, expected5);
         //set fake principal
         oracleDataSource2.setPrincipal("fake principal");
         String expected6 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
         String actual6 = oracleDataSource2.getJdbcUrl();
-        Assert.assertEquals(expected6, actual6);
+        System.out.println(StringUtils.equals(expected6, actual6));
     }
 
     @Test
@@ -81,20 +82,20 @@ public class OracleDataSourceTest {
         oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
         String expected = DbConnectType.ORACLE_SERVICE_NAME.getDescp();
         String actual = oracleDataSource.getType().getDescp();
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(actual, expected);
     }
 
     @Test
     public void driverClassSelector() {
         String expected = "oracle.jdbc.driver.OracleDriver";
         String actual = oracleDataSource.driverClassSelector();
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(actual, expected);
     }
 
     @Test
     public void dbTypeSelector() {
         String expected = DbType.ORACLE.getDescp();
         String actual = oracleDataSource.dbTypeSelector().getDescp();
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(actual, expected);
     }
 }
