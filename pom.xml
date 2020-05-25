@@ -829,7 +829,6 @@
                         <include>**/dao/mapper/ProjectMapperTest.java</include>
                         <include>**/dao/mapper/ProjectUserMapperTest.java</include>
                         <include>**/dao/mapper/QueueMapperTest.java</include>
-                        <!--<include>**/dao/mapper/ResourceMapperTest.java</include>-->
                         <include>**/dao/mapper/ResourceUserMapperTest.java</include>
                         <include>**/dao/mapper/ScheduleMapperTest.java</include>
                         <include>**/dao/mapper/SessionMapperTest.java</include>
@@ -841,6 +840,9 @@
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
+                        <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
+                        <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
+                        <include>**/dao/upgrade/UpgradeDaoTest.java</include>
                         <include>**/plugin/model/AlertDataTest.java</include>
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <include>**/plugin/utils/PropertyUtilsTest.java</include>

@@ -114,10 +114,6 @@ else:
 
 dolphin_common_map_tmp = config['configurations']['dolphin-common']
 data_basedir_path = dolphin_common_map_tmp['data.basedir.path']
-process_exec_basepath = data_basedir_path + '/exec'
-data_download_basedir_path = data_basedir_path + '/download'
-dolphin_common_map['process.exec.basepath'] = process_exec_basepath
-dolphin_common_map['data.download.basedir.path'] = data_download_basedir_path
 dolphin_common_map['dolphinscheduler.env.path'] = dolphin_env_path
 dolphin_common_map.update(config['configurations']['dolphin-common'])
 
