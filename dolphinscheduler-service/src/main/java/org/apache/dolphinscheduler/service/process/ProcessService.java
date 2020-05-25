@@ -325,8 +325,15 @@ public class ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost())){
                 continue;
             }
-            String ip = Host.of(taskInstance.getHost()).getIp();
             int port = Constants.RPC_PORT;
+            String ip = "";
+            try {
+                ip = Host.of(taskInstance.getHost()).getIp();
+            }catch (Exception e){
+                // compatible old version
+                ip = taskInstance.getHost();
+            }
+
 
             // remove task log from loggerserver
             logClient.removeTaskLog(ip,port,taskLogPath);
