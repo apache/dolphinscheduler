@@ -46,19 +46,6 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
-     * gets the JDBC url for the data source connection
-     * @return jdbc url
-     */
-    @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
-            jdbcUrl += "/";
-        }
-        return jdbcUrl;
-    }
-
-    /**
      * @return db type
      */
     @Override
