@@ -16,39 +16,48 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class OracleDataSourceTest {
 
+    private OracleDataSource oracleDataSource;
+
+    @Before
+    public void before() throws Exception{
+        oracleDataSource = new OracleDataSource();
+    }
+
     @Test
     public void getJdbcUrl() {
         //Oracle JDBC Thin ServiceName:Method One
-        OracleDataSource oracleDataSource = new OracleDataSource();
         oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
         oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
         oracleDataSource.setDatabase("test");
         oracleDataSource.setPassword("123456");
         oracleDataSource.setUser("test");
         String expected1 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
-        Assert.assertEquals(expected1, oracleDataSource.getJdbcUrl());
+        String actual1 = oracleDataSource.getJdbcUrl();
+        Assert.assertEquals(expected1, actual1);
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
         String expected2 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
-        Assert.assertEquals(expected2, oracleDataSource.getJdbcUrl());
+        String actual2 = oracleDataSource.getJdbcUrl();
+        Assert.assertEquals(expected2, actual2);
 
         //Oracle JDBC Thin ServiceName:Method Two
         oracleDataSource.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
         String expected3 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
-        Assert.assertEquals(expected3, oracleDataSource.getJdbcUrl());
+        String actual3 = oracleDataSource.getJdbcUrl();
+        Assert.assertEquals(expected3, actual3);
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
         String expected4 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
-        Assert.assertEquals(expected4, oracleDataSource.getJdbcUrl());
-
+        String actual4 = oracleDataSource.getJdbcUrl();
+        Assert.assertEquals(expected4, actual4);
 
         //Oracle JDBC Thin using SID
         OracleDataSource oracleDataSource2 = new OracleDataSource();
@@ -58,32 +67,34 @@ public class OracleDataSourceTest {
         oracleDataSource2.setPassword("123456");
         oracleDataSource2.setUser("test");
         String expected5 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
-        Assert.assertEquals(expected5, oracleDataSource2.getJdbcUrl());
+        String actual5 = oracleDataSource2.getJdbcUrl();
+        Assert.assertEquals(expected5, actual5);
         //set fake principal
         oracleDataSource2.setPrincipal("fake principal");
         String expected6 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
-        Assert.assertEquals(expected6, oracleDataSource2.getJdbcUrl());
+        String actual6 = oracleDataSource2.getJdbcUrl();
+        Assert.assertEquals(expected6, actual6);
     }
 
     @Test
     public void getType() {
-        OracleDataSource oracleDataSource = new OracleDataSource();
         oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
-        DbConnectType expected = DbConnectType.ORACLE_SERVICE_NAME;
-        Assert.assertEquals(expected, oracleDataSource.getType());
+        String expected = DbConnectType.ORACLE_SERVICE_NAME.getDescp();
+        String actual = oracleDataSource.getType().getDescp();
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void driverClassSelector() {
-        OracleDataSource oracleDataSource = new OracleDataSource();
         String expected = "oracle.jdbc.driver.OracleDriver";
-        Assert.assertEquals(expected, oracleDataSource.driverClassSelector());
+        String actual = oracleDataSource.driverClassSelector();
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void dbTypeSelector() {
-        OracleDataSource oracleDataSource = new OracleDataSource();
-        DbType expected = DbType.ORACLE;
-        Assert.assertEquals(expected, oracleDataSource.dbTypeSelector());
+        String expected = DbType.ORACLE.getDescp();
+        String actual = oracleDataSource.dbTypeSelector().getDescp();
+        Assert.assertEquals(expected, actual);
     }
 }
