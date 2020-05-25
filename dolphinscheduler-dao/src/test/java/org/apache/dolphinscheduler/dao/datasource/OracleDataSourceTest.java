@@ -33,21 +33,21 @@ public class OracleDataSourceTest {
         oracleDataSource.setDatabase("test");
         oracleDataSource.setPassword("123456");
         oracleDataSource.setUser("test");
-        Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test",
-                oracleDataSource.getJdbcUrl());
+        String expected1 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
+        Assert.assertEquals(expected1, oracleDataSource.getJdbcUrl());
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
-        Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test",
-                oracleDataSource.getJdbcUrl());
+        String expected2 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
+        Assert.assertEquals(expected2, oracleDataSource.getJdbcUrl());
 
         //Oracle JDBC Thin ServiceName:Method Two
         oracleDataSource.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
-        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521/test",
-                oracleDataSource.getJdbcUrl());
+        String expected3 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
+        Assert.assertEquals(expected3, oracleDataSource.getJdbcUrl());
         //set fake principal
         oracleDataSource.setPrincipal("fake principal");
-        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521/test",
-                oracleDataSource.getJdbcUrl());
+        String expected4 = "jdbc:oracle:thin:@127.0.0.1:1521/test";
+        Assert.assertEquals(expected4, oracleDataSource.getJdbcUrl());
 
 
         //Oracle JDBC Thin using SID
@@ -57,36 +57,33 @@ public class OracleDataSourceTest {
         oracleDataSource2.setDatabase("test");
         oracleDataSource2.setPassword("123456");
         oracleDataSource2.setUser("test");
-        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:test",
-                oracleDataSource2.getJdbcUrl());
+        String expected5 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
+        Assert.assertEquals(expected5, oracleDataSource2.getJdbcUrl());
         //set fake principal
         oracleDataSource2.setPrincipal("fake principal");
-        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:test",
-                oracleDataSource2.getJdbcUrl());
-    }
-
-    @Test
-    public void oracleDBConnectType() {
-        String oracleConnectType = "type";
-        Assert.assertEquals(Constants.ORACLE_DB_CONNECT_TYPE, oracleConnectType);
+        String expected6 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
+        Assert.assertEquals(expected6, oracleDataSource2.getJdbcUrl());
     }
 
     @Test
     public void getType() {
         OracleDataSource oracleDataSource = new OracleDataSource();
         oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
-        Assert.assertEquals(DbConnectType.ORACLE_SERVICE_NAME, oracleDataSource.getType());
+        DbConnectType expected = DbConnectType.ORACLE_SERVICE_NAME;
+        Assert.assertEquals(expected, oracleDataSource.getType());
     }
 
     @Test
     public void driverClassSelector() {
         OracleDataSource oracleDataSource = new OracleDataSource();
-        Assert.assertEquals(Constants.COM_ORACLE_JDBC_DRIVER, oracleDataSource.driverClassSelector());
+        String expected = "oracle.jdbc.driver.OracleDriver";
+        Assert.assertEquals(expected, oracleDataSource.driverClassSelector());
     }
 
     @Test
     public void dbTypeSelector() {
         OracleDataSource oracleDataSource = new OracleDataSource();
-        Assert.assertEquals(DbType.ORACLE, oracleDataSource.dbTypeSelector());
+        DbType expected = DbType.ORACLE;
+        Assert.assertEquals(expected, oracleDataSource.dbTypeSelector());
     }
 }
