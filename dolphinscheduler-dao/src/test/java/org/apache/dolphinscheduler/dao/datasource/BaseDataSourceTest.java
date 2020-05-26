@@ -133,9 +133,9 @@ public class BaseDataSourceTest {
     oracleDataSource2.setDatabase("test");
     oracleDataSource2.setPassword("123456");
     oracleDataSource2.setUser("test");
-    String expected5 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
-    String actual5 = oracleDataSource2.getJdbcUrl();
-    Assert.assertEquals(expected5, actual5);
+    String expected2 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
+    String actual2 = oracleDataSource2.getJdbcUrl();
+    Assert.assertEquals(expected2, actual2);
 
   }
 
