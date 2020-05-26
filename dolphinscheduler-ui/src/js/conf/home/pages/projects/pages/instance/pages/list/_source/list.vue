@@ -287,6 +287,20 @@
         </tr>
       </table>
     </div>
+    <x-poptip
+            v-show="strDelete !== ''"
+            ref="poptipDeleteAll"
+            placement="bottom-start"
+            width="90">
+      <p>{{$t('Delete?')}}</p>
+      <div style="text-align: right; margin: 0;padding-top: 4px;">
+        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
+        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
+      </div>
+      <template slot="reference">
+        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
+      </template>
+    </x-poptip>
   </div>
 </template>
 <script>
