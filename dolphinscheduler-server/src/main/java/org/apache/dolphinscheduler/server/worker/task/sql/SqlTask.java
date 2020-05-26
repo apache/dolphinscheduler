@@ -31,10 +31,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -46,13 +43,11 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
-
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import static org.apache.dolphinscheduler.common.Constants.*;
 import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 
@@ -164,7 +159,7 @@ public class SqlTask extends AbstractTask {
      * @param sql sql
      * @return  SqlBinds
      */
-    private SqlBinds getSqlAndSqlParamsMap(String sql) {
+    public SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer,Property> sqlParamsMap =  new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
         
@@ -198,7 +193,7 @@ public class SqlTask extends AbstractTask {
         sqlBuilder.append(formatSql);
 
         // print replace sql
-        printReplacedSql(sql, formatSql, regex, sqlParamsMap);
+        printReplacedSql(formatSql,sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
@@ -271,16 +266,16 @@ public class SqlTask extends AbstractTask {
             resultJsonArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJsonArray, SerializerFeature.WriteMapNullValue));
+        logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
 
         // if there is a result set
         if (!resultJsonArray.isEmpty() ) {
             if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                 sendAttachment(sqlParameters.getTitle(),
-                        JSONObject.toJSONString(resultJsonArray, SerializerFeature.WriteMapNullValue));
+                        JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
             }else{
                 sendAttachment(taskExecutionContext.getTaskName() + " query result set ",
-                        JSONObject.toJSONString(resultJsonArray, SerializerFeature.WriteMapNullValue));
+                        JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
             }
         }
     }
@@ -311,7 +306,7 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    private void close(PreparedStatement preparedStatement, ResultSet resultSet) {
+    public void close(PreparedStatement preparedStatement, ResultSet resultSet) {
 
         if(resultSet != null){
             try {
@@ -504,12 +499,10 @@ public class SqlTask extends AbstractTask {
 
     /**
      * print replace sql
-     * @param content       content
      * @param formatSql     format sql
-     * @param regex         regex
      * @param sqlParamsMap  sql params map
      */
-    private void printReplacedSql(String content, String formatSql,String regex, Map<Integer,Property> sqlParamsMap){
+    private void printReplacedSql(String formatSql,Map<Integer,Property> sqlParamsMap){
         //parameter print style
         logger.info("after replace sql , preparing : {}" , formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");

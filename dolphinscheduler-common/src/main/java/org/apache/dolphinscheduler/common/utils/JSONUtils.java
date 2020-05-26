@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
@@ -214,6 +215,19 @@ public class JSONUtils {
   public static String toJsonString(Object object) {
     try{
       return JSON.toJSONString(object,false);
+    } catch (Exception e) {
+      throw new RuntimeException("Object json deserialization exception.", e);
+    }
+  }
+
+  /**
+   * object to json string
+   * @param object object
+   * @return json string
+   */
+  public static String toJsonString(Object object,SerializerFeature... features) {
+    try{
+      return JSON.toJSONString(object,features);
     } catch (Exception e) {
       throw new RuntimeException("Object json deserialization exception.", e);
     }
