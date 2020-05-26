@@ -244,7 +244,7 @@ public class SqlTask extends AbstractTask {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error("close connection error {}",e);
+                    logger.error("close connection error",e);
                 }
             }
         }
@@ -317,7 +317,7 @@ public class SqlTask extends AbstractTask {
             try {
                 resultSet.close();
             } catch (SQLException e) {
-                logger.error("close result set error {}",e);
+                logger.error("close result set error ",e);
             }
         }
 
@@ -325,7 +325,7 @@ public class SqlTask extends AbstractTask {
             try {
                 preparedStatement.close();
             } catch (SQLException e) {
-                logger.error("close prepared statement error {}",e);
+                logger.error("close prepared statement error",e);
             }
         }
 
