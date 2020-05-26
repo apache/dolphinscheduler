@@ -111,32 +111,28 @@ public class BaseDataSourceTest {
     //set fake other
     db2DataSource.setOther("charset=UTF-8");
     Assert.assertEquals("jdbc:db2://127.0.0.1:50000/test:charset=UTF-8", db2DataSource.getJdbcUrl());
+
+      OracleDataSource oracleDataSource = new OracleDataSource();
+      oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
+      oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
+      oracleDataSource.setDatabase("test");
+      oracleDataSource.setPassword("123456");
+      oracleDataSource.setUser("test");
+      Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test", oracleDataSource.getJdbcUrl());
+      //set fake principal
+      oracleDataSource.setPrincipal("fake principal");
+      Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test", oracleDataSource.getJdbcUrl());
+      //set fake other
+      oracleDataSource.setOther("charset=UTF-8");
+      Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test?charset=UTF-8", oracleDataSource.getJdbcUrl());
+
+      //Oracle JDBC Thin using SID
+      OracleDataSource oracleDataSource2 = new OracleDataSource();
+      oracleDataSource2.setType(DbConnectType.ORACLE_SID);
+      oracleDataSource2.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
+      oracleDataSource2.setDatabase("test");
+      oracleDataSource2.setPassword("123456");
+      oracleDataSource2.setUser("test");
+      Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:test", oracleDataSource2.getJdbcUrl());
   }
-
-  @Test
-  public void testGetOracleJdbcUrl() {
-    OracleDataSource oracleDataSource = new OracleDataSource();
-    //Oracle JDBC Thin ServiceName
-    oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
-    oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
-    oracleDataSource.setDatabase("test");
-    oracleDataSource.setPassword("123456");
-    oracleDataSource.setUser("test");
-    String expected1 = "jdbc:oracle:thin:@//127.0.0.1:1521/test";
-    String actual1 = oracleDataSource.getJdbcUrl();
-    Assert.assertEquals(expected1, actual1);
-
-    //Oracle JDBC Thin using SID
-    OracleDataSource oracleDataSource2 = new OracleDataSource();
-    oracleDataSource2.setType(DbConnectType.ORACLE_SID);
-    oracleDataSource2.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
-    oracleDataSource2.setDatabase("test");
-    oracleDataSource2.setPassword("123456");
-    oracleDataSource2.setUser("test");
-    String expected2 = "jdbc:oracle:thin:@127.0.0.1:1521:test";
-    String actual2 = oracleDataSource2.getJdbcUrl();
-    Assert.assertEquals(expected2, actual2);
-
-  }
-
 }

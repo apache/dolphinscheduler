@@ -44,18 +44,16 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
-     * gets the JDBC url for the data source connection
-     * @return jdbc url
+     * append SERVICE_NAME service name or SID
      */
     @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
+    protected void appendDatabase(StringBuilder jdbcUrl) {
         if (getType() == DbConnectType.ORACLE_SID) {
-            jdbcUrl += ":";
+            jdbcUrl.append(":");
         } else {
-            jdbcUrl += "/";
+            jdbcUrl.append("/");
         }
-        return jdbcUrl + getDatabase();
+        jdbcUrl.append(getDatabase());
     }
 
     /**
