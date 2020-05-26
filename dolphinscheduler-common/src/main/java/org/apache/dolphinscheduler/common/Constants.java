@@ -961,4 +961,9 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
+    /**
+     *  Oracle DbConnectType
+     */
+    public static final String ORACLE_DB_CONNECT_TYPE = "type";
+
 }
