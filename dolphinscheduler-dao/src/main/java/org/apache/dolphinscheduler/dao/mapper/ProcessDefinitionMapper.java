@@ -104,9 +104,9 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<Map<String, Object>> listResources();
 
     /**
-     * query definition by target table keys
-     * @param targetTableKeys targetTableKeys
+     * query definition by target node keys
+     * @param targetNodeKeys target node keys
      * @return process definition list
      */
-    List<ProcessDefinition> queryDefinitionByTargetTableKeys(@Param("targetTableKeys") String[] targetTableKeys);
+    List<ProcessDefinition> queryDefinitionByTargetNodeKeys(@Param("targetNodeKeys") String[] targetNodeKeys);
 }

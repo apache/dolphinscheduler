@@ -45,14 +45,14 @@ public abstract class AbstractParameters implements IParameters {
   private int checkDependFlag;
 
   /**
-   * target table key
+   * target node keys
    */
-  private String targetTableKey;
+  private String targetNodeKeys;
 
   /**
-   * depend sql table keys
+   * depend node keys
    */
-  private String dependSqlTableKeys;
+  private String dependNodeKeys;
 
   /**
    * get local parameters list
@@ -74,20 +74,20 @@ public abstract class AbstractParameters implements IParameters {
     this.checkDependFlag = checkDependFlag;
   }
 
-  public String getTargetTableKey() {
-    return targetTableKey;
+  public String getTargetNodeKeys() {
+    return targetNodeKeys;
   }
 
-  public void setTargetTableKey(String targetTableKey) {
-    this.targetTableKey = targetTableKey;
+  public void setTargetNodeKeys(String targetNodeKeys) {
+    this.targetNodeKeys = targetNodeKeys;
   }
 
-  public String getDependSqlTableKeys() {
-    return dependSqlTableKeys;
+  public String getDependNodeKeys() {
+    return dependNodeKeys;
   }
 
-  public void setDependSqlTableKeys(String dependSqlTableKeys) {
-    this.dependSqlTableKeys = dependSqlTableKeys;
+  public void setDependNodeKeys(String dependNodeKeys) {
+    this.dependNodeKeys = dependNodeKeys;
   }
 
   /**

@@ -400,7 +400,7 @@ public class ProcessInstanceService extends BaseDAGService {
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
-            processDefinition.setProcessDefinitionJson(processInstanceJson);
+            processDefinition.setProcessDefinitionJson(processInstance.getProcessInstanceJson());
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
             processDefinition.setConnects(connects);

@@ -16,7 +16,7 @@ public class DependCheckUtils {
 
     private static final String MARK_WORD_TARGET = "target";
 
-    public static String finishStr(String str) {
+    public static String clearIllegalChars(String str) {
         if (StringUtils.isEmpty(str)) {
             return "";
         }
@@ -83,22 +83,36 @@ public class DependCheckUtils {
         }
     }
 
-    public static boolean existDependRelation(TaskNode taskNode, String[] dependSqlTableKeys) {
+    public static boolean existDependRelation(TaskNode taskNode, String[] dependNodeKeys) {
         AbstractParameters parameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-        return existDependRelation(parameters.getTargetTableKey(), dependSqlTableKeys);
+        return existDependRelation(parameters.getTargetNodeKeys(), dependNodeKeys);
     }
 
-    public static boolean existDependRelation(String targetTableKey, String[] dependSqlTableKeys) {
-        if (StringUtils.isEmpty(targetTableKey)) {
+    public static boolean existDependRelation(String targetNodeKey, String[] dependNodeKeys) {
+        if (StringUtils.isEmpty(targetNodeKey)) {
             return false;
         }
 
-        for (String dependKey : dependSqlTableKeys) {
-            if (targetTableKey.indexOf(dependKey.replace(MARK_WORD_DEPEND, MARK_WORD_TARGET)) > -1) {
+        for (String dependKey : dependNodeKeys) {
+            if (targetNodeKey.indexOf(dependKey.replace(MARK_WORD_DEPEND, MARK_WORD_TARGET)) > -1) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public static String[] replaceMarkWordToTarget(String[] dependNodeKeys) {
+        String[] targetNodeKeys = new String[dependNodeKeys.length];
+        if(dependNodeKeys != null) {
+            for(int i = 0; i < dependNodeKeys.length; i++) {
+                targetNodeKeys[i] = replaceMarkWordToTarget(dependNodeKeys[i]);
+            }
+        }
+        return targetNodeKeys;
+    }
+
+    public static String replaceMarkWordToTarget(String dependNodeKey) {
+        return dependNodeKey.replace(MARK_WORD_DEPEND, MARK_WORD_TARGET);
     }
 }

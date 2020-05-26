@@ -12,16 +12,16 @@ public class TaskNodeUtils {
         return String.format("%s-%d", "tasks", 10000 + RandomUtils.nextInt(9999));
     }
 
-    public static TaskNode buildDependTaskNode(String dependProcessName, String dependNodeName) {
+    public static TaskNode buildDependTaskNode(String dependProcessName, String dependNodeName, int retryTimes, int retryInterval) {
         TaskNode node = new TaskNode();
         node.setId(buildTaskId());
-        node.setName(String.format("project: %s process: %s", dependProcessName, dependNodeName));
+        node.setName(String.format("%s | %s", dependProcessName, dependNodeName));
         node.setType(TaskType.DEPENDENT.toString());
         node.setRunFlag(Constants.FLOWNODE_RUN_FLAG_NORMAL);
-        node.setMaxRetryTimes(Constants.DEPEND_CHECK_MAX_RETRY_TIMES);
-        node.setRetryInterval(Constants.DEPEND_CHECK_RETRY_INTERVAL_MINUTE);
+        node.setMaxRetryTimes(retryTimes);
+        node.setRetryInterval(retryInterval);
         node.setTimeout("{\"strategy\": \"\", \"interval\": null, \"enable\": false}");
-        node.setTaskInstancePriority(Priority.MEDIUM);
+        node.setTaskInstancePriority(Priority.HIGH);
         return node;
     }
 

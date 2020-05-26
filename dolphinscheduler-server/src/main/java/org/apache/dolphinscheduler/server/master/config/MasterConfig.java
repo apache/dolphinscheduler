@@ -52,6 +52,12 @@ public class MasterConfig {
     @Value("${master.listen.port:5678}")
     private int listenPort;
 
+    @Value("${data.lineage.depend.retryTimes:240}")
+    private int dataLineageDependRetryTimes;
+
+    @Value("${data.lineage.depend.retryInterval:2}")
+    private int dataLineageDependRetryInterval;
+
     public int getListenPort() {
         return listenPort;
     }
@@ -125,5 +131,21 @@ public class MasterConfig {
 
     public void setMasterReservedMemory(double masterReservedMemory) {
         this.masterReservedMemory = masterReservedMemory;
+    }
+
+    public int getDataLineageDependRetryTimes() {
+        return dataLineageDependRetryTimes;
+    }
+
+    public void setDataLineageDependRetryTimes(int dataLineageDependRetryTimes) {
+        this.dataLineageDependRetryTimes = dataLineageDependRetryTimes;
+    }
+
+    public int getDataLineageDependRetryInterval() {
+        return dataLineageDependRetryInterval;
+    }
+
+    public void setDataLineageDependRetryInterval(int dataLineageDependRetryInterval) {
+        this.dataLineageDependRetryInterval = dataLineageDependRetryInterval;
     }
 }

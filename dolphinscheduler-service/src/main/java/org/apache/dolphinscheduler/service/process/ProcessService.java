@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.dependent.DependCheckUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -1813,12 +1814,17 @@ public class ProcessService {
     }
 
     /**
-     * query process definition info by target table keys
-     * @param targetTableKeys target table keys
-     * @return process instance
+     * query depend process definition list
+     * @param dependNodeKeys depend node keys
+     * @return process definition list
      */
-    public List<ProcessDefinition> queryDefinitionByTargetTableKeys(String[] targetTableKeys){
-        return processDefineMapper.queryDefinitionByTargetTableKeys(targetTableKeys);
+    public List<ProcessDefinition> queryDependDefinitionList(String[] dependNodeKeys){
+        if(dependNodeKeys == null) {
+            return null;
+        }
+
+        String[] targetNodeKeys = DependCheckUtils.replaceMarkWordToTarget(dependNodeKeys);
+        return processDefineMapper.queryDefinitionByTargetNodeKeys(targetNodeKeys);
     }
 
 }
