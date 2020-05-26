@@ -44,7 +44,7 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
-     * append SERVICE_NAME service name or SID
+     * append service name or SID
      */
     @Override
     protected void appendDatabase(StringBuilder jdbcUrl) {
