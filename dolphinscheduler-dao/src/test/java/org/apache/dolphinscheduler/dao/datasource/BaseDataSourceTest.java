@@ -140,4 +140,23 @@ public class BaseDataSourceTest {
     Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:orcl?charset=UTF-8", oracleDataSource2.getJdbcUrl());
 
   }
+
+  @Test
+  public void testAppendDatabase() {
+    OracleDataSource oracleDataSource = new OracleDataSource();
+    oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
+    oracleDataSource.setDatabase("test");
+    oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
+    StringBuilder jdbcUrl = new StringBuilder(oracleDataSource.getAddress());
+    oracleDataSource.appendDatabase(jdbcUrl);
+    Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test", jdbcUrl.toString());
+
+    OracleDataSource oracleDataSource2 = new OracleDataSource();
+    oracleDataSource2.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
+    oracleDataSource2.setDatabase("orcl");
+    oracleDataSource2.setType(DbConnectType.ORACLE_SID);
+    StringBuilder jdbcUrl2 = new StringBuilder(oracleDataSource2.getAddress());
+    oracleDataSource2.appendDatabase(jdbcUrl2);
+    Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:orcl", jdbcUrl2.toString());
+  }
 }
