@@ -19,7 +19,7 @@ import _ from 'lodash'
 import canvg from 'canvg'
 import { tasksAll } from './util'
 import html2canvas from 'html2canvas'
-import { findComponentDownward } from '@/module/util/'
+// import { findComponentDownward } from '@/module/util/'
 
 const DownChart = function () {
   this.dag = {}
