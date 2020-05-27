@@ -27,6 +27,8 @@ import java.util.Properties;
  */
 public class ConnectionUtils {
 
+    private ConnectionUtils(){}
+
     public static Connection getConnection(Properties paramProp,BaseDataSource baseDataSource) throws SQLException {
         return DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                 paramProp);

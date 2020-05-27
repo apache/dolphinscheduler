@@ -160,7 +160,7 @@ public class SqlTask extends AbstractTask {
      * @param sql sql
      * @return  SqlBinds
      */
-    public SqlBinds getSqlAndSqlParamsMap(String sql) {
+    private SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer,Property> sqlParamsMap =  new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
         
@@ -270,7 +270,10 @@ public class SqlTask extends AbstractTask {
 
         // if there is a result set
         if (!resultJsonArray.isEmpty() ) {
-            logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
+            if(logger.isDebugEnabled()){
+                logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
+            }
+
             if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                 sendAttachment(sqlParameters.getTitle(),
                         JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
@@ -307,7 +310,7 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    public void close(PreparedStatement preparedStatement, ResultSet resultSet) {
+    private void close(PreparedStatement preparedStatement, ResultSet resultSet) {
 
         if(resultSet != null){
             try {
@@ -380,9 +383,9 @@ public class SqlTask extends AbstractTask {
      * create connection
      *
      * @return connection
-     * @throws Exception Exception
+     * @throws SQLException SQLException
      */
-    public Connection createConnection() throws Exception{
+    private Connection createConnection() throws SQLException{
         // if hive , load connection params if exists
         Connection connection;
         if (HIVE == DbType.valueOf(sqlParameters.getType())) {
