@@ -122,9 +122,9 @@ public class AlertPluginLoader {
         URLClassLoader classLoader = createClassLoader(artifacts, pomFile.getPath());
 
         Artifact artifact = artifacts.get(0);
-        Set<String> plugins = AlertPluginDiscovery.discoverPluginsFromArtifact(artifact, classLoader);
+        Set<String> plugins = DolphinPluginDiscovery.discoverPluginsFromArtifact(artifact, classLoader);
         if (!plugins.isEmpty()) {
-            AlertPluginDiscovery.writePluginServices(plugins, artifact.getFile());
+            DolphinPluginDiscovery.writePluginServices(plugins, artifact.getFile());
         }
 
         return classLoader;

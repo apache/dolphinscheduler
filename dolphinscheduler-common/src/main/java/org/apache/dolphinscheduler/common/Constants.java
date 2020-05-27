@@ -958,4 +958,8 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
+    /**
+     * status
+     */
+    public static final String STATUS = "status";
 }

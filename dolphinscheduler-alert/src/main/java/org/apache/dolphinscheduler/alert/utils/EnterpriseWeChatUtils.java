@@ -22,6 +22,7 @@ import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
+import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

@@ -570,6 +570,12 @@
                 <version>1.5</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>6.2.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -1028,7 +1034,6 @@
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
-        <module>dolphinscheduler-plugin-api</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
         <module>dolphinscheduler-job-plugin</module>

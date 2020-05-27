@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 import org.apache.dolphinscheduler.plugin.alert.email.Constants;
+import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTableTypeMessage(String content,boolean showAll){
 
         if (StringUtils.isNotEmpty(content)){
-            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+            List<LinkedHashMap> mapItemsList = JacksonUtils.toList(content, LinkedHashMap.class);
 
             if(!showAll && mapItemsList.size() > Constants.NUMBER_1000){
                 mapItemsList = mapItemsList.subList(0,Constants.NUMBER_1000);
@@ -108,7 +109,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         if (StringUtils.isNotEmpty(content)){
             List<String> list;
             try {
-                list = JSONUtils.toList(content,String.class);
+                list = JacksonUtils.toList(content,String.class);
             }catch (Exception e){
                 logger.error("json format exception",e);
                 return null;

@@ -16,8 +16,8 @@ package org.apache.dolphinscheduler.alert.plugin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import jdk.internal.org.objectweb.asm.ClassReader;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
+import org.objectweb.asm.ClassReader;
 import org.sonatype.aether.artifact.Artifact;
 
 import java.io.File;
@@ -43,17 +43,17 @@ import static java.nio.file.Files.walkFileTree;
 /**
  * The role of this class is to load the plugin class during development
  */
-final class AlertPluginDiscovery
+final class DolphinPluginDiscovery
 {
     private static final String JAVA_CLASS_FILE_SUFFIX = ".class";
     private static final String PLUGIN_SERVICES_FILE = "META-INF/services/" + DolphinSchedulerPlugin.class.getName();
 
-    private AlertPluginDiscovery() {}
+    private DolphinPluginDiscovery() {}
 
     public static Set<String> discoverPluginsFromArtifact(Artifact artifact, ClassLoader classLoader)
             throws IOException
     {
-        if (!artifact.getExtension().equals("alert-plugin")) {
+        if (!artifact.getExtension().equals("dolphinscheduler-plugin")) {
             throw new RuntimeException("Unexpected extension for main artifact: " + artifact);
         }
 

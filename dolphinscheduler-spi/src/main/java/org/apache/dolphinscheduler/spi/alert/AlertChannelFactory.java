@@ -33,6 +33,7 @@ public interface AlertChannelFactory {
      * this alert plugin name eg: email , message ...
      * name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
      * @return
+     *  this alert plugin chinese name
      */
     String getNameCh();
 
@@ -41,6 +42,7 @@ public interface AlertChannelFactory {
      * this alert plugin name eg: email , message ...
      * name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
      * @return
+     *  this alert plugin english name
      */
     String getNameEn();
 
@@ -49,6 +51,7 @@ public interface AlertChannelFactory {
      * eg: If you develop and use an alert plugin named email_alert, you should add a configuration file in the conf/alert directory as email_alert.properties
      * and the name of the file should be equal to the return value of the 'getId()' method , like 'email_alert'
      * @return
+     *  this alert plugin id
      */
     String getId();
 
@@ -56,13 +59,15 @@ public interface AlertChannelFactory {
     /**
      * Returns the configurable parameters that this plugin needs to display on the web ui
      * @return
+     *  this alert plugin params
      */
     List<AbsPluginParams> getParams();
 
     /**
      * The parameters configured in the alert / xxx.properties file will be in the config map
-     * @param config
+     * @param config configured in the alert / xxx.properties file will be in the config map
      * @return
+     *  AlertChannel
      */
     AlertChannel create(Map<String, String> config);
 }

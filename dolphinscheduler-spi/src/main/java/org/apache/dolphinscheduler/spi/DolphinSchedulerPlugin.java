@@ -25,8 +25,8 @@ import static java.util.Collections.emptyList;
  * Dolphinscheduler plugin interface
  * All plugin need implements this interface.
  * Each plugin needs a factory. This factory has at least two methods.
- * one called 'getName()', used to return the name of the plugin implementation, so that the 'PluginLoad' module can find the plugin implementation class by the name in the configuration file.
- * The other method is called 'create(Map <String, String> config)'. This method contains at least one parameter  Map <String, String> config. Config contains custom parameters read from the plug-in configuration file.
+ * one called <code>AlertChannelFactory#getId()</code>, used to return the name of the plugin implementation, so that the 'PluginLoad' module can find the plugin implementation class by the name in the configuration file.
+ * The other method is called <code>create(Map config)</code>. This method contains at least one parameter  <code>Map config</code>. Config contains custom parameters read from the plug-in configuration file.
  */
 public interface DolphinSchedulerPlugin {
 

@@ -18,12 +18,14 @@ package org.apache.dolphinscheduler.spi.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -51,16 +53,6 @@ public class JacksonUtils {
         return null;
     }
 
-
-    public static List<LinkedHashMap> toList(String content, Class<LinkedHashMap> linkedHashMapClass) {
-        try {
-            return (List<LinkedHashMap>) objectMapper.readValue(content, linkedHashMapClass);
-        } catch (IOException e) {
-            logger.error("object to List<LinkedHashMap> exception!",e);
-        }
-        return null;
-    }
-
     public static String toJsonString(List<LinkedHashMap<String, Object>> list) {
         try {
             return objectMapper.writeValueAsString(list);
@@ -68,5 +60,28 @@ public class JacksonUtils {
             logger.error("toJsonString exception!",e);
         }
         return null;
+    }
+
+    /**
+     * json to list
+     *
+     * @param json json string
+     * @param clazz class
+     * @param <T> T
+     * @return list
+     */
+    public static <T> List<T> toList(String json, Class<T> clazz) {
+        if (StringUtils.isEmpty(json)) {
+            return new ArrayList<>();
+        }
+        try {
+            JavaType t = objectMapper.getTypeFactory().constructParametricType(
+                    List.class, clazz);
+            return objectMapper.readValue(json, t);
+        } catch (Exception e) {
+            logger.error("json to list exception!",e);
+        }
+
+        return new ArrayList<>();
     }
 }
