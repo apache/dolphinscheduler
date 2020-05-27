@@ -59,8 +59,6 @@ public class SqlTaskTest {
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(AlertDao.class)).thenReturn(getAlertDao());
-
-        //模拟MockConnection
         PowerMockito.mockStatic(ConnectionUtils.class);
     }
 

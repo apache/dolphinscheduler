@@ -222,8 +222,6 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.when(processService.getTaskInstanceDetailByTaskId(1)).thenReturn(taskInstance);
         taskPriorityQueue.put("2_1_2_1_default");
 
-
-
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
         dataSource.setName("datax");
