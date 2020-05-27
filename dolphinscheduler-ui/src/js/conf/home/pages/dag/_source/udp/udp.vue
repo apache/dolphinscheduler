@@ -205,7 +205,13 @@
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
-      this.tenantId = dag.tenantId || -1
+
+      if (dag.tenantId === -1) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
+      } else {
+          this.tenantId = dag.tenantId
+      }
+
     },
     mounted () {},
     components: {FormTenant, mLocalParams }
