@@ -57,10 +57,40 @@ public class DataSourceServiceTest {
     @Test
     public void buildParameter(){
 
+        getOracleConnectJDBC();
+
         String param = dataSourceService.buildParameter("","", DbType.ORACLE, "192.168.9.1","1521","im"
                 ,"","test","test", DbConnectType.ORACLE_SERVICE_NAME,"");
         String expected = "{\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
+
+        OracleDataSource oracleDataSource = new OracleDataSource();
+        oracleDataSource.setType(DbConnectType.ORACLE_SERVICE_NAME);
+        oracleDataSource.setAddress("jdbc:oracle:thin:@//127.0.0.1:1521");
+        oracleDataSource.setDatabase("test");
+        oracleDataSource.setPassword("123456");
+        oracleDataSource.setUser("test");
+        Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test", oracleDataSource.getJdbcUrl());
+        //set fake principal
+        oracleDataSource.setPrincipal("fake principal");
+        Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test", oracleDataSource.getJdbcUrl());
+        //set fake other
+        oracleDataSource.setOther("charset=UTF-8");
+        Assert.assertEquals("jdbc:oracle:thin:@//127.0.0.1:1521/test?charset=UTF-8", oracleDataSource.getJdbcUrl());
+
+        OracleDataSource oracleDataSource2 = new OracleDataSource();
+        oracleDataSource2.setAddress("jdbc:oracle:thin:@127.0.0.1:1521");
+        oracleDataSource2.setDatabase("orcl");
+        oracleDataSource2.setPassword("123456");
+        oracleDataSource2.setUser("test");
+        oracleDataSource2.setType(DbConnectType.ORACLE_SID);
+        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:orcl", oracleDataSource2.getJdbcUrl());
+        //set fake principal
+        oracleDataSource2.setPrincipal("fake principal");
+        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:orcl", oracleDataSource2.getJdbcUrl());
+        //set fake other
+        oracleDataSource2.setOther("charset=UTF-8");
+        Assert.assertEquals("jdbc:oracle:thin:@127.0.0.1:1521:orcl?charset=UTF-8", oracleDataSource2.getJdbcUrl());
     }
 
     @Test
