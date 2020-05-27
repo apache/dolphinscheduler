@@ -1473,7 +1473,7 @@ public class ProcessService {
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
         //1 update processInstance host is null
-        processInstance.setHost("null");
+        processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
 
         //2 insert into recover command
