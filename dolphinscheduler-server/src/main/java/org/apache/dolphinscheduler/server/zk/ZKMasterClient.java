@@ -335,6 +335,9 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		//updateProcessInstance host is null and insert into command
 		for(ProcessInstance processInstance : needFailoverProcessInstanceList){
+			if(Constants.NULL.equals(processInstance.getHost()) ){
+			    continue;
+			}
 			processService.processNeedFailoverProcessInstances(processInstance);
 		}
 
