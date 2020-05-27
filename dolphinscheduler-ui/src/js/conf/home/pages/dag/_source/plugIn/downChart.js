@@ -111,10 +111,10 @@ DownChart.prototype.download = function ({ dagThis }) {
       }, 100)
 
       // To refresh the dag instance, otherwise you can't re-plot
-      setTimeout(() => {
-        // Refresh current dag
-        findComponentDownward(this.dag.$root, `${this.dag.type}-details`).init()
-      }, 500)
+      // setTimeout(() => {
+      //   // Refresh current dag
+      //   findComponentDownward(this.dag.$root, `${this.dag.type}-details`).init()
+      // }, 500)
     })
   })
 }
