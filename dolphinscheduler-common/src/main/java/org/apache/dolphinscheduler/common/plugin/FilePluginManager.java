@@ -90,8 +90,8 @@ public class FilePluginManager implements PluginManager {
     }
 
     @Override
-    public AlertPlugin findOne(String name) {
-        return pluginMap.get(name);
+    public AlertPlugin findOne(String pluginId) {
+        return pluginMap.get(pluginId);
     }
 
     @Override

@@ -20,11 +20,13 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
+import com.github.rholder.retry.RetryException;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -43,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -101,21 +104,19 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        try {
-            this.doAck(taskExecutionContext);
-        }catch (Exception e){
-            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            this.doAck(taskExecutionContext);
-        }
-
-        // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
-    }
-
-    private void doAck(TaskExecutionContext taskExecutionContext){
         // tell master that task is in executing
-        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
+        final Command ackCommand = buildAckCommand(taskExecutionContext).convert2Command();
+        
+        try {
+            RetryerUtils.retryCall(() -> {
+                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(),ackCommand);
+                return Boolean.TRUE;
+            });
+            // submit task
+            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
+        } catch (ExecutionException | RetryException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     /**
