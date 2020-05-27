@@ -429,14 +429,14 @@
           this.showdDatabase = false;
         }
 
-        if (value== 'ORACLE') {
+        if (value== 'ORACLE' && !this.item.id) {
           this.showConnectType = true;
           this.connectType = 'ORACLE_SERVICE_NAME'
+        } else if(value== 'ORACLE' && this.item.id) {
+          this.showConnectType = true;
         } else {
           this.showConnectType = false;
-          this.connectType = ''
         }
-
         //Set default port for each type datasource
         this._setDefaultValues(value)
 
