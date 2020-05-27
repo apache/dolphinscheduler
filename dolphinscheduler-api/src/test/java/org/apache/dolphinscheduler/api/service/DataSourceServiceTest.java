@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -66,6 +67,13 @@ public class DataSourceServiceTest {
         PowerMockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(getDataSourceList());
         Result result = dataSourceService.verifyDataSourceName(loginUser, dataSourceName);
         Assert.assertEquals(Status.DATASOURCE_EXIST.getMsg(),result.getMsg());
+    }
+
+    @Test
+    public void queryDataSourceTest(){
+        PowerMockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(null);
+        Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt());
+        Assert.assertEquals(((Status)result.get(Constants.STATUS)).getCode(),Status.RESOURCE_NOT_EXIST.getCode());
     }
 
 
