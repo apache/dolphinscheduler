@@ -19,22 +19,20 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * data source of Oracle
  */
 public class OracleDataSource extends BaseDataSource {
 
-    private DbConnectType type;
+    private DbConnectType connectType;
 
-    public DbConnectType getType() {
-        return type;
+    public DbConnectType getConnectType() {
+        return connectType;
     }
 
-    public void setType(DbConnectType type) {
-        this.type = type;
+    public void setConnectType(DbConnectType connectType) {
+        this.connectType = connectType;
     }
 
     /**
