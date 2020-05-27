@@ -121,10 +121,6 @@ public class ProcessService {
             logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
-        if (processInstance.getCommandType().equals(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)){
-            delCommandByid(command.getId());
-            return null;
-        }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
@@ -1484,7 +1480,7 @@ public class ProcessService {
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
         //1 update processInstance host is null
-        processInstance.setHost("null");
+        processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
 
         //2 insert into recover command
