@@ -225,7 +225,7 @@ public class JSONUtils {
    * @param object object
    * @return json string
    */
-  public static String toJsonString(Object object,SerializerFeature... features) {
+  public static String toJsonString(Object object,SerializerFeature... features) throws RuntimeException{
     try{
       return JSON.toJSONString(object,features);
     } catch (Exception e) {

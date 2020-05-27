@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -266,10 +267,10 @@ public class SqlTask extends AbstractTask {
             resultJsonArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
 
         // if there is a result set
         if (!resultJsonArray.isEmpty() ) {
+            logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
             if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                 sendAttachment(sqlParameters.getTitle(),
                         JSONUtils.toJsonString(resultJsonArray, SerializerFeature.WriteMapNullValue));
@@ -381,7 +382,7 @@ public class SqlTask extends AbstractTask {
      * @return connection
      * @throws Exception Exception
      */
-    private Connection createConnection() throws Exception{
+    public Connection createConnection() throws Exception{
         // if hive , load connection params if exists
         Connection connection;
         if (HIVE == DbType.valueOf(sqlParameters.getType())) {
@@ -393,12 +394,9 @@ public class SqlTask extends AbstractTask {
                     HIVE_CONF);
             paramProp.putAll(connParamMap);
 
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    paramProp);
+            connection = ConnectionUtils.getConnection(paramProp,baseDataSource);
         }else{
-            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                    baseDataSource.getUser(),
-                    baseDataSource.getPassword());
+            connection = ConnectionUtils.getConnection(baseDataSource);
         }
         return connection;
     }
