@@ -74,20 +74,26 @@ public class DataSourceServiceTest {
         PowerMockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(null);
         Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt());
         Assert.assertEquals(((Status)result.get(Constants.STATUS)).getCode(),Status.RESOURCE_NOT_EXIST.getCode());
+
+        PowerMockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(getOracleDataSource());
+        result = dataSourceService.queryDataSource(Mockito.anyInt());
+        Assert.assertEquals(((Status)result.get(Constants.STATUS)).getCode(),Status.SUCCESS.getCode());
     }
 
 
     private List<DataSource> getDataSourceList(){
 
         List<DataSource> dataSources =  new ArrayList<>();
-        dataSources.add(getDataSource());
+        dataSources.add(getOracleDataSource());
         return dataSources;
     }
 
-    private DataSource getDataSource(){
+    private DataSource getOracleDataSource(){
         DataSource dataSource = new DataSource();
         dataSource.setName("test");
         dataSource.setNote("Note");
+        dataSource.setType(DbType.ORACLE);
+        dataSource.setConnectionParams("{\"connectType\":\"ORACLE_SID\",\"address\":\"jdbc:oracle:thin:@192.168.xx.xx:49161\",\"database\":\"XE\",\"jdbcUrl\":\"jdbc:oracle:thin:@192.168.xx.xx:49161/XE\",\"user\":\"system\",\"password\":\"oracle\"}");
 
         return dataSource;
     }
