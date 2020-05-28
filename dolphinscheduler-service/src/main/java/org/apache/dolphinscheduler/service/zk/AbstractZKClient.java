@@ -187,7 +187,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		}
 		Map<String, String> serverMaps = getServerMaps(zkNodeType);
 		for(String hostKey : serverMaps.keySet()){
-			if(hostKey.startsWith(host)){
+			if(hostKey.contains(host)){
 				return true;
 			}
 		}
