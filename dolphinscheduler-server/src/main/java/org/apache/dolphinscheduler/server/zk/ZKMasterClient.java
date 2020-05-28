@@ -262,7 +262,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		Date workerServerStartDate = null;
 		List<Server> workerServers = getServersList(ZKNodeType.WORKER);
 		for(Server workerServer : workerServers){
-			if(workerServer.getHost().equals(taskInstance.getHost())){
+		    if(taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())){
 				workerServerStartDate = workerServer.getCreateTime();
 				break;
 			}

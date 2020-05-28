@@ -95,14 +95,18 @@ public class TaskCallbackService {
         if(newChannel != null){
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
-        logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
+        logger.warn("original master : {} for task : {} is not reachable, random select master",
+                nettyRemoteChannel.getHost(),
+                taskInstanceId);
         Set<String> masterNodes = null;
         while (Stopper.isRunning()) {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
-                logger.error("no available master node");
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }else {
+                logger.error("find {} masters for task : {}.",
+                        masterNodes.size(),
+                        taskInstanceId);
                 break;
             }
         }
@@ -112,7 +116,7 @@ public class TaskCallbackService {
                 return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
             }
         }
-        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable", masterNodes));
+        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId){
