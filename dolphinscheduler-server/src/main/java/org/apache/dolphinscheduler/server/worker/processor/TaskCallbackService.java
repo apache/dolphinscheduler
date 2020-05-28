@@ -114,6 +114,7 @@ public class TaskCallbackService {
                     return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
                 }
             }
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
         throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
