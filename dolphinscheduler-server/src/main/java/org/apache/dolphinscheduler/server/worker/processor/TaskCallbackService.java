@@ -103,19 +103,19 @@ public class TaskCallbackService {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }else {
-                logger.error("find {} masters for task : {}.",
-                        masterNodes.size(),
-                        taskInstanceId);
-                break;
+                continue;
+            }
+            for (String masterNode : masterNodes) {
+                newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+                if (newChannel != null) {
+                    logger.info("find {} masters for task : {}.",
+                            masterNodes.size(),
+                            taskInstanceId);
+                    return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+                }
             }
         }
-        for(String masterNode : masterNodes){
-            newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
-            if(newChannel != null){
-                return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
-            }
-        }
+
         throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
 
