@@ -17,6 +17,7 @@
 import Vue from 'vue'
 let v = new Vue()
 import _ from 'lodash'
+import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
 import JSP from './plugIn/jsPlumbHandle'
 import DownChart from './plugIn/downChart'
@@ -94,8 +95,8 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
         closable: false,
         showMask: true,
         maskClosable: true,
-        title: $t('Download'),
-        content: $t('Please confirm whether the workflow has been saved before downloading'),
+        title: i18n.$t('Download'),
+        content: i18n.$t('Please confirm whether the workflow has been saved before downloading'),
         ok: {
           handle (e) {
             DownChart.download({
