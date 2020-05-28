@@ -19,11 +19,12 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
+import org.apache.dolphinscheduler.common.utils.SchemaUtils;
+import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
 
@@ -259,11 +261,18 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
         upgradeDolphinSchedulerDML(schemaDir);
 
-        updateProcessDefinitionJsonWorkerGroup();
-
-
     }
 
+
+    /**
+     * upgrade DolphinScheduler worker group
+     * ds 1.3.0 modify the worker group from mysql to zk
+     */
+    public void upgradeDolphinSchedulerWorkerGroup() {
+
+        updateProcessDefinitionJsonWorkerGroup();
+
+    }
     /**
      * updateProcessDefinitionJsonWorkerGroup
      */
