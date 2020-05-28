@@ -14,41 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.datasource;
+package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
-import org.apache.dolphinscheduler.common.enums.DbType;
+import org.junit.Test;
 
-/**
- * data source of Oracle
- */
-public class OracleDataSource extends BaseDataSource {
+import javax.sql.DataSource;
+import java.util.Map;
 
-    private DbConnectType connectType;
+import static org.apache.dolphinscheduler.dao.upgrade.UpgradeDao.getDataSource;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.assertThat;
 
-    public DbConnectType getConnectType() {
-        return connectType;
-    }
+public class UpgradeDaoTest {
+    PostgresqlUpgradeDao postgresqlUpgradeDao = PostgresqlUpgradeDao.getInstance();
 
-    public void setConnectType(DbConnectType connectType) {
-        this.connectType = connectType;
-    }
-
-    /**
-     * @return driver class
-     */
-    @Override
-    public String driverClassSelector() {
-        return Constants.COM_ORACLE_JDBC_DRIVER;
-    }
-
-    /**
-     * @return db type
-     */
-    @Override
-    public DbType dbTypeSelector() {
-        return DbType.ORACLE;
+    @Test
+    public void testQueryQueryAllOldWorkerGroup() throws Exception{
+        postgresqlUpgradeDao.updateProcessDefinitionJsonWorkerGroup();
     }
 
 }

@@ -268,6 +268,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -356,9 +357,11 @@
       taskType: String,
       self: Object,
       preNode: Array,
-      rearList: Array
+      rearList: Array,
+      instanceId: Number
     },
     methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
       /**
        * depend
        */
@@ -633,8 +636,12 @@
             break;
           }
         }
-        if(!hasMatch && o.workerGroupId!=undefined){
-          this.workerGroup = 'default'
+        if(o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList',{
+            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
         } else {
           this.workerGroup = o.workerGroup
         }
