@@ -112,17 +112,12 @@ public class DolphinSchedulerManager {
             for(String schemaDir : schemaList) {
                 schemaVersion = schemaDir.split("_")[0];
                 if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
-
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
-
                     logger.info("Begin upgrading DolphinScheduler's table structure");
-
                     upgradeDao.upgradeDolphinScheduler(schemaDir);
-
                     if (upgradeDao.isExistsTable("t_ds_worker_group")) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     }
-
                     version = schemaVersion;
                 }
 

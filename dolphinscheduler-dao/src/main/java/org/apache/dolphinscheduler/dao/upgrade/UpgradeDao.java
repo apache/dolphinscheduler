@@ -260,7 +260,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         upgradeDolphinSchedulerDDL(schemaDir);
 
         upgradeDolphinSchedulerDML(schemaDir);
-
     }
 
 
@@ -269,9 +268,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * ds 1.3.0 modify the worker group from mysql to zk
      */
     public void upgradeDolphinSchedulerWorkerGroup() {
-
         updateProcessDefinitionJsonWorkerGroup();
-
     }
     /**
      * updateProcessDefinitionJsonWorkerGroup
