@@ -105,12 +105,12 @@ public class TaskCallbackService {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
                 continue;
             }
+            logger.info("find {} masters for task : {}.",
+                    masterNodes.size(),
+                    taskInstanceId);
             for (String masterNode : masterNodes) {
                 newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
                 if (newChannel != null) {
-                    logger.info("find {} masters for task : {}.",
-                            masterNodes.size(),
-                            taskInstanceId);
                     return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
                 }
             }
