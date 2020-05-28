@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import Vue from 'vue'
+let v = new Vue()
 import _ from 'lodash'
 import { jsPlumb } from 'jsplumb'
 import JSP from './plugIn/jsPlumbHandle'
@@ -73,6 +74,7 @@ Dag.prototype.create = function () {
  * Action event on the right side of the toolbar
  */
 Dag.prototype.toolbarEvent = function ({ item, code, is }) {
+  let self = this
   switch (code) {
     case 'pointer':
       JSP.handleEventPointer(is)
@@ -87,8 +89,21 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
       JSP.handleEventScreen({ item, is })
       break
     case 'download':
-      DownChart.download({
-        dagThis: this.dag
+      v.$modal.dialog({
+        width: 350,
+        closable: false,
+        showMask: true,
+        maskClosable: true,
+        title: $t('Download'),
+        content: $t('Please confirm whether the workflow has been saved before downloading'),
+        ok: {
+          handle (e) {
+            DownChart.download({
+              dagThis: self.dag
+            })
+          }
+        },
+        cancel: {}
       })
       break
   }
