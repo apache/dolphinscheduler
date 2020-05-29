@@ -114,6 +114,7 @@ public class TaskCallbackService {
                     return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
                 }
             }
+            masterNodes = null;
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
