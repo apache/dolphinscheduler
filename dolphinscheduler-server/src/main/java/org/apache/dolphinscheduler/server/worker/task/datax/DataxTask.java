@@ -362,9 +362,10 @@ public class DataxTask extends AbstractTask {
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh",
+        String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+                taskExecutionContext.getTaskAppId(),
+                OSUtils.isWindows() ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 
