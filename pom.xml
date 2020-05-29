@@ -799,6 +799,7 @@
                         <exclude>**/src/sass/common/_normalize.scss</exclude>
                         <exclude>.github/**</exclude>
                         <exclude>sql/soft_version</exclude>
+                        <exclude>**/common/utils/ScriptRunner.java</exclude>
                         <exclude>**/*.json</exclude>
                         <!-- document files -->
                         <exclude>**/*.md</exclude>
