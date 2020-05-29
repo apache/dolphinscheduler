@@ -115,7 +115,7 @@ public class DolphinSchedulerManager {
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
                     logger.info("Begin upgrading DolphinScheduler's table structure");
                     upgradeDao.upgradeDolphinScheduler(schemaDir);
-                    if (upgradeDao.isExistsTable("t_ds_worker_group")) {
+                    if ("1.3.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     }
                     version = schemaVersion;
