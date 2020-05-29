@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.registry;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.RandomHostManager;
@@ -63,6 +64,10 @@ public class DependencyConfig {
         return Mockito.mock(ProcessService.class);
     }
 
+    @Bean
+    public MasterConfig masterConfig(){
+        return Mockito.mock(MasterConfig.class);
+    }
     @Bean
     public UserMapper userMapper(){
         return Mockito.mock(UserMapper.class);

@@ -426,9 +426,11 @@ export default {
   Running: 'Running',
   'Waiting for dependency to complete': 'Waiting for dependency to complete',
   Selected: 'Selected',
+  CurrentHour: 'CurrentHour',
   Last1Hour: 'Last1Hour',
   Last2Hours: 'Last2Hours',
   Last3Hours: 'Last3Hours',
+  Last24Hours: 'Last24Hours',
   today: 'today',
   Last1Days: 'Last1Days',
   Last2Days: 'Last2Days',
@@ -590,5 +592,7 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
   'Successful branch flow and failed branch flow are required': 'conditions node Successful and failed branch flow are required',
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
-  'Please delete all non-existent resources': 'Please delete all non-existent resources'
+  'Please delete all non-existent resources': 'Please delete all non-existent resources',
+  'The Worker group no longer exists, please select the correct Worker group!': 'The Worker group no longer exists, please select the correct Worker group!',
+  'Please confirm whether the workflow has been saved before downloading': 'Please confirm whether the workflow has been saved before downloading'
 }
