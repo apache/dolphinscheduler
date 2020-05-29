@@ -415,6 +415,7 @@ CREATE TABLE `t_ds_process_definition` (
   `modify_by` varchar(255) DEFAULT NULL,
   `resource_ids` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_unique` (`name`,`project_id`),
   KEY `process_definition_index` (`project_id`,`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
@@ -774,6 +775,7 @@ CREATE TABLE `t_ds_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
+  `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

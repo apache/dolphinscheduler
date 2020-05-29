@@ -77,7 +77,7 @@
                   icon="ans-icon-triangle-solid-right"
                   size="xsmall"
                   data-container="body"
-                  v-if="type === 'instance'"
+                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
                   style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
@@ -155,6 +155,7 @@
         isLoading: false,
         taskId: null,
         arg: false,
+
       }
     },
     mixins: [disabledState],
