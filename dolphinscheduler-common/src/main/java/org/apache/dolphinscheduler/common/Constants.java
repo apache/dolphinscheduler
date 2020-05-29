@@ -200,11 +200,6 @@ public final class Constants {
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
     /**
-     * dot .
-     */
-    public static final String DOT = ".";
-
-    /**
      * comma ,
      */
     public static final String COMMA = ",";
@@ -239,6 +234,15 @@ public final class Constants {
      */
     public static final String EQUAL_SIGN = "=";
 
+    /**
+     * dot .
+     */
+    public static final String DOT = ".";
+
+    /**
+     * SHARP
+     */
+    public static final String SHARP = "#";
 
     public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
 

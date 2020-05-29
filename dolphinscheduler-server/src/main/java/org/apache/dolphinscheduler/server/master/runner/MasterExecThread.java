@@ -22,19 +22,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.DependentItem;
-import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
-import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
-import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.dependent.DependCheckUtils;
+import org.apache.dolphinscheduler.common.utils.DependUnionKeyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -454,7 +450,7 @@ public class MasterExecThread implements Runnable {
                  */
                 if (!realNode.isForbidden()
                         && !analyseNode.getName().equals(realNode.getName())
-                        && DependCheckUtils.existDependRelation(realNode, dependNodeKeys)) {
+                        && DependUnionKeyUtils.existDependRelation(realNode, dependNodeKeys)) {
 
                     // check if the depend node exists
                     if (cacheExistedTaskNode.containsKey(processDefinition.getId() + realNode.getName())) {

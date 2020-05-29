@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.dependent.DependCheckUtils;
+import org.apache.dolphinscheduler.common.utils.DependUnionKeyUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -218,20 +218,20 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         selectTableList.removeAll(insertTableList);
 
-        parameters.setDependNodeKeys(DependCheckUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), selectTableList));
+        parameters.setDependNodeKeys(DependUnionKeyUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), selectTableList));
 
         if (CollectionUtils.isNotEmpty(insertTableList)) {
-            parameters.setTargetNodeKeys(DependCheckUtils.buildTargetTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), insertTableList));
+            parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), insertTableList));
         }
 
-        String targetTable = DependCheckUtils.clearIllegalChars(parameters.getTargetTable());
+        String targetTable = DependUnionKeyUtils.clearIllegalChars(parameters.getTargetTable());
         if (StringUtils.isNotEmpty(targetTable)) {
             String[] targetTables = targetTable.split(COMMA);
 
             DataSource dataTarget = dataSourceMapper.selectById(parameters.getDataTarget());
             BaseDataSource dataTargetForm = DataSourceFactory.getDatasource(dataTarget.getType(), dataTarget.getConnectionParams());
             String[] targetHostsPorts = JdbcUtils.getHostsAndPort(dataTargetForm.getAddress());
-            String targetTableKey = DependCheckUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), targetTables);
+            String targetTableKey = DependUnionKeyUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), targetTables);
 
             if(StringUtils.isEmpty(parameters.getTargetNodeKeys())) {
                 parameters.setTargetNodeKeys(targetTableKey);
@@ -257,8 +257,8 @@ public class ProcessDefinitionService extends BaseDAGService {
         BaseDataSource dataTargetForm = DataSourceFactory.getDatasource(dataTarget.getType(), dataTarget.getConnectionParams());
         String[] targetHostsPorts = JdbcUtils.getHostsAndPort(dataTargetForm.getAddress());
 
-        parameters.setDependNodeKeys(DependCheckUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), tableList));
-        parameters.setTargetNodeKeys(DependCheckUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), parameters.getTargetTable()));
+        parameters.setDependNodeKeys(DependUnionKeyUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), tableList));
+        parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), parameters.getTargetTable()));
 
         return parameters;
     }
@@ -1695,7 +1695,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                  */
                 if (!realNode.isForbidden()
                         && !analyseNode.getName().equals(realNode.getName())
-                        && DependCheckUtils.existDependRelation(realNode, dependNodeKeys)) {
+                        && DependUnionKeyUtils.existDependRelation(realNode, dependNodeKeys)) {
 
                     // check if the depend node exists
                     if (cacheExistedTaskNode.containsKey(processDefinition.getId() + realNode.getName())) {

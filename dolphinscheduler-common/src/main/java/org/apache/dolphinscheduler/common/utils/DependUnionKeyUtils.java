@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.common.utils.dependent;
+package org.apache.dolphinscheduler.common.utils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,15 +10,15 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 
-public class DependCheckUtils {
+public class DependUnionKeyUtils {
 
-    private static final String MARK_WORD_DEPEND = "depend";
+    private static final String MARK_WORD_DEPEND = Constants.SHARP + "depend";
 
-    private static final String MARK_WORD_TARGET = "target";
+    private static final String MARK_WORD_TARGET = Constants.SHARP + "target";
 
     public static String clearIllegalChars(String str) {
         if (StringUtils.isEmpty(str)) {
-            return "";
+            return str;
         }
 
         str = str.replace(" ", "");
@@ -33,8 +33,8 @@ public class DependCheckUtils {
             return str;
         }
 
-        str = str.replace("(" + MARK_WORD_DEPEND + ")", "");
-        str = str.replace("(" + MARK_WORD_TARGET + ")", "");
+        str = str.replace(MARK_WORD_DEPEND, "");
+        str = str.replace(MARK_WORD_TARGET, "");
         return str;
     }
 
@@ -76,11 +76,12 @@ public class DependCheckUtils {
             return null;
         }
 
-        if (tableName.indexOf(Constants.DOT) > -1) {
-            return String.format("%s:%s(%s)", host, tableName.replace(Constants.DOT, Constants.COLON), markWord);
-        } else {
-            return String.format("%s:%s:%s(%s)", host, database, tableName, markWord);
+        if (tableName.indexOf(Constants.DOT) > 0) {
+            database = tableName.split("\\" + Constants.DOT)[0];
+            tableName = tableName.split("\\" + Constants.DOT)[1];
         }
+
+        return String.format("%s:%s:%s%s", host, database, tableName, markWord);
     }
 
     public static boolean existDependRelation(TaskNode taskNode, String[] dependNodeKeys) {
@@ -89,7 +90,7 @@ public class DependCheckUtils {
     }
 
     public static boolean existDependRelation(String targetNodeKey, String[] dependNodeKeys) {
-        if (StringUtils.isEmpty(targetNodeKey)) {
+        if (StringUtils.isEmpty(targetNodeKey) || dependNodeKeys == null) {
             return false;
         }
 
@@ -103,11 +104,13 @@ public class DependCheckUtils {
     }
 
     public static String[] replaceMarkWordToTarget(String[] dependNodeKeys) {
+        if(dependNodeKeys == null) {
+            return null;
+        }
+
         String[] targetNodeKeys = new String[dependNodeKeys.length];
-        if(dependNodeKeys != null) {
-            for(int i = 0; i < dependNodeKeys.length; i++) {
-                targetNodeKeys[i] = replaceMarkWordToTarget(dependNodeKeys[i]);
-            }
+        for(int i = 0; i < dependNodeKeys.length; i++) {
+            targetNodeKeys[i] = replaceMarkWordToTarget(dependNodeKeys[i]);
         }
         return targetNodeKeys;
     }
