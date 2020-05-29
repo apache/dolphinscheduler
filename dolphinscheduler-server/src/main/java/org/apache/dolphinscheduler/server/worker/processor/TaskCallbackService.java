@@ -102,6 +102,7 @@ public class TaskCallbackService {
         while (Stopper.isRunning()) {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
+                masterNodes = null;
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
                 continue;
             }
