@@ -116,7 +116,7 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh",
+    String fileName = String.format("%s/%s_node.%s",
             taskExecutionContext.getExecutePath(),
             taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
