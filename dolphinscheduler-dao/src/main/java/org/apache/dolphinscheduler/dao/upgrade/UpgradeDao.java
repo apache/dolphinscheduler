@@ -265,7 +265,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     /**
      * upgrade DolphinScheduler worker group
-     * ds 1.3.0 modify the worker group for process definition json
+     * ds-1.3.0 modify the worker group for process definition json
      */
     public void upgradeDolphinSchedulerWorkerGroup() {
         updateProcessDefinitionJsonWorkerGroup();
