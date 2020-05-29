@@ -30,7 +30,7 @@ const config = merge.smart(baseConfig, {
     hot: true,
     contentBase: assetsDir,
     publicPath: baseConfig.output.publicPath,
-    port: getEnv('DEV_PORT', 8888),
+    port: getEnv('DEV_PORT', 9999),
     host: getEnv('DEV_HOST', 'localhost'),
     noInfo: false,
     historyApiFallback: true,
