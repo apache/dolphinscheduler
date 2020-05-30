@@ -159,6 +159,9 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
         processDefineMapper.insert(processDefine);
+
+        // return processDefinition object with ID
+        result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",processDefine.getId());
         return result;
