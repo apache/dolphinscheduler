@@ -165,6 +165,9 @@ public class SchedulerService extends BaseService {
         processDefinition.setReceivers(receivers);
         processDefinition.setReceiversCc(receiversCc);
         processDefinitionMapper.updateById(processDefinition);
+
+        // return scheduler object with ID
+        result.put(Constants.DATA_LIST, scheduleMapper.selectById(scheduleObj.getId()));
         putMsg(result, Status.SUCCESS);
 
         result.put("scheduleId", scheduleObj.getId());
