@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -101,9 +103,6 @@ public class JSONUtilsTest {
 
     @Test
     public void testParseObject() {
-        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.parseObject(
-                "{\n" + "\"foo\": \"bar\",\n" + "}", String.class));
-
         Assert.assertNull(JSONUtils.parseObject("", null));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
@@ -134,15 +133,19 @@ public class JSONUtilsTest {
         map.put("foo","bar");
 
         Assert.assertTrue(map.equals(JSONUtils.toMap(
-                "{\n" + "\"foo\": \"bar\",\n" + "}")));
+                "{\n" + "\"foo\": \"bar\"\n" + "}")));
 
         Assert.assertFalse(map.equals(JSONUtils.toMap(
-                "{\n" + "\"bar\": \"foo\",\n" + "}")));
+                "{\n" + "\"bar\": \"foo\"\n" + "}")));
 
         Assert.assertNull(JSONUtils.toMap("3"));
         Assert.assertNull(JSONUtils.toMap(null));
         Assert.assertNull(JSONUtils.toMap("3", null, null));
         Assert.assertNull(JSONUtils.toMap(null, null, null));
+
+        String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
+        Map<String, String> m = JSONUtils.toMap(str);
+        Assert.assertNotNull(m);
     }
 
     @Test
@@ -155,4 +158,27 @@ public class JSONUtilsTest {
         Assert.assertEquals(String.valueOf((Object) null),
                 JSONUtils.toJsonString(null));
     }
+
+    @Test
+    public void parseObject() {
+        String str = "{\"color\":\"yellow\",\"type\":\"renault\"}";
+        ObjectNode node = JSONUtils.parseObject(str);
+
+        Assert.assertEquals("yellow", node.path("color").asText());
+
+        node.put("price", 100);
+        Assert.assertEquals(100, node.path("price").asInt());
+
+        node.put("color", "red");
+        Assert.assertEquals("red", node.path("color").asText());
+    }
+
+    @Test
+    public void parseArray() {
+        String str = "[{\"color\":\"yellow\",\"type\":\"renault\"}]";
+        ArrayNode node = JSONUtils.parseArray(str);
+
+        Assert.assertEquals("yellow", node.path(0).path("color").asText());
+    }
+
 }
