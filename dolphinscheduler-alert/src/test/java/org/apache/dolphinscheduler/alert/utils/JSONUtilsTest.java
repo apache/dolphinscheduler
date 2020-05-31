@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.alert.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -108,5 +109,6 @@ public class JSONUtilsTest {
         assertTrue(result.isEmpty());
 
     }
+
 
 }
