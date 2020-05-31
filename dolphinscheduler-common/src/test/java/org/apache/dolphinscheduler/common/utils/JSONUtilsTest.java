@@ -102,7 +102,7 @@ public class JSONUtilsTest {
 
     @Test
     public void testParseObject() {
-        Assert.assertNull(JSONUtils.parseObject("", null));
+        Assert.assertNull(JSONUtils.parseObject("", int.class));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
 

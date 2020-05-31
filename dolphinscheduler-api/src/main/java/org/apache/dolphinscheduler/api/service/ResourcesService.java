@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
@@ -1128,8 +1126,8 @@ public class ResourcesService extends BaseService {
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
-        logger.info(JSON.toJSONString(visitor.visit(), SerializerFeature.SortField));
-        String jsonTreeStr = JSON.toJSONString(visitor.visit().getChildren(), SerializerFeature.SortField);
+        logger.info(JSONUtils.toJson(visitor.visit()));
+        String jsonTreeStr = JSONUtils.toJson(visitor.visit().getChildren());
         logger.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);

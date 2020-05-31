@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -529,7 +528,7 @@ public class ProcessInstanceService extends BaseDAGService {
         List<Property> globalParams = new ArrayList<>();
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSON.parseArray(userDefinedParams, Property.class);
+            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
 
 
@@ -538,7 +537,7 @@ public class ProcessInstanceService extends BaseDAGService {
         // global param string
         String globalParamStr = JSONUtils.toJson(globalParams);
         globalParamStr = ParameterUtils.convertParameterPlaceholders(globalParamStr, timeParams);
-        globalParams = JSON.parseArray(globalParamStr, Property.class);
+        globalParams = JSONUtils.toList(globalParamStr, Property.class);
         for (Property property : globalParams) {
             timeParams.put(property.getProp(), property.getValue());
         }
@@ -551,7 +550,7 @@ public class ProcessInstanceService extends BaseDAGService {
             String localParams = map.get(LOCAL_PARAMS);
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = JSON.parseArray(localParams, Property.class);
+                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());
                 localParamsMap.put("localParamsList",localParamsList);
