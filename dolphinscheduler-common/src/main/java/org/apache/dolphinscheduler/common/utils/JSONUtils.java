@@ -47,6 +47,7 @@ public class JSONUtils {
     static {
         //Feature that determines whether encountering of unknown properties, false means not analyzer unknown properties
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).setTimeZone(TimeZone.getDefault());
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).setTimeZone(TimeZone.getDefault());
     }
 
     /**
@@ -174,8 +175,7 @@ public class JSONUtils {
         }
 
         try {
-            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {
-            });
+            return objectMapper.readValue(json, new TypeReference<Map<String, String>>() {});
         } catch (Exception e) {
             logger.error("json to map exception!", e);
         }

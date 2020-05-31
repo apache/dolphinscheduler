@@ -142,6 +142,10 @@ public class JSONUtilsTest {
         Assert.assertNull(JSONUtils.toMap(null));
         Assert.assertNull(JSONUtils.toMap("3", null, null));
         Assert.assertNull(JSONUtils.toMap(null, null, null));
+
+        String str = "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}";
+        Map<String, String> m = JSONUtils.toMap(str);
+        Assert.assertNotNull(m);
     }
 
     @Test
