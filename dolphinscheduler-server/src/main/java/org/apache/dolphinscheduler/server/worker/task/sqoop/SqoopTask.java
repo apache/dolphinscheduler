@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -50,7 +50,7 @@ public class SqoopTask extends AbstractYarnTask {
     public void init() throws Exception {
         logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
         sqoopParameters =
-                JSON.parseObject(taskExecutionContext.getTaskParams(),SqoopParameters.class);
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(),SqoopParameters.class);
         if (!sqoopParameters.checkParameters()) {
             throw new RuntimeException("sqoop task params is not valid");
         }

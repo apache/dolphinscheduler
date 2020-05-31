@@ -66,6 +66,16 @@ public class JSONUtils {
         return null;
     }
 
+    public static String toJson(Object object, SerializationFeature feature) {
+        try {
+            ObjectWriter writer = objectMapper.writer(feature);
+            return writer.writeValueAsString(object);
+        } catch (Exception e) {
+            logger.error("object to json exception!", e);
+        }
+
+        return null;
+    }
 
     /**
      * This method deserializes the specified Json into an object of the specified class. It is not
@@ -238,6 +248,17 @@ public class JSONUtils {
         }
     }
 
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
+    }
+
+    public static JsonNode toJsonNode(Object obj) {
+        return objectMapper.valueToTree(obj);
+    }
 
     /**
      * json serializer
@@ -263,4 +284,5 @@ public class JSONUtils {
         }
 
     }
+
 }
