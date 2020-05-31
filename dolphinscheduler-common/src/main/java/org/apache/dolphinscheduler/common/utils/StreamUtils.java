@@ -14,26 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils.exportprocess;
+package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-/**
- * ProcessAddTaskParam
- */
-public interface ProcessAddTaskParam {
+public class StreamUtils {
 
-    /**
-     * add export task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addExportSpecialParam(JsonNode taskNode);
+    private StreamUtils() { }
 
-    /**
-     * add task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addImportSpecialParam(JsonNode taskNode);
+    public static <T> Stream<T> asStream(Iterator<T> sourceIterator) {
+        return asStream(sourceIterator, false);
+    }
+
+    public static <T> Stream<T> asStream(Iterator<T> sourceIterator, boolean parallel) {
+        Iterable<T> iterable = () -> sourceIterator;
+        return StreamSupport.stream(iterable.spliterator(), parallel);
+    }
+
 }
