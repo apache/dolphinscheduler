@@ -47,7 +47,6 @@ public abstract class AbstractBaseBenchmark {
     private static Logger logger = LoggerFactory.getLogger(AbstractBaseBenchmark.class);
 
 
-
     private ChainedOptionsBuilder newOptionsBuilder() {
 
         String className = getClass().getSimpleName();
@@ -70,21 +69,26 @@ public abstract class AbstractBaseBenchmark {
 
         String output = getReportDir();
         if (output != null) {
+            boolean writeFileStatus;
             String filePath = getReportDir() + className + ".json";
             File file = new File(filePath);
+
             if (file.exists()) {
-                file.delete();
+                writeFileStatus = file.delete();
+
+
             } else {
-                file.getParentFile().mkdirs();
+                writeFileStatus = file.getParentFile().mkdirs();
                 try {
-                    file.createNewFile();
+                    writeFileStatus = file.createNewFile();
                 } catch (IOException e) {
-                   logger.warn("jmh test create file error"+e);
+                    logger.warn("jmh test create file error" + e);
                 }
             }
-
-            optBuilder.resultFormat(ResultFormatType.JSON)
-                    .result(filePath);
+            if (writeFileStatus) {
+                optBuilder.resultFormat(ResultFormatType.JSON)
+                        .result(filePath);
+            }
         }
         return optBuilder;
     }
