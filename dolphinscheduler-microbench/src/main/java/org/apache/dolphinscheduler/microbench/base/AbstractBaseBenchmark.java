@@ -110,7 +110,7 @@ public abstract class AbstractBaseBenchmark {
     }
 
     private static int getForks() {
-        String value = System.getProperty("measureIterations");
+        String value = System.getProperty("forkCount");
         return null != value ? Integer.parseInt(value) : -1;
     }
 
