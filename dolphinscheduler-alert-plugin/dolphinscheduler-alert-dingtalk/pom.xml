@@ -11,7 +11,6 @@
 
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
 
 
 </project>

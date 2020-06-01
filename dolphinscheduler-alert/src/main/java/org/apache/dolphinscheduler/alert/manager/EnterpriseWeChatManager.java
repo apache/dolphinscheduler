@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
-import org.apache.dolphinscheduler.plugin.model.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class EnterpriseWeChatManager {
         String users = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_USERS;
         List<String> userList = Arrays.asList(users.split(","));
         logger.info("send message {}", alertInfo.getAlertData().getTitle());
-        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alertInfo.getAlertData()));
+        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alertInfo));
         try {
             EnterpriseWeChatUtils.sendEnterpriseWeChat(Constants.UTF_8, msg, token);
         } catch (IOException e) {

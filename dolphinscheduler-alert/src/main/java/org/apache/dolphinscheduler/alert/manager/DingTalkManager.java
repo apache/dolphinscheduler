@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.DingTalkUtils;
-import org.apache.dolphinscheduler.plugin.model.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

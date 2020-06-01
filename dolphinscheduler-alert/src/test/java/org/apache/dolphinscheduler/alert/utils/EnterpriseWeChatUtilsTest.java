@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.alert.utils;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.plugin.model.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,10 +120,13 @@ public class EnterpriseWeChatUtilsTest {
     public void testMarkdownByAlertForText(){
         Alert alertForText = createAlertForText();
         AlertData alertData = new AlertData();
+        AlertInfo alertInfo = new AlertInfo();
+        alertInfo.addProp("show_type", ShowType.TEXT.getDescp());
+        alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-                .setShowType(alertForText.getShowType().getDescp())
+//                .setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
     }
 
@@ -129,10 +134,13 @@ public class EnterpriseWeChatUtilsTest {
     public void testMarkdownByAlertForTable(){
         Alert alertForText = createAlertForTable();
         AlertData alertData = new AlertData();
+        AlertInfo alertInfo = new AlertInfo();
+        alertInfo.addProp("show_type", ShowType.TABLE.getDescp());
+        alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-                .setShowType(alertForText.getShowType().getDescp())
+//                .setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
     }
 

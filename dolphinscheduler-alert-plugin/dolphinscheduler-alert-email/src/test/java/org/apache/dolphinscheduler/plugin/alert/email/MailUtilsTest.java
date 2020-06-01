@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
+import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class MailUtilsTest {
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
         maps.add(1,map2);
-        String mapjson = JSONUtils.toJsonString(maps);
+        String mapjson = JacksonUtils.toJsonString(maps);
         logger.info(mapjson);
 
         return mapjson;
