@@ -191,7 +191,7 @@ CREATE TABLE t_ds_alert (
   content text ,
   alert_type int DEFAULT NULL ,
   alert_status int DEFAULT '0' ,
-  ·log· text ,
+  log text ,
   alertgroup_id int DEFAULT NULL ,
   receivers text ,
   receivers_cc text ,
