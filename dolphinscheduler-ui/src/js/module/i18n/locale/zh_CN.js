@@ -595,5 +595,5 @@ export default {
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
   'Please confirm whether the workflow has been saved before downloading': '下载前请确定工作流是否已保存',
-  'Username length cannot be less than 3': '用户名长度不能小于3'
+  'User name length is between 3 and 60': '用户名长度在3～60之间'
 }
