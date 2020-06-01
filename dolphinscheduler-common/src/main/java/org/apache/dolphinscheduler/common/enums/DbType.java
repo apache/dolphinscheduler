@@ -18,6 +18,8 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.HashMap;
+
 /**
  * data base types
  */
@@ -59,11 +61,17 @@ public enum DbType {
     }
 
 
+    private static HashMap<Integer, DbType> DB_TYPE_MAP =new HashMap<>();
+
+    static {
+        for (DbType dbType:DbType.values()){
+            DB_TYPE_MAP.put(dbType.getCode(),dbType);
+        }
+    }
+
     public static DbType of(int type){
-        for(DbType ty : values()){
-            if(ty.getCode() == type){
-                return ty;
-            }
+        if(DB_TYPE_MAP.containsKey(type)){
+            return DB_TYPE_MAP.get(type);
         }
         throw new IllegalArgumentException("invalid type : " + type);
     }
