@@ -18,6 +18,8 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -334,8 +336,10 @@ public class UsersService extends BaseService {
                         List<Resource> fileResourcesList = resourceMapper.queryResourceList(
                                 null, userId, ResourceType.FILE.ordinal());
                         if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            for (Resource resource : fileResourcesList) {
-                                HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
+                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
+                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+                            for (ResourceComponent resource : resourceComponent.getChildren()) {
+                                HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getName(), newResourcePath, false, true);
                             }
                         }
 
@@ -343,8 +347,10 @@ public class UsersService extends BaseService {
                         List<Resource> udfResourceList = resourceMapper.queryResourceList(
                                 null, userId, ResourceType.UDF.ordinal());
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            for (Resource resource : udfResourceList) {
-                                HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
+                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
+                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+                            for (ResourceComponent resource : resourceComponent.getChildren()) {
+                                HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getName(), newUdfsPath, false, true);
                             }
                         }
 
