@@ -16,25 +16,20 @@
  */
 package org.apache.dolphinscheduler.microbench.common;
 
-import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
-import org.junit.Test;
-import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
+import org.openjdk.jmh.annotations.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- *Simple JMH test
+ *Enum values JMH test
  */
 @Warmup(iterations = 2, time = 1)
 @Measurement(iterations = 4, time = 1)
 @State(Scope.Benchmark)
-public class SimpleEnumTest extends AbstractBaseBenchmark {
+public class EnumBenchMark extends AbstractBaseBenchmark {
 
     @Benchmark
     public boolean simpleTest(){
@@ -117,16 +112,6 @@ public class SimpleEnumTest extends AbstractBaseBenchmark {
             }
             throw new IllegalArgumentException("invalid code : " + code);
         }
-    }
-
-    @Test
-    public void runTest() throws RunnerException {
-        Options opt = new OptionsBuilder()
-                .include(SimpleEnumTest.class.getSimpleName())
-                .forks(2)
-                .build();
-
-        new Runner(opt).run();
     }
 
 }
