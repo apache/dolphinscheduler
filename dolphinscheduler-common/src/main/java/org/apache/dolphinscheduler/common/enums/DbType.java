@@ -31,6 +31,7 @@ public enum DbType {
      * 5 oracle
      * 6 sqlserver
      * 7 db2
+     * 8 remoteserver
      */
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
@@ -39,7 +40,8 @@ public enum DbType {
     CLICKHOUSE(4, "clickhouse"),
     ORACLE(5, "oracle"),
     SQLSERVER(6, "sqlserver"),
-    DB2(7, "db2");
+    DB2(7, "db2"),
+    REMOTESERVER(8, "remoteserver");
 
     DbType(int code, String descp) {
         this.code = code;

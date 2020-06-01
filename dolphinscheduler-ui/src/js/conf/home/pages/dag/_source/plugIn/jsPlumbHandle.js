@@ -634,7 +634,7 @@ JSP.prototype.saveStore = function () {
         if (v.type === 'SUB_PROCESS') {
           tasksParam = _.omit(tasksParam, ['maxRetryTimes', 'retryInterval'])
         }
-
+        console.log('-----------', tasksParam)
         tasks.push(tasksParam)
       }
     })

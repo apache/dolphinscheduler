@@ -243,7 +243,7 @@ const tasksType = {
     desc: 'SHELL',
     color: '#646464'
   },
-  'SUB_PROCESS': {
+  SUB_PROCESS: {
     desc: 'SUB_PROCESS',
     color: '#0097e0'
   },

@@ -207,7 +207,12 @@ public abstract class AbstractTask {
         TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
         switch (taskType){
             case SHELL:
-                paramsClass = ShellParameters.class;
+                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).getBoolean("remote");
+                if (remote != null && remote) {
+                    paramsClass = ShellParameters.class;
+                } else {
+                    paramsClass = SSHParameters.class;
+                }
                 break;
             case SQL:
                 paramsClass = SqlParameters.class;
@@ -235,9 +240,6 @@ public abstract class AbstractTask {
                 break;
             case CONDITIONS:
                 paramsClass = ConditionsParameters.class;
-                break;
-            case SSH:
-                paramsClass = SSHParameters.class;
                 break;
             default:
                 logger.error("not support this task type: {}", taskType);

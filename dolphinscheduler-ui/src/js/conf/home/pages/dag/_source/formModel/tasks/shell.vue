@@ -17,6 +17,16 @@
 <template>
   <div class="shell-model">
     <m-list-box>
+      <div slot="text">{{$t('Remote Exec')}}</div>
+      <div slot="content">
+        <m-remote-server
+                ref="refDs"
+                @on-dsData="_onDsData"
+                :data="{ remote:remote,datasource:datasource }">
+        </m-remote-server>
+      </div>
+    </m-list-box>
+    <m-list-box>
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
         <div class="from-mirror">
@@ -67,6 +77,7 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
+  import mRemoteServer from './_source/remoteServer'
   import mScriptBox from './_source/scriptBox'
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
@@ -81,6 +92,12 @@
     name: 'shell',
     data () {
       return {
+        // remote exec status
+        remote: false,
+        // remote server
+        datasource: '',
+        // Return to the selected remote server
+        rtDatasource: '',
         valueConsistsOf: 'LEAF_PRIORITY',
         // script
         rawScript: '',
@@ -106,6 +123,13 @@
       backfillItem: Object
     },
     methods: {
+      /**
+       * return data source
+       */
+      _onDsData (o) {
+        this.remote = o.remote
+        this.rtDatasource = o.datasource
+      },
       /**
        * return localParams
        */
@@ -180,6 +204,8 @@
         })
         // storage
         this.$emit('on-params', {
+          remote: this.remote,
+          datasource: this.rtDatasource,
           resourceList: dataProcessing,
           localParams: this.localParams,
           rawScript: editor.getValue()
@@ -317,6 +343,8 @@
         })
         this.noRes = result
         return {
+          remote: this.remote,
+          datasource: this.rtDatasource,
           resourceList: resourceIdArr,
           localParams: this.localParams
         }
@@ -327,11 +355,12 @@
       this.diGuiTree(item)
       this.options = item
       let o = this.backfillItem
-      
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.rawScript = o.params.rawScript || ''
-
+        // back remote server
+        this.remote = o.params.remote || ''
+        this.datasource = o.params.datasource || ''
         // backfill resourceList
         let backResource = o.params.resourceList || []
         let resourceList = o.params.resourceList || []
@@ -374,7 +403,7 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
-    components: { mLocalParams, mListBox, mResources, mScriptBox, Treeselect }
+    components: { mLocalParams, mListBox, mRemoteServer, mResources, mScriptBox, Treeselect }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

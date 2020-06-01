@@ -172,6 +172,7 @@ public class TaskExecutionContext implements Serializable{
      */
     private List<String> resources;
 
+    private SSHTaskExecutionContext sshTaskExecutionContext;
     /**
      *  sql TaskExecutionContext
      */
@@ -403,6 +404,14 @@ public class TaskExecutionContext implements Serializable{
 
     public void setWorkerGroup(String workerGroup) {
         this.workerGroup = workerGroup;
+    }
+
+    public SSHTaskExecutionContext getSshTaskExecutionContext() {
+        return sshTaskExecutionContext;
+    }
+
+    public void setSshTaskExecutionContext(SSHTaskExecutionContext sshTaskExecutionContext) {
+        this.sshTaskExecutionContext = sshTaskExecutionContext;
     }
 
     public SQLTaskExecutionContext getSqlTaskExecutionContext() {

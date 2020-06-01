@@ -592,5 +592,7 @@ export default {
   'Unauthorized or deleted resources': '未授权或已删除资源',
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'Enable': '启用',
-  'Disable': '停用'
+  'Disable': '停用',
+  'Remote Exec' : '远程执行',
+  'Please select the remote server': '请选择数据主机'
 }

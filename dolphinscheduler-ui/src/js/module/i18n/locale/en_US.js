@@ -592,5 +592,7 @@ export default {
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
-  'Disable': 'Disable'
+  'Disable': 'Disable',
+  'Remote Exec' : 'Remote Exec',
+  'Please select the remote server': 'Please select the remote server'
 }

@@ -179,17 +179,23 @@ public class TaskPriorityQueueConsumer extends Thread{
         taskInstance.setExecutePath(getExecLocalPath(taskInstance));
         taskInstance.setResources(getResourceFullNames(taskNode));
 
-
+        SSHTaskExecutionContext sshTaskExecutionContext = new SSHTaskExecutionContext();
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
         SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
 
+        // ssh task
+        if (taskType == TaskType.SHELL){
+            Boolean remote = JSONUtils.parseObject(taskNode.getParams()).getBoolean("remote");
+            if (remote != null && remote) {
+                setSSHTaskRelation(sshTaskExecutionContext, taskNode);
+            }
+        }
 
         // SQL task
         if (taskType == TaskType.SQL){
             setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
-
         }
 
         // DATAX task
@@ -212,6 +218,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
+                .buildSSHTaskRelatedInfo(sshTaskExecutionContext)
                 .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
@@ -282,6 +289,18 @@ public class TaskPriorityQueueConsumer extends Thread{
             sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
             sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
         }
+    }
+
+    /**
+     * set ssh remote task relation
+     * @param sshTaskExecutionContext sshTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setSSHTaskRelation(SSHTaskExecutionContext sshTaskExecutionContext, TaskNode taskNode) {
+        SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
+        int datasourceId = sqlParameters.getDatasource();
+        DataSource datasource = processService.findDataSourceById(datasourceId);
+        sshTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
     }
 
     /**

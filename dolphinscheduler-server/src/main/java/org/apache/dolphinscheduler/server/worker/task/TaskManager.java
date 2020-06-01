@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
-import org.apache.dolphinscheduler.server.worker.task.dummy.DummyTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
@@ -40,45 +39,45 @@ import org.slf4j.Logger;
  */
 public class TaskManager {
 
-  /**
-   * create new task
-   * @param taskExecutionContext  taskExecutionContext
-   * @param logger    logger
-   * @return AbstractTask
-   * @throws IllegalArgumentException illegal argument exception
-   */
-  public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger)
-      throws IllegalArgumentException {
-    Boolean enable = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).getBoolean("enable");
-    if (enable != null && enable == false ) {
-      return new DummyTask(taskExecutionContext, logger);
+    /**
+     * create new task
+     *
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger               logger
+     * @return AbstractTask
+     * @throws IllegalArgumentException illegal argument exception
+     */
+    public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger)
+        throws IllegalArgumentException {
+        switch (EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType())) {
+            case SHELL:
+                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).getBoolean("remote");
+                if (remote != null && remote) {
+                    return new SSHTask(taskExecutionContext, logger);
+                } else {
+                    return new ShellTask(taskExecutionContext, logger);
+                }
+            case PROCEDURE:
+                return new ProcedureTask(taskExecutionContext, logger);
+            case SQL:
+                return new SqlTask(taskExecutionContext, logger);
+            case MR:
+                return new MapReduceTask(taskExecutionContext, logger);
+            case SPARK:
+                return new SparkTask(taskExecutionContext, logger);
+            case FLINK:
+                return new FlinkTask(taskExecutionContext, logger);
+            case PYTHON:
+                return new PythonTask(taskExecutionContext, logger);
+            case HTTP:
+                return new HttpTask(taskExecutionContext, logger);
+            case DATAX:
+                return new DataxTask(taskExecutionContext, logger);
+            case SQOOP:
+                return new SqoopTask(taskExecutionContext, logger);
+            default:
+                logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
+                throw new IllegalArgumentException("not support task type");
+        }
     }
-    switch (EnumUtils.getEnum(TaskType.class,taskExecutionContext.getTaskType())) {
-      case SHELL:
-        return new ShellTask(taskExecutionContext, logger);
-      case PROCEDURE:
-        return new ProcedureTask(taskExecutionContext, logger);
-      case SQL:
-        return new SqlTask(taskExecutionContext, logger);
-      case MR:
-        return new MapReduceTask(taskExecutionContext, logger);
-      case SPARK:
-        return new SparkTask(taskExecutionContext, logger);
-      case FLINK:
-        return new FlinkTask(taskExecutionContext, logger);
-      case PYTHON:
-        return new PythonTask(taskExecutionContext, logger);
-      case HTTP:
-        return new HttpTask(taskExecutionContext, logger);
-      case DATAX:
-        return new DataxTask(taskExecutionContext, logger);
-      case SQOOP:
-        return new SqoopTask(taskExecutionContext, logger);
-      case SSH:
-        return new SSHTask(taskExecutionContext, logger);
-      default:
-        logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
-        throw new IllegalArgumentException("not support task type");
-    }
-  }
 }

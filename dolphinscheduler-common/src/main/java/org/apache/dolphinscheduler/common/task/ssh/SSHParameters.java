@@ -26,39 +26,51 @@ import java.util.List;
  * ssh parameters
  */
 public class SSHParameters extends AbstractParameters {
-  /**
-   * shell script
-   */
-  private String rawScript;
+    /**
+     * datasource id
+     */
+    private int datasource;
+    /**
+     * shell script
+     */
+    private String rawScript;
 
-  /**
-   * resource list
-   */
-  private List<ResourceInfo> resourceList;
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
-  public String getRawScript() {
-    return rawScript;
-  }
+    public int getDatasource() {
+        return datasource;
+    }
 
-  public void setRawScript(String rawScript) {
-    this.rawScript = rawScript;
-  }
+    public void setDatasource(int datasource) {
+        this.datasource = datasource;
+    }
 
-  public List<ResourceInfo> getResourceList() {
-    return resourceList;
-  }
+    public String getRawScript() {
+        return rawScript;
+    }
 
-  public void setResourceList(List<ResourceInfo> resourceList) {
-    this.resourceList = resourceList;
-  }
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
+    }
 
-  @Override
-  public boolean checkParameters() {
-    return rawScript != null && !rawScript.isEmpty();
-  }
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
 
-  @Override
-  public List<ResourceInfo> getResourceFilesList() {
-    return resourceList;
-  }
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
+
+    @Override
+    public boolean checkParameters() {
+        return rawScript != null && !rawScript.isEmpty();
+    }
+
+    @Override
+    public List<ResourceInfo> getResourceFilesList() {
+        return resourceList;
+    }
 }

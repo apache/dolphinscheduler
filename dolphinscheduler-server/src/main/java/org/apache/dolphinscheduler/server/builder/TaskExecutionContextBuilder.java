@@ -81,6 +81,16 @@ public class TaskExecutionContextBuilder {
         return this;
     }
 
+    /**
+     * build SSHTask related info
+     *
+     * @param sshTaskExecutionContext sshTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildSSHTaskRelatedInfo(SSHTaskExecutionContext sshTaskExecutionContext) {
+        taskExecutionContext.setSshTaskExecutionContext(sshTaskExecutionContext);
+        return this;
+    }
 
     /**
      * build SQLTask related info
