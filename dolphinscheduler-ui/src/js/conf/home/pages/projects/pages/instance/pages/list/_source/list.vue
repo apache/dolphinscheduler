@@ -53,11 +53,11 @@
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
           <th scope="col" style="min-width: 135px">
-            <span>{{$t('host')}}</span>
+            <span>{{$t('Executor')}}</span>
           </th>
-          <th scope="col" style="min-width: 60px">
-            <div style="width: 60px">
-              <span>{{$t('Executor')}}</span>
+          <th scope="col" style="min-width: 100px">
+            <div style="width: 100px">
+              <span>{{$t('host')}}</span>
             </div>
           </th>
           <th scope="col" style="min-width: 210px">
@@ -92,11 +92,11 @@
           <td width="70"><span>{{item.runTimes}}</span></td>
           <td><span>{{item.recovery}}</span></td>
           <td>
-            <span v-if="item.host">{{item.host}}</span>
+            <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
           </td>
           <td>
-            <span style="word-break: break-all" v-if="item.executorName">{{item.executorName}}</span>
+            <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
             <span v-else>-</span>
           </td>
           <td>
