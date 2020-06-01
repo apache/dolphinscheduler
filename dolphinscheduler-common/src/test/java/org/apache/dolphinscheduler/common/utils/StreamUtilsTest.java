@@ -14,26 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils.exportprocess;
+package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * ProcessAddTaskParam
- */
-public interface ProcessAddTaskParam {
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-    /**
-     * add export task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addExportSpecialParam(JsonNode taskNode);
+import static org.junit.Assert.*;
 
-    /**
-     * add task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
-     */
-    JsonNode addImportSpecialParam(JsonNode taskNode);
+public class StreamUtilsTest {
+
+    @Test
+    public void asStream() {
+        List<String> list = Arrays.asList("a", "b", "c");
+        List<String> ret = StreamUtils.asStream(list.iterator())
+                .filter(item -> item.equals("a"))
+                .collect(Collectors.toList());
+        Assert.assertEquals("a", ret.get(0));
+    }
+
 }
