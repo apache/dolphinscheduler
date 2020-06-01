@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -94,7 +95,7 @@ public class MailUtilsTest {
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
         maps.add(1,map2);
-        String mapjson = JSONUtils.toJsonString(maps);
+        String mapjson = JSONUtils.toJson(maps);
         logger.info(mapjson);
 
         return mapjson;

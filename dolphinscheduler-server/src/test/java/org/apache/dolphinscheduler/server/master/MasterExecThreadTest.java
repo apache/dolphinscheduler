@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -85,7 +85,7 @@ public class MasterExecThreadTest {
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-31 23:00:00");
-        Mockito.when(processInstance.getCommandParam()).thenReturn(JSON.toJSONString(cmdParam));
+        Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJson(cmdParam));
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);

@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
-import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DefaultHTMLTemplateTest{
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
         maps.add(1,map2);
-        String mapjson = JSONUtils.toJsonString(maps);
+        String mapjson = JSONUtils.toJson(maps);
         logger.info(mapjson);
 
         return mapjson;

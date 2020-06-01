@@ -16,13 +16,10 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -100,8 +97,8 @@ public class DingTalkUtilsTest {
     @Test
     public void testProxyConfig() {
         RequestConfig rc = DingTalkUtils.getProxyConfig();
-        Assert.assertEquals(rc.getProxy().getPort(), 80);
-        Assert.assertEquals(rc.getProxy().getHostName(), "proxy.com.cn");
+        Assert.assertEquals(80, rc.getProxy().getPort());
+        Assert.assertEquals("proxy.com.cn", rc.getProxy().getHostName());
     }
 
     @Test

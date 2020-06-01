@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class ParamUtilsTest {
 
         //Invoke convert
         Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, CommandType.START_PROCESS, date);
-        String result = JSON.toJSONString(paramsMap);
+        String result = JSONUtils.toJson(paramsMap);
         assertEquals(expected, result);
 
         for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
@@ -104,7 +104,7 @@ public class ParamUtilsTest {
 
         //Invoke convert with null globalParams
         Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams, CommandType.START_PROCESS, date);
-        String result1 = JSON.toJSONString(paramsMap1);
+        String result1 = JSONUtils.toJson(paramsMap1);
         assertEquals(expected1, result1);
 
         //Null check, invoke convert with null globalParams and null localParams
@@ -123,7 +123,7 @@ public class ParamUtilsTest {
 
         //Invoke convert
         Map<String, String> paramsMap = ParamUtils.convert(globalParams);
-        String result = JSON.toJSONString(paramsMap);
+        String result = JSONUtils.toJson(paramsMap);
         assertEquals(expected, result);
 
         logger.info(result);
