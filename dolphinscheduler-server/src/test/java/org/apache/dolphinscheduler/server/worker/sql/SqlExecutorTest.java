@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.worker.sql;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -112,7 +112,7 @@ public class SqlExecutorTest {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 

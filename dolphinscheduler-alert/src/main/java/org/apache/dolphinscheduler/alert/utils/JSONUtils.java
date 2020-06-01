@@ -16,8 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class JSONUtils {
    */
   public static String toJsonString(Object object) {
     try{
-      return JSON.toJSONString(object,false);
+      return JSONUtils.toJsonString(object);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
@@ -58,7 +57,7 @@ public class JSONUtils {
       return Collections.emptyList();
     }
     try {
-      return JSON.parseArray(json, clazz);
+      return JSONUtils.toList(json, clazz);
     } catch (Exception e) {
       logger.error("JSONArray.parseArray exception!",e);
     }

@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -80,7 +79,7 @@ public class TaskExecuteThread implements Runnable {
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
@@ -152,7 +151,7 @@ public class TaskExecuteThread implements Runnable {
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
         if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
+            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;

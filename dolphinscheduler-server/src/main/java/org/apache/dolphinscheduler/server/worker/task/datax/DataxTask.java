@@ -31,11 +31,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -72,7 +72,6 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.alibaba.fastjson.JSONObject;
 
 
 /**
@@ -216,14 +215,16 @@ public class DataxTask extends AbstractTask {
             }
 
         }else {
+            ObjectMapper mapper = new ObjectMapper();
 
-            JSONObject job = new JSONObject();
-            job.put("content", buildDataxJobContentJson());
-            job.put("setting", buildDataxJobSettingJson());
+            ObjectNode job = mapper.createObjectNode();
+            job.putArray("content").addAll(buildDataxJobContentJson());
+            job.set("setting", buildDataxJobSettingJson());
 
-            JSONObject root = new JSONObject();
-            root.put("job", job);
-            root.put("core", buildDataxCoreJson());
+            ObjectNode root = mapper.createObjectNode();
+
+            root.set("job", job);
+            root.set("core", buildDataxCoreJson());
             json = root.toString();
         }
 
@@ -240,7 +241,10 @@ public class DataxTask extends AbstractTask {
      * @return collection of datax job config JSONObject
      * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson() throws SQLException {
+    private List<ObjectNode> buildDataxJobContentJson() throws SQLException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode job = mapper.createObjectNode();
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
 
@@ -250,50 +254,76 @@ public class DataxTask extends AbstractTask {
         BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
-        List<JSONObject> readerConnArr = new ArrayList<>();
-        JSONObject readerConn = new JSONObject();
-        readerConn.put("querySql", new String[] {dataXParameters.getSql()});
-        readerConn.put("jdbcUrl", new String[] {dataSourceCfg.getJdbcUrl()});
+        List<ObjectNode> readerConnArr = new ArrayList<>();
+        ObjectNode readerConn = mapper.createObjectNode();
+
+        ArrayNode sqlArr = readerConn.putArray("querySql");
+        for (String sql : new String[]{dataXParameters.getSql()}) {
+            sqlArr.add(sql);
+        }
+
+        ArrayNode urlArr = readerConn.putArray("jdbcUrl");
+        for (String url : new String[]{dataSourceCfg.getJdbcUrl()}) {
+            urlArr.add(url);
+        }
+
         readerConnArr.add(readerConn);
 
-        JSONObject readerParam = new JSONObject();
+        ObjectNode readerParam = mapper.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
         readerParam.put("password", dataSourceCfg.getPassword());
-        readerParam.put("connection", readerConnArr);
+        readerParam.putArray("connection").addAll(readerConnArr);
 
-        JSONObject reader = new JSONObject();
+
+        ObjectNode reader = mapper.createObjectNode();
         reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
-        reader.put("parameter", readerParam);
+        reader.set("parameter", readerParam);
 
-        List<JSONObject> writerConnArr = new ArrayList<>();
-        JSONObject writerConn = new JSONObject();
-        writerConn.put("table", new String[] {dataXParameters.getTargetTable()});
+        List<ObjectNode> writerConnArr = new ArrayList<>();
+        ObjectNode writerConn = mapper.createObjectNode();
+        ArrayNode tableArr = writerConn.putArray("table");
+        for (String table : new String[]{dataXParameters.getTargetTable()}) {
+            tableArr.add(table);
+        }
+
         writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
         writerConnArr.add(writerConn);
 
-        JSONObject writerParam = new JSONObject();
+        ObjectNode writerParam = mapper.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
-        writerParam.put("column",
-            parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
-                    DbType.of(dataxTaskExecutionContext.getTargetType()),
-                    dataSourceCfg, dataXParameters.getSql()));
-        writerParam.put("connection", writerConnArr);
+
+        String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataSourceCfg, dataXParameters.getSql());
+        ArrayNode columnArr = writerParam.putArray("column");
+        for (String column : columns) {
+            columnArr.add(column);
+        }
+        writerParam.putArray("connection").addAll(writerConnArr);
+
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
-            writerParam.put("preSql", dataXParameters.getPreStatements());
+            ArrayNode preSqlArr = writerParam.putArray("preSql");
+            for (String preSql : dataXParameters.getPreStatements()) {
+                preSqlArr.add(preSql);
+            }
+
         }
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
-            writerParam.put("postSql", dataXParameters.getPostStatements());
+            ArrayNode postSqlArr = writerParam.putArray("postSql");
+            for (String postSql : dataXParameters.getPostStatements()) {
+                postSqlArr.add(postSql);
+            }
         }
 
-        JSONObject writer = new JSONObject();
+        ObjectNode writer = mapper.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
-        writer.put("parameter", writerParam);
+        writer.set("parameter", writerParam);
 
-        List<JSONObject> contentList = new ArrayList<>();
-        JSONObject content = new JSONObject();
+        List<ObjectNode> contentList = new ArrayList<>();
+        ObjectNode content = mapper.createObjectNode();
         content.put("reader", reader);
         content.put("writer", writer);
         contentList.add(content);
@@ -306,8 +336,11 @@ public class DataxTask extends AbstractTask {
      * 
      * @return datax setting config JSONObject
      */
-    private JSONObject buildDataxJobSettingJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxJobSettingJson() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode speed = mapper.createObjectNode();
+
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -318,19 +351,21 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject errorLimit = new JSONObject();
+        ObjectNode errorLimit = mapper.createObjectNode();
         errorLimit.put("record", 0);
         errorLimit.put("percentage", 0);
 
-        JSONObject setting = new JSONObject();
+        ObjectNode setting = mapper.createObjectNode();
         setting.put("speed", speed);
         setting.put("errorLimit", errorLimit);
 
         return setting;
     }
 
-    private JSONObject buildDataxCoreJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxCoreJson() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode speed = mapper.createObjectNode();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -341,14 +376,14 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject channel = new JSONObject();
-        channel.put("speed", speed);
+        ObjectNode channel = mapper.createObjectNode();
+        channel.set("speed", speed);
 
-        JSONObject transport = new JSONObject();
-        transport.put("channel", channel);
+        ObjectNode transport = mapper.createObjectNode();
+        transport.set("channel", channel);
 
-        JSONObject core = new JSONObject();
-        core.put("transport", transport);
+        ObjectNode core = mapper.createObjectNode();
+        core.set("transport", transport);
 
         return core;
     }

@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -636,7 +635,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         try {
             out = response.getOutputStream();
             buff = new BufferedOutputStream(out);
-            buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+            buff.write(JSONUtils.toJsonString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
             buff.flush();
             buff.close();
         } catch (IOException e) {
@@ -756,7 +755,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
-        List<ProcessMeta> processMetaList = JSON.parseArray(processMetaJson, ProcessMeta.class);
+        List<ProcessMeta> processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
 
         //check file content
         if (CollectionUtils.isEmpty(processMetaList)) {
@@ -1340,9 +1339,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                          */
                         if (taskInstance.getTaskType().equals(TaskType.SUB_PROCESS.name())) {
                             String taskJson = taskInstance.getTaskJson();
-                            taskNode = JSON.parseObject(taskJson, TaskNode.class);
-                            subProcessId = Integer.parseInt(JSON.parseObject(
-                                    taskNode.getParams()).getString(CMDPARAM_SUB_PROCESS_DEFINE_ID));
+                            taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+                            subProcessId = Integer.parseInt(JSONUtils.parseObject(
+                                    taskNode.getParams()).path(CMDPARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
                                 , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));

@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
@@ -32,6 +31,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -82,7 +82,7 @@ public class EnterpriseWeChatUtils {
     /**
      * get Enterprise WeChat token info
      * @return token string info
-     * @throws IOException the IOException
+     * @throws IOException the IOExceptionorg.apache.dolphinscheduler.alert.utils
      */
     public static String getToken() throws IOException {
         String resp;
@@ -99,9 +99,7 @@ public class EnterpriseWeChatUtils {
                 response.close();
             }
 
-            Map<String, Object> map = JSON.parseObject(resp,
-                    new TypeToken<Map<String, Object>>() {
-                    }.getType());
+            Map<String, Object> map = JSONUtils.parseObject(resp, Map.class);
             return map.get("access_token").toString();
         } finally {
             httpClient.close();

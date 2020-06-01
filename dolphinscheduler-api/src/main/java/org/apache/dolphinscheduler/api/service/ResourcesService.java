@@ -544,7 +544,7 @@ public class ResourcesService extends BaseService {
         }
         List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
-        //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
+        //JSONArray jsonArray = JSONUtils.toList(JSONUtils.toJsonString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
 

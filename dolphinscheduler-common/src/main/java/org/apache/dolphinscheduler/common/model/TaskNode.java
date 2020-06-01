@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.model;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -295,7 +294,7 @@ public class TaskNode {
     if(StringUtils.isNotEmpty(this.getTimeout())){
       String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
       String taskTimeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
-      return JSON.parseObject(taskTimeout,TaskTimeoutParameter.class);
+      return JSONUtils.parseObject(taskTimeout,TaskTimeoutParameter.class);
     }
     return new TaskTimeoutParameter(false);
   }

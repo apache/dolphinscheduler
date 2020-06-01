@@ -22,8 +22,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import com.alibaba.fastjson.JSONObject;
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -293,20 +292,20 @@ public class DataxTaskTest {
         try {
             Method method = DataxTask.class.getDeclaredMethod("buildDataxJobContentJson");
             method.setAccessible(true);
-            List<JSONObject> contentList = (List<JSONObject>) method.invoke(dataxTask, null);
+            List<ObjectNode> contentList = (List<ObjectNode>) method.invoke(dataxTask, null);
             Assert.assertNotNull(contentList);
 
-            JSONObject content = contentList.get(0);
-            JSONObject reader = (JSONObject) content.get("reader");
+            ObjectNode content = contentList.get(0);
+            ObjectNode reader = (ObjectNode) content.get("reader");
             Assert.assertNotNull(reader);
 
-            String readerPluginName = (String) reader.get("name");
+            String readerPluginName = (String) reader.path("name").asText();
             Assert.assertEquals(DataxUtils.DATAX_READER_PLUGIN_MYSQL, readerPluginName);
 
-            JSONObject writer = (JSONObject) content.get("writer");
+            ObjectNode writer = (ObjectNode) content.get("writer");
             Assert.assertNotNull(writer);
 
-            String writerPluginName = (String) writer.get("name");
+            String writerPluginName = (String) writer.path("name").asText();;
             Assert.assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_MYSQL, writerPluginName);
         }
         catch (Exception e) {
@@ -323,7 +322,7 @@ public class DataxTaskTest {
         try {
             Method method = DataxTask.class.getDeclaredMethod("buildDataxJobSettingJson");
             method.setAccessible(true);
-            JSONObject setting = (JSONObject) method.invoke(dataxTask, null);
+            ObjectNode setting = (ObjectNode) method.invoke(dataxTask, null);
             Assert.assertNotNull(setting);
             Assert.assertNotNull(setting.get("speed"));
             Assert.assertNotNull(setting.get("errorLimit"));
@@ -342,7 +341,7 @@ public class DataxTaskTest {
         try {
             Method method = DataxTask.class.getDeclaredMethod("buildDataxCoreJson");
             method.setAccessible(true);
-            JSONObject coreConfig = (JSONObject) method.invoke(dataxTask, null);
+            ObjectNode coreConfig = (ObjectNode) method.invoke(dataxTask, null);
             Assert.assertNotNull(coreConfig);
             Assert.assertNotNull(coreConfig.get("transport"));
         }
