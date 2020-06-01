@@ -595,5 +595,5 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'The Worker group no longer exists, please select the correct Worker group!': 'The Worker group no longer exists, please select the correct Worker group!',
   'Please confirm whether the workflow has been saved before downloading': 'Please confirm whether the workflow has been saved before downloading',
-  'Username length cannot be less than 3': 'Username length cannot be less than 3'
+  'User name length is between 3 and 60': 'User name length is between 3 and 60'
 }
