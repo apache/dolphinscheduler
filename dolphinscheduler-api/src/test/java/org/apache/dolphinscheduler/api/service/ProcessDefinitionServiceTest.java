@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.entity.ContentType;
 import org.json.JSONException;
