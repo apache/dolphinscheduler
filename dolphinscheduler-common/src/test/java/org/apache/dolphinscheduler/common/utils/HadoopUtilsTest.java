@@ -191,6 +191,12 @@ public class HadoopUtilsTest {
     }
 
     @Test
+    public void getJobHistoryUrl(){
+        String application_1516778421218_0042 = hadoopUtils.getJobHistoryUrl("application_1529051418016_0167");
+        logger.info(application_1516778421218_0042);
+    }
+
+    @Test
     public void catFileWithLimitTest() {
         List<String> stringList = new ArrayList<>();
         try {
