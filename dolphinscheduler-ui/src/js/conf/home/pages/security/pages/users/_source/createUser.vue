@@ -155,8 +155,8 @@
         
         let userNameLength = this.userName.length
         // user name
-        if (userNameLength<3 && userNameLength>60) {
-          this.$message.warning(`${i18n.$t('User name length is between 3 and 60')}`)
+        if (userNameLength<3 && userNameLength>39) {
+          this.$message.warning(`${i18n.$t('User name length is between 3 and 39')}`)
           return false
         }
         if (!this.userName.replace(/\s*/g,"")) {
