@@ -22,6 +22,8 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +42,10 @@ public abstract class AbstractBaseBenchmark {
 
     static final int DEFAULT_MEASURE_ITERATIONS = 10;
 
-    protected static final int DEFAULT_FORKS = 2;
+    static final int DEFAULT_FORKS = 2;
+
+    private static Logger logger = LoggerFactory.getLogger(AbstractBaseBenchmark.class);
+
 
 
     private ChainedOptionsBuilder newOptionsBuilder() {
@@ -74,7 +79,7 @@ public abstract class AbstractBaseBenchmark {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                   logger.warn("jmh test create file error"+e);
                 }
             }
 
