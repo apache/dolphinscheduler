@@ -16,9 +16,8 @@
  */
 package org.apache.dolphinscheduler.service.process;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -205,16 +204,16 @@ public class ProcessService {
         CommandType commandType = command.getCommandType();
 
         if(cmdTypeMap.containsKey(commandType)){
-            JSONObject cmdParamObj = (JSONObject) JSON.parse(command.getCommandParam());
-            JSONObject tempObj;
-            int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
+            ObjectNode cmdParamObj = JSONUtils.parseObject(command.getCommandParam());
+            ObjectNode tempObj;
+            int processInstanceId = cmdParamObj.path(CMDPARAM_RECOVER_PROCESS_ID_STRING).asInt();
 
             List<Command> commands = commandMapper.selectList(null);
             // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
-                    tempObj = (JSONObject) JSON.parse(tmpCommand.getCommandParam());
-                    if(tempObj != null && processInstanceId == tempObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING)){
+                    tempObj = JSONUtils.parseObject(tmpCommand.getCommandParam());
+                    if(tempObj != null && processInstanceId == tempObj.path(CMDPARAM_RECOVER_PROCESS_ID_STRING).asInt()){
                         isNeedCreate = false;
                         break;
                     }
@@ -331,7 +330,7 @@ public class ProcessService {
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
                 if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
-                    SubProcessParameters subProcessParam = JSON.parseObject(parameter, SubProcessParameters.class);
+                    SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
