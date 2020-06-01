@@ -152,8 +152,13 @@
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
-
+        
+        let userNameLength = this.userName.length
         // user name
+        if (userNameLength<3) {
+          this.$message.warning(`${i18n.$t('Username length cannot be less than 3')}`)
+          return false
+        }
         if (!this.userName.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
