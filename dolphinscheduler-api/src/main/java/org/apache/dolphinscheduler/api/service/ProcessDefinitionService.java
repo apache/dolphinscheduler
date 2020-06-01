@@ -1634,14 +1634,14 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionId
      */
     private void resetDagTaskNodesByDataLineage(ProcessDag processDag, int processDefinitionId) {
-        Map<String, TaskNode> cacheExistedTaskNode = new HashMap<>();
+        Map<String, TaskNode> existedTaskNodeMap = new HashMap<>();
 
         for(TaskNode taskNode : processDag.getNodes()) {
             if (taskNode.isForbidden()) {
                 continue;
             }
 
-            cacheExistedTaskNode.put(processDefinitionId + taskNode.getName(), taskNode);
+            existedTaskNodeMap.put(processDefinitionId + taskNode.getName(), taskNode);
         }
 
         int nodeSize = processDag.getNodes().size();
@@ -1653,12 +1653,11 @@ public class ProcessDefinitionService extends BaseDAGService {
             }
 
             AbstractParameters parameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-            if (parameters.getCheckDependFlag() == Flag.NO.ordinal()
-                    || StringUtils.isEmpty(parameters.getDependNodeKeys())) {
+            if (!parameters.isCheckDepend()) {
                 continue;
             }
 
-            analyseNodeDependByTableLineage(processDag, taskNode, taskNode, cacheExistedTaskNode);
+            analyseNodeDependByTableLineage(processDag, taskNode, taskNode, existedTaskNodeMap);
         }
     }
 
@@ -1667,9 +1666,9 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDag
      * @param analyseNode
      * @param postNode
-     * @param cacheExistedTaskNode
+     * @param existedTaskNodeMap
      */
-    private void analyseNodeDependByTableLineage(ProcessDag processDag, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> cacheExistedTaskNode) {
+    private void analyseNodeDependByTableLineage(ProcessDag processDag, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> existedTaskNodeMap) {
         // exist depend tag
         AbstractParameters parameters = TaskParametersUtils.getParameters(analyseNode.getType(), analyseNode.getParams());
         if (StringUtils.isEmpty(parameters.getDependNodeKeys())) {
@@ -1698,8 +1697,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                         && DependUnionKeyUtils.existDependRelation(realNode, dependNodeKeys)) {
 
                     // check if the depend node exists
-                    if (cacheExistedTaskNode.containsKey(processDefinition.getId() + realNode.getName())) {
-                        TaskNode dependNode = cacheExistedTaskNode.get(processDefinition.getId() + realNode.getName());
+                    if (existedTaskNodeMap.containsKey(processDefinition.getId() + realNode.getName())) {
+                        TaskNode dependNode = existedTaskNodeMap.get(processDefinition.getId() + realNode.getName());
                         processDag.getEdges().add(new TaskNodeRelation(dependNode.getName(), postNode.getName()));
                         postNode.setPreTasks(JSONUtils.writeValueAsString(new String[]{dependNode.getName()}));
                         continue;
@@ -1713,9 +1712,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                     processDag.getEdges().add(new TaskNodeRelation(dependNode.getName(), postNode.getName()));
                     postNode.setPreTasks(JSONUtils.writeValueAsString(new String[]{dependNode.getName()}));
 
-                    cacheExistedTaskNode.put(processDefinition.getId() + realNode.getName(), dependNode);
+                    existedTaskNodeMap.put(processDefinition.getId() + realNode.getName(), dependNode);
 
-                    analyseNodeDependByTableLineage(processDag, realNode, dependNode, cacheExistedTaskNode);
+                    analyseNodeDependByTableLineage(processDag, realNode, dependNode, existedTaskNodeMap);
                 }
             }
         }

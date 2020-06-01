@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.dolphinscheduler.common.utils;
 
 import java.sql.SQLException;
@@ -34,64 +50,6 @@ import com.alibaba.druid.stat.TableStat;
 public class SqlUtils {
 
     public static final Logger logger = LoggerFactory.getLogger(SqlUtils.class);
-
-    /**
-     * 解析select语句查询列名
-     *
-     * @param dbType database type
-     * @param sql select sql
-     * @return select columns
-     * @throws RuntimeException
-     */
-    public static String[] resolveStandardSelectSqlColumns(DbType dbType, String sql) {
-        String[] columns;
-
-        try {
-            SQLStatementParser parser = SQLParserUtils.createSQLStatementParser(sql, dbType.getDesc());
-            ValidUtils.notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
-
-            SQLStatement sqlStatement = parser.parseStatement();
-            SQLSelectStatement sqlSelectStatement = (SQLSelectStatement) sqlStatement;
-            SQLSelect sqlSelect = sqlSelectStatement.getSelect();
-
-            List<SQLSelectItem> selectItemList = null;
-
-            if (sqlSelect.getQuery() instanceof SQLSelectQueryBlock) {
-                SQLSelectQueryBlock block = (SQLSelectQueryBlock) sqlSelect.getQuery();
-                selectItemList = block.getSelectList();
-            } else if (sqlSelect.getQuery() instanceof SQLUnionQuery) {
-                SQLUnionQuery unionQuery = (SQLUnionQuery) sqlSelect.getQuery();
-                SQLSelectQueryBlock block = (SQLSelectQueryBlock) unionQuery.getRight();
-                selectItemList = block.getSelectList();
-            }
-
-            ValidUtils.notNull(selectItemList, String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
-
-            columns = new String[selectItemList.size()];
-            for (int i = 0; i < selectItemList.size(); i++) {
-                SQLSelectItem item = selectItemList.get(i);
-
-                if (item.getAlias() != null) {
-                    columns[i] = item.getAlias();
-                } else if (item.getExpr() != null) {
-                    if (item.getExpr() instanceof SQLPropertyExpr) {
-                        SQLPropertyExpr expr = (SQLPropertyExpr) item.getExpr();
-                        columns[i] = expr.getName();
-                    } else if (item.getExpr() instanceof SQLIdentifierExpr) {
-                        SQLIdentifierExpr expr = (SQLIdentifierExpr) item.getExpr();
-                        columns[i] = expr.getName();
-                    }
-                } else {
-                    throw new RuntimeException(String.format("column [ %s ] parse fail", item.toString()));
-                }
-            }
-        } catch (Exception e) {
-            logger.warn(e.getMessage(),e);
-            return null;
-        }
-
-        return columns;
-    }
 
     /**
      * 解析sql语句select from表名
@@ -191,40 +149,6 @@ public class SqlUtils {
         return tableMap;
     }
 
-    public static String[] parseKeywordsColumns(DbType dbType, String[] columns) {
-        if (columns == null) {
-            return columns;
-        }
-
-        for (int i = 0; i < columns.length; i++) {
-            columns[i] = parseKeywordsColumn(dbType, columns[i]);
-        }
-
-        return columns;
-    }
-
-    public static String parseKeywordsColumn(DbType dbType, String column) {
-        if (column == null) {
-            return column;
-        }
-
-        column = column.trim();
-        column = column.replace("`", "");
-        column = column.replace("\"", "");
-
-        if (DbType.MYSQL.name().equals(dbType.toString())){
-            column = String.format("`%s`", column);
-        }else if (DbType.POSTGRESQL.name().equals(dbType.toString())){
-            column = String.format("\"%s\"", column);
-        }else if (DbType.SQLSERVER.name().equals(dbType.toString())){
-            column = String.format("`%s`", column);
-        }else if (DbType.ORACLE.name().equals(dbType.toString())){
-            column = String.format("\"%s\"", column);
-        }
-
-        return column;
-    }
-
     private static SchemaStatVisitor getSchemaStatVisitor(DbType dbType, SQLStatement stmt) {
         SchemaStatVisitor visitor;
 
@@ -247,6 +171,43 @@ public class SqlUtils {
 
         stmt.accept(visitor);
         return visitor;
+    }
+
+    public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
+        if (columns == null) {
+            return null;
+        }
+
+        String[] toColumns = new String[columns.length];
+        for (int i = 0; i < columns.length; i++ ) {
+            toColumns[i] = doConvertKeywordsColumn(dbType, columns[i]);
+        }
+
+        return toColumns;
+    }
+
+    public static String doConvertKeywordsColumn(DbType dbType, String column) {
+        if (column == null) {
+            return column;
+        }
+
+        column = column.trim();
+        column = column.replace("`", "");
+        column = column.replace("\"", "");
+        column = column.replace("'", "");
+
+        switch (dbType) {
+            case MYSQL:
+                return String.format("`%s`", column);
+            case POSTGRESQL:
+                return String.format("\"%s\"", column);
+            case ORACLE:
+                return String.format("\"%s\"", column);
+            case SQLSERVER:
+                return String.format("`%s`", column);
+            default:
+                return column;
+        }
     }
 
 }

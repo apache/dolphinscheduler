@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.server.utils.DependAnalyseUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
@@ -167,9 +166,6 @@ public class MasterExecThread implements Runnable {
                 masterTaskExecNum);
         this.nettyRemotingClient = nettyRemotingClient;
     }
-
-
-
 
     @Override
     public void run() {
@@ -383,18 +379,20 @@ public class MasterExecThread implements Runnable {
      * @param startNodeNameList
      */
     private void resetDagTaskNodesByDataLineage(List<TaskNode> taskNodeList, List<String> startNodeNameList) {
-        Map<String, TaskNode> cacheExistedTaskNode = new HashMap<>();
+        Map<String, TaskNode> existedTaskNodeMap = new HashMap<>();
 
         for(TaskNode taskNode : taskNodeList) {
             if (taskNode.isForbidden()) {
                 continue;
             }
 
-            if (startNodeNameList.contains(taskNode.getName()) && processInstance.getTaskDependType() != TaskDependType.TASK_PRE) {
+            // clear pre task depend of start nodes
+            if (processInstance.getTaskDependType() != TaskDependType.TASK_PRE
+                    && startNodeNameList.contains(taskNode.getName())) {
                 taskNode.setPreTasks(null);
             }
 
-            cacheExistedTaskNode.put(processInstance.getProcessDefinitionId() + taskNode.getName(), taskNode);
+            existedTaskNodeMap.put(processInstance.getProcessDefinitionId() + taskNode.getName(), taskNode);
         }
 
         int nodeSize = taskNodeList.size();
@@ -406,12 +404,11 @@ public class MasterExecThread implements Runnable {
             }
 
             AbstractParameters parameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-            if (parameters.getCheckDependFlag() == Flag.NO.ordinal()
-                    || StringUtils.isEmpty(parameters.getDependNodeKeys())) {
+            if (!parameters.isCheckDepend()) {
                 continue;
             }
 
-            analyseNodeDependByTableLineage(taskNodeList, taskNode, taskNode, cacheExistedTaskNode);
+            analyseNodeDependByTableLineage(taskNodeList, taskNode, taskNode, existedTaskNodeMap);
         }
     }
 
@@ -420,9 +417,9 @@ public class MasterExecThread implements Runnable {
      * @param lineageNodeList
      * @param analyseNode
      * @param postNode
-     * @param cacheExistedTaskNode
+     * @param existedTaskNodeMap
      */
-    private void analyseNodeDependByTableLineage(List<TaskNode> lineageNodeList, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> cacheExistedTaskNode) {
+    private void analyseNodeDependByTableLineage(List<TaskNode> lineageNodeList, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> existedTaskNodeMap) {
         // exist depend tag
         AbstractParameters parameters = TaskParametersUtils.getParameters(analyseNode.getType(), analyseNode.getParams());
         if (StringUtils.isEmpty(parameters.getDependNodeKeys())) {
@@ -453,10 +450,10 @@ public class MasterExecThread implements Runnable {
                         && DependUnionKeyUtils.existDependRelation(realNode, dependNodeKeys)) {
 
                     // check if the depend node exists
-                    if (cacheExistedTaskNode.containsKey(processDefinition.getId() + realNode.getName())) {
-                        TaskNode dependNode = cacheExistedTaskNode.get(processDefinition.getId() + realNode.getName());
-                        DependAnalyseUtils.addNodeDependentItem(dependNode, processDefinition.getId(), realNode.getName());
-                        DependAnalyseUtils.addNodeDepList(postNode, dependNode);
+                    if (existedTaskNodeMap.containsKey(processDefinition.getId() + realNode.getName())) {
+                        TaskNode dependNode = existedTaskNodeMap.get(processDefinition.getId() + realNode.getName());
+                        TaskNodeUtils.addNodeDependentItem(dependNode, processDefinition.getId(), realNode.getName());
+                        TaskNodeUtils.addNodeDepList(postNode, dependNode);
                         logger.info("new depend relation : {} -> {}", dependNode.getName(), postNode.getName());
                         continue;
                     }
@@ -466,18 +463,18 @@ public class MasterExecThread implements Runnable {
                             masterConfig.getDataLineageDependRetryTimes(), masterConfig.getDataLineageDependRetryInterval());
 
                     // cache node
-                    cacheExistedTaskNode.put(processDefinition.getId() + realNode.getName(), dependNode);
+                    existedTaskNodeMap.put(processDefinition.getId() + realNode.getName(), dependNode);
 
                     // add node relation
-                    DependAnalyseUtils.addNodeDependentItem(dependNode, processDefinition.getId(), realNode.getName());
-                    DependAnalyseUtils.addNodeDepList(postNode, dependNode);
+                    TaskNodeUtils.addNodeDependentItem(dependNode, processDefinition.getId(), realNode.getName());
+                    TaskNodeUtils.addNodeDepList(postNode, dependNode);
 
                     lineageNodeList.add(dependNode);
 
                     logger.info("new depend relation : {} -> {}", dependNode.getName(), postNode.getName());
 
                     // analyse current node table lineage
-                    analyseNodeDependByTableLineage(lineageNodeList, realNode, dependNode, cacheExistedTaskNode);
+                    analyseNodeDependByTableLineage(lineageNodeList, realNode, dependNode, existedTaskNodeMap);
                 }
             }
         }

@@ -16,8 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.task;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,6 +106,15 @@ public abstract class AbstractParameters implements IParameters {
         return localParametersMaps;
       }
       return null;
+  }
+
+  public boolean isCheckDepend() {
+    if (this.getCheckDependFlag() == Flag.NO.ordinal()
+            || StringUtils.isEmpty(this.getDependNodeKeys())) {
+      return false;
+    }
+
+    return true;
   }
 
 }

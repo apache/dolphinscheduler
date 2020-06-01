@@ -48,6 +48,8 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SqlUtils;
+import org.apache.dolphinscheduler.common.utils.ValidUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -430,9 +432,9 @@ public class DataxTask extends AbstractTask {
             columnNames = tryExecuteSqlResolveColumnNames(dataSourceCfg, sql);
         }
 
-        notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
+        ValidUtils.notNull(columnNames, String.format("parsing sql columns failed : %s", sql));
 
-        return DataxUtils.convertKeywordsColumns(dtType, columnNames);
+        return SqlUtils.convertKeywordsColumns(dtType, columnNames);
     }
 
     /**
@@ -450,7 +452,7 @@ public class DataxTask extends AbstractTask {
 
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
-            notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
+            ValidUtils.notNull(parser, String.format("database driver [%s] is not support", dbType.toString()));
 
             SQLStatement sqlStatement = parser.parseStatement();
             SQLSelectStatement sqlSelectStatement = (SQLSelectStatement)sqlStatement;
@@ -466,7 +468,7 @@ public class DataxTask extends AbstractTask {
                 selectItemList = block.getSelectList();
             }
 
-            notNull(selectItemList,
+            ValidUtils.notNull(selectItemList,
                 String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
 
             columnNames = new String[selectItemList.size()];
@@ -544,12 +546,6 @@ public class DataxTask extends AbstractTask {
     @Override
     public AbstractParameters getParameters() {
         return dataXParameters;
-    }
-
-    private void notNull(Object obj, String message) {
-        if (obj == null) {
-            throw new RuntimeException(message);
-        }
     }
 
 }

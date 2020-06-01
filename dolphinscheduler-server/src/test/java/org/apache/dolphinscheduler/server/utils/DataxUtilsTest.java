@@ -21,6 +21,7 @@ import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
 import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.SqlUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -73,36 +74,4 @@ public class DataxUtilsTest {
         assertTrue(DataxUtils.getSqlStatementParser(DbType.DB2, "select 1") == null);
     }
 
-    /**
-     *
-     * Method: convertKeywordsColumns(DbType dbType, String[] columns)
-     *
-     */
-    @Test
-    public void testConvertKeywordsColumns() throws Exception {
-        String[] fromColumns = new String[]{"`select`", "from", "\"where\"", " table "};
-        String[] targetColumns = new String[]{"`select`", "`from`", "`where`", "`table`"};
-
-        String[] toColumns = DataxUtils.convertKeywordsColumns(DbType.MYSQL, fromColumns);
-
-        assertTrue(fromColumns.length == toColumns.length);
-
-        for (int i = 0; i < toColumns.length; i++) {
-            assertEquals(targetColumns[i], toColumns[i]);
-        }
-    }
-
-    /**
-     *
-     * Method: doConvertKeywordsColumn(DbType dbType, String column)
-     *
-     */
-    @Test
-    public void testDoConvertKeywordsColumn() throws Exception {
-        assertEquals("`select`", DataxUtils.doConvertKeywordsColumn(DbType.MYSQL, " \"`select`\" "));
-        assertEquals("\"select\"", DataxUtils.doConvertKeywordsColumn(DbType.POSTGRESQL, " \"`select`\" "));
-        assertEquals("`select`", DataxUtils.doConvertKeywordsColumn(DbType.SQLSERVER, " \"`select`\" "));
-        assertEquals("\"select\"", DataxUtils.doConvertKeywordsColumn(DbType.ORACLE, " \"`select`\" "));
-        assertEquals("select", DataxUtils.doConvertKeywordsColumn(DbType.DB2, " \"`select`\" "));
-    }
 }

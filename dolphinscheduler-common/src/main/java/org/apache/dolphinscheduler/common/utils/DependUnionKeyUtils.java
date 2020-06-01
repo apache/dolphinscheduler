@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.dolphinscheduler.common.utils;
 
 import java.util.Arrays;
@@ -7,14 +23,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 
 public class DependUnionKeyUtils {
 
-    private static final String MARK_WORD_DEPEND = Constants.SHARP + "depend";
+    private static final String MARK_WORD_TABLE_DEPEND = Constants.SHARP + "table_depend";
 
-    private static final String MARK_WORD_TARGET = Constants.SHARP + "target";
+    private static final String MARK_WORD_TABLE_TARGET = Constants.SHARP + "table_target";
 
     public static String clearIllegalChars(String str) {
         if (StringUtils.isEmpty(str)) {
@@ -33,29 +47,29 @@ public class DependUnionKeyUtils {
             return str;
         }
 
-        str = str.replace(MARK_WORD_DEPEND, "");
-        str = str.replace(MARK_WORD_TARGET, "");
+        str = str.replace(MARK_WORD_TABLE_DEPEND, "");
+        str = str.replace(MARK_WORD_TABLE_TARGET, "");
         return str;
     }
 
     public static String buildDependTableUnionKey(String host, String database, String tableName) {
-        return buildUnionKey(host, database, tableName, MARK_WORD_DEPEND);
+        return buildUnionKey(host, database, tableName, MARK_WORD_TABLE_DEPEND);
     }
 
     public static String buildDependTableUnionKey(String host, String database, List<String> tableList) {
-        return buildUnionKey(host, database, tableList, MARK_WORD_DEPEND);
+        return buildUnionKey(host, database, tableList, MARK_WORD_TABLE_DEPEND);
     }
 
     public static String buildTargetTableUnionKey(String host, String database, String tableName) {
-        return buildUnionKey(host, database, tableName, MARK_WORD_TARGET);
+        return buildUnionKey(host, database, tableName, MARK_WORD_TABLE_TARGET);
     }
 
     public static String buildTargetTableUnionKey(String host, String database, List<String> tableList) {
-        return buildUnionKey(host, database, tableList, MARK_WORD_TARGET);
+        return buildUnionKey(host, database, tableList, MARK_WORD_TABLE_TARGET);
     }
 
     public static String buildTargetTableUnionKey(String host, String database, String[] tableArray) {
-        return buildUnionKey(host, database, Arrays.asList(tableArray), MARK_WORD_TARGET);
+        return buildUnionKey(host, database, Arrays.asList(tableArray), MARK_WORD_TABLE_TARGET);
     }
 
     public static String buildUnionKey(String host, String database, List<String> tableList, String markWord) {
@@ -95,7 +109,7 @@ public class DependUnionKeyUtils {
         }
 
         for (String dependKey : dependNodeKeys) {
-            if (targetNodeKey.indexOf(dependKey.replace(MARK_WORD_DEPEND, MARK_WORD_TARGET)) > -1) {
+            if (targetNodeKey.indexOf(dependKey.replace(MARK_WORD_TABLE_DEPEND, MARK_WORD_TABLE_TARGET)) > -1) {
                 return true;
             }
         }
@@ -116,6 +130,6 @@ public class DependUnionKeyUtils {
     }
 
     public static String replaceMarkWordToTarget(String dependNodeKey) {
-        return dependNodeKey.replace(MARK_WORD_DEPEND, MARK_WORD_TARGET);
+        return dependNodeKey.replace(MARK_WORD_TABLE_DEPEND, MARK_WORD_TABLE_TARGET);
     }
 }

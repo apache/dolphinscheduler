@@ -89,41 +89,4 @@ public class DataxUtils {
         }
     }
 
-    public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
-        if (columns == null) {
-            return null;
-        }
-
-        String[] toColumns = new String[columns.length];
-        for (int i = 0; i < columns.length; i++ ) {
-            toColumns[i] = doConvertKeywordsColumn(dbType, columns[i]);
-        }
-
-        return toColumns;
-    }
-
-    public static String doConvertKeywordsColumn(DbType dbType, String column) {
-        if (column == null) {
-            return column;
-        }
-
-        column = column.trim();
-        column = column.replace("`", "");
-        column = column.replace("\"", "");
-        column = column.replace("'", "");
-
-        switch (dbType) {
-            case MYSQL:
-                return String.format("`%s`", column);
-            case POSTGRESQL:
-                return String.format("\"%s\"", column);
-            case ORACLE:
-                return String.format("\"%s\"", column);
-            case SQLSERVER:
-                return String.format("`%s`", column);
-            default:
-                return column;
-        }
-    }
-
 }
