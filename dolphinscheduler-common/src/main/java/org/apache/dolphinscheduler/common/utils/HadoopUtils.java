@@ -666,10 +666,10 @@ public class HadoopUtils implements Closeable {
                 return null;
             }
             //to json
-            JSONObject jsonObject = JSON.parseObject(retStr);
+            ObjectNode jsonObject = JSONUtils.parseObject(retStr);
 
             //get ResourceManager state
-            return jsonObject.getJSONObject("clusterInfo").getString("haState");
+            return jsonObject.get("clusterInfo").path("haState").asText();
         }
 
     }

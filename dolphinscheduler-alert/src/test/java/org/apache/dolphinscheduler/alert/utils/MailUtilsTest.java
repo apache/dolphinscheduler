@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.AlertDao;

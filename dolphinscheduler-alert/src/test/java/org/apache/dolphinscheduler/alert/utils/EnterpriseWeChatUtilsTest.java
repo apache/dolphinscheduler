@@ -22,17 +22,17 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Please manually modify the configuration file before testing.
@@ -205,7 +205,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(partyId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).path("errmsg").asText;
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -220,7 +220,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(listPartyId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).path("errmsg").asText;
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -247,7 +247,7 @@ public class EnterpriseWeChatUtilsTest {
 //
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).path("errmsg").asText;
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -262,7 +262,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).path("errmsg").asText;
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();

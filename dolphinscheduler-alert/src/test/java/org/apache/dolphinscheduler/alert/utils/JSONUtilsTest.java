@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.alert.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
