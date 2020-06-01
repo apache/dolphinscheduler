@@ -54,7 +54,7 @@ DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id();
 delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_C_app_link() RETURNS void AS $$
 BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
           WHERE TABLE_NAME='t_ds_task_instance'
                             AND COLUMN_NAME ='app_link')
       THEN
