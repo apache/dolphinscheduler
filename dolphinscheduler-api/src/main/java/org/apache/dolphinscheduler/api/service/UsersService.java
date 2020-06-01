@@ -347,7 +347,7 @@ public class UsersService extends BaseService {
                         List<Resource> udfResourceList = resourceMapper.queryResourceList(
                                 null, userId, ResourceType.UDF.ordinal());
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
+                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
                             for (ResourceComponent resource : resourceComponent.getChildren()) {
                                 HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getName(), newUdfsPath, false, true);
