@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.microbench.common;
 
 import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
 import org.openjdk.jmh.annotations.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +94,6 @@ public class SimpleEnumTest extends AbstractBaseBenchmark {
                 TEST_TYPE_MAP.put(testTypeEnum.code,testTypeEnum);
             }
         }
-
 
         public static void newGetNameByType(int code) {
             if (TEST_TYPE_MAP.containsKey(code)) {
