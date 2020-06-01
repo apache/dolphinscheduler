@@ -154,8 +154,9 @@
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
         
         let userNameLength = this.userName.length
+        console.log(userNameLength)
         // user name
-        if (userNameLength<3 && userNameLength>39) {
+        if (userNameLength<3 || userNameLength>39) {
           this.$message.warning(`${i18n.$t('User name length is between 3 and 39')}`)
           return false
         }
