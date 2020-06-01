@@ -36,10 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -50,8 +50,6 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
@@ -59,8 +57,6 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -72,7 +68,6 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
 import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.alibaba.fastjson.JSONObject;
 
 
 /**
@@ -180,7 +175,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * build datax configuration file
-     * 
+     *
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
@@ -217,13 +212,13 @@ public class DataxTask extends AbstractTask {
 
         }else {
 
-            JSONObject job = new JSONObject();
-            job.put("content", buildDataxJobContentJson());
-            job.put("setting", buildDataxJobSettingJson());
+            ObjectNode job = JSONUtils.createObjectNode();
+            job.put("content", JSONUtils.toJsonNode(buildDataxJobContentJson()));
+            job.put("setting", JSONUtils.toJsonNode(buildDataxJobSettingJson()));
 
-            JSONObject root = new JSONObject();
-            root.put("job", job);
-            root.put("core", buildDataxCoreJson());
+            ObjectNode root = JSONUtils.createObjectNode();
+            root.set("job", job);
+            root.set("core", JSONUtils.toJsonNode(buildDataxCoreJson()));
             json = root.toString();
         }
 
@@ -236,11 +231,11 @@ public class DataxTask extends AbstractTask {
 
     /**
      * build datax job config
-     * 
+     *
      * @return collection of datax job config JSONObject
      * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson() throws SQLException {
+    private List<ObjectNode> buildDataxJobContentJson() throws SQLException {
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
 
@@ -250,50 +245,50 @@ public class DataxTask extends AbstractTask {
         BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataxTaskExecutionContext.getTargetConnectionParams());
 
-        List<JSONObject> readerConnArr = new ArrayList<>();
-        JSONObject readerConn = new JSONObject();
-        readerConn.put("querySql", new String[] {dataXParameters.getSql()});
-        readerConn.put("jdbcUrl", new String[] {dataSourceCfg.getJdbcUrl()});
+        List<ObjectNode> readerConnArr = new ArrayList<>();
+        ObjectNode readerConn = JSONUtils.createObjectNode();
+        readerConn.set("querySql", JSONUtils.toJsonNode(new String[] {dataXParameters.getSql()}));
+        readerConn.set("jdbcUrl", JSONUtils.toJsonNode(new String[] {dataSourceCfg.getJdbcUrl()}));
         readerConnArr.add(readerConn);
 
-        JSONObject readerParam = new JSONObject();
+        ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
         readerParam.put("password", dataSourceCfg.getPassword());
-        readerParam.put("connection", readerConnArr);
+        readerParam.set("connection", JSONUtils.toJsonNode(readerConnArr));
 
-        JSONObject reader = new JSONObject();
+        ObjectNode reader = JSONUtils.createObjectNode();
         reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
-        reader.put("parameter", readerParam);
+        reader.set("parameter", readerParam);
 
-        List<JSONObject> writerConnArr = new ArrayList<>();
-        JSONObject writerConn = new JSONObject();
-        writerConn.put("table", new String[] {dataXParameters.getTargetTable()});
+        List<ObjectNode> writerConnArr = new ArrayList<>();
+        ObjectNode writerConn = JSONUtils.createObjectNode();
+        writerConn.set("table", JSONUtils.toJsonNode(new String[] {dataXParameters.getTargetTable()}));
         writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
         writerConnArr.add(writerConn);
 
-        JSONObject writerParam = new JSONObject();
+        ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
-        writerParam.put("column",
-            parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+        writerParam.set("column",
+                JSONUtils.toJsonNode(parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
                     DbType.of(dataxTaskExecutionContext.getTargetType()),
-                    dataSourceCfg, dataXParameters.getSql()));
-        writerParam.put("connection", writerConnArr);
+                    dataSourceCfg, dataXParameters.getSql())));
+        writerParam.set("connection", JSONUtils.toJsonNode(writerConnArr));
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
-            writerParam.put("preSql", dataXParameters.getPreStatements());
+            writerParam.set("preSql", JSONUtils.toJsonNode(dataXParameters.getPreStatements()));
         }
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
-            writerParam.put("postSql", dataXParameters.getPostStatements());
+            writerParam.set("postSql", JSONUtils.toJsonNode(dataXParameters.getPostStatements()));
         }
 
-        JSONObject writer = new JSONObject();
+        ObjectNode writer = JSONUtils.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
         writer.put("parameter", writerParam);
 
-        List<JSONObject> contentList = new ArrayList<>();
-        JSONObject content = new JSONObject();
+        List<ObjectNode> contentList = new ArrayList<>();
+        ObjectNode content = JSONUtils.createObjectNode();
         content.put("reader", reader);
         content.put("writer", writer);
         contentList.add(content);
@@ -303,11 +298,11 @@ public class DataxTask extends AbstractTask {
 
     /**
      * build datax setting config
-     * 
+     *
      * @return datax setting config JSONObject
      */
-    private JSONObject buildDataxJobSettingJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxJobSettingJson() {
+        ObjectNode speed = JSONUtils.createObjectNode();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -318,19 +313,19 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject errorLimit = new JSONObject();
+        ObjectNode errorLimit = JSONUtils.createObjectNode();
         errorLimit.put("record", 0);
         errorLimit.put("percentage", 0);
 
-        JSONObject setting = new JSONObject();
+        ObjectNode setting = JSONUtils.createObjectNode();
         setting.put("speed", speed);
         setting.put("errorLimit", errorLimit);
 
         return setting;
     }
 
-    private JSONObject buildDataxCoreJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxCoreJson() {
+        ObjectNode speed = JSONUtils.createObjectNode();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -341,21 +336,21 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject channel = new JSONObject();
-        channel.put("speed", speed);
+        ObjectNode channel = JSONUtils.createObjectNode();
+        channel.set("speed", speed);
 
-        JSONObject transport = new JSONObject();
-        transport.put("channel", channel);
+        ObjectNode transport = JSONUtils.createObjectNode();
+        transport.set("channel", channel);
 
-        JSONObject core = new JSONObject();
-        core.put("transport", transport);
+        ObjectNode core = JSONUtils.createObjectNode();
+        core.set("transport", transport);
 
         return core;
     }
 
     /**
      * create command
-     * 
+     *
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
@@ -411,7 +406,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * parsing synchronized column names in SQL statements
-     * 
+     *
      * @param dsType
      *            the database type of the data source
      * @param dtType
@@ -437,7 +432,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * try grammatical parsing column
-     * 
+     *
      * @param dbType
      *            database type
      * @param sql
@@ -508,7 +503,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * try to execute sql to resolve column names
-     * 
+     *
      * @param baseDataSource
      *            the database connection parameters
      * @param sql

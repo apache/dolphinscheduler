@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -129,7 +129,7 @@ public class DingTalkUtils {
         textContent.put("content", txt);
         items.put("text", textContent);
 
-        return JSON.toJSONString(items);
+        return JSONUtils.toJson(items);
 
     }
 

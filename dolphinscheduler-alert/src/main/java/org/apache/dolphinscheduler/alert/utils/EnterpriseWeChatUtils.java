@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import com.alibaba.fastjson.JSON;
 
-import com.google.common.reflect.TypeToken;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -99,9 +99,8 @@ public class EnterpriseWeChatUtils {
                 response.close();
             }
 
-            Map<String, Object> map = JSON.parseObject(resp,
-                    new TypeToken<Map<String, Object>>() {
-                    }.getType());
+            Map<String, Object> map = JSONUtils.parseObject(resp,
+                    new TypeReference<Map<String, Object>>(){});
             return map.get("access_token").toString();
         } finally {
             httpClient.close();
