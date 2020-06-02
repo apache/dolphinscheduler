@@ -50,6 +50,7 @@ public class ResourceTreeVisitor implements Visitor{
      * visit
      * @return resoruce component
      */
+    @Override
     public ResourceComponent visit() {
         ResourceComponent rootDirectory = new Directory();
         for (Resource resource : resourceList) {
@@ -117,6 +118,7 @@ public class ResourceTreeVisitor implements Visitor{
         }else{
             tempResourceComponent = new FileLeaf();
         }
+        
         tempResourceComponent.setName(resource.getAlias());
         tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
         tempResourceComponent.setId(resource.getId());

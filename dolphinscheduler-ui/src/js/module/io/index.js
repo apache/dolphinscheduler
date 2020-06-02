@@ -18,7 +18,6 @@
 import io from '@/module/axios/index'
 import cookies from 'js-cookie'
 
-
 const apiPrefix = '/dolphinscheduler'
 const reSlashPrefix = /^\/+/
 
@@ -73,13 +72,13 @@ io.interceptors.response.use(
 // Global request interceptor registion
 io.interceptors.request.use(
   config => {
-    let sIdCookie = cookies.get('sessionId')
-    let sessionId = sessionStorage.getItem("sessionId")
-    let  requstUrl = config.url.substring(config.url.lastIndexOf("/")+1)
-    if(sIdCookie !== null && requstUrl!=='login' && sIdCookie!=sessionId) {
+    const sIdCookie = cookies.get('sessionId')
+    const sessionId = sessionStorage.getItem('sessionId')
+    const requstUrl = config.url.substring(config.url.lastIndexOf('/') + 1)
+    if (sIdCookie !== null && requstUrl !== 'login' && sIdCookie !== sessionId) {
       window.location.href = `${PUBLIC_PATH}/view/login/index.html`
     } else {
-      let { method } = config
+      const { method } = config
       if (method === 'get') {
         config.params = Object.assign({}, config.params, {
           _t: Math.random()

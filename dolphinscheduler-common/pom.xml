@@ -33,11 +33,14 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.dolphinscheduler</groupId>
+			<artifactId>dolphinscheduler-plugin-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -590,6 +593,20 @@
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>${codehaus.janino.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.rholder</groupId>
+			<artifactId>guava-retrying</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.code.findbugs</groupId>
+					<artifactId>jsr305</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 </project>

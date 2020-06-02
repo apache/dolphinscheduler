@@ -20,7 +20,7 @@ import i18n from '@/module/i18n'
 /**
  * State code table
  */
-let stateType = [
+const stateType = [
   {
     code: '',
     label: `${i18n.$t('none')}`

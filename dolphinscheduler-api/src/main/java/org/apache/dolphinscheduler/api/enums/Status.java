@@ -175,6 +175,7 @@ public enum Status {
     QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
+    USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -214,8 +215,8 @@ public enum Status {
     EXECUTE_PROCESS_INSTANCE_ERROR(50015,"execute process instance error", "操作工作流实例错误"),
     CHECK_PROCESS_DEFINITION_ERROR(50016,"check process definition error", "检查工作流实例错误"),
     QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR(50017,"query recipients and copyers by process definition error", "查询收件人和抄送人错误"),
-    DATA_IS_NOT_VALID(50017,"data %s not valid", "数据[%s]无效"),
-    DATA_IS_NULL(50018,"data %s is null", "数据[%s]不能为空"),
+    DATA_IS_NOT_VALID(50017,"data {0} not valid", "数据[{0}]无效"),
+    DATA_IS_NULL(50018,"data {0} is null", "数据[{0}]不能为空"),
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle", "流程节点间存在循环依赖"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid", "流程节点[%s]参数无效"),
     PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line", "工作流定义[{0}]已上线"),
@@ -226,6 +227,7 @@ public enum Status {
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error", "批量删除工作流定义[{0}]错误"),
     TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available.", "没有合适的租户，请选择可用的租户"),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error", "导出工作流定义错误"),
+    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028,"batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error", "导入工作流定义错误"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup", "hdfs未启用"),
