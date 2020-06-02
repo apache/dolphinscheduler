@@ -17,8 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.http;
 
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.Charsets;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -48,7 +47,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -152,7 +150,7 @@ public class HttpTask extends AbstractTask {
                 String jsonObject = JSONUtils.toJsonString(httpProperty);
                 String params = ParameterUtils.convertParameterPlaceholders(jsonObject,ParamUtils.convert(paramsMap));
                 logger.info("http request params：{}",params);
-                httpPropertyList.add(JSON.parseObject(params,HttpProperty.class));
+                httpPropertyList.add(JSONUtils.parseObject(params,HttpProperty.class));
             }
         }
         addRequestParams(builder,httpPropertyList);
@@ -252,7 +250,7 @@ public class HttpTask extends AbstractTask {
      */
     protected void addRequestParams(RequestBuilder builder,List<HttpProperty> httpPropertyList) {
         if(CollectionUtils.isNotEmpty(httpPropertyList)){
-            JSONObject jsonParam = new JSONObject();
+            ObjectNode jsonParam = JSONUtils.createObjectNode();
             for (HttpProperty property: httpPropertyList){
                 if(property.getHttpParametersType() != null){
                     if (property.getHttpParametersType().equals(HttpParametersType.PARAMETER)){

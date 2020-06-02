@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -29,8 +26,8 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
 import org.slf4j.Logger;
@@ -411,7 +408,7 @@ public class HadoopUtils implements Closeable {
      * @return the return may be null or there may be other parse exceptions
      * @throws JSONException json exception
      */
-    public ExecutionStatus getApplicationStatus(String applicationId) throws JSONException {
+    public ExecutionStatus getApplicationStatus(String applicationId)  {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
@@ -670,10 +667,10 @@ public class HadoopUtils implements Closeable {
                 return null;
             }
             //to json
-            JSONObject jsonObject = JSON.parseObject(retStr);
+            ObjectNode jsonObject = JSONUtils.parseObject(retStr);
 
             //get ResourceManager state
-            return jsonObject.getJSONObject("clusterInfo").getString("haState");
+            return jsonObject.get("clusterInfo").path("haState").asText();
         }
 
     }

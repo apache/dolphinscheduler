@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
+import org.apache.dolphinscheduler.common.utils.*;
 
 import java.sql.*;
 import java.util.*;
@@ -254,30 +255,30 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private void resultProcess(ResultSet resultSet) throws Exception{
-        JSONArray resultJSONArray = new JSONArray();
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
 
         int rowCount = 0;
 
         while (rowCount < LIMIT && resultSet.next()) {
-            JSONObject mapOfColValues = new JSONObject(true);
+            ObjectNode mapOfColValues = JSONUtils.createObjectNode();
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                mapOfColValues.set(md.getColumnName(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
             }
             resultJSONArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+        logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
 
         // if there is a result set
-        if (!resultJSONArray.isEmpty() ) {
+        if (!resultJSONArray.isEmpty(null) ) {
             if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                 sendAttachment(sqlParameters.getTitle(),
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+                        JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
             }else{
                 sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+                        JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
             }
         }
     }

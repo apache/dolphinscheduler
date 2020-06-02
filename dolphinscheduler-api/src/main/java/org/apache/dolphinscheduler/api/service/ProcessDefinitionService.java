@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -1340,9 +1339,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                          */
                         if (taskInstance.getTaskType().equals(TaskType.SUB_PROCESS.name())) {
                             String taskJson = taskInstance.getTaskJson();
-                            taskNode = JSON.parseObject(taskJson, TaskNode.class);
-                            subProcessId = Integer.parseInt(JSON.parseObject(
-                                    taskNode.getParams()).getString(CMDPARAM_SUB_PROCESS_DEFINE_ID));
+                            taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+                            subProcessId = Integer.parseInt(JSONUtils.parseObject(
+                                    taskNode.getParams()).path(CMDPARAM_SUB_PROCESS_DEFINE_ID).asText());
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
                                 , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
