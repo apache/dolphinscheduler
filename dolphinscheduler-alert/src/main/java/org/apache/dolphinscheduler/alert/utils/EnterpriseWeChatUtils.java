@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import com.alibaba.fastjson.JSON;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import com.google.common.reflect.TypeToken;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
@@ -99,9 +99,7 @@ public class EnterpriseWeChatUtils {
                 response.close();
             }
 
-            Map<String, Object> map = JSON.parseObject(resp,
-                    new TypeToken<Map<String, Object>>() {
-                    }.getType());
+            Map<String, Object> map = JSONUtils.parseObject(resp, Map.class);
             return map.get("access_token").toString();
         } finally {
             httpClient.close();

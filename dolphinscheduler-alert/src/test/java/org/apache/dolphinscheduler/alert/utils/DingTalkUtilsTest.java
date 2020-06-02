@@ -118,7 +118,7 @@ public class DingTalkUtilsTest {
 
         logger.info("test support utf8, actual:" + msg);
         logger.info("test support utf8, actual:" + DingTalkUtils.isEnableDingTalk);
-        String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
+        String expect = "{\"msgtype\":\"text\",\"text\":{\"content\":\"this is test:中文\"}}";
         Assert.assertEquals(expect, msg);
     }
 

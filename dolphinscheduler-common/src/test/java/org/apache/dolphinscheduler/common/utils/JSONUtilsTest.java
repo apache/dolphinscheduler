@@ -87,7 +87,7 @@ public class JSONUtilsTest {
 
         List<LinkedHashMap<String, String>> maps = new ArrayList<>();
         maps.add(0,map1);
-        String resultJson = JSONUtils.toJson(maps);
+        String resultJson = JSONUtils.toJsonString(maps);
         return resultJson;
     }
 
@@ -96,14 +96,14 @@ public class JSONUtilsTest {
         Map<String, String> map = new HashMap<>();
         map.put("foo","bar");
 
-        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJson(map));
+        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJsonString(map));
         Assert.assertEquals(
-                String.valueOf((Object) null), JSONUtils.toJson(null));
+                String.valueOf((Object) null), JSONUtils.toJsonString(null));
     }
 
     @Test
     public void testParseObject() {
-        Assert.assertNull(JSONUtils.parseObject("", null));
+        Assert.assertNull(JSONUtils.parseObject(""));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
     }
 

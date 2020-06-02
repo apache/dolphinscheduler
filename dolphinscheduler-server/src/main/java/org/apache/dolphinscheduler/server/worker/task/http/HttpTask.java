@@ -28,10 +28,7 @@ import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -102,7 +99,7 @@ public class HttpTask extends AbstractTask {
     @Override
     public void init() {
         logger.info("http task params {}", taskExecutionContext.getTaskParams());
-        this.httpParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
+        this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
 
         if (!httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
@@ -152,7 +149,7 @@ public class HttpTask extends AbstractTask {
         List<HttpProperty> httpPropertyList = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(httpParameters.getHttpParams() )){
             for (HttpProperty httpProperty: httpParameters.getHttpParams()) {
-                String jsonObject = JSON.toJSONString(httpProperty);
+                String jsonObject = JSONUtils.toJsonString(httpProperty);
                 String params = ParameterUtils.convertParameterPlaceholders(jsonObject,ParamUtils.convert(paramsMap));
                 logger.info("http request params：{}",params);
                 httpPropertyList.add(JSON.parseObject(params,HttpProperty.class));
