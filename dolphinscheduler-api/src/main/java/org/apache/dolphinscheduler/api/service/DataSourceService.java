@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -161,8 +162,18 @@ public class DataSourceService extends BaseService{
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
+        //check password，if the password is not updated, set to the old password.
+        JSONObject paramObject = JSON.parseObject(parameter);
+        String password = paramObject.getString(Constants.PASSWORD);
+        if (StringUtils.isBlank(password)) {
+            String oldConnectionParams = dataSource.getConnectionParams();
+            JSONObject oldParams = JSON.parseObject(oldConnectionParams);
+            paramObject.put(Constants.PASSWORD, oldParams.getString(Constants.PASSWORD));
+        }
+        // connectionParams json
+        String connectionParams = paramObject.toJSONString();
 
-        Boolean isConnection = checkConnection(type, parameter);
+        Boolean isConnection = checkConnection(type, connectionParams);
         if (!isConnection) {
             logger.info("connect failed, type:{}, parameter:{}", type, parameter);
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
@@ -174,7 +185,7 @@ public class DataSourceService extends BaseService{
         dataSource.setNote(desc);
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(type);
-        dataSource.setConnectionParams(parameter);
+        dataSource.setConnectionParams(connectionParams);
         dataSource.setUpdateTime(now);
         dataSourceMapper.updateById(dataSource);
         putMsg(result, Status.SUCCESS);
@@ -259,7 +270,6 @@ public class DataSourceService extends BaseService{
         map.put(PRINCIPAL, datasourceForm.getPrincipal());
         map.put(DATABASE, database);
         map.put(USER_NAME, datasourceForm.getUser());
-        map.put(PASSWORD, datasourceForm.getPassword());
         map.put(OTHER, otherMap);
         result.put(Constants.DATA_LIST, map);
         putMsg(result, Status.SUCCESS);
