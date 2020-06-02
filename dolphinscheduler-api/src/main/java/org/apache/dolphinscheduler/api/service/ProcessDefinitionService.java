@@ -636,7 +636,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         try {
             out = response.getOutputStream();
             buff = new BufferedOutputStream(out);
-            buff.write(JSON.toJSONString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
+            buff.write(JSONUtils.toJsonString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
             buff.flush();
             buff.close();
         } catch (IOException e) {
@@ -756,7 +756,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
-        List<ProcessMeta> processMetaList = JSON.parseArray(processMetaJson, ProcessMeta.class);
+        List<ProcessMeta> processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
 
         //check file content
         if (CollectionUtils.isEmpty(processMetaList)) {

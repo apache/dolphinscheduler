@@ -191,7 +191,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             return true;
         }catch (Exception e){
             logger.error("submit task  Exception: ", e);
-            logger.error("task error : %s", JSONUtils.toJson(taskInstance));
+            logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
             return false;
         }
     }

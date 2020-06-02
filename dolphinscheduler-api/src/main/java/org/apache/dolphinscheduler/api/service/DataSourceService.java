@@ -317,7 +317,7 @@ public class DataSourceService extends BaseService{
             String connectionParams  = dataSource.getConnectionParams();
             JSONObject  object = JSON.parseObject(connectionParams);
             object.put(Constants.PASSWORD, Constants.XXXXXX);
-            dataSource.setConnectionParams(JSONUtils.toJson(object));
+            dataSource.setConnectionParams(JSONUtils.toJsonString(object));
 
         }
     }
@@ -542,9 +542,9 @@ public class DataSourceService extends BaseService{
         }
 
         if(logger.isDebugEnabled()){
-            logger.info("parameters map-----" + JSON.toJSONString(parameterMap));
+            logger.info("parameters map-----" + JSONUtils.toJsonString(parameterMap));
         }
-        return JSON.toJSONString(parameterMap);
+        return JSONUtils.toJsonString(parameterMap);
 
 
     }

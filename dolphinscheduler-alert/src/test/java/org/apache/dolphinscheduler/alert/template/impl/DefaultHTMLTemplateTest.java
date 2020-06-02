@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
-import org.apache.dolphinscheduler.alert.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.junit.Test;
 import org.slf4j.Logger;

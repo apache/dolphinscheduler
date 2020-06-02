@@ -50,22 +50,36 @@ public class JSONUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).setTimeZone(TimeZone.getDefault());
     }
 
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
+    }
+
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+
+    public static JsonNode toJsonNode(Object obj) {
+        return objectMapper.valueToTree(obj);
+    }
+
     /**
      * json representation of object
      *
      * @param object object
+     * @param feature feature
      * @return object to json string
      */
-    public static String toJson(Object object) {
+    public static String toJsonString(Object object, SerializationFeature feature) {
         try {
-            return objectMapper.writeValueAsString(object);
+            ObjectWriter writer = objectMapper.writer(feature);
+            return writer.writeValueAsString(object);
         } catch (Exception e) {
             logger.error("object to json exception!", e);
         }
 
         return null;
     }
-
 
     /**
      * This method deserializes the specified Json into an object of the specified class. It is not
@@ -94,6 +108,19 @@ public class JSONUtils {
         return null;
     }
 
+
+    public static <T> T parseObject(String json, TypeReference typeReference) {
+        if (StringUtils.isEmpty(json)) {
+            return null;
+        }
+
+        try {
+            return objectMapper.readValue(json, typeReference);
+        } catch (Exception e) {
+            logger.error("parse object exception!", e);
+        }
+        return null;
+    }
 
     /**
      * json to list

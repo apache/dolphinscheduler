@@ -334,7 +334,7 @@ public class QuartzExecutors {
     Map<String, Object> dataMap = new HashMap<>(3);
     dataMap.put(PROJECT_ID, projectId);
     dataMap.put(SCHEDULE_ID, scheduleId);
-    dataMap.put(SCHEDULE, JSONUtils.toJson(schedule));
+    dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
 
     return dataMap;
   }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -421,15 +422,15 @@ public class HadoopUtils implements Closeable {
 
         String responseContent = HttpUtils.get(applicationUrl);
         if (responseContent != null) {
-            JSONObject jsonObject = JSON.parseObject(responseContent);
-            result = jsonObject.getJSONObject("app").getString("finalStatus");
+            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            result = jsonObject.path("app").path("finalStatus").asText();
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = HttpUtils.get(jobHistoryUrl);
-            JSONObject jsonObject = JSONObject.parseObject(responseContent);
-            result = jsonObject.getJSONObject("job").getString("state");
+            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            result = jsonObject.path("job").path("state").asText();
         }
 
         switch (result) {

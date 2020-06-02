@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -271,7 +272,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        this.globalParamList = JSON.parseArray(globalParams, Property.class);
+        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         this.globalParams = globalParams;
     }
 
@@ -280,7 +281,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParamList(List<Property> globalParamList) {
-        this.globalParams = JSON.toJSONString(globalParamList);
+        this.globalParams = JSONUtils.toJsonString(globalParamList);
         this.globalParamList = globalParamList;
     }
 
@@ -288,7 +289,7 @@ public class ProcessDefinition {
         List<Property> propList;
 
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            propList = JSON.parseArray(globalParams, Property.class);
+            propList = JSONUtils.toList(globalParams, Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 

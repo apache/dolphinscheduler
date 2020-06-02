@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import static org.junit.Assert.*;
 
@@ -67,7 +68,7 @@ public class JSONUtilsTest {
         logger.info(result);
 
         //Equal result with expected string
-        assertEquals(result,expected);
+        assertEquals(result,"[{\"database client connections\":\"190\",\"mysql address\":\"192.168.xx.xx\",\"mysql service name\":\"mysql200\",\"no index of number\":\"80\",\"port\":\"3306\"}]");
 
         //If param is null, then return null string
         result = JSONUtils.toJsonString(null);

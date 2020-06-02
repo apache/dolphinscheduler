@@ -95,7 +95,7 @@ public class ParamsTest {
 
         Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap,
                 localParams, CommandType.START_PROCESS, new Date());
-        logger.info(JSON.toJSONString(paramsMap));
+        logger.info(JSONUtils.toJsonString(paramsMap));
 
 
     }

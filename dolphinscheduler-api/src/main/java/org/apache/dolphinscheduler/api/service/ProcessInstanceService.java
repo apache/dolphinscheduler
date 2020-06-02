@@ -242,7 +242,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 if(logResult.getCode() == Status.SUCCESS.ordinal()){
                     String log = (String) logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
-                    taskInstance.setDependentResult(JSONUtils.toJson(resultMap));
+                    taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
                 }
             }
         }
@@ -380,7 +380,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 return result;
             }
 
-            originDefParams = JSONUtils.toJson(processData.getGlobalParams());
+            originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
             Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
@@ -529,16 +529,16 @@ public class ProcessInstanceService extends BaseDAGService {
         List<Property> globalParams = new ArrayList<>();
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSON.parseArray(userDefinedParams, Property.class);
+            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
 
 
         List<TaskNode> taskNodeList = workflowData.getTasks();
 
         // global param string
-        String globalParamStr = JSONUtils.toJson(globalParams);
+        String globalParamStr = JSONUtils.toJsonString(globalParams);
         globalParamStr = ParameterUtils.convertParameterPlaceholders(globalParamStr, timeParams);
-        globalParams = JSON.parseArray(globalParamStr, Property.class);
+        globalParams = JSONUtils.toList(globalParamStr, Property.class);
         for (Property property : globalParams) {
             timeParams.put(property.getProp(), property.getValue());
         }
@@ -551,7 +551,7 @@ public class ProcessInstanceService extends BaseDAGService {
             String localParams = map.get(LOCAL_PARAMS);
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = JSON.parseArray(localParams, Property.class);
+                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());
                 localParamsMap.put("localParamsList",localParamsList);

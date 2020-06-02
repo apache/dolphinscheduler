@@ -145,7 +145,7 @@ public class AlertManager {
                 failedTaskMap.put("log path", task.getLogPath());
                 failedTaskList.add(failedTaskMap);
             }
-            res = JSONUtils.toJson(failedTaskList);
+            res = JSONUtils.toJsonString(failedTaskList);
         }
 
         return res;
@@ -170,7 +170,7 @@ public class AlertManager {
             toleranceWorkerContentMap.put("task retry times", String.valueOf(taskInstance.getRetryTimes()));
             toleranceTaskInstanceList.add(toleranceWorkerContentMap);
         }
-        return JSONUtils.toJson(toleranceTaskInstanceList);
+        return JSONUtils.toJsonString(toleranceTaskInstanceList);
     }
 
     /**

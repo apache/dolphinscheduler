@@ -80,7 +80,7 @@ public class TaskExecuteThread implements Runnable {
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
