@@ -297,4 +297,13 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstanceIPage.getTotal(), 0);
 
     }
+
+    /**
+     * test find aLl task list by process instanceId
+     */
+    @Test
+    public void testFindALlTaskListByProcessInstanceId() {
+        List<TaskInstance> taskInstanceList = taskInstanceMapper.findALlTaskListByProcessInstanceId(0);
+        Assert.assertEquals(0, taskInstanceList == null ? 0 : taskInstanceList.size());
+    }
 }

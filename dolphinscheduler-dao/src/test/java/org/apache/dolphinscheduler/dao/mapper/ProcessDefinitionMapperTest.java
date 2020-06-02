@@ -226,4 +226,10 @@ public class ProcessDefinitionMapperTest {
         List<Map<String, Object>> maps = processDefinitionMapper.listResources();
         Assert.assertNotNull(maps);
     }
+
+    @Test
+    public void testFindALlTaskListByProcessInstanceId(){
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionByTargetNodeKeys(new String[]{"127.0.0.1:db1:t1"});
+        Assert.assertEquals(0, processDefinitionList == null ? 0 : processDefinitionList.size());
+    }
 }
