@@ -584,7 +584,6 @@
 
       //fillback use cacheTasks
       let cacheTasks = this.store.state.dag.cacheTasks
-      console.log("formModel-created", this.store.state)
       let o = {}
       if (cacheTasks[this.id]) {
         o = cacheTasks[this.id]

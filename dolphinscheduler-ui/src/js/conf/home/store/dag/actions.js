@@ -122,7 +122,6 @@ export default {
         state.timeout = processDefinitionJson.timeout
 
         state.tenantId = processDefinitionJson.tenantId
-        console.log("getProcessDetails", state)
         resolve(res.data)
       }).catch(res => {
         reject(res)
