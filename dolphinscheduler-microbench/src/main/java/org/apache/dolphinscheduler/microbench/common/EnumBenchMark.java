@@ -82,6 +82,7 @@ public class EnumBenchMark extends AbstractBaseBenchmark {
             this.code = code;
             this.name = name;
         }
+
         private static final Map<Integer, TestTypeEnum> TEST_TYPE_MAP = new HashMap<>();
 
         static {
