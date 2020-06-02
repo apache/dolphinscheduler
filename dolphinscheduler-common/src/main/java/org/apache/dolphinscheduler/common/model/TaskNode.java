@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.model;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -164,6 +165,7 @@ public class TaskNode {
     this.type = type;
   }
 
+  @JsonRawValue
   public String getParams() {
     return params;
   }

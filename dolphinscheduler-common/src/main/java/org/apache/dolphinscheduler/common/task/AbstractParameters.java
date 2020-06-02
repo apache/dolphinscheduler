@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -96,6 +97,7 @@ public abstract class AbstractParameters implements IParameters {
    * get local parameters map
    * @return parameters map
    */
+  @JsonIgnore
   public Map<String,Property> getLocalParametersMap() {
       if (localParams != null) {
         Map<String,Property> localParametersMaps = new LinkedHashMap<>();
