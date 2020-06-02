@@ -202,19 +202,19 @@ public class ProcessDefinitionService extends BaseDAGService {
                     logger.info("task node [{}] set depend params", taskNode.getName());
                     SqlParameters sqlParameters = (SqlParameters) TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
                     initSqlNodeDependParams(sqlParameters);
-                    taskNode.setParams(JSONUtils.writeValueAsString(sqlParameters));
+                    taskNode.setParams(JSONUtils.toJsonString(sqlParameters));
                 } else if (taskNode.getType().equals(TaskType.DATAX.toString())) {
                     logger.info("task node [{}] set depend params", taskNode.getName());
                     DataxParameters etlParameters = (DataxParameters) TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
                     initEtlNodeDependParams(etlParameters);
-                    taskNode.setParams(JSONUtils.writeValueAsString(etlParameters));
+                    taskNode.setParams(JSONUtils.toJsonString(etlParameters));
                 }
             }
         } catch (Exception e) {
             throw new SQLException(String.format("node [%s] refresh depend parameter fail : %s", taskNodeName, e.getMessage()));
         }
 
-        return JSONUtils.writeValueAsString(processData);
+        return JSONUtils.toJsonString(processData);
     }
 
     private SqlParameters initSqlNodeDependParams(SqlParameters parameters) throws SQLException {
@@ -1707,7 +1707,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     if (existedTaskNodeMap.containsKey(processDefinition.getId() + realNode.getName())) {
                         TaskNode dependNode = existedTaskNodeMap.get(processDefinition.getId() + realNode.getName());
                         processDag.getEdges().add(new TaskNodeRelation(dependNode.getName(), postNode.getName()));
-                        postNode.setPreTasks(JSONUtils.writeValueAsString(new String[]{dependNode.getName()}));
+                        postNode.setPreTasks(JSONUtils.toJsonString(new String[]{dependNode.getName()}));
                         continue;
                     }
 
@@ -1717,7 +1717,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     // add node relation
                     processDag.getNodes().add(dependNode);
                     processDag.getEdges().add(new TaskNodeRelation(dependNode.getName(), postNode.getName()));
-                    postNode.setPreTasks(JSONUtils.writeValueAsString(new String[]{dependNode.getName()}));
+                    postNode.setPreTasks(JSONUtils.toJsonString(new String[]{dependNode.getName()}));
 
                     existedTaskNodeMap.put(processDefinition.getId() + realNode.getName(), dependNode);
 

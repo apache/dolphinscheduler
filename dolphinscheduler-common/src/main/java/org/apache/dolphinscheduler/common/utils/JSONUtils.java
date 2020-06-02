@@ -239,19 +239,6 @@ public class JSONUtils {
     }
 
     /**
-     * object to json string
-     * @param object object
-     * @return json string
-     */
-    public static String writeValueAsString(Object object) {
-        try{
-            return objectMapper.writeValueAsString(object);
-        } catch (Exception e) {
-            throw new RuntimeException("Json deserialization exception.", e);
-        }
-    }
-
-    /**
      * json serializer
      */
     public static class JsonDataSerializer extends JsonSerializer<String> {

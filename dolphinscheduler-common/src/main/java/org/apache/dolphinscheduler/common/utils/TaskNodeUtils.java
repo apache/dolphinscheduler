@@ -86,7 +86,7 @@ public class TaskNodeUtils {
         dependTaskList.add(dependentTaskModel);
         dependentParameters.setDependTaskList(dependTaskList);
         dependentParameters.setRelation(DependentRelation.AND);
-        taskNode.setDependence(JSONUtils.writeValueAsString(dependentParameters));
+        taskNode.setDependence(JSONUtils.toJsonString(dependentParameters));
     }
 
     public static void addNodeDepList(TaskNode taskNode, TaskNode dependNode) {
