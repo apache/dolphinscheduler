@@ -598,11 +598,10 @@ public class ProcessInstanceService extends BaseDAGService {
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
-        for (String node : nodeList) {
-            TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstanceId, node);
-            if (taskInstance == null) {
-                continue;
-            }
+
+        // query node task and virtual task
+        List<TaskInstance> taskInstanceList = taskInstanceMapper.findALlTaskListByProcessInstanceId(processInstanceId);
+        for (TaskInstance taskInstance : taskInstanceList) {
             Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
             Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
             Task task = new Task();
