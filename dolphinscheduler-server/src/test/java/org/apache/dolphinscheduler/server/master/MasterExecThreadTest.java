@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import com.alibaba.fastjson.JSON;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;

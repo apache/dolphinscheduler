@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 
 import java.util.*;
 
@@ -116,9 +116,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             }
 
             StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
+            for (Object obj : list){
                 contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
+                contents.append(Constants.TD).append(obj).append(Constants.TD_END);
                 contents.append(Constants.TR_END);
             }
 
