@@ -339,7 +339,9 @@ public class UsersService extends BaseService {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
                             for (ResourceComponent resource : resourceComponent.getChildren()) {
-                                HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getName(), newResourcePath, false, true);
+                                 if(StringUtils.isNotBlank(resource.getName()) && !resource.isDirctory()){
+                                    HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getName(), newResourcePath, false, true);
+                                }
                             }
                         }
 
@@ -350,7 +352,9 @@ public class UsersService extends BaseService {
                             ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
                             ResourceComponent resourceComponent = resourceTreeVisitor.visit();
                             for (ResourceComponent resource : resourceComponent.getChildren()) {
-                                HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getName(), newUdfsPath, false, true);
+                                if(StringUtils.isNotBlank(resource.getName()) && !resource.isDirctory()){
+                                    HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getName(), newUdfsPath, false, true);
+                                }
                             }
                         }
 
