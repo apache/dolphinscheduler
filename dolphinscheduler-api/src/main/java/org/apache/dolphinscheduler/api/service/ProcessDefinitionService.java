@@ -233,22 +233,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), insertTableList));
         }
 
-        String targetTable = DependUnionKeyUtils.clearIllegalChars(parameters.getTargetTable());
-        if (StringUtils.isNotEmpty(targetTable)) {
-            String[] targetTables = targetTable.split(COMMA);
-
-            DataSource dataTarget = dataSourceMapper.selectById(parameters.getDataTarget());
-            BaseDataSource dataTargetForm = DataSourceFactory.getDatasource(dataTarget.getType(), dataTarget.getConnectionParams());
-            String[] targetHostsPorts = JdbcUtils.getHostsAndPort(dataTargetForm.getAddress());
-            String targetTableKey = DependUnionKeyUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), targetTables);
-
-            if(StringUtils.isEmpty(parameters.getTargetNodeKeys())) {
-                parameters.setTargetNodeKeys(targetTableKey);
-            } else {
-                parameters.setTargetNodeKeys(parameters.getTargetNodeKeys() + COMMA + targetTableKey);
-            }
-        }
-
         return parameters;
     }
 
