@@ -56,7 +56,7 @@ public class TaskParametersUtils {
                 case SUB_PROCESS:
                     return JSONUtils.parseObject(parameter, SubProcessParameters.class);
                 case SHELL:
-                    Boolean remote = JSONUtils.parseObject(parameter).getBoolean("remote");
+                    Boolean remote = JSONUtils.parseObject(parameter).get("remote").asBoolean();
                     if (remote != null && remote) {
                         return JSONUtils.parseObject(parameter, SSHParameters.class);
                     } else {
