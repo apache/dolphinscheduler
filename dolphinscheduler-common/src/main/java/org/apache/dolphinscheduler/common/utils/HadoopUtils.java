@@ -406,7 +406,6 @@ public class HadoopUtils implements Closeable {
      *
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
-     * @throws JSONException json exception
      */
     public ExecutionStatus getApplicationStatus(String applicationId)  {
         if (StringUtils.isEmpty(applicationId)) {
@@ -467,6 +466,7 @@ public class HadoopUtils implements Closeable {
      * hdfs resource dir
      *
      * @param tenantCode tenant code
+     * @param resourceType resource type
      * @return hdfs resource dir
      */
     public static String getHdfsDir(ResourceType resourceType, String tenantCode) {
