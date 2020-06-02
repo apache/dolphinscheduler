@@ -196,7 +196,7 @@ public class ParameterUtils {
         property.setValue(val);
       }
     }
-    return JSONUtils.toJson(globalParamList);
+    return JSONUtils.toJsonString(globalParamList);
   }
 
 
