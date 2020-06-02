@@ -215,9 +215,10 @@ public class ParameterUtils {
   /**
    * new
    * $[yyyyMMdd] replace scheduler time
-   * @param text
-   * @param paramsMap
-   * @return
+   * @param text text
+   * @param scheduleTime scheduleTime
+   * @param paramsMap paramsMap
+   * @return text
    */
   public static String replaceScheduleTime(String text, Date scheduleTime, Map<String, Property> paramsMap) {
     if (paramsMap != null) {
