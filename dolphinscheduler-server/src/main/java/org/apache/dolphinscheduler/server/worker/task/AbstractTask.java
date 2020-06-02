@@ -207,7 +207,7 @@ public abstract class AbstractTask {
         TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
         switch (taskType){
             case SHELL:
-                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).getBoolean("remote");
+                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
                 if (remote != null && remote) {
                     paramsClass = ShellParameters.class;
                 } else {

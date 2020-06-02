@@ -51,7 +51,7 @@ public class TaskManager {
         throws IllegalArgumentException {
         switch (EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType())) {
             case SHELL:
-                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).getBoolean("remote");
+                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
                 if (remote != null && remote) {
                     return new SSHTask(taskExecutionContext, logger);
                 } else {
