@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;

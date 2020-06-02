@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
