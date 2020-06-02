@@ -16,12 +16,18 @@
  */
 package org.apache.dolphinscheduler.remote.utils;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
 
 /**
- *  json serialize or deserialize
+ * json serialize or deserialize
  */
-public class FastJsonSerializer {
+public class JacksonSerializer {
+	private static final Logger logger = LoggerFactory.getLogger(JacksonSerializer.class);
 
 	/**
 	 * serialize to byte
@@ -30,31 +36,51 @@ public class FastJsonSerializer {
 	 * @param <T> object type
 	 * @return byte array
 	 */
-	public static <T> byte[] serialize(T obj)  {
-		String json = JSON.toJSONString(obj);
+	public static ObjectMapper mapper = new ObjectMapper();
+
+	public static <T> byte[] serialize(T obj) {
+
+		String json = "";
+		try {
+			json = mapper.writeValueAsString(obj);
+		} catch (JsonProcessingException e) {
+			logger.error("json format exception !", e);
+		}
 		return json.getBytes(Constants.UTF8);
 	}
 
 	/**
-	 *  serialize to string
+	 * serialize to string
+	 *
 	 * @param obj object
 	 * @param <T> object type
 	 * @return string
 	 */
-	public static <T> String serializeToString(T obj)  {
-		return JSON.toJSONString(obj);
-	}
+	public static <T> String serializeToString(T obj) {
+		String json = "";
+		try {
+			json = mapper.writeValueAsString(obj);
+		} catch (JsonProcessingException e) {
+			logger.error("json format exception !", e);
+		}
+		return json;    }
 
 	/**
-	 *  deserialize
+	 * deserialize
 	 *
-	 * @param src byte array
+	 * @param src   byte array
 	 * @param clazz class
-	 * @param <T> deserialize type
+	 * @param <T>   deserialize type
 	 * @return deserialize type
 	 */
 	public static <T> T deserialize(byte[] src, Class<T> clazz) {
-		return JSON.parseObject(src, clazz);
+		String json = new String(src, StandardCharsets.UTF_8);
+		try {
+			return mapper.readValue(json, clazz);
+		} catch (Exception e) {
+			logger.error("json deserialize exception !", e);
+		}
+		return null;
 	}
 
 }

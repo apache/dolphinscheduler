@@ -104,7 +104,9 @@ public class DingTalkUtilsTest {
         String jsonString = DingTalkUtils.textToJsonString("this is test");
 
         logger.info(jsonString);
-        String expect = "{\"text\":{\"content\":\"this is test\"},\"msgtype\":\"text\"}";
+//      String expect = "{\"text\":{\"content\":\"this is test\"},\"msgtype\":\"text\"}";
+        String expect = "{\"msgtype\":\"text\",\"text\":{\"content\":\"this is test\"}}";
+
         Assert.assertEquals(expect, jsonString);
     }
     @Test
@@ -113,7 +115,9 @@ public class DingTalkUtilsTest {
 
         logger.info("test support utf8, actual:" + msg);
         logger.info("test support utf8, actual:" + DingTalkUtils.isEnableDingTalk);
-        String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
+//        String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
+        String expect = "{\"msgtype\":\"text\",\"text\":{\"content\":\"this is test:中文\"}}";
+
         Assert.assertEquals(expect, msg);
     }
 

@@ -116,9 +116,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             }
 
             StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
+            for (Object obj : list){
                 contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
+                contents.append(Constants.TD).append(obj).append(Constants.TD_END);
                 contents.append(Constants.TR_END);
             }
 

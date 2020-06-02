@@ -95,8 +95,8 @@ public class DefaultHTMLTemplateTest{
                 "    </head>\n" +
                 "    <body style=\"margin:0;padding:0\">\n" +
                 "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" +
-                "<thead><tr><th>mysql service name</th><th>mysql address</th><th>port</th><th>no index of number</th><th>database client connections</th></tr></thead>\n" +
-                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>3306</td><td>80</td><td>190</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>3306</td><td>10</td><td>90</td></tr>        </table>\n" +
+                "<thead><tr><th>database client connections</th><th>mysql address</th><th>mysql service name</th><th>no index of number</th><th>port</th></tr></thead>\n" +
+                "<tr><td>190</td><td>192.168.xx.xx</td><td>mysql200</td><td>80</td><td>3306</td></tr><tr><td>90</td><td>192.168.xx.xx</td><td>mysql210</td><td>10</td><td>3306</td></tr>        </table>\n" +
                 "    </body>\n" +
                 "</html>";
     }
@@ -116,7 +116,7 @@ public class DefaultHTMLTemplateTest{
                 "    </head>\n" +
                 "    <body style=\"margin:0;padding:0\">\n" +
                 "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" +
-                "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"190\",\"port\":\"3306\",\"no index of number\":\"80\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"90\",\"port\":\"3306\",\"no index of number\":\"10\"}</td></tr>        </table>\n" +
+                "<tr><td>{database client connections=190, mysql address=192.168.xx.xx, mysql service name=mysql200, no index of number=80, port=3306}</td></tr><tr><td>{database client connections=90, mysql address=192.168.xx.xx, mysql service name=mysql210, no index of number=10, port=3306}</td></tr>        </table>\n" +
                 "    </body>\n" +
                 "</html>";
     }
