@@ -9,6 +9,7 @@ import org.apache.dolphinscheduler.spi.params.AbsPluginParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 public class AlertChannelManager {
     private static final Logger logger = LoggerFactory.getLogger(AlertChannelManager.class);
 
-    private static final File CONFIG_DIR = new File("alert");
+    private static final String CONFIG_DIR = "alerts";
 
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> configuredAlertChannelMap = new ConcurrentHashMap<>();
@@ -34,23 +35,25 @@ public class AlertChannelManager {
 
         File configFile = getPluginConfigFile(alertChannelFactory.getId());
         if (configFile == null) {
-            logger.info("Alert Plugin: %s not config , skip.", alertChannelFactory.getId());
+            logger.info("Alert Plugin: {} not config , skip.", alertChannelFactory.getId());
             return;
         }
 
         if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getId(), alertChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Alert Plugin '%s' is already registered", alertChannelFactory.getId()));
+            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getId()));
         }
 
         try {
             loadConfiguredAlertChannel(alertChannelFactory.getId(), configFile);
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '%s' is can not load , read config file failed.", alertChannelFactory.getId()));
+            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load , read config file failed.", alertChannelFactory.getId()));
         }
     }
 
     private File getPluginConfigFile(String pluginId) {
-        File configFile = CONFIG_DIR.getAbsoluteFile();
+        URL path = AlertChannelManager.class.getClassLoader().getResource(CONFIG_DIR);
+        System.out.println(path);
+        File configFile = new File(path.getPath());
         if (!configFile.exists() || !configFile.isDirectory()) {
             logger.warn(CONFIG_DIR + " not exists or is not a directory. can not load alert channel plugin!");
             return null;
@@ -68,7 +71,7 @@ public class AlertChannelManager {
     public void loadConfiguredAlertChannel(String pluginId, File configFile)
             throws Exception
     {
-        logger.info("-- Loading Alert Plugin: %s from config file %s .", pluginId, configFile.getPath());
+        logger.info("-- Loading Alert Plugin: {} from config file {} .", pluginId, configFile.getPath());
         Map<String, String> properties = new HashMap<>(PluginPropertiesUtil.loadProperties(configFile));
         setConfiguredAlertChannel(pluginId, properties);
     }
@@ -79,7 +82,7 @@ public class AlertChannelManager {
         requireNonNull(properties, "properties is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
-        checkState(alertChannelFactory != null, "Alert Plugin '%s' is not registered", name);
+        checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
 
         List<AbsPluginParams> params = alertChannelFactory.getParams();
         String nameCh = alertChannelFactory.getNameCh();
@@ -93,7 +96,7 @@ public class AlertChannelManager {
             this.configuredAlertChannelMap.put(name, alertChannel);
         }
 
-        logger.info("-- Loaded Alert Plugin %s --", name);
+        logger.info("-- Loaded Alert Plugin {} --", name);
     }
 
     public Map<String, AlertChannelFactory> getAlertChannelFactoryMap() {

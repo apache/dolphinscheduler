@@ -54,14 +54,18 @@ public class AlertServer {
         alertChannelManager = new AlertChannelManager();
         dolphinPluginManagerConfig = new DolphinPluginManagerConfig();
         dolphinPluginManagerConfig.setPlugins(PropertyUtils.getString("alert.plugin.binding"));
-        if(StringUtils.isNotBlank(PropertyUtils.getString("alert.plugin.dir"))) {
+        if (StringUtils.isNotBlank(PropertyUtils.getString("alert.plugin.dir"))) {
             dolphinPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString("alert.plugin.dir").trim());
+        }
+
+        if (StringUtils.isNotBlank(PropertyUtils.getString("maven.local.repository"))) {
+            dolphinPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString("maven.local.repository").trim());
         }
         AlertPluginLoader alertPluginLoader = new AlertPluginLoader(dolphinPluginManagerConfig, alertChannelManager);
         try {
             alertPluginLoader.loadPlugins();
         } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !");
+            throw new RuntimeException("load Alert Plugin Failed !", e);
         }
     }
 

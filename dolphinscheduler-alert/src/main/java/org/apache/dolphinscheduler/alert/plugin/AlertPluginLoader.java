@@ -73,21 +73,21 @@ public class AlertPluginLoader {
     private void loadPlugin(String plugin)
             throws Exception
     {
-        logger.info("-- Loading Alert plugin %s --", plugin);
+        logger.info("-- Loading Alert plugin {} --", plugin);
         URLClassLoader pluginClassLoader = buildPluginClassLoader(plugin);
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(pluginClassLoader)) {
             loadPlugin(pluginClassLoader);
         }
-        logger.info("-- Finished loading Alert plugin %s --", plugin);
+        logger.info("-- Finished loading Alert plugin {} --", plugin);
     }
 
     private void loadPlugin(URLClassLoader pluginClassLoader)
     {
         ServiceLoader<DolphinSchedulerPlugin> serviceLoader = ServiceLoader.load(DolphinSchedulerPlugin.class, pluginClassLoader);
         List<DolphinSchedulerPlugin> plugins = ImmutableList.copyOf(serviceLoader);
-        checkState(!plugins.isEmpty(), "No service providers the plugin %s", DolphinSchedulerPlugin.class.getName());
+        checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
-            logger.info("Installing %s", plugin.getClass().getName());
+            logger.info("Installing {}", plugin.getClass().getName());
             installPlugin(plugin);
         }
     }
@@ -95,7 +95,7 @@ public class AlertPluginLoader {
     public void installPlugin(DolphinSchedulerPlugin plugin)
     {
         for (AlertChannelFactory alertChannelFactory : plugin.getAlertChannelFactorys()) {
-            logger.info("Registering Alert Plugin %s", alertChannelFactory.getId());
+            logger.info("Registering Alert Plugin '{}'", alertChannelFactory.getId());
             alertChannelManager.addAlertChannelFactory(alertChannelFactory);
         }
     }
@@ -104,14 +104,15 @@ public class AlertPluginLoader {
             throws Exception
     {
         File file = new File(plugin);
-        if (file.isFile() && (file.getName().equals("pom.xml") || file.getName().endsWith(".pom"))) {
+
+        if (!file.isDirectory() && (file.getName().equals("pom.xml") || file.getName().endsWith(".pom"))) {
             return buildPluginClassLoaderFromPom(file);
         }
         if (file.isDirectory()) {
             return buildPluginClassLoaderFromDirectory(file);
         }
         else {
-            throw new IllegalArgumentException(format("plugin must be a pom file or directory %s .", plugin));
+            throw new IllegalArgumentException(format("plugin must be a pom file or directory {} .", plugin));
         }
     }
 
@@ -133,10 +134,10 @@ public class AlertPluginLoader {
     private URLClassLoader buildPluginClassLoaderFromDirectory(File dir)
             throws Exception
     {
-        logger.info("Classpath for %s:", dir.getName());
+        logger.info("Classpath for {}:", dir.getName());
         List<URL> urls = new ArrayList<>();
         for (File file : listPluginDirs(dir)) {
-            logger.info("   %s", file);
+            logger.info("   {}", file);
             urls.add(file.toURI().toURL());
         }
         return createClassLoader(urls);
@@ -145,14 +146,14 @@ public class AlertPluginLoader {
     private URLClassLoader createClassLoader(List<Artifact> artifacts, String name)
             throws IOException
     {
-        logger.info("Classpath for %s:", name);
+        logger.info("Classpath for {}:", name);
         List<URL> urls = new ArrayList<>();
         for (Artifact artifact : sortArtifacts(artifacts)) {
             if (artifact.getFile() == null) {
                 throw new RuntimeException("Could not resolve artifact: " + artifact);
             }
             File file = artifact.getFile().getCanonicalFile();
-            logger.info("    %s", file);
+            logger.info("    {}", file);
             urls.add(file.toURI().toURL());
         }
         return createClassLoader(urls);
