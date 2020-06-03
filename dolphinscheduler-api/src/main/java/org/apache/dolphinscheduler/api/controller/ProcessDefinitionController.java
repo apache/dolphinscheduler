@@ -119,7 +119,7 @@ public class ProcessDefinitionController extends BaseController {
 
 
         logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project name:{}",
-                isCopy?"copy":"move",loginUser.getUserName().replaceAll("[\n|\r|\t]", "_"), projectName.replaceAll("[\n|\r|\t]", "_"), processDefinitionIds,targetProjectName.replaceAll("[\n|\r|\t]", "_"));
+                isCopy?"copy":"move",loginUser.getUserName().replaceAll("[\n|\r|\t]", "_"), projectName.replaceAll("[\n|\r|\t]", "_"), processDefinitionIds.replaceAll("[\n|\r|\t]", "_"),targetProjectName.replaceAll("[\n|\r|\t]", "_"));
 
         return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName,isCopy));
     }
