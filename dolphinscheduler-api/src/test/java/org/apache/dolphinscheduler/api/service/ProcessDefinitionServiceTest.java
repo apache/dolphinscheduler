@@ -225,7 +225,7 @@ public class ProcessDefinitionServiceTest {
                 definition.getConnects())).thenReturn(createProcessResult);
 
         Map<String, Object> successRes = processDefinitionService.copyProcessDefinition(loginUser,
-                "project_test1", 46);
+                "project_test1", 46,"project_test1");
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }

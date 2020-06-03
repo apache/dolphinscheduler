@@ -187,7 +187,7 @@ public class ProcessDefinitionControllerTest{
         Map<String, Object> result = new HashMap<>(5);
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.copyProcessDefinition(user, projectName,id)).thenReturn(result);
+        Mockito.when(processDefinitionService.copyProcessDefinition(user, projectName,id,projectName)).thenReturn(result);
         Result response = processDefinitionController.copyProcessDefinition(user, projectName,id);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());

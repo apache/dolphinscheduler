@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -27,8 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
  *HttpTask./
  **/
 @Service
-public class ProjectService extends BaseService{
+public class ProjectService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
@@ -341,6 +341,27 @@ public class ProjectService extends BaseService{
         }
 
         List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
+        result.put(Constants.DATA_LIST, projects);
+        putMsg(result,Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query authorized project
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return projects which the user have permission to see, Except for items created by this user
+     */
+    public Map<String, Object> queryProjectCreatedByUser(User loginUser, Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(userId);
         result.put(Constants.DATA_LIST, projects);
         putMsg(result,Status.SUCCESS);
 

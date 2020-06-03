@@ -176,6 +176,9 @@ public enum Status {
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
     USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
+    QUERY_USER_CREATED_PROJECT_ERROR(10151,"query user created project error error", "查询用户创建的项目错误"),
+    PROCESS_DEFINITION_IDS_IS_EMPTY(10152,"process definition ids is empty", "工作流IDS不能为空"),
+    COPY_OR_MOVE_PROCESS_DEFINITION_ERROR(10148,"copy or move process definition error", "复制或者移动工作流错误"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
