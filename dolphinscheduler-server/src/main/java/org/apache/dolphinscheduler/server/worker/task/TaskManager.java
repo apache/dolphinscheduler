@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
@@ -51,7 +52,10 @@ public class TaskManager {
         throws IllegalArgumentException {
         switch (EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType())) {
             case SHELL:
-                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
+                Boolean remote = false;
+                if (JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote") != null) {
+                    remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
+                }
                 if (remote != null && remote) {
                     return new SSHTask(taskExecutionContext, logger);
                 } else {

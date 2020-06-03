@@ -32,14 +32,12 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.ssh.SSHParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -207,7 +205,10 @@ public abstract class AbstractTask {
         TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
         switch (taskType){
             case SHELL:
-                Boolean remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
+                Boolean remote = false;
+                if (JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote") != null) {
+                    remote = JSONUtils.parseObject(taskExecutionContext.getTaskParams()).get("remote").asBoolean();
+                }
                 if (remote != null && remote) {
                     paramsClass = ShellParameters.class;
                 } else {

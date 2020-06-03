@@ -187,7 +187,10 @@ public class TaskPriorityQueueConsumer extends Thread{
 
         // ssh task
         if (taskType == TaskType.SHELL){
-            Boolean remote = JSONUtils.parseObject(taskNode.getParams()).get("remote").asBoolean();
+            Boolean remote = false;
+            if (JSONUtils.parseObject(taskNode.getParams()).get("remote") != null) {
+                remote = JSONUtils.parseObject(taskNode.getParams()).get("remote").asBoolean();
+            }
             if (remote != null && remote) {
                 setSSHTaskRelation(sshTaskExecutionContext, taskNode);
             }
