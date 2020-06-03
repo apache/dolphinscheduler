@@ -295,25 +295,15 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * copy process definition
-     *
      * @param loginUser   login user
-     * @param projectName project name
      * @param processId   process definition id
      * @return copy result code
      */
-    public Map<String, Object> copyProcessDefinition(User loginUser,
-                                                     String projectName,
+    private Map<String, Object> copyProcessDefinition(User loginUser,
                                                      Integer processId,
                                                      String targetProjectName) throws JsonProcessingException {
 
         Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
-        }
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
@@ -325,12 +315,6 @@ public class ProcessDefinitionService extends BaseDAGService {
                 putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectName);
                 return result;
             }else{
-                // check the target project authorization
-                Status status = (Status) checkResult.get(Constants.STATUS);
-                if (status != Status.SUCCESS) {
-                    return checkResult;
-                }
-
                 return createProcessDefinition(
                         loginUser,
                         targetProjectName,
@@ -345,23 +329,63 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * batchCopyProcessDefinition
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionIds
-     * @param targetProjectName
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @param processDefinitionIds processDefinitionIds
+     * @param targetProjectName targetProjectName
      * @return
-     * @throws JsonProcessingException
      */
     public Map<String, Object> batchCopyProcessDefinition(User loginUser,
                                                           String projectName,
                                                           String processDefinitionIds,
-                                                          String targetProjectName) throws JsonProcessingException{
+                                                          String targetProjectName){
         Map<String, Object> result = new HashMap<>(5);
         List<String> copyFailedIdList = new ArrayList<>();
+
         if (StringUtils.isEmpty(processDefinitionIds)) {
             putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, targetProjectName);
+            return result;
         }
 
+        //check src project auth
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
+        if (checkResult != null) {
+            return checkResult;
+        }
+
+        if(!targetProjectName.equals(projectName)){
+            Map<String, Object> checkTargetProjectResult = checkProjectAndAuth(loginUser, targetProjectName);
+            if (checkTargetProjectResult != null) {
+                return checkTargetProjectResult;
+            }
+        }
+
+        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
+        for(String processDefinitionId:processDefinitionIdList){
+            try {
+                Map<String, Object> copyProcessDefinitionResult =
+                        copyProcessDefinition(loginUser,Integer.valueOf(processDefinitionId),targetProjectName);
+                if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
+                    copyFailedIdList.add(processDefinitionId);
+                    logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
+                }
+            } catch (Exception e) {
+                copyFailedIdList.add(processDefinitionId);
+            }
+        }
+
+        checkBatchOperateResult(result, copyFailedIdList);
+
+        return result;
+    }
+
+    /**
+     * checkProjectAndAuth
+     * @param loginUser
+     * @param projectName
+     * @return
+     */
+    private Map<String, Object> checkProjectAndAuth(User loginUser, String projectName) {
         Project project = projectMapper.queryByName(projectName);
 
         //check user access for project
@@ -371,54 +395,19 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (resultStatus != Status.SUCCESS) {
             return checkResult;
         }
-
-        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
-        for(String processDefinitionId:processDefinitionIdList){
-
-            try {
-                Map<String, Object> copyProcessDefinitionResult =
-                        copyProcessDefinition(loginUser,projectName,Integer.valueOf(processDefinitionId),targetProjectName);
-                if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
-                    copyFailedIdList.add(processDefinitionId);
-                    logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
-                }
-            } catch (Exception e) {
-                copyFailedIdList.add(processDefinitionId);
-            }
-
-        }
-
-        if (!copyFailedIdList.isEmpty()) {
-            putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, String.join(",", copyFailedIdList));
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
-
-        return result;
+        return null;
     }
 
     /**
      * move process definition
-     * @param loginUser loginUser
-     * @param projectName  projectName
      * @param processId processId
      * @param targetProjectName targetProjectName
      * @return move result code
-     * @throws JsonProcessingException
      */
-    public Map<String, Object> moveProcessDefinition(User loginUser,
-                                                     String projectName,
-                                                     Integer processId,
-                                                     String targetProjectName) throws JsonProcessingException {
+    private Map<String, Object> moveProcessDefinition(Integer processId,
+                                                     String targetProjectName) {
 
         Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
-        }
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
@@ -430,12 +419,6 @@ public class ProcessDefinitionService extends BaseDAGService {
                 putMsg(result, Status.PROJECT_NOT_FOUNT, processId);
                 return result;
             }else{
-                // check the target project authorization
-                Status status = (Status) checkResult.get(Constants.STATUS);
-                if (status != Status.SUCCESS) {
-                    return checkResult;
-                }
-
                 processDefinition.setProjectId(targetProject.getId());
                 processDefinition.setUpdateTime(new Date());
                 if (processDefineMapper.updateById(processDefinition) > 0) {
@@ -466,16 +449,20 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         if (StringUtils.isEmpty(processDefinitionIds)) {
             putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, targetProjectName);
+            return result;
         }
 
-        Project project = projectMapper.queryByName(projectName);
-
-        //check user access for project
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-
-        if (resultStatus != Status.SUCCESS) {
+        //check src project auth
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
+        if (checkResult != null) {
             return checkResult;
+        }
+
+        if(!targetProjectName.equals(projectName)){
+            Map<String, Object> checkTargetProjectResult = checkProjectAndAuth(loginUser, targetProjectName);
+            if (checkTargetProjectResult != null) {
+                return checkTargetProjectResult;
+            }
         }
 
         String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
@@ -483,7 +470,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
             try {
                 Map<String, Object> moveProcessDefinitionResult =
-                        moveProcessDefinition(loginUser,projectName,Integer.valueOf(processDefinitionId),targetProjectName);
+                        moveProcessDefinition(Integer.valueOf(processDefinitionId),targetProjectName);
                 if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
                     moveFailedIdList.add(processDefinitionId);
                     logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
@@ -493,13 +480,17 @@ public class ProcessDefinitionService extends BaseDAGService {
             }
         }
 
-        if (!moveFailedIdList.isEmpty()) {
-            putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, String.join(",", moveFailedIdList));
+        checkBatchOperateResult(result, moveFailedIdList);
+
+        return result;
+    }
+
+    private void checkBatchOperateResult(Map<String, Object> result, List<String> failedIdList) {
+        if (!failedIdList.isEmpty()) {
+            putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, String.join(",", failedIdList));
         } else {
             putMsg(result, Status.SUCCESS);
         }
-
-        return result;
     }
 
     /**

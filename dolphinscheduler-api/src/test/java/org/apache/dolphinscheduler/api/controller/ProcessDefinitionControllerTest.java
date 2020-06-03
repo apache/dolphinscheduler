@@ -179,16 +179,32 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testCopyProcessDefinition() throws Exception {
+    public void testBatchCopyProcessDefinition() throws Exception {
 
         String projectName = "test";
-        int id = 1;
+        String id = "1";
 
         Map<String, Object> result = new HashMap<>(5);
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.copyProcessDefinition(user, projectName,id,projectName)).thenReturn(result);
-        Result response = processDefinitionController.copyProcessDefinition(user, projectName,id);
+        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user,projectName,id,projectName)).thenReturn(result);
+        Result response = processDefinitionController.copyOrMoveProcessDefinition(user, projectName,true,id,projectName);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testBatchMoveProcessDefinition() throws Exception {
+
+        String projectName = "test";
+        String targetProjectName = "test1";
+        String id = "1";
+
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.batchMoveProcessDefinition(user,projectName,id,targetProjectName)).thenReturn(result);
+        Result response = processDefinitionController.copyOrMoveProcessDefinition(user, projectName,false,id,targetProjectName);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
