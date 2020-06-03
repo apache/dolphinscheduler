@@ -217,8 +217,12 @@ public class ProcessDefinitionService extends BaseDAGService {
         return JSONUtils.toJsonString(processData);
     }
 
-    private SqlParameters initSqlNodeDependParams(SqlParameters parameters) throws SQLException {
+    private void initSqlNodeDependParams(SqlParameters parameters) throws SQLException {
         DataSource dataSource = dataSourceMapper.selectById(parameters.getDatasource());
+        if (dataSource == null) {
+            return;
+        }
+
         BaseDataSource dataSourceForm = DataSourceFactory.getDatasource(dataSource.getType(), dataSource.getConnectionParams());
         String[] hostsPorts = JdbcUtils.getHostsAndPort(dataSourceForm.getAddress());
 
@@ -233,27 +237,32 @@ public class ProcessDefinitionService extends BaseDAGService {
             parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), insertTableList));
         }
 
-        return parameters;
+        return;
     }
 
-    private DataxParameters initEtlNodeDependParams(DataxParameters parameters) throws SQLException {
+    private void initEtlNodeDependParams(DataxParameters parameters) throws SQLException {
         List<String> tableList = SqlUtils.resolveSqlSelectTables(DbType.valueOf(parameters.getDsType()), parameters.getSql());
         if (CollectionUtils.isEmpty(tableList)) {
-            return parameters;
+            return;
         }
 
         DataSource dataSource = dataSourceMapper.selectById(parameters.getDataSource());
+        DataSource dataTarget = dataSourceMapper.selectById(parameters.getDataTarget());
+        if (dataSource == null || dataTarget == null) {
+            return;
+        }
+
         BaseDataSource dataSourceForm = DataSourceFactory.getDatasource(dataSource.getType(), dataSource.getConnectionParams());
         String[] hostsPorts = JdbcUtils.getHostsAndPort(dataSourceForm.getAddress());
 
-        DataSource dataTarget = dataSourceMapper.selectById(parameters.getDataTarget());
+
         BaseDataSource dataTargetForm = DataSourceFactory.getDatasource(dataTarget.getType(), dataTarget.getConnectionParams());
         String[] targetHostsPorts = JdbcUtils.getHostsAndPort(dataTargetForm.getAddress());
 
         parameters.setDependNodeKeys(DependUnionKeyUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), tableList));
         parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), parameters.getTargetTable()));
 
-        return parameters;
+        return;
     }
 
     /**
