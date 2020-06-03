@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -71,7 +73,12 @@ public class DataxTaskTest {
 
     @Before
     public void before()
-        throws Exception {
+            throws Exception {
+        setTaskParems(0);
+    }
+
+    private void setTaskParems(Integer customConfig) {
+
         processService = Mockito.mock(ProcessService.class);
         shellCommandExecutor = Mockito.mock(ShellCommandExecutor.class);
 
@@ -88,8 +95,15 @@ public class DataxTaskTest {
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
-        props.setTaskParams(
-            "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
+        if (customConfig == 1) {
+            props.setTaskParams(
+                    "{\"customConfig\":1, \"localParams\":[{\"prop\":\"test\",\"value\":\"38294729\"}],\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"${test}\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
+
+//                    "{\"customConfig\":1,\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"xxx\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
+        } else {
+            props.setTaskParams(
+                    "{\"customConfig\":0,\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"dataSource\":1,\"dsType\":\"MYSQL\",\"dataTarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
+        }
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
@@ -111,27 +125,19 @@ public class DataxTaskTest {
         dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
         props.setCmdTypeIfComplement(START_PROCESS);
-        setTaskParems(0);
+
 
         Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
         Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
         String fileName = String.format("%s/%s_node.sh", props.getExecutePath(), props.getTaskAppId());
-        Mockito.when(shellCommandExecutor.run(fileName)).thenReturn(null);
-    }
-
-    private void setTaskParems(Integer customConfig) {
-        if (customConfig == 1) {
-            props.setTaskParams(
-                    "{\"customConfig\":1, \"localParams\":[{\"prop\":\"test\",\"value\":\"38294729\"}],\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"${test}\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
-
-//                    "{\"customConfig\":1,\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"xxx\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
-        } else {
-            props.setTaskParams(
-                    "{\"customConfig\":0,\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
-
+        try {
+            Mockito.when(shellCommandExecutor.run(fileName)).thenReturn(null);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
 
         dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
@@ -154,7 +160,8 @@ public class DataxTaskTest {
 
     @After
     public void after()
-        throws Exception {}
+            throws Exception {
+    }
 
     /**
      * Method: DataxTask()
@@ -210,7 +217,7 @@ public class DataxTaskTest {
      */
     @Test
     public void testParsingSqlColumnNames()
-        throws Exception {
+            throws Exception {
         try {
             BaseDataSource dataSource = DataSourceFactory.getDatasource(getDataSource().getType(),
                     getDataSource().getConnectionParams());
@@ -224,8 +231,7 @@ public class DataxTaskTest {
             Assert.assertTrue(columns.length == 2);
 
             Assert.assertEquals("[`a`, `table`]", Arrays.toString(columns));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -235,7 +241,7 @@ public class DataxTaskTest {
      */
     @Test
     public void testTryGrammaticalAnalysisSqlColumnNames()
-        throws Exception {
+            throws Exception {
         try {
             Method method = DataxTask.class.getDeclaredMethod("tryGrammaticalAnalysisSqlColumnNames", DbType.class, String.class);
             method.setAccessible(true);
@@ -246,8 +252,7 @@ public class DataxTaskTest {
             Assert.assertTrue(columns.length == 2);
 
             Assert.assertEquals("[a, b]", Arrays.toString(columns));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -258,7 +263,7 @@ public class DataxTaskTest {
      */
     @Test
     public void testTryExecuteSqlResolveColumnNames()
-        throws Exception {
+            throws Exception {
         // TODO: Test goes here...
     }
 
@@ -270,19 +275,30 @@ public class DataxTaskTest {
             throws Exception {
         try {
             setTaskParems(1);
-            buildDataJson();
-            setTaskParems(0);
-            buildDataJson();
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
+            method.setAccessible(true);
+            String filePath = (String) method.invoke(dataxTask, null);
+            Assert.assertNotNull(filePath);
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
 
-    public void buildDataJson() throws Exception {
-        Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
-        method.setAccessible(true);
-        String filePath = (String) method.invoke(dataxTask, null);
-        Assert.assertNotNull(filePath);
+    /**
+     * Method: buildDataxJsonFile()
+     */
+    @Test
+    public void testBuildDataxJsonFile0()
+            throws Exception {
+        try {
+            setTaskParems(0);
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
+            method.setAccessible(true);
+            String filePath = (String) method.invoke(dataxTask, null);
+            Assert.assertNotNull(filePath);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     /**
@@ -309,8 +325,7 @@ public class DataxTaskTest {
 
             String writerPluginName = writer.path("name").asText();
             Assert.assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_MYSQL, writerPluginName);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -320,7 +335,7 @@ public class DataxTaskTest {
      */
     @Test
     public void testBuildDataxJobSettingJson()
-        throws Exception {
+            throws Exception {
         try {
             Method method = DataxTask.class.getDeclaredMethod("buildDataxJobSettingJson");
             method.setAccessible(true);
@@ -345,8 +360,7 @@ public class DataxTaskTest {
             ObjectNode coreConfig = (ObjectNode) method.invoke(dataxTask, null);
             Assert.assertNotNull(coreConfig);
             Assert.assertNotNull(coreConfig.get("transport"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -356,13 +370,12 @@ public class DataxTaskTest {
      */
     @Test
     public void testBuildShellCommandFile()
-        throws Exception {
+            throws Exception {
         try {
             Method method = DataxTask.class.getDeclaredMethod("buildShellCommandFile", String.class);
             method.setAccessible(true);
             Assert.assertNotNull(method.invoke(dataxTask, "test.json"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -381,13 +394,12 @@ public class DataxTaskTest {
      */
     @Test
     public void testNotNull()
-        throws Exception {
+            throws Exception {
         try {
             Method method = DataxTask.class.getDeclaredMethod("notNull", Object.class, String.class);
             method.setAccessible(true);
             method.invoke(dataxTask, "abc", "test throw RuntimeException");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
     }
