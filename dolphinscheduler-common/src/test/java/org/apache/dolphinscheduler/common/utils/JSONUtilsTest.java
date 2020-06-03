@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -188,6 +189,9 @@ public class JSONUtilsTest {
                 JSONUtils.toJsonString(map));
         Assert.assertEquals(String.valueOf((Object) null),
                 JSONUtils.toJsonString(null));
+
+        Assert.assertEquals("{\"foo\":\"bar\"}",
+                JSONUtils.toJsonString(map, SerializationFeature.WRITE_NULL_MAP_VALUES));
     }
 
     @Test
