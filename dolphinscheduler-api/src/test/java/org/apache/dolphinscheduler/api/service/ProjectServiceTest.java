@@ -267,6 +267,26 @@ public class ProjectServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
+
+    @Test
+    public void testQueryCreatedProject(){
+
+        User loginUser = getLoginUser();
+
+        Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(getList());
+        //USER_NO_OPERATION_PERM
+        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser,3);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
+
+        //success
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = projectService.queryProjectCreatedByUser(loginUser,1);
+        logger.info(result.toString());
+        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+    }
     @Test
     public void testQueryAllProjectList(){
 

@@ -113,18 +113,13 @@ public class ProcessDefinitionController extends BaseController {
     @ApiException(COPY_OR_MOVE_PROCESS_DEFINITION_ERROR)
     public Result copyOrMoveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                              @RequestParam(value = "isCopy", required = true) boolean isCopy,
                                               @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
-                                              @RequestParam(value = "targetProjectName",required = true) String targetProjectName) throws JsonProcessingException {
+                                              @RequestParam(value = "targetProjectName",required = true) String targetProjectName,
+                                              @RequestParam(value = "isCopy", required = true) boolean isCopy)  {
         logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project name:{}",
                 isCopy?"copy":"move",loginUser.getUserName(), projectName, processDefinitionIds,targetProjectName);
-        Map<String, Object> result;
-        if(isCopy){
-            result = processDefinitionService.batchCopyProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName);
-        }else{
-            result = processDefinitionService.batchMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName);
-        }
-        return returnDataList(result);
+
+        return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName,isCopy));
     }
 
     /**

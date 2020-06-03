@@ -224,8 +224,8 @@ public class ProcessDefinitionServiceTest {
                 definition.getLocations(),
                 definition.getConnects())).thenReturn(createProcessResult);
 
-        Map<String, Object> successRes = processDefinitionService.batchCopyProcessDefinition(loginUser,"project_test1",
-                 "46","project_test1");
+        Map<String, Object> successRes = processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,"project_test1",
+                 "46","project_test1",true);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -261,8 +261,8 @@ public class ProcessDefinitionServiceTest {
         putMsg(result, Status.SUCCESS);
 
 
-        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(loginUser,"project_test1",
-                "46","project_test1");
+        Map<String, Object> successRes = processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,"project_test1",
+                "46","project_test1",false);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }

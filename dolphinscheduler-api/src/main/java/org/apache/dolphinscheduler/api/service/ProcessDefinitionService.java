@@ -328,19 +328,19 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
-     * batchCopyProcessDefinition
+     * batch copy or move process definition
      * @param loginUser loginUser
      * @param projectName projectName
      * @param processDefinitionIds processDefinitionIds
      * @param targetProjectName targetProjectName
      * @return
      */
-    public Map<String, Object> batchCopyProcessDefinition(User loginUser,
+    public Map<String, Object> batchCopyOrMoveProcessDefinition(User loginUser,
                                                           String projectName,
                                                           String processDefinitionIds,
-                                                          String targetProjectName){
+                                                          String targetProjectName, boolean isCopy){
         Map<String, Object> result = new HashMap<>(5);
-        List<String> copyFailedIdList = new ArrayList<>();
+        List<String> failedIdList = new ArrayList<>();
 
         if (StringUtils.isEmpty(processDefinitionIds)) {
             putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, targetProjectName);
@@ -361,26 +361,41 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
-        for(String processDefinitionId:processDefinitionIdList){
-            try {
-                Map<String, Object> copyProcessDefinitionResult =
-                        copyProcessDefinition(loginUser,Integer.valueOf(processDefinitionId),targetProjectName);
-                if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
-                    copyFailedIdList.add(processDefinitionId);
-                    logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
+        if(isCopy){
+            for(String processDefinitionId:processDefinitionIdList){
+                try {
+                    Map<String, Object> copyProcessDefinitionResult =
+                            copyProcessDefinition(loginUser,Integer.valueOf(processDefinitionId),targetProjectName);
+                    if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
+                        failedIdList.add(processDefinitionId);
+                        logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    failedIdList.add(processDefinitionId);
                 }
-            } catch (Exception e) {
-                copyFailedIdList.add(processDefinitionId);
+            }
+        }else{
+            for(String processDefinitionId:processDefinitionIdList){
+                try {
+                    Map<String, Object> moveProcessDefinitionResult =
+                            moveProcessDefinition(Integer.valueOf(processDefinitionId),targetProjectName);
+                    if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
+                        failedIdList.add(processDefinitionId);
+                        logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    failedIdList.add(processDefinitionId);
+                }
             }
         }
 
-        checkBatchOperateResult(result, copyFailedIdList);
+        checkBatchOperateResult(result, failedIdList);
 
         return result;
     }
 
     /**
-     * checkProjectAndAuth
+     * check project and auth
      * @param loginUser
      * @param projectName
      * @return
@@ -432,59 +447,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
-     * batchMoveProcessDefinition
-     * @param loginUser loginUser
-     * @param projectName projectName
-     * @param processDefinitionIds processDefinitionIds
-     * @param targetProjectName targetProjectName
-     * @return
-     * @throws JsonProcessingException
+     * check batch operate result
+     * @param result
+     * @param failedIdList
      */
-    public Map<String, Object> batchMoveProcessDefinition(User loginUser,
-                                                          String projectName,
-                                                          String processDefinitionIds,
-                                                          String targetProjectName) throws JsonProcessingException{
-        Map<String, Object> result = new HashMap<>(5);
-        List<String> moveFailedIdList = new ArrayList<>();
-
-        if (StringUtils.isEmpty(processDefinitionIds)) {
-            putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, targetProjectName);
-            return result;
-        }
-
-        //check src project auth
-        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
-        if (checkResult != null) {
-            return checkResult;
-        }
-
-        if(!targetProjectName.equals(projectName)){
-            Map<String, Object> checkTargetProjectResult = checkProjectAndAuth(loginUser, targetProjectName);
-            if (checkTargetProjectResult != null) {
-                return checkTargetProjectResult;
-            }
-        }
-
-        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
-        for(String processDefinitionId:processDefinitionIdList){
-
-            try {
-                Map<String, Object> moveProcessDefinitionResult =
-                        moveProcessDefinition(Integer.valueOf(processDefinitionId),targetProjectName);
-                if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
-                    moveFailedIdList.add(processDefinitionId);
-                    logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
-                }
-            } catch (Exception e) {
-                moveFailedIdList.add(processDefinitionId);
-            }
-        }
-
-        checkBatchOperateResult(result, moveFailedIdList);
-
-        return result;
-    }
-
     private void checkBatchOperateResult(Map<String, Object> result, List<String> failedIdList) {
         if (!failedIdList.isEmpty()) {
             putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, String.join(",", failedIdList));
