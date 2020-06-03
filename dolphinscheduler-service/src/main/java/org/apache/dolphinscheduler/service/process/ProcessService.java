@@ -1813,7 +1813,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId){
-        return userMapper.queryDetailsById(userId);
+        return userMapper.selectById(userId);
     }
 
     /**
