@@ -116,8 +116,10 @@ public class ProcessDefinitionController extends BaseController {
                                               @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                               @RequestParam(value = "targetProjectName",required = true) String targetProjectName,
                                               @RequestParam(value = "isCopy", required = true) boolean isCopy)  {
+
+
         logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project name:{}",
-                isCopy?"copy":"move",loginUser.getUserName(), projectName, processDefinitionIds,targetProjectName);
+                isCopy?"copy":"move",loginUser.getUserName().replaceAll("[\n|\r|\t]", "_"), projectName.replaceAll("[\n|\r|\t]", "_"), processDefinitionIds,targetProjectName.replaceAll("[\n|\r|\t]", "_"));
 
         return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName,isCopy));
     }
