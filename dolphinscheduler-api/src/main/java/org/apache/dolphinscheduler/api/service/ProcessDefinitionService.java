@@ -236,8 +236,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (CollectionUtils.isNotEmpty(insertTableList)) {
             parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), insertTableList));
         }
-
-        return;
     }
 
     private void initEtlNodeDependParams(DataxParameters parameters) throws SQLException {
@@ -261,8 +259,6 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         parameters.setDependNodeKeys(DependUnionKeyUtils.buildDependTableUnionKey(hostsPorts[0], dataSourceForm.getDatabase(), tableList));
         parameters.setTargetNodeKeys(DependUnionKeyUtils.buildTargetTableUnionKey(targetHostsPorts[0], dataTargetForm.getDatabase(), parameters.getTargetTable()));
-
-        return;
     }
 
     /**
@@ -1358,6 +1354,16 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
+
+        TreeViewDto parentTreeViewDto = buildTreeViewDto(processId, limit, dag);
+
+        result.put(Constants.DATA_LIST, parentTreeViewDto);
+        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.MSG, Status.SUCCESS.getMsg());
+        return result;
+    }
+
+    private TreeViewDto buildTreeViewDto(Integer processId, Integer limit, DAG<String, TaskNode, TaskNodeRelation> dag) {
         /**
          * nodes that is running
          */
@@ -1368,30 +1374,31 @@ public class ProcessDefinitionService extends BaseDAGService {
          */
         Map<String, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
-        /**
-         * List of process instances
-         */
-        List<ProcessInstance> processInstanceList = processInstanceMapper.queryByProcessDefineId(processId, limit);
-
-        for (ProcessInstance processInstance : processInstanceList) {
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
-        }
-
-        if (limit > processInstanceList.size()) {
-            limit = processInstanceList.size();
-        }
-
         TreeViewDto parentTreeViewDto = new TreeViewDto();
         parentTreeViewDto.setName("DAG");
         parentTreeViewDto.setType("");
-        // Specify the process definition, because it is a TreeView for a process definition
 
-        for (int i = limit - 1; i >= 0; i--) {
-            ProcessInstance processInstance = processInstanceList.get(i);
+        // List of process instances
+        List<ProcessInstance> processInstanceList = null;
+        if (limit > 0) {
+            processInstanceList = processInstanceMapper.queryByProcessDefineId(processId, limit);
 
-            Date endTime = processInstance.getEndTime() == null ? new Date() : processInstance.getEndTime();
-            parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), "", processInstance.getState().toString()
-                    , processInstance.getStartTime(), endTime, processInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
+            for (ProcessInstance processInstance : processInstanceList) {
+                processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
+            }
+
+            if (limit > processInstanceList.size()) {
+                limit = processInstanceList.size();
+            }
+
+            // Specify the process definition, because it is a TreeView for a process definition
+            for (int i = limit - 1; i >= 0; i--) {
+                ProcessInstance processInstance = processInstanceList.get(i);
+
+                Date endTime = processInstance.getEndTime() == null ? new Date() : processInstance.getEndTime();
+                parentTreeViewDto.getInstances().add(new Instance(processInstance.getId(), processInstance.getName(), "", processInstance.getState().toString()
+                        , processInstance.getStartTime(), endTime, processInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
+            }
         }
 
         List<TreeViewDto> parentTreeViewDtoList = new ArrayList<>();
@@ -1415,30 +1422,33 @@ public class ProcessDefinitionService extends BaseDAGService {
                 treeViewDto.setType(taskNode.getType());
 
 
-                //set treeViewDto instances
-                for (int i = limit - 1; i >= 0; i--) {
-                    ProcessInstance processInstance = processInstanceList.get(i);
-                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), nodeName);
-                    if (taskInstance == null) {
-                        treeViewDto.getInstances().add(new Instance(-1, "not running", "null"));
-                    } else {
-                        Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
-                        Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
+                if (CollectionUtils.isNotEmpty(processInstanceList)) {
+                    //set treeViewDto instances
+                    for (int i = limit - 1; i >= 0; i--) {
+                        ProcessInstance processInstance = processInstanceList.get(i);
+                        TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), nodeName);
+                        if (taskInstance == null) {
+                            treeViewDto.getInstances().add(new Instance(-1, "not running", "null"));
+                        } else {
+                            Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
+                            Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
 
-                        int subProcessId = 0;
-                        /**
-                         * if process is sub process, the return sub id, or sub id=0
-                         */
-                        if (taskInstance.getTaskType().equals(TaskType.SUB_PROCESS.name())) {
-                            String taskJson = taskInstance.getTaskJson();
-                            taskNode = JSON.parseObject(taskJson, TaskNode.class);
-                            subProcessId = Integer.parseInt(JSON.parseObject(
-                                    taskNode.getParams()).getString(CMDPARAM_SUB_PROCESS_DEFINE_ID));
+                            int subProcessId = 0;
+                            /**
+                             * if process is sub process, the return sub id, or sub id=0
+                             */
+                            if (taskInstance.getTaskType().equals(TaskType.SUB_PROCESS.name())) {
+                                String taskJson = taskInstance.getTaskJson();
+                                taskNode = JSON.parseObject(taskJson, TaskNode.class);
+                                subProcessId = Integer.parseInt(JSON.parseObject(
+                                        taskNode.getParams()).getString(CMDPARAM_SUB_PROCESS_DEFINE_ID));
+                            }
+                            treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
+                                    , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
                         }
-                        treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(), taskInstance.getTaskType(), taskInstance.getState().toString()
-                                , taskInstance.getStartTime(), taskInstance.getEndTime(), taskInstance.getHost(), DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessId));
                     }
                 }
+
                 for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
                     pTreeViewDto.getChildren().add(treeViewDto);
                 }
@@ -1465,10 +1475,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                 waitingRunningNodeMap.clear();
             }
         }
-        result.put(Constants.DATA_LIST, parentTreeViewDto);
-        result.put(Constants.STATUS, Status.SUCCESS);
-        result.put(Constants.MSG, Status.SUCCESS.getMsg());
-        return result;
+
+        return parentTreeViewDto;
     }
 
     /**
@@ -1486,7 +1494,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         List<TaskNode> taskNodeList = processData.getTasks();
 
         processDefinition.setGlobalParamList(processData.getGlobalParams());
-
 
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
 
@@ -1556,68 +1563,9 @@ public class ProcessDefinitionService extends BaseDAGService {
             throw new RuntimeException("process define not exists");
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraphByDepend(processDefinition);
-        /**
-         * nodes that is running
-         */
-        Map<String, List<TreeViewDto>> runningNodeMap = new ConcurrentHashMap<>();
 
-        /**
-         * nodes that is waiting torun
-         */
-        Map<String, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
+        TreeViewDto parentTreeViewDto = buildTreeViewDto(processId, -1, dag);
 
-        TreeViewDto parentTreeViewDto = new TreeViewDto();
-        parentTreeViewDto.setName("DAG");
-        parentTreeViewDto.setType("");
-
-        // Specify the process definition, because it is a TreeView for a process definition
-        List<TreeViewDto> parentTreeViewDtoList = new ArrayList<>();
-        parentTreeViewDtoList.add(parentTreeViewDto);
-        // Here is the encapsulation task instance
-        for (String startNode : dag.getBeginNode()) {
-            runningNodeMap.put(startNode, parentTreeViewDtoList);
-        }
-
-        while (Stopper.isRunning()) {
-            Set<String> postNodeList = null;
-            Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<String, List<TreeViewDto>> en = iter.next();
-                String nodeName = en.getKey();
-                parentTreeViewDtoList = en.getValue();
-
-                TreeViewDto treeViewDto = new TreeViewDto();
-                treeViewDto.setName(nodeName);
-                TaskNode taskNode = dag.getNode(nodeName);
-                treeViewDto.setType(taskNode.getType());
-
-                for (TreeViewDto pTreeViewDto : parentTreeViewDtoList) {
-                    pTreeViewDto.getChildren().add(treeViewDto);
-                }
-                postNodeList = dag.getSubsequentNodes(nodeName);
-                if (postNodeList != null && postNodeList.size() > 0) {
-                    for (String nextNodeName : postNodeList) {
-                        List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeName);
-                        if (treeViewDtoList != null && treeViewDtoList.size() > 0) {
-                            treeViewDtoList.add(treeViewDto);
-                            waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
-                        } else {
-                            treeViewDtoList = new ArrayList<>();
-                            treeViewDtoList.add(treeViewDto);
-                            waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
-                        }
-                    }
-                }
-                runningNodeMap.remove(nodeName);
-            }
-
-            if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
-                break;
-            } else {
-                runningNodeMap.putAll(waitingRunningNodeMap);
-                waitingRunningNodeMap.clear();
-            }
-        }
         result.put(Constants.DATA_LIST, parentTreeViewDto);
         result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.MSG, Status.SUCCESS.getMsg());
