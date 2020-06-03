@@ -68,7 +68,7 @@ public class SqlUtilsTest {
     @Test
     public void testResolveSqlInsertTables()
         throws Exception {
-        List<String> tableList = SqlUtils.resolveSqlSelectTables(DbType.MYSQL, "insert into t1(a) values (1)");
+        List<String> tableList = SqlUtils.resolveSqlInsertTables(DbType.MYSQL, "insert into t1(a) values (1)");
         Assert.assertNotNull(tableList);
         Assert.assertTrue(tableList.size() == 1);
         Assert.assertEquals("t1", tableList.get(0));
@@ -80,7 +80,7 @@ public class SqlUtilsTest {
     @Test
     public void testResolveSqlUpdateTables()
         throws Exception {
-        List<String> tableList = SqlUtils.resolveSqlSelectTables(DbType.MYSQL, "update t1 set a = 1");
+        List<String> tableList = SqlUtils.resolveSqlUpdateTables(DbType.MYSQL, "update t1 set a = 1");
         Assert.assertNotNull(tableList);
         Assert.assertTrue(tableList.size() == 1);
         Assert.assertEquals("t1", tableList.get(0));
@@ -92,7 +92,7 @@ public class SqlUtilsTest {
     @Test
     public void testResolveSqlDeleteTables()
         throws Exception {
-        List<String> tableList = SqlUtils.resolveSqlSelectTables(DbType.MYSQL, "delete from t1 where a = 1");
+        List<String> tableList = SqlUtils.resolveSqlDeleteTables(DbType.MYSQL, "delete from t1 where a = 1");
         Assert.assertNotNull(tableList);
         Assert.assertTrue(tableList.size() == 1);
         Assert.assertEquals("t1", tableList.get(0));
