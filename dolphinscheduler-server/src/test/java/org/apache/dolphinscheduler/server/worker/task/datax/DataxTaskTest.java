@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -108,7 +109,7 @@ public class DataxTaskTest {
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
         Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
@@ -273,6 +274,7 @@ public class DataxTaskTest {
     @Test
     public void testBuildDataxJsonFile()
             throws Exception {
+
         try {
             setTaskParems(1);
             Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
