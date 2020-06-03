@@ -18,20 +18,20 @@
 package org.apache.dolphinscheduler.remote;
 
 
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JacksonSerializer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FastJsonSerializerTest {
+public class JacksonSerializerTest {
 
     @Test
     public void testSerialize(){
         TestObj testObj = new TestObj();
         testObj.setAge(12);
-        byte[] serializeByte = FastJsonSerializer.serialize(testObj);
+        byte[] serializeByte = JacksonSerializer.serialize(testObj);
 
         //
-        TestObj deserialize = FastJsonSerializer.deserialize(serializeByte, TestObj.class);
+        TestObj deserialize = JacksonSerializer.deserialize(serializeByte, TestObj.class);
 
         Assert.assertEquals(testObj.getAge(), deserialize.getAge());
     }
