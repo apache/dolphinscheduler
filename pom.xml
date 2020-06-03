@@ -850,6 +850,9 @@
                         <include>**/plugin/model/AlertDataTest.java</include>
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <include>**/plugin/utils/PropertyUtilsTest.java</include>
+                        <include>**/common/utils/DependUnionKeyUtilsTest.java</include>
+                        <include>**/common/utils/SqlUtilsTest.java</include>
+                        <include>**/common/utils/ValidUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
