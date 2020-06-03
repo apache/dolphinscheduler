@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -29,20 +30,66 @@ import java.util.*;
 
 public class JSONUtilsTest {
 
+    @Test
+    public void createArrayNodeTest() {
+        Property property = new Property();
+        property.setProp("ds");
+        property.setDirect(Direct.IN);
+        property.setType(DataType.VARCHAR);
+        property.setValue("sssssss");
+        String str = "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
+        JsonNode jsonNode = JSONUtils.toJsonNode(property);
+
+        ArrayNode arrayNode = JSONUtils.createArrayNode();
+        ArrayList<JsonNode> objects = new ArrayList<>();
+        objects.add(jsonNode);
+        objects.add(jsonNode);
+
+        ArrayNode jsonNodes = arrayNode.addAll(objects);
+        String s = JSONUtils.toJsonString(jsonNodes);
+        Assert.assertEquals(s, str);
+
+    }
+
+    @Test
+    public void toJsonNodeTest() {
+        Property property = new Property();
+        property.setProp("ds");
+        property.setDirect(Direct.IN);
+        property.setType(DataType.VARCHAR);
+        property.setValue("sssssss");
+        String str = "{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
+
+        JsonNode jsonNodes = JSONUtils.toJsonNode(property);
+        String s = JSONUtils.toJsonString(jsonNodes);
+        Assert.assertEquals(s, str);
+
+    }
+
+    @Test
+    public void createObjectNodeTest() {
+        String jsonStr = "{\"a\":\"b\",\"b\":\"d\"}";
+
+        ObjectNode objectNode = JSONUtils.createObjectNode();
+        objectNode.put("a","b");
+        objectNode.put("b","d");
+        String s = JSONUtils.toJsonString(objectNode);
+        Assert.assertEquals(s, jsonStr);
+    }
 
     @Test
     public void toMap() {
 
         String jsonStr = "{\"id\":\"1001\",\"name\":\"Jobs\"}";
 
-        Map<String,String> models = JSONUtils.toMap(jsonStr);
+        Map<String, String> models = JSONUtils.toMap(jsonStr);
         Assert.assertEquals("1001", models.get("id"));
         Assert.assertEquals("Jobs", models.get("name"));
 
     }
 
     @Test
-    public void convert2Property(){
+    public void convert2Property() {
         Property property = new Property();
         property.setProp("ds");
         property.setDirect(Direct.IN);
@@ -56,7 +103,7 @@ public class JSONUtilsTest {
 
 
     @Test
-    public void String2MapTest(){
+    public void String2MapTest() {
         String str = list2String();
 
         List<LinkedHashMap> maps = JSONUtils.toList(str,
@@ -70,29 +117,19 @@ public class JSONUtilsTest {
         Assert.assertEquals("190", maps.get(0).get("database client connections"));
     }
 
-    public String list2String(){
+    public String list2String() {
 
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
-        map1.put("mysql service name","mysql200");
-        map1.put("mysql address","192.168.xx.xx");
-        map1.put("port","3306");
-        map1.put("no index of number","80");
-        map1.put("database client connections","190");
+        map1.put("mysql service name", "mysql200");
+        map1.put("mysql address", "192.168.xx.xx");
+        map1.put("port", "3306");
+        map1.put("no index of number", "80");
+        map1.put("database client connections", "190");
 
         List<LinkedHashMap<String, String>> maps = new ArrayList<>();
-        maps.add(0,map1);
+        maps.add(0, map1);
         String resultJson = JSONUtils.toJsonString(maps);
         return resultJson;
-    }
-
-    @Test
-    public void testToJson() {
-        Map<String, String> map = new HashMap<>();
-        map.put("foo","bar");
-
-        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJsonString(map));
-        Assert.assertEquals(
-                String.valueOf((Object) null), JSONUtils.toJsonString(null));
     }
 
     @Test
@@ -124,7 +161,7 @@ public class JSONUtilsTest {
     @Test
     public void testToMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("foo","bar");
+        map.put("foo", "bar");
 
         Assert.assertTrue(map.equals(JSONUtils.toMap(
                 "{\n" + "\"foo\": \"bar\"\n" + "}")));

@@ -108,20 +108,6 @@ public class JSONUtils {
         return null;
     }
 
-
-    public static <T> T parseObject(String json, TypeReference typeReference) {
-        if (StringUtils.isEmpty(json)) {
-            return null;
-        }
-
-        try {
-            return objectMapper.readValue(json, typeReference);
-        } catch (Exception e) {
-            logger.error("parse object exception!", e);
-        }
-        return null;
-    }
-
     /**
      * json to list
      *
