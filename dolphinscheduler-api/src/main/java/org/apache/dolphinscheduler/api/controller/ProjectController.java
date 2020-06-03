@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,7 +239,7 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query authorized project by user id: {}.", loginUser.getUserName().replaceAll("[\n|\r|\t]", "_"), String.valueOf(loginUser.getId()).replaceAll("[\n|\r|\t]", "_"));
+        logger.info("login user {}, query authorized project by user id: {}.", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
         Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser, loginUser.getId());
         return returnDataList(result);
     }
