@@ -43,7 +43,7 @@ public class SqlUtils {
     public static final Logger logger = LoggerFactory.getLogger(SqlUtils.class);
 
     /**
-     * 解析sql语句select from表名
+     * resolve sql statement select table names
      *
      * @param dbType database type
      * @param sql select sql
@@ -55,7 +55,7 @@ public class SqlUtils {
     }
 
     /**
-     * 解析sql语句insert表名
+     * resolve sql statement insert table names
      *
      * @param dbType database type
      * @param sql select sql
@@ -67,7 +67,7 @@ public class SqlUtils {
     }
 
     /**
-     * 解析sql语句update表名
+     * resolve sql statement update table names
      *
      * @param dbType database type
      * @param sql select sql
@@ -79,7 +79,7 @@ public class SqlUtils {
     }
 
     /**
-     * 解析sql语句delete表名
+     * resolve sql statement delete table names
      *
      * @param dbType database type
      * @param sql select sql
@@ -91,7 +91,7 @@ public class SqlUtils {
     }
 
     /**
-     * 解析标准sql语句查询表名
+     * resolve sql statement table names
      *
      * @param dbType database type
      * @param sql sql
