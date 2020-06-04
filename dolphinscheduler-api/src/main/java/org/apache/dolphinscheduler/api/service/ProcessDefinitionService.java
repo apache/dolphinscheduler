@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -755,8 +756,13 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
-        List<ProcessMeta> processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
+        List<ProcessMeta> processMetaList = new ArrayList<>();
 
+        try {
+            processMetaList = JSONUtils.getMapper().readValue(processMetaJson, new TypeReference<List<ProcessMeta>>() {});
+        } catch (Exception e) {
+            logger.error("parse list exception!", e);
+        }
         //check file content
         if (CollectionUtils.isEmpty(processMetaList)) {
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
