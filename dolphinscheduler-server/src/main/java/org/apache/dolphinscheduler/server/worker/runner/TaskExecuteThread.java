@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.utils.*;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -152,7 +153,13 @@ public class TaskExecuteThread implements Runnable {
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
         if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
+            List<Property> globalParamsList = new ArrayList<>();
+
+            try {
+                globalParamsList = JSONUtils.getMapper().readValue(globalParamsStr, new TypeReference<List<Property>>() {});
+            } catch (Exception e) {
+                logger.error("parse list exception!", e);
+            }
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;

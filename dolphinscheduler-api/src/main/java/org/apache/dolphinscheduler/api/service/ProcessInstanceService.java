@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -531,7 +532,11 @@ public class ProcessInstanceService extends BaseDAGService {
         List<Property> globalParams = new ArrayList<>();
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+            try {
+                globalParams = JSONUtils.getMapper().readValue(userDefinedParams, new TypeReference<List<Property>>() {});
+            } catch (Exception e) {
+                logger.error("parse list exception!", e);
+            }
         }
 
 
@@ -540,7 +545,11 @@ public class ProcessInstanceService extends BaseDAGService {
         // global param string
         String globalParamStr = JSONUtils.toJsonString(globalParams);
         globalParamStr = ParameterUtils.convertParameterPlaceholders(globalParamStr, timeParams);
-        globalParams = JSONUtils.toList(globalParamStr, Property.class);
+        try {
+            globalParams = JSONUtils.getMapper().readValue(globalParamStr, new TypeReference<List<Property>>() {});
+        } catch (Exception e) {
+            logger.error("parse list exception!", e);
+        }
         for (Property property : globalParams) {
             timeParams.put(property.getProp(), property.getValue());
         }
@@ -553,7 +562,13 @@ public class ProcessInstanceService extends BaseDAGService {
             String localParams = map.get(LOCAL_PARAMS);
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                List<Property> localParamsList = new ArrayList<>();
+                try {
+                    localParamsList = JSONUtils.getMapper().readValue(localParams, new TypeReference<List<Property>>() {});
+                } catch (Exception e) {
+                    logger.error("parse list exception!", e);
+                }
+
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());
                 localParamsMap.put("localParamsList",localParamsList);

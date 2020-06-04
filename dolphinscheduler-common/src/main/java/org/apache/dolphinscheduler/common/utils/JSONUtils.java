@@ -50,6 +50,11 @@ public class JSONUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).setTimeZone(TimeZone.getDefault());
     }
 
+    public static ObjectMapper getMapper() {
+        return objectMapper;
+    }
+
+
     public static ArrayNode createArrayNode() {
         return objectMapper.createArrayNode();
     }
@@ -124,7 +129,7 @@ public class JSONUtils {
             return objectMapper.readValue(json, new TypeReference<List<T>>() {
             });
         } catch (Exception e) {
-            logger.error("JSONArray.parseArray exception!", e);
+            logger.error("parse list exception!", e);
         }
 
         return new ArrayList<>();
