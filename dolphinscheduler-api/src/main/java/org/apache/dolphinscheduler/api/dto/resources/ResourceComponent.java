@@ -1,6 +1,7 @@
 package org.apache.dolphinscheduler.api.dto.resources;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.alibaba.fastjson.annotation.JSONType;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * resource component
  */
-@JsonPropertyOrder({"id","pid","name","fullName","description","isDirctory","children","type"})
+@JSONType(orders={"id","pid","name","fullName","description","isDirctory","children","type"})
 public abstract class ResourceComponent {
     public ResourceComponent() {
     }
@@ -45,14 +46,17 @@ public abstract class ResourceComponent {
     /**
      * id
      */
+    @JSONField(ordinal = 1)
     protected int id;
     /**
      * parent id
      */
+    @JSONField(ordinal = 2)
     protected int pid;
     /**
      * name
      */
+    @JSONField(ordinal = 3)
     protected String name;
     /**
      * current directory
@@ -61,26 +65,32 @@ public abstract class ResourceComponent {
     /**
      * full name
      */
+    @JSONField(ordinal = 4)
     protected String fullName;
     /**
      * description
      */
+    @JSONField(ordinal = 5)
     protected String description;
     /**
      * is directory
      */
+    @JSONField(ordinal = 6)
     protected boolean isDirctory;
     /**
      * id value
      */
+    @JSONField(ordinal = 7)
     protected String idValue;
     /**
      * resoruce type
      */
+    @JSONField(ordinal = 8)
     protected ResourceType type;
     /**
      * children
      */
+    @JSONField(ordinal = 8)
     protected List<ResourceComponent> children = new ArrayList<>();
 
     /**
