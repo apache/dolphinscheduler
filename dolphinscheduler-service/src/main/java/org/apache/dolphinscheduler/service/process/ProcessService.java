@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.service.process;
 
 import com.cronutils.model.Cron;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -751,8 +753,16 @@ public class ProcessService {
      * @return global params join
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
-        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
-        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
+        List<Property> parentPropertyList = new ArrayList<>();
+        List<Property> subPropertyList = new ArrayList<>();
+
+        try {
+            parentPropertyList = JSONUtils.getMapper().readValue(parentGlobalParams, new TypeReference<List<Property>>() {});
+            subPropertyList = JSONUtils.getMapper().readValue(subGlobalParams, new TypeReference<List<Property>>() {});
+        } catch (IOException e) {
+            logger.error("json parse exception!", e);
+        }
+
         Map<String,String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
         for(Property parent : parentPropertyList){
