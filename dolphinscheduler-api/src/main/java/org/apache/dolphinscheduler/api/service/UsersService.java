@@ -311,9 +311,8 @@ public class UsersService extends BaseService {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
                 return result;
             }
-            user.setPhone(phone);
         }
-
+        user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
         Date now = new Date();
