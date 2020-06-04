@@ -306,14 +306,11 @@ public class UsersService extends BaseService {
             user.setEmail(email);
         }
 
-        if (StringUtils.isNotEmpty(phone)) {
-            if (!CheckUtils.checkPhone(phone)){
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
-                return result;
-            }
-            user.setPhone(phone);
+        if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
+            return result;
         }
-
+        user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
         Date now = new Date();
