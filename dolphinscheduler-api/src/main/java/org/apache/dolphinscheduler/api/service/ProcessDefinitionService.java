@@ -1353,7 +1353,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
             return result;
         }
-        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
+        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition, false);
 
         TreeViewDto parentTreeViewDto = buildTreeViewDto(processId, limit, dag);
 
@@ -1485,45 +1485,19 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinition process definition
      * @return dag graph
      */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
+    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition, boolean isResetDepend) {
 
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        ProcessDag processDag = DagHelper.getProcessDag(processData.getTasks());
 
-        processDefinition.setGlobalParamList(processData.getGlobalParams());
-
-        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
-
-        // Traverse node information and build relationships
-        for (TaskNode taskNode : taskNodeList) {
-            String preTasks = taskNode.getPreTasks();
-            List<String> preTasksList = JSONUtils.toList(preTasks, String.class);
-
-            // If the dependency is not empty
-            if (preTasksList != null) {
-                for (String depNode : preTasksList) {
-                    taskNodeRelations.add(new TaskNodeRelation(depNode, taskNode.getName()));
-                }
-            }
+        if (isResetDepend) {
+            // analyse dependence
+            resetDagTaskNodesByDataLineage(processDag, processDefinition.getId());
         }
 
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-
-        // Generate concrete Dag to be executed
-        return genDagGraph(processDag);
-    }
-
-    /**
-     * Generate the DAG of process
-     *
-     * @return DAG
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDag processDag) {
         DAG<String, TaskNode, TaskNodeRelation> dag = new DAG<>();
 
         /**
@@ -1562,7 +1536,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             logger.info("process define not exists");
             throw new RuntimeException("process define not exists");
         }
-        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraphByDepend(processDefinition);
+        DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition, true);
 
         TreeViewDto parentTreeViewDto = buildTreeViewDto(processId, -1, dag);
 
@@ -1570,26 +1544,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         result.put(Constants.STATUS, Status.SUCCESS);
         result.put(Constants.MSG, Status.SUCCESS.getMsg());
         return result;
-    }
-
-    /**
-     * Generate the DAG Graph based on the process definition id
-     *
-     * @param processDefinition process definition
-     * @return dag graph
-     * @throws Exception if exception happens
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraphByDepend(ProcessDefinition processDefinition) throws Exception {
-        ProcessData processData = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson(), ProcessData.class);
-        processDefinition.setGlobalParamList(processData.getGlobalParams());
-
-        ProcessDag processDag = DagHelper.getProcessDag(processData.getTasks());
-
-        // analyse dependence
-        resetDagTaskNodesByDataLineage(processDag, processDefinition.getId());
-
-        // Generate concrete Dag to be executed
-        return genDagGraph(processDag);
     }
 
     /**
@@ -1610,18 +1564,11 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         int nodeSize = processDag.getNodes().size();
         for(int i = 0; i < nodeSize; i++) {
-            TaskNode taskNode = processDag.getNodes().get(i);
-
-            if (taskNode.isForbidden()) {
+            if (processDag.getNodes().get(i).isForbidden()) {
                 continue;
             }
 
-            AbstractParameters parameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-            if (!parameters.isCheckDepend()) {
-                continue;
-            }
-
-            analyseNodeDependByTableLineage(processDag, taskNode, taskNode, existedTaskNodeMap);
+            analyseNodeDependByTableLineage(processDag, processDag.getNodes().get(i), processDag.getNodes().get(i), existedTaskNodeMap);
         }
     }
 
@@ -1635,7 +1582,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     private void analyseNodeDependByTableLineage(ProcessDag processDag, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> existedTaskNodeMap) {
         // exist depend tag
         AbstractParameters parameters = TaskParametersUtils.getParameters(analyseNode.getType(), analyseNode.getParams());
-        if (StringUtils.isEmpty(parameters.getDependNodeKeys())) {
+        if (!parameters.isCheckDepend()) {
             return;
         }
 
@@ -1651,11 +1598,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             List<TaskNode> dependTaskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
 
             for (TaskNode realNode : dependTaskNodeList) {
-                /**
-                 * 1. non forbidden
-                 * 2. non oneself node
-                 * 3. exist depend relation
-                 */
                 if (!realNode.isForbidden()
                         && !analyseNode.getName().equals(realNode.getName())
                         && DependUnionKeyUtils.existDependRelation(realNode, dependNodeKeys)) {

@@ -1819,7 +1819,7 @@ public class ProcessService {
      * @return process definition list
      */
     public List<ProcessDefinition> queryDependDefinitionList(String[] dependNodeKeys){
-        if(dependNodeKeys == null) {
+        if(dependNodeKeys == null || dependNodeKeys.length == 0) {
             return null;
         }
 

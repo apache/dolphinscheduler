@@ -396,18 +396,11 @@ public class MasterExecThread implements Runnable {
 
         int nodeSize = taskNodeList.size();
         for(int i = 0; i < nodeSize; i++) {
-            TaskNode taskNode = taskNodeList.get(i);
-
-            if (taskNode.isForbidden()) {
+            if (taskNodeList.get(i).isForbidden()) {
                 continue;
             }
 
-            AbstractParameters parameters = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-            if (!parameters.isCheckDepend()) {
-                continue;
-            }
-
-            analyseNodeDependByTableLineage(taskNodeList, taskNode, taskNode, existedTaskNodeMap);
+            analyseNodeDependByTableLineage(taskNodeList, taskNodeList.get(i), taskNodeList.get(i), existedTaskNodeMap);
         }
     }
 
@@ -421,7 +414,7 @@ public class MasterExecThread implements Runnable {
     private void analyseNodeDependByTableLineage(List<TaskNode> lineageNodeList, TaskNode analyseNode, TaskNode postNode, Map<String, TaskNode> existedTaskNodeMap) {
         // exist depend tag
         AbstractParameters parameters = TaskParametersUtils.getParameters(analyseNode.getType(), analyseNode.getParams());
-        if (StringUtils.isEmpty(parameters.getDependNodeKeys())) {
+        if (!parameters.isCheckDepend()) {
             return;
         }
 
