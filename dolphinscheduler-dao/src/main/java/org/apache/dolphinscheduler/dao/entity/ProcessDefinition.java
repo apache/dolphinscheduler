@@ -279,10 +279,15 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        try {
-            this.globalParamList = JSONUtils.getMapper().readValue(globalParams, new TypeReference<List<Property>>() {});
-        } catch (IOException e) {
-            logger.error("json parse exception!", e);
+        if (globalParams == null){
+            this.globalParamList = new ArrayList<>();
+        }else {
+            try {
+                this.globalParamList = JSONUtils.getMapper().readValue(globalParams, new TypeReference<List<Property>>() {
+                });
+            } catch (IOException e) {
+                logger.error("json parse exception!", e);
+            }
         }
         this.globalParams = globalParams;
     }
