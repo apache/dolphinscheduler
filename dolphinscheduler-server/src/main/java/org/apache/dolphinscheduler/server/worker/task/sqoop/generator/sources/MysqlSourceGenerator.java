@@ -91,7 +91,7 @@ public class MysqlSourceGenerator implements ISourceGenerator {
 
                         if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-hive ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
 
@@ -105,7 +105,7 @@ public class MysqlSourceGenerator implements ISourceGenerator {
 
                         if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-java ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
                 }
