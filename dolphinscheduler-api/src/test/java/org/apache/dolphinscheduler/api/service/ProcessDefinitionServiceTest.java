@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -621,8 +621,8 @@ public class ProcessDefinitionServiceTest {
                 "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
 
-        JSONObject jsonObject = JSONUtils.parseObject(topProcessJson);
-        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+        ObjectNode jsonObject = JSONUtils.parseObject(topProcessJson);
+        ArrayNode jsonArray = (ArrayNode) jsonObject.path("tasks");
 
         String originSubJson = jsonArray.toString();
 
