@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
- *  shell task test
+ *  ssh task test
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
@@ -70,7 +70,7 @@ public class SSHTaskTest {
     public void after() {}
 
     /**
-     * Method: ShellTask()
+     * Method: SSHTask()
      */
     @Test
     public void testSSHTask() throws Exception {
@@ -82,7 +82,7 @@ public class SSHTaskTest {
     }
 
     /**
-     * Method: handle() for Windows
+     * Method: handle()
      */
     @Test
     public void testHandle() throws Exception {
