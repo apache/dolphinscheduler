@@ -77,35 +77,35 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                         }else{
                             srcQuery += " WHERE $CONDITIONS";
                         }
-                        result.append(" --query \'"+srcQuery+"\'");
+                        result.append(" --query \'").append(srcQuery).append("\'");
 
                     }
 
                     List<Property>  mapColumnHive = sourceMysqlParameter.getMapColumnHive();
 
                     if(mapColumnHive != null && !mapColumnHive.isEmpty()){
-                        String columnMap = "";
+                        StringBuilder columnMap = new StringBuilder();
                         for(Property item:mapColumnHive){
-                            columnMap = item.getProp()+"="+ item.getValue()+",";
+                            columnMap.append(item.getProp()).append("=").append(item.getValue()).append(",");
                         }
 
-                        if(StringUtils.isNotEmpty(columnMap)){
+                        if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-hive ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
 
                     List<Property>  mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
                     if(mapColumnJava != null && !mapColumnJava.isEmpty()){
-                        String columnMap = "";
+                        StringBuilder columnMap = new StringBuilder();
                         for(Property item:mapColumnJava){
-                            columnMap = item.getProp()+"="+ item.getValue()+",";
+                            columnMap.append(item.getProp()).append("=").append(item.getValue()).append(",");
                         }
 
-                        if(StringUtils.isNotEmpty(columnMap)){
+                        if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-java ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
                 }
