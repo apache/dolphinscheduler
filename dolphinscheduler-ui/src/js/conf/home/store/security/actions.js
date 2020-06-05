@@ -282,7 +282,7 @@ export default {
         const list = res.data
         list.unshift({
           id: -1,
-          tenantName: 'Default'
+          tenantName: 'default'
         })
         state.tenantAllList = list
         resolve(list)
