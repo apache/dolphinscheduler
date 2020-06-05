@@ -95,24 +95,31 @@ public class TaskCallbackService {
         if(newChannel != null){
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
-        logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
+        logger.warn("original master : {} for task : {} is not reachable, random select master",
+                nettyRemoteChannel.getHost(),
+                taskInstanceId);
         Set<String> masterNodes = null;
         while (Stopper.isRunning()) {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
-                logger.error("no available master node");
+                masterNodes = null;
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }else {
-                break;
+                continue;
             }
-        }
-        for(String masterNode : masterNodes){
-            newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
-            if(newChannel != null){
-                return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+            logger.info("find {} masters for task : {}.",
+                    masterNodes.size(),
+                    taskInstanceId);
+            for (String masterNode : masterNodes) {
+                newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+                if (newChannel != null) {
+                    return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+                }
             }
+            masterNodes = null;
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
-        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable", masterNodes));
+
+        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId){
