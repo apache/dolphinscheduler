@@ -46,6 +46,16 @@ public class SSHTask extends AbstractTask {
     private SSHParameters sshParameters;
 
     /**
+     * jsch session
+     */
+    private Session session;
+
+    /**
+     * jsch channel
+     */
+    private Channel channel;
+
+    /**
      * shell command executor
      */
 
@@ -94,9 +104,9 @@ public class SSHTask extends AbstractTask {
             RemoteServerSource remote = (RemoteServerSource) DataSourceFactory.getDatasource(DbType.REMOTESERVER,
                 sshTaskExecutionContext.getConnectionParams());
             // construct process
-            Session session = openSession(remote);
+            openSession(remote);
             command = buildCommand();
-            Object[] result = execute(session, command);
+            Object[] result = execute(command);
             if ((int) result[0] == 0) {
                 setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
                 logger.info("Execute ssh task success, the command is {{}} and result is {{}}", command, result[1]);
@@ -114,7 +124,15 @@ public class SSHTask extends AbstractTask {
 
     @Override
     public void cancelApplication(boolean cancelApplication) throws Exception {
-        // cancel process
+        // cancel ssh task
+        if (!session.isConnected()){
+            return;
+        }
+        if (channel.isClosed()) {
+            return;
+        }
+        channel.disconnect();
+        session.disconnect();
     }
 
     /**
@@ -134,18 +152,17 @@ public class SSHTask extends AbstractTask {
     }
 
 
-    private Session openSession(RemoteServerSource remote) throws Exception {
+    private void openSession(RemoteServerSource remote) throws Exception {
         JSch jsch = new JSch();
-        Session session = jsch.getSession(remote.getUser(), remote.getHost(), remote.getPort());
+        session = jsch.getSession(remote.getUser(), remote.getHost(), remote.getPort());
         session.setPassword(remote.getPassword());
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect(Constants.REMOTESERVER_TIME_OUT);
-        return session;
     }
 
-    private Object[] execute(Session session, String command) throws Exception {
+    private Object[] execute(String command) throws Exception {
         StringBuilder builder = new StringBuilder();
-        Channel channel = session.openChannel("exec");
+        channel = session.openChannel("exec");
         ChannelExec channelExec = ((ChannelExec) channel);
         channelExec.setCommand(command);
         InputStream inputStream = channelExec.getInputStream();
