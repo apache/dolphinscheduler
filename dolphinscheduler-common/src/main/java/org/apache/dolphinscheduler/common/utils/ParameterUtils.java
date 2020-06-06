@@ -48,7 +48,7 @@ public class ParameterUtils {
    * @return convert parameters place holders
    */
   public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
-    if (StringUtils.isEmpty(parameterString)) {
+    if (StringUtils.isEmpty(parameterString) || parameterMap == null) {
       return parameterString;
     }
 

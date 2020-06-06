@@ -21,9 +21,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -273,14 +273,15 @@ public class DataxTaskTest {
             setTaskParems(0);
             buildDataJson();
         } catch (Exception e) {
+            e.printStackTrace();
             Assert.fail(e.getMessage());
         }
     }
 
     public void buildDataJson() throws Exception {
-        Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
+        Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile", new Class[]{Map.class});
         method.setAccessible(true);
-        String filePath = (String) method.invoke(dataxTask, null);
+        String filePath = (String) method.invoke(dataxTask, new Object[]{null});
         Assert.assertNotNull(filePath);
     }
 
@@ -358,9 +359,9 @@ public class DataxTaskTest {
     public void testBuildShellCommandFile()
         throws Exception {
         try {
-            Method method = DataxTask.class.getDeclaredMethod("buildShellCommandFile", String.class);
+            Method method = DataxTask.class.getDeclaredMethod("buildShellCommandFile", String.class, Map.class);
             method.setAccessible(true);
-            Assert.assertNotNull(method.invoke(dataxTask, "test.json"));
+            Assert.assertNotNull(method.invoke(dataxTask, "test.json", null));
         }
         catch (Exception e) {
             Assert.fail(e.getMessage());
