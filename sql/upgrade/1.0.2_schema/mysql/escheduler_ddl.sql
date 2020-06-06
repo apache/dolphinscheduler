@@ -80,9 +80,9 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_error_command()
            `failure_strategy` tinyint(4) NULL DEFAULT 0 COMMENT '失败策略：0结束，1继续',
            `warning_type` tinyint(4) NULL DEFAULT 0 COMMENT '告警类型',
            `warning_group_id` int(11) NULL DEFAULT NULL COMMENT '告警组',
-           `schedule_time` datetime(0) NULL DEFAULT NULL COMMENT '预期运行时间',
-           `start_time` datetime(0) NULL DEFAULT NULL COMMENT '开始时间',
-           `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+           `schedule_time` datetime NULL DEFAULT NULL COMMENT '预期运行时间',
+           `start_time` datetime NULL DEFAULT NULL COMMENT '开始时间',
+           `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
            `dependence` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '依赖字段',
            `process_instance_priority` int(11) NULL DEFAULT NULL COMMENT '流程实例优先级：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
            `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组',
@@ -108,8 +108,8 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_worker_group()
            `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
            `name` varchar(256)  NULL DEFAULT NULL COMMENT '组名称',
            `ip_list` varchar(256)  NULL DEFAULT NULL COMMENT 'worker地址列表',
-           `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-           `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+           `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
+           `update_time` datetime NULL DEFAULT NULL COMMENT '更新时间',
            PRIMARY KEY (`id`) USING BTREE
        ) ENGINE = InnoDB AUTO_INCREMENT=1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 

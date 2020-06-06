@@ -176,8 +176,8 @@ CREATE TABLE `t_escheduler_project` (
   `desc` varchar(200) DEFAULT NULL COMMENT '项目描述',
   `user_id` int(11) DEFAULT NULL COMMENT '所属用户',
   `flag` tinyint(4) DEFAULT '1' COMMENT '是否可用  1 可用,0 不可用',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

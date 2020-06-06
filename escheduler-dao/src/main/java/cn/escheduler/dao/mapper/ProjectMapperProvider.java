@@ -42,6 +42,8 @@ public class ProjectMapperProvider {
                 VALUES("`user_id`", "#{project.userId}");
                 VALUES("`name`", "#{project.name}");
                 VALUES("`desc`", "#{project.desc}");
+                VALUES("`create_time`", "#{project.createTime}");
+                VALUES("`update_time`", "#{project.updateTime}");
             }
         }.toString();
     }
