@@ -336,11 +336,9 @@ public class NettyRemotingClient {
      */
     public Channel createChannel(Host host, boolean isSync) {
         ChannelFuture future;
-        InetSocketAddress socket ;
         try {
             synchronized (bootstrap){
-                socket = new InetSocketAddress(host.getIp(), host.getPort());
-                future = bootstrap.connect(socket);
+                future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
             }
             if(isSync){
                 future.sync();
@@ -351,7 +349,6 @@ public class NettyRemotingClient {
                 return channel;
             }
         } catch (Exception ex) {
-            socket = null;
             logger.info("connect to {} error  {}", host, ex);
         }
         return null;
