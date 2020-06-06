@@ -921,7 +921,7 @@ public class ProcessService {
 
         CommandType fatherType = parentProcessInstance.getCommandType();
         CommandType commandType = fatherType;
-        if(childInstance == null || commandType == CommandType.REPEAT_RUNNING){
+        if(childInstance == null){
             String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
             // sub process must begin with schedule/complement data
             // if father begin with scheduler/complement data
@@ -1813,7 +1813,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId){
-        return userMapper.queryDetailsById(userId);
+        return userMapper.selectById(userId);
     }
 
     /**
