@@ -109,7 +109,8 @@ public class SqlUtils {
             List<SQLStatement> stmtList = SQLUtils.parseStatements(sql, dbType.getDesc());
 
             for (SQLStatement stmt : stmtList) {
-                SchemaStatVisitor visitor = getSchemaStatVisitor(dbType, stmt);
+                SchemaStatVisitor visitor = SQLUtils.createSchemaStatVisitor(dbType.getDesc());
+                stmt.accept(visitor);
 
                 if (visitor.getTables() != null) {
                     for (TableStat.Name name : visitor.getTables().keySet()) {
@@ -138,30 +139,6 @@ public class SqlUtils {
         }
 
         return tableMap;
-    }
-
-    private static SchemaStatVisitor getSchemaStatVisitor(DbType dbType, SQLStatement stmt) {
-        SchemaStatVisitor visitor;
-
-        switch (dbType) {
-            case MYSQL:
-                visitor = new MySqlSchemaStatVisitor();
-                break;
-            case POSTGRESQL:
-                visitor = new PGSchemaStatVisitor();
-                break;
-            case ORACLE:
-                visitor = new OracleSchemaStatVisitor();
-                break;
-            case SQLSERVER:
-                visitor = new SQLServerSchemaStatVisitor();
-                break;
-            default:
-                throw new UnsupportedDataTypeException(dbType.getDesc());
-        }
-
-        stmt.accept(visitor);
-        return visitor;
     }
 
     public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
