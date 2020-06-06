@@ -46,8 +46,10 @@
     <select id="queryDetailsById" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select u.*, t.tenant_name,
         case when u.queue <![CDATA[ <> ]]>  '' then u.queue else q.queue_name end as queue_name
-        from t_ds_user u,t_ds_tenant t,t_ds_queue q
-        WHERE u.tenant_id = t.id and t.queue_id = q.id and u.id = #{userId}
+        from t_ds_user u
+        left join t_ds_tenant t on u.tenant_id=t.id
+        left join t_ds_queue q on t.queue_id = q.id
+        WHERE u.id = #{userId}
     </select>
     <select id="queryUserListByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
       select u.*

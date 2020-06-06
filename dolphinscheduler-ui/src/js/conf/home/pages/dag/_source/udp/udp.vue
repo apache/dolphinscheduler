@@ -205,12 +205,13 @@
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
-
-      if (dag.tenantId === -1) {
+      this.$nextTick(() => {
+        if (dag.tenantId === -1) {
           this.tenantId = this.store.state.user.userInfo.tenantId
-      } else {
+        } else {
           this.tenantId = dag.tenantId
-      }
+        }
+      })
 
     },
     mounted () {},
