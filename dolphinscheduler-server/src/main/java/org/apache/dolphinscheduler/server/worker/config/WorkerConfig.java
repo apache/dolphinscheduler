@@ -38,9 +38,6 @@ public class WorkerConfig {
     @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${worker.rpc.maxretries:-1}")
-    private int workerRpcMaxRetries;
-
     @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
 
@@ -98,14 +95,6 @@ public class WorkerConfig {
         this.workerReservedMemory = workerReservedMemory;
     }
 
-    public int getWorkerRpcMaxRetries() {
-        return workerRpcMaxRetries;
-    }
-
-    public void setWorkerRpcMaxRetries(int workerRpcMaxRetries) {
-        this.workerRpcMaxRetries = workerRpcMaxRetries;
-    }
-
     public int getWorkerMaxCpuloadAvg() {
         if (workerMaxCpuloadAvg == -1){
             return Constants.DEFAULT_WORKER_CPU_LOAD;
@@ -116,5 +105,4 @@ public class WorkerConfig {
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
     }
-
 }
