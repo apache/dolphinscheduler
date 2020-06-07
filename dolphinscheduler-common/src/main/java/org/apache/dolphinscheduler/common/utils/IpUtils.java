@@ -49,11 +49,10 @@ public class IpUtils {
     ipNumbers[2] = ipLong >> 8 & tmp;
     ipNumbers[3] = ipLong & tmp;
 
-    String sb = ipNumbers[0] + DOT +
+    return ipNumbers[0] + DOT +
             ipNumbers[1] + DOT +
             ipNumbers[2] + DOT +
             ipNumbers[3];
-    return sb;
   }
 
 }
