@@ -20,6 +20,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -78,7 +79,7 @@ public class MasterRegistry {
      *  registry
      */
     public void registry() {
-        String address = NetUtils.getHost()();
+        String address = NetUtils.getHost();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
@@ -124,7 +125,7 @@ public class MasterRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return NetUtils.getHost()() + ":" + masterConfig.getListenPort();
+        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 
     /**

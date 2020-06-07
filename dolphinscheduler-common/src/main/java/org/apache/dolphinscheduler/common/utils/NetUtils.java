@@ -123,7 +123,7 @@ public class NetUtils {
         return Optional.empty();
     }
 
-   public static InetAddress normalizeV6Address(Inet6Address address) {
+   private static InetAddress normalizeV6Address(Inet6Address address) {
         String addr = address.getHostAddress();
         int i = addr.lastIndexOf('%');
         if (i > 0) {
@@ -154,7 +154,7 @@ public class NetUtils {
      *
      * @return true if it is reachable
      */
-    public static boolean isPreferIPV6Address() {
+    private static boolean isPreferIPV6Address() {
         return Boolean.getBoolean("java.net.preferIPv6Addresses");
     }
 
@@ -173,7 +173,7 @@ public class NetUtils {
 
     }
 
-    public static List<NetworkInterface> getValidNetworkInterfaces() throws SocketException {
+    private static List<NetworkInterface> getValidNetworkInterfaces() throws SocketException {
         List<NetworkInterface> validNetworkInterfaces = new LinkedList<>();
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {

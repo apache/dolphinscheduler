@@ -142,7 +142,7 @@ public class WorkerRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return NetUtils.getHost()() + ":" + workerConfig.getListenPort();
+        return NetUtils.getHost() + ":" + workerConfig.getListenPort();
     }
 
     /**
