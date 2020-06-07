@@ -71,6 +71,12 @@ public class TaskCallbackServiceTest {
     private TaskResponseProcessor taskResponseProcessor;
 
     /**
+     *  worker config
+     */
+    @Autowired
+    private WorkerConfig workerConfig;
+
+    /**
      * send ack test
      * @throws Exception
      */
@@ -142,6 +148,7 @@ public class TaskCallbackServiceTest {
 
     @Test(expected = IllegalStateException.class)
     public void testSendAckWithIllegalStateException1(){
+        workerConfig.setWorkerRpcMaxRetries(5);
         masterRegistry.registry();
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);

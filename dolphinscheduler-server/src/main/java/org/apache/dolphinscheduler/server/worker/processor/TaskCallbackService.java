@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,12 @@ public class TaskCallbackService {
      */
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
+
+    /**
+     *  worker config
+     */
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * netty remoting client
@@ -101,6 +108,7 @@ public class TaskCallbackService {
                 taskInstanceId);
         Set<String> masterNodes = null;
         int ntries = 0;
+        int maxRetries = workerConfig.getWorkerRpcMaxRetries();
         while (Stopper.isRunning()) {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
@@ -108,6 +116,7 @@ public class TaskCallbackService {
                         ntries + 1,
                         taskInstanceId);
                 masterNodes = null;
+                isStopRunning(ntries, maxRetries, taskInstanceId);
                 ThreadUtils.sleep(pause(ntries++));
                 continue;
             }
@@ -122,10 +131,21 @@ public class TaskCallbackService {
                 }
             }
             masterNodes = null;
+            isStopRunning(ntries, maxRetries, taskInstanceId);
             ThreadUtils.sleep(pause(ntries++));
         }
 
         throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
+    }
+
+    private void isStopRunning(int ntries, int maxRetries,int taskInstanceId){
+        if ( ntries >= maxRetries - 1 ) {
+            logger.error(" have alreay tried max({}) times to connect master for task : {}, but not found, I will stop myself",
+                    ntries + 1,
+                    taskInstanceId);
+            System.exit(-1);
+        }
+
     }
 
     private long pause(int ntries){
