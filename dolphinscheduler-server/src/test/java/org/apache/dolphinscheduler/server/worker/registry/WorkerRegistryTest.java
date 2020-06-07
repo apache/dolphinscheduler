@@ -58,7 +58,7 @@ public class WorkerRegistryTest {
         workerRegistry.registry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
         Assert.assertEquals(DEFAULT_WORKER_GROUP, workerConfig.getWorkerGroup().trim());
-        String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (OSUtils.getHost() + ":" + workerConfig.getListenPort());
+        String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (NetUtils.getHost()() + ":" + workerConfig.getListenPort());
         TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
         Assert.assertEquals(5, heartbeat.split(",").length);

@@ -89,7 +89,7 @@ public class OSUtilsTest {
     }
     @Test
     public void getHost(){
-        String host = OSUtils.getHost();
+        String host = NetUtils.getHost();
         Assert.assertNotNull(host);
         Assert.assertNotEquals("", host);
     }

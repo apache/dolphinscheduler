@@ -78,7 +78,7 @@ public class MasterRegistry {
      *  registry
      */
     public void registry() {
-        String address = OSUtils.getHost();
+        String address = NetUtils.getHost()();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
@@ -124,7 +124,7 @@ public class MasterRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+        return NetUtils.getHost()() + ":" + masterConfig.getListenPort();
     }
 
     /**

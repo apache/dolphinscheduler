@@ -75,7 +75,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			while (!checkZKNodeExists(OSUtils.getHost(), ZKNodeType.MASTER)){
+			while (!checkZKNodeExists(NetUtils.getHost()(), ZKNodeType.MASTER)){
 				ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 			}
 
@@ -155,7 +155,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-		if(StringUtils.isEmpty(serverHost) || serverHost.startsWith(OSUtils.getHost())){
+		if(StringUtils.isEmpty(serverHost) || serverHost.startsWith(NetUtils.getHost()())){
 			return ;
 		}
 		switch (zkNodeType){

@@ -90,7 +90,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         String contextJson = taskRequestCommand.getTaskExecutionContext();
 
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
-        taskExecutionContext.setHost(OSUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setHost(NetUtils.getHost()() + ":" + workerConfig.getListenPort());
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
