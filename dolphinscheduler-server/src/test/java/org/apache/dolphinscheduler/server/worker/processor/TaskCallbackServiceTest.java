@@ -164,6 +164,8 @@ public class TaskCallbackServiceTest {
 
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
+        Assert.assertEquals(false, channel.isOpen());
+
         Stopper.stop();
 
         nettyRemotingServer.close();

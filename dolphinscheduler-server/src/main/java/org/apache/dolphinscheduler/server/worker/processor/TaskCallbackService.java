@@ -46,7 +46,7 @@ import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 public class TaskCallbackService {
 
     private final Logger logger = LoggerFactory.getLogger(TaskCallbackService.class);
-    private static final int RETRY_BACKOFF[] = { 1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200 };
+    private static final int [] RETRY_BACKOFF = { 1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200 };
 
     /**
      *  remote channels
@@ -130,9 +130,8 @@ public class TaskCallbackService {
     }
 
 
-    public long pause(int ntries){
-        long normalPause = SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
-        return normalPause;
+    public int pause(int ntries){
+        return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
     }
 
 
