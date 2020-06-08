@@ -130,7 +130,7 @@ public class TaskCallbackService {
     }
 
 
-    private long pause(int ntries){
+    public long pause(int ntries){
         long normalPause = SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
         return normalPause;
     }
