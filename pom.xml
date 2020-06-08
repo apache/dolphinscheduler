@@ -740,7 +740,7 @@
                         <include>**/alert/utils/MailUtilsTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                     </includes>
-                    <!-- <skip>true</skip> -->
+                     <skip>true</skip>
                 </configuration>
             </plugin>
 
