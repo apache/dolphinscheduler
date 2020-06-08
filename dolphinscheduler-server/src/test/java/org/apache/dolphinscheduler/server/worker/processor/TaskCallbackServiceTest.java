@@ -156,7 +156,7 @@ public class TaskCallbackServiceTest {
         NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
         Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-        channel.close();
+//        channel.close();
 
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(1);
@@ -164,7 +164,7 @@ public class TaskCallbackServiceTest {
 
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
 
-        Assert.assertEquals(false, channel.isOpen());
+        Assert.assertEquals(true, channel.isOpen());
 
         Stopper.stop();
 
