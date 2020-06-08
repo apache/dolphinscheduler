@@ -49,7 +49,7 @@ public class NetUtils {
 
     private static String LOCALHOST_VALUE = "127.0.0.1";
 
-    private static volatile InetAddress LOCAL_ADDRESS = null;
+    private static  InetAddress LOCAL_ADDRESS = null;
 
     private static volatile String HOST_ADDRESS;
 
@@ -70,7 +70,7 @@ public class NetUtils {
      *
      * @return first valid local IP
      */
-    public static InetAddress getLocalAddress() {
+    public static synchronized InetAddress getLocalAddress() {
 
         if (null != LOCAL_ADDRESS) {
             return LOCAL_ADDRESS;
