@@ -131,7 +131,7 @@
     },
     created () {
       let supportType = this.supportType || []
-      this.typeList = _.cloneDeep(this.store.state.dag.dsTypeListS)
+      this.typeList = this.data.typeList || _.cloneDeep(this.store.state.dag.dsTypeListS)
       // Have a specified data source
       if (supportType.length) {
         let is = (type) => {
