@@ -1011,5 +1011,6 @@
         <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-plugin-api</module>
+        <module>dolphinscheduler-microbench</module>
     </modules>
 </project>
