@@ -756,13 +756,8 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
-        List<ProcessMeta> processMetaList = new ArrayList<>();
+        List<ProcessMeta>  processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
 
-        try {
-            processMetaList = JSONUtils.getMapper().readValue(processMetaJson, new TypeReference<List<ProcessMeta>>() {});
-        } catch (Exception e) {
-            logger.error("parse list exception!", e);
-        }
         //check file content
         if (CollectionUtils.isEmpty(processMetaList)) {
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
