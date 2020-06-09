@@ -104,13 +104,21 @@ public class Queue {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Queue queue1 = (Queue) o;
 
-        if (id != queue1.id) return false;
-        if (!queueName.equals(queue1.queueName)) return false;
+        if (id != queue1.id) {
+            return false;
+        }
+        if (!queueName.equals(queue1.queueName)) {
+            return false;
+        }
         return queue.equals(queue1.queue);
     }
 

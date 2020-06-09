@@ -91,8 +91,7 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     LoggerService loggerService;
 
-    @Autowired
-    WorkerGroupMapper workerGroupMapper;
+
 
     @Autowired
     UsersService usersService;
@@ -505,9 +504,8 @@ public class ProcessInstanceService extends BaseDAGService {
      *
      * @param processInstanceId process instance id
      * @return variables data
-     * @throws Exception exception
      */
-    public Map<String, Object> viewVariables( Integer processInstanceId) throws Exception {
+    public Map<String, Object> viewVariables(Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>(5);
 
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
@@ -538,7 +536,7 @@ public class ProcessInstanceService extends BaseDAGService {
         List<TaskNode> taskNodeList = workflowData.getTasks();
 
         // global param string
-        String globalParamStr = JSON.toJSONString(globalParams);
+        String globalParamStr = JSONUtils.toJson(globalParams);
         globalParamStr = ParameterUtils.convertParameterPlaceholders(globalParamStr, timeParams);
         globalParams = JSON.parseArray(globalParamStr, Property.class);
         for (Property property : globalParams) {

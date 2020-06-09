@@ -46,7 +46,7 @@
         <m-list-box-f v-if="isADMIN">
           <template slot="name"><strong>*</strong>{{$t('Tenant')}}</template>
           <template slot="content">
-            <x-select v-model="tenantId">
+            <x-select v-model="tenantId" style="width: 100%;">
               <x-option
                       v-for="city in tenantList"
                       :key="city.id"
@@ -59,8 +59,8 @@
         <m-list-box-f v-if="isADMIN">
           <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
-            <x-select v-model="queueName">
-              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
+            <x-select v-model="queueName" style="width: 100%;">
+              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
                 <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
                 <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
               </x-input>
@@ -93,6 +93,15 @@
             </x-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name">{{$t('State')}}</template>
+          <template slot="content">
+            <x-radio-group v-model="userState" >
+              <x-radio :label="'1'">{{$t('Enable')}}</x-radio>
+              <x-radio :label="'0'">{{$t('Disable')}}</x-radio>
+            </x-radio-group>
+          </template>
+        </m-list-box-f>
       </div>
     </template>
   </m-popup>
@@ -118,6 +127,7 @@
         queueName: '',
         email: '',
         phone: '',
+        userState: '1',
         tenantList: [],
         // Source admin user information
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER' && router.history.current.name !== 'account'
@@ -241,7 +251,8 @@
           tenantId: this.tenantId,
           email: this.email,
           queue: queueCode,
-          phone: this.phone
+          phone: this.phone,
+          state: this.userState
         }
 
         if (this.item) {
@@ -270,6 +281,7 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
+            this.userState = this.item.state + '' || '1'
             this.tenantId = this.item.tenantId
             this.$nextTick(() => {
               this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
@@ -282,6 +294,7 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
+          this.userState = this.state + '' || '1'
           this.tenantId = this.item.tenantId
           if(this.queueList.length>0) {
             this.queueName = _.find(this.queueList, ['code', this.item.queue]).id

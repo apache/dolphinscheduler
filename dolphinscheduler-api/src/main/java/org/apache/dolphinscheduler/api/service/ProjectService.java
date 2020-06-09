@@ -88,6 +88,8 @@ public class ProjectService extends BaseService{
         project.setUpdateTime(now);
 
         if (projectMapper.insert(project) > 0) {
+            Project insertedProject = projectMapper.queryByName(name);
+            result.put(Constants.DATA_LIST, insertedProject);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.CREATE_PROJECT_ERROR);
@@ -124,9 +126,7 @@ public class ProjectService extends BaseService{
      * @return true if the login user have permission to see the project
      */
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
-
         Map<String, Object> result = new HashMap<>(5);
-
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         } else if (!checkReadPermission(loginUser, project)) {
@@ -135,8 +135,6 @@ public class ProjectService extends BaseService{
         }else {
             putMsg(result, Status.SUCCESS);
         }
-
-
         return result;
     }
 

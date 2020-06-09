@@ -21,40 +21,21 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * worker group for task running
+ * worker group
  */
-@TableName("t_ds_worker_group")
 public class WorkerGroup {
-
-    @TableId(value="id", type=IdType.AUTO)
-    private int id;
 
     private String name;
 
-    private String ipList;
+    private List<String> ipList;
 
     private Date createTime;
 
     private Date updateTime;
 
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getIpList() {
-        return ipList;
-    }
-
-    public void setIpList(String ipList) {
-        this.ipList = ipList;
-    }
 
     public Date getCreateTime() {
         return createTime;
@@ -72,18 +53,6 @@ public class WorkerGroup {
         this.updateTime = updateTime;
     }
 
-    @Override
-    public String toString() {
-        return "Worker group model{" +
-                "id= " + id +
-                ",name= " + name +
-                ",ipList= " + ipList +
-                ",createTime= " + createTime +
-                ",updateTime= " + updateTime +
-
-                "}";
-    }
-
     public String getName() {
         return name;
     }
@@ -91,4 +60,14 @@ public class WorkerGroup {
     public void setName(String name) {
         this.name = name;
     }
+
+    public List<String> getIpList() {
+        return ipList;
+    }
+
+    public void setIpList(List<String> ipList) {
+        this.ipList = ipList;
+    }
+
+
 }
