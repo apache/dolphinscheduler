@@ -277,7 +277,6 @@ public class DataxTask extends AbstractTask {
                 dataSourceCfg, dataXParameters.getSql());
 
         ArrayNode columnArr = writerParam.putArray("column");
-        columnArr.addAll()
         for (String column : columns) {
             columnArr.add(column);
         }

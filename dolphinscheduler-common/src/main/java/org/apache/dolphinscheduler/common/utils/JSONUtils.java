@@ -187,7 +187,7 @@ public class JSONUtils {
      */
     public static Map<String, String> toMap(String json) {
         if (StringUtils.isEmpty(json)) {
-            return new HashMap<>();
+            return null;
         }
 
         try {
@@ -196,7 +196,7 @@ public class JSONUtils {
             logger.error("json to map exception!", e);
         }
 
-        return new HashMap<>();
+        return null;
     }
 
     /**
