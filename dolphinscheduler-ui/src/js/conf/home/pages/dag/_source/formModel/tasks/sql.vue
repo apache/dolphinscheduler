@@ -89,6 +89,9 @@
                   name="code-sql-mirror"
                   style="opacity: 0;">
           </textarea>
+          <a class="ans-modal-box-max">
+            <em class="ans-icon-max" @click="setEditorVal"></em>
+          </a>
         </div>
       </div>
     </m-list-box>
@@ -140,6 +143,7 @@
   import i18n from '@/module/i18n'
   import mUdfs from './_source/udfs'
   import mListBox from './_source/listBox'
+  import mScriptBox from './_source/scriptBox'
   import mSqlType from './_source/sqlType'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
@@ -190,6 +194,34 @@
       createNodeId: Number
     },
     methods: {
+      setEditorVal() {
+        let self = this
+          let modal = self.$modal.dialog({
+            className: 'scriptModal',
+            closable: false,
+            showMask: true,
+            maskClosable: true,
+            onClose: function() {
+
+            },
+            render (h) {
+              return h(mScriptBox, {
+                on: {
+                  getSriptBoxValue (val) {
+                    editor.setValue(val)
+                  },
+                  closeAble () {
+                    // this.$modal.destroy()
+                    modal.remove()
+                  }
+                },
+                props: {
+                  item: editor.getValue()
+                }
+              })
+            }
+          })
+      },
       /**
        * return sqlType
        */
@@ -494,6 +526,11 @@
   .requiredIcon {
     color: #ff0000;
     padding-right: 4px;
+  }
+  .ans-modal-box-max {
+    position: absolute;
+    right: -12px;
+    top: -16px;
   }
 </style>
 
