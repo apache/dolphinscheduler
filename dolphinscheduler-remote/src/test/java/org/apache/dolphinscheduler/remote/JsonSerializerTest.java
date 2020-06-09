@@ -18,20 +18,20 @@
 package org.apache.dolphinscheduler.remote;
 
 
-import org.apache.dolphinscheduler.remote.utils.JacksonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class JacksonSerializerTest {
+public class JsonSerializerTest {
 
     @Test
     public void testSerialize(){
         TestObj testObj = new TestObj();
         testObj.setAge(12);
-        byte[] serializeByte = JacksonSerializer.serialize(testObj);
+        byte[] serializeByte = JsonSerializer.serialize(testObj);
 
         //
-        TestObj deserialize = JacksonSerializer.deserialize(serializeByte, TestObj.class);
+        TestObj deserialize = JsonSerializer.deserialize(serializeByte, TestObj.class);
 
         Assert.assertEquals(testObj.getAge(), deserialize.getAge());
     }

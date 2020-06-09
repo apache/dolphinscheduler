@@ -27,9 +27,9 @@ import java.nio.charset.StandardCharsets;
 /**
  *  json serialize or deserialize
  */
-public class JacksonSerializer {
+public class JsonSerializer {
 	private static final ObjectMapper objectMapper = new ObjectMapper();
-	private static final Logger logger = LoggerFactory.getLogger(JacksonSerializer.class);
+	private static final Logger logger = LoggerFactory.getLogger(JsonSerializer.class);
 
 	/**
 	 * serialize to byte

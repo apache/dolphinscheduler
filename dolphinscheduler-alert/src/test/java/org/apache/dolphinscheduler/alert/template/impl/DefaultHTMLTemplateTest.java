@@ -116,7 +116,7 @@ public class DefaultHTMLTemplateTest{
                 "    </head>\n" +
                 "    <body style=\"margin:0;padding:0\">\n" +
                 "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" +
-                "<tr><td>{mysql service name=mysql200, mysql address=192.168.xx.xx, port=3306, no index of number=80, database client connections=190}</td></tr><tr><td>{mysql service name=mysql210, mysql address=192.168.xx.xx, port=3306, no index of number=10, database client connections=90}</td></tr>        </table>\n" +
+                "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"port\":\"3306\",\"no index of number\":\"80\",\"database client connections\":\"190\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"port\":\"3306\",\"no index of number\":\"10\",\"database client connections\":\"90\"}</td></tr>        </table>\n" +
                 "    </body>\n" +
                 "</html>";
     }

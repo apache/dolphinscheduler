@@ -753,15 +753,9 @@ public class ProcessService {
      * @return global params join
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
-        List<Property> parentPropertyList = new ArrayList<>();
-        List<Property> subPropertyList = new ArrayList<>();
 
-        try {
-            parentPropertyList = JSONUtils.getMapper().readValue(parentGlobalParams, new TypeReference<List<Property>>() {});
-            subPropertyList = JSONUtils.getMapper().readValue(subGlobalParams, new TypeReference<List<Property>>() {});
-        } catch (IOException e) {
-            logger.error("json parse exception!", e);
-        }
+        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
+        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
 
         Map<String,String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
