@@ -22,6 +22,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +51,6 @@ public class JSONUtils {
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).setTimeZone(TimeZone.getDefault());
     }
 
-    public static ObjectMapper getMapper() {
-        return objectMapper;
-    }
-
 
     public static ArrayNode createArrayNode() {
         return objectMapper.createArrayNode();
@@ -62,7 +59,6 @@ public class JSONUtils {
     public static ObjectNode createObjectNode() {
         return objectMapper.createObjectNode();
     }
-
 
     public static JsonNode toJsonNode(Object obj) {
         return objectMapper.valueToTree(obj);
@@ -125,9 +121,11 @@ public class JSONUtils {
         if (StringUtils.isEmpty(json)) {
             return new ArrayList<>();
         }
+
         try {
-            return objectMapper.readValue(json, new TypeReference<List<T>>() {
-            });
+
+            CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
+            return objectMapper.readValue(json, listType);
         } catch (Exception e) {
             logger.error("parse list exception!", e);
         }
@@ -189,7 +187,7 @@ public class JSONUtils {
      */
     public static Map<String, String> toMap(String json) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return new HashMap<>();
         }
 
         try {
@@ -198,7 +196,7 @@ public class JSONUtils {
             logger.error("json to map exception!", e);
         }
 
-        return null;
+        return new HashMap<>();
     }
 
     /**

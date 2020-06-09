@@ -521,7 +521,6 @@ public class ProcessDefinitionServiceTest {
     @Test
     public void testExportProcessMetaDataStr() {
         Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(getSchedulerList());
-
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setProcessDefinitionJson(sqlDependentJson);
 

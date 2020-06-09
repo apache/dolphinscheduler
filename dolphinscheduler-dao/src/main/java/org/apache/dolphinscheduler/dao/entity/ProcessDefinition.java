@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -101,11 +102,13 @@ public class ProcessDefinition {
     /**
      * create time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     /**
@@ -282,12 +285,7 @@ public class ProcessDefinition {
         if (globalParams == null){
             this.globalParamList = new ArrayList<>();
         }else {
-            try {
-                this.globalParamList = JSONUtils.getMapper().readValue(globalParams, new TypeReference<List<Property>>() {
-                });
-            } catch (IOException e) {
-                logger.error("json parse exception!", e);
-            }
+            this.globalParamList = JSONUtils.toList(globalParams, Property.class);
         }
         this.globalParams = globalParams;
     }
@@ -305,13 +303,7 @@ public class ProcessDefinition {
         List<Property> propList = new ArrayList<> ();
 
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            try {
-                propList = JSONUtils.getMapper().readValue(globalParams, new TypeReference<List<Property>>() {
-                });
-            } catch (IOException e) {
-                logger.error("json parse exception!", e);
-            }
-
+            propList = JSONUtils.toList(globalParams,Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 

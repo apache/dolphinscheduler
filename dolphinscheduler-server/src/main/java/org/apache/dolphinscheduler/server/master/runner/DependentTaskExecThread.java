@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -53,6 +54,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * dependent date
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date dependentDate;
 
     /**

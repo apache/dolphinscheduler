@@ -154,12 +154,7 @@ public class TaskExecuteThread implements Runnable {
         String globalParamsStr = taskExecutionContext.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = new ArrayList<>();
-
-            try {
-                globalParamsList = JSONUtils.getMapper().readValue(globalParamsStr, new TypeReference<List<Property>>() {});
-            } catch (Exception e) {
-                logger.error("parse list exception!", e);
-            }
+            globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;

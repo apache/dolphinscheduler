@@ -786,7 +786,7 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
-                        <include>**/remote/JacksonSerializerTest.java</include>
+                        <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>

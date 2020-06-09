@@ -55,10 +55,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -278,7 +275,9 @@ public class DataxTask extends AbstractTask {
         String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
                 DbType.of(dataxTaskExecutionContext.getTargetType()),
                 dataSourceCfg, dataXParameters.getSql());
+
         ArrayNode columnArr = writerParam.putArray("column");
+        columnArr.addAll()
         for (String column : columns) {
             columnArr.add(column);
         }

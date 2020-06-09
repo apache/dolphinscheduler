@@ -167,7 +167,7 @@ public class DataSourceService extends BaseService{
             paramObject.put(Constants.PASSWORD, oldParams.path(Constants.PASSWORD).asText());
         }
         // connectionParams json
-        String connectionParams = JSONUtils.toJsonString(paramObject);
+        String connectionParams = paramObject.toString();
 
         Boolean isConnection = checkConnection(type, connectionParams);
         if (!isConnection) {
@@ -315,7 +315,7 @@ public class DataSourceService extends BaseService{
             String connectionParams  = dataSource.getConnectionParams();
             ObjectNode  object = JSONUtils.parseObject(connectionParams);
             object.put(Constants.PASSWORD, Constants.XXXXXX);
-            dataSource.setConnectionParams(JSONUtils.toJsonString(object));
+            dataSource.setConnectionParams(object.toString());
 
         }
     }
@@ -524,7 +524,7 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
         if (other != null && !"".equals(other)) {
-            LinkedHashMap<String, String> map = JSONUtils.parseObject(other, LinkedHashMap.class);
+            Map<String, String> map = JSONUtils.toMap(other);
             if (map.size() > 0) {
                 StringBuilder otherSb = new StringBuilder();
                 for (Map.Entry<String, String> entry: map.entrySet()) {
