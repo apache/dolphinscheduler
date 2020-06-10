@@ -14,23 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.security;
+package org.apache.dolphinscheduler.data.security;
 
-import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.UserManagePage;
-import org.testng.annotations.Test;
+public class AlertManageData {
+    /**
+     * Alert Name
+     */
+    public static final String ALERT_NAME = "selenium_alert_Name";
+    /**
+     * Alert Type
+     */
+    public static final String ALERT_TYPE = "邮件";
 
-public class UserManageTest extends BaseTest {
-    private UserManagePage userManagePage;
+    /**
+     * Alert Description
+     */
+    public static final String DESCRIPTION = "create alert test";
 
-    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "UserManageTest",priority=3)
-    public void testUserManage() throws InterruptedException {
-        userManagePage = new UserManagePage(driver);
-        //assert user manage page
-        System.out.println("start create user");
-        assert userManagePage.createUser();
-        System.out.println("end create user");
-        System.out.println("===================================");
+    public static final String ALERT_MANAGE = "告警组管理 - DolphinScheduler";
 
-    }
 }

@@ -14,25 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.deleteData;
+package org.apache.dolphinscheduler.testcase.testSecurity;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.security.TenantManagePage;
 import org.testng.annotations.Test;
 
-public class DeleteTenantTest extends BaseTest {
+
+public class TestTenantManage extends BaseTest {
     private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","createTenant"},description = "DeleteTenantTest",priority=9)
-    public void testDeleteTenant() throws InterruptedException {
+    @Test(groups={"functionTests","createTenant"},dependsOnGroups = { "login" },description = "TestTenantManage")
+    public void testTenantManage() throws InterruptedException {
         tenantManagePage = new TenantManagePage(driver);
         //assert tenant manage page
-        System.out.println("jump to security to delete tenant");
-        tenantManagePage.jumpSecurity();
-
-        System.out.println("start delete tenant");
-        assert tenantManagePage.deleteTenant();
-        System.out.println("end delete tenant");
+        System.out.println("start create tenant");
+        assert tenantManagePage.createTenant();
+        System.out.println("end create tenant");
         System.out.println("===================================");
     }
 }
