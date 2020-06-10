@@ -60,14 +60,14 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
          */
         final CommandType commandType = command.getType();
         switch (commandType){
-                case GET_LOG_BYTES_REQUEST:
-                    GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
-                            command.getBody(), GetLogBytesRequestCommand.class);
-                    byte[] bytes = getFileContentBytes(getLogRequest.getPath());
-                    GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
-                    channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
-                    break;
-                case VIEW_WHOLE_LOG_REQUEST:
+            case GET_LOG_BYTES_REQUEST:
+                GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
+                        command.getBody(), GetLogBytesRequestCommand.class);
+                byte[] bytes = getFileContentBytes(getLogRequest.getPath());
+                GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
+                channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
+                break;
+            case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = FastJsonSerializer.deserialize(
                         command.getBody(), ViewLogRequestCommand.class);
                 String msg = readWholeFileContent(viewLogRequest.getPath());
@@ -85,6 +85,25 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 }
                 RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(builder.toString());
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
+                break;
+            case REMOVE_TAK_LOG_REQUEST:
+                RemoveTaskLogRequestCommand removeTaskLogRequest = FastJsonSerializer.deserialize(
+                        command.getBody(), RemoveTaskLogRequestCommand.class);
+
+                String taskLogPath = removeTaskLogRequest.getPath();
+
+                File taskLogFile = new File(taskLogPath);
+                Boolean status = true;
+                try {
+                    if (taskLogFile.exists()){
+                        taskLogFile.delete();
+                    }
+                }catch (Exception e){
+                    status = false;
+                }
+
+                RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(status);
+                channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType");
