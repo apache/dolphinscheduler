@@ -96,7 +96,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 Boolean status = true;
                 try {
                     if (taskLogFile.exists()){
-                        taskLogFile.delete();
+                        status = taskLogFile.delete();
                     }
                 }catch (Exception e){
                     status = false;
