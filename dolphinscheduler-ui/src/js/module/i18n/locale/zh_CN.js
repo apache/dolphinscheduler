@@ -99,6 +99,7 @@ export default {
   Script: '脚本',
   'Please enter script(required)': '请输入脚本(必填)',
   'Deploy Mode': '部署方式',
+  'Flink Version': 'Flink版本',
   'Driver core number': 'Driver内核数',
   'Please enter driver core number': '请输入Driver内核数',
   'Driver memory use': 'Driver内存数',
