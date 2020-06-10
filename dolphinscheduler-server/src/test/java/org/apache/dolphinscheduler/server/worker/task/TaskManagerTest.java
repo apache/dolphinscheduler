@@ -58,7 +58,7 @@ public class TaskManagerTest {
     }
 
     /**
-     * Method: SSHTask()
+     * Method: testNewTask()
      */
     @Test
     public void testNewTask() throws Exception {
