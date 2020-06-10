@@ -38,9 +38,9 @@ public class HttpParametersTest  {
 
     @Test
     public void testGenerator(){
-        String data1 = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\"," +
+        String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        HttpParameters httpParameters = JSON.parseObject(data1, HttpParameters.class);
+        HttpParameters httpParameters = JSON.parseObject(paramData, HttpParameters.class);
 
 
         Assert.assertEquals(10000,httpParameters.getConnectTimeout() );
