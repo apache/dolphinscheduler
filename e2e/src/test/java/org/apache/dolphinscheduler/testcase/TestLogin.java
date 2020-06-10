@@ -14,27 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.project;
+package org.apache.dolphinscheduler.testcase;
 
-import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.LoginPage;
 import org.testng.annotations.Test;
 
-public class CreateProjectTest  extends BaseTest {
-    private CreateProjectPage createProjectPage;
+import static org.apache.dolphinscheduler.base.BaseTest.driver;
 
-    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest",priority=4)
-    public void testCreateProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        // enter user manage page
-        System.out.println("jump to the projectManage page to create project ");
-        createProjectPage.jumpProjectManagePage();
-        //assert user manage page
-        System.out.println("start create project");
-        assert createProjectPage.createProject();
-        System.out.println("end create project");
+@Test(groups={"functionTests","login"})
+public class TestLogin {
+    private LoginPage loginPage;
+
+    @Test(description = "TestLogin")
+    public void testLogin() throws InterruptedException {
+        loginPage = new LoginPage(driver);
         System.out.println("===================================");
+        System.out.println("jump to Chinese login page");
+        loginPage.jumpPageChinese();
+
+        System.out.println("start login");
+        assert  loginPage.login();
+        System.out.println("end login");
+        System.out.println("===================================");
+
     }
-
 }
-
