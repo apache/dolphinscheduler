@@ -69,7 +69,7 @@ public class SqoopJobGenerator {
         if (SqoopJobType.TEMPLATE.getDescp().equals(sqoopParameters.getJobType())) {
             createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
             if(sourceGenerator == null || targetGenerator == null){
-                return null;
+                throw new RuntimeException("sqoop task source type or target type is null");
             }
 
             sqoopScripts =  commonGenerator.generate(sqoopParameters)
