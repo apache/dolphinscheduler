@@ -106,7 +106,7 @@ public class TargetMysqlParameter {
         this.preQuery = preQuery;
     }
 
-    public boolean isUpdate() {
+    public boolean getIsUpdate() {
         return isUpdate;
     }
 

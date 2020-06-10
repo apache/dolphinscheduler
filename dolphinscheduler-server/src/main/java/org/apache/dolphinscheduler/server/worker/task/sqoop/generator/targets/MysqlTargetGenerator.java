@@ -78,7 +78,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                         result.append(" --lines-terminated-by '").append(targetMysqlParameter.getLinesTerminated()).append("'");
                     }
 
-                    if(targetMysqlParameter.isUpdate()
+                    if(targetMysqlParameter.getIsUpdate()
                             && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
                             && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())){
                         result.append(" --update-key ").append(targetMysqlParameter.getTargetUpdateKey())
