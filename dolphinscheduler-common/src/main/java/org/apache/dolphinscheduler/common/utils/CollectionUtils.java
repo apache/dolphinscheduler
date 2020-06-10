@@ -99,8 +99,8 @@ public class CollectionUtils {
         }
         String[] strings = str.split(separator);
         Map<String, String> map = new HashMap<>(strings.length);
-        for (int i = 0; i < strings.length; i++) {
-            String[] strArray = strings[i].split("=");
+        for (String string : strings) {
+            String[] strArray = string.split("=");
             if (strArray.length != 2) {
                 return emptyMap;
             }
