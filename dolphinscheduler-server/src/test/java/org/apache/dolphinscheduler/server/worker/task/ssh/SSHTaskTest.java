@@ -82,13 +82,26 @@ public class SSHTaskTest {
     }
 
     /**
+     * Method: init()
+     */
+    @Test
+    public void testInit() throws Exception {
+        try {
+            sshTask.init();
+        } catch (Error | Exception e) {
+            logger.error("error", e);
+            if (!e.getMessage().contains("process error . exitCode is :  -1")) {
+                logger.error(e.getMessage());
+            }
+        }
+    }
+
+    /**
      * Method: handle()
      */
     @Test
     public void testHandle() throws Exception {
         try {
-            taskExecutionContext.getSshTaskExecutionContext().setConnectionParams(params);
-            SSHTask sshTask = new SSHTask(taskExecutionContext, logger);
             sshTask.init();
             sshTask.handle();
         } catch (Error | Exception e) {

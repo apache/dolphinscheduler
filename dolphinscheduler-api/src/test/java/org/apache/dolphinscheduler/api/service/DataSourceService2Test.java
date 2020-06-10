@@ -35,22 +35,18 @@ import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-public class DataSourceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
+public class DataSourceService2Test {
 
     @Autowired
     private DataSourceService dataSourceService;
 
     /**
-     * Method: queryDataSourceList()
+     * Method: checkConnection()
      */
     @Test
-    public void queryDataSourceList(){
-
-        User loginUser = new User();
-        loginUser.setId(27);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+    public void checkConnection() {
+        DbType type = DbType.REMOTESERVER;
+        String params = "{\"address\":\"\",\"database\":\"\",\"jdbcUrl\":\"/\",\"user\":\"root\",\"password\":\"123456\",\"host\":\"127.0.0.1\",\"port\":\"22\"}";
+        dataSourceService.checkConnection(type, params);
     }
 }
