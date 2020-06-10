@@ -66,7 +66,7 @@ public class FlinkArgsUtils {
 
             // judgy flink version,from flink1.10,the parameter -yn removed
             String flinkVersion = param.getFlinkVersion();
-            if (flinkVersion.equals(FLINK_VERSION_BEFORE_1_10)) {
+            if (FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                 int taskManager = param.getTaskManager();
                 if (taskManager != 0) {                        //-yn
                     args.add(Constants.FLINK_TASK_MANAGE);
