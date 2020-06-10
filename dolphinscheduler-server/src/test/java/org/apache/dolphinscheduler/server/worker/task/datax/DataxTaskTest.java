@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.CommandType;
