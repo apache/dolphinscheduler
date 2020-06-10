@@ -19,22 +19,20 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * data source of Oracle
  */
 public class OracleDataSource extends BaseDataSource {
 
-    private DbConnectType type;
+    private DbConnectType connectType;
 
-    public DbConnectType getType() {
-        return type;
+    public DbConnectType getConnectType() {
+        return connectType;
     }
 
-    public void setType(DbConnectType type) {
-        this.type = type;
+    public void setConnectType(DbConnectType connectType) {
+        this.connectType = connectType;
     }
 
     /**
@@ -43,19 +41,6 @@ public class OracleDataSource extends BaseDataSource {
     @Override
     public String driverClassSelector() {
         return Constants.COM_ORACLE_JDBC_DRIVER;
-    }
-
-    /**
-     * gets the JDBC url for the data source connection
-     * @return jdbc url
-     */
-    @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
-            jdbcUrl += "/";
-        }
-        return jdbcUrl;
     }
 
     /**

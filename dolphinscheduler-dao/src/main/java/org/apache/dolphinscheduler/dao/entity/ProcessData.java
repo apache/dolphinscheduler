@@ -102,4 +102,14 @@ public class ProcessData {
   public void setTenantId(int tenantId) {
     this.tenantId = tenantId;
   }
+
+  @Override
+  public String toString() {
+    return "ProcessData{" +
+            "tasks=" + tasks +
+            ", globalParams=" + globalParams +
+            ", timeout=" + timeout +
+            ", tenantId=" + tenantId +
+            '}';
+  }
 }

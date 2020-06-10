@@ -95,8 +95,9 @@ public class ZKServer {
      * @param port The port to listen on
      */
     public static void startLocalZkServer(final int port) {
-
-        startLocalZkServer(port, System.getProperty("user.dir") +"/zookeeper_data", ZooKeeperServer.DEFAULT_TICK_TIME,"20");
+        String zkDataDir = System.getProperty("user.dir") +"/zookeeper_data";
+        logger.info("zk server starting, data dir path:{}" , zkDataDir);
+        startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME,"60");
     }
 
     /**

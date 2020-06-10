@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -85,6 +87,13 @@ public class TaskPriorityQueueConsumer extends Thread{
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
     @PostConstruct
     public void init(){
         super.setName("TaskUpdateQueueConsumerThread");
@@ -93,14 +102,27 @@ public class TaskPriorityQueueConsumer extends Thread{
 
     @Override
     public void run() {
+        List<String> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()){
             try {
-                // if not task , blocking here
-                String taskPriorityInfo = taskPriorityQueue.take();
-
-                TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
-
-                dispatch(taskPriority.getTaskId());
+                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
+                failedDispatchTasks.clear();
+                for(int i = 0; i < fetchTaskNum; i++){
+                    if(taskPriorityQueue.size() <= 0){
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                        continue;
+                    }
+                    // if not task , blocking here
+                    String taskPriorityInfo = taskPriorityQueue.take();
+                    TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+                    boolean dispatchResult = dispatch(taskPriority.getTaskId());
+                    if(!dispatchResult){
+                        failedDispatchTasks.add(taskPriorityInfo);
+                    }
+                }
+                for(String dispatchFailedTask : failedDispatchTasks){
+                    taskPriorityQueue.put(dispatchFailedTask);
+                }
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
             }
@@ -114,21 +136,20 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private Boolean dispatch(int taskInstanceId){
-        TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
-        ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        Boolean result = false;
-        while (Stopper.isRunning()){
-            try {
-                result = dispatcher.dispatch(executionContext);
-            } catch (ExecuteException e) {
-                logger.error("dispatch error",e);
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }
+    private boolean dispatch(int taskInstanceId){
+        boolean result = false;
+        try {
+            TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
+            ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 
-            if (result || taskInstanceIsFinalState(taskInstanceId)){
-                break;
+            if (taskInstanceIsFinalState(taskInstanceId)){
+                // when task finish, ignore this task, there is no need to dispatch anymore
+                return true;
+            }else{
+                result = dispatcher.dispatch(executionContext);
             }
+        } catch (ExecuteException e) {
+            logger.error("dispatch error",e);
         }
         return result;
     }
