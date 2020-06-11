@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
@@ -34,6 +35,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
 
@@ -43,6 +46,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String rootDir = System.getProperty("user.dir");
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
+
 
     @Override
     protected void init() {
@@ -118,6 +122,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
         // Execute the dolphinscheduler DML, it can be rolled back
         runInitDML(initSqlPath);
+
 
     }
 
@@ -255,6 +260,53 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         upgradeDolphinSchedulerDDL(schemaDir);
 
         upgradeDolphinSchedulerDML(schemaDir);
+    }
+
+
+    /**
+     * upgrade DolphinScheduler worker group
+     * ds-1.3.0 modify the worker group for process definition json
+     */
+    public void upgradeDolphinSchedulerWorkerGroup() {
+        updateProcessDefinitionJsonWorkerGroup();
+    }
+    /**
+     * updateProcessDefinitionJsonWorkerGroup
+     */
+    protected void updateProcessDefinitionJsonWorkerGroup(){
+        WorkerGroupDao workerGroupDao = new WorkerGroupDao();
+        ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
+        Map<Integer,String> replaceProcessDefinitionMap = new HashMap<>();
+        try {
+            Map<Integer, String> oldWorkerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
+            Map<Integer,String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
+
+            for (Map.Entry<Integer,String> entry : processDefinitionJsonMap.entrySet()){
+                JSONObject jsonObject = JSONObject.parseObject(entry.getValue());
+                JSONArray tasks = JSONArray.parseArray(jsonObject.getString("tasks"));
+
+                for (int i = 0 ;i < tasks.size() ; i++){
+                    JSONObject task = tasks.getJSONObject(i);
+                    Integer workerGroupId = task.getInteger("workerGroupId");
+                    if (workerGroupId == -1) {
+                        task.put("workerGroup", "default");
+                    }else {
+                        task.put("workerGroup", oldWorkerGroupMap.get(workerGroupId));
+                    }
+                }
+
+                jsonObject.remove(jsonObject.getString("tasks"));
+
+                jsonObject.put("tasks",tasks);
+
+                replaceProcessDefinitionMap.put(entry.getKey(),jsonObject.toJSONString());
+            }
+            if (replaceProcessDefinitionMap.size() > 0){
+                processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),replaceProcessDefinitionMap);
+            }
+        }catch (Exception e){
+            logger.error("update process definition json workergroup error",e);
+        }
 
     }
 
