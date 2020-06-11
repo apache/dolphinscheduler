@@ -24,9 +24,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import redis.clients.jedis.Jedis;
 import org.openqa.selenium.JavascriptExecutor;
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +76,7 @@ public class BrowserCommon {
 
     /**
      * @param driver driver
-     * @param jedis  jedis
+     * @param jedis jedis
      */
     public BrowserCommon(WebDriver driver, Jedis jedis) {
         this.driver = driver;
@@ -92,7 +89,7 @@ public class BrowserCommon {
     }
 
     /**
-     * @param driver    driver
+     * @param driver driver
      * @param redisUtil redisUtil
      */
     public BrowserCommon(WebDriver driver, RedisUtil redisUtil) {
@@ -186,7 +183,7 @@ public class BrowserCommon {
     /**
      * input codeMirror
      *
-     * @param codeMirrorLocator     By codeMirror
+     * @param codeMirrorLocator By codeMirror
      * @param codeMirrorLineLocator By codeMirrorLine
      */
     public void inputCodeMirror(By codeMirrorLocator, By codeMirrorLineLocator, String content) {
@@ -260,7 +257,7 @@ public class BrowserCommon {
      *
      * @return WebElement
      */
-    public WebElement selectDate(String js ,By locator_time , String date) throws InterruptedException {
+    public WebElement selectDate(String js, By locator_time, String date) {
         JavascriptExecutor removeAttribute = (JavascriptExecutor) driver;
         removeAttribute.executeScript("var setDate=" + js + ";setDate.removeAttribute('readonly');");
         WebElement dateElement = locateElement(locator_time);
