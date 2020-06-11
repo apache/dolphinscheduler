@@ -207,14 +207,13 @@ public class ProcessService {
 
         if(cmdTypeMap.containsKey(commandType)){
             ObjectNode cmdParamObj = JSONUtils.parseObject(command.getCommandParam());
-            ObjectNode tempObj;
             int processInstanceId = cmdParamObj.path(CMDPARAM_RECOVER_PROCESS_ID_STRING).asInt();
 
             List<Command> commands = commandMapper.selectList(null);
             // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
-                    tempObj = JSONUtils.parseObject(tmpCommand.getCommandParam());
+                    ObjectNode tempObj = JSONUtils.parseObject(tmpCommand.getCommandParam());
                     if(tempObj != null && processInstanceId == tempObj.path(CMDPARAM_RECOVER_PROCESS_ID_STRING).asInt()){
                         isNeedCreate = false;
                         break;
