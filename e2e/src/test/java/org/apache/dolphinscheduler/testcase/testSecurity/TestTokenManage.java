@@ -17,26 +17,27 @@
 package org.apache.dolphinscheduler.testcase.testSecurity;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.QueueManagePage;
+import org.apache.dolphinscheduler.page.security.TokenManagePage;
 import org.testng.annotations.Test;
 
+public class TestTokenManage extends BaseTest {
+    private TokenManagePage tokenManagePage;
 
-public class TestQueueManage extends BaseTest {
-    private QueueManagePage queueManagePage;
-
-    @Test(groups={"functionTests","queue"},dependsOnGroups = { "login" },description = "TestQueueManage")
-    public void testTenantManage() throws InterruptedException {
-        queueManagePage = new QueueManagePage(driver);
-        //create queue
-        System.out.println("start create queue");
-        assert queueManagePage.createQueue();
-        System.out.println("end create queue");
+    @Test(groups={"functionTests","token"},dependsOnGroups = { "login" },description = "TestTokenManage")
+    public void testUserManage() throws InterruptedException {
+        tokenManagePage = new TokenManagePage(driver);
+        //generate token
+        System.out.println("start create token");
+        assert tokenManagePage.createToken();
+        System.out.println("end create token");
         System.out.println("===================================");
 
-        //edit queue
-        System.out.println("start edit queue");
-        assert queueManagePage.editQueue();
-        System.out.println("end edit queue");
+
+        //edit token
+        System.out.println("start edit token");
+        assert tokenManagePage.editToken();
+        System.out.println("end edit token");
         System.out.println("===================================");
+
     }
 }

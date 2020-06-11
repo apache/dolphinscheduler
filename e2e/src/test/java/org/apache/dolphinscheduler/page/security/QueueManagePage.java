@@ -64,12 +64,13 @@ public class QueueManagePage extends PageCommon {
      */
     public boolean editQueue() throws InterruptedException {
         // click queue manage
+        Thread.sleep(1000);
         clickElement(QueueManageLocator.CLICK_QUEUE_MANAGE);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         // click  edit queue button
         clickElement(QueueManageLocator.CLICK_EDIT_QUEUE);
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
         // input queue data
         sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.EDIT_QUEUE_NAME);

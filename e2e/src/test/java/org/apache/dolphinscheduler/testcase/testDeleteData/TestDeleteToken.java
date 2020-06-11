@@ -14,29 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.testSecurity;
+package org.apache.dolphinscheduler.testcase.testDeleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.QueueManagePage;
+import org.apache.dolphinscheduler.page.security.TenantManagePage;
+import org.apache.dolphinscheduler.page.security.TokenManagePage;
 import org.testng.annotations.Test;
 
+public class TestDeleteToken extends BaseTest {
+    private TokenManagePage tokenManagePage;
+    private TenantManagePage tenantManagePage;
 
-public class TestQueueManage extends BaseTest {
-    private QueueManagePage queueManagePage;
 
-    @Test(groups={"functionTests","queue"},dependsOnGroups = { "login" },description = "TestQueueManage")
-    public void testTenantManage() throws InterruptedException {
-        queueManagePage = new QueueManagePage(driver);
-        //create queue
-        System.out.println("start create queue");
-        assert queueManagePage.createQueue();
-        System.out.println("end create queue");
-        System.out.println("===================================");
+    @Test(groups = {"functionTests"}, dependsOnGroups = {"login", "token"}, description = "TestDeleteToken")
+    public void testUserManage() throws InterruptedException {
+        tenantManagePage = new TenantManagePage(driver);
+        System.out.println("jump to security to delete token");
+        tenantManagePage.jumpSecurity();
 
-        //edit queue
-        System.out.println("start edit queue");
-        assert queueManagePage.editQueue();
-        System.out.println("end edit queue");
+        tokenManagePage = new TokenManagePage(driver);
+        //delete token
+        System.out.println("start delete token");
+        assert tokenManagePage.deleteToken();
+        System.out.println("end delete token");
         System.out.println("===================================");
     }
 }
