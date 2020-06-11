@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.HashMap;
+
 /**
  * running status for workflow and task nodes
  *
@@ -62,6 +64,13 @@ public enum ExecutionStatus {
     private final int code;
     private final String descp;
 
+    private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP=new HashMap<>();
+
+    static {
+       for (ExecutionStatus executionStatus:ExecutionStatus.values()){
+           EXECUTION_STATUS_MAP.put(executionStatus.code,executionStatus);
+       }
+    }
 
  /**
   * status is success
@@ -76,7 +85,7 @@ public enum ExecutionStatus {
   * @return status
   */
    public boolean typeIsFailure(){
-     return this == FAILURE || this == NEED_FAULT_TOLERANCE;
+     return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
    }
 
  /**
@@ -130,11 +139,9 @@ public enum ExecutionStatus {
     }
 
     public static ExecutionStatus of(int status){
-        for(ExecutionStatus es : values()){
-            if(es.getCode() == status){
-                return es;
-            }
-        }
+       if(EXECUTION_STATUS_MAP.containsKey(status)){
+           return EXECUTION_STATUS_MAP.get(status);
+       }
         throw new IllegalArgumentException("invalid status : " + status);
     }
 }
