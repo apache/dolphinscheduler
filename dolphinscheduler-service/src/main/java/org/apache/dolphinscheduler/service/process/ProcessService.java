@@ -121,10 +121,6 @@ public class ProcessService {
             logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
-        if (processInstance.getCommandType().equals(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)){
-            delCommandByid(command.getId());
-            return null;
-        }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
@@ -325,8 +321,15 @@ public class ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost())){
                 continue;
             }
-            String ip = Host.of(taskInstance.getHost()).getIp();
             int port = Constants.RPC_PORT;
+            String ip = "";
+            try {
+                ip = Host.of(taskInstance.getHost()).getIp();
+            }catch (Exception e){
+                // compatible old version
+                ip = taskInstance.getHost();
+            }
+
 
             // remove task log from loggerserver
             logClient.removeTaskLog(ip,port,taskLogPath);
@@ -918,7 +921,7 @@ public class ProcessService {
 
         CommandType fatherType = parentProcessInstance.getCommandType();
         CommandType commandType = fatherType;
-        if(childInstance == null || commandType == CommandType.REPEAT_RUNNING){
+        if(childInstance == null){
             String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
             // sub process must begin with schedule/complement data
             // if father begin with scheduler/complement data
@@ -1477,7 +1480,7 @@ public class ProcessService {
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
         //1 update processInstance host is null
-        processInstance.setHost("null");
+        processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
 
         //2 insert into recover command
@@ -1810,7 +1813,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId){
-        return userMapper.queryDetailsById(userId);
+        return userMapper.selectById(userId);
     }
 
     /**
