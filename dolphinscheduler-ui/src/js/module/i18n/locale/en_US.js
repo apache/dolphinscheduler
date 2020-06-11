@@ -600,10 +600,10 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
   'Disable': 'Disable',
-  'Timeout Settings': '超时设置',
-  'Connect Timeout':'连接超时',
-  'Socket Timeout':'Socket超时',
-  'Connect timeout be a positive integer': '连接超时必须为数字',
-  'Socket Timeout be a positive integer': 'Socket超时必须为数字',
-  'ms':'毫秒'
+  'Timeout Settings': 'Timeout Settings',
+  'Connect Timeout':'Connect Timeout',
+  'Socket Timeout':'Socket Timeout',
+  'Connect timeout be a positive integer': 'Connect timeout be a positive integer',
+  'Socket Timeout be a positive integer': 'Socket Timeout be a positive integer',
+  'ms':'ms'
 }
