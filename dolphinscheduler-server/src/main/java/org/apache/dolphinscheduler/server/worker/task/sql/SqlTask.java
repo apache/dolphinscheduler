@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
@@ -43,7 +42,6 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
-import org.apache.dolphinscheduler.common.utils.*;
 
 import java.sql.*;
 import java.util.*;
