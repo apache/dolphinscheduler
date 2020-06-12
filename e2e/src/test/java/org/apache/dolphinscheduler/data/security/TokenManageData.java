@@ -14,23 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.security;
+package org.apache.dolphinscheduler.data.security;
 
-import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.UserManagePage;
-import org.testng.annotations.Test;
+public class TokenManageData {
+    public static final String TOKEN_MANAGE = "令牌管理 - DolphinScheduler";
+    public static final String DATE = "2038-06-10 00:00:00";
 
-public class UserManageTest extends BaseTest {
-    private UserManagePage userManagePage;
 
-    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "UserManageTest",priority=3)
-    public void testUserManage() throws InterruptedException {
-        userManagePage = new UserManagePage(driver);
-        //assert user manage page
-        System.out.println("start create user");
-        assert userManagePage.createUser();
-        System.out.println("end create user");
-        System.out.println("===================================");
-
-    }
 }

@@ -22,10 +22,10 @@ import org.testng.annotations.Test;
 import static org.apache.dolphinscheduler.base.BaseTest.driver;
 
 @Test(groups={"functionTests","login"})
-public class LoginTest {
+public class TestLogin {
     private LoginPage loginPage;
 
-    @Test(description = "LoginTest", priority = 1)
+    @Test(description = "TestLogin")
     public void testLogin() throws InterruptedException {
         loginPage = new LoginPage(driver);
         System.out.println("===================================");
