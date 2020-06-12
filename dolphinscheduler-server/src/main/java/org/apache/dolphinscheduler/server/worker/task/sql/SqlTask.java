@@ -269,16 +269,17 @@ public class SqlTask extends AbstractTask {
             resultJSONArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
+        String result = JSONUtils.toJsonString(resultJSONArray);
+        logger.debug("execute sql : {}", result);
 
         // if there is a result set
         if (!resultJSONArray.isEmpty(null) ) {
             if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                 sendAttachment(sqlParameters.getTitle(),
-                        JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
+                        JSONUtils.toJsonString(resultJSONArray));
             }else{
                 sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONUtils.toJsonString(resultJSONArray, SerializationFeature.WRITE_NULL_MAP_VALUES));
+                        JSONUtils.toJsonString(resultJSONArray));
             }
         }
     }

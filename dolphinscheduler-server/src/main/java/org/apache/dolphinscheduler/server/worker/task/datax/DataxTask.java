@@ -223,7 +223,7 @@ public class DataxTask extends AbstractTask {
      * @return collection of datax job config JSONObject
      * @throws SQLException if error throws SQLException
      */
-    private List<ObjectNode> buildDataxJobContentJson() throws SQLException {
+    private List<ObjectNode> buildDataxJobContentJson() {
 
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
@@ -304,8 +304,8 @@ public class DataxTask extends AbstractTask {
 
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
-        content.put("reader", reader);
-        content.put("writer", writer);
+        content.put("reader", reader.toString());
+        content.put("writer", reader.toString());
         contentList.add(content);
 
         return contentList;
@@ -335,8 +335,8 @@ public class DataxTask extends AbstractTask {
         errorLimit.put("percentage", 0);
 
         ObjectNode setting = JSONUtils.createObjectNode();
-        setting.put("speed", speed);
-        setting.put("errorLimit", errorLimit);
+        setting.put("speed", speed.toString());
+        setting.put("errorLimit", errorLimit.toString());
 
         return setting;
     }
