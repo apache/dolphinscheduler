@@ -16,9 +16,16 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
 
 /**
  * common script generator
@@ -32,6 +39,38 @@ public class CommonGenerator {
         try{
             result.append("sqoop ")
                     .append(sqoopParameters.getModelType());
+
+            //set sqoop job name
+            result.append(" -D mapred.job.name")
+                    .append(Constants.EQUAL_SIGN)
+                    .append(sqoopParameters.getJobName());
+
+            //set hadoop custom param
+            List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
+            if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
+                for (Property hadoopCustomParam : hadoopCustomParams) {
+                    String hadoopCustomParamStr = " -D " + hadoopCustomParam.getProp()
+                            + Constants.EQUAL_SIGN + hadoopCustomParam.getValue();
+
+                    if (StringUtils.isNotEmpty(hadoopCustomParamStr)) {
+                        result.append(hadoopCustomParamStr);
+                    }
+                }
+            }
+
+            //set sqoop advanced custom param
+            List<Property> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
+            if (CollectionUtils.isNotEmpty(sqoopAdvancedParams)) {
+
+                for (Property sqoopAdvancedParam : sqoopAdvancedParams) {
+                    String sqoopAdvancedParamStr = " " + sqoopAdvancedParam.getProp()
+                            + " " + sqoopAdvancedParam.getValue();
+                    if (StringUtils.isNotEmpty(sqoopAdvancedParamStr)) {
+                        result.append(sqoopAdvancedParamStr);
+                    }
+                }
+            }
+
             if(sqoopParameters.getConcurrency() >0){
                 result.append(" -m ")
                         .append(sqoopParameters.getConcurrency());
