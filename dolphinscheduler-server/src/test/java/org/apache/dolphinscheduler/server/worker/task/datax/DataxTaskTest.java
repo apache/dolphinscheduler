@@ -25,9 +25,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -316,13 +314,13 @@ public class DataxTaskTest {
             Assert.assertNotNull(contentList);
 
             ObjectNode content = contentList.get(0);
-            JsonNode reader = content.path("reader");
+            JsonNode reader = JSONUtils.parseObject(content.path("reader").asText());
             Assert.assertNotNull(reader);
 
             String readerPluginName = reader.path("name").asText();
             Assert.assertEquals(DataxUtils.DATAX_READER_PLUGIN_MYSQL, readerPluginName);
 
-            JsonNode writer = content.path("writer");
+            JsonNode writer = JSONUtils.parseObject(content.path("writer").asText());
             Assert.assertNotNull(writer);
 
             String writerPluginName = writer.path("name").asText();

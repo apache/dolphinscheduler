@@ -305,7 +305,7 @@ public class DataxTask extends AbstractTask {
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();
         content.put("reader", reader.toString());
-        content.put("writer", reader.toString());
+        content.put("writer", writer.toString());
         contentList.add(content);
 
         return contentList;
