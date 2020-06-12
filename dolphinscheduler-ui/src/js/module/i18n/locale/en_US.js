@@ -98,6 +98,7 @@ export default {
   Script: 'Script',
   'Please enter script(required)': 'Please enter script(required)',
   'Deploy Mode': 'Deploy Mode',
+  'Flink Version':'Flink Version',
   'Driver core number': 'Driver core number',
   'Please enter driver core number': 'Please enter driver core number',
   'Driver memory use': 'Driver memory use',
