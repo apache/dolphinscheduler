@@ -14,26 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.deleteData;
+package org.apache.dolphinscheduler.testcase.testDeleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.security.AlertManagePage;
+import org.apache.dolphinscheduler.page.security.TenantManagePage;
 import org.testng.annotations.Test;
 
-public class DeleteProjectTest extends BaseTest {
-    private CreateProjectPage createProjectPage;
+public class TestDeleteAlert extends BaseTest {
+    private AlertManagePage alertManagePage;
+    private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "DeleteProjectTest",priority=7)
-    public void testDeleteProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        //jump to project manage page
-        System.out.println("jump to the project manage page to delete project");
-        createProjectPage.jumpProjectManagePage();
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","alert" },description = "TestDeleteAlert",priority=8)
+    public void testDeleteAlert() throws InterruptedException {
+        tenantManagePage = new TenantManagePage(driver);
+        System.out.println("jump to testSecurity to delete alert");
+        tenantManagePage.jumpSecurity();
 
-        //assert tenant manage page
-        System.out.println("start delete project");
-        assert createProjectPage.deleteProject();
-        System.out.println("end delete project");
+        alertManagePage = new AlertManagePage(driver);
+
+        //assert alert manage page
+        System.out.println("start delete alert");
+        assert alertManagePage.deleteAlert();
+        System.out.println("end delete alert");
         System.out.println("===================================");
     }
 }

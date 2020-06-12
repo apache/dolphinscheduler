@@ -16,24 +16,30 @@
   ~ limitations under the License.
   -->
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="dolphinscheduler_e2e" parallel="true">
+<suite name="dolphinscheduler_e2e" verbose="1">
     <test name="dolphinscheduler_test" preserve-order="true">
         <groups>
             <run>
                 <include name="functionTests"/>
             </run>
         </groups>
-
         <classes>
-            <class name="org.apache.dolphinscheduler.testcase.LoginTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteWorkflowTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteProjectTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteUserTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.TestLogin"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTenantManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestUserManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>
+
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateProject"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateWorkflow"></class>
+
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteProject"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteAlert"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteTenant"></class>
         </classes>
     </test>
 
