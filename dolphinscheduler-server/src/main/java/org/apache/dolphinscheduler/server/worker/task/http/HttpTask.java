@@ -66,13 +66,6 @@ public class HttpTask extends AbstractTask {
      */
     private HttpParameters httpParameters;
 
-
-
-    /**
-     * Convert mill seconds to second unit
-     */
-    protected static final int MAX_CONNECTION_MILLISECONDS = 60000;
-
     /**
      * application json
      */
@@ -303,7 +296,7 @@ public class HttpTask extends AbstractTask {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**
