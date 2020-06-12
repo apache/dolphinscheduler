@@ -14,27 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.project;
+package org.apache.dolphinscheduler.testcase.testSecurity;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.security.QueueManagePage;
 import org.testng.annotations.Test;
 
-public class CreateProjectTest  extends BaseTest {
-    private CreateProjectPage createProjectPage;
 
-    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest",priority=4)
-    public void testCreateProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        // enter user manage page
-        System.out.println("jump to the projectManage page to create project ");
-        createProjectPage.jumpProjectManagePage();
-        //assert user manage page
-        System.out.println("start create project");
-        assert createProjectPage.createProject();
-        System.out.println("end create project");
+public class TestQueueManage extends BaseTest {
+    private QueueManagePage queueManagePage;
+
+    @Test(groups={"functionTests","queue"},dependsOnGroups = { "login" },description = "TestQueueManage")
+    public void testTenantManage() throws InterruptedException {
+        queueManagePage = new QueueManagePage(driver);
+        //create queue
+        System.out.println("start create queue");
+        assert queueManagePage.createQueue();
+        System.out.println("end create queue");
+        System.out.println("===================================");
+
+        //edit queue
+        System.out.println("start edit queue");
+        assert queueManagePage.editQueue();
+        System.out.println("end edit queue");
         System.out.println("===================================");
     }
-
 }
-

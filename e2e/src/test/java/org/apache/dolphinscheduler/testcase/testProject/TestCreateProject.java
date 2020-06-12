@@ -14,32 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.project;
+package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.project.CreateProjectPage;
-import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
 import org.testng.annotations.Test;
 
-public class CreateWorkflowTest  extends BaseTest {
-    private CreateWorkflowPage createWorkflowPage;
+public class TestCreateProject extends BaseTest {
     private CreateProjectPage createProjectPage;
 
-
-    @Test(groups={"functionTests","workflow"},dependsOnGroups = { "login" },description = "CreateWorkflowTest",priority=5)
-    public void testCreateWorkflow() throws InterruptedException {
+    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest")
+    public void testCreateProject() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
-        System.out.println("jump to the projectManage page to create workflow");
+        // enter user manage page
+        System.out.println("jump to the projectManage page to create project ");
         createProjectPage.jumpProjectManagePage();
-
-        createWorkflowPage = new CreateWorkflowPage(driver);
-        System.out.println("Click on the project name to jump to the project homepage");
-        createWorkflowPage.jumpWorkflowPage();
-
-        System.out.println("start create workflow");
-        assert createWorkflowPage.createWorkflow();
-        assert createWorkflowPage.saveWorkflow();
-        System.out.println("end create workflow");
+        //assert user manage page
+        System.out.println("start create project");
+        assert createProjectPage.createProject();
+        System.out.println("end create project");
         System.out.println("===================================");
     }
+
 }
+
