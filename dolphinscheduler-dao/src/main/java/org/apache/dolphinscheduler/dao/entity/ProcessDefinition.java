@@ -22,21 +22,16 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -44,7 +39,6 @@ import java.util.stream.Stream;
  */
 @TableName("t_ds_process_definition")
 public class ProcessDefinition {
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinition.class);
 
     /**
      * id
@@ -300,10 +294,8 @@ public class ProcessDefinition {
     }
 
     public Map<String, String> getGlobalParamMap() {
-        List<Property> propList = new ArrayList<> ();
-
         if (globalParamMap == null && StringUtils.isNotEmpty(globalParams)) {
-            propList = JSONUtils.toList(globalParams,Property.class);
+            List<Property> propList = JSONUtils.toList(globalParams,Property.class);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 

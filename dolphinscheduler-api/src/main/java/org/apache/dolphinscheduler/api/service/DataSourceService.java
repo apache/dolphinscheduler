@@ -539,7 +539,7 @@ public class DataSourceService extends BaseService{
         }
 
         if(logger.isDebugEnabled()){
-            logger.info("parameters map-----" + JSONUtils.toJsonString(parameterMap));
+            logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
         }
         return JSONUtils.toJsonString(parameterMap);
 

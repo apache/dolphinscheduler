@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.service.process;
 
 import com.cronutils.model.Cron;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -37,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

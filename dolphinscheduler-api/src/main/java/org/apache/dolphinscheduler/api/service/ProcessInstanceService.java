@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -554,8 +553,7 @@ public class ProcessInstanceService extends BaseDAGService {
             String localParams = map.get(LOCAL_PARAMS);
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = new ArrayList<>();
-                localParamsList = JSONUtils.toList(localParams, Property.class);
+                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());

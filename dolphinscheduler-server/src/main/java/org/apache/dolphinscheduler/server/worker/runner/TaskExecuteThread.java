@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.common.utils.*;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,7 +24,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;

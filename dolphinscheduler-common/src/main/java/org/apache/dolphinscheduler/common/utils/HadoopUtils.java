@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.core.io.JsonEOFException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -408,7 +409,7 @@ public class HadoopUtils implements Closeable {
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
      */
-    public ExecutionStatus getApplicationStatus(String applicationId) throws NullPointerException {
+    public ExecutionStatus getApplicationStatus(String applicationId) {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
@@ -428,7 +429,7 @@ public class HadoopUtils implements Closeable {
             responseContent = HttpUtils.get(jobHistoryUrl);
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
             if (!jsonObject.has("job")){
-                throw new NullPointerException();
+                return ExecutionStatus.FAILURE;
             }
             result = jsonObject.path("job").path("state").asText();
         }

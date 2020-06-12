@@ -32,7 +32,7 @@ public class ProcessDefinitionTest {
         taskInstance.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
 
         taskInstance.getGlobalParamMap();
-        Assert.assertEquals(taskInstance.getGlobalParamMap().toString(),"{selenium_global_parameters_1=selenium_global_parameters_value_1}");
+        Assert.assertEquals("{selenium_global_parameters_1=selenium_global_parameters_value_1}",taskInstance.getGlobalParamMap().toString());
 
 
 
