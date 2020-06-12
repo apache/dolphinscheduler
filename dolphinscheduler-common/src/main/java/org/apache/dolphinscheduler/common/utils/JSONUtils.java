@@ -119,7 +119,7 @@ public class JSONUtils {
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
         if (StringUtils.isEmpty(json)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         try {
@@ -130,7 +130,7 @@ public class JSONUtils {
             logger.error("parse list exception!", e);
         }
 
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 
