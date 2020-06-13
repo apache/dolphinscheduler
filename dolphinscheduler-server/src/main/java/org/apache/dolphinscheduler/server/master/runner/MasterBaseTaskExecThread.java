@@ -20,7 +20,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -191,7 +191,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             return true;
         }catch (Exception e){
             logger.error("submit task  Exception: ", e);
-            logger.error("task error : %s", JSONUtils.toJson(taskInstance));
+            logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
             return false;
         }
     }
