@@ -14,28 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.page.LoginPage;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
-import static org.apache.dolphinscheduler.base.BaseTest.driver;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Test(groups={"functionTests","login"})
-public class LoginTest {
-    private LoginPage loginPage;
+import static org.junit.Assert.*;
 
-    @Test(description = "LoginTest", priority = 1)
-    public void testLogin() throws InterruptedException {
-        loginPage = new LoginPage(driver);
-        System.out.println("===================================");
-        System.out.println("jump to Chinese login page");
-        loginPage.jumpPageChinese();
+public class StreamUtilsTest {
 
-        System.out.println("start login");
-        assert  loginPage.login();
-        System.out.println("end login");
-        System.out.println("===================================");
-
+    @Test
+    public void asStream() {
+        List<String> list = Arrays.asList("a", "b", "c");
+        List<String> ret = StreamUtils.asStream(list.iterator())
+                .filter(item -> item.equals("a"))
+                .collect(Collectors.toList());
+        Assert.assertEquals("a", ret.get(0));
     }
+
 }

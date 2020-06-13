@@ -14,23 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.security;
+package org.apache.dolphinscheduler.testcase.testDeleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.UserManagePage;
+import org.apache.dolphinscheduler.page.security.AlertManagePage;
+import org.apache.dolphinscheduler.page.security.TenantManagePage;
 import org.testng.annotations.Test;
 
-public class UserManageTest extends BaseTest {
-    private UserManagePage userManagePage;
+public class TestDeleteAlert extends BaseTest {
+    private AlertManagePage alertManagePage;
+    private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "UserManageTest",priority=3)
-    public void testUserManage() throws InterruptedException {
-        userManagePage = new UserManagePage(driver);
-        //assert user manage page
-        System.out.println("start create user");
-        assert userManagePage.createUser();
-        System.out.println("end create user");
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","alert" },description = "TestDeleteAlert",priority=8)
+    public void testDeleteAlert() throws InterruptedException {
+        tenantManagePage = new TenantManagePage(driver);
+        System.out.println("jump to testSecurity to delete alert");
+        tenantManagePage.jumpSecurity();
+
+        alertManagePage = new AlertManagePage(driver);
+
+        //assert alert manage page
+        System.out.println("start delete alert");
+        assert alertManagePage.deleteAlert();
+        System.out.println("end delete alert");
         System.out.println("===================================");
-
     }
 }

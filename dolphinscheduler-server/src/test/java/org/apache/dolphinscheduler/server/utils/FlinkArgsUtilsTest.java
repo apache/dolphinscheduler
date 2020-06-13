@@ -49,6 +49,7 @@ public class FlinkArgsUtilsTest {
     public String mainArgs = "testArgs";
     public String queue = "queue1";
     public String others = "--input file:///home";
+    public String flinkVersion = "<1.10";
 
 
     @Before
@@ -79,6 +80,7 @@ public class FlinkArgsUtilsTest {
         param.setMainArgs(mainArgs);
         param.setQueue(queue);
         param.setOthers(others);
+        param.setFlinkVersion(flinkVersion);
 
         //Invoke buildArgs
         List<String> result = FlinkArgsUtils.buildArgs(param);
