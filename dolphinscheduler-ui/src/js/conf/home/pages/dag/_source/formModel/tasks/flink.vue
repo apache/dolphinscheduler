@@ -62,7 +62,47 @@
         </x-radio-group>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Flink Version')}}</div>
+      <div slot="content">
+        <x-select
+          style="width: 100px;"
+          v-model="flinkVersion"
+          :disabled="isDetails">
+          <x-option
+            v-for="version in flinkVersionList"
+            :key="version.code"
+            :value="version.code"
+            :label="version.code">
+          </x-option>
+        </x-select>
+      </div>
+    </m-list-box>
     <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
+        <span class="sp2">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="jobManagerMemory"
+            :placeholder="$t('Please enter the number of Executor')"
+            style="width: 200px;"
+            autocomplete="off">
+        </x-input>
+        </span>
+        <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
+        <span class="sp2">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="taskManagerMemory"
+            :placeholder="$t('Please enter the Executor memory')"
+            style="width: 186px;"
+            autocomplete="off">
+        </x-input>
+        </span>
+      </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('slot')}}</span>
         <span class="sp2">
@@ -75,6 +115,7 @@
                   autocomplete="off">
         </x-input>
         </span>
+        <div v-if="flinkVersion !== '>=1.10'">
         <span class="sp1 sp3">{{$t('taskManager')}}</span>
         <span class="sp2">
           <x-input
@@ -86,32 +127,8 @@
                   autocomplete="off">
         </x-input>
         </span>
+        </div>
       </div>
-      <div class="clearfix list">
-        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="jobManagerMemory"
-                  :placeholder="$t('Please enter the number of Executor')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-        <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="taskManagerMemory"
-                  :placeholder="$t('Please enter the Executor memory')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-      </div>
-
     </div>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
@@ -207,6 +224,11 @@
         programType: 'SCALA',
         // Program type(List)
         programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
+
+        flinkVersion:'<1.10',
+        // Flink Versions(List)
+        flinkVersionList: [{ code: '<1.10' }, { code: '>=1.10' }],
+
         normalizer(node) {
           return {
             label: node.name
@@ -324,6 +346,7 @@
             return {id: v}
           }),
           localParams: this.localParams,
+          flinkVersion: this.flinkVersion,
           slot: this.slot,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
@@ -485,10 +508,12 @@
             this.mainJar = o.params.mainJar.id || ''
           }
           this.deployMode = o.params.deployMode || ''
+          this.flinkVersion = o.params.flinkVersion || '<1.10'
           this.slot = o.params.slot || 1
           this.taskManager = o.params.taskManager || '2'
           this.jobManagerMemory = o.params.jobManagerMemory || '1G'
           this.taskManagerMemory = o.params.taskManagerMemory || '2G'
+
 
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others

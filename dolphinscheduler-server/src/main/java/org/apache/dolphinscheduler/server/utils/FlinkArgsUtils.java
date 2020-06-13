@@ -28,10 +28,12 @@ import java.util.List;
 
 
 /**
- *  spark args utils
+ * flink args utils
  */
 public class FlinkArgsUtils {
     private static final String LOCAL_DEPLOY_MODE = "local";
+    private static final String FLINK_VERSION_BEFORE_1_10 = "<1.10";
+
     /**
      * build args
      * @param param flink parameters
@@ -44,7 +46,6 @@ public class FlinkArgsUtils {
         String tmpDeployMode = param.getDeployMode();
         if (StringUtils.isNotEmpty(tmpDeployMode)) {
             deployMode = tmpDeployMode;
-
         }
         if (!LOCAL_DEPLOY_MODE.equals(deployMode)) {
             args.add(Constants.FLINK_RUN_MODE);  //-m
@@ -63,12 +64,15 @@ public class FlinkArgsUtils {
                 args.add(appName);
             }
 
-            int taskManager = param.getTaskManager();
-            if (taskManager != 0) {                        //-yn
-                args.add(Constants.FLINK_TASK_MANAGE);
-                args.add(String.format("%d", taskManager));
+            // judgy flink version,from flink1.10,the parameter -yn removed
+            String flinkVersion = param.getFlinkVersion();
+            if (FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
+                int taskManager = param.getTaskManager();
+                if (taskManager != 0) {                        //-yn
+                    args.add(Constants.FLINK_TASK_MANAGE);
+                    args.add(String.format("%d", taskManager));
+                }
             }
-
             String jobManagerMemory = param.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
                 args.add(Constants.FLINK_JOB_MANAGE_MEM);
