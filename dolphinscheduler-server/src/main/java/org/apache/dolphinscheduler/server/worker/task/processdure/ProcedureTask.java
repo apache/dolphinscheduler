@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -25,6 +23,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -74,7 +73,7 @@ public class ProcedureTask extends AbstractTask {
 
         logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
 
-        this.procedureParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        this.procedureParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
 
 
         // check parameters
