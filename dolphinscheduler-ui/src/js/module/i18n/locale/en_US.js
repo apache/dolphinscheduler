@@ -98,6 +98,7 @@ export default {
   Script: 'Script',
   'Please enter script(required)': 'Please enter script(required)',
   'Deploy Mode': 'Deploy Mode',
+  'Flink Version':'Flink Version',
   'Driver core number': 'Driver core number',
   'Please enter driver core number': 'Please enter driver core number',
   'Driver memory use': 'Driver memory use',
@@ -602,7 +603,16 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
   'Disable': 'Disable',
+<<<<<<< HEAD
   'The Worker group no longer exists, please select the correct Worker group!': 'The Worker group no longer exists, please select the correct Worker group!',
   'Please confirm whether the workflow has been saved before downloading': 'Please confirm whether the workflow has been saved before downloading',
   'User name length is between 3 and 39': 'User name length is between 3 and 39'
+=======
+  'Timeout Settings': 'Timeout Settings',
+  'Connect Timeout':'Connect Timeout',
+  'Socket Timeout':'Socket Timeout',
+  'Connect timeout be a positive integer': 'Connect timeout be a positive integer',
+  'Socket Timeout be a positive integer': 'Socket Timeout be a positive integer',
+  'ms':'ms'
+>>>>>>> upstream/dev
 }

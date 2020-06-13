@@ -99,6 +99,7 @@ export default {
   Script: '脚本',
   'Please enter script(required)': '请输入脚本(必填)',
   'Deploy Mode': '部署方式',
+  'Flink Version': 'Flink版本',
   'Driver core number': 'Driver内核数',
   'Please enter driver core number': '请输入Driver内核数',
   'Driver memory use': 'Driver内存数',
@@ -602,7 +603,16 @@ export default {
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'Enable': '启用',
   'Disable': '停用',
+<<<<<<< HEAD
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
   'Please confirm whether the workflow has been saved before downloading': '下载前请确定工作流是否已保存',
   'User name length is between 3 and 39': '用户名长度在3～39之间'
+=======
+  'Timeout Settings': '超时设置',
+  'Connect Timeout':'连接超时',
+  'Socket Timeout':'Socket超时',
+  'Connect timeout be a positive integer': '连接超时必须为数字',
+  'Socket Timeout be a positive integer': 'Socket超时必须为数字',
+  'ms':'毫秒'
+>>>>>>> upstream/dev
 }
