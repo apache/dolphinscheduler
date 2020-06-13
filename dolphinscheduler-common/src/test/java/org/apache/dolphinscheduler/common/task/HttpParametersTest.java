@@ -16,19 +16,12 @@
  */
 package org.apache.dolphinscheduler.common.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.enums.HttpCheckCondition;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
-import org.apache.dolphinscheduler.common.process.HttpProperty;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.alibaba.fastjson.JSON;
 
 /**
  * http parameter
@@ -40,7 +33,7 @@ public class HttpParametersTest  {
     public void testGenerator(){
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        HttpParameters httpParameters = JSON.parseObject(paramData, HttpParameters.class);
+        HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
 
         Assert.assertEquals(10000,httpParameters.getConnectTimeout() );
@@ -57,7 +50,7 @@ public class HttpParametersTest  {
     public void testCheckParameters(){
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        HttpParameters httpParameters = JSON.parseObject(paramData, HttpParameters.class);
+        HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
         Assert.assertTrue( httpParameters.checkParameters());
         Assert.assertEquals(10000,httpParameters.getConnectTimeout() );
@@ -74,7 +67,7 @@ public class HttpParametersTest  {
     public void testCheckValues() {
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        HttpParameters httpParameters = JSON.parseObject(paramData, HttpParameters.class);
+        HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
         Assert.assertTrue( httpParameters.checkParameters());
         Assert.assertEquals(10000,httpParameters.getConnectTimeout() );

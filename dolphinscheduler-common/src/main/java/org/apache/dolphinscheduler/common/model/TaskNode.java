@@ -16,14 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.model;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -195,7 +194,7 @@ public class TaskNode {
 
   public void setDepList(List<String> depList) throws JsonProcessingException {
     this.depList = depList;
-    this.preTasks = JSONUtils.toJson(depList);
+    this.preTasks = JSONUtils.toJsonString(depList);
   }
 
   public String getLoc() {
@@ -295,7 +294,7 @@ public class TaskNode {
     if(StringUtils.isNotEmpty(this.getTimeout())){
       String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
       String taskTimeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
-      return JSON.parseObject(taskTimeout,TaskTimeoutParameter.class);
+      return JSONUtils.parseObject(taskTimeout,TaskTimeoutParameter.class);
     }
     return new TaskTimeoutParameter(false);
   }

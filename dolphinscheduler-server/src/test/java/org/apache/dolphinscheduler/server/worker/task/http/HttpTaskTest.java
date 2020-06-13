@@ -24,6 +24,7 @@ import java.util.Date;
 import org.apache.dolphinscheduler.common.enums.HttpCheckCondition;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -47,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import com.alibaba.fastjson.JSON;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
@@ -123,7 +123,7 @@ public class HttpTaskTest {
     public void testGenerator(){
         String paramJson = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://github.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
-        HttpParameters httpParameters = JSON.parseObject(paramJson, HttpParameters.class);
+        HttpParameters httpParameters = JSONUtils.parseObject(paramJson, HttpParameters.class);
 
 
         Assert.assertEquals(10000,httpParameters.getConnectTimeout() );

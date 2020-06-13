@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHiveParameter;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
 import org.slf4j.Logger;

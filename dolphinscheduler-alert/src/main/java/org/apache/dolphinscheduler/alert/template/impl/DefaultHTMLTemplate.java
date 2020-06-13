@@ -16,13 +16,15 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.*;
 
 import java.util.*;
 
@@ -107,18 +109,11 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTextTypeMessage(String content,boolean showAll){
 
         if (StringUtils.isNotEmpty(content)){
-            List<String> list;
-            try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
-                return null;
-            }
-
+            ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
+            for (JsonNode jsonNode : list){
                 contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
+                contents.append(Constants.TD).append(jsonNode.toString()).append(Constants.TD_END);
                 contents.append(Constants.TR_END);
             }
 
