@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
@@ -24,8 +25,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,7 +195,7 @@ public class ParameterUtils {
         property.setValue(val);
       }
     }
-    return JSON.toJSONString(globalParamList);
+    return JSONUtils.toJsonString(globalParamList);
   }
 
 
@@ -216,9 +215,10 @@ public class ParameterUtils {
   /**
    * new
    * $[yyyyMMdd] replace scheduler time
-   * @param text
-   * @param paramsMap
-   * @return
+   * @param text text
+   * @param scheduleTime scheduleTime
+   * @param paramsMap paramsMap
+   * @return text
    */
   public static String replaceScheduleTime(String text, Date scheduleTime, Map<String, Property> paramsMap) {
     if (paramsMap != null) {
