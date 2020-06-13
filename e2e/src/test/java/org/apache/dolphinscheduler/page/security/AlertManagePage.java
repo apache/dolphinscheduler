@@ -42,7 +42,6 @@ public class AlertManagePage extends PageCommon {
 
         // click  create alert button
         clickElement(AlertManageLocator.CLICK_CREATE_ALERT);
-        Thread.sleep(1000);
 
         // input alert data
         sendInput(AlertManageLocator.INPUT_ALERT_NAME, AlertManageData.ALERT_NAME);
