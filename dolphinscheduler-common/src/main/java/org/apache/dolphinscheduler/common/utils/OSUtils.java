@@ -53,6 +53,13 @@ public class OSUtils {
   private static final SystemInfo SI = new SystemInfo();
   public static final String TWO_DECIMAL = "0.00";
 
+  /**
+   * return -1 when the function can not get hardware env info
+   * e.g {@link OSUtils#memoryUsage()} {@link OSUtils#availablePhysicalMemorySize()}
+   * {@link OSUtils#totalMemorySize()} {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+   */
+  public static final double NEGATIVE_ONE = -1;
+
   private static HardwareAbstractionLayer hal = SI.getHardware();
 
   private OSUtils() {}
@@ -118,9 +125,11 @@ public class OSUtils {
    */
   public static double loadAverage() {
     double loadAverage =  hal.getProcessor().getSystemLoadAverage();
+    if (Double.isNaN(loadAverage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-
     df.setRoundingMode(RoundingMode.HALF_UP);
     return Double.parseDouble(df.format(loadAverage));
   }
@@ -133,10 +142,12 @@ public class OSUtils {
   public static double cpuUsage() {
     CentralProcessor processor = hal.getProcessor();
     double cpuUsage = processor.getSystemCpuLoad();
+    if (Double.isNaN(cpuUsage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);
-
     return Double.parseDouble(df.format(cpuUsage));
   }
 
@@ -392,7 +403,6 @@ public class OSUtils {
     }
     return null;
   }
-
 
   /**
    * whether is macOS
