@@ -14,26 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.deleteData;
+package org.apache.dolphinscheduler.testcase;
 
-import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.LoginPage;
 import org.testng.annotations.Test;
 
-public class DeleteProjectTest extends BaseTest {
-    private CreateProjectPage createProjectPage;
+import static org.apache.dolphinscheduler.base.BaseTest.driver;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "DeleteProjectTest",priority=7)
-    public void testDeleteProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        //jump to project manage page
-        System.out.println("jump to the project manage page to delete project");
-        createProjectPage.jumpProjectManagePage();
+@Test(groups={"functionTests","login"})
+public class TestLogin {
+    private LoginPage loginPage;
 
-        //assert tenant manage page
-        System.out.println("start delete project");
-        assert createProjectPage.deleteProject();
-        System.out.println("end delete project");
+    @Test(description = "TestLogin")
+    public void testLogin() throws InterruptedException {
+        loginPage = new LoginPage(driver);
         System.out.println("===================================");
+        System.out.println("jump to Chinese login page");
+        loginPage.jumpPageChinese();
+
+        System.out.println("start login");
+        assert  loginPage.login();
+        System.out.println("end login");
+        System.out.println("===================================");
+
     }
 }

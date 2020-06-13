@@ -91,13 +91,13 @@ public class ParameterUtilsTest {
         globalParamList.add(property);
 
         String result2 =  ParameterUtils.curingGlobalParams(null,globalParamList,CommandType.START_CURRENT_TASK_PROCESS,scheduleTime);
-        Assert.assertEquals(result2, JSON.toJSONString(globalParamList));
+        Assert.assertEquals(result2, JSONUtils.toJson(globalParamList));
 
         String result3 =  ParameterUtils.curingGlobalParams(globalParamMap,globalParamList,CommandType.START_CURRENT_TASK_PROCESS,null);
-        Assert.assertEquals(result3, JSON.toJSONString(globalParamList));
+        Assert.assertEquals(result3, JSONUtils.toJson(globalParamList));
 
         String result4 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
-        Assert.assertEquals(result4, JSON.toJSONString(globalParamList));
+        Assert.assertEquals(result4, JSONUtils.toJson(globalParamList));
 
         //test var $ startsWith
         globalParamMap.put("bizDate","${system.biz.date}");
@@ -113,7 +113,7 @@ public class ParameterUtilsTest {
         globalParamList.add(property4);
 
         String result5 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
-        Assert.assertEquals(result5,JSONUtils.toJsonString(globalParamList));
+        Assert.assertEquals(result5, JSONUtils.toJson(globalParamList));
     }
 
     /**
