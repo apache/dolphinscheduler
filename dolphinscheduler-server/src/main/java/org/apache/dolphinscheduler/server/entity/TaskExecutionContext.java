@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -45,6 +46,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  task start time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
@@ -91,6 +93,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  process instance schedule time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date scheduleTime;
 
     /**
@@ -431,7 +434,7 @@ public class TaskExecutionContext implements Serializable{
 
     public Command toCommand(){
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(this));
+        requestCommand.setTaskExecutionContext(JsonSerializer.serializeToString(this));
         return requestCommand.convert2Command();
     }
 
