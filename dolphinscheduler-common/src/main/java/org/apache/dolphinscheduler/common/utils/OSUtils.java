@@ -55,8 +55,7 @@ public class OSUtils {
 
   /**
    * return -1 when the function can not get hardware env info
-   * e.g {@link OSUtils#memoryUsage()} {@link OSUtils#availablePhysicalMemorySize()}
-   * {@link OSUtils#totalMemorySize()} {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+   * e.g {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
    */
   public static final double NEGATIVE_ONE = -1;
 
