@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
-import com.alibaba.fastjson.JSONObject;
 import com.github.rholder.retry.RetryException;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
@@ -35,7 +34,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -82,15 +81,17 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
+        TaskExecuteRequestCommand taskRequestCommand = JsonSerializer.deserialize(
                 command.getBody(), TaskExecuteRequestCommand.class);
 
         logger.info("received command : {}", taskRequestCommand);
 
         String contextJson = taskRequestCommand.getTaskExecutionContext();
 
+
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
         taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
