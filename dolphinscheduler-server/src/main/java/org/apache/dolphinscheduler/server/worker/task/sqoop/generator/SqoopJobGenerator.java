@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
+import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HdfsSourceGenerator;
@@ -62,14 +63,23 @@ public class SqoopJobGenerator {
      * @return
      */
     public String generateSqoopJob(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext){
-        createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
-        if(sourceGenerator == null || targetGenerator == null){
-            return null;
+
+        String sqoopScripts = "";
+
+        if (SqoopJobType.TEMPLATE.getDescp().equals(sqoopParameters.getJobType())) {
+            createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
+            if(sourceGenerator == null || targetGenerator == null){
+                throw new RuntimeException("sqoop task source type or target type is null");
+            }
+
+            sqoopScripts =  commonGenerator.generate(sqoopParameters)
+                    + sourceGenerator.generate(sqoopParameters,taskExecutionContext)
+                    + targetGenerator.generate(sqoopParameters,taskExecutionContext);
+        } else if (SqoopJobType.CUSTOM.getDescp().equals(sqoopParameters.getJobType())) {
+            sqoopScripts =  sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
         }
 
-        return commonGenerator.generate(sqoopParameters)
-                + sourceGenerator.generate(sqoopParameters,taskExecutionContext)
-                + targetGenerator.generate(sqoopParameters,taskExecutionContext);
+        return sqoopScripts;
     }
 
     /**
