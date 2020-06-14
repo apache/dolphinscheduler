@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
+import com.alibaba.fastjson.JSONObject;
 import com.github.rholder.retry.RetryException;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
