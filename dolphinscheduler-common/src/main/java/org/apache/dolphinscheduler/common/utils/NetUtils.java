@@ -49,7 +49,7 @@ public class NetUtils {
 
     private static String LOCALHOST_VALUE = "127.0.0.1";
 
-    private static  InetAddress LOCAL_ADDRESS = null;
+    private static volatile InetAddress LOCAL_ADDRESS = null;
 
     private static volatile String HOST_ADDRESS;
 
@@ -65,49 +65,50 @@ public class NetUtils {
         return LOCALHOST_VALUE;
     }
 
+
     /**
      * Find first valid IP from local network card
      *
      * @return first valid local IP
      */
-    public static synchronized InetAddress getLocalAddress() {
+    private static InetAddress getLocalAddress() {
 
         if (null != LOCAL_ADDRESS) {
             return LOCAL_ADDRESS;
         }
 
-        InetAddress localAddress = null;
+            InetAddress localAddress = null;
 
-        try {
-            NetworkInterface networkInterface = findNetworkInterface();
-            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
-                if (addressOp.isPresent()) {
-                    try {
-                        if (addressOp.get().isReachable(100)) {
-                            return addressOp.get();
+            try {
+                NetworkInterface networkInterface = findNetworkInterface();
+                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
+                    if (addressOp.isPresent()) {
+                        try {
+                            if (addressOp.get().isReachable(100)) {
+                                return addressOp.get();
+                            }
+                        } catch (IOException e) {
+                            // ignore
                         }
-                    } catch (IOException e) {
-                        // ignore
                     }
                 }
+            } catch (Throwable e) {
+                logger.warn("get localHost address error", e);
             }
-        } catch (Throwable e) {
-            logger.warn("get localHost address error", e);
-        }
 
-        try {
-            localAddress = InetAddress.getLocalHost();
-            Optional<InetAddress> addressOp = toValidAddress(localAddress);
-            if (addressOp.isPresent()) {
-                return addressOp.get();
+            try {
+                localAddress = InetAddress.getLocalHost();
+                Optional<InetAddress> addressOp = toValidAddress(localAddress);
+                if (addressOp.isPresent()) {
+                    return addressOp.get();
+                }
+            } catch (Throwable e) {
+                logger.warn("valid address error", e);
             }
-        } catch (Throwable e) {
-            logger.warn("valid address error", e);
-        }
-
-        return localAddress;
+            LOCAL_ADDRESS = localAddress;
+        return LOCAL_ADDRESS;
     }
 
     private static Optional<InetAddress> toValidAddress(InetAddress address) {
@@ -123,7 +124,7 @@ public class NetUtils {
         return Optional.empty();
     }
 
-   private static InetAddress normalizeV6Address(Inet6Address address) {
+    private static InetAddress normalizeV6Address(Inet6Address address) {
         String addr = address.getHostAddress();
         int i = addr.lastIndexOf('%');
         if (i > 0) {
@@ -137,7 +138,7 @@ public class NetUtils {
         return address;
     }
 
-   public static boolean isValidV4Address(InetAddress address) {
+    public static boolean isValidV4Address(InetAddress address) {
         if (address == null || address.isLoopbackAddress()) {
             return false;
         }
