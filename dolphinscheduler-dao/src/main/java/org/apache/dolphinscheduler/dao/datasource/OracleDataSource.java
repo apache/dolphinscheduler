@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.dao.datasource;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * data source of Oracle
@@ -46,16 +44,16 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
-     * gets the JDBC url for the data source connection
-     * @return jdbc url
+     * append service name or SID
      */
     @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
-            jdbcUrl += "/";
+    protected void appendDatabase(StringBuilder jdbcUrl) {
+        if (getType() == DbConnectType.ORACLE_SID) {
+            jdbcUrl.append(":");
+        } else {
+            jdbcUrl.append("/");
         }
-        return jdbcUrl;
+        jdbcUrl.append(getDatabase());
     }
 
     /**

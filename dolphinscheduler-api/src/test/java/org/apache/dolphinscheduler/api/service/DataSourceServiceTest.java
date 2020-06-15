@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -49,5 +50,13 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         Map<String, Object> map = dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+    }
+
+    @Test
+    public void buildParameter(){
+        String param = dataSourceService.buildParameter("","", DbType.ORACLE, "192.168.9.1","1521","im"
+                ,"","test","test", DbConnectType.ORACLE_SERVICE_NAME,"");
+        String expected = "{\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
+        Assert.assertEquals(expected, param);
     }
 }
