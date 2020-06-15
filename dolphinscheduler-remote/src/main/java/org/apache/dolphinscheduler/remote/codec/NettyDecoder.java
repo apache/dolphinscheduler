@@ -81,7 +81,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 checkpoint(State.MAGIC);
                 break;
             default:
-                logger.warn("unknown decoder state " + state());
+                logger.warn("unknown decoder state {}", state());
         }
     }
 
