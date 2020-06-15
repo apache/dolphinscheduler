@@ -208,9 +208,7 @@ public class NettyRemotingServer {
                 if(workGroup != null){
                     this.workGroup.shutdownGracefully();
                 }
-                if(defaultExecutor != null){
-                    defaultExecutor.shutdown();
-                }
+                defaultExecutor.shutdown();
             } catch (Exception ex) {
                 logger.error("netty server close exception", ex);
             }
