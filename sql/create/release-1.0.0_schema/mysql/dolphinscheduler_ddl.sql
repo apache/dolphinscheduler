@@ -193,8 +193,8 @@ CREATE TABLE `t_escheduler_project` (
   `desc` varchar(200) DEFAULT NULL COMMENT 'project description',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
