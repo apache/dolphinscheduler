@@ -49,7 +49,7 @@ public class NetUtils {
 
     private static String LOCALHOST_VALUE = "127.0.0.1";
 
-    private static volatile InetAddress LOCAL_ADDRESS = null;
+    private static InetAddress LOCAL_ADDRESS = null;
 
     private static volatile String HOST_ADDRESS;
 
@@ -65,49 +65,51 @@ public class NetUtils {
         return LOCALHOST_VALUE;
     }
 
+    private static InetAddress getLocalAddress() {
+        if (null != LOCAL_ADDRESS) {
+            return LOCAL_ADDRESS;
+        }
+        return getLocalAddress0();
+    }
 
     /**
      * Find first valid IP from local network card
      *
      * @return first valid local IP
      */
-    private static InetAddress getLocalAddress() {
-
-        if (null != LOCAL_ADDRESS) {
-            return LOCAL_ADDRESS;
-        }
-
-            InetAddress localAddress = null;
-
-            try {
-                NetworkInterface networkInterface = findNetworkInterface();
-                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
-                    if (addressOp.isPresent()) {
-                        try {
-                            if (addressOp.get().isReachable(100)) {
-                                return addressOp.get();
-                            }
-                        } catch (IOException e) {
-                            // ignore
+    private static synchronized InetAddress getLocalAddress0() {
+        InetAddress localAddress = null;
+        try {
+            NetworkInterface networkInterface = findNetworkInterface();
+            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
+                if (addressOp.isPresent()) {
+                    try {
+                        if (addressOp.get().isReachable(100)) {
+                            return addressOp.get();
                         }
+                    } catch (IOException e) {
+                        // ignore
                     }
                 }
-            } catch (Throwable e) {
-                logger.warn("get localHost address error", e);
             }
+        } catch (Throwable e) {
+            logger.warn("get localHost address error", e);
+        }
 
-            try {
-                localAddress = InetAddress.getLocalHost();
-                Optional<InetAddress> addressOp = toValidAddress(localAddress);
-                if (addressOp.isPresent()) {
-                    return addressOp.get();
-                }
-            } catch (Throwable e) {
-                logger.warn("valid address error", e);
+        try {
+            localAddress = InetAddress.getLocalHost();
+            Optional<InetAddress> addressOp = toValidAddress(localAddress);
+            if (addressOp.isPresent()) {
+                return addressOp.get();
             }
+        } catch (Throwable e) {
+            logger.warn("valid address error", e);
+
             LOCAL_ADDRESS = localAddress;
+        }
+
         return LOCAL_ADDRESS;
     }
 
