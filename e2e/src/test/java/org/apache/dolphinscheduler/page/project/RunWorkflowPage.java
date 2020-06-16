@@ -27,23 +27,19 @@ public class RunWorkflowPage extends PageCommon {
     }
 
     public boolean runWorkflow() throws InterruptedException {
-        // click online button
-        clickButton(RunWorkflowLocator.CLICK_ONLINE_WORKFLOW_BUTTON);
-        System.out.println("Click online workflow button");
-        Thread.sleep(1000);
-
         // click run workflow button
-        clickButton(RunWorkflowLocator.CLICK_RUN_WORKFLOW_BUTTON);
         System.out.println("Click run workflow button");
-        switchNextHandle();
+        Thread.sleep(1000);
+        clickButton(RunWorkflowLocator.CLICK_RUN_WORKFLOW_BUTTON);
         Thread.sleep(1000);
 
         clickElement(RunWorkflowLocator.SELECT_FAILURE_STRATEGY_END);
         clickElement(RunWorkflowLocator.SELECT_FAILURE_STRATEGY_CONTINUE);
         clickElement(RunWorkflowLocator.CLICK_NOTICE_STRATEGY);
         clickElement(RunWorkflowLocator.SELECT_NOTICE_STRATEGY);
+        Thread.sleep(500);
         clickElement(RunWorkflowLocator.CLICK_PROCESS_PRIORITY);
-        clickElement(RunWorkflowLocator.SELECT_PROCESS_PRIORITY_GIGHEST);
+        clickElement(RunWorkflowLocator.SELECT_PROCESS_PRIORITY_HIGHEST);
         clickElement(RunWorkflowLocator.CLICK_WORKER_GROUP);
         clickElement(RunWorkflowLocator.SELECT_WORKER_GROUP);
         clickElement(RunWorkflowLocator.CLICK_NOTICE_GROUP);
@@ -51,10 +47,6 @@ public class RunWorkflowPage extends PageCommon {
         sendInput(RunWorkflowLocator.INPUT_RECIPIENT, RunWorkflowData.RECIPIENT);
         sendInput(RunWorkflowLocator.INPUT_Cc,RunWorkflowData.Cc);
         clickButton(RunWorkflowLocator.CLICK_RUNNING_BUTTON);
-        Thread.sleep(1500);
-        System.out.println("offline workflow");
-        clickButton(RunWorkflowLocator.CLICK_OFFLINE_WORKFLOW_BUTTON);
-
 
         return ifTitleContains(RunWorkflowData.RUN_WORKFLOW_TITLE);
     }

@@ -17,25 +17,19 @@
 package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
-import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
-import org.apache.dolphinscheduler.page.project.RunWorkflowPage;
+import org.apache.dolphinscheduler.page.project.TimingPage;
 import org.testng.annotations.Test;
 
-public class TestRunWorkflow extends BaseTest {
-    private CreateWorkflowPage createWorkflowPage;
-    private CreateProjectPage createProjectPage;
-    private RunWorkflowPage runWorkflowPage;
+public class TestTiming extends BaseTest {
+    private TimingPage timingPage;
 
-
-    @Test(groups={"functionTests","runWorkflow"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
     public void testRunWorkflow() throws InterruptedException {
-        runWorkflowPage = new RunWorkflowPage(driver);
+        timingPage = new TimingPage(driver);
 
-        createProjectPage = new CreateProjectPage(driver);
-        System.out.println("start run workflow");
-        assert runWorkflowPage.runWorkflow();
-        System.out.println("end run workflow");
+        System.out.println("start create timing");
+        assert timingPage.createTiming();
+        System.out.println("end create timing");
         System.out.println("===================================");
     }
 }

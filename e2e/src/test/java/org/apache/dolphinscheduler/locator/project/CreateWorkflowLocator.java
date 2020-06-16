@@ -172,6 +172,20 @@ public class CreateWorkflowLocator {
     //scroll to element bottom
     public static final By SCROLL_BOTTOM = By.xpath("//span/a/em");
 
+
+    /**
+     * online workflow
+     */
+    // click online workflow button
+    public static final By CLICK_ONLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
+
+    /**
+     * offline workflow
+     */
+    // click offline workflow button
+    public static final By CLICK_OFFLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
+
+
     /**
      * delete workflow
      */

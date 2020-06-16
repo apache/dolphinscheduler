@@ -34,6 +34,7 @@
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateProject"></class>
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateWorkflow"></class>
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming"></class>
 
 
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow"></class>
