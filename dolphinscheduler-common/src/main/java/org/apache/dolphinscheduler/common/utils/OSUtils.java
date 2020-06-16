@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -33,8 +33,6 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -388,19 +386,6 @@ public class OSUtils {
   public static int getProcessID() {
     RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     return Integer.parseInt(runtimeMXBean.getName().split("@")[0]);
-  }
-
-  /**
-   * get local host
-   * @return host
-   */
-  public static String getHost(){
-    try {
-      return InetAddress.getLocalHost().getHostAddress();
-    } catch (UnknownHostException e) {
-      logger.error(e.getMessage(),e);
-    }
-    return null;
   }
 
   /**
