@@ -78,9 +78,11 @@ public class NetUtils {
      * @return first valid local IP
      */
     private static synchronized InetAddress getLocalAddress0() {
+
         if (null != LOCAL_ADDRESS) {
             return LOCAL_ADDRESS;
         }
+
         InetAddress localAddress = null;
         try {
             NetworkInterface networkInterface = findNetworkInterface();
