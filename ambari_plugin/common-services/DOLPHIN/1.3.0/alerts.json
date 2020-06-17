@@ -96,7 +96,7 @@
     ],
     "DOLPHIN_ALERT": [
       {
-        "name": "DOLPHIN_DOLPHIN_ALERT_CHECK",
+        "name": "DOLPHIN_ALERT_CHECK",
         "label": "check dolphin scheduler alert status",
         "description": "",
         "interval":10,
@@ -127,10 +127,10 @@
         }
       }
     ],
-    "DOLPHIN_ALERT": [
+    "DOLPHIN_LOGGER": [
       {
-        "name": "DOLPHIN_DOLPHIN_LOGGER_CHECK",
-        "label": "check dolphin scheduler alert status",
+        "name": "DOLPHIN_LOGGER_CHECK",
+        "label": "check dolphin scheduler logger status",
         "description": "",
         "interval":10,
         "scope": "HOST",
