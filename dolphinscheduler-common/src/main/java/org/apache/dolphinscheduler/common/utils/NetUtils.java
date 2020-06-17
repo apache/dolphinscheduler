@@ -147,7 +147,6 @@ public class NetUtils {
         if (address == null || address.isLoopbackAddress()) {
             return false;
         }
-
         String name = address.getHostAddress();
         return (name != null
                 && IP_PATTERN.matcher(name).matches()
