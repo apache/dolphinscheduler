@@ -21,13 +21,19 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.*;
 
 public class JSONUtilsTest {
 
@@ -214,6 +220,21 @@ public class JSONUtilsTest {
         ArrayNode node = JSONUtils.parseArray(str);
 
         Assert.assertEquals("yellow", node.path(0).path("color").asText());
+    }
+
+    @Test
+    public void jsonDataDeserializerTest() {
+        String a = "{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
+                + "\"conditionsTask\":false,\"depList\":[],\"dependence\":\"{}\",\"forbidden\":false,"
+                + "\"id\":\"tasks-86823\",\"maxRetryTimes\":1,\"name\":\"shell test\","
+                + "\"params\":\"{\\\"resourceList\\\":[],\\\"localParams\\\":[],\\\"rawScript\\\":\\\"echo "
+                + "'yyc'\\\"}\",\"preTasks\":\"[]\",\"retryInterval\":1,\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"HIGHEST\",\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+                + "\"timeout\":\"{}\",\"type\":\"SHELL\",\"workerGroup\":\"default\"}";
+
+        TaskNode taskNode = JSONUtils.parseObject(a, TaskNode.class);
+
+        Assert.assertTrue(true);
     }
 
 }
