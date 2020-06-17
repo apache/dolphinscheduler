@@ -13,7 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ */ 
 <template>
   <div class="update-udf-model">
     <div class="update-udf-box">
@@ -26,7 +26,7 @@
                     v-model="udfName"
                     :disabled="progress !== 0"
                     style="width: 535px"
-                    :placeholder="$t('Please enter resource name')"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
             <div class="p1" style="position: absolute;">
@@ -96,7 +96,7 @@
       _verifyName () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/resourceVerifyName', {
-            fullName: '/'+this.udfName,
+            fullName: '/'+this.currentDir+'/'+this.udfName,
             type: 'UDF'
           }).then(res => {
             resolve()
