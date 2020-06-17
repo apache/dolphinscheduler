@@ -50,23 +50,14 @@ public class AlertServer {
 
     private DolphinPluginManagerConfig dolphinPluginManagerConfig;
 
-    public AlertServer() {
-        alertChannelManager = new AlertChannelManager();
-        dolphinPluginManagerConfig = new DolphinPluginManagerConfig();
-        dolphinPluginManagerConfig.setPlugins(PropertyUtils.getString("alert.plugin.binding"));
-        if (StringUtils.isNotBlank(PropertyUtils.getString("alert.plugin.dir"))) {
-            dolphinPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString("alert.plugin.dir").trim());
-        }
+    public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
 
-        if (StringUtils.isNotBlank(PropertyUtils.getString("maven.local.repository"))) {
-            dolphinPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString("maven.local.repository").trim());
-        }
-        AlertPluginLoader alertPluginLoader = new AlertPluginLoader(dolphinPluginManagerConfig, alertChannelManager);
-        try {
-            alertPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
-        }
+    public static final String ALERT_PLUGIN_DIR = "alert.plugin.dir";
+
+    public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
+
+    public AlertServer() {
+
     }
 
     public synchronized static AlertServer getInstance() {
@@ -76,7 +67,30 @@ public class AlertServer {
         return instance;
     }
 
+    private void initPlugin() {
+        alertChannelManager = new AlertChannelManager();
+        dolphinPluginManagerConfig = new DolphinPluginManagerConfig();
+        dolphinPluginManagerConfig.setPlugins(PropertyUtils.getString(ALERT_PLUGIN_BINDING));
+        if (StringUtils.isNotBlank(PropertyUtils.getString(ALERT_PLUGIN_DIR))) {
+            dolphinPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(ALERT_PLUGIN_DIR).trim());
+        }
+
+        if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
+            dolphinPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
+        }
+
+        AlertPluginLoader alertPluginLoader = new AlertPluginLoader(dolphinPluginManagerConfig, alertChannelManager);
+        try {
+            alertPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("load Alert Plugin Failed !", e);
+        }
+    }
+
     public void start() {
+
+        initPlugin();
+
         logger.info("alert server ready start ");
         while (Stopper.isRunning()) {
             try {

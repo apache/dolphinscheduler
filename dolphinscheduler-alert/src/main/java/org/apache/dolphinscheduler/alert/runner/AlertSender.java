@@ -82,9 +82,9 @@ public class AlertSender {
             AlertInfo alertInfo = new AlertInfo();
             alertInfo.setAlertData(alertData);
 
-            //TODO get the alert plugin params which is configured at the web ui. eg: email receivers , email receiverscc
-            //TODO get the alert plugin params which is configured in AlertGroup.
-            //TODO turn the alert params to json eg:
+            //TODO: get the alert plugin params which is configured at the web ui. eg: email receivers , email receiverscc
+            //TODO: get the alert plugin params which is configured in AlertGroup.
+            //TODO: turn the alert params to json eg:
             //[
             // {"alertPluginId":"email_alert", "receivers":"xxx@qq.com,bbb@qq.com", "receiverscc":"aaaa@qq.com,ccc@qq.com"},
             // {"alertPluginId":"wechat_alert", "receivers":"nnnnn"}
