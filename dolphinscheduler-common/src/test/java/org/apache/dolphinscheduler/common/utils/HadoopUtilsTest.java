@@ -185,7 +185,7 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    public void getApplicationUrl(){
+    public void getApplicationUrl() throws Exception {
         String application_1516778421218_0042 = hadoopUtils.getApplicationUrl("application_1529051418016_0167");
         logger.info(application_1516778421218_0042);
     }
