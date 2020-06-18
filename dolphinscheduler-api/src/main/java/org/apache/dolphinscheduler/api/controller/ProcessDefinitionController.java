@@ -106,7 +106,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "copyOrMoveProcessDefinition", notes= "COPY_OR_MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4,5"),
             @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer"),
             @ApiImplicitParam(name = "isCopy", value = "IS_COPY", required = true, type = "boolean")
     })
@@ -377,7 +377,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result getNodeListByDefinitionIdList(
             @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-            @RequestParam("processDefinitionIdList") String processDefinitionIdList) throws Exception {
+            @RequestParam("processDefinitionIdList") String processDefinitionIdList) {
 
         logger.info("query task node name list by definitionId list, login user:{}, project name:{}, id list: {}",
                 loginUser.getUserName(), projectName, processDefinitionIdList);
