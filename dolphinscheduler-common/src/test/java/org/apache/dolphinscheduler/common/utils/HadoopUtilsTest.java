@@ -142,7 +142,7 @@ public class HadoopUtilsTest {
     @Test
     public void isYarnEnabled() {
         boolean result = hadoopUtils.isYarnEnabled();
-        Assert.assertEquals(false, result);
+        Assert.assertEquals(true, result);
     }
 
     @Test
