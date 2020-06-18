@@ -101,12 +101,14 @@ public class ProcessDefinitionController extends BaseController {
      * @param projectName project name
      * @param isCopy  isCopy
      * @param processDefinitionIds   process definition ids
-     * @param targetProjectName target project name
+     * @param targetProjectId target project id
      * @return copy result code
      */
     @ApiOperation(value = "copyOrMoveProcessDefinition", notes= "COPY_OR_MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4")
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer"),
+            @ApiImplicitParam(name = "isCopy", value = "IS_COPY", required = true, type = "boolean")
     })
     @PostMapping(value = "/copy-or-move")
     @ResponseStatus(HttpStatus.OK)
@@ -114,14 +116,18 @@ public class ProcessDefinitionController extends BaseController {
     public Result copyOrMoveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
-                                              @RequestParam(value = "targetProjectName",required = true) String targetProjectName,
+                                              @RequestParam(value = "targetProjectId",required = true) int targetProjectId,
                                               @RequestParam(value = "isCopy", required = true) boolean isCopy)  {
 
 
-        logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project name:{}",
-                isCopy?"copy":"move",StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(projectName), StringUtils.replaceNRTtoUnderline(processDefinitionIds),StringUtils.replaceNRTtoUnderline(targetProjectName));
+        logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
+                isCopy?"copy":"move",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), 
+                StringUtils.replaceNRTtoUnderline(projectName), 
+                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
 
-        return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectName,isCopy));
+        return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId,isCopy));
     }
 
     /**

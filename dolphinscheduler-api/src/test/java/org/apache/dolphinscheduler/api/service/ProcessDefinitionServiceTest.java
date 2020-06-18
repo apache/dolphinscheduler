@@ -194,6 +194,8 @@ public class ProcessDefinitionServiceTest {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
+        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(getProject(projectName));
+
         Project project = getProject(projectName);
 
         User loginUser = new User();
@@ -225,7 +227,7 @@ public class ProcessDefinitionServiceTest {
                 definition.getConnects())).thenReturn(createProcessResult);
 
         Map<String, Object> successRes = processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,"project_test1",
-                 "46","project_test1",true);
+                 "46",1,true);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -235,11 +237,14 @@ public class ProcessDefinitionServiceTest {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
-        String targetProjectName = "project_test2";
-        Mockito.when(projectMapper.queryByName(targetProjectName)).thenReturn(getProject(targetProjectName));
+        String projectName2 = "project_test2";
+        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(getProject(projectName2));
+
+        int targetProjectId = 2;
+        Mockito.when(projectMapper.queryDetailById(targetProjectId)).thenReturn(getProjectById(targetProjectId));
 
         Project project = getProject(projectName);
-        Project targetProject = getProject(targetProjectName);
+        Project targetProject = getProjectById(targetProjectId);
 
         User loginUser = new User();
         loginUser.setId(-1);
@@ -247,8 +252,12 @@ public class ProcessDefinitionServiceTest {
 
         Map<String, Object> result = new HashMap<>(5);
         putMsg(result, Status.SUCCESS, projectName);
+
+        Map<String, Object> result2 = new HashMap<>(5);
+        putMsg(result2, Status.SUCCESS, targetProject.getName());
+
         Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,targetProject,targetProjectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser,targetProject,targetProject.getName())).thenReturn(result2);
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
@@ -262,7 +271,7 @@ public class ProcessDefinitionServiceTest {
 
 
         Map<String, Object> successRes = processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,"project_test1",
-                "46","project_test1",false);
+                "46",2,false);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -855,6 +864,19 @@ public class ProcessDefinitionServiceTest {
         Project project = new Project();
         project.setId(1);
         project.setName(projectName);
+        project.setUserId(1);
+        return  project;
+    }
+
+    /**
+     * get mock Project
+     * @param projectId projectId
+     * @return Project
+     */
+    private Project getProjectById(int projectId){
+        Project project = new Project();
+        project.setId(1);
+        project.setName("project_test2");
         project.setUserId(1);
         return  project;
     }
