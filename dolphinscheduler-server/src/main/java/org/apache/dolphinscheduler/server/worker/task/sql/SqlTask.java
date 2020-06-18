@@ -270,16 +270,15 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         logger.debug("execute sql : {}", result);
 
-        // if there is a result set
-        if (!resultJSONArray.isEmpty(null) ) {
-            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                sendAttachment(sqlParameters.getTitle(),
-                        JSONUtils.toJsonString(resultJSONArray));
-            }else{
-                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONUtils.toJsonString(resultJSONArray));
-            }
+
+        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+            sendAttachment(sqlParameters.getTitle(),
+                    JSONUtils.toJsonString(resultJSONArray));
+        }else{
+            sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
+                    JSONUtils.toJsonString(resultJSONArray));
         }
+
     }
 
     /**
