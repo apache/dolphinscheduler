@@ -910,8 +910,6 @@
                         <exclude>**/node/**</exclude>
                         <exclude>**/dist/**</exclude>
                         <exclude>**/licenses/**</exclude>
-                        <exclude>**/src/sass/common/_animation.scss</exclude>
-                        <exclude>**/src/sass/common/_normalize.scss</exclude>
                         <exclude>.github/**</exclude>
                         <exclude>sql/soft_version</exclude>
                         <exclude>**/common/utils/ScriptRunner.java</exclude>
