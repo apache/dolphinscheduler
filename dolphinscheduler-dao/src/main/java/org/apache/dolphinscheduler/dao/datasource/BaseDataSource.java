@@ -97,7 +97,7 @@ public abstract class BaseDataSource {
    * append database
    * @param jdbcUrl jdbc url
    */
-  private void appendDatabase(StringBuilder jdbcUrl) {
+  protected void appendDatabase(StringBuilder jdbcUrl) {
     if (dbTypeSelector() == DbType.SQLSERVER) {
       jdbcUrl.append(";databaseName=").append(getDatabase());
     } else {
