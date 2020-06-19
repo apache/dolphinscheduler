@@ -34,6 +34,11 @@ import static java.util.Collections.emptyList;
  */
 public class NetUtils {
 
+
+    private NetUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static Logger logger = LoggerFactory.getLogger(NetUtils.class);
 
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
