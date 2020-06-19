@@ -141,7 +141,7 @@ public class DataxTask extends AbstractTask {
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
 
-            // run datax process
+            // run datax procesDataSourceService.s
             String jsonFilePath = buildDataxJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
             CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
@@ -176,7 +176,7 @@ public class DataxTask extends AbstractTask {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile()
+    private String buildDataxJsonFile(Map<String, Property> paramsMap)
             throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
