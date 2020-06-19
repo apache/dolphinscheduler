@@ -58,7 +58,8 @@ public class NetUtils {
 
         InetAddress address = getLocalAddress();
         if (address != null) {
-            return HOST_ADDRESS = address.getHostAddress();
+            HOST_ADDRESS = address.getHostAddress();
+            return HOST_ADDRESS;
         }
         return LOCAL_HOST_VALUE;
     }
@@ -80,37 +81,30 @@ public class NetUtils {
             return LOCAL_ADDRESS;
         }
         InetAddress localAddress = null;
-        try {
-            NetworkInterface networkInterface = findNetworkInterface();
-            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
-                if (addressOp.isPresent()) {
-                    try {
-                        if (addressOp.get().isReachable(100)) {
-                            return addressOp.get();
-                        }
-                    } catch (IOException e) {
-                        // ignore
+        NetworkInterface networkInterface = findNetworkInterface();
+        Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+        while (addresses.hasMoreElements()) {
+            Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
+            if (addressOp.isPresent()) {
+                try {
+                    if (addressOp.get().isReachable(100)) {
+                        return addressOp.get();
                     }
+                } catch (IOException e) {
+                    logger.warn("test address id reachable io exception", e);
                 }
             }
-        } catch (Throwable e) {
-            logger.warn("get localHost address error", e);
         }
 
         try {
             localAddress = InetAddress.getLocalHost();
-            Optional<InetAddress> addressOp = toValidAddress(localAddress);
-            if (addressOp.isPresent()) {
-                return addressOp.get();
-            }
-        } catch (Throwable e) {
-            logger.warn("valid address error", e);
-
-            LOCAL_ADDRESS = localAddress;
+        } catch (UnknownHostException e) {
+          logger.warn("InetAddress get LocalHost exception",e);
         }
-
+        Optional<InetAddress> addressOp = toValidAddress(localAddress);
+        if (addressOp.isPresent()) {
+            LOCAL_ADDRESS = addressOp.get();
+        }
         return LOCAL_ADDRESS;
     }
 
@@ -134,7 +128,6 @@ public class NetUtils {
             try {
                 return InetAddress.getByName(addr.substring(0, i) + '%' + address.getScopeId());
             } catch (UnknownHostException e) {
-                // ignore
                 logger.debug("Unknown IPV6 address: ", e);
             }
         }
@@ -170,15 +163,18 @@ public class NetUtils {
     private static NetworkInterface findNetworkInterface() {
 
         List<NetworkInterface> validNetworkInterfaces = emptyList();
+
         try {
             validNetworkInterfaces = getValidNetworkInterfaces();
-        } catch (Throwable e) {
-            logger.warn(String.valueOf(e));
+        } catch (SocketException e) {
+           logger.warn("ValidNetworkInterfaces exception",e);
         }
+
 
         return validNetworkInterfaces.get(0);
 
     }
+
     /**
      * Get the valid {@link NetworkInterface network interfaces}
      *
@@ -196,6 +192,7 @@ public class NetUtils {
         }
         return validNetworkInterfaces;
     }
+
     /**
      * @param networkInterface {@link NetworkInterface}
      * @return if the specified {@link NetworkInterface} should be ignored, return <code>true</code>
