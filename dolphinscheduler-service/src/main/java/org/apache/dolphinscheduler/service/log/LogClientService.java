@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
-                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
+                RollViewLogResponseCommand rollReviewLog = JsonSerializer.deserialize(
                         response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
@@ -105,7 +105,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
-                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
+                ViewLogResponseCommand viewLog = JsonSerializer.deserialize(
                         response.getBody(), ViewLogResponseCommand.class);
                 return viewLog.getMsg();
             }
@@ -133,7 +133,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
-                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
+                GetLogBytesResponseCommand getLog = JsonSerializer.deserialize(
                         response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData();
             }
