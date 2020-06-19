@@ -156,13 +156,30 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
+    
+
+    public static final String DINGTALK_WEBHOOK = "dingtalk.webhook";
+
+    public static final String DINGTALK_KEYWORD = "dingtalk.keyword";
+
+    public static final String DINGTALK_PROXY_ENABLE = "dingtalk.isEnableProxy";
+
+    public static final String DINGTALK_PROXY = "dingtalk.proxy";
+
+    public static final String DINGTALK_PORT = "dingtalk.port";
+
+    public static final String DINGTALK_USER = "dingtalk.user";
+
+    public static final String DINGTALK_PASSWORD = "dingtalk.password";
+
+    public static final String DINGTALK_ENABLE = "dingtalk.isEnable";
 
     /**
      * plugin config
      */
     public static final String PLUGIN_DIR = "plugin.dir";
 
-    public static final String PLUGIN_DEFAULT_EMAIL = "email";
+    public static final String PLUGIN_DEFAULT_EMAIL_ID = "email";
 
     public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
 
@@ -173,4 +190,5 @@ public class Constants {
     public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
 
     public static final String RETMAP_MSG = "msg";
+
 }
