@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
@@ -162,7 +163,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
-                RemoveTaskLogResponseCommand taskLogResponse = FastJsonSerializer.deserialize(
+                RemoveTaskLogResponseCommand taskLogResponse = JsonSerializer.deserialize(
                         response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }

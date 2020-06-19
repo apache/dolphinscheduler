@@ -522,7 +522,6 @@ public class DataSourceService extends BaseService{
             separator = ";";
         }
 
-        Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
         parameterMap.put(TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);

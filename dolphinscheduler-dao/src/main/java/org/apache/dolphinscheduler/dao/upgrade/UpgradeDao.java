@@ -16,13 +16,11 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.common.utils.SchemaUtils;
-import org.apache.dolphinscheduler.common.utils.ScriptRunner;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.slf4j.Logger;
@@ -282,12 +280,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             Map<Integer,String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
 
             for (Map.Entry<Integer,String> entry : processDefinitionJsonMap.entrySet()){
-                JSONObject jsonObject = JSONObject.parseObject(entry.getValue());
-                JSONArray tasks = JSONArray.parseArray(jsonObject.getString("tasks"));
+                ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
+                ArrayNode tasks = JSONUtils.parseArray(jsonObject.get("tasks").toString());
 
                 for (int i = 0 ;i < tasks.size() ; i++){
-                    JSONObject task = tasks.getJSONObject(i);
-                    Integer workerGroupId = task.getInteger("workerGroupId");
+                    ObjectNode task = (ObjectNode) tasks.path(i);
+                    ObjectNode workerGroupNode = (ObjectNode) task.path("workerGroupId");
+                    Integer workerGroupId = -1;
+                    if(workerGroupNode != null && workerGroupNode.canConvertToInt()){
+                        workerGroupId = workerGroupNode.asInt(-1);
+                    }
                     if (workerGroupId == -1) {
                         task.put("workerGroup", "default");
                     }else {
@@ -295,11 +297,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                     }
                 }
 
-                jsonObject.remove(jsonObject.getString("tasks"));
+                jsonObject.remove("task");
 
                 jsonObject.put("tasks",tasks);
 
-                replaceProcessDefinitionMap.put(entry.getKey(),jsonObject.toJSONString());
+                replaceProcessDefinitionMap.put(entry.getKey(),jsonObject.toString());
             }
             if (replaceProcessDefinitionMap.size() > 0){
                 processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),replaceProcessDefinitionMap);
