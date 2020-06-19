@@ -181,6 +181,7 @@ export default {
   Tenant: 'Tenant',
   Email: 'Email',
   Phone: 'Phone',
+  'User Type':'User Type',
   'Please enter phone number': 'Please enter phone number',
   'Please enter main class': 'Please enter main class',
   'Please enter email': 'Please enter email',
