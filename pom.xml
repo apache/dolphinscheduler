@@ -69,7 +69,6 @@
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
-        <fastjson.version>1.2.61</fastjson.version>
         <druid.version>1.1.14</druid.version>
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.6</commons.codec.version>
@@ -150,11 +149,6 @@
                 <version>${cron.utils.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
@@ -787,7 +781,7 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
-                        <include>**/remote/FastJsonSerializerTest.java</include>
+                        <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
@@ -822,6 +816,7 @@
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <include>**/server/worker/task/http/HttpTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
@@ -850,6 +845,7 @@
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
+                        <include>**/dao/datasource/OracleDataSourceTest.java</include>
                         <include>**/plugin/model/AlertDataTest.java</include>
                         <include>**/plugin/model/AlertInfoTest.java</include>
                         <include>**/plugin/utils/PropertyUtilsTest.java</include>
