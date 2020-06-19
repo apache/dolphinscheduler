@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -80,6 +81,7 @@ public class TaskProps {
   /**
    * task start time
    */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
   private Date taskStartTime;
 
   /**
@@ -99,6 +101,7 @@ public class TaskProps {
   /**
    * schedule time
    */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
   private Date scheduleTime;
 
   /**

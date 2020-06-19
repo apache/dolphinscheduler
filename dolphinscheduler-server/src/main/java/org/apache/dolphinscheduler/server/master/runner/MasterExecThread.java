@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -295,7 +294,7 @@ public class MasterExecThread implements Runnable {
             processInstance.setScheduleTime(scheduleDate);
             if(cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_START_NODE_STRING)){
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
-                processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
+                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
             }
 
             List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -467,7 +466,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance node json
-            taskInstance.setTaskJson(JSON.toJSONString(taskNode));
+            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert

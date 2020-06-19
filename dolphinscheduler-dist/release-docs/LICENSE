@@ -253,7 +253,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     datanucleus-rdbms 4.1.7: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.7, Apache 2.0
     derby 10.14.2.0: https://github.com/apache/derby, Apache 2.0
     druid 1.1.14: https://mvnrepository.com/artifact/com.alibaba/druid/1.1.14, Apache 2.0
-    fastjson 1.2.61: https://mvnrepository.com/artifact/com.alibaba/fastjson/1.2.61, Apache 2.0
     gson 2.8.5: https://github.com/google/gson, Apache 2.0
     guava 20.0: https://mvnrepository.com/artifact/com.google.guava/guava/20.0, Apache 2.0
     guice 3.0: https://mvnrepository.com/artifact/com.google.inject/guice/3.0, Apache 2.0
@@ -321,7 +320,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     joda-time 2.10.1: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
-    jsp-api-2.1 6.1.14: https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-api-2.1/6.1.14, Apache 2.0 
+    jsp-api-2.1 6.1.14: https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-api-2.1/6.1.14, Apache 2.0
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
     libfb303 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libfb303/0.9.3, Apache 2.0
     libthrift 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libthrift/0.9.3, Apache 2.0
@@ -426,7 +425,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jersey-json 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-json/1.9, CDDL 1.1 and GPL 1.1
     jersey-server 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-server/1.9, CDDL 1.1 and GPL 1.1
     jsp-2.1 6.1.14 https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-2.1/6.1.14, CDDL 1.0
-    
+
     jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
     transaction-api 1.1: https://mvnrepository.com/artifact/javax.transaction/transaction-api/1.1, CDDL 1.0
 

@@ -44,6 +44,19 @@ public class OracleDataSource extends BaseDataSource {
     }
 
     /**
+     * append service name or SID
+     */
+    @Override
+    protected void appendDatabase(StringBuilder jdbcUrl) {
+        if (getConnectType() == DbConnectType.ORACLE_SID) {
+            jdbcUrl.append(":");
+        } else {
+            jdbcUrl.append("/");
+        }
+        jdbcUrl.append(getDatabase());
+    }
+
+    /**
      * @return db type
      */
     @Override

@@ -83,7 +83,7 @@ public class ResInfo {
      */
     public static String getResInfoJson(double cpuUsage , double memoryUsage,double loadAverage){
         ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage,loadAverage);
-        return JSONUtils.toJson(resInfo);
+        return JSONUtils.toJsonString(resInfo);
     }
 
 
