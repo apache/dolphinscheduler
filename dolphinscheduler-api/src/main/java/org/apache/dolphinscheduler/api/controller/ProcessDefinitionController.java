@@ -106,7 +106,7 @@ public class ProcessDefinitionController extends BaseController {
      */
     @ApiOperation(value = "copyOrMoveProcessDefinition", notes= "COPY_OR_MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4,5"),
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
             @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer"),
             @ApiImplicitParam(name = "isCopy", value = "IS_COPY", required = true, type = "boolean")
     })
