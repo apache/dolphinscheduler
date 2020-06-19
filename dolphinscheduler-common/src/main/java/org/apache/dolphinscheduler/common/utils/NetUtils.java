@@ -157,19 +157,28 @@ public class NetUtils {
         return Boolean.getBoolean("java.net.preferIPv6Addresses");
     }
 
+    /**
+     * Get the suitable {@link NetworkInterface}
+     *
+     * @return If no {@link NetworkInterface} is available , return <code>null</code>
+     */
     private static NetworkInterface findNetworkInterface() {
 
         List<NetworkInterface> validNetworkInterfaces = emptyList();
         try {
             validNetworkInterfaces = getValidNetworkInterfaces();
         } catch (Throwable e) {
-            logger.warn("", e);
+            logger.warn(String.valueOf(e));
         }
 
         return validNetworkInterfaces.get(0);
 
     }
-
+    /**
+     * Get the valid {@link NetworkInterface network interfaces}
+     *
+     * @throws SocketException SocketException if an I/O error occurs.
+     */
     private static List<NetworkInterface> getValidNetworkInterfaces() throws SocketException {
         List<NetworkInterface> validNetworkInterfaces = new LinkedList<>();
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -182,7 +191,11 @@ public class NetUtils {
         }
         return validNetworkInterfaces;
     }
-
+    /**
+     * @param networkInterface {@link NetworkInterface}
+     * @return if the specified {@link NetworkInterface} should be ignored, return <code>true</code>
+     * @throws SocketException SocketException if an I/O error occurs.
+     */
     public static boolean ignoreNetworkInterface(NetworkInterface networkInterface) throws SocketException {
         return networkInterface == null
                 || networkInterface.isLoopback()
