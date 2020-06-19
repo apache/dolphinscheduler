@@ -36,18 +36,11 @@ public class NetUtils {
 
     private static Logger logger = LoggerFactory.getLogger(NetUtils.class);
 
-
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("^\\d{1,3}(\\.\\d{1,3}){3}\\:\\d{1,5}$");
-
-    private static final Pattern LOCAL_IP_PATTERN = Pattern.compile("127(\\.\\d{1,3}){3}$");
-
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
 
     private static String ANY_HOST_VALUE = "0.0.0.0";
 
-    private static String LOCALHOST_KEY = "localhost";
-
-    private static String LOCALHOST_VALUE = "127.0.0.1";
+    private static String LOCAL_HOST_VALUE = "127.0.0.1";
 
     private static InetAddress LOCAL_ADDRESS = null;
 
@@ -62,7 +55,7 @@ public class NetUtils {
         if (address != null) {
             return HOST_ADDRESS = address.getHostAddress();
         }
-        return LOCALHOST_VALUE;
+        return LOCAL_HOST_VALUE;
     }
 
     private static InetAddress getLocalAddress() {
@@ -152,7 +145,7 @@ public class NetUtils {
         return (name != null
                 && IP_PATTERN.matcher(name).matches()
                 && !ANY_HOST_VALUE.equals(name)
-                && !LOCALHOST_VALUE.equals(name));
+                && !LOCAL_HOST_VALUE.equals(name));
     }
 
     /**
@@ -172,8 +165,6 @@ public class NetUtils {
         } catch (Throwable e) {
             logger.warn("", e);
         }
-
-        NetworkInterface result = null;
 
         return validNetworkInterfaces.get(0);
 
