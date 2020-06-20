@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch;
 
 
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
@@ -69,9 +69,9 @@ public class ExecutorDispatcherTest {
         int port = 30000;
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(port);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_EXECUTE_REQUEST, Mockito.mock(TaskExecuteProcessor.class));
-        nettyRemotingServer.start();
+        NettyRemoteServer nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        nettyRemoteServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_EXECUTE_REQUEST, Mockito.mock(TaskExecuteProcessor.class));
+        nettyRemoteServer.start();
         //
         workerConfig.setListenPort(port);
         workerRegistry.registry();

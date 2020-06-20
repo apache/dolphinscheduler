@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.handler;
 
 import io.netty.channel.*;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -42,15 +42,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      *  netty remote server
      */
-    private final NettyRemotingServer nettyRemotingServer;
+    private final NettyRemoteServer nettyRemoteServer;
 
     /**
      *  server processors queue
      */
     private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap();
 
-    public NettyServerHandler(NettyRemotingServer nettyRemotingServer){
-        this.nettyRemotingServer = nettyRemotingServer;
+    public NettyServerHandler(NettyRemoteServer nettyRemoteServer){
+        this.nettyRemoteServer = nettyRemoteServer;
     }
 
     /**
@@ -96,7 +96,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if(executorRef == null){
-            executorRef = nettyRemotingServer.getDefaultExecutor();
+            executorRef = nettyRemoteServer.getDefaultExecutor();
         }
         this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
     }

@@ -42,11 +42,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *  remoting netty server
+ *  remote netty server
  */
-public class NettyRemotingServer {
+public class NettyRemoteServer {
 
-    private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
+    private final Logger logger = LoggerFactory.getLogger(NettyRemoteServer.class);
 
     /**
      *  server bootstrap
@@ -93,7 +93,7 @@ public class NettyRemotingServer {
      *
      * @param serverConfig server config
      */
-    public NettyRemotingServer(final NettyServerConfig serverConfig){
+    public NettyRemoteServer(final NettyServerConfig serverConfig){
         this.serverConfig = serverConfig;
 
         this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {

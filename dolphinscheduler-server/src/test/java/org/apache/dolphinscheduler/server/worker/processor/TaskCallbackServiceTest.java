@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -78,13 +78,13 @@ public class TaskCallbackServiceTest {
     public void testSendAck() throws Exception{
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
-        nettyRemotingServer.start();
+        NettyRemoteServer nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
+        nettyRemoteServer.start();
 
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
+        NettyRemoteClient nettyRemoteClient = new NettyRemoteClient(clientConfig);
+        Channel channel = nettyRemoteClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(1);
@@ -97,8 +97,8 @@ public class TaskCallbackServiceTest {
 
         Thread.sleep(5000);
 
-        nettyRemotingServer.close();
-        nettyRemotingClient.close();
+        nettyRemoteServer.close();
+        nettyRemoteClient.close();
     }
 
     /**
@@ -109,13 +109,13 @@ public class TaskCallbackServiceTest {
     public void testSendResult() throws Exception{
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
-        nettyRemotingServer.start();
+        NettyRemoteServer nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskResponseProcessor);
+        nettyRemoteServer.start();
 
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
+        NettyRemoteClient nettyRemoteClient = new NettyRemoteClient(clientConfig);
+        Channel channel = nettyRemoteClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
         TaskExecuteResponseCommand responseCommand  = new TaskExecuteResponseCommand();
         responseCommand.setTaskInstanceId(1);
@@ -129,8 +129,8 @@ public class TaskCallbackServiceTest {
 
         Thread.sleep(5000);
 
-        nettyRemotingServer.close();
-        nettyRemotingClient.close();
+        nettyRemoteServer.close();
+        nettyRemoteClient.close();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -145,20 +145,20 @@ public class TaskCallbackServiceTest {
         masterRegistry.registry();
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
-        nettyRemotingServer.start();
+        NettyRemoteServer nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, taskAckProcessor);
+        nettyRemoteServer.start();
 
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
+        NettyRemoteClient nettyRemoteClient = new NettyRemoteClient(clientConfig);
+        Channel channel = nettyRemoteClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
         channel.close();
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(1);
         ackCommand.setStartTime(new Date());
 
-        nettyRemotingServer.close();
+        nettyRemoteServer.close();
 
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
         try {

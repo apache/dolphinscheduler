@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
@@ -54,14 +54,14 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     /**
      * netty remote client
      */
-    private final NettyRemotingClient nettyRemotingClient;
+    private final NettyRemoteClient nettyRemoteClient;
 
     /**
      * constructor
      */
     public NettyExecutorManager(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.nettyRemoteClient = new NettyRemoteClient(clientConfig);
     }
 
     @PostConstruct
@@ -70,9 +70,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
          * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
          * register EXECUTE_TASK_ACK command type TaskAckProcessor
          */
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemoteClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+        this.nettyRemoteClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        this.nettyRemoteClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
     }
 
     /**
@@ -140,7 +140,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         boolean success = false;
         do {
             try {
-                nettyRemotingClient.send(host, command);
+                nettyRemoteClient.send(host, command);
                 success = true;
             } catch (Exception ex) {
                 logger.error(String.format("send command : %s to %s error", command, host), ex);
@@ -180,7 +180,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         return nodes;
     }
 
-    public NettyRemotingClient getNettyRemotingClient() {
-        return nettyRemotingClient;
+    public NettyRemoteClient getNettyRemoteClient() {
+        return nettyRemoteClient;
     }
 }

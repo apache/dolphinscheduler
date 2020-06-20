@@ -47,11 +47,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *  remoting netty client
+ *  remote netty client
  */
-public class NettyRemotingClient {
+public class NettyRemoteClient {
 
-    private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
+    private final Logger logger = LoggerFactory.getLogger(NettyRemoteClient.class);
 
     /**
      * client bootstrap
@@ -107,7 +107,7 @@ public class NettyRemotingClient {
      *  client init
      * @param clientConfig client config
      */
-    public NettyRemotingClient(final NettyClientConfig clientConfig){
+    public NettyRemoteClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
         this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);

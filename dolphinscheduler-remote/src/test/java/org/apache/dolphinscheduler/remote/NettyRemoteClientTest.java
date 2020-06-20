@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  *  netty remote client test
  */
-public class NettyRemotingClientTest {
+public class NettyRemoteClientTest {
 
 
     /**
@@ -47,7 +47,7 @@ public class NettyRemotingClientTest {
     public void testSendSync(){
         NettyServerConfig serverConfig = new NettyServerConfig();
 
-        NettyRemotingServer server = new NettyRemotingServer(serverConfig);
+        NettyRemoteServer server = new NettyRemoteServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
             @Override
             public void process(Channel channel, Command command) {
@@ -59,7 +59,7 @@ public class NettyRemotingClientTest {
         server.start();
         //
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient client = new NettyRemotingClient(clientConfig);
+        NettyRemoteClient client = new NettyRemoteClient(clientConfig);
         Command commandPing = Ping.create();
         try {
             Command response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
@@ -78,7 +78,7 @@ public class NettyRemotingClientTest {
     public void testSendAsync(){
         NettyServerConfig serverConfig = new NettyServerConfig();
 
-        NettyRemotingServer server = new NettyRemotingServer(serverConfig);
+        NettyRemoteServer server = new NettyRemoteServer(serverConfig);
         server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
             @Override
             public void process(Channel channel, Command command) {
@@ -88,7 +88,7 @@ public class NettyRemotingClientTest {
         server.start();
         //
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        NettyRemotingClient client = new NettyRemotingClient(clientConfig);
+        NettyRemoteClient client = new NettyRemoteClient(clientConfig);
         CountDownLatch latch = new CountDownLatch(1);
         Command commandPing = Ping.create();
         try {

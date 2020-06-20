@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -71,7 +71,7 @@ public class MasterServer {
     /**
      * netty remote server
      */
-    private NettyRemotingServer nettyRemotingServer;
+    private NettyRemoteServer nettyRemoteServer;
 
     /**
      * master registry
@@ -108,14 +108,14 @@ public class MasterServer {
     @PostConstruct
     public void run(){
 
-        //init remoting server
+        //init remote server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
-        this.nettyRemotingServer.start();
+        this.nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        this.nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+        this.nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        this.nettyRemoteServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemoteServer.start();
 
         // register
         this.masterRegistry.registry();
@@ -177,7 +177,7 @@ public class MasterServer {
             }
             //
             this.masterSchedulerService.close();
-            this.nettyRemotingServer.close();
+            this.nettyRemoteServer.close();
             this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
             //close quartz

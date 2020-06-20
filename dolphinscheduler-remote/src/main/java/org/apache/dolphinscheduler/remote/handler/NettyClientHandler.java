@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.remote.handler;
 
 import io.netty.channel.*;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
@@ -44,7 +44,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     /**
      *  netty client
      */
-    private final NettyRemotingClient nettyRemotingClient;
+    private final NettyRemoteClient nettyRemoteClient;
 
     /**
      *  callback thread executor
@@ -61,8 +61,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
 
-    public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor){
-        this.nettyRemotingClient = nettyRemotingClient;
+    public NettyClientHandler(NettyRemoteClient nettyRemoteClient, ExecutorService callbackExecutor){
+        this.nettyRemoteClient = nettyRemoteClient;
         this.callbackExecutor = callbackExecutor;
         this.processors = new ConcurrentHashMap();
     }
@@ -76,7 +76,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
+        nettyRemoteClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
 
@@ -171,7 +171,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("exceptionCaught : {}", cause);
-        nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
+        nettyRemoteClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
 

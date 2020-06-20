@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
@@ -68,9 +68,9 @@ public class MasterSchedulerService extends Thread {
     private MasterConfig masterConfig;
 
     /**
-     *  netty remoting client
+     *  netty remote client
      */
-    private NettyRemotingClient nettyRemotingClient;
+    private NettyRemoteClient nettyRemoteClient;
 
     /**
      * master exec service
@@ -85,7 +85,7 @@ public class MasterSchedulerService extends Thread {
     public void init(){
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.nettyRemoteClient = new NettyRemoteClient(clientConfig);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class MasterSchedulerService extends Thread {
         if(!terminated){
             logger.warn("masterExecService shutdown without terminated, increase await time");
         }
-        nettyRemotingClient.close();
+        nettyRemoteClient.close();
         logger.info("master schedule service stopped...");
     }
 
@@ -138,7 +138,7 @@ public class MasterSchedulerService extends Thread {
                                     this.masterConfig.getMasterExecThreads() - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemotingClient));
+                                masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemoteClient));
                             }
                         }catch (Exception e){
                             logger.error("scan command error ", e);

@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -64,9 +64,9 @@ public class NettyExecutorManagerTest {
     public void testExecute() throws ExecuteException{
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
-        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
-        nettyRemotingServer.start();
+        NettyRemoteServer nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        nettyRemoteServer.registerProcessor(org.apache.dolphinscheduler.remote.command.CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
+        nettyRemoteServer.start();
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
         ProcessInstance processInstance = new ProcessInstance();
@@ -81,7 +81,7 @@ public class NettyExecutorManagerTest {
         executionContext.setHost(Host.of(OSUtils.getHost() + ":" + serverConfig.getListenPort()));
         Boolean execute = nettyExecutorManager.execute(executionContext);
         Assert.assertTrue(execute);
-        nettyRemotingServer.close();
+        nettyRemoteServer.close();
     }
 
     @Test(expected = ExecuteException.class)

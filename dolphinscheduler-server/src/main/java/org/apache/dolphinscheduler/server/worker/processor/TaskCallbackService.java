@@ -24,7 +24,7 @@ import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -59,14 +59,14 @@ public class TaskCallbackService {
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
-     * netty remoting client
+     * netty remote client
      */
-    private final NettyRemotingClient nettyRemotingClient;
+    private final NettyRemoteClient nettyRemoteClient;
 
 
     public TaskCallbackService(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.nettyRemoteClient = new NettyRemoteClient(clientConfig);
     }
 
     /**
@@ -91,7 +91,7 @@ public class TaskCallbackService {
         if(nettyRemoteChannel.isActive()){
             return nettyRemoteChannel;
         }
-        Channel newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
+        Channel newChannel = nettyRemoteClient.getChannel(nettyRemoteChannel.getHost());
         if(newChannel != null){
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
@@ -107,7 +107,7 @@ public class TaskCallbackService {
             }
         }
         for(String masterNode : masterNodes){
-            newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+            newChannel = nettyRemoteClient.getChannel(Host.of(masterNode));
             if(newChannel != null){
                 return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
             }

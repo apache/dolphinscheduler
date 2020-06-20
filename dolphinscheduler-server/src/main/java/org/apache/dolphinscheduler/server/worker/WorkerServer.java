@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.NettyRemoteServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -49,7 +49,7 @@ public class WorkerServer {
     /**
      *  netty remote server
      */
-    private NettyRemotingServer nettyRemotingServer;
+    private NettyRemoteServer nettyRemoteServer;
 
     /**
      *  worker registry
@@ -89,13 +89,13 @@ public class WorkerServer {
     public void run(){
         logger.info("start worker server...");
 
-        //init remoting server
+        //init remote server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
-        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
-        this.nettyRemotingServer.start();
+        this.nettyRemoteServer = new NettyRemoteServer(serverConfig);
+        this.nettyRemoteServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
+        this.nettyRemoteServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
+        this.nettyRemoteServer.start();
 
         // worker registry
         this.workerRegistry.registry();
@@ -131,7 +131,7 @@ public class WorkerServer {
                 logger.warn("thread sleep exception", e);
             }
 
-            this.nettyRemotingServer.close();
+            this.nettyRemoteServer.close();
             this.workerRegistry.unRegistry();
 
         } catch (Exception e) {

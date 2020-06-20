@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.NettyRemoteClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
@@ -35,7 +35,7 @@ public class LogClientService {
 
     private final NettyClientConfig clientConfig;
 
-    private final NettyRemotingClient client;
+    private final NettyRemoteClient client;
 
     /**
      *  request time out
@@ -48,7 +48,7 @@ public class LogClientService {
     public LogClientService() {
         this.clientConfig = new NettyClientConfig();
         this.clientConfig.setWorkerThreads(4);
-        this.client = new NettyRemotingClient(clientConfig);
+        this.client = new NettyRemoteClient(clientConfig);
     }
 
     /**
