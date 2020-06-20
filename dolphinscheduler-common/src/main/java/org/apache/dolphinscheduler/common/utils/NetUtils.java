@@ -134,7 +134,7 @@ public class NetUtils {
         return address;
     }
 
-    private static boolean isValidV4Address(InetAddress address) {
+    public static boolean isValidV4Address(InetAddress address) {
 
         if (address == null || address.isLoopbackAddress()) {
             return false;
