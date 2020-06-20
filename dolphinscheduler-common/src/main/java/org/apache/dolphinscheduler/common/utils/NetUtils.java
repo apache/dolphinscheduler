@@ -88,7 +88,8 @@ public class NetUtils {
             if (addressOp.isPresent()) {
                 try {
                     if (addressOp.get().isReachable(100)) {
-                        return addressOp.get();
+                        LOCAL_ADDRESS = addressOp.get();
+                        return LOCAL_ADDRESS;
                     }
                 } catch (IOException e) {
                     logger.warn("test address id reachable io exception", e);
@@ -99,7 +100,7 @@ public class NetUtils {
         try {
             localAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-          logger.warn("InetAddress get LocalHost exception",e);
+            logger.warn("InetAddress get LocalHost exception", e);
         }
         Optional<InetAddress> addressOp = toValidAddress(localAddress);
         if (addressOp.isPresent()) {
@@ -167,7 +168,7 @@ public class NetUtils {
         try {
             validNetworkInterfaces = getValidNetworkInterfaces();
         } catch (SocketException e) {
-           logger.warn("ValidNetworkInterfaces exception",e);
+            logger.warn("ValidNetworkInterfaces exception", e);
         }
 
 
