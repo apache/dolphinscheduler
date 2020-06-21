@@ -14,45 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.dao.entity;
 
-package org.apache.dolphinscheduler.remote;
-
-
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FastJsonSerializerTest {
+public class ProcessDefinitionTest {
 
+    /**
+     * task instance sub process
+     */
     @Test
-    public void testSerialize(){
-        TestObj testObj = new TestObj();
-        testObj.setAge(12);
-        byte[] serializeByte = FastJsonSerializer.serialize(testObj);
+    public void getGlobalParamMapTest() {
+        ProcessDefinition taskInstance = new ProcessDefinition();
 
-        //
-        TestObj deserialize = FastJsonSerializer.deserialize(serializeByte, TestObj.class);
+        //sub process
+        taskInstance.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
 
-        Assert.assertEquals(testObj.getAge(), deserialize.getAge());
-    }
+        taskInstance.getGlobalParamMap();
+        Assert.assertEquals("{selenium_global_parameters_1=selenium_global_parameters_value_1}",taskInstance.getGlobalParamMap().toString());
 
-    static class TestObj {
 
-        private int age;
 
-        public int getAge() {
-            return age;
-        }
-
-        public void setAge(int age) {
-            this.age = age;
-        }
-
-        @Override
-        public String toString() {
-            return "TestObj{" +
-                    "age=" + age +
-                    '}';
-        }
     }
 }

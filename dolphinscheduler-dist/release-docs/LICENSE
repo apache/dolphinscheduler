@@ -255,7 +255,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     derby 10.14.2.0: https://github.com/apache/derby, Apache 2.0
     druid 1.1.14: https://mvnrepository.com/artifact/com.alibaba/druid/1.1.14, Apache 2.0
     error_prone_annotations 2.1.2: https://mvnrepository.com/artifact/com.google.errorprone/error_prone_annotations/2.1.2, Apache 2.0
-    fastjson 1.2.61: https://mvnrepository.com/artifact/com.alibaba/fastjson/1.2.61, Apache 2.0
     freemarker 2.3.21: https://github.com/apache/freemarker, Apache 2.0
     grpc-context 1.9.0: https://mvnrepository.com/artifact/io.grpc/grpc-context/1.9.0, Apache 2.0
     grpc-core 1.9.0: https://mvnrepository.com/artifact/io.grpc/grpc-core/1.9.0, Apache 2.0

@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -521,7 +521,6 @@ public class ProcessDefinitionServiceTest {
     @Test
     public void testExportProcessMetaDataStr() {
         Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(getSchedulerList());
-
         ProcessDefinition processDefinition = getProcessDefinition();
         processDefinition.setProcessDefinitionJson(sqlDependentJson);
 
@@ -621,8 +620,8 @@ public class ProcessDefinitionServiceTest {
                 "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
 
-        JSONObject jsonObject = JSONUtils.parseObject(topProcessJson);
-        JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+        ObjectNode jsonObject = JSONUtils.parseObject(topProcessJson);
+        ArrayNode jsonArray = (ArrayNode) jsonObject.path("tasks");
 
         String originSubJson = jsonArray.toString();
 

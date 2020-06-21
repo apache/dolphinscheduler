@@ -14,23 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.security;
+package org.apache.dolphinscheduler.testcase.testSecurity;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.TenantManagePage;
+import org.apache.dolphinscheduler.page.security.AlertManagePage;
 import org.testng.annotations.Test;
 
+public class TestAlertManage extends BaseTest {
+    private AlertManagePage alertManagePage;
 
-public class TenantManageTest extends BaseTest {
-    private TenantManagePage tenantManagePage;
-
-    @Test(groups={"functionTests","createTenant"},dependsOnGroups = { "login" },description = "TenantManageTest",priority=2)
-    public void testTenantManage() throws InterruptedException {
-        tenantManagePage = new TenantManagePage(driver);
-        //assert tenant manage page
-        System.out.println("start create tenant");
-        assert tenantManagePage.createTenant();
-        System.out.println("end create tenant");
+    @Test(groups={"functionTests","alert"},dependsOnGroups = { "login" },description = "AlertManagePage")
+    public void testAlertManage() throws InterruptedException {
+        alertManagePage = new AlertManagePage(driver);
+        //assert alert manage page
+        System.out.println("start create alert");
+        assert alertManagePage.createAlert();
+        System.out.println("end create alert");
         System.out.println("===================================");
+
     }
 }
