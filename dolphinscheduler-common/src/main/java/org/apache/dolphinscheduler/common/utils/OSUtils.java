@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.configuration.Configuration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
