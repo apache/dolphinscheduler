@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
@@ -117,10 +118,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
-            taskLogger.error(errorLog, ex);
-            logger.error(errorLog, ex);
+            LoggerUtils.logError(Optional.ofNullable(logger), errorLog, ex);
+            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
         }
         FileUtils.taskLoggerThreadLocal.remove();
 

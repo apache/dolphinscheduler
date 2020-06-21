@@ -18,8 +18,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,37 +95,23 @@ public class LoggerUtils {
         return appIds;
     }
 
-
-    public static void logError(Logger commonLogger
-            , Supplier<Logger> taskLoggerSupplier
+    public static void logError(Optional<Logger> optionalLogger
             , String error) {
-        Logger taskLogger = taskLoggerSupplier.get();
-        if (Objects.nonNull(taskLogger)) {
-            taskLogger.error(error);
-        }
-        commonLogger.error(error);
+        optionalLogger.ifPresent((Logger logger) -> logger.error(error));
     }
 
-    public static void logException(Logger commonLogger
-            , Supplier<Logger> taskLoggerSupplier
+    public static void logError(Optional<Logger> optionalLogger
             , Throwable e) {
-        Logger taskLogger = taskLoggerSupplier.get();
-        if (Objects.nonNull(taskLogger)) {
-            taskLogger.error(e.getMessage(), e);
-        }
-        commonLogger.error(e.getMessage(), e);
+        optionalLogger.ifPresent((Logger logger) -> logger.error(e.getMessage(), e));
     }
 
-    public static void logInfo(Logger commonLogger
-            , Supplier<Logger> taskLoggerSupplier
-            , String error) {
-        Preconditions.checkNotNull(commonLogger);
-        Preconditions.checkNotNull(taskLoggerSupplier);
-        Preconditions.checkNotNull(error);
-        Logger taskLogger = taskLoggerSupplier.get();
-        if (Objects.nonNull(taskLogger)) {
-            taskLogger.info(error);
-        }
-        commonLogger.info(error);
+    public static void logError(Optional<Logger> optionalLogger
+            , String error, Throwable e) {
+        optionalLogger.ifPresent((Logger logger) -> logger.error(error, e));
+    }
+
+    public static void logInfo(Optional<Logger> optionalLogger
+            , String info) {
+        optionalLogger.ifPresent((Logger logger) -> logger.info(info));
     }
 }

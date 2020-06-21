@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.Configuration;
@@ -255,7 +257,8 @@ public class OSUtils {
       String userGroup = OSUtils.getGroup();
       if (StringUtils.isEmpty(userGroup)) {
         String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-        LoggerUtils.logError(logger, taskLoggerThreadLocal::get, errorLog);
+        LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
+        LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), errorLog);
         return false;
       }
       if (isMacOS()) {
@@ -267,7 +270,8 @@ public class OSUtils {
       }
       return true;
     } catch (Exception e) {
-      LoggerUtils.logException(logger, taskLoggerThreadLocal::get, e);
+      LoggerUtils.logError(Optional.ofNullable(logger), e);
+      LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
     }
 
     return false;
@@ -281,11 +285,13 @@ public class OSUtils {
    */
   private static void createLinuxUser(String userName, String userGroup) throws IOException {
     String infoLog1 = String.format("create linux os user : %s", userName);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
 
     String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
     String infoLog2 = String.format("execute cmd : %s", cmd);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
     OSUtils.exeCmd(cmd);
   }
 
@@ -297,17 +303,23 @@ public class OSUtils {
    */
   private static void createMacUser(String userName, String userGroup) throws IOException {
 
-    String infoLog1 = String.format("create mac os user : %s", userName);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog1);
+    Optional<Logger> optionalLogger = Optional.ofNullable(logger);
+    Optional<Logger> optionalTaskLogger = Optional.ofNullable(taskLoggerThreadLocal.get());
 
-    String userCreateCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
-    String infoLog2 = String.format("create user command : %s", userCreateCmd);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog2);
-    OSUtils.exeCmd(userCreateCmd);
+    String infoLog1 = String.format("create mac os user : %s", userName);
+    LoggerUtils.logInfo(optionalLogger, infoLog1);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog1);
+
+    String createUserCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
+    String infoLog2 = String.format("create user command : %s", createUserCmd);
+    LoggerUtils.logInfo(optionalLogger, infoLog2);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog2);
+    OSUtils.exeCmd(createUserCmd);
 
     String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
     String infoLog3 = String.format("append user to group : %s", appendGroupCmd);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog3);
+    LoggerUtils.logInfo(optionalLogger, infoLog3);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog3);
     OSUtils.exeCmd(appendGroupCmd);
   }
 
@@ -319,16 +331,19 @@ public class OSUtils {
    */
   private static void createWindowsUser(String userName, String userGroup) throws IOException {
     String infoLog1 = String.format("create windows os user : %s", userName);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
 
     String userCreateCmd = String.format("net user \"%s\" /add", userName);
     String infoLog2 = String.format("execute create user command : %s", userCreateCmd);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
     OSUtils.exeCmd(userCreateCmd);
 
     String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
     String infoLog3 = String.format("execute append user to group : %s", appendGroupCmd);
-    LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, infoLog3);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog3);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog3);
     OSUtils.exeCmd(appendGroupCmd);
   }
 
@@ -367,7 +382,12 @@ public class OSUtils {
    * @throws IOException errors
    */
   public static String exeCmd(String command) throws IOException {
-    return exeShell(command);
+    StringTokenizer st = new StringTokenizer(command);
+    String[] cmdArray = new String[st.countTokens()];
+    for (int i = 0; st.hasMoreTokens(); i++) {
+      cmdArray[i] = st.nextToken();
+    }
+    return exeShell(cmdArray);
   }
 
   /**
@@ -376,8 +396,8 @@ public class OSUtils {
    * @return result of execute the shell
    * @throws IOException errors
    */
-  public static String exeShell(String command) throws IOException {
-    return ShellExecutor.execCommand("bash", "-c", command);
+  public static String exeShell(String[] command) throws IOException {
+    return ShellExecutor.execCommand(command);
   }
 
   /**

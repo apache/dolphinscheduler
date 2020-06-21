@@ -34,6 +34,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Optional;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -164,26 +165,27 @@ public class FileUtils {
         //create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        LoggerUtils.logInfo(logger, taskLoggerThreadLocal::get, mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
 
         //if not exists this user,then create
-        Logger taskLogger = taskLoggerThreadLocal.get();
-        OSUtils.taskLoggerThreadLocal.set(taskLogger);
+        OSUtils.taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
         try {
             if (!OSUtils.getUserList().contains(userName)) {
                 boolean isSuccessCreateUser = OSUtils.createUser(userName);
 
+                String infoLog;
                 if (isSuccessCreateUser) {
-                    String infoLog = String.format("create user name success %s", userName);
-                    taskLogger.info(infoLog);
-                    logger.info(infoLog);
+                    infoLog = String.format("create user name success %s", userName);
                 } else {
-                    String infoLog = String.format("create user name fail %s", userName);
-                    taskLogger.error(infoLog);
-                    logger.error(infoLog);
+                    infoLog = String.format("create user name fail %s", userName);
                 }
+                LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
+                LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable e) {
+            LoggerUtils.logError(Optional.ofNullable(logger), e);
+            LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
         }
         OSUtils.taskLoggerThreadLocal.remove();
     }
