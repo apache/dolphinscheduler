@@ -99,6 +99,7 @@ export default {
   Script: '脚本',
   'Please enter script(required)': '请输入脚本(必填)',
   'Deploy Mode': '部署方式',
+  'Flink Version': 'Flink版本',
   'Driver core number': 'Driver内核数',
   'Please enter driver core number': '请输入Driver内核数',
   'Driver memory use': 'Driver内存数',
@@ -183,6 +184,7 @@ export default {
   Tenant: '租户',
   Email: '邮件',
   Phone: '手机',
+  'User Type':'用户类型',
   'Please enter phone number': '请输入手机',
   'Please enter email': '请输入邮箱',
   'Please enter the correct email format': '请输入正确的邮箱格式',
@@ -599,5 +601,11 @@ export default {
   'Unauthorized or deleted resources': '未授权或已删除资源',
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'Enable': '启用',
-  'Disable': '停用'
+  'Disable': '停用',
+  'Timeout Settings': '超时设置',
+  'Connect Timeout':'连接超时',
+  'Socket Timeout':'Socket超时',
+  'Connect timeout be a positive integer': '连接超时必须为数字',
+  'Socket Timeout be a positive integer': 'Socket超时必须为数字',
+  'ms':'毫秒'
 }

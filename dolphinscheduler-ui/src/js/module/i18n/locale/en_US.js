@@ -98,6 +98,7 @@ export default {
   Script: 'Script',
   'Please enter script(required)': 'Please enter script(required)',
   'Deploy Mode': 'Deploy Mode',
+  'Flink Version':'Flink Version',
   'Driver core number': 'Driver core number',
   'Please enter driver core number': 'Please enter driver core number',
   'Driver memory use': 'Driver memory use',
@@ -180,6 +181,7 @@ export default {
   Tenant: 'Tenant',
   Email: 'Email',
   Phone: 'Phone',
+  'User Type':'User Type',
   'Please enter phone number': 'Please enter phone number',
   'Please enter main class': 'Please enter main class',
   'Please enter email': 'Please enter email',
@@ -599,5 +601,11 @@ export default {
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
-  'Disable': 'Disable'
+  'Disable': 'Disable',
+  'Timeout Settings': 'Timeout Settings',
+  'Connect Timeout':'Connect Timeout',
+  'Socket Timeout':'Socket Timeout',
+  'Connect timeout be a positive integer': 'Connect timeout be a positive integer',
+  'Socket Timeout be a positive integer': 'Socket Timeout be a positive integer',
+  'ms':'ms'
 }
