@@ -33,6 +33,7 @@ public class NetUtilsTest {
     public void testGetLocalHost() {
         assertNotNull(NetUtils.getHost());
     }
+
     @Test
     public void testIsValidAddress() {
         assertFalse(NetUtils.isValidV4Address((InetAddress) null));
