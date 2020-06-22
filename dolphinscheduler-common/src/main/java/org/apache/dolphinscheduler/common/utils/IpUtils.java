@@ -49,12 +49,11 @@ public class IpUtils {
     ipNumbers[2] = ipLong >> 8 & tmp;
     ipNumbers[3] = ipLong & tmp;
 
-    StringBuilder sb = new StringBuilder(16);
-    sb.append(ipNumbers[0]).append(DOT)
-            .append(ipNumbers[1]).append(DOT)
-            .append(ipNumbers[2]).append(DOT)
-            .append(ipNumbers[3]);
-    return sb.toString();
+    String sb = ipNumbers[0] + DOT +
+            ipNumbers[1] + DOT +
+            ipNumbers[2] + DOT +
+            ipNumbers[3];
+    return sb;
   }
 
 }

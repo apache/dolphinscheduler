@@ -184,6 +184,7 @@ export default {
   Tenant: '租户',
   Email: '邮件',
   Phone: '手机',
+  'User Type':'用户类型',
   'Please enter phone number': '请输入手机',
   'Please enter email': '请输入邮箱',
   'Please enter the correct email format': '请输入正确的邮箱格式',
