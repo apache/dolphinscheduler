@@ -607,7 +607,6 @@ export default {
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
   'Please confirm whether the workflow has been saved before downloading': '下载前请确定工作流是否已保存',
   'User name length is between 3 and 39': '用户名长度在3～39之间',
-  'Disable': '停用',
   'Timeout Settings': '超时设置',
   'Connect Timeout':'连接超时',
   'Socket Timeout':'Socket超时',
