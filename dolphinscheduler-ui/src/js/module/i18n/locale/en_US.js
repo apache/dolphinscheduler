@@ -603,7 +603,6 @@ export default {
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'Enable': 'Enable',
-  'Disable': 'Disable',
   'Timeout Settings': 'Timeout Settings',
   'Connect Timeout':'Connect Timeout',
   'Socket Timeout':'Socket Timeout',
