@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -42,6 +43,7 @@ public class Session {
     /**
      * last login time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date lastLoginTime;
 
     /**
@@ -93,14 +95,24 @@ public class Session {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Session session = (Session) o;
 
-        if (userId != session.userId) return false;
-        if (!id.equals(session.id)) return false;
-        if (!lastLoginTime.equals(session.lastLoginTime)) return false;
+        if (userId != session.userId) {
+            return false;
+        }
+        if (!id.equals(session.id)) {
+            return false;
+        }
+        if (!lastLoginTime.equals(session.lastLoginTime)) {
+            return false;
+        }
         return ip.equals(session.ip);
     }
 

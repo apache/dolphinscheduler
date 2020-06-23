@@ -15,29 +15,30 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Process definition')">
-    <template slot="conditions">
-      <m-conditions @on-conditions="_onConditions">
-        <template slot="button-group">
-          <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
-          <x-button type="ghost" size="small"  @click="_uploading">{{$t('Import process')}}</x-button>
-
+  <div class="wrap-definition">
+    <m-list-construction :title="$t('Process definition')">
+      <template slot="conditions">
+        <m-conditions @on-conditions="_onConditions">
+          <template slot="button-group">
+            <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
+            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Import process')}}</x-button>
+          </template>
+        </m-conditions>
+      </template>
+      <template slot="content">
+        <template v-if="processListP.length || total>0">
+          <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+          <div class="page-box">
+            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          </div>
         </template>
-      </m-conditions>
-    </template>
-    <template slot="content">
-      <template v-if="processListP.length || total>0">
-        <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
-        <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
-        </div>
+        <template v-if="!processListP.length && total<=0">
+          <m-no-data></m-no-data>
+        </template>
+        <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
       </template>
-      <template v-if="!processListP.length && total<=0">
-        <m-no-data></m-no-data>
-      </template>
-      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
-    </template>
-  </m-list-construction>
+    </m-list-construction>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -146,3 +147,30 @@
   }
 </script>
 
+<style lang="scss" rel="stylesheet/scss">
+  .wrap-definition {
+    .table-box {
+      overflow-y: scroll;
+    }
+    .table-box {
+      .fixed {
+        table-layout: auto;
+        tr {
+          th:last-child,td:last-child {
+            background: inherit;
+            width: 300px;
+            height: 40px;
+            line-height: 40px;
+            border-left:1px solid #ecf3ff;
+            position: absolute;
+            right: 0;
+            z-index: 2;
+          }
+          th:nth-last-child(2) {
+            padding-right: 330px;
+          }
+        }
+      }
+    }
+  }
+</style>

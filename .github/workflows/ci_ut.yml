@@ -21,7 +21,6 @@ on:
     branches:
       - dev
 env:
-  DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
 name: Unit Test
@@ -47,7 +46,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Bootstrap database
-        run: cd ${DOCKER_DIR} && docker-compose up -d
+        run: |
+          sed -i "s/: root/: test/g" $(pwd)/docker/docker-swarm/docker-compose.yml
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml create --force-recreate dolphinscheduler-zookeeper dolphinscheduler-postgresql
+          sudo cp $(pwd)/sql/dolphinscheduler-postgre.sql $(docker volume inspect docker-swarm_dolphinscheduler-postgresql-initdb | grep "Mountpoint" | awk -F "\"" '{print $4}')
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d dolphinscheduler-zookeeper dolphinscheduler-postgresql
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -75,12 +78,12 @@ jobs:
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
+          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Collect logs
         run: |
           mkdir -p ${LOG_DIR}
-          cd ${DOCKER_DIR}
-          docker-compose logs db > ${LOG_DIR}/db.txt
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml logs dolphinscheduler-postgresql > ${LOG_DIR}/db.txt
         continue-on-error: true

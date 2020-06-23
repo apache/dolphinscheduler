@@ -44,22 +44,21 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Build Image
         run: |
-          export VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
-          sh ./dockerfile/hooks/build
+          sh ./docker/build/hooks/build
       - name: Docker Run
         run: |
-          VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
-          mkdir -p /tmp/logs
-          docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -v /tmp/logs:/opt/dolphinscheduler/logs -p 8888:8888 dolphinscheduler:$VERSION all
+          export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
+          sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
       - name: Check Server Status
-        run: sh ./dockerfile/hooks/check
+        run: sh $(pwd)/docker/docker-swarm/check
       - name: Prepare e2e env
         run: |
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
           sudo apt-get install -f -y
-          wget -N https://chromedriver.storage.googleapis.com/80.0.3987.106/chromedriver_linux64.zip
+          wget -N https://chromedriver.storage.googleapis.com/83.0.4103.39/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv -f chromedriver /usr/local/share/chromedriver
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
@@ -70,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dslogs
-          path: /tmp/logs
+          path: /var/lib/docker/volumes/dolphinscheduler-logs/_data
 
 

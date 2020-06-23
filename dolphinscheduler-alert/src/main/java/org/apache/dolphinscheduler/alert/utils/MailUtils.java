@@ -74,7 +74,7 @@ public class MailUtils {
      * @param showType the show type
      * @return the result map
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, String title, String content,ShowType showType) {
+    public static Map<String,Object> sendMails(Collection<String> receivers, String title, String content,String showType) {
         return sendMails(receivers, null, title, content, showType);
     }
 
@@ -87,7 +87,7 @@ public class MailUtils {
      * @param showType the show type
      * @return the send result
      */
-    public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
+    public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, String showType) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
 
@@ -98,7 +98,7 @@ public class MailUtils {
 
         receivers.removeIf(StringUtils::isEmpty);
 
-        if (showType == ShowType.TABLE || showType == ShowType.TEXT){
+        if (showType.equals(ShowType.TABLE.getDescp()) || showType.equals(ShowType.TEXT.getDescp())) {
             // send email
             HtmlEmail email = new HtmlEmail();
 
@@ -125,10 +125,10 @@ public class MailUtils {
             } catch (Exception e) {
                 handleException(receivers, retMap, e);
             }
-        }else if (showType == ShowType.ATTACHMENT || showType == ShowType.TABLEATTACHMENT){
+        }else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType == ShowType.ATTACHMENT ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
 
                 attachment(receivers,receiversCc,title,content,partContent);
 
@@ -290,7 +290,7 @@ public class MailUtils {
      * @return the result map
      * @throws EmailException
      */
-    private static Map<String, Object> getStringObjectMap(String title, String content, ShowType showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
+    private static Map<String, Object> getStringObjectMap(String title, String content, String showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
 
         /**
          * the subject of the message to be sent
@@ -299,9 +299,9 @@ public class MailUtils {
         /**
          * to send information, you can use HTML tags in mail content because of the use of HtmlEmail
          */
-        if (showType == ShowType.TABLE) {
+        if (showType.equals(ShowType.TABLE.getDescp())) {
             email.setMsg(htmlTable(content));
-        } else if (showType == ShowType.TEXT) {
+        } else if (showType.equals(ShowType.TEXT.getDescp())) {
             email.setMsg(htmlText(content));
         }
 

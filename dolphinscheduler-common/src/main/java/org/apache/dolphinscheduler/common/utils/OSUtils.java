@@ -53,9 +53,21 @@ public class OSUtils {
   private static final SystemInfo SI = new SystemInfo();
   public static final String TWO_DECIMAL = "0.00";
 
+  /**
+   * return -1 when the function can not get hardware env info
+   * e.g {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+   */
+  public static final double NEGATIVE_ONE = -1;
+
   private static HardwareAbstractionLayer hal = SI.getHardware();
 
   private OSUtils() {}
+
+  /**
+   * Initialization regularization, solve the problem of pre-compilation performance,
+   * avoid the thread safety problem of multi-thread operation
+   */
+  private static final Pattern PATTERN = Pattern.compile("\\s+");
 
 
   /**
@@ -112,9 +124,11 @@ public class OSUtils {
    */
   public static double loadAverage() {
     double loadAverage =  hal.getProcessor().getSystemLoadAverage();
+    if (Double.isNaN(loadAverage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-
     df.setRoundingMode(RoundingMode.HALF_UP);
     return Double.parseDouble(df.format(loadAverage));
   }
@@ -127,10 +141,12 @@ public class OSUtils {
   public static double cpuUsage() {
     CentralProcessor processor = hal.getProcessor();
     double cpuUsage = processor.getSystemCpuLoad();
+    if (Double.isNaN(cpuUsage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);
-
     return Double.parseDouble(df.format(cpuUsage));
   }
 
@@ -219,8 +235,7 @@ public class OSUtils {
 
     List<String> users = new ArrayList<>();
     while (startPos <= endPos) {
-      Pattern pattern = Pattern.compile("\\s+");
-      users.addAll(Arrays.asList(pattern.split(lines[startPos])));
+      users.addAll(Arrays.asList(PATTERN.split(lines[startPos])));
       startPos++;
     }
 
@@ -313,7 +328,7 @@ public class OSUtils {
       String currentProcUserName = System.getProperty("user.name");
       String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
       String line = result.split("\n")[22];
-      String group = Pattern.compile("\\s+").split(line)[1];
+      String group = PATTERN.split(line)[1];
       if (group.charAt(0) == '*') {
         return group.substring(1);
       } else {
@@ -387,7 +402,6 @@ public class OSUtils {
     }
     return null;
   }
-
 
   /**
    * whether is macOS

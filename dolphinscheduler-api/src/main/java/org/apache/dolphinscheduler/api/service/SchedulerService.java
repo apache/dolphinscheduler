@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -165,6 +165,9 @@ public class SchedulerService extends BaseService {
         processDefinition.setReceivers(receivers);
         processDefinition.setReceiversCc(receiversCc);
         processDefinitionMapper.updateById(processDefinition);
+
+        // return scheduler object with ID
+        result.put(Constants.DATA_LIST, scheduleMapper.selectById(scheduleObj.getId()));
         putMsg(result, Status.SUCCESS);
 
         result.put("scheduleId", scheduleObj.getId());
@@ -365,6 +368,7 @@ public class SchedulerService extends BaseService {
 
         if (masterServers.size() == 0) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
+            return result;
         }
 
         // set status

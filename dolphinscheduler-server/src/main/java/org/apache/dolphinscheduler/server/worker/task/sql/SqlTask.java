@@ -16,9 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -86,7 +85,7 @@ public class SqlTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         logger.info("sql task params {}", taskExecutionContext.getTaskParams());
-        this.sqlParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+        this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
@@ -254,32 +253,26 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private void resultProcess(ResultSet resultSet) throws Exception{
-        JSONArray resultJSONArray = new JSONArray();
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
 
         int rowCount = 0;
 
         while (rowCount < LIMIT && resultSet.next()) {
-            JSONObject mapOfColValues = new JSONObject(true);
+            ObjectNode mapOfColValues = JSONUtils.createObjectNode();
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                mapOfColValues.set(md.getColumnName(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
             }
             resultJSONArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+        String result = JSONUtils.toJsonString(resultJSONArray);
+        logger.debug("execute sql : {}", result);
 
-        // if there is a result set
-        if (!resultJSONArray.isEmpty() ) {
-            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                sendAttachment(sqlParameters.getTitle(),
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }else{
-                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }
-        }
+        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
+                        sqlParameters.getTitle(): taskExecutionContext.getTaskName() + " query result sets",
+                JSONUtils.toJsonString(resultJSONArray));
     }
 
     /**
@@ -457,7 +450,7 @@ public class SqlTask extends AbstractTask {
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
-                    receviersCcList, title, content, ShowType.valueOf(showTypeName));
+                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
             if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }

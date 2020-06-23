@@ -18,10 +18,9 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.Alert;
-import com.alibaba.fastjson.JSON;
+import org.apache.dolphinscheduler.common.utils.*;
 
-import com.google.common.reflect.TypeToken;
+import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -64,21 +63,25 @@ public class EnterpriseWeChatUtils {
 
     /**
      * get Enterprise WeChat is enable
+     *
      * @return isEnable
      */
-    public static Boolean isEnable(){
-        Boolean isEnable = false;
+    public static boolean isEnable() {
+        Boolean isEnable = null;
         try {
             isEnable = PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
+        }
+        if (isEnable == null) {
+            return false;
         }
         return isEnable;
-
     }
 
     /**
      * get Enterprise WeChat token info
+     *
      * @return token string info
      * @throws IOException the IOException
      */
@@ -97,10 +100,12 @@ public class EnterpriseWeChatUtils {
                 response.close();
             }
 
-            Map<String, Object> map = JSON.parseObject(resp,
-                    new TypeToken<Map<String, Object>>() {
-                    }.getType());
-            return map.get("access_token").toString();
+            Map<String, String> map = JSONUtils.toMap(resp);
+            if (map != null) {
+                return map.get("access_token");
+            } else {
+                return null;
+            }
         } finally {
             httpClient.close();
         }
@@ -108,9 +113,10 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single Enterprise WeChat message
+     *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
@@ -121,9 +127,10 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi Enterprise WeChat message
+     *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
@@ -135,9 +142,10 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single user message
-     * @param toUser the toUser
+     *
+     * @param toUser  the toUser
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
@@ -148,9 +156,10 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi user message
-     * @param toUser the toUser
+     *
+     * @param toUser  the toUser
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
@@ -162,9 +171,10 @@ public class EnterpriseWeChatUtils {
 
     /**
      * send Enterprise WeChat
+     *
      * @param charset the charset
-     * @param data the data
-     * @param token the token
+     * @param data    the data
+     * @param token   the token
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException the IOException
      */
@@ -194,21 +204,22 @@ public class EnterpriseWeChatUtils {
 
     /**
      * convert table to markdown style
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
      * @return markdown table content
      */
-    public static String markdownTable(String title,String content){
+    public static String markdownTable(String title, String content) {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
 
         if (null != mapItemsList) {
-            for (LinkedHashMap mapItems : mapItemsList){
+            for (LinkedHashMap mapItems : mapItemsList) {
                 Set<Map.Entry<String, String>> entries = mapItems.entrySet();
                 Iterator<Map.Entry<String, String>> iterator = entries.iterator();
-                StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
+                StringBuilder t = new StringBuilder(String.format("`%s`%s", title, Constants.MARKDOWN_ENTER));
 
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
 
                     Map.Entry<String, String> entry = iterator.next();
                     t.append(Constants.MARKDOWN_QUOTE);
@@ -223,23 +234,24 @@ public class EnterpriseWeChatUtils {
 
     /**
      * convert text to markdown style
-     * @param title the title
+     *
+     * @param title   the title
      * @param content the content
      * @return markdown text
      */
-    public static String markdownText(String title,String content){
-        if (StringUtils.isNotEmpty(content)){
+    public static String markdownText(String title, String content) {
+        if (StringUtils.isNotEmpty(content)) {
             List<String> list;
             try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
+                list = JSONUtils.toList(content, String.class);
+            } catch (Exception e) {
+                logger.error("json format exception", e);
                 return null;
             }
 
             StringBuilder contents = new StringBuilder(100);
-            contents.append(String.format("`%s`%n",title));
-            for (String str : list){
+            contents.append(String.format("`%s`%n", title));
+            for (String str : list) {
                 contents.append(Constants.MARKDOWN_QUOTE);
                 contents.append(str);
                 contents.append(Constants.MARKDOWN_ENTER);
@@ -253,15 +265,15 @@ public class EnterpriseWeChatUtils {
 
     /**
      * Determine the mardown style based on the show type of the alert
-     * @param alert the alert
+     *
      * @return the markdown alert table/text
      */
-    public static String markdownByAlert(Alert alert){
+    public static String markdownByAlert(AlertData alert) {
         String result = "";
-        if (alert.getShowType() == ShowType.TABLE) {
-            result = markdownTable(alert.getTitle(),alert.getContent());
-        }else if(alert.getShowType() == ShowType.TEXT){
-            result = markdownText(alert.getTitle(),alert.getContent());
+        if (alert.getShowType().equals(ShowType.TABLE.getDescp())) {
+            result = markdownTable(alert.getTitle(), alert.getContent());
+        } else if (alert.getShowType().equals(ShowType.TEXT.getDescp())) {
+            result = markdownText(alert.getTitle(), alert.getContent());
         }
         return result;
 

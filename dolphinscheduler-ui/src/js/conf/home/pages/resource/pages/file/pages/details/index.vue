@@ -118,7 +118,7 @@
        * up
        */
       _onUp: _.debounce(function () {
-        this.loadingIndex = this.loadingIndex - 2
+        this.loadingIndex = this.loadingIndex - 3
         console.log('_onUp')
         this._editorOff()
 
@@ -131,7 +131,7 @@
        * down
        */
       _onDown: _.debounce(function () {
-        this.loadingIndex = this.loadingIndex + 2
+        this.loadingIndex = this.loadingIndex + 3
         console.log('_onDown')
         this._editorOff()
 
@@ -166,11 +166,11 @@
           // down
           if ((scrollTop + h) > totalHeight) {
             if (this.isData) {
-              this._onDown()
+              // this._onDown()
             }
           }
           // up
-          if (scrollTop < 2) {
+          if (scrollTop < 3) {
             if (this.loadingIndex > 0) {
               this._onUp()
             }
@@ -210,7 +210,7 @@
         return {
           id: this.$route.params.id,
           skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
-          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 2 : 2}000`)
+          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 3 : 3}000`)
         }
       }
     },

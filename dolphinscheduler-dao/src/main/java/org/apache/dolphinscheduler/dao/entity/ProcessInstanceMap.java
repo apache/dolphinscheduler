@@ -91,14 +91,24 @@ public class ProcessInstanceMap {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ProcessInstanceMap that = (ProcessInstanceMap) o;
 
-        if (id != that.id) return false;
-        if (parentProcessInstanceId != that.parentProcessInstanceId) return false;
-        if (parentTaskInstanceId != that.parentTaskInstanceId) return false;
+        if (id != that.id) {
+            return false;
+        }
+        if (parentProcessInstanceId != that.parentProcessInstanceId) {
+            return false;
+        }
+        if (parentTaskInstanceId != that.parentTaskInstanceId) {
+            return false;
+        }
         return processInstanceId == that.processInstanceId;
     }
 

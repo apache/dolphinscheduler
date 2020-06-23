@@ -31,15 +31,15 @@ import Permissions from '@/module/permissions'
 import 'ans-ui/lib/ans-ui.min.css'
 import ans from 'ans-ui/lib/ans-ui.min'
 import en_US from 'ans-ui/lib/locale/en' // eslint-disable-line
-import'normalize.css/normalize.css'
+import 'normalize.css/normalize.css'
 import 'sass/conf/home/index.scss'
-import'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
-import'bootstrap/dist/js/bootstrap.min.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
 
 // Component internationalization
-let useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
+const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
 
 // Vue.use(ans)
 Vue.use(ans, useOpt)
@@ -74,7 +74,7 @@ Permissions.request().then(res => {
     methods: {
       initApp () {
         $('.global-loading').hide()
-        let bootstrapTooltip = $.fn.tooltip.noConflict()
+        const bootstrapTooltip = $.fn.tooltip.noConflict()
         $.fn.tooltip = bootstrapTooltip
         $('body').tooltip({
           selector: '[data-toggle="tooltip"]',

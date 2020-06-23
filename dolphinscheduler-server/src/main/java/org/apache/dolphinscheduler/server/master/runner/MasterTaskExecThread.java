@@ -17,15 +17,13 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 
-
-import com.alibaba.fastjson.JSON;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -35,9 +33,12 @@ import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheMan
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
+import java.util.Set;
+import org.apache.dolphinscheduler.common.utils.*;
 
 
 /**
@@ -53,6 +54,12 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     private NettyExecutorManager nettyExecutorManager;
 
+
+    /**
+     * zookeeper register center
+     */
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
@@ -61,6 +68,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         super(taskInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
+        this.zookeeperRegistryCenter = SpringApplicationContext.getBean(ZookeeperRegistryCenter.class);
     }
 
     /**
@@ -175,6 +183,16 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         }
         alreadyKilled = true;
 
+        String taskInstanceWorkerGroup = taskInstance.getWorkerGroup();
+
+        // not exists
+        if (!existsValidWorkerGroup(taskInstanceWorkerGroup)){
+            taskInstance.setState(ExecutionStatus.KILL);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
+            return;
+        }
+
         TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
         killCommand.setTaskInstanceId(taskInstance.getId());
 
@@ -185,8 +203,31 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
         nettyExecutorManager.executeDirectly(executionContext);
 
-        logger.info("master add kill task :{} id:{} to kill queue",
+        logger.info("master kill taskInstance name :{} taskInstance id:{}",
                 taskInstance.getName(), taskInstance.getId() );
+    }
+
+    /**
+     * whether exists valid worker group
+     * @param taskInstanceWorkerGroup taskInstanceWorkerGroup
+     * @return whether exists
+     */
+    public Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup){
+        Set<String> workerGroups = zookeeperRegistryCenter.getWorkerGroupDirectly();
+        // not worker group
+        if (CollectionUtils.isEmpty(workerGroups)){
+            return false;
+        }
+
+        // has worker group , but not taskInstance assigned worker group
+        if (!workerGroups.contains(taskInstanceWorkerGroup)){
+            return false;
+        }
+        Set<String> workers = zookeeperRegistryCenter.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
+        if (CollectionUtils.isEmpty(workers)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -195,7 +236,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
     }
 

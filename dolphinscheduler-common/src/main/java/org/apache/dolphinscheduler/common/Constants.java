@@ -104,6 +104,11 @@ public final class Constants {
     public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
 
     /**
+     * yarn.job.history.status.address
+     */
+    public static final String YARN_JOB_HISTORY_STATUS_ADDRESS = "yarn.job.history.status.address";
+
+    /**
      * hdfs configuration
      * hdfs.root.user
      */
@@ -954,4 +959,11 @@ public final class Constants {
      * authorize readable perm
      */
     public static final int AUTHORIZE_READABLE_PERM=4;
+
+
+    /**
+     * plugin configurations
+     */
+    public static final String PLUGIN_JAR_SUFFIX = ".jar";
+
 }

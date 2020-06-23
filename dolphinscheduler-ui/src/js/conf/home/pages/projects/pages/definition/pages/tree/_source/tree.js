@@ -21,7 +21,7 @@ import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
 
 let self = this
 
-let Tree = function () {
+const Tree = function () {
   self = this
   this.selfTree = {}
   this.tree = function () {}
@@ -57,7 +57,7 @@ Tree.prototype.init = function ({ data, limit, selfTree }) {
     this.duration = 400
     this.i = 0
     this.tree = d3.layout.tree().nodeSize([0, 46])
-    let tasks = this.tree.nodes(data)
+    const tasks = this.tree.nodes(data)
 
     this.diagonal = d3.svg
       .diagonal()
@@ -142,9 +142,9 @@ Tree.prototype.treeToggles = function (clicked_d) { // eslint-disable-line
  */
 Tree.prototype.treeUpdate = function (source) {
   return new Promise((resolve, reject) => {
-    let tasks = this.tree.nodes(this.root)
-    let height = Math.max(500, tasks.length * this.config.barHeight + this.config.margin.top + this.config.margin.bottom)
-    let width = (this.config.nodesMax * 70) + (this.squareNum * (this.config.squareSize + this.config.squarePading)) + this.config.margin.left + this.config.margin.right + 50
+    const tasks = this.tree.nodes(this.root)
+    const height = Math.max(500, tasks.length * this.config.barHeight + this.config.margin.top + this.config.margin.bottom)
+    const width = (this.config.nodesMax * 70) + (this.squareNum * (this.config.squareSize + this.config.squarePading)) + this.config.margin.left + this.config.margin.right + 50
 
     d3.select('svg')
       .transition()
@@ -156,12 +156,12 @@ Tree.prototype.treeUpdate = function (source) {
       n.x = i * this.config.barHeight
     })
 
-    let task = this.svg.selectAll('g.node')
+    const task = this.svg.selectAll('g.node')
       .data(tasks, (d) => {
         return d.id || (d.id = ++this.i)
       })
 
-    let nodeEnter = task.enter()
+    const nodeEnter = task.enter()
       .append('g')
       .attr('class', this.nodesClass)
       .attr('transform', () => 'translate(' + source.y0 + ',' + source.x0 + ')')
@@ -201,7 +201,7 @@ Tree.prototype.treeUpdate = function (source) {
         }
       })
       .attr('class', 'state')
-      .style('fill', d => d.state && tasksState[d.state].color || '#ffffff')
+      .style('fill', d => (d.state && tasksState[d.state].color) || '#ffffff')
       .attr('data-toggle', 'tooltip')
       .attr('rx', d => d.type ? 0 : 12)
       .attr('ry', d => d.type ? 0 : 12)
@@ -231,7 +231,6 @@ Tree.prototype.treeUpdate = function (source) {
       .attr('transform', d => 'translate(' + d.y + ',' + d.x + ')')
       .style('opacity', 1)
 
-
     // Convert the exit node to the new location of the parent node。
     task.exit().transition()
       .duration(this.duration)
@@ -240,14 +239,14 @@ Tree.prototype.treeUpdate = function (source) {
       .remove()
 
     // Update link
-    let link = this.svg.selectAll('path.link')
+    const link = this.svg.selectAll('path.link')
       .data(this.tree.links(tasks), d => d.target.id)
 
     // Enter any new links in the previous location of the parent node。
     link.enter().insert('path', 'g')
       .attr('class', 'link')
       .attr('d', (d) => {
-        let o = { x: source.x0, y: source.y0 }
+        const o = { x: source.x0, y: source.y0 }
         return this.diagonal({ source: o, target: o })
       })
       .transition()
@@ -263,7 +262,7 @@ Tree.prototype.treeUpdate = function (source) {
     link.exit().transition()
       .duration(this.duration)
       .attr('d', (d) => {
-        let o = { x: source.x, y: source.y }
+        const o = { x: source.x, y: source.y }
         return this.diagonal({ source: o, target: o })
       })
       .remove()

@@ -1,6 +1,0 @@
-globals:
-  $: true
-  expect: true
-rules:
-  "no-new": "off"
-  "no-labels": [2, {"allowLoop": true}]
