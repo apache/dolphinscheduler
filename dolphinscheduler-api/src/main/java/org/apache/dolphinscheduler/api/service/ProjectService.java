@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,13 +27,13 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
 /**
@@ -351,17 +349,16 @@ public class ProjectService extends BaseService {
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
-    public Map<String, Object> queryProjectCreatedByUser(User loginUser, Integer userId) {
+    public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();
 
         if (checkAdmin(loginUser, result)) {
             return result;
         }
 
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(userId);
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
         putMsg(result,Status.SUCCESS);
 

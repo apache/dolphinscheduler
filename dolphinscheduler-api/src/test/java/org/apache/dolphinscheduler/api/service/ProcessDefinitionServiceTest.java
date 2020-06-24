@@ -71,8 +71,6 @@ public class ProcessDefinitionServiceTest {
     @Mock
     private ScheduleMapper scheduleMapper;
 
-
-
     @Mock
     private ProcessService processService;
 

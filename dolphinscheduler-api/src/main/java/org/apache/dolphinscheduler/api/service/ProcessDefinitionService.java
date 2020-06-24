@@ -311,7 +311,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
             return result;
         } else {
-
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
@@ -338,7 +337,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                                                           String processDefinitionIds,
                                                           int targetProjectId, boolean isCopy){
         Map<String, Object> result = new HashMap<>(5);
-        List<String> failedIdList = new ArrayList<>();
+        List<String> failedProcessList = new ArrayList<>();
 
         if (StringUtils.isEmpty(processDefinitionIds)) {
             putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, processDefinitionIds);
@@ -366,12 +365,12 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
         if(isCopy){
-            doBatchCopyProcessDefinition(loginUser, targetProject, failedIdList, processDefinitionIdList);
+            doBatchCopyProcessDefinition(loginUser, targetProject, failedProcessList, processDefinitionIdList);
         }else{
-            doBatchMoveProcessDefinition(targetProject, failedIdList, processDefinitionIdList);
+            doBatchMoveProcessDefinition(targetProject, failedProcessList, processDefinitionIdList);
         }
 
-        checkBatchOperateResult(projectName,targetProject.getName(),result, failedIdList,isCopy);
+        checkBatchOperateResult(projectName,targetProject.getName(),result,failedProcessList,isCopy);
 
         return result;
     }
@@ -379,20 +378,20 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * batch move process definition
      * @param targetProject targetProject
-     * @param failedIdList failedIdList
+     * @param failedProcessList failedProcessList
      * @param processDefinitionIdList processDefinitionIdList
      */
-    private void doBatchMoveProcessDefinition(Project targetProject, List<String> failedIdList, String[] processDefinitionIdList) {
+    private void doBatchMoveProcessDefinition(Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
         for(String processDefinitionId:processDefinitionIdList){
             try {
                 Map<String, Object> moveProcessDefinitionResult =
                         moveProcessDefinition(Integer.valueOf(processDefinitionId),targetProject);
                 if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
-                    failedIdList.add((String) moveProcessDefinitionResult.get(Constants.MSG));
+                    setFailedProcessList(failedProcessList, processDefinitionId);
                     logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
                 }
             } catch (Exception e) {
-                failedIdList.add(processDefinitionId);
+                setFailedProcessList(failedProcessList, processDefinitionId);
             }
         }
     }
@@ -401,28 +400,40 @@ public class ProcessDefinitionService extends BaseDAGService {
      * batch copy process definition
      * @param loginUser loginUser
      * @param targetProject targetProject
-     * @param failedIdList failedIdList
+     * @param failedProcessList failedProcessList
      * @param processDefinitionIdList processDefinitionIdList
      */
-    private void doBatchCopyProcessDefinition(User loginUser, Project targetProject, List<String> failedIdList, String[] processDefinitionIdList) {
+    private void doBatchCopyProcessDefinition(User loginUser, Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
         for(String processDefinitionId:processDefinitionIdList){
             try {
                 Map<String, Object> copyProcessDefinitionResult =
                         copyProcessDefinition(loginUser,Integer.valueOf(processDefinitionId),targetProject);
                 if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
-                    failedIdList.add((String) copyProcessDefinitionResult.get(Constants.MSG));
+                    setFailedProcessList(failedProcessList, processDefinitionId);
                     logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
                 }
             } catch (Exception e) {
-                failedIdList.add(processDefinitionId);
+                setFailedProcessList(failedProcessList, processDefinitionId);
             }
         }
     }
 
     /**
+     * set failed processList
+     * @param failedProcessList failedProcessList
+     * @param processDefinitionId processDefinitionId
+     */
+    private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(Integer.valueOf(processDefinitionId));
+        if(processDefinition != null){
+            failedProcessList.add(processDefinition.getName());
+        }
+    }
+
+    /**
      * check project and auth
-     * @param loginUser
-     * @param projectName
+     * @param loginUser loginUser
+     * @param projectName projectName
      * @return
      */
     private Map<String, Object> checkProjectAndAuth(User loginUser, String projectName) {
@@ -467,19 +478,19 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * check batch operate result
-     * @param srcProjectName
-     * @param targetProjectName
-     * @param result
-     * @param failedIdList
-     * @param isCopy
+     * @param srcProjectName srcProjectName
+     * @param targetProjectName targetProjectName
+     * @param result result
+     * @param failedProcessList failedProcessList
+     * @param isCopy isCopy
      */
     private void checkBatchOperateResult(String srcProjectName,String targetProjectName,
-                                         Map<String, Object> result, List<String> failedIdList,boolean isCopy) {
-        if (!failedIdList.isEmpty()) {
+                                         Map<String, Object> result, List<String> failedProcessList,boolean isCopy) {
+        if (!failedProcessList.isEmpty()) {
             if(isCopy){
-                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedIdList));
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedProcessList));
             }else{
-                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedIdList));
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedProcessList));
             }
 
         } else {

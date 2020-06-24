@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * base service
  */
-public class BaseService {
+public class BaseService{
 
     /**
      * check admin

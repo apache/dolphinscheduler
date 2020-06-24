@@ -240,7 +240,7 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}, query authorized project by user id: {}.", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
-        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser, loginUser.getId());
+        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
         return returnDataList(result);
     }
 
