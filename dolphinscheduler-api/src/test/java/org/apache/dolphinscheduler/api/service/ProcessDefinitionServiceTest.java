@@ -226,7 +226,6 @@ public class ProcessDefinitionServiceTest {
 
         Map<String, Object> successRes = processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,"project_test1",
                  "47",1,true);
-        System.out.println(successRes.get(Constants.MSG));
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
