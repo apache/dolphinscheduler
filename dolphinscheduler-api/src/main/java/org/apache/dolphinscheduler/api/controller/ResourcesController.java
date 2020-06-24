@@ -63,7 +63,7 @@ public class ResourcesController extends BaseController {
     private UdfFuncService udfFuncService;
 
     /**
-     * create resource
+     * create directory
      *
      * @param loginUser login user
      * @param alias alias
