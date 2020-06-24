@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
-import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,27 +35,28 @@ public class MailUtilsTest {
 
     private AlertTemplate alertTemplate;
 
-    MailUtils mailUtils;
+    MailSender mailSender;
 
     @BeforeClass
     public void initEmailConfig(){
-        emailConfig.put(Constants.MAIL_PROTOCOL, "SMTP");
-        emailConfig.put(Constants.MAIL_SERVER_HOST, "xxx.xxx.com");
-        emailConfig.put(Constants.MAIL_SERVER_PORT, "25");
-        emailConfig.put(Constants.MAIL_SENDER, "xxx1.xxx.com");
-        emailConfig.put(Constants.MAIL_USER, "xxx2.xxx.com");
-        emailConfig.put(Constants.MAIL_PASSWD, "111111");
-        emailConfig.put(Constants.MAIL_SMTP_STARTTLS_ENABLE, "true");
-        emailConfig.put(Constants.MAIL_SMTP_SSL_ENABLE, "false");
-        emailConfig.put(Constants.MAIL_SMTP_SSL_ENABLE, "false");
+        emailConfig.put(MailParamsConstants.MAIL_PROTOCOL, "smtp");
+        emailConfig.put(MailParamsConstants.MAIL_SMTP_HOST, "xxx.xxx.com");
+        emailConfig.put(MailParamsConstants.MAIL_SMTP_PORT, "25");
+        emailConfig.put(MailParamsConstants.MAIL_SENDER, "xxx1.xxx.com");
+        emailConfig.put(MailParamsConstants.MAIL_USER, "xxx2.xxx.com");
+        emailConfig.put(MailParamsConstants.MAIL_PASSWD, "111111");
+        emailConfig.put(MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE, "true");
+        emailConfig.put(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, "false");
+        emailConfig.put(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, "false");
+        emailConfig.put(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS, "347801120@qq.com");
+        emailConfig.put(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERCCS, "347801120@qq.com");
+        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         alertTemplate = new DefaultHTMLTemplate();
-        mailUtils = new MailUtils(emailConfig);
+        mailSender = new MailSender(emailConfig);
     }
 
     @Test
     public void testSendMails() {
-        String[] receivers = new String[]{"347801120@qq.com"};
-        String[] receiversCc = new String[]{"347801120@qq.com"};
 
         String content ="[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +
@@ -68,12 +69,9 @@ public class MailUtilsTest {
                 "\"Host: 192.168.xx.xx\"," +
                 "\"Notify group :4\"]";
 
-        mailUtils.sendMails(
-                Arrays.asList(receivers),
-                Arrays.asList(receiversCc),
+        mailSender.sendMails(
                 "Mysql Exception",
-                content,
-                ShowType.TEXT.getDescp());
+                content);
     }
 
     public String list2String(){
@@ -95,7 +93,7 @@ public class MailUtilsTest {
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
         maps.add(1,map2);
-        String mapjson = JacksonUtils.toJsonString(maps);
+        String mapjson = JSONUtils.toJsonString(maps);
         logger.info(mapjson);
 
         return mapjson;
@@ -104,36 +102,27 @@ public class MailUtilsTest {
 
     @Test
     public void testSendTableMail(){
-        String[] mails = new String[]{"347801120@qq.com"};
         String title = "Mysql Exception";
         String content= list2String();
-        mailUtils.sendMails(
-                Arrays.asList(mails),
-                title,
-                content,
-                ShowType.TABLE.getDescp());
+        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        mailSender = new MailSender(emailConfig);
+        mailSender.sendMails(title, content);
     }
 
     @Test
     public void testAttachmentFile()throws Exception{
-        String[] mails = new String[]{"xx@xx.com"};
         String content = list2String();
-        mailUtils.sendMails(
-                Arrays.asList(mails),
-                "gaojing",
-                content,
-                ShowType.ATTACHMENT.getDescp());
+        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.ATTACHMENT.getDescp());
+        mailSender = new MailSender(emailConfig);
+        mailSender.sendMails("gaojing", content);
     }
 
     @Test
     public void testTableAttachmentFile()throws Exception{
-        String[] mails = new String[]{"xx@xx.com"};
         String content = list2String();
-        mailUtils.sendMails(
-                Arrays.asList(mails),
-                "gaojing",
-                content,
-                ShowType.TABLEATTACHMENT.getDescp());
+        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLEATTACHMENT.getDescp());
+        mailSender = new MailSender(emailConfig);
+        mailSender.sendMails("gaojing", content);
     }
 
 }

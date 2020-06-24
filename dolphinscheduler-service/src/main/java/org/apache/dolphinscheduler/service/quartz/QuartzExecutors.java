@@ -20,7 +20,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -334,7 +334,7 @@ public class QuartzExecutors {
     Map<String, Object> dataMap = new HashMap<>(3);
     dataMap.put(PROJECT_ID, projectId);
     dataMap.put(SCHEDULE_ID, scheduleId);
-    dataMap.put(SCHEDULE, JSONUtils.toJson(schedule));
+    dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
 
     return dataMap;
   }

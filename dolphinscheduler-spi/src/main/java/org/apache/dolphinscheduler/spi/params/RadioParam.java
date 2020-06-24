@@ -3,38 +3,52 @@ package org.apache.dolphinscheduler.spi.params;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * radio
  */
 public class RadioParam extends AbsPluginParams {
 
-    /**
-     * values can be select
-     */
-    private List<String> values;
+    public RadioParam(String name, String label, List<String> optionValues, String defaultValue, boolean isRequired, boolean readOnly) {
+        super(name);
+        requireNonNull(label , "label is null");
+        requireNonNull(optionValues , "optionValues is null");
+        if(optionValues.size() == 0) {
+            throw new RuntimeException("optionValues is empty");
+        }
 
-    public RadioParam(String name, String showNameEn, String showNameCh) {
-        super(name, showNameEn, showNameCh);
+        this.alpacajsSchema = new AlpacajsSchema();
+        this.alpacajsSchema.setTitle(label);
+        this.alpacajsSchema.setDefaultValue(defaultValue);
+        this.alpacajsSchema.setType(DataType.STRING.getDataType());
+        this.alpacajsSchema.setRequired(isRequired);
+        this.alpacajsSchema.setEnumValues(optionValues);
+
+        this.alpacajsOptions = new AlpacajsOptions();
+        this.alpacajsOptions.setType(FormType.RADIO.getFormType());
+        this.alpacajsOptions.setReadOnly(readOnly);
     }
 
     public List<String> getValues() {
-        return values;
+        return this.alpacajsSchema.getEnumValues();
     }
 
     public void setValues(List<String> values) {
-        this.values = values;
+        this.alpacajsSchema.setEnumValues(values);
     }
 
     /**
      * add one value
      * @param value
+     *  value
      * @return
      */
     public RadioParam addValue(String value) {
-        if (this.values == null) {
-            this.values = new ArrayList<>();
+        if (this.alpacajsSchema.getEnumValues() == null) {
+            this.alpacajsSchema.setEnumValues(new ArrayList<>());
         }
-        this.values.add(value);
+        this.alpacajsSchema.getEnumValues().add(value);
         return this;
     }
 }

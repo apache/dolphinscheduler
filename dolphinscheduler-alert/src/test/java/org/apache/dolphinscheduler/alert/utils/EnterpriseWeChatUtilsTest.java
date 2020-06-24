@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
-import org.apache.dolphinscheduler.spi.utils.JacksonUtils;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -121,7 +121,8 @@ public class EnterpriseWeChatUtilsTest {
         Alert alertForText = createAlertForText();
         AlertData alertData = new AlertData();
         AlertInfo alertInfo = new AlertInfo();
-        alertInfo.addProp("show_type", ShowType.TEXT.getDescp());
+        //TODO:
+        alertInfo.setAlertParams(null);
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
 //                .setShowType(alertForText.getShowType().getDescp())
@@ -135,7 +136,8 @@ public class EnterpriseWeChatUtilsTest {
         Alert alertForText = createAlertForTable();
         AlertData alertData = new AlertData();
         AlertInfo alertInfo = new AlertInfo();
-        alertInfo.addProp("show_type", ShowType.TABLE.getDescp());
+        //TODO:
+        alertInfo.setAlertParams(null);
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
 //                .setShowType(alertForText.getShowType().getDescp())
@@ -185,7 +187,7 @@ public class EnterpriseWeChatUtilsTest {
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0, map1);
         maps.add(1, map2);
-        String mapjson = JacksonUtils.toJsonString(maps);
+        String mapjson = JSONUtils.toJsonString(maps);
         return mapjson;
     }
 
@@ -210,7 +212,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(partyId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSON.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -225,7 +227,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(listPartyId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSON.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -252,7 +254,7 @@ public class EnterpriseWeChatUtilsTest {
 //
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSON.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();
@@ -267,7 +269,7 @@ public class EnterpriseWeChatUtilsTest {
 //            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId, agentId, "hello world");
 //            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 //
-//            String errmsg = JSON.parseObject(resp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(resp).getString("errmsg");
 //            Assert.assertEquals("ok",errmsg);
 //        } catch (IOException e) {
 //            e.printStackTrace();

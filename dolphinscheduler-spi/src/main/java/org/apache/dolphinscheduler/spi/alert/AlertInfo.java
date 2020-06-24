@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.spi.alert;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * AlertInfo
@@ -25,41 +23,28 @@ import java.util.Map;
 public class AlertInfo {
 
     /**
-     * all runtime parameters of alertplugin are here . eg : email receivers , email receiverCcs .
-     * each alert plugin can get the params they need from this map.
+     * all params this plugin need is in alertProps
      */
-    private Map<String, Object> alertProps;
+    private String alertParams;
 
+    /**
+     * the alert content
+     */
     private AlertData alertData;
 
-    public AlertInfo() {
-        this.alertProps = new HashMap<>();
+    public String getAlertParams() {
+        return alertParams;
     }
 
-    public Map<String, Object> getAlertProps() {
-        return alertProps;
-    }
-
-    public AlertInfo setAlertProps(Map<String, Object> alertProps) {
-        this.alertProps = alertProps;
-        return this;
-    }
-
-    public AlertInfo addProp(String key, Object value) {
-        this.alertProps.put(key, value);
-        return this;
-    }
-
-    public Object getProp(String key) {
-        return this.alertProps.get(key);
+    public void setAlertParams(String alertParams) {
+        this.alertParams = alertParams;
     }
 
     public AlertData getAlertData() {
         return alertData;
     }
 
-    public AlertInfo setAlertData(AlertData alertData) {
+    public void setAlertData(AlertData alertData) {
         this.alertData = alertData;
-        return this;
     }
 }

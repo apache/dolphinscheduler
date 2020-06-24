@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class ProjectControllerTest extends AbstractControllerTest{
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("projectName","project_test1");
-        paramsMap.add("desc","the test project");
+        paramsMap.add("description","the test project");
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/create")
                 .header(SESSION_ID, sessionId)
@@ -56,7 +56,8 @@ public class ProjectControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertNotNull(result.getData());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

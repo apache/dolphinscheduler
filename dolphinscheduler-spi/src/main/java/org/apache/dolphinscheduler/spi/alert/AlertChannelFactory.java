@@ -65,9 +65,8 @@ public interface AlertChannelFactory {
 
     /**
      * The parameters configured in the alert / xxx.properties file will be in the config map
-     * @param config configured in the alert / xxx.properties file will be in the config map
      * @return
      *  AlertChannel
      */
-    AlertChannel create(Map<String, String> config);
+    AlertChannel create();
 }

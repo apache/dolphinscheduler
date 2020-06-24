@@ -16,11 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,7 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.datasource.*;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -159,8 +158,18 @@ public class DataSourceService extends BaseService{
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
+        //check password，if the password is not updated, set to the old password.
+        ObjectNode paramObject = JSONUtils.parseObject(parameter);
+        String password = paramObject.path(Constants.PASSWORD).asText();
+        if (StringUtils.isBlank(password)) {
+            String oldConnectionParams = dataSource.getConnectionParams();
+            ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
+            paramObject.put(Constants.PASSWORD, oldParams.path(Constants.PASSWORD).asText());
+        }
+        // connectionParams json
+        String connectionParams = paramObject.toString();
 
-        Boolean isConnection = checkConnection(type, parameter);
+        Boolean isConnection = checkConnection(type, connectionParams);
         if (!isConnection) {
             logger.info("connect failed, type:{}, parameter:{}", type, parameter);
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
@@ -172,7 +181,7 @@ public class DataSourceService extends BaseService{
         dataSource.setNote(desc);
         dataSource.setUserName(loginUser.getUserName());
         dataSource.setType(type);
-        dataSource.setConnectionParams(parameter);
+        dataSource.setConnectionParams(connectionParams);
         dataSource.setUpdateTime(now);
         dataSourceMapper.updateById(dataSource);
         putMsg(result, Status.SUCCESS);
@@ -257,7 +266,6 @@ public class DataSourceService extends BaseService{
         map.put(PRINCIPAL, datasourceForm.getPrincipal());
         map.put(DATABASE, database);
         map.put(USER_NAME, datasourceForm.getUser());
-        map.put(PASSWORD, datasourceForm.getPassword());
         map.put(OTHER, otherMap);
         result.put(Constants.DATA_LIST, map);
         putMsg(result, Status.SUCCESS);
@@ -305,9 +313,9 @@ public class DataSourceService extends BaseService{
         for (DataSource dataSource : dataSourceList) {
 
             String connectionParams  = dataSource.getConnectionParams();
-            JSONObject  object = JSON.parseObject(connectionParams);
+            ObjectNode  object = JSONUtils.parseObject(connectionParams);
             object.put(Constants.PASSWORD, Constants.XXXXXX);
-            dataSource.setConnectionParams(JSONUtils.toJson(object));
+            dataSource.setConnectionParams(object.toString());
 
         }
     }
@@ -369,11 +377,11 @@ public class DataSourceService extends BaseService{
         try {
             switch (dbType) {
                 case POSTGRESQL:
-                    datasource = JSON.parseObject(parameter, PostgreDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, PostgreDataSource.class);
                     Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
                     break;
                 case MYSQL:
-                    datasource = JSON.parseObject(parameter, MySQLDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, MySQLDataSource.class);
                     Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
                     break;
                 case HIVE:
@@ -388,26 +396,26 @@ public class DataSourceService extends BaseService{
                                     getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
                     }
                     if (dbType == DbType.HIVE){
-                        datasource = JSON.parseObject(parameter, HiveDataSource.class);
+                        datasource = JSONUtils.parseObject(parameter, HiveDataSource.class);
                     }else if (dbType == DbType.SPARK){
-                        datasource = JSON.parseObject(parameter, SparkDataSource.class);
+                        datasource = JSONUtils.parseObject(parameter, SparkDataSource.class);
                     }
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
                     break;
                 case CLICKHOUSE:
-                    datasource = JSON.parseObject(parameter, ClickHouseDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, ClickHouseDataSource.class);
                     Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
                     break;
                 case ORACLE:
-                    datasource = JSON.parseObject(parameter, OracleDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, OracleDataSource.class);
                     Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
                     break;
                 case SQLSERVER:
-                    datasource = JSON.parseObject(parameter, SQLServerDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, SQLServerDataSource.class);
                     Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
                     break;
                 case DB2:
-                    datasource = JSON.parseObject(parameter, DB2ServerDataSource.class);
+                    datasource = JSONUtils.parseObject(parameter, DB2ServerDataSource.class);
                     Class.forName(Constants.COM_DB2_JDBC_DRIVER);
                     break;
                 default:
@@ -506,6 +514,7 @@ public class DataSourceService extends BaseService{
         }
 
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
+        parameterMap.put(TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
@@ -516,8 +525,7 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
         if (other != null && !"".equals(other)) {
-            LinkedHashMap<String, String> map = JSON.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
-            });
+            Map<String, String> map = JSONUtils.toMap(other);
             if (map.size() > 0) {
                 StringBuilder otherSb = new StringBuilder();
                 for (Map.Entry<String, String> entry: map.entrySet()) {
@@ -532,9 +540,9 @@ public class DataSourceService extends BaseService{
         }
 
         if(logger.isDebugEnabled()){
-            logger.info("parameters map-----" + JSON.toJSONString(parameterMap));
+            logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
         }
-        return JSON.toJSONString(parameterMap);
+        return JSONUtils.toJsonString(parameterMap);
 
 
     }
