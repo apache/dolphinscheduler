@@ -172,7 +172,6 @@ public class CreateWorkflowLocator {
     //scroll to element bottom
     public static final By SCROLL_BOTTOM = By.xpath("//span/a/em");
 
-
     /**
      * online workflow
      */

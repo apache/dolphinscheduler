@@ -19,8 +19,9 @@ package org.apache.dolphinscheduler.locator.project;
 import org.openqa.selenium.By;
 
 public class TimingLocator {
-    // click timing button
+    // create timing button
     public static final By CLICK_TIMING_BUTTON = By.xpath("//div[2]/div/div[3]/div[1]/div/table/tr[2]/td[10]/button[3]");
+
     public static final By CLICK_EXECUTION_TIMING_BUTTON = By.xpath("//div[3]/button/span");
 
     public static final By SELECT_FAILURE_STRATEGY_END = By.xpath("//label[2]/span/input");
@@ -42,4 +43,20 @@ public class TimingLocator {
     public static final By INPUT_Cc  = By.xpath("//div[11]/div[2]/div/div/span/span/input");
 
     public static final By CLICK_CREATE_BUTTON  = By.xpath("//div[12]/button[2]/span");
+
+    //edit timing
+    public static final By CLICK_TIMING_MANAGEMENT_BUTTON = By.xpath("//div[2]/div/div[3]/div[1]/div/table/tr[2]/td[10]/button[6]");
+
+    public static final By CLICK_EDIT_TIMING_BUTTON = By.xpath("//div[2]/div[3]/div/div[2]/div[1]/table/tr[2]/td[10]/button[1]");
+
+    //online timing
+    public static final By CLICK_ONLINE_TIMING_BUTTON = By.xpath("//td[10]/button[2]");
+
+    //offline timing
+    public static final By CLICK_OFFLINE_TIMING_BUTTON = By.xpath("//div[2]/div[3]/div/div[2]/div[1]/table/tr[2]/td[10]/button[2]");
+
+    //delete timing
+    public static final By CLICK_DELETE_TIMING_BUTTON = By.xpath("//div[2]/div[3]/div/div[2]/div[1]/table/tr[2]/td[10]/span/button");
+    public static final By CLICK_CONFIRM_DELETE_TIMING_BUTTON = By.xpath("//div[2]/div/button[2]/span");
+
 }

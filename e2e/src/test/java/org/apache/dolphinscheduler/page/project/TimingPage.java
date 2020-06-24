@@ -27,6 +27,10 @@ public class TimingPage extends PageCommon {
         super(driver);
     }
 
+
+    /**
+     * create timing
+     */
     public boolean createTiming() throws InterruptedException {
         // click timing button
         System.out.println("Click timing button");
@@ -50,6 +54,77 @@ public class TimingPage extends PageCommon {
         sendInput(TimingLocator.INPUT_Cc,TimingData.Cc);
         clickButton(TimingLocator.CLICK_CREATE_BUTTON);
 
-        return ifTitleContains(TimingData.RUN_WORKFLOW_TITLE);
+        return ifTitleContains(TimingData.WORKFLOW_TITLE);
+    }
+
+    /**
+     * edit timing
+     */
+    public boolean editTiming() throws InterruptedException {
+        // click timing button
+        System.out.println("Click timing  management button");
+        clickButton(TimingLocator.CLICK_TIMING_MANAGEMENT_BUTTON);
+        System.out.println("Click edit timing button");
+        clickButton(TimingLocator.CLICK_EDIT_TIMING_BUTTON);
+        System.out.println("Click execution timing button");
+        clickButton(TimingLocator.CLICK_EXECUTION_TIMING_BUTTON);
+        Thread.sleep(1000);
+
+        clickElement(TimingLocator.SELECT_FAILURE_STRATEGY_END);
+        clickElement(TimingLocator.SELECT_FAILURE_STRATEGY_CONTINUE);
+        clickElement(TimingLocator.CLICK_NOTICE_STRATEGY);
+        clickElement(TimingLocator.SELECT_NOTICE_STRATEGY);
+        Thread.sleep(500);
+        clickElement(TimingLocator.CLICK_PROCESS_PRIORITY);
+        clickElement(TimingLocator.SELECT_PROCESS_PRIORITY_GIGHEST);
+        clickElement(TimingLocator.CLICK_WORKER_GROUP);
+        clickElement(TimingLocator.SELECT_WORKER_GROUP);
+        clickElement(TimingLocator.CLICK_NOTICE_GROUP);
+        clickElement(TimingLocator.SELECT_NOTICE_GROUP);
+        sendInput(TimingLocator.INPUT_RECIPIENT, TimingData.RECIPIENT);
+        sendInput(TimingLocator.INPUT_Cc,TimingData.Cc);
+        clickButton(TimingLocator.CLICK_CREATE_BUTTON);
+
+        return ifTitleContains(TimingData.TIMING_TITLE );
+    }
+
+
+    /**
+     * online timing
+     */
+    public boolean onlineTiming() throws InterruptedException {
+        // click online timing button
+        System.out.println("Click online timing  button");
+        clickButton(TimingLocator.CLICK_ONLINE_TIMING_BUTTON);
+
+        return ifTitleContains(TimingData.TIMING_TITLE );
+    }
+
+
+    /**
+     * offline timing
+     */
+    public boolean offlineTiming() throws InterruptedException {
+        // click offline timing button
+        System.out.println("Click offline timing  button");
+        Thread.sleep(500);
+        clickButton(TimingLocator.CLICK_OFFLINE_TIMING_BUTTON);
+
+        return ifTitleContains(TimingData.TIMING_TITLE );
+    }
+
+
+
+    /**
+     * delete timing
+     */
+    public boolean deleteTiming() throws InterruptedException {
+        // click offline timing button
+        System.out.println("Click delete timing  button");
+        Thread.sleep(500);
+        clickButton(TimingLocator.CLICK_DELETE_TIMING_BUTTON);
+        clickButton(TimingLocator.CLICK_CONFIRM_DELETE_TIMING_BUTTON);
+
+        return ifTitleContains(TimingData.WORKFLOW_TITLE );
     }
 }

@@ -201,6 +201,7 @@ public class CreateWorkflowPage extends PageCommon {
     public boolean offlineWorkflow() throws InterruptedException {
         // click offline button
         System.out.println("offline workflow");
+        Thread.sleep(500);
         clickButton(CreateWorkflowLocator.CLICK_OFFLINE_WORKFLOW_BUTTON);
 
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);

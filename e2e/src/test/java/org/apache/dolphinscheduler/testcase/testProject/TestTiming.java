@@ -23,13 +23,43 @@ import org.testng.annotations.Test;
 public class TestTiming extends BaseTest {
     private TimingPage timingPage;
 
-    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
-    public void testRunWorkflow() throws InterruptedException {
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestCreateTiming")
+    public void testCreateTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 
         System.out.println("start create timing");
         assert timingPage.createTiming();
         System.out.println("end create timing");
+        System.out.println("===================================");
+
+    }
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestEditTiming")
+    public void testEditTiming() throws InterruptedException {
+        timingPage = new TimingPage(driver);
+
+        System.out.println("start edit timing");
+        assert timingPage.editTiming();
+        System.out.println("end edit timing");
+        System.out.println("===================================");
+    }
+
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestOnlineTiming")
+    public void testOnlineTiming() throws InterruptedException {
+        timingPage = new TimingPage(driver);
+
+        System.out.println("start online timing");
+        assert timingPage.onlineTiming();
+        System.out.println("end online timing");
+        System.out.println("===================================");
+    }
+
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestDeleteTiming")
+    public void testDeleteTiming() throws InterruptedException {
+        timingPage = new TimingPage(driver);
+
+        System.out.println("start delete timing");
+        assert timingPage.deleteTiming();
+        System.out.println("end delete timing");
         System.out.println("===================================");
     }
 }
