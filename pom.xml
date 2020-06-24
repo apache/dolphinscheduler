@@ -699,7 +699,7 @@
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
-                        <include>**/api/enums/testGetEnum.java</include>
+                        <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
                         <include>**/api/enums/StatusTest.java</include>
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
@@ -819,7 +819,7 @@
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <include>**/server/worker/task/http/HttpTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
@@ -829,7 +829,7 @@
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
 
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
-                        <include>**/dao/mapper/ErrorCommandMapperTest.java</include>
+                        <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
