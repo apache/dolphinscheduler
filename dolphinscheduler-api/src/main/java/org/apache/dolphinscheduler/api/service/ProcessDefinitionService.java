@@ -426,7 +426,9 @@ public class ProcessDefinitionService extends BaseDAGService {
     private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(Integer.valueOf(processDefinitionId));
         if(processDefinition != null){
-            failedProcessList.add(processDefinition.getName());
+            failedProcessList.add(processDefinitionId+"["+processDefinition.getName()+"]");
+        }else{
+            failedProcessList.add(processDefinitionId+"[]");
         }
     }
 
@@ -488,11 +490,10 @@ public class ProcessDefinitionService extends BaseDAGService {
                                          Map<String, Object> result, List<String> failedProcessList,boolean isCopy) {
         if (!failedProcessList.isEmpty()) {
             if(isCopy){
-                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedProcessList));
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName,String.join(",", failedProcessList));
             }else{
-                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, getErrorPrefix(srcProjectName, targetProjectName),String.join(",", failedProcessList));
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName,String.join(",", failedProcessList));
             }
-
         } else {
             putMsg(result, Status.SUCCESS);
         }
