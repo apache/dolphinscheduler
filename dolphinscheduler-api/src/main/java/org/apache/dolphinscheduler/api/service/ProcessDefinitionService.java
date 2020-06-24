@@ -428,7 +428,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         if(processDefinition != null){
             failedProcessList.add(processDefinitionId+"["+processDefinition.getName()+"]");
         }else{
-            failedProcessList.add(processDefinitionId+"[]");
+            failedProcessList.add(processDefinitionId+"[null]");
         }
     }
 
