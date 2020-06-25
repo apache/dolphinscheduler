@@ -601,6 +601,7 @@
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
                         <source>8</source>
+                        <failOnError>false</failOnError>
                     </configuration>
                 </plugin>
 
