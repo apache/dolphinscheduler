@@ -16,27 +16,28 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.springframework.stereotype.Service;
-
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * round robin selector
- * @param <T> T
+ *  AbstractSelector
  */
-@Service
-public class RoundRobinSelector<T> extends AbstractSelector<T> {
-
-    private final AtomicInteger index = new AtomicInteger(0);
-
+public  abstract class AbstractSelector<T> implements Selector<T>{
     @Override
-    public T doSelect(Collection<T> source) {
+    public T select(Collection<T> source) {
 
-        int size = source.size();
+        if (source == null || source.size() == 0) {
+            throw new IllegalArgumentException("Empty source.");
+        }
+
         /**
-         * round robin
+         * if only one , return directly
          */
-        return (T) source.toArray()[index.getAndIncrement() % size];
+        if (source.size() == 1) {
+            return (T)source.toArray()[0];
+        }
+        return doSelect(source);
     }
+
+    protected abstract T  doSelect(Collection<T> source);
+
 }
