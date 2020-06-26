@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+
 import java.util.Collection;
 
 /**
@@ -25,7 +27,7 @@ public  abstract class AbstractSelector<T> implements Selector<T>{
     @Override
     public T select(Collection<T> source) {
 
-        if (source == null || source.size() == 0) {
+        if (CollectionUtils.isEmpty(source)) {
             throw new IllegalArgumentException("Empty source.");
         }
 
