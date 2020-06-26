@@ -97,9 +97,9 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_error_command()
            `failure_strategy` tinyint(4) NULL DEFAULT 0 COMMENT 'failure strategy',
            `warning_type` tinyint(4) NULL DEFAULT 0 COMMENT 'warning type',
            `warning_group_id` int(11) NULL DEFAULT NULL COMMENT 'warning group id',
-           `schedule_time` datetime(0) NULL DEFAULT NULL COMMENT 'scheduler time',
-           `start_time` datetime(0) NULL DEFAULT NULL COMMENT 'start time',
-           `update_time` datetime(0) NULL DEFAULT NULL COMMENT 'update time',
+           `schedule_time` datetime NULL DEFAULT NULL COMMENT 'scheduler time',
+           `start_time` datetime NULL DEFAULT NULL COMMENT 'start time',
+           `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
            `dependence` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'dependence',
            `process_instance_priority` int(11) NULL DEFAULT NULL COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
            `worker_group_id` int(11) NULL DEFAULT -1 COMMENT 'worker group id',
@@ -125,8 +125,8 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_worker_group()
            `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
            `name` varchar(256)  NULL DEFAULT NULL COMMENT 'worker group name',
            `ip_list` varchar(256)  NULL DEFAULT NULL COMMENT 'worker ip list. split by [,] ',
-           `create_time` datetime(0) NULL DEFAULT NULL COMMENT 'create time',
-           `update_time` datetime(0) NULL DEFAULT NULL COMMENT 'update time',
+           `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+           `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
            PRIMARY KEY (`id`) USING BTREE
        ) ENGINE = InnoDB AUTO_INCREMENT=1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 

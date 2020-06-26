@@ -67,10 +67,14 @@ jobs:
       - name: Upload coverage report to codecov
         run: |
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
+      # Set up JDK 11 for SonarCloud.
+      - name: Set up JDK 1.11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
       - name: Run SonarCloud Analysis
         run: >
-          mvn verify --batch-mode
-          org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.1.1688:sonar
+          mvn --batch-mode verify sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
           -Dmaven.test.skip=true
           -Dsonar.host.url=https://sonarcloud.io
@@ -78,7 +82,7 @@ jobs:
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
-          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js
+          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
