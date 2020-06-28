@@ -51,7 +51,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
-
     /**
      *  thread executor service
      */
@@ -83,9 +82,18 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", taskRequestCommand);
 
-        String contextJson = taskRequestCommand.getTaskExecutionContext();
+        if(taskRequestCommand == null){
+            logger.error("task execute request command is null");
+            return;
+        }
 
+        String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
+        if(taskExecutionContext == null){
+            logger.error("task execution context is null");
+            return;
+        }
+
         taskExecutionContext.setHost(OSUtils.getHost() + ":" + workerConfig.getListenPort());
 
         // local execute path
@@ -102,7 +110,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         // tell master that task is in executing
         final Command ackCommand = buildAckCommand(taskExecutionContext).convert2Command();
-        
+
         try {
             RetryerUtils.retryCall(() -> {
                 taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(),ackCommand);
