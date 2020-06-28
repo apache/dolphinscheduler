@@ -51,7 +51,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
-
     /**
      *  thread executor service
      */
@@ -83,10 +82,20 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", taskRequestCommand);
 
-        String contextJson = taskRequestCommand.getTaskExecutionContext();
+        if(taskRequestCommand == null){
+            logger.error("task execute request command is null");
+            return;
+        }
 
+        String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
-        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+
+        if(taskExecutionContext == null){
+            logger.error("task execution context is null");
+            return;
+        }
+
+         taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
