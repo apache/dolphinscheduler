@@ -80,7 +80,7 @@ public class DataAnalysisService extends BaseService{
      */
     public Map<String,Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if(!checkProject){
             return result;
@@ -130,7 +130,7 @@ public class DataAnalysisService extends BaseService{
      */
     public Map<String,Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if(!checkProject){
             return result;
@@ -193,7 +193,7 @@ public class DataAnalysisService extends BaseService{
      */
     public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         boolean checkProject = checkProject(loginUser, projectId, result);
         if(!checkProject){
             return result;
@@ -305,7 +305,7 @@ public class DataAnalysisService extends BaseService{
      * @return queue state count data
      */
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         boolean checkProject = checkProject(loginUser, projectId, result);
         if(!checkProject){

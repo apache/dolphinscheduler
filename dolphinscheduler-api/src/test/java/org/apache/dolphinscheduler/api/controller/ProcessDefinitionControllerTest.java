@@ -80,7 +80,7 @@ public class ProcessDefinitionControllerTest {
         String name = "dag_test";
         String description = "desc test";
         String connects = "[]";
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",1);
 
@@ -104,7 +104,7 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testVerifyProcessDefinitionName() throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROCESS_INSTANCE_EXIST);
         String projectName = "test";
         String name = "dag_test";
@@ -126,7 +126,7 @@ public class ProcessDefinitionControllerTest {
         String description = "desc test";
         String connects = "[]";
         int id = 1;
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",1);
 
@@ -142,7 +142,7 @@ public class ProcessDefinitionControllerTest {
     public void testReleaseProcessDefinition() throws Exception {
         String projectName = "test";
         int id = 1;
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectName,id,ReleaseState.OFFLINE.ordinal())).thenReturn(result);
@@ -170,7 +170,7 @@ public class ProcessDefinitionControllerTest {
         processDefinition.setName(name);
         processDefinition.setProcessDefinitionJson(json);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, processDefinition);
 
@@ -187,7 +187,7 @@ public class ProcessDefinitionControllerTest {
         int targetProjectId = 2;
         String id = "1";
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.batchCopyOrMoveProcessDefinition(user,projectName,id,targetProjectId,true)).thenReturn(result);
@@ -203,7 +203,7 @@ public class ProcessDefinitionControllerTest {
         int targetProjectId = 2;
         String id = "1";
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.batchCopyOrMoveProcessDefinition(user,projectName,id,targetProjectId,false)).thenReturn(result);
@@ -219,7 +219,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         List<ProcessDefinition> resourceList =  getDefinitionList();
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resourceList);
 
@@ -274,7 +274,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         int id = 1;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.deleteProcessDefinitionById(user, projectName,id)).thenReturn(result);
@@ -288,7 +288,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         int id = 1;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.getTaskNodeListByDefinitionId(id)).thenReturn(result);
@@ -302,7 +302,7 @@ public class ProcessDefinitionControllerTest {
         String projectName = "test";
         String idList = "1,2,3";
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.getTaskNodeListByDefinitionIdList(idList)).thenReturn(result);

@@ -96,7 +96,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryProcessInstanceList() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -151,7 +151,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryProcessInstanceById() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -189,7 +189,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryTaskListByProcessId() throws IOException {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -238,7 +238,7 @@ public class ProcessInstanceServiceTest {
     public void testQuerySubProcessInstanceByTaskId() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -284,7 +284,7 @@ public class ProcessInstanceServiceTest {
     public void testUpdateProcessInstance() throws ParseException {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -340,7 +340,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryParentInstanceBySubId() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -381,7 +381,7 @@ public class ProcessInstanceServiceTest {
     public void testDeleteProcessInstanceById() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail

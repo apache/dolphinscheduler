@@ -76,10 +76,10 @@ public class AlertGroupServiceTest {
 
 
     @Test
-    public  void testQueryAlertgroup(){
+    public  void testQueryAlertGroup(){
 
         Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        HashMap<String, Object> result= alertGroupService.queryAlertgroup();
+        HashMap<String, Object> result= alertGroupService.queryAlertGroup();
         logger.info(result.toString());
         List<AlertGroup> alertGroups = (List<AlertGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(alertGroups));

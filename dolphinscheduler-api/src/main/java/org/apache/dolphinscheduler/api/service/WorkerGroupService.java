@@ -66,7 +66,7 @@ public class WorkerGroupService extends BaseService {
         // list to index
         Integer toIndex = (pageNo - 1) * pageSize + pageSize;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }

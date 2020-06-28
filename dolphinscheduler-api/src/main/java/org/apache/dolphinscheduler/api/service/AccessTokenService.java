@@ -56,7 +56,7 @@ public class AccessTokenService extends BaseService {
      * @return token list for page number and page size
      */
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page(pageNo, pageSize);
@@ -81,7 +81,7 @@ public class AccessTokenService extends BaseService {
      * @return create result code
      */
     public Map<String, Object> createToken(int userId, String expireTime, String token) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (userId <= 0) {
             throw new IllegalArgumentException("User id should not less than or equals to 0.");
@@ -112,7 +112,7 @@ public class AccessTokenService extends BaseService {
      * @return token string
      */
     public Map<String, Object> generateToken(int userId, String expireTime) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         String token = EncryptionUtils.getMd5(userId + expireTime + String.valueOf(System.currentTimeMillis()));
         result.put(Constants.DATA_LIST, token);
         putMsg(result, Status.SUCCESS);
@@ -126,7 +126,7 @@ public class AccessTokenService extends BaseService {
      * @return delete result code
      */
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
 
@@ -156,7 +156,7 @@ public class AccessTokenService extends BaseService {
      * @return update result code
      */
     public Map<String, Object> updateToken(int id,int userId, String expireTime, String token) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {

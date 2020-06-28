@@ -432,7 +432,7 @@ public class ProcessDefinitionController extends BaseController {
         logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
                 loginUser.getUserName(), projectName, processDefinitionIds);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (StringUtils.isNotEmpty(processDefinitionIds)) {
             String[] processDefinitionIdArray = processDefinitionIds.split(",");
