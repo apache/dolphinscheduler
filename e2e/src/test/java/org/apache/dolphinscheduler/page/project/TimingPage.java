@@ -95,6 +95,7 @@ public class TimingPage extends PageCommon {
     public boolean onlineTiming() throws InterruptedException {
         // click online timing button
         System.out.println("Click online timing  button");
+        Thread.sleep(500);
         clickButton(TimingLocator.CLICK_ONLINE_TIMING_BUTTON);
 
         return ifTitleContains(TimingData.TIMING_TITLE );
