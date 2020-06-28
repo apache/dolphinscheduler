@@ -151,8 +151,8 @@ data_download_basedir_path = data_basedir_path + '/download'
 dolphin_common_map['process.exec.basepath'] = process_exec_basepath
 dolphin_common_map['data.download.basedir.path'] = data_download_basedir_path
 dolphin_common_map['dolphinscheduler.env.path'] = dolphin_env_path
+dolphin_common_map['resource.storage.type'] = config['configurations']['dolphin-common']['res.upload.startup.type']
 
-dolphin_app_api_map['resource.storage.type'] = dolphin_common_map['res.upload.startup.type']
 
 zookeeperHosts = default("/clusterHostInfo/zookeeper_server_hosts", [])
 if len(zookeeperHosts) > 0 and "clientPort" in config['configurations']['zoo.cfg']:
