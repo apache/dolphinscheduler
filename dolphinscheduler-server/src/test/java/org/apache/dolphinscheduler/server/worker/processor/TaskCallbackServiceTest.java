@@ -18,14 +18,17 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
@@ -52,10 +55,23 @@ import java.util.Date;
  * test task call back service
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={TaskCallbackServiceTestConfig.class, SpringZKServer.class, SpringApplicationContext.class, MasterRegistry.class, WorkerRegistry.class,
-        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, TaskCallbackService.class,
-        TaskResponseService.class, TaskAckProcessor.class,TaskResponseProcessor.class})
+@ContextConfiguration(classes={
+        TaskCallbackServiceTestConfig.class,
+        SpringZKServer.class,
+        SpringApplicationContext.class,
+        MasterRegistry.class,
+        WorkerRegistry.class,
+        ZookeeperRegistryCenter.class,
+        MasterConfig.class,
+        WorkerConfig.class,
+        ZookeeperCachedOperator.class,
+        ZookeeperConfig.class,
+        ZookeeperNodeManager.class,
+        TaskCallbackService.class,
+        TaskResponseService.class,
+        TaskAckProcessor.class,
+        TaskResponseProcessor.class,
+        TaskExecuteProcessor.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
@@ -69,6 +85,9 @@ public class TaskCallbackServiceTest {
 
     @Autowired
     private TaskResponseProcessor taskResponseProcessor;
+
+    @Autowired
+    private TaskExecuteProcessor taskExecuteProcessor;
 
     /**
      * send ack test
@@ -174,6 +193,35 @@ public class TaskCallbackServiceTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testTaskExecuteProcessor() throws Exception{
+        final NettyServerConfig serverConfig = new NettyServerConfig();
+        serverConfig.setListenPort(30000);
+        NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
+        nettyRemotingServer.start();
+
+        final NettyClientConfig clientConfig = new NettyClientConfig();
+        NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
+
+        TaskExecuteRequestCommand taskExecuteRequestCommand = new TaskExecuteRequestCommand();
+
+        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+
+        taskExecuteRequestCommand.setTaskExecutionContext(JSONUtils.toJsonString(new TaskExecutionContext()));
+
+        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+
+        Thread.sleep(5000);
+
+        Stopper.stop();
+
+        Thread.sleep(5000);
+
+        nettyRemotingServer.close();
+        nettyRemotingClient.close();
     }
 
 //    @Test(expected = IllegalStateException.class)
