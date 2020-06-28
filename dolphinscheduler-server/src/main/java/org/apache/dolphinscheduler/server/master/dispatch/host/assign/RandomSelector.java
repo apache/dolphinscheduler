@@ -24,23 +24,12 @@ import java.util.Random;
  * random selector
  * @param <T> T
  */
-public class RandomSelector<T> implements Selector<T> {
+public class RandomSelector<T> extends AbstractSelector<T> {
 
     private final Random random = new Random();
 
     @Override
-    public T select(final Collection<T> source) {
-
-        if (source == null || source.size() == 0) {
-            throw new IllegalArgumentException("Empty source.");
-        }
-
-        /**
-         * if only one , return directly
-         */
-        if (source.size() == 1) {
-            return (T) source.toArray()[0];
-        }
+    public T doSelect(final Collection<T> source) {
 
         int size = source.size();
         /**
