@@ -34,7 +34,7 @@ public class NettyRemoteChannel {
     private final Channel channel;
 
     /**
-     *  equest unique identification
+     *  request unique identification
      */
     private final long opaque;
 
