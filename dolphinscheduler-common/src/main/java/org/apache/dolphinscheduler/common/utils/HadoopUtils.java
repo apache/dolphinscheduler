@@ -193,19 +193,20 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
         String appUrl = "";
-        //not use resourcemanager
-        if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)) {
-
-            yarnEnabled = false;
-            logger.warn("should not step here");
-        } else if (!StringUtils.isEmpty(rmHaIds)) {
-            //resourcemanager HA enabled
+        //resource manager HA
+        if (StringUtils.isNotEmpty(rmHaIds) && !rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)) {
             appUrl = getAppAddress(appAddress, rmHaIds);
             yarnEnabled = true;
             logger.info("application url : {}", appUrl);
-        } else {
-            //single resourcemanager enabled
+        } else if (StringUtils.isNotEmpty(appAddress) && !appAddress.contains("ark1")){
+            //single resource manager
             yarnEnabled = true;
+            appUrl = appAddress;
+        } else {
+            //yarn conf error
+            yarnEnabled = false;
+            logger.error("Yarn conf error, Please check the yarn conf in hadoop.properties");
+            throw new RuntimeException("Yarn conf error, Please check the yarn conf in hadoop.properties");
         }
 
         return String.format(appUrl, applicationId);
