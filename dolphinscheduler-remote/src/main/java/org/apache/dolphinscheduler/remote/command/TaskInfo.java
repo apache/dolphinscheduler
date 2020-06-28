@@ -34,7 +34,7 @@ public class TaskInfo implements Serializable{
 
 
     /**
-     *  taks name
+     *  task name
      */
     private String taskName;
 
