@@ -500,16 +500,6 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
-     * get error prefix
-     * @param srcProjectName
-     * @param targetProjectName
-     * @return
-     */
-    private String getErrorPrefix(String srcProjectName, String targetProjectName) {
-        return "from " + srcProjectName + " to " + targetProjectName;
-    }
-
-    /**
      * update  process definition
      *
      * @param loginUser             login user
