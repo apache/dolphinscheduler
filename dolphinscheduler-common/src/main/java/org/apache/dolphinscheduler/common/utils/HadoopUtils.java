@@ -206,7 +206,6 @@ public class HadoopUtils implements Closeable {
             //yarn conf error
             yarnEnabled = false;
             logger.error("Yarn conf error, Please check the yarn conf in hadoop.properties");
-            throw new RuntimeException("Yarn conf error, Please check the yarn conf in hadoop.properties");
         }
 
         return String.format(appUrl, applicationId);
