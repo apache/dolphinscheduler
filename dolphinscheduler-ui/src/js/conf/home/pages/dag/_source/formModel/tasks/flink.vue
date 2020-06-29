@@ -86,7 +86,7 @@
             :disabled="isDetails"
             type="input"
             v-model="jobManagerMemory"
-            :placeholder="$t('Please enter the number of Executor')"
+            :placeholder="$t('Please enter jobManager memory')"
             style="width: 200px;"
             autocomplete="off">
         </x-input>
@@ -97,7 +97,7 @@
             :disabled="isDetails"
             type="input"
             v-model="taskManagerMemory"
-            :placeholder="$t('Please enter the Executor memory')"
+            :placeholder="$t('Please enter the taskManager memory')"
             style="width: 186px;"
             autocomplete="off">
         </x-input>
@@ -210,12 +210,10 @@
         slot: 1,
         // Driver Number of memory
         taskManager: '2',
-        // Executor Number
+        // jobManager Memory
         jobManagerMemory: '1G',
-        // Executor Number of memory
+        // taskManager Memory
         taskManagerMemory: '2G',
-        // Executor Number of cores
-        executorCores: 2,
         // Command line argument
         mainArgs: '',
         // Other parameters
@@ -290,37 +288,22 @@
         }
 
         if (!this.jobManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the number of Executor')}`)
+          this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
           return false
         }
 
         if (!Number.isInteger(parseInt(this.jobManagerMemory))) {
-          this.$message.warning(`${i18n.$t('The number of Executors should be a positive integer')}`)
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
           return false
         }
 
         if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
-          return false
-        }
-
-        if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter the taskManager memory')}`)
           return false
         }
 
         if (!_.isNumber(parseInt(this.taskManagerMemory))) {
           this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.executorCores) {
-          this.$message.warning(`${i18n.$t('Please enter ExecutorPlease enter Executor core number')}`)
-          return false
-        }
-
-        if (!Number.isInteger(parseInt(this.executorCores))) {
-          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
           return false
         }
 
@@ -351,7 +334,6 @@
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
-          executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -482,7 +464,6 @@
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
-          executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
