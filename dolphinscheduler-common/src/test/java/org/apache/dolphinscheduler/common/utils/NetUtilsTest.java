@@ -36,7 +36,7 @@ public class NetUtilsTest {
 
     @Test
     public void testIsValidAddress() {
-        assertFalse(NetUtils.isValidV4Address((InetAddress) null));
+        assertFalse(NetUtils.isValidV4Address(null));
         InetAddress address = mock(InetAddress.class);
         when(address.isLoopbackAddress()).thenReturn(true);
         assertFalse(NetUtils.isValidV4Address(address));
