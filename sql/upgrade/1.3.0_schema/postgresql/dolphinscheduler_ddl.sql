@@ -150,3 +150,136 @@ d//
 delimiter ;
 select ac_dolphin_T_t_ds_process_definition_A_resource_ids();
 DROP FUNCTION ac_dolphin_T_t_ds_process_definition_A_resource_ids();
+
+
+-- uc_dolphin_T_t_ds_process_instance_R_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_R_worker_group_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_process_instance_R_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_process_instance RENAME worker_group_id TO worker_group;
+         ALTER TABLE t_ds_process_instance ALTER COLUMN worker_group type varchar(64);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_process_instance_R_worker_group_id();
+DROP FUNCTION uc_dolphin_T_t_ds_process_instance_R_worker_group_id();
+
+
+-- uc_dolphin_T_t_ds_task_instance_R_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_R_worker_group_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_task_instance_R_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_task_instance rename worker_group_id to worker_group;
+         ALTER TABLE t_ds_task_instance alter column worker_group type varchar(64);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_task_instance_R_worker_group_id();
+DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_worker_group_id();
+
+-- uc_dolphin_T_t_ds_schedules_R_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_schedules_R_worker_group_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_schedules_R_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_schedules'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_schedules rename worker_group_id to worker_group;
+         ALTER TABLE t_ds_schedules alter column worker_group type varchar(64);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_schedules_R_worker_group_id();
+DROP FUNCTION uc_dolphin_T_t_ds_schedules_R_worker_group_id();
+
+-- uc_dolphin_T_t_ds_command_R_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_command_R_worker_group_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_command_R_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_command'
+          AND COLUMN_NAME ='worker_group')
+      THEN
+         ALTER TABLE t_ds_command rename worker_group_id to worker_group;
+         ALTER TABLE t_ds_command alter column worker_group type varchar(64);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_command_R_worker_group_id();
+DROP FUNCTION uc_dolphin_T_t_ds_command_R_worker_group_id();
+
+-- uc_dolphin_T_t_ds_error_command_R_worker_group_id
+delimiter ;
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_error_command_R_worker_group_id();
+delimiter d//
+CREATE FUNCTION uc_dolphin_T_t_ds_error_command_R_worker_group_id() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_error_command'
+          AND COLUMN_NAME ='worker_group_id')
+      THEN
+         ALTER TABLE t_ds_error_command rename worker_group_id to worker_group;
+         ALTER TABLE t_ds_error_command alter column worker_group type varchar(64);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select uc_dolphin_T_t_ds_error_command_R_worker_group_id();
+DROP FUNCTION uc_dolphin_T_t_ds_error_command_R_worker_group_id();
+
+
+-- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_process_definition_unique() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM pg_stat_all_indexes
+          WHERE relname='t_ds_process_definition'
+                            AND indexrelname ='process_definition_unique')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD CONSTRAINT process_definition_unique UNIQUE (name,project_id);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_process_definition_unique();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique();
+
+

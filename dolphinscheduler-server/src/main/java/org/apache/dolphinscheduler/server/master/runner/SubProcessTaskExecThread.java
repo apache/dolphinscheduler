@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
@@ -32,11 +30,6 @@ import java.util.Date;
 public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
-     * logger of SubProcessTaskExecThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(SubProcessTaskExecThread.class);
-
-    /**
      * sub process instance
      */
     private ProcessInstance subProcessInstance;
@@ -44,10 +37,9 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * sub process task exec thread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public SubProcessTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        super(taskInstance, processInstance);
+    public SubProcessTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
     }
 
     @Override

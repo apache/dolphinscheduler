@@ -44,7 +44,7 @@ import java.util.List;
 @Rollback(true)
 public class ScheduleMapperTest {
 
-    
+
     @Autowired
     ScheduleMapper scheduleMapper;
 
@@ -87,7 +87,6 @@ public class ScheduleMapperTest {
         //update
         int update = scheduleMapper.updateById(schedule);
         Assert.assertEquals(update, 1);
-        scheduleMapper.deleteById(schedule.getId());
     }
 
     /**
@@ -109,7 +108,6 @@ public class ScheduleMapperTest {
         //query
         List<Schedule> schedules = scheduleMapper.selectList(null);
         Assert.assertNotEquals(schedules.size(), 0);
-        scheduleMapper.deleteById(schedule.getId());
     }
 
     /**
@@ -141,14 +139,10 @@ public class ScheduleMapperTest {
         Page<Schedule> page = new Page(1,3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(page,
                 processDefinition.getId(), ""
-                );
+        );
         Assert.assertNotEquals(scheduleIPage.getSize(), 0);
 
 
-        projectMapper.deleteById(project.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        userMapper.deleteById(user.getId());
-        scheduleMapper.deleteById(schedule.getId());
     }
 
     /**
@@ -182,10 +176,6 @@ public class ScheduleMapperTest {
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
                 project.getName()
         );
-        projectMapper.deleteById(project.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        userMapper.deleteById(user.getId());
-        scheduleMapper.deleteById(schedule.getId());
 
         Assert.assertNotEquals(schedules.size(), 0);
     }
@@ -202,7 +192,6 @@ public class ScheduleMapperTest {
         scheduleMapper.updateById(schedule);
 
         List<Schedule> schedules= scheduleMapper.selectAllByProcessDefineArray(new int[] {schedule.getProcessDefinitionId()});
-        scheduleMapper.deleteById(schedule.getId());
         Assert.assertNotEquals(schedules.size(), 0);
     }
 
@@ -216,7 +205,6 @@ public class ScheduleMapperTest {
         scheduleMapper.updateById(schedule);
 
         List<Schedule> schedules= scheduleMapper.queryByProcessDefinitionId(schedule.getProcessDefinitionId());
-        scheduleMapper.deleteById(schedule.getId());
         Assert.assertNotEquals(schedules.size(), 0);
     }
 }

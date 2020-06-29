@@ -34,6 +34,6 @@ public class Stopper {
 	}
 	
 	public static final void stop(){
-		signal.getAndSet(true);
+		signal.set(true);
 	}
 }

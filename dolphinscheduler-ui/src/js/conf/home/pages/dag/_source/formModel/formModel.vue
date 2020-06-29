@@ -90,7 +90,7 @@
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
         </div>
 
@@ -268,6 +268,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -333,7 +334,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1,
+        workerGroup: 'default',
         stateList:[
           {
             value: 'success',
@@ -356,9 +357,11 @@
       taskType: String,
       self: Object,
       preNode: Array,
-      rearList: Array
+      rearList: Array,
+      instanceId: Number
     },
     methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
       /**
        * depend
        */
@@ -455,7 +458,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -484,12 +487,26 @@
         }
         return true
       },
+      _verifWorkGroup() {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id == this.workerGroup;
+        });
+        if(item==undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false;
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
       _verification () {
         // Verify name
         if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if(!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
@@ -519,7 +536,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -611,25 +628,30 @@
           this.failedBranch = o.conditionResult.failedNode[0]
         }
           // If the workergroup has been deleted, set the default workergroup
-          var hasMatch = false;
-          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroupId == workerGroupId) {
-              hasMatch = true;
-              break;
-            }
+        var hasMatch = false;
+        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup == workerGroup) {
+            hasMatch = true;
+            break;
           }
-
-          if(!hasMatch){
-            this.workerGroupId = -1
-          }else{
-            this.workerGroupId = o.workerGroupId
-          }
+        }
+        if(o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList',{
+            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
+        } else {
+          this.workerGroup = o.workerGroup
+        }
 
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
 
+      } else {
+        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
       this.isContentBox = true
     },
@@ -663,7 +685,7 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId,
+          workerGroup: this.workerGroup,
           successBranch: this.successBranch,
           failedBranch: this.failedBranch
         }

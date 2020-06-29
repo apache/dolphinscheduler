@@ -18,7 +18,7 @@
 import _ from 'lodash'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
-let pie = {
+const pie = {
   series: [
     {
       type: 'pie',
@@ -37,7 +37,7 @@ let pie = {
   ]
 }
 
-let bar = {
+const bar = {
   title: {
     text: ''
   },
@@ -56,7 +56,7 @@ let bar = {
   },
   tooltip: {
     formatter (v) {
-      let val = v[0].name.split(',')
+      const val = v[0].name.split(',')
       return `${val[0]} (${v[0].value})`
     }
   },
@@ -66,7 +66,7 @@ let bar = {
   }]
 }
 
-let simple = {
+const simple = {
   xAxis: {
     splitLine: {
       show: false
@@ -92,7 +92,6 @@ let simple = {
     }
   },
   color: ['#D5050B', '#0398E1']
-
 
 }
 
