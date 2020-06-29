@@ -110,7 +110,7 @@
                   :disabled="isDetails"
                   type="input"
                   v-model="slot"
-                  :placeholder="$t('Please enter driver core number')"
+                  :placeholder="$t('Please enter solt number')"
                   style="width: 200px;"
                   autocomplete="off">
         </x-input>
@@ -122,7 +122,7 @@
                   :disabled="isDetails"
                   type="input"
                   v-model="taskManager"
-                  :placeholder="$t('Please enter driver memory use')"
+                  :placeholder="$t('Please enter taskManager number')"
                   style="width: 186px;"
                   autocomplete="off">
         </x-input>

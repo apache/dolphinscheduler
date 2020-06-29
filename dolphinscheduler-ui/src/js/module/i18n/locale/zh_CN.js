@@ -116,6 +116,8 @@ export default {
   'Core number should be positive integer': '内核数为正整数',
   'Please enter jobManager memory': '请输入JobManager内存数',
   'Please enter the taskManager memory': '请输入TaskManager内存数',
+  'Please enter solt number': '请输入solt数量',
+  'Please enter taskManager number': '请输入taskManager数量',
   'SQL Type': 'sql类型',
   Title: '主题',
   'Please enter the title of email': '请输入邮件主题',
