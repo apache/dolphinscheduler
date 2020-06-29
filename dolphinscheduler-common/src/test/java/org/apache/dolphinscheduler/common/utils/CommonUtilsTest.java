@@ -35,11 +35,6 @@ public class CommonUtilsTest {
         Assert.assertTrue(true);
     }
     @Test
-    public void getQueueImplValue(){
-        logger.info(CommonUtils.getQueueImplValue());
-        Assert.assertTrue(true);
-    }
-    @Test
     public void isDevelopMode() {
         logger.info("develop mode: {}",CommonUtils.isDevelopMode());
         Assert.assertTrue(true);

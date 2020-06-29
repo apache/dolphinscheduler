@@ -43,7 +43,7 @@
     </property>
     <property>
         <name>zookeeper.connection.timeout</name>
-        <value>300</value>
+        <value>30000</value>
         <value-attributes>
             <type>int</type>
         </value-attributes>
@@ -73,7 +73,7 @@
     </property>
     <property>
         <name>zookeeper.retry.maxtime</name>
-        <value>5</value>
+        <value>10</value>
         <value-attributes>
             <type>int</type>
         </value-attributes>

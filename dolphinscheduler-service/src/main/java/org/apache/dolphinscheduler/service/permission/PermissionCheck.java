@@ -174,11 +174,15 @@ public class PermissionCheck<T> {
 
             // get user type in order to judge whether the user is admin
             User user = processService.getUserById(userId);
+            if (user == null) {
+                logger.error("user id {} didn't exist",userId);
+                throw new RuntimeException(String.format("user %s didn't exist",userId));
+            }
             if (user.getUserType() != UserType.ADMIN_USER){
                 List<T> unauthorizedList = processService.listUnauthorized(userId,needChecks,authorizationType);
                 // if exist unauthorized resource
                 if(CollectionUtils.isNotEmpty(unauthorizedList)){
-                    logger.error("user {} didn't has permission of {}: {}", user.getUserName(), authorizationType.getDescp(),unauthorizedList.toString());
+                    logger.error("user {} didn't has permission of {}: {}", user.getUserName(), authorizationType.getDescp(),unauthorizedList);
                     throw new RuntimeException(String.format("user %s didn't has permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }

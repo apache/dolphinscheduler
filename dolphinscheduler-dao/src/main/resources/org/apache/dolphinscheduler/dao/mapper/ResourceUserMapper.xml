@@ -29,4 +29,17 @@
             and resources_id = #{resourceId}
         </if>
     </delete>
+
+    <delete id="deleteResourceUserArray" parameterType="java.lang.Integer">
+        delete
+        from t_ds_relation_resources_user
+        where 1 = 1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
+        and resources_id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </delete>
 </mapper>

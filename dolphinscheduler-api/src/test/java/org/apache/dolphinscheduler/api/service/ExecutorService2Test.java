@@ -122,7 +122,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, 0, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         }catch (Exception e){
@@ -142,7 +142,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, 0, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
             Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
             verify(processService, times(0)).createCommand(any(Command.class));
         }catch (Exception e){
@@ -162,7 +162,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, 0, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         }catch (Exception e){
@@ -182,7 +182,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_PARALLEL,
-                    Priority.LOW, 0, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(31)).createCommand(any(Command.class));
         }catch (Exception e){
@@ -202,7 +202,7 @@ public class ExecutorService2Test {
                     null, null,
                     null, null, 0,
                     "", "", RunMode.RUN_MODE_PARALLEL,
-                    Priority.LOW, 0, 110);
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(15)).createCommand(any(Command.class));
         }catch (Exception e){

@@ -155,3 +155,125 @@ d//
 delimiter ;
 CALL ac_dolphin_T_t_ds_process_definition_A_resource_ids;
 DROP PROCEDURE ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+
+
+-- uc_dolphin_T_t_ds_process_instance_R_worker_group_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_R_worker_group_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_R_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_process_instance change `worker_group_id` `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_R_worker_group_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_R_worker_group_id;
+
+-- uc_dolphin_T_t_ds_task_instance_R_worker_group_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_R_worker_group_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_R_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_task_instance change `worker_group_id` `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_R_worker_group_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_R_worker_group_id;
+
+-- uc_dolphin_T_t_ds_schedules_R_worker_group_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_schedules_R_worker_group_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_schedules_R_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_schedules'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_schedules change `worker_group_id` `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_schedules_R_worker_group_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_schedules_R_worker_group_id;
+
+-- uc_dolphin_T_t_ds_command_R_worker_group_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_command_R_worker_group_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_command_R_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_command change `worker_group_id` `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_command_R_worker_group_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_command_R_worker_group_id;
+
+-- uc_dolphin_T_t_ds_error_command_R_worker_group_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_error_command_R_worker_group_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_error_command_R_worker_group_id()
+   BEGIN
+       IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_error_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='worker_group_id')
+   THEN
+         ALTER TABLE t_ds_error_command change `worker_group_id` `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_error_command_R_worker_group_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_error_command_R_worker_group_id;
+
+-- uc_dolphin_T_t_ds_process_definition_A_process_definition_unique
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.STATISTICS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND INDEX_NAME ='process_definition_unique')
+   THEN
+         ALTER TABLE t_ds_process_definition ADD UNIQUE KEY `process_definition_unique` (`name`,`project_id`);
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_process_definition_unique;
+

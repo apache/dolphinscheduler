@@ -18,7 +18,7 @@
 import localStore from '@/module/util/localStorage'
 
 // Get the name of the item currently clicked
-let projectName = localStore.getItem('projectName')
+const projectName = localStore.getItem('projectName')
 
 export default {
   // name
@@ -34,7 +34,7 @@ export default {
   // Timeout alarm
   timeout: 0,
   // tenant id
-  tenantId:-1,
+  tenantId: -1,
   // Node location information
   locations: {},
   // Node-to-node connection

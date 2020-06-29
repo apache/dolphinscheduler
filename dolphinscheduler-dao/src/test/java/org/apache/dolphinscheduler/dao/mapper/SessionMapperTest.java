@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -46,6 +47,7 @@ public class SessionMapperTest {
     private Session insertOne(){
         //insertOne
         Session session = new Session();
+        session.setId(UUID.randomUUID().toString());
         session.setLastLoginTime(new Date());
         session.setUserId(11111);
         sessionMapper.insert(session);
@@ -63,7 +65,6 @@ public class SessionMapperTest {
         //update
         int update = sessionMapper.updateById(session);
         Assert.assertEquals(update, 1);
-        sessionMapper.deleteById(session.getId());
     }
 
     /**
@@ -85,7 +86,6 @@ public class SessionMapperTest {
         //query
         List<Session> sessions = sessionMapper.selectList(null);
         Assert.assertNotEquals(sessions.size(), 0);
-        sessionMapper.deleteById(session.getId());
     }
 
     /**
@@ -97,6 +97,5 @@ public class SessionMapperTest {
         List<Session> sessions = sessionMapper.queryByUserId(session.getUserId());
         Assert.assertNotEquals(sessions.size(), 0);
 
-        sessionMapper.deleteById(session.getId());
     }
 }

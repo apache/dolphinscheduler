@@ -120,9 +120,14 @@ public class TaskNode {
   private Priority taskInstancePriority;
 
   /**
+   * worker group
+   */
+  private String workerGroup;
+
+  /**
    * worker group id
    */
-  private int workerGroupId;
+  private Integer workerGroupId;
 
 
   /**
@@ -236,8 +241,9 @@ public class TaskNode {
             Objects.equals(extras, taskNode.extras) &&
             Objects.equals(runFlag, taskNode.runFlag) &&
             Objects.equals(dependence, taskNode.dependence) &&
+            Objects.equals(workerGroup, taskNode.workerGroup) &&
             Objects.equals(conditionResult, taskNode.conditionResult) &&
-            Objects.equals(workerGroupId, taskNode.workerGroupId) &&
+
             CollectionUtils.equalLists(depList, taskNode.depList);
   }
 
@@ -288,7 +294,7 @@ public class TaskNode {
 
   /**
    * get task time out parameter
-   * @return
+   * @return task time out parameter
    */
   public TaskTimeoutParameter getTaskTimeoutParameter() {
     if(StringUtils.isNotEmpty(this.getTimeout())){
@@ -321,16 +327,16 @@ public class TaskNode {
             ", dependence='" + dependence + '\'' +
             ", taskInstancePriority=" + taskInstancePriority +
             ", timeout='" + timeout + '\'' +
-            ", workerGroupId='" + workerGroupId + '\'' +
+            ", workerGroup='" + workerGroup + '\'' +
             '}';
   }
 
-  public int getWorkerGroupId() {
-    return workerGroupId;
+  public String getWorkerGroup() {
+    return workerGroup;
   }
 
-  public void setWorkerGroupId(int workerGroupId) {
-    this.workerGroupId = workerGroupId;
+  public void setWorkerGroup(String workerGroup) {
+    this.workerGroup = workerGroup;
   }
 
   public String getConditionResult() {
@@ -339,5 +345,13 @@ public class TaskNode {
 
   public void setConditionResult(String conditionResult) {
     this.conditionResult = conditionResult;
+  }
+
+  public Integer getWorkerGroupId() {
+    return workerGroupId;
+  }
+
+  public void setWorkerGroupId(Integer workerGroupId) {
+    this.workerGroupId = workerGroupId;
   }
 }

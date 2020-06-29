@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -141,11 +142,17 @@ public class MasterExecThread implements Runnable {
     private MasterConfig masterConfig;
 
     /**
-     * constructor of MasterExecThread
-     * @param processInstance   process instance
-     * @param processService        process dao
+     *
      */
-    public MasterExecThread(ProcessInstance processInstance, ProcessService processService){
+    private NettyRemotingClient nettyRemotingClient;
+
+    /**
+     * constructor of MasterExecThread
+     * @param processInstance processInstance
+     * @param processService processService
+     * @param nettyRemotingClient nettyRemotingClient
+     */
+    public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
         this.processService = processService;
 
         this.processInstance = processInstance;
@@ -153,7 +160,10 @@ public class MasterExecThread implements Runnable {
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
+        this.nettyRemotingClient = nettyRemotingClient;
     }
+
+
 
 
     @Override
@@ -328,7 +338,7 @@ public class MasterExecThread implements Runnable {
     private void endProcess() {
         processInstance.setEndTime(new Date());
         processService.updateProcessInstance(processInstance);
-        if(processInstance.getState().typeIsWaittingThread()){
+        if(processInstance.getState().typeIsWaitingThread()){
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -355,7 +365,6 @@ public class MasterExecThread implements Runnable {
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
-
     }
 
     /**
@@ -408,9 +417,13 @@ public class MasterExecThread implements Runnable {
     private TaskInstance submitTaskExec(TaskInstance taskInstance) {
         MasterBaseTaskExecThread abstractExecThread = null;
         if(taskInstance.isSubProcess()){
-            abstractExecThread = new SubProcessTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new SubProcessTaskExecThread(taskInstance);
+        }else if(taskInstance.isDependTask()){
+            abstractExecThread = new DependentTaskExecThread(taskInstance);
+        }else if(taskInstance.isConditionsTask()){
+            abstractExecThread = new ConditionsTaskExecThread(taskInstance);
         }else {
-            abstractExecThread = new MasterTaskExecThread(taskInstance, processInstance);
+            abstractExecThread = new MasterTaskExecThread(taskInstance);
         }
         Future<Boolean> future = taskExecService.submit(abstractExecThread);
         activeTaskNode.putIfAbsent(abstractExecThread, future);
@@ -482,34 +495,20 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
             }
 
-            int workerGroupId = taskNode.getWorkerGroupId();
-            taskInstance.setWorkerGroupId(workerGroupId);
+            String processWorkerGroup = processInstance.getWorkerGroup();
+            processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
+            String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+            if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
+                taskInstance.setWorkerGroup(processWorkerGroup);
+            }else {
+                taskInstance.setWorkerGroup(taskWorkerGroup);
+            }
 
         }
         return taskInstance;
     }
 
-    /**
-     * is there have conditions after the parent node
-     * @param parentNodeName
-     * @return
-     */
-    private boolean haveConditionsAfterNode(String parentNodeName){
 
-        boolean result = false;
-        Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
-        if(startVertex == null){
-            return result;
-        }
-        for(String nodeName : startVertex){
-            TaskNode taskNode = dag.getNode(nodeName);
-            if(taskNode.getType().equals(TaskType.CONDITIONS.toString())){
-                result = true;
-                break;
-            }
-        }
-        return result;
-    }
 
     /**
      * if all of the task dependence are skip, skip it too.
@@ -686,7 +685,7 @@ public class MasterExecThread implements Runnable {
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
             // conditions task would not return failed.
             if(depTaskState.typeIsFailure()
-                    && !haveConditionsAfterNode(depsNode)
+                    && !DagHelper.haveConditionsAfterNode(depsNode, dag )
                     && !dag.getNode(depsNode).isConditionsTask()){
                 return DependResult.FAILED;
             }
@@ -806,7 +805,8 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0){
+        if(activeTaskNode.size() > 0 || retryTaskExists()){
+            // active task and retry task exists
             return runningState(state);
         }
         // process failure
@@ -829,7 +829,8 @@ public class MasterExecThread implements Runnable {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             if(CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
+                    || CollectionUtils.isNotEmpty(killList)
+                    || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -838,9 +839,13 @@ public class MasterExecThread implements Runnable {
 
         // success
         if(state == ExecutionStatus.RUNNING_EXEUTION){
+            List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXEUTION;
+            }else if(CollectionUtils.isNotEmpty(killTasks)){
+                // tasks maybe killed manually
+                return ExecutionStatus.FAILURE;
             }else{
                 //  if the waiting queue is empty and the status is in progress, then success
                 return ExecutionStatus.SUCCESS;
@@ -848,6 +853,24 @@ public class MasterExecThread implements Runnable {
         }
 
         return state;
+    }
+
+    /**
+     * whether standby task list have retry tasks
+     * @return
+     */
+    private boolean retryTaskExists() {
+
+        boolean result = false;
+
+        for(String taskName : readyToSubmitTaskList.keySet()){
+            TaskInstance task = readyToSubmitTaskList.get(taskName);
+            if(task.getState().typeIsFailure()){
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -937,10 +960,10 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.IsProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop()){
 
             // send warning email if process time out.
-            if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
+            if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){
                 alertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefineById(processInstance.getProcessDefinitionId()));
                 sendTimeWarning = true;
@@ -952,12 +975,21 @@ public class MasterExecThread implements Runnable {
                 if(!future.isDone()){
                     continue;
                 }
+
                 // node monitor thread complete
-                activeTaskNode.remove(entry.getKey());
+                task = this.processService.findTaskInstanceById(task.getId());
+
                 if(task == null){
                     this.taskFailedSubmit = true;
+                    activeTaskNode.remove(entry.getKey());
                     continue;
                 }
+
+                // node monitor thread complete
+                if(task.getState().typeIsFinished()){
+                    activeTaskNode.remove(entry.getKey());
+                }
+
                 logger.info("task :{}, id:{} complete, state is {} ",
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
@@ -975,8 +1007,8 @@ public class MasterExecThread implements Runnable {
                         addTaskToStandByList(task);
                     }else{
                         completeTaskList.put(task.getName(), task);
-                        if( task.getTaskType().equals(TaskType.CONDITIONS.toString()) ||
-                                haveConditionsAfterNode(task.getName())) {
+                        if( task.isConditionsTask()
+                            || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
                             submitPostNode(task.getName());
                         }else{
                             errorTaskList.put(task.getName(), task);
