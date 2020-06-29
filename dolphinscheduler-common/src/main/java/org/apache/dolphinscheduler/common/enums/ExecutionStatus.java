@@ -76,7 +76,7 @@ public enum ExecutionStatus {
   * @return status
   */
    public boolean typeIsFailure(){
-     return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
+     return this == FAILURE || this == NEED_FAULT_TOLERANCE;
    }
 
  /**
@@ -86,14 +86,14 @@ public enum ExecutionStatus {
    public boolean typeIsFinished(){
 
        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-               || typeIsWaittingThread();
+               || typeIsStop();
    }
 
     /**
      * status is waiting thread
      * @return status
      */
-   public boolean typeIsWaittingThread(){
+   public boolean typeIsWaitingThread(){
        return this == WAITTING_THREAD;
    }
 
@@ -104,6 +104,13 @@ public enum ExecutionStatus {
    public boolean typeIsPause(){
        return this == PAUSE;
    }
+    /**
+     * status is pause
+     * @return status
+     */
+    public boolean typeIsStop(){
+        return this == STOP;
+    }
 
     /**
      * status is running
@@ -127,5 +134,14 @@ public enum ExecutionStatus {
 
     public String getDescp() {
         return descp;
+    }
+
+    public static ExecutionStatus of(int status){
+        for(ExecutionStatus es : values()){
+            if(es.getCode() == status){
+                return es;
+            }
+        }
+        throw new IllegalArgumentException("invalid status : " + status);
     }
 }

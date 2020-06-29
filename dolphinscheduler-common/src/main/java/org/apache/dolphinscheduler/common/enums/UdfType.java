@@ -44,4 +44,15 @@ public enum UdfType {
     public String getDescp() {
         return descp;
     }
+
+    public static UdfType of(int type){
+        for(UdfType ut : values()){
+            if(ut.getCode() == type){
+                return ut;
+            }
+        }
+        throw new IllegalArgumentException("invalid type : " + type);
+    }
+
+
 }

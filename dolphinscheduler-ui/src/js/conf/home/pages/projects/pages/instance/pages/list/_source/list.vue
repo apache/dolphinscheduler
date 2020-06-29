@@ -25,7 +25,7 @@
           <th scope="col" style="min-width: 30px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col" style="min-width: 300px">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Name')}}</span>
           </th>
           <th scope="col" style="min-width: 30px">
@@ -69,8 +69,8 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
-            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
+            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id , query:{id: item.processDefinitionId}}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
           </td>
           <td>
             <span v-html="_rtState(item.state)" style="cursor: pointer;"></span>
@@ -99,7 +99,7 @@
             <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
             <span v-else>-</span>
           </td>
-          <td>
+          <td style="z-index: inherit;">
             <div v-show="item.disabled">
               <x-button type="info"
                         shape="circle"
@@ -143,7 +143,7 @@
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
-                      placement="bottom-end"
+                      placement="top-end"
                       width="90">
                 <p>{{$t('Delete?')}}</p>
                 <div style="text-align: right; margin: 0;padding-top: 4px;">
@@ -312,9 +312,9 @@
     name: 'list',
     data () {
       return {
-        // 数据
+        // data
         list: [],
-        // 按钮类型
+        // btn type
         buttonType: '',
         strDelete: '',
         checkAll: false
@@ -344,11 +344,7 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }else{
-          this.$refs['poptipDeleteAll'].doClose()
-        }
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
        * delete

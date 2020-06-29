@@ -352,13 +352,7 @@ public class OSUtils {
 
       return sb.toString();
     } finally {
-      if (br != null) {
-        try {
-          br.close();
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
+      IOUtils.closeQuietly(br);
     }
   }
 
@@ -400,8 +394,7 @@ public class OSUtils {
    * @return true if mac
    */
   public static boolean isMacOS() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Mac");
+    return getOSName().startsWith("Mac");
   }
 
 
@@ -410,12 +403,21 @@ public class OSUtils {
    * @return true if windows
    */
   public static boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
+    return getOSName().startsWith("Windows");
+  }
+
+  /**
+   * get current OS name
+   * @return current OS name
+   */
+  public static String getOSName() {
+    return System.getProperty("os.name");
   }
 
   /**
    * check memory and cpu usage
+   * @param systemCpuLoad systemCpuLoad
+   * @param systemReservedMemory systemReservedMemory
    * @return check memory and cpu usage
    */
   public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){

@@ -19,7 +19,7 @@
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
-        <div class="dep-opt"> 
+        <div class="dep-opt">
           <a href="javascript:"
              @click="!isDetails && _addDep()"
              class="add-dep">

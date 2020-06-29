@@ -16,22 +16,33 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+
+
 import com.alibaba.fastjson.JSON;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
+import java.util.Set;
 
-import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL;
 
 /**
  * master task exec thread
@@ -39,17 +50,28 @@ import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASK
 public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
-     * logger of MasterTaskExecThread
+     * taskInstance state manager
      */
-    private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
+    private TaskInstanceCacheManager taskInstanceCacheManager;
+
+
+    private NettyExecutorManager nettyExecutorManager;
+
+
+    /**
+     * zookeeper register center
+     */
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
-     * @param processInstance   process instance
      */
-    public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        super(taskInstance, processInstance);
+    public MasterTaskExecThread(TaskInstance taskInstance){
+        super(taskInstance);
+        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
+        this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
+        this.zookeeperRegistryCenter = SpringApplicationContext.getBean(ZookeeperRegistryCenter.class);
     }
 
     /**
@@ -68,6 +90,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * submit task instance and wait complete
+     *
      * @return true is task quit is true
      */
     @Override
@@ -89,6 +112,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
+     * polling db
+     *
      * wait task quit
      * @return true if task quit success
      */
@@ -117,8 +142,13 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
                     cancelTaskInstance();
                 }
+                if(processInstance.getState() == ExecutionStatus.READY_PAUSE){
+                    pauseTask();
+                }
                 // task instance finished
                 if (taskInstance.getState().typeIsFinished()){
+                    // if task is final result , then remove taskInstance from cache
+                    taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
                     break;
                 }
                 if(checkTimeout){
@@ -149,25 +179,74 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return true;
     }
 
+    /**
+     * pause task if task have not been dispatched to worker, do not dispatch anymore.
+     *
+     */
+    public void pauseTask() {
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(taskInstance == null){
+            return;
+        }
+        if(StringUtils.isBlank(taskInstance.getHost())){
+            taskInstance.setState(ExecutionStatus.PAUSE);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
+        }
+    }
+
 
     /**
      *  task instance add queue , waiting worker to kill
      */
-    private void cancelTaskInstance(){
+    private void cancelTaskInstance() throws Exception{
         if(alreadyKilled){
-            return ;
+            return;
         }
         alreadyKilled = true;
-        String host = taskInstance.getHost();
-        if(host == null){
-            host = Constants.NULL;
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(StringUtils.isBlank(taskInstance.getHost())){
+            taskInstance.setState(ExecutionStatus.KILL);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
+            return;
         }
-        String queueValue = String.format("%s-%d",
-                host, taskInstance.getId());
-        taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
 
-        logger.info("master add kill task :{} id:{} to kill queue",
+        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        killCommand.setTaskInstanceId(taskInstance.getId());
+
+        ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+
+        Host host = Host.of(taskInstance.getHost());
+        executionContext.setHost(host);
+
+        nettyExecutorManager.executeDirectly(executionContext);
+
+        logger.info("master kill taskInstance name :{} taskInstance id:{}",
                 taskInstance.getName(), taskInstance.getId() );
+    }
+
+    /**
+     * whether exists valid worker group
+     * @param taskInstanceWorkerGroup taskInstanceWorkerGroup
+     * @return whether exists
+     */
+    public Boolean existsValidWorkerGroup(String taskInstanceWorkerGroup){
+        Set<String> workerGroups = zookeeperRegistryCenter.getWorkerGroupDirectly();
+        // not worker group
+        if (CollectionUtils.isEmpty(workerGroups)){
+            return false;
+        }
+
+        // has worker group , but not taskInstance assigned worker group
+        if (!workerGroups.contains(taskInstanceWorkerGroup)){
+            return false;
+        }
+        Set<String> workers = zookeeperRegistryCenter.getWorkerGroupNodesDirectly(taskInstanceWorkerGroup);
+        if (CollectionUtils.isEmpty(workers)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -182,7 +261,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
 
     /**
-     * get remain time（s）
+     * get remain time?s?
      *
      * @return remain time
      */

@@ -77,7 +77,7 @@
                   icon="ans-icon-triangle-solid-right"
                   size="xsmall"
                   data-container="body"
-                  v-if="type === 'instance'"
+                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
                   style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
@@ -155,6 +155,7 @@
         isLoading: false,
         taskId: null,
         arg: false,
+
       }
     },
     mixins: [disabledState],
@@ -179,6 +180,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -579,7 +581,8 @@
               taskType: type,
               self: self,
               preNode: preNode,
-              rearList: rearList
+              rearList: rearList,
+              instanceId: this.$route.params.id
             }
           })
         })
@@ -616,6 +619,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',

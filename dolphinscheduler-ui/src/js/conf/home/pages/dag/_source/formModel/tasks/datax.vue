@@ -237,12 +237,23 @@
         this.postStatements = a
       },
       /**
+       * return localParams
+       */
+      _onLocalParams (a) {
+        this.localParams = a
+      },
+      /**
        * verification
        */
       _verification () {
         if(this.customConfig) {
           if (!jsonEditor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
+            return false
+          }
+
+          // localParams Subcomponent verification
+          if (!this.$refs.refLocalParams._verifProp()) {
             return false
           }
 

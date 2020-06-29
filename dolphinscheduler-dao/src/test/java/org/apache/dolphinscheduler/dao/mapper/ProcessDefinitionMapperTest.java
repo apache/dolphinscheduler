@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -72,6 +74,22 @@ public class ProcessDefinitionMapperTest {
     }
 
     /**
+     * insert
+     * @return ProcessDefinition
+     */
+    private ProcessDefinition insertTwo(){
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 2");
+        processDefinition.setProjectId(1010);
+        processDefinition.setUserId(101);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinitionMapper.insert(processDefinition);
+        return processDefinition;
+    }
+
+    /**
      * test update
      */
     @Test
@@ -81,8 +99,7 @@ public class ProcessDefinitionMapperTest {
         //update
         processDefinition.setUpdateTime(new Date());
         int update = processDefinitionMapper.updateById(processDefinition);
-        Assert.assertEquals(update, 1);
-        processDefinitionMapper.deleteById(processDefinition.getId());
+        Assert.assertEquals(1, update);
     }
 
     /**
@@ -92,7 +109,7 @@ public class ProcessDefinitionMapperTest {
     public void testDelete(){
         ProcessDefinition processDefinition = insertOne();
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -104,7 +121,6 @@ public class ProcessDefinitionMapperTest {
         //query
         List<ProcessDefinition> dataSources = processDefinitionMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -147,11 +163,6 @@ public class ProcessDefinitionMapperTest {
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getId(), "def 1");
         Assert.assertNotEquals(processDefinition1, null);
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        queueMapper.deleteById(queue.getId());
-        projectMapper.deleteById(project.getId());
-        tenantMapper.deleteById(tenant.getId());
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -163,7 +174,6 @@ public class ProcessDefinitionMapperTest {
         Page<ProcessDefinition> page = new Page(1,3);
         IPage<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010,true);
         Assert.assertNotEquals(processDefinitionIPage.getTotal(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -174,7 +184,6 @@ public class ProcessDefinitionMapperTest {
         ProcessDefinition processDefinition = insertOne();
         List<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryAllDefinitionList(1010);
         Assert.assertNotEquals(processDefinitionIPage.size(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -184,16 +193,14 @@ public class ProcessDefinitionMapperTest {
     public void testQueryDefinitionListByIdList() {
 
         ProcessDefinition processDefinition = insertOne();
-        ProcessDefinition processDefinition1 = insertOne();
+        ProcessDefinition processDefinition1 = insertTwo();
 
         Integer[] array = new Integer[2];
         array[0] = processDefinition.getId();
         array[1] = processDefinition1.getId();
 
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByIdList(array);
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        processDefinitionMapper.deleteById(processDefinition1.getId());
-        Assert.assertEquals(processDefinitions.size(), 2);
+        Assert.assertEquals(2, processDefinitions.size());
 
     }
 
@@ -224,7 +231,24 @@ public class ProcessDefinitionMapperTest {
                 projectIds,
                 user.getUserType() == UserType.ADMIN_USER
         );
-        processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertNotEquals(processDefinitions.size(), 0);
+    }
+
+    @Test
+    public void listResourcesTest(){
+        ProcessDefinition processDefinition = insertOne();
+        processDefinition.setResourceIds("3,5");
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        List<Map<String, Object>> maps = processDefinitionMapper.listResources();
+        Assert.assertNotNull(maps);
+    }
+
+    @Test
+    public void listResourcesByUserTest(){
+        ProcessDefinition processDefinition = insertOne();
+        processDefinition.setResourceIds("3,5");
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        List<Map<String, Object>> maps = processDefinitionMapper.listResourcesByUser(processDefinition.getUserId());
+        Assert.assertNotNull(maps);
     }
 }

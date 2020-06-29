@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.Charsets;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
 import org.apache.dolphinscheduler.common.process.HttpProperty;
@@ -31,12 +32,9 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -68,10 +66,7 @@ public class HttpTask extends AbstractTask {
      */
     private HttpParameters httpParameters;
 
-    /**
-     *  process service
-     */
-    private ProcessService processService;
+
 
     /**
      * Convert mill seconds to second unit
@@ -88,20 +83,26 @@ public class HttpTask extends AbstractTask {
      */
     protected String output;
 
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
     /**
      * constructor
-     * @param props     props
+     * @param taskExecutionContext     taskExecutionContext
      * @param logger    logger
      */
-    public HttpTask(TaskProps props, Logger logger) {
-        super(props, logger);
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+    public HttpTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
-        logger.info("http task params {}", taskProps.getTaskParams());
-        this.httpParameters = JSON.parseObject(taskProps.getTaskParams(), HttpParameters.class);
+        logger.info("http task params {}", taskExecutionContext.getTaskParams());
+        this.httpParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
 
         if (!httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
@@ -110,7 +111,7 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void handle() throws Exception {
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         long startTime = System.currentTimeMillis();
@@ -141,13 +142,13 @@ public class HttpTask extends AbstractTask {
      */
     protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                taskProps.getDefinedParams(),
+        // replace placeholder
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
                 httpParameters.getLocalParametersMap(),
-                processInstance.getCmdTypeIfComplement(),
-                processInstance.getScheduleTime());
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
         List<HttpProperty> httpPropertyList = new ArrayList<>();
         if(CollectionUtils.isNotEmpty(httpParameters.getHttpParams() )){
             for (HttpProperty httpProperty: httpParameters.getHttpParams()) {

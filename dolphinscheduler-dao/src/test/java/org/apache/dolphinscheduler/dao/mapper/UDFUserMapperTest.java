@@ -130,9 +130,6 @@ public class UDFUserMapperTest {
         udfUser.setUdfId(2);
         int update = udfUserMapper.updateById(udfUser);
         Assert.assertEquals(update, 1);
-        udfUserMapper.deleteById(udfUser.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
-        userMapper.deleteById(user.getId());
 
     }
 
@@ -149,8 +146,6 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteById(udfUser.getId());
         Assert.assertEquals(delete, 1);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
     }
 
     /**
@@ -163,7 +158,6 @@ public class UDFUserMapperTest {
         //query
         List<UDFUser> udfUserList = udfUserMapper.selectList(null);
         Assert.assertNotEquals(udfUserList.size(), 0);
-        userMapper.deleteById(udfUser.getId());
     }
 
     /**
@@ -179,8 +173,6 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUserId(user.getId());
         Assert.assertEquals(delete, 1);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
 
     }
 
@@ -197,7 +189,5 @@ public class UDFUserMapperTest {
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUdfFuncId(udfFunc.getId());
         Assert.assertEquals(delete, 1);
-        userMapper.deleteById(user.getId());
-        udfFuncMapper.deleteById(udfFunc.getId());
     }
 }

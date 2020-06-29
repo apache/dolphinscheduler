@@ -26,16 +26,15 @@ import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +42,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -176,6 +177,21 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
+
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
+
         // file is empty
         if (file.isEmpty()) {
             logger.error("file is empty: {}", file.getOriginalFilename());
@@ -218,9 +234,6 @@ public class ResourcesService extends BaseService {
         }
 
         Date now = new Date();
-
-
-
         Resource resource = new Resource(pid,name,fullName,false,desc,file.getOriginalFilename(),loginUser.getId(),type,file.getSize(),now,now);
 
         try {
@@ -301,7 +314,6 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-
         if (name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -309,9 +321,10 @@ public class ResourcesService extends BaseService {
 
         //check resource aleady exists
         String originFullName = resource.getFullName();
+        String originResourceName = resource.getAlias();
 
         String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
-        if (!resource.getAlias().equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
+        if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -322,25 +335,54 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isEmpty(tenantCode)){
             return result;
         }
-        String nameWithSuffix = name;
-        String originResourceName = resource.getAlias();
+        // verify whether the resource exists in storage
+        // get the path of origin file in storage
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        try {
+            if (!HadoopUtils.getInstance().exists(originHdfsFileName)) {
+                logger.error("{} not exist", originHdfsFileName);
+                putMsg(result,Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(),e);
+            throw new ServiceException(Status.HDFS_OPERATION_ERROR);
+        }
+
         if (!resource.isDirectory()) {
-            //get the file suffix
+            //get the origin file suffix
+            String originSuffix = FileUtils.suffix(originFullName);
+            String suffix = FileUtils.suffix(fullName);
+            boolean suffixIsChanged = false;
+            if (StringUtils.isBlank(suffix) && StringUtils.isNotBlank(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            if (StringUtils.isNotBlank(suffix) && !suffix.equals(originSuffix)) {
+                suffixIsChanged = true;
+            }
+            //verify whether suffix is changed
+            if (suffixIsChanged) {
+                //need verify whether this resource is authorized to other users
+                Map<String, Object> columnMap = new HashMap<>();
+                columnMap.put("resources_id", resourceId);
 
-            String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
-
-            //if the name without suffix then add it ,else use the origin name
-            if(!name.endsWith(suffix)){
-                nameWithSuffix = nameWithSuffix + suffix;
+                List<ResourcesUser> resourcesUsers = resourceUserMapper.selectByMap(columnMap);
+                if (CollectionUtils.isNotEmpty(resourcesUsers)) {
+                    List<Integer> userIds = resourcesUsers.stream().map(ResourcesUser::getUserId).collect(Collectors.toList());
+                    List<User> users = userMapper.selectBatchIds(userIds);
+                    String userNames = users.stream().map(User::getUserName).collect(Collectors.toList()).toString();
+                    logger.error("resource is authorized to user {},suffix not allowed to be modified", userNames);
+                    putMsg(result,Status.RESOURCE_IS_AUTHORIZED,userNames);
+                    return result;
+                }
             }
         }
 
         // updateResource data
-        List<Integer> childrenResource = listAllChildren(resource);
-        String oldFullName = resource.getFullName();
+        List<Integer> childrenResource = listAllChildren(resource,false);
         Date now = new Date();
 
-        resource.setAlias(nameWithSuffix);
+        resource.setAlias(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
@@ -348,10 +390,11 @@ public class ResourcesService extends BaseService {
         try {
             resourcesMapper.updateById(resource);
             if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
+                String matcherFullName = Matcher.quoteReplacement(fullName);
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
+                    t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                     t.setUpdateTime(now);
                     return t;
                 }).collect(Collectors.toList());
@@ -369,29 +412,24 @@ public class ResourcesService extends BaseService {
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-            throw new RuntimeException(Status.UPDATE_RESOURCE_ERROR.getMsg());
+            throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
         }
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name)) {
             return result;
         }
 
-        // get file hdfs path
-        // delete hdfs file by type
-        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        // get the path of dest file in hdfs
         String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
 
+
         try {
-            if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
-                logger.info("hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
-                HadoopUtils.getInstance().copy(originHdfsFileName, destHdfsFileName, true, true);
-            } else {
-                logger.error("{} not exist", originHdfsFileName);
-                putMsg(result,Status.RESOURCE_NOT_EXIST);
-            }
+            logger.info("start hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
+            HadoopUtils.getInstance().copy(originHdfsFileName, destHdfsFileName, true, true);
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
             putMsg(result,Status.HDFS_COPY_FAIL);
+            throw new ServiceException(Status.HDFS_COPY_FAIL);
         }
 
         return result;
@@ -416,6 +454,14 @@ public class ResourcesService extends BaseService {
         if (isAdmin(loginUser)) {
             userId= 0;
         }
+        if (direcotryId != -1) {
+            Resource directory = resourcesMapper.selectById(direcotryId);
+            if (directory == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+        }
+
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
                 userId,direcotryId, type.ordinal(), searchVal);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
@@ -505,41 +551,17 @@ public class ResourcesService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        Set<Resource> allResourceList = getAllResources(loginUser, type);
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(new ArrayList<>(allResourceList));
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
 
         return result;
-    }
-
-    /**
-     * get all resources
-     * @param loginUser     login user
-     * @return all resource set
-     */
-    private Set<Resource> getAllResources(User loginUser, ResourceType type) {
-        int userId = loginUser.getId();
-        boolean listChildren = true;
-        if(isAdmin(loginUser)){
-            userId = 0;
-            listChildren = false;
-        }
-        List<Resource> resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        Set<Resource> allResourceList = new HashSet<>(resourceList);
-        if (listChildren) {
-            Set<Integer> authorizedIds = new HashSet<>();
-            List<Resource> authorizedDirecoty = resourceList.stream().filter(t->t.getUserId() != loginUser.getId() && t.isDirectory()).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(authorizedDirecoty)) {
-                for(Resource resource : authorizedDirecoty){
-                    authorizedIds.addAll(listAllChildren(resource));
-                }
-                List<Resource> childrenResources = resourcesMapper.listResourceByIds(authorizedIds.toArray(new Integer[authorizedIds.size()]));
-                allResourceList.addAll(childrenResources);
-            }
-        }
-        return allResourceList;
     }
 
     /**
@@ -552,8 +574,11 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-
-        Set<Resource> allResourceList = getAllResources(loginUser, type);
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
         List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
@@ -592,15 +617,6 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        //if resource type is UDF,need check whether it is bound by UDF functon
-        if (resource.getType() == (ResourceType.UDF)) {
-            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new int[]{resourceId});
-            if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
-                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
-                return result;
-            }
-        }
 
         String tenantCode = getTenantCode(resource.getUserId(),result);
         if (StringUtils.isEmpty(tenantCode)){
@@ -608,10 +624,22 @@ public class ResourcesService extends BaseService {
         }
 
         // get all resource id of process definitions those is released
-        Map<Integer, Set<Integer>> resourceProcessMap = getResourceProcessMap();
+        List<Map<String, Object>> list = processDefinitionMapper.listResources();
+        Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
-        List<Integer> allChildren = listAllChildren(resource);
+        List<Integer> allChildren = listAllChildren(resource,true);
+        Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
+
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        if (resource.getType() == (ResourceType.UDF)) {
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
+            if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
+                return result;
+            }
+        }
 
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
@@ -632,8 +660,8 @@ public class ResourcesService extends BaseService {
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         //delete data in database
-        resourcesMapper.deleteIds(allChildren.toArray(new Integer[allChildren.size()]));
-        resourceUserMapper.deleteResourceUser(0, resourceId);
+        resourcesMapper.deleteIds(needDeleteResourceIdArray);
+        resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
 
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);
@@ -977,8 +1005,21 @@ public class ResourcesService extends BaseService {
             logger.error("resource id {} is directory,can't download it", resourceId);
             throw new RuntimeException("cant't download directory");
         }
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
+
+        int userId = resource.getUserId();
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            logger.error("user id {} not exists", userId);
+            throw new RuntimeException(String.format("resource owner id %d not exist",userId));
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if(tenant == null){
+            logger.error("tenant id {} not exists", user.getTenantId());
+            throw new RuntimeException(String.format("The tenant id %d of resource owner not exist",user.getTenantId()));
+        }
+
+        String tenantCode = tenant.getTenantCode();
 
         String hdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
@@ -1144,8 +1185,8 @@ public class ResourcesService extends BaseService {
      */
     private String getTenantCode(int userId,Result result){
 
-        User user = userMapper.queryDetailsById(userId);
-        if(user == null){
+        User user = userMapper.selectById(userId);
+        if (user == null) {
             logger.error("user {} not exists", userId);
             putMsg(result, Status.USER_NOT_EXIST,userId);
             return null;
@@ -1162,12 +1203,13 @@ public class ResourcesService extends BaseService {
 
     /**
      * list all children id
-     * @param resource resource
+     * @param resource    resource
+     * @param containSelf whether add self to children list
      * @return all children id
      */
-    List<Integer> listAllChildren(Resource resource){
+    List<Integer> listAllChildren(Resource resource,boolean containSelf){
         List<Integer> childList = new ArrayList<>();
-        if (resource.getId() != -1) {
+        if (resource.getId() != -1 && containSelf) {
             childList.add(resource.getId());
         }
 
@@ -1189,40 +1231,6 @@ public class ResourcesService extends BaseService {
             childList.add(chlidId);
             listAllChildren(chlidId,childList);
         }
-    }
-
-    /**
-     * get resource process map key is resource id,value is the set of process definition
-     * @return resource process definition map
-     */
-    private Map<Integer,Set<Integer>> getResourceProcessMap(){
-        Map<Integer, String> map = new HashMap<>();
-        Map<Integer, Set<Integer>> result = new HashMap<>();
-        List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (Map<String, Object> tempMap : list) {
-
-                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
-            }
-        }
-
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            Integer mapKey = entry.getKey();
-            String[] arr = entry.getValue().split(",");
-            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
-            for (Integer value : mapValues) {
-                if (result.containsKey(value)) {
-                    Set<Integer> set = result.get(value);
-                    set.add(mapKey);
-                    result.put(value, set);
-                } else {
-                    Set<Integer> set = new HashSet<>();
-                    set.add(mapKey);
-                    result.put(value, set);
-                }
-            }
-        }
-        return result;
     }
 
 }

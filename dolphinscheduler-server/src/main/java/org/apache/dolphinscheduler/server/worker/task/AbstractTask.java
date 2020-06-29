@@ -17,9 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
@@ -34,10 +32,13 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -47,14 +48,25 @@ import java.util.Map;
 public abstract class AbstractTask {
 
     /**
-     * task props
+     * taskExecutionContext
      **/
-    protected TaskProps taskProps;
+    TaskExecutionContext taskExecutionContext;
 
     /**
      *  log record
      */
     protected Logger logger;
+
+
+    /**
+     *  SHELL process pid
+     */
+    protected int processId;
+
+    /**
+     * other resource manager appId , for example : YARN etc
+     */
+    protected String appIds;
 
 
     /**
@@ -69,11 +81,11 @@ public abstract class AbstractTask {
 
     /**
      * constructor
-     * @param taskProps task props
+     * @param taskExecutionContext taskExecutionContext
      * @param logger    logger
      */
-    protected AbstractTask(TaskProps taskProps, Logger logger) {
-        this.taskProps = taskProps;
+    protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
     }
 
@@ -121,11 +133,28 @@ public abstract class AbstractTask {
         this.exitStatusCode = exitStatusCode;
     }
 
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
+    }
+
+    public int getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(int processId) {
+        this.processId = processId;
+    }
+
     /**
      * get task parameters
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
+
 
 
     /**
@@ -135,20 +164,20 @@ public abstract class AbstractTask {
         if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
             // task recor flat : if true , start up qianfan
             if (TaskRecordDao.getTaskRecordFlag()
-                    && TaskType.typeIsNormalTask(taskProps.getTaskType())){
-                AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskProps.getTaskParams(), getCurTaskParamsClass());
+                    && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())){
+                AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskExecutionContext.getTaskParams(), getCurTaskParamsClass());
 
                 // replace placeholder
-                Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                        taskProps.getDefinedParams(),
+                Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                        taskExecutionContext.getDefinedParams(),
                         params.getLocalParametersMap(),
-                        taskProps.getCmdTypeIfComplement(),
-                        taskProps.getScheduleTime());
+                        CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                        taskExecutionContext.getScheduleTime());
                 if (paramsMap != null && !paramsMap.isEmpty()
                         && paramsMap.containsKey("v_proc_date")){
                     String vProcDate = paramsMap.get("v_proc_date").getValue();
                     if (!StringUtils.isEmpty(vProcDate)){
-                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskProps.getNodeName(), vProcDate);
+                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskExecutionContext.getTaskName(), vProcDate);
                         logger.info("task record status : {}",taskRecordState);
                         if (taskRecordState == TaskRecordStatus.FAILURE){
                             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
@@ -174,7 +203,7 @@ public abstract class AbstractTask {
     private Class getCurTaskParamsClass(){
         Class paramsClass = null;
         // get task type
-        TaskType taskType = TaskType.valueOf(taskProps.getTaskType());
+        TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
         switch (taskType){
             case SHELL:
                 paramsClass = ShellParameters.class;
@@ -232,4 +261,5 @@ public abstract class AbstractTask {
         }
         return status;
     }
+
 }
