@@ -186,6 +186,12 @@
             id: v
           }
         })
+        //verify deploy mode
+        if(this.deployMode == 'local'){
+          this.master = 'local'
+          this.masterUrl = ''
+          this.deployMode = 'client'
+        }
         // get local params
         let locparams = ''
         this.localParams.forEach(v=>{
