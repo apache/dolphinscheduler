@@ -44,3 +44,6 @@ dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 
 .mvn/wrapper/*.jar
 
+.mvn/wrapper/*.jar
+
+!/zookeeper_data/
