@@ -17,15 +17,22 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
-import com.github.rholder.retry.RetryException;
-import io.netty.channel.Channel;
+
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.Preconditions;
+import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
@@ -40,9 +47,11 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import com.github.rholder.retry.RetryException;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
+import io.netty.channel.Channel;
 
 /**
  *  worker request processor
@@ -97,15 +106,26 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
          taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
 
+        // custom logger
+        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()));
+
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
         logger.info("task instance  local execute path : {} ", execLocalPath);
 
+        FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
-        } catch (Exception ex){
-            logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
+        } catch (Throwable ex) {
+            String errorLog = String.format("create execLocalPath : %s", execLocalPath);
+            LoggerUtils.logError(Optional.ofNullable(logger), errorLog, ex);
+            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
         }
+        FileUtils.taskLoggerThreadLocal.remove();
+
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
@@ -118,7 +138,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 return Boolean.TRUE;
             });
             // submit task
-            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
+            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
         } catch (ExecutionException | RetryException e) {
             logger.error(e.getMessage(), e);
         }
