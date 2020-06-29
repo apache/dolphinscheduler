@@ -16,9 +16,59 @@
 */
 <template>
   <div class="shell-model">
-    <!--todo-->
-    <!--master-->
     <!--deploy mode-->
+    <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1">{{$t('Deploy Mode')}}</span>
+        <span class="sp2">
+          <x-radio-group v-model="deployMode">
+            <x-radio :label="'client'" :disabled="isDetails"></x-radio>
+            <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
+            <x-radio :label="'local'" :disabled="isDetails"></x-radio>
+          </x-radio-group>
+        </span>
+        <span class="sp1 sp3">{{$t('Queue')}}</span>
+        <span class="sp4">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="queue"
+            :placeholder="$t('Please enter queue value')"
+            style="width: 60%;"
+            autocomplete="off">
+        </x-input>
+        </span>
+      </div>
+    </div>
+    <!--master-->
+    <div class="list-box-4p" v-if="deployMode !== 'local'">
+      <div class="clearfix list">
+        <span class="sp1">{{$t('Master')}}</span>
+        <span class="sp4">
+          <x-select
+            style="width: 130px;"
+            v-model="master"
+            :disabled="isDetails">
+          <x-option
+            v-for="city in masterType"
+            :key="city.code"
+            :value="city.code"
+            :label="city.code">
+          </x-option>
+          </x-select>
+        </span>
+        <span v-if="masterUrlState">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="masterUrl"
+            :placeholder="$t('Please Enter Url')"
+            style="width: 60%;"
+            autocomplete="off">
+        </x-input>
+        </span>
+      </div>
+    </div>
     <!--config file-->
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
@@ -61,13 +111,25 @@
         // script
         rawScript: '',
         // waterdrop script
-        baseScript: 'start-waterdrop.sh --master yarn --deploy-mode client --config ',
+        baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh',
         // resourceNameVal
         resourceNameVal : [],
         // Custom parameter
         localParams: [],
         // resource(list)
         resourceList: [],
+        // Deployment method
+        deployMode: 'client',
+        // Deployment master
+        queue: 'default',
+        // Deployment master
+        master: 'yarn',
+        // Spark version(LIst)
+        masterType: [{ code: 'yarn' }, { code: 'local' }, { code: 'spark://' }, { code: 'mesos://' }],
+        // Deployment masterUrl state
+        masterUrlState:false,
+        // Deployment masterUrl
+        masterUrl: '',
         // Cache ResourceList
         cacheResourceList: [],
         // define options
@@ -124,11 +186,21 @@
             id: v
           }
         })
-
+        // get local params
+        let locparams = ''
+        this.localParams.forEach(v=>{
+            locparams = locparams + ' --variable ' + v.prop + '=' + v.value
+          }
+        )
         // get waterdrop script
         let tureScript = ''
         this.resourceNameVal.resourceList.forEach(v=>{
-          tureScript = tureScript + this.baseScript + v.res +' \n'
+          tureScript = tureScript + this.baseScript +
+            ' --master '+ this.master + this.masterUrl +
+            ' --deploy-mode '+ this.deployMode +
+            ' --queue '+ this.queue +
+            ' --config ' +  v.res +
+            locparams + ' \n'
         })
 
         // storage
@@ -219,6 +291,18 @@
       cacheParams (val) {
         this.resourceNameVal = val
         this.$emit('on-cache-params', val);
+      },
+      "master": {
+        handler(code) {
+          if(code == 'spark://'){
+            this.masterUrlState = true;
+          }else if(code == 'mesos://'){
+            this.masterUrlState = true;
+          }else{
+            this.masterUrlState = false;
+            this.masterUrl = ''
+          }
+        }
       },
     },
     computed: {
@@ -323,6 +407,33 @@
       background-color: #ecf3f8;
       .vue-treeselect__single-value {
         color: #6d859e;
+      }
+    }
+  }
+  .list-box-4p {
+    .list {
+      margin-bottom: 14px;
+      .sp1 {
+        float: left;
+        width: 112px;
+        text-align: right;
+        margin-right: 10px;
+        font-size: 14px;
+        color: #777;
+        display: inline-block;
+        padding-top: 6px;
+      }
+      .sp2 {
+        float: left;
+        margin-right: 4px;
+        padding-top: 6px;
+      }
+      .sp3 {
+        width: 90px;
+      }
+      .sp4 {
+        float: left;
+        margin-right: 4px;
       }
     }
   }

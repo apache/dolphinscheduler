@@ -607,5 +607,7 @@ export default {
   'Socket Timeout':'Socket Timeout',
   'Connect timeout be a positive integer': 'Connect timeout be a positive integer',
   'Socket Timeout be a positive integer': 'Socket Timeout be a positive integer',
-  'ms':'ms'
+  'ms':'ms',
+  'Please Enter Url': 'Please Enter Url£¬eg. 127.0.0.1:7077',
+  'Master': 'Master'
 }
