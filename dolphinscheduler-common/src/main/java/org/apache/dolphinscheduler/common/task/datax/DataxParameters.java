@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
@@ -31,7 +32,7 @@ public class DataxParameters extends AbstractParameters {
     /**
      * if custom json config，eg  0, 1
      */
-    private Integer customConfig;
+    private int customConfig;
 
     /**
      * if customConfig eq 1 ,then json is usable
@@ -88,11 +89,11 @@ public class DataxParameters extends AbstractParameters {
      */
     private int jobSpeedRecord;
 
-    public Integer getCustomConfig() {
+    public int getCustomConfig() {
         return customConfig;
     }
 
-    public void setCustomConfig(Integer customConfig) {
+    public void setCustomConfig(int customConfig) {
         this.customConfig = customConfig;
     }
 
@@ -184,13 +185,9 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
-
     @Override
     public boolean checkParameters() {
-        if (customConfig == null) {
-            return false;
-        }
-        if (customConfig == 0) {
+        if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0
                     && dataTarget != 0
                     && StringUtils.isNotEmpty(sql)
