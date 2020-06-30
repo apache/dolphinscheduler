@@ -123,28 +123,16 @@ public class DependentExecute {
 
     /**
      * depend type = depend_all
-     * skip the condition tasks.
-     * judge all the task
      * @return
      */
     private DependResult dependResultByProcessInstance(ProcessInstance processInstance){
-        DependResult result = DependResult.FAILED;
-        List<TaskNode> taskNodes =
-                processService.getTaskNodeListByDefinitionId(processInstance.getProcessDefinitionId());
-        if(CollectionUtils.isEmpty(taskNodes)) {
-            return result;
+        if(!processInstance.getState().typeIsFinished()){
+            return DependResult.WAITING;
         }
-        for(TaskNode taskNode:taskNodes){
-            if(taskNode.isConditionsTask()
-                    || DagHelper.haveConditionsAfterNode(taskNode.getName(), taskNodes)){
-                continue;
-            }
-            DependResult tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
-            if(DependResult.SUCCESS != tmpResult){
-                return tmpResult;
-            }
+        if(processInstance.getState().typeIsSuccess()){
+            return DependResult.SUCCESS;
         }
-        return DependResult.SUCCESS;
+        return DependResult.FAILED;
     }
 
     /**
@@ -168,7 +156,11 @@ public class DependentExecute {
         if(taskInstance == null){
             // cannot find task in the process instance
             // maybe because process instance is running or failed.
-            result = getDependResultByProcessStateWhenTaskNull(processInstance.getState());
+            if(processInstance.getState().typeIsFinished()){
+                result = DependResult.FAILED;
+            }else{
+                return DependResult.WAITING;
+            }
         }else{
             result = getDependResultByState(taskInstance.getState());
         }
@@ -217,9 +209,7 @@ public class DependentExecute {
      */
     private DependResult getDependResultByState(ExecutionStatus state) {
 
-        if(state.typeIsRunning()
-                || state == ExecutionStatus.SUBMITTED_SUCCESS
-                || state == ExecutionStatus.WAITTING_THREAD){
+        if(!state.typeIsFinished()){
             return DependResult.WAITING;
         }else if(state.typeIsSuccess()){
             return DependResult.SUCCESS;

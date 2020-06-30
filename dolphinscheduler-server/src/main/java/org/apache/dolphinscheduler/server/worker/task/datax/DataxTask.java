@@ -28,6 +28,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
@@ -132,9 +134,16 @@ public class DataxTask extends AbstractTask {
             String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
-            // run datax process
-            String jsonFilePath = buildDataxJsonFile();
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath);
+            // combining local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                    taskExecutionContext.getDefinedParams(),
+                    dataXParameters.getLocalParametersMap(),
+                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                    taskExecutionContext.getScheduleTime());
+
+            // run datax procesDataSourceService.s
+            String jsonFilePath = buildDataxJsonFile(paramsMap);
+            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
             CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
@@ -167,7 +176,7 @@ public class DataxTask extends AbstractTask {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile()
+    private String buildDataxJsonFile(Map<String, Property> paramsMap)
             throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
@@ -180,35 +189,21 @@ public class DataxTask extends AbstractTask {
             return fileName;
         }
 
-
-
-        if (dataXParameters.getCustomConfig() == 1){
-
+        if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()){
             json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
-
-            /**
-             *  combining local and global parameters
-             */
-            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                    taskExecutionContext.getDefinedParams(),
-                    dataXParameters.getLocalParametersMap(),
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    taskExecutionContext.getScheduleTime());
-            if (paramsMap != null){
-                json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
-            }
-
         }else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
             job.set("setting", buildDataxJobSettingJson());
 
             ObjectNode root = JSONUtils.createObjectNode();
-
             root.set("job", job);
             root.set("core", buildDataxCoreJson());
             json = root.toString();
         }
+
+        // replace placeholder
+        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
 
         logger.debug("datax job json : {}", json);
 
@@ -372,12 +367,13 @@ public class DataxTask extends AbstractTask {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath)
-            throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
+        throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh",
+        String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+                taskExecutionContext.getTaskAppId(),
+                OSUtils.isWindows() ? "bat" : "sh");
 
         Path path = new File(fileName).toPath();
 
@@ -392,18 +388,9 @@ public class DataxTask extends AbstractTask {
         sbr.append(DATAX_HOME_EVN);
         sbr.append(" ");
         sbr.append(jobConfigFilePath);
-        String dataxCommand = sbr.toString();
 
-        // combining local and global parameters
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-                taskExecutionContext.getDefinedParams(),
-                dataXParameters.getLocalParametersMap(),
-                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                taskExecutionContext.getScheduleTime());
-        if (paramsMap != null) {
-            dataxCommand = ParameterUtils.convertParameterPlaceholders(dataxCommand, ParamUtils.convert(paramsMap));
-        }
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
 
         logger.debug("raw script : {}", dataxCommand);
 

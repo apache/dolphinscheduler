@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
@@ -139,6 +140,35 @@ public class LogClientService {
             }
         } catch (Exception e) {
             logger.error("get log size error", e);
+        } finally {
+            this.client.closeChannel(address);
+        }
+        return result;
+    }
+
+
+    /**
+     * remove task log
+     * @param host host
+     * @param port port
+     * @param path path
+     * @return remove task status
+     */
+    public Boolean removeTaskLog(String host, int port, String path) {
+        logger.info("log path {}", path);
+        RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
+        Boolean result = false;
+        final Host address = new Host(host, port);
+        try {
+            Command command = request.convert2Command();
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            if(response != null){
+                RemoveTaskLogResponseCommand taskLogResponse = JsonSerializer.deserialize(
+                        response.getBody(), RemoveTaskLogResponseCommand.class);
+                return taskLogResponse.getStatus();
+            }
+        } catch (Exception e) {
+            logger.error("remove task log error", e);
         } finally {
             this.client.closeChannel(address);
         }

@@ -34,12 +34,12 @@ public abstract class BaseDataSource {
   /**
    * user name
    */
-  private String user;
+  protected String user;
 
   /**
    * user password
    */
-  private String password;
+  protected String password;
 
   /**
    * data source address
@@ -124,7 +124,8 @@ public abstract class BaseDataSource {
    * @param jdbcUrl jdbc url
    */
   private void appendOther(StringBuilder jdbcUrl) {
-    if (StringUtils.isNotEmpty(getOther())) {
+    String otherParams = filterOther(getOther());
+    if (StringUtils.isNotEmpty(otherParams)) {
       String separator = "";
       switch (dbTypeSelector()) {
         case CLICKHOUSE:
@@ -144,8 +145,12 @@ public abstract class BaseDataSource {
         default:
           logger.error("Db type mismatch!");
       }
-      jdbcUrl.append(separator).append(getOther());
+      jdbcUrl.append(separator).append(otherParams);
     }
+  }
+
+  protected String filterOther(String otherParams){
+    return otherParams;
   }
 
   /**

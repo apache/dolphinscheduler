@@ -86,7 +86,7 @@
             <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
-          <td>
+          <td style="z-index: inherit;">
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-edit"><!--{{$t('编辑')}}--></x-button>
             <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-play"><!--{{$t('启动')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="ans-icon-timer"><!--{{$t('定时')}}--></x-button>
@@ -136,7 +136,6 @@
         <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
-
     <template v-if="strSelectIds !== ''">
       <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
     </template>
@@ -264,11 +263,7 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }else{
-          this.$refs['poptipDeleteAll'].doClose()
-        }
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
        * delete

@@ -33,6 +33,13 @@ public class DependentDateUtils {
      */
     public static List<DateInterval> getLastHoursInterval(Date businessDate, int hourNumber){
         List<DateInterval> dateIntervals = new ArrayList<>();
+        if (hourNumber == 0) {
+            Date lastHour = DateUtils.getSomeHourOfDay(businessDate, 0);
+            Date beginTime = DateUtils.getStartOfHour(lastHour);
+            Date endTime = DateUtils.getEndOfHour(lastHour);
+            dateIntervals.add(new DateInterval(beginTime, endTime));
+            return dateIntervals;
+        }
         for(int index = hourNumber; index > 0; index--){
             Date lastHour = DateUtils.getSomeHourOfDay(businessDate, -index);
             Date beginTime = DateUtils.getStartOfHour(lastHour);
@@ -71,6 +78,26 @@ public class DependentDateUtils {
 
             Date beginTime = DateUtils.getStartOfDay(lastDay);
             Date endTime = DateUtils.getEndOfDay(lastDay);
+            dateIntervals.add(new DateInterval(beginTime, endTime));
+        }
+        return dateIntervals;
+    }
+
+    /**
+     * get special last day interval list (yesterday 1:00 - today 1:00)
+     * @param businessDate businessDate
+     * @return DateInterval list
+     */
+    public static List<DateInterval> getSpecialLastDayInterval(Date businessDate){
+
+        List<DateInterval> dateIntervals = new ArrayList<>();
+        int hourIndex = DateUtils.getHourIndex(businessDate);
+        int startIndex = hourIndex + 23;
+        int endIndex = startIndex - 24;
+        for(int index = startIndex; index > endIndex; index--) {
+            Date lastHour = DateUtils.getSomeHourOfDay(businessDate, -index);
+            Date beginTime = DateUtils.getStartOfHour(lastHour);
+            Date endTime = DateUtils.getEndOfHour(lastHour);
             dateIntervals.add(new DateInterval(beginTime, endTime));
         }
         return dateIntervals;

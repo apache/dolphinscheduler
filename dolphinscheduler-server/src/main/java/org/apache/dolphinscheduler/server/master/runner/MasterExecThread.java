@@ -337,7 +337,7 @@ public class MasterExecThread implements Runnable {
     private void endProcess() {
         processInstance.setEndTime(new Date());
         processService.updateProcessInstance(processInstance);
-        if(processInstance.getState().typeIsWaittingThread()){
+        if(processInstance.getState().typeIsWaitingThread()){
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -495,6 +495,7 @@ public class MasterExecThread implements Runnable {
             }
 
             String processWorkerGroup = processInstance.getWorkerGroup();
+            processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
             String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
             if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
                 taskInstance.setWorkerGroup(processWorkerGroup);
@@ -803,7 +804,8 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0 || haveRetryTaskStandBy()){
+        if(activeTaskNode.size() > 0 || retryTaskExists()){
+            // active task and retry task exists
             return runningState(state);
         }
         // process failure
@@ -826,7 +828,8 @@ public class MasterExecThread implements Runnable {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             if(CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
+                    || CollectionUtils.isNotEmpty(killList)
+                    || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -835,9 +838,13 @@ public class MasterExecThread implements Runnable {
 
         // success
         if(state == ExecutionStatus.RUNNING_EXEUTION){
+            List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXEUTION;
+            }else if(CollectionUtils.isNotEmpty(killTasks)){
+                // tasks maybe killed manually
+                return ExecutionStatus.FAILURE;
             }else{
                 //  if the waiting queue is empty and the status is in progress, then success
                 return ExecutionStatus.SUCCESS;
@@ -851,7 +858,7 @@ public class MasterExecThread implements Runnable {
      * whether standby task list have retry tasks
      * @return
      */
-    private boolean haveRetryTaskStandBy() {
+    private boolean retryTaskExists() {
 
         boolean result = false;
 

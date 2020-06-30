@@ -95,7 +95,7 @@ const rewriterPath = p => {
     }
   }
 }
-
+const version = new Date().getTime();
 const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
   let pagePath = `${path.join(viewDir, p)}`
   let newPagePath = rewriterPath(pagePath)
@@ -109,7 +109,9 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     filename: newPagePath || path.join('view', p),
     template: `${path.join('src/view', p)}`,
     cache: true,
+    favicon:'./favicon.ico',
     inject: true,
+    hash: version,
     chunks: chunks,
     minify: minifierConfig
   })
@@ -120,7 +122,7 @@ const baseConfig = {
   output: {
     path: distDir,
     publicPath: '/',
-    filename: 'js/[name].[chunkhash:7].js'
+    filename: 'js/[name].[chunkhash:7]'+version+'.js'
   },
   module: {
     rules: [
