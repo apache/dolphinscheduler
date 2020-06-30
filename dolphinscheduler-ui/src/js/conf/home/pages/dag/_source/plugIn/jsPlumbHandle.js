@@ -54,6 +54,7 @@ const JSP = function () {
     isClick: false
   }
 }
+
 /**
  * dag init
  */
@@ -198,9 +199,7 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       isAttachment: this.config.isAttachment,
       taskType: v.type,
       runFlag: v.runFlag,
-      nodenumber: locations[v.id].nodenumber,
-      successNode: v.conditionResult === undefined? '' : v.conditionResult.successNode[0],
-      failedNode: v.conditionResult === undefined? '' : v.conditionResult.failedNode[0]
+      nodenumber: locations[v.id].nodenumber
     }))
 
     // contextmenu event
@@ -746,34 +745,13 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         sourceId = v.endPointSourceId
         targetId = v.endPointTargetId
       }
-      
-      if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-successnode') === $(`#${targetId}`).find('.name-p').text()) {
-        this.JspInstance.connect({
-          source: sourceId,
-          target: targetId,
-          type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: i18n.$t('success'), location:0.5, id:"label"} ]]
-        })
-      } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
-        this.JspInstance.connect({
-          source: sourceId,
-          target: targetId,
-          type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#252d39' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: i18n.$t('failed'), location:0.5, id:"label"} ]]
-        })
-      } else {
-        this.JspInstance.connect({
-          source: sourceId,
-          target: targetId,
-          type: 'basic',
-          paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
-        })
-      }
+
+      this.JspInstance.connect({
+        source: sourceId,
+        target: targetId,
+        type: 'basic',
+        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
+      })
     })
   })
 

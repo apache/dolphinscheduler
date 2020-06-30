@@ -241,21 +241,18 @@
         </m-list-box>
       </template>
 
-    <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
-      <div slot="text">{{$t('SQL Statement')}}</div>
-      <div slot="content">
-        <div class="from-mirror">
-          <textarea
-                  id="code-sqoop-mirror"
-                  name="code-sqoop-mirror"
-                  style="opacity: 0;">
-          </textarea>
-          <a class="ans-modal-box-max">
-            <em class="ans-icon-max" @click="setEditorVal"></em>
-          </a>
+      <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
+        <div slot="text">{{$t('SQL Statement')}}</div>
+        <div slot="content">
+          <div class="from-mirror">
+            <textarea
+              id="code-sqoop-mirror"
+              name="code-sqoop-mirror"
+              style="opacity: 0;">
+            </textarea>
+          </div>
         </div>
-      </div>
-    </m-list-box>
+      </m-list-box>
 
       <template>
         <m-list-box v-show="sourceType === 'MYSQL'">
@@ -557,7 +554,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
@@ -705,34 +701,23 @@
       backfillItem: Object
     },
     methods: {
-      setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
 
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    // this.$modal.destroy()
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+      _onSwitch(is){
+        if(is) {
+          this.jobType = 'CUSTOM'
+          this.isCustomTask = true
+          setTimeout(() => {
+            this._handlerShellEditor()
+          }, 200)
+        } else {
+          this.jobType = 'TEMPLATE'
+          this.isCustomTask = false
+          setTimeout(() => {
+            this._handlerEditor()
+          }, 200)
+        }
       },
+
       _handleQueryType(o){
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
         this._getTargetTypeList(this.sourceType)
@@ -1274,11 +1259,6 @@
   .requiredIcon {
     color: #ff0000;
     padding-right: 4px;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
   }
 </style>
 
