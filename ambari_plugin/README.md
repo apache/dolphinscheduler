@@ -3,7 +3,8 @@
 #### Note
 
 1. This document is intended for users with a basic understanding of Ambari
-2. This document is a description of adding the Dolphin Scheduler(version 1.3.0) service to the installed Ambari service
+2. This document is a description of adding the Dolphin Scheduler service to the installed Ambari service
+3. This document is based on version 2.5.2 of Ambari 
 
 ####   Installation preparation
 
@@ -16,8 +17,12 @@
 3. Install with rpm package
 
    - Manual installation (recommended）：
-      - Copy the prepared RPM packages to each node of the cluster
-      -  Execute with DS installation user: ```rpm -ivh apache-dolphinscheduler-incubating-xxx.noarch.rpm```
+      - Copy the prepared RPM packages to each node of the cluster.
+      - Execute with DS installation user: ```rpm -ivh apache-dolphinscheduler-incubating-xxx.noarch.rpm```
+      - Mysql-connector-java packaged using the default POM file will not be included.
+      - The RPM package was packaged in the project with the installation path of /opt/soft. 
+        If you use mysql as the database, you need add it manually.
+      
    - Automatic installation with ambari
       - Each node of the cluster needs to configure the local yum source
       - Copy the prepared RPM packages to each node local yum source
@@ -45,6 +50,7 @@
  
 
 #### Ambari Install Dolphin Scheduler
+- **NOTE: You have to install zookeeper first**
 
 1. Install  Dolphin Scheduler on ambari web interface
 
@@ -62,21 +68,25 @@
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_004.png)
 
-5. Configure the database information (same as in the initialization database in step 1)
+5. System Env Optimization will export some system environment config. Modify according to actual situation
+
+   ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_020.png)
+   
+6. Configure the database information (same as in the initialization database in step 1)
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_005.png)
 
-6. Configure additional information if needed
+7. Configure additional information if needed
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_006.png)
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_007.png)
 
-7. Perform the next steps as normal
+8. Perform the next steps as normal
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_008.png)
 
-8. The interface after successful installation
+9. The interface after successful installation
 
    ![](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_009.png)
    
@@ -109,7 +119,6 @@
 5. Start the component
 
    ![DS2_AMBARI_016](https://github.com/apache/incubator-dolphinscheduler-website/blob/master/img/ambari-plugin/DS2_AMBARI_016.png)
-
 
 
 #### Remove the component from the node with Ambari
