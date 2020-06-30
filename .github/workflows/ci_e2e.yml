@@ -69,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dslogs
-          path: /var/lib/docker/volumes/dolphinscheduler-logs/_data
+          path: /var/lib/docker/volumes/docker-swarm_dolphinscheduler-logs/_data
 
 
