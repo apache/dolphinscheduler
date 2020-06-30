@@ -180,6 +180,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -334,11 +335,11 @@
        * Storage interface
        */
       _save (sourceType) {
-        if(this._verifConditions()) {
-          return new Promise((resolve, reject) => {
-            this.spinnerLoading = true
-            // Storage store
-            Dag.saveStore().then(res => {
+        return new Promise((resolve, reject) => {
+          this.spinnerLoading = true
+          // Storage store
+          Dag.saveStore().then(res => {
+            if(this._verifConditions(res.tasks)) {
               if (this.urlParam.id) {
                 /**
                  * Edit
@@ -372,12 +373,12 @@
                   reject(e)
                 })
               }
-            })
+            }
           })
-        }
+        })
       },
-      _verifConditions () {
-        let tasks = this.$store.state.dag.tasks
+      _verifConditions (value) {
+        let tasks = value
         let bool = true
         tasks.map(v=>{
           if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
@@ -387,6 +388,7 @@
         })
         if(!bool) {
           this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
+          this.spinnerLoading = false
           return false
         }
         return true
@@ -579,7 +581,8 @@
               taskType: type,
               self: self,
               preNode: preNode,
-              rearList: rearList
+              rearList: rearList,
+              instanceId: this.$route.params.id
             }
           })
         })
@@ -616,6 +619,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',

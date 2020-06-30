@@ -94,10 +94,38 @@ public class DependentTaskTest {
     }
 
     @Test
-    public void test() throws Exception{
+    public void testDependAll() throws Exception{
 
         TaskInstance taskInstance = getTaskInstance();
         String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
+        taskInstance.setDependency(dependString);
+
+        Mockito.when(processService.submitTask(taskInstance))
+                .thenReturn(taskInstance);
+        DependentTaskExecThread dependentTask =
+                new DependentTaskExecThread(taskInstance);
+
+        dependentTask.call();
+
+        Assert.assertEquals(ExecutionStatus.SUCCESS, dependentTask.getTaskInstance().getState());
+
+        DateInterval dateInterval =DependentDateUtils.getTodayInterval(new Date()).get(0);
+
+
+        Mockito.when(processService
+                .findLastRunningProcess(4, dateInterval.getStartTime(),
+                        dateInterval.getEndTime()))
+                .thenReturn(findLastStopProcessInterval());
+        DependentTaskExecThread dependentFailure = new DependentTaskExecThread(taskInstance);
+        dependentFailure.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, dependentFailure.getTaskInstance().getState());
+    }
+
+    @Test
+    public void testDependTask() throws Exception{
+
+        TaskInstance taskInstance = getTaskInstance();
+        String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"D\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
         taskInstance.setDependency(dependString);
         Mockito.when(processService.submitTask(taskInstance))
                 .thenReturn(taskInstance);
@@ -107,6 +135,27 @@ public class DependentTaskTest {
         dependentTask.call();
 
         Assert.assertEquals(ExecutionStatus.SUCCESS, dependentTask.getTaskInstance().getState());
+
+        DateInterval dateInterval =DependentDateUtils.getTodayInterval(new Date()).get(0);
+        Mockito.when(processService
+                .findLastRunningProcess(4, dateInterval.getStartTime(),
+                        dateInterval.getEndTime()))
+                .thenReturn(findLastStopProcessInterval());
+
+        Mockito.when(processService
+                .findValidTaskListByProcessId(11))
+                .thenReturn(getErrorTaskInstances());
+        DependentTaskExecThread dependentFailure = new DependentTaskExecThread(taskInstance);
+        dependentFailure.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, dependentFailure.getTaskInstance().getState());
+    }
+
+    private ProcessInstance findLastStopProcessInterval(){
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(11);
+        processInstance.setProcessDefinitionId(4);
+        processInstance.setState(ExecutionStatus.STOP);
+        return  processInstance;
     }
 
     private ProcessInstance findLastProcessInterval(){
@@ -142,10 +191,20 @@ public class DependentTaskTest {
         return list;
     }
 
-    private List<TaskInstance> getTaskInstances(){
+    private List<TaskInstance> getErrorTaskInstances(){
         List<TaskInstance> list = new ArrayList<>();
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setName("C");
+        taskInstance.setState(ExecutionStatus.SUCCESS);
+        taskInstance.setDependency("1231");
+        list.add(taskInstance);
+        return list;
+    }
+
+    private List<TaskInstance> getTaskInstances(){
+        List<TaskInstance> list = new ArrayList<>();
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setName("D");
         taskInstance.setState(ExecutionStatus.SUCCESS);
         taskInstance.setDependency("1231");
         list.add(taskInstance);
@@ -158,6 +217,7 @@ public class DependentTaskTest {
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;
     }
 

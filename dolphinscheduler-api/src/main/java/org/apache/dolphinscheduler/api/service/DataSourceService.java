@@ -220,12 +220,20 @@ public class DataSourceService extends BaseService{
         String parameter = dataSource.getConnectionParams();
 
         BaseDataSource datasourceForm = DataSourceFactory.getDatasource(dataSource.getType(), parameter);
+        DbConnectType  connectType = null;
+        String hostSeperator = Constants.DOUBLE_SLASH;
+        if(DbType.ORACLE.equals(dataSource.getType())){
+            connectType = ((OracleDataSource) datasourceForm).getConnectType();
+            if(DbConnectType.ORACLE_SID.equals(connectType)){
+                hostSeperator = Constants.AT_SIGN;
+            }
+        }
         String database = datasourceForm.getDatabase();
         // jdbc connection params
         String other = datasourceForm.getOther();
         String address = datasourceForm.getAddress();
 
-        String[] hostsPorts = getHostsAndPort(address);
+        String[] hostsPorts = getHostsAndPort(address,hostSeperator);
         // ip host
         String host = hostsPorts[0];
         // prot
@@ -261,6 +269,10 @@ public class DataSourceService extends BaseService{
         map.put(NAME, dataSourceName);
         map.put(NOTE, desc);
         map.put(TYPE, dataSourceType);
+        if (connectType != null) {
+            map.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
+        }
+
         map.put(HOST, host);
         map.put(PORT, port);
         map.put(PRINCIPAL, datasourceForm.getPrincipal());
@@ -486,13 +498,10 @@ public class DataSourceService extends BaseService{
                                  String password, DbConnectType connectType, String other) {
 
         String address = buildAddress(type, host, port, connectType);
-
-        String jdbcUrl;
-        if (Constants.ORACLE.equals(type.name())
-                && connectType == DbConnectType.ORACLE_SID) {
-            jdbcUrl = address + ":" + database;
-        } else {
-            jdbcUrl = address + "/" + database;
+        Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
+        String jdbcUrl = address + "/" + database;
+        if (Constants.ORACLE.equals(type.name())) {
+            parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
 
         if (CommonUtils.getKerberosStartupState() &&
@@ -513,7 +522,6 @@ public class DataSourceService extends BaseService{
             separator = ";";
         }
 
-        Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
         parameterMap.put(TYPE, connectType);
         parameterMap.put(Constants.ADDRESS, address);
         parameterMap.put(Constants.DATABASE, database);
@@ -683,12 +691,23 @@ public class DataSourceService extends BaseService{
     /**
      * get host and port by address
      *
-     * @param address
+     * @param address   address
      * @return sting array: [host,port]
      */
     private String[] getHostsAndPort(String address) {
+        return getHostsAndPort(address,Constants.DOUBLE_SLASH);
+    }
+
+    /**
+     * get host and port by address
+     *
+     * @param address   address
+     * @param separator separator
+     * @return sting array: [host,port]
+     */
+    private String[] getHostsAndPort(String address,String separator) {
         String[] result = new String[2];
-        String[] tmpArray = address.split(Constants.DOUBLE_SLASH);
+        String[] tmpArray = address.split(separator);
         String hostsAndPorts = tmpArray[tmpArray.length - 1];
         StringBuilder hosts = new StringBuilder();
         String[] hostPortArray = hostsAndPorts.split(Constants.COMMA);

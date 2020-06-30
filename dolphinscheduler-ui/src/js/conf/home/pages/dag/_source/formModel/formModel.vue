@@ -268,6 +268,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -356,9 +357,11 @@
       taskType: String,
       self: Object,
       preNode: Array,
-      rearList: Array
+      rearList: Array,
+      instanceId: Number
     },
     methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
       /**
        * depend
        */
@@ -484,12 +487,26 @@
         }
         return true
       },
+      _verifWorkGroup() {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id == this.workerGroup;
+        });
+        if(item==undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false;
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
       _verification () {
         // Verify name
         if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if(!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
@@ -619,9 +636,12 @@
             break;
           }
         }
-
-        if(!hasMatch){
-          this.workerGroup = 'default'
+        if(o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList',{
+            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
         } else {
           this.workerGroup = o.workerGroup
         }
