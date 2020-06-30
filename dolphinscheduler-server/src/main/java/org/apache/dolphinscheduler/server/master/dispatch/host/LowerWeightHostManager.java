@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -37,8 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMA;
 
@@ -69,12 +66,7 @@ public class LowerWeightHostManager extends CommonHostManager {
     /**
      * worker host weights
      */
-    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeightsMap;
-
-    /**
-     * worker group host lock
-     */
-    private Lock lock;
+    private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeights;
 
     /**
      * executor service
@@ -84,10 +76,9 @@ public class LowerWeightHostManager extends CommonHostManager {
     @PostConstruct
     public void init(){
         this.selector = new LowerWeightRoundRobin();
-        this.workerHostWeightsMap = new ConcurrentHashMap<>();
-        this.lock = new ReentrantLock();
+        this.workerHostWeights = new ConcurrentHashMap<>();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
-        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
+        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),35, 40, TimeUnit.SECONDS);
         this.roundRobinHostManager = new RoundRobinHostManager();
         this.roundRobinHostManager.setZookeeperNodeManager(getZookeeperNodeManager());
     }
@@ -107,8 +98,9 @@ public class LowerWeightHostManager extends CommonHostManager {
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
         if(CollectionUtils.isNotEmpty(workerHostWeights)){
             return selector.select(workerHostWeights).getHost();
+        } else{
+            return roundRobinHostManager.select(context);
         }
-        return new Host();
     }
 
     @Override
@@ -116,23 +108,13 @@ public class LowerWeightHostManager extends CommonHostManager {
         throw new UnsupportedOperationException("not support");
     }
 
-    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights){
-        lock.lock();
-        try {
-            workerHostWeightsMap.clear();
-            workerHostWeightsMap.putAll(workerHostWeights);
-        } finally {
-            lock.unlock();
-        }
+    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
+        this.workerHostWeights.clear();
+        this.workerHostWeights.putAll(workerHostWeights);
     }
 
-    private Set<HostWeight> getWorkerHostWeights(String workerGroup){
-        lock.lock();
-        try {
-            return workerHostWeightsMap.get(workerGroup);
-        } finally {
-            lock.unlock();
-        }
+    private Set<HostWeight> getWorkerHostWeights(String workerGroup) {
+        return workerHostWeights.get(workerGroup);
     }
 
     class RefreshResourceTask implements Runnable{
@@ -150,17 +132,8 @@ public class LowerWeightHostManager extends CommonHostManager {
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
                     for(String node : nodes){
                         String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
-                        if(StringUtils.isNotEmpty(heartbeat)
-                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
+                        if(StringUtils.isNotEmpty(heartbeat) && heartbeat.contains(COMMA) && heartbeat.split(COMMA).length == 5){
                             String[] parts = heartbeat.split(COMMA);
-
-                            int status = Integer.parseInt(parts[8]);
-                            if (status == Constants.ABNORMAL_NODE_STATUS){
-                                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
-                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
-                                continue;
-                            }
-
                             double cpu = Double.parseDouble(parts[0]);
                             double memory = Double.parseDouble(parts[1]);
                             double loadAverage = Double.parseDouble(parts[2]);

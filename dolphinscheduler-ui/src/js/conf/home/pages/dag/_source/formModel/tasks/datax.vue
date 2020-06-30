@@ -47,9 +47,6 @@
               name="code-sql-mirror"
               style="opacity: 0;">
             </textarea>
-            <a class="ans-modal-box-max">
-              <em class="ans-icon-max" @click="setEditorVal"></em>
-            </a>
           </div>
         </div>
       </m-list-box>
@@ -126,9 +123,6 @@
               name="code-json-mirror"
               style="opacity: 0;">
             </textarea>
-            <a class="ans-modal-box-max">
-              <em class="ans-icon-max" @click="setJsonEditorVal"></em>
-            </a>
           </div>
         </div>
       </m-list-box>
@@ -150,7 +144,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
@@ -204,62 +197,6 @@
       createNodeId: Number
     },
     methods: {
-      setEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  editor.setValue(val)
-                },
-                closeAble () {
-                  // this.$modal.destroy()
-                  modal.remove()
-                }
-              },
-              props: {
-                item: editor.getValue()
-              }
-            })
-          }
-        })
-      },
-      setJsonEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  jsonEditor.setValue(val)
-                },
-                closeAble () {
-                  // this.$modal.destroy()
-                  modal.remove()
-                }
-              },
-              props: {
-                item: jsonEditor.getValue()
-              }
-            })
-          }
-        })
-      },
       _onSwitch (is) {
         if(is) {
           this.customConfig = 1
@@ -300,23 +237,12 @@
         this.postStatements = a
       },
       /**
-       * return localParams
-       */
-      _onLocalParams (a) {
-        this.localParams = a
-      },
-      /**
        * verification
        */
       _verification () {
         if(this.customConfig) {
           if (!jsonEditor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
-            return false
-          }
-
-          // localParams Subcomponent verification
-          if (!this.$refs.refLocalParams._verifProp()) {
             return false
           }
 
@@ -538,10 +464,3 @@
     components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>

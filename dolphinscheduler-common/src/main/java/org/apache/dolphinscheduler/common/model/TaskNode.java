@@ -123,11 +123,6 @@ public class TaskNode {
    */
   private String workerGroup;
 
-  /**
-   * worker group id
-   */
-  private Integer workerGroupId;
-
 
   /**
    * task time out
@@ -344,13 +339,5 @@ public class TaskNode {
 
   public void setConditionResult(String conditionResult) {
     this.conditionResult = conditionResult;
-  }
-
-  public Integer getWorkerGroupId() {
-    return workerGroupId;
-  }
-
-  public void setWorkerGroupId(Integer workerGroupId) {
-    this.workerGroupId = workerGroupId;
   }
 }

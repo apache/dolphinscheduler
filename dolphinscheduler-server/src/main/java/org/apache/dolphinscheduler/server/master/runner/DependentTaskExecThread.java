@@ -148,7 +148,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                 if ( allDependentTaskFinish() || taskInstance.getState().typeIsFinished()){
                     break;
                 }
-                // update process task
+                // updateProcessInstance task instance
                 taskInstance = processService.findTaskInstanceById(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);

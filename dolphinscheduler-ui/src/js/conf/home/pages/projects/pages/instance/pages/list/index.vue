@@ -216,9 +216,6 @@
             right: 0;
             z-index: 2;
           }
-          td:last-child {
-            border-bottom:1px solid #ecf3ff;
-          }
           th:nth-last-child(2) {
             padding-right: 260px;
           }

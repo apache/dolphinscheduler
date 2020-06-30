@@ -27,8 +27,7 @@ class DolphinMasterService(Script):
         import params
         env.set_params(params)
         self.install_packages(env)
-        Execute(('chmod', '-R', '777', params.dolphin_home))
-        Execute(('chown', '-R', params.dolphin_user + ":" + params.dolphin_group,  params.dolphin_home))
+        Execute(('chmod', '-R', '777', params.dolphin_home), user=params.dolphin_user, sudo=True)
 
     def configure(self, env):
         import params

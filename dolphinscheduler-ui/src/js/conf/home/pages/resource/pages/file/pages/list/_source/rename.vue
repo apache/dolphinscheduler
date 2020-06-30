@@ -71,7 +71,7 @@
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
-              fullName: '/'+this.name,
+              fullName: localStore.getItem('currentDir')+'/'+this.name,
               type: 'FILE'
             })
           }
