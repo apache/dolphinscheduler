@@ -20,7 +20,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.2.1-SNAPSHOT</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -203,7 +203,7 @@
                             <packager>dolphinscheduler</packager>
                             <!-- <version>${project.version}</version> -->
                             <prefix>/opt/soft</prefix>
-
+                            <autoRequires>false</autoRequires>
                             <defineStatements>
                                 <!-- disable compile python when rpm build -->
                                 <defineStatement>__os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')</defineStatement>

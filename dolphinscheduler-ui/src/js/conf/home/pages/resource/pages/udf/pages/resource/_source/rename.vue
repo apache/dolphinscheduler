@@ -72,7 +72,7 @@
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
-              fullName: localStore.getItem('currentDir')+'/'+this.name,
+              fullName: '/'+this.name,
               type: 'UDF'
             })
           }

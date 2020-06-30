@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
+import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
 /**
  * master registry test
  */
@@ -57,7 +57,7 @@ public class MasterRegistryTest {
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);
-        Assert.assertEquals(5, heartbeat.split(",").length);
+        Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
     }
 
     @Test

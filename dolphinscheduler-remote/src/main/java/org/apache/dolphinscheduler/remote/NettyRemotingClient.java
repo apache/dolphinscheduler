@@ -349,7 +349,7 @@ public class NettyRemotingClient {
                 return channel;
             }
         } catch (Exception ex) {
-            logger.info("connect to {} error  {}", host, ex);
+            logger.warn(String.format("connect to %s error", host), ex);
         }
         return null;
     }
