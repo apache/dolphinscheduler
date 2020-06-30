@@ -95,6 +95,12 @@ dolphin_alert_map.update(dolphin_alert_config_map)
 # application-api.properties
 dolphin_app_api_map = {}
 dolphin_app_api_map.update(config['configurations']['dolphin-application-api'])
+if 'spring.servlet.multipart.max-file-size' in dolphin_app_api_map:
+    file_size = dolphin_app_api_map['spring.servlet.multipart.max-file-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-file-size'] = file_size + "MB"
+if 'spring.servlet.multipart.max-file-size' in dolphin_app_api_map:
+    request_size = dolphin_app_api_map['spring.servlet.multipart.max-request-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-request-size'] = request_size + "MB"
 
 
 # common.properties
