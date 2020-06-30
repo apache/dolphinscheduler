@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import junit.framework.Assert;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.consumer.TaskPriorityQueueConsumer;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -27,12 +27,13 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -42,8 +43,9 @@ import java.util.Set;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class})
+        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class MasterTaskExecThreadTest {
+
 
     @Test
     public void testExistsValidWorkerGroup1(){
@@ -76,5 +78,36 @@ public class MasterTaskExecThreadTest {
         masterTaskExecThread.existsValidWorkerGroup("test1");
     }
 
+    @Test
+    public void testPauseTask(){
+
+
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        TaskInstance taskInstance = getTaskInstance();
+        Mockito.when(processService.findTaskInstanceById(252612))
+                .thenReturn(taskInstance);
+
+        Mockito.when(processService.updateTaskInstance(taskInstance))
+        .thenReturn(true);
+
+        MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
+        masterTaskExecThread.pauseTask();
+        org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
+    }
+
+    private TaskInstance getTaskInstance(){
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setId(252612);
+        taskInstance.setName("C");
+        taskInstance.setProcessInstanceId(10111);
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        return taskInstance;
+    }
 
 }
