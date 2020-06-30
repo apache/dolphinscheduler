@@ -57,7 +57,7 @@
               <span>{{$t('Retry Count')}}</span>
             </div>
           </th>
-          <th scope="col" style="min-width: 50px">
+          <th scope="col" style="min-width: 60px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

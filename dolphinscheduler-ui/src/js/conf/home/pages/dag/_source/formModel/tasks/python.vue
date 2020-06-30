@@ -22,6 +22,9 @@
         <div class="from-mirror">
           <textarea id="code-python-mirror" name="code-python-mirror" style="opacity: 0;">
           </textarea>
+          <a class="ans-modal-box-max">
+            <em class="ans-icon-max" @click="setEditorVal"></em>
+          </a>
         </div>
       </div>
     </m-list-box>
@@ -57,6 +60,7 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
+  import mScriptBox from './_source/scriptBox'
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import Treeselect from '@riophae/vue-treeselect'
@@ -99,6 +103,34 @@
        */
       _onLocalParams (a) {
         this.localParams = a
+      },
+      setEditorVal() {
+        let self = this
+          let modal = self.$modal.dialog({
+            className: 'scriptModal',
+            closable: false,
+            showMask: true,
+            maskClosable: true,
+            onClose: function() {
+
+            },
+            render (h) {
+              return h(mScriptBox, {
+                on: {
+                  getSriptBoxValue (val) {
+                    editor.setValue(val)
+                  },
+                  closeAble () {
+                    // this.$modal.destroy()
+                    modal.remove()
+                  }
+                },
+                props: {
+                  item: editor.getValue()
+                }
+              })
+            }
+          })
       },
       /**
        * return resourceList
@@ -341,5 +373,10 @@
         color: #6d859e;
       }
     }
+  }
+  .ans-modal-box-max {
+    position: absolute;
+    right: -12px;
+    top: -16px;
   }
 </style>
