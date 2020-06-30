@@ -123,7 +123,7 @@
     ],
     "DOLPHIN_ALERT": [
       {
-        "name": "DOLPHIN_ALERT_CHECK",
+        "name": "DOLPHIN_DOLPHIN_ALERT_CHECK",
         "label": "check dolphin scheduler alert status",
         "description": "",
         "interval":10,
