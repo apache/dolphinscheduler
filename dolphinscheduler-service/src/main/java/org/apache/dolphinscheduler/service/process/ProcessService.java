@@ -28,8 +28,6 @@ import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -38,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -119,6 +116,10 @@ public class ProcessService {
         if(!checkThreadNum(command, validThreadNum)){
             logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
+        }
+        if (processInstance.getCommandType().equals(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS)){
+            delCommandByid(command.getId());
+            return null;
         }
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
@@ -235,7 +236,7 @@ public class ProcessService {
      * @param defineId
      * @return
      */
-    public List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
+    public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
@@ -248,7 +249,7 @@ public class ProcessService {
         //process data check
         if (null == processData) {
             logger.error("process data is null");
-            return new ArrayList<>();
+            return null;
         }
 
         return processData.getTasks();
@@ -290,48 +291,12 @@ public class ProcessService {
 
         List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
 
-        for(Integer subId : subProcessIdList){
+        for(Integer subId : subProcessIdList ){
             deleteAllSubWorkProcessByParentId(subId);
             deleteWorkProcessMapByParentId(subId);
-            removeTaskLogFile(subId);
             deleteWorkProcessInstanceById(subId);
         }
         return 1;
-    }
-
-
-    /**
-     * remove task log file
-     * @param processInstanceId processInstanceId
-     */
-    public void removeTaskLogFile(Integer processInstanceId){
-
-        LogClientService logClient = new LogClientService();
-
-        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
-
-        if (CollectionUtils.isEmpty(taskInstanceList)){
-            return;
-        }
-
-        for (TaskInstance taskInstance : taskInstanceList){
-            String taskLogPath = taskInstance.getLogPath();
-            if (StringUtils.isEmpty(taskInstance.getHost())){
-                continue;
-            }
-            int port = Constants.RPC_PORT;
-            String ip = "";
-            try {
-                ip = Host.of(taskInstance.getHost()).getIp();
-            }catch (Exception e){
-                // compatible old version
-                ip = taskInstance.getHost();
-            }
-
-
-            // remove task log from loggerserver
-            logClient.removeTaskLog(ip,port,taskLogPath);
-        }
     }
 
 
@@ -363,13 +328,11 @@ public class ProcessService {
 
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
-                ObjectNode parameterJson = JSONUtils.parseObject(parameter);
-                if (parameterJson.get(CMDPARAM_SUB_PROCESS_DEFINE_ID) != null){
+                if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
                     SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
-
             }
         }
     }
@@ -669,7 +632,6 @@ public class ProcessService {
                     taskInstance.setFlag(Flag.NO);
                     this.updateTaskInstance(taskInstance);
                 }
-                initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case REPEAT_RUNNING:
                 // delete the recover task names from command parameter
@@ -726,9 +688,7 @@ public class ProcessService {
 
         Date startComplementTime = DateUtils.parse(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE),
                 YYYY_MM_DD_HH_MM_SS);
-        if(Flag.NO == processInstance.getIsSubProcess()) {
-            processInstance.setScheduleTime(startComplementTime);
-        }
+        processInstance.setScheduleTime(startComplementTime);
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                 processDefinition.getGlobalParamMap(),
                 processDefinition.getGlobalParamList(),
@@ -921,7 +881,7 @@ public class ProcessService {
 
         CommandType fatherType = parentProcessInstance.getCommandType();
         CommandType commandType = fatherType;
-        if(childInstance == null){
+        if(childInstance == null || commandType == CommandType.REPEAT_RUNNING){
             String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
             // sub process must begin with schedule/complement data
             // if father begin with scheduler/complement data
@@ -961,7 +921,6 @@ public class ProcessService {
         command.setCommandParam(processMapStr);
         command.setCommandType(commandType);
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
-        command.setWorkerGroup(parentProcessInstance.getWorkerGroup());
         createCommand(command);
         logger.info("sub process command created: {} ", command.toString());
     }
@@ -1480,7 +1439,7 @@ public class ProcessService {
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
         //1 update processInstance host is null
-        processInstance.setHost(Constants.NULL);
+        processInstance.setHost("null");
         processInstanceMapper.updateById(processInstance);
 
         //2 insert into recover command
@@ -1813,7 +1772,7 @@ public class ProcessService {
      * @return User
      */
     public User getUserById(int userId){
-        return userMapper.selectById(userId);
+        return userMapper.queryDetailsById(userId);
     }
 
     /**

@@ -142,7 +142,7 @@ public class HadoopUtilsTest {
     @Test
     public void isYarnEnabled() {
         boolean result = hadoopUtils.isYarnEnabled();
-        Assert.assertEquals(true, result);
+        Assert.assertEquals(false, result);
     }
 
     @Test
@@ -185,7 +185,7 @@ public class HadoopUtilsTest {
     }
 
     @Test
-    public void getApplicationUrl() throws Exception {
+    public void getApplicationUrl(){
         String application_1516778421218_0042 = hadoopUtils.getApplicationUrl("application_1529051418016_0167");
         logger.info(application_1516778421218_0042);
     }
