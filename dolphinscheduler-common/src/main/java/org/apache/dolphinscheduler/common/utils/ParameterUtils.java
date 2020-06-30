@@ -47,7 +47,7 @@ public class ParameterUtils {
    * @return convert parameters place holders
    */
   public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
-    if (StringUtils.isEmpty(parameterString) || parameterMap == null) {
+    if (StringUtils.isEmpty(parameterString)) {
       return parameterString;
     }
 
@@ -212,28 +212,28 @@ public class ParameterUtils {
     return inputString;
   }
 
-
   /**
-   * $[yyyyMMdd] replace schedule time
-   * @param text
-   * @param scheduleTime
-   * @return
+   * new
+   * $[yyyyMMdd] replace scheduler time
+   * @param text text
+   * @param scheduleTime scheduleTime
+   * @param paramsMap paramsMap
+   * @return text
    */
-  public static String replaceScheduleTime(String text, Date scheduleTime) {
-      Map<String, Property> paramsMap = new HashMap<>();
+  public static String replaceScheduleTime(String text, Date scheduleTime, Map<String, Property> paramsMap) {
+    if (paramsMap != null) {
       //if getScheduleTime null ,is current date
       if (null == scheduleTime) {
         scheduleTime = new Date();
       }
-
       String dateTime = org.apache.dolphinscheduler.common.utils.DateUtils.format(scheduleTime, Constants.PARAMETER_FORMAT_TIME);
       Property p = new Property();
       p.setValue(dateTime);
       p.setProp(Constants.PARAMETER_SHECDULE_TIME);
       paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
       text = ParameterUtils.convertParameterPlaceholders2(text, convert(paramsMap));
-
-      return text;
+    }
+    return text;
   }
 
 

@@ -239,10 +239,6 @@ public final class Constants {
      * EQUAL SIGN
      */
     public static final String EQUAL_SIGN = "=";
-    /**
-     * AT SIGN
-     */
-    public static final String AT_SIGN = "@";
 
 
     public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
@@ -304,7 +300,7 @@ public final class Constants {
     /**
      * user name regex
      */
-    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
+    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
 
     /**
      * email regex
@@ -516,7 +512,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 5;
 
 
     /**
@@ -925,7 +921,6 @@ public final class Constants {
     public static final String JDBC_URL = "jdbcUrl";
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
-    public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
 
 
     /**
@@ -970,9 +965,5 @@ public final class Constants {
      * plugin configurations
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
-
-    public static final int NORAML_NODE_STATUS = 0;
-    public static final int ABNORMAL_NODE_STATUS = 1;
-
 
 }
