@@ -33,47 +33,12 @@ public class ShellExecutorTest {
     @Test
     public void execCommand() throws InterruptedException {
 
-        ThreadPoolExecutors executors = ThreadPoolExecutors.getInstance();
-        CountDownLatch latch = new CountDownLatch(200);
-
-        executors.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    int i =0;
-                    while(i++ <= 100){
-                        String res = ShellExecutor.execCommand("groups");
-                        logger.info("time:" + i + ",thread id:" + Thread.currentThread().getId() + ", result:" + res.substring(0,5));
-                        Thread.sleep(100l);
-                        latch.countDown();
-                    }
-
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        executors.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    int i =0;
-                    while(i++ <= 100){
-                        String res = ShellExecutor.execCommand("whoami");
-                        logger.info("time:" + i + ",thread id:" + Thread.currentThread().getId() + ", result2:" + res);
-                        Thread.sleep(100l);
-                        latch.countDown();
-                    }
-
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        latch.await();
+        try {
+            String res = ShellExecutor.execCommand("groups");
+            logger.info("thread id:" + Thread.currentThread().getId() + ", result:" + res.substring(0, 5));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 }
