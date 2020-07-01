@@ -915,7 +915,7 @@
                         <exclude>**/dist/**</exclude>
                         <exclude>**/licenses/**</exclude>
                         <exclude>.github/**</exclude>
-                        <exclude>sql/soft_version</exclude>
+                        <exclude>**/sql/soft_version</exclude>
                         <exclude>**/common/utils/ScriptRunner.java</exclude>
                         <exclude>**/*.json</exclude>
                         <!-- document files -->
