@@ -17,6 +17,7 @@
 
 export default {
   'User Name': 'User Name',
+  'User Type': 'User Type',
   'Please enter user name': 'Please enter user name',
   Password: 'Password',
   'Please enter your password': 'Please enter your password',

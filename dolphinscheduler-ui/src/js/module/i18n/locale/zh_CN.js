@@ -17,6 +17,7 @@
 
 export default {
   'User Name': '用户名',
+  'User Type': '用户类型',
   'Please enter user name': '请输入用户名',
   Password: '密码',
   'Please enter your password': '请输入密码',

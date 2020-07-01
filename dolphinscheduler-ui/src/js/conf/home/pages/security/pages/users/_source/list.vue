@@ -26,7 +26,7 @@
             <span>{{$t('User Name')}}</span>
           </th>
           <th>
-            <span>用户类型</span>
+            <span>{{$t('User Type')}}</span>
           </th>
           <th>
             <span>{{$t('Tenant')}}</span>
