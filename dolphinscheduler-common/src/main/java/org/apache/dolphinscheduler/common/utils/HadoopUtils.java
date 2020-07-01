@@ -185,7 +185,7 @@ public class HadoopUtils implements Closeable {
      * @param applicationId application id
      * @return url of application
      */
-    public String getApplicationUrl(String applicationId) {
+    public String getApplicationUrl(String applicationId) throws Exception {
         /**
          * if rmHaIds contains xx, it signs not use resourcemanager
          * otherwise:
@@ -193,21 +193,21 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
         String appUrl = "";
-        //not use resourcemanager
-        if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)) {
 
-            yarnEnabled = false;
-            logger.warn("should not step here");
-        } else if (!StringUtils.isEmpty(rmHaIds)) {
+        if (StringUtils.isEmpty(rmHaIds)){
+            //single resourcemanager enabled
+            appUrl = appAddress;
+            yarnEnabled = true;
+        } else {
             //resourcemanager HA enabled
             appUrl = getAppAddress(appAddress, rmHaIds);
             yarnEnabled = true;
             logger.info("application url : {}", appUrl);
-        } else {
-            //single resourcemanager enabled
-            yarnEnabled = true;
         }
 
+        if(StringUtils.isBlank(appUrl)){
+            throw new Exception("application url is blank");
+        }
         return String.format(appUrl, applicationId);
     }
 
@@ -407,7 +407,7 @@ public class HadoopUtils implements Closeable {
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
      */
-    public ExecutionStatus getApplicationStatus(String applicationId) {
+    public ExecutionStatus getApplicationStatus(String applicationId) throws Exception{
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
