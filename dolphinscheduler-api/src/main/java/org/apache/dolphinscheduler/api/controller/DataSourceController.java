@@ -278,7 +278,7 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "password") String password,
                                     @RequestParam(value = "connectType") DbConnectType connectType,
                                     @RequestParam(value = "other") String other) {
-        logger.info("login user {}, connect datasource: {} failure, note: {}, type: {}, connectType: {}, other: {}",
+        logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
         Boolean isConnection = dataSourceService.checkConnection(type, parameter);
