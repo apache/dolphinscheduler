@@ -35,6 +35,7 @@ import {
   computeScale
 } from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
+import multiDrag from './multiDrag'
 
 const JSP = function () {
   this.dag = {}
@@ -92,6 +93,9 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   if (this.config.isNewNodes) {
     DragZoom.init()
   }
+
+  // support multi drag
+  multiDrag()
 }
 
 /**
