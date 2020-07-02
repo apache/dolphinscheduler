@@ -324,7 +324,13 @@ public class TaskPriorityQueueConsumer extends Thread{
             }
 
             List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
-            sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
+            Map<UdfFunc,String> udfFuncMap = new HashMap<>();
+            for(UdfFunc udfFunc : udfFuncList) {
+                String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
+                udfFuncMap.put(udfFunc,tenantCode);
+            }
+
+            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
         }
     }
 
@@ -366,7 +372,7 @@ public class TaskPriorityQueueConsumer extends Thread{
 
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
+            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
                 Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
