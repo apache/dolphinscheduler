@@ -77,7 +77,7 @@ public class UDFUtils {
             if (!uploadPath.startsWith("hdfs:")) {
                 uploadPath = defaultFS + uploadPath;
             }
-            sqls.add(String.format("add jar %s/%s", uploadPath, entry.getKey().getResourceName()));
+            sqls.add(String.format("add jar %s%s", uploadPath, entry.getKey().getResourceName()));
         }
 
     }
@@ -94,21 +94,6 @@ public class UDFUtils {
                         .format(CREATE_FUNCTION_FORMAT, udfFunc.getFuncName(), udfFunc.getClassName()));
             }
         }
-    }
-
-    /**
-     * get the resource names of all functions
-     * @param udfFuncs udf function list
-     * @return
-     */
-    private static Set<String> getFuncResouces(List<UdfFunc> udfFuncs) {
-        Set<String> resources = new HashSet<>();
-
-        for (UdfFunc udfFunc : udfFuncs) {
-            resources.add(udfFunc.getResourceName());
-        }
-
-        return resources;
     }
 
 
