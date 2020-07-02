@@ -129,7 +129,7 @@ v-ps<template>
       }
     },
     props: {
-      udfFuncTenantCodeMap: Array,
+      udfFuncList: Array,
       pageNo: Number,
       pageSize: Number
     },
@@ -179,7 +179,7 @@ v-ps<template>
       }
     },
     watch: {
-      udfFuncTenantCodeMap (a) {
+      udfFuncList (a) {
         this.list = []
         setTimeout(() => {
           this.list = a
@@ -189,7 +189,7 @@ v-ps<template>
     created () {
     },
     mounted () {
-      this.list = this.udfFuncTenantCodeMap
+      this.list = this.udfFuncList
     },
     components: { }
   }

@@ -26,14 +26,14 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="udfFuncTenantCodeMap.length || total>0">
-        <m-list :udf-func-list="udfFuncTenantCodeMap" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
+      <template v-if="udfFuncList.length || total>0">
+        <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!udfFuncTenantCodeMap.length && total<=0">
+      <template v-if="!udfFuncList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
@@ -57,7 +57,7 @@
       return {
         total: null,
         isLoading: false,
-        udfFuncTenantCodeMap: [],
+        udfFuncList: [],
         searchParams: {
           id: -1,
           pageSize: 10,
@@ -120,8 +120,8 @@
           if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
             this.searchParams.pageNo = this.searchParams.pageNo -1
           } else {
-            this.udfFuncTenantCodeMap = []
-            this.udfFuncTenantCodeMap = res.totalList
+            this.udfFuncList = []
+            this.udfFuncList = res.totalList
             this.total = res.total
             this.isLoading = false
           }
