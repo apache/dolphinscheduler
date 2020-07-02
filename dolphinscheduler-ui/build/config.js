@@ -109,7 +109,7 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     filename: newPagePath || path.join('view', p),
     template: `${path.join('src/view', p)}`,
     cache: true,
-    favicon:'./favicon.ico',
+    favicon:'./favicon.png',
     inject: true,
     hash: version,
     chunks: chunks,
