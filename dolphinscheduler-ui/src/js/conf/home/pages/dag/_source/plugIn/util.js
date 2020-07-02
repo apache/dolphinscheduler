@@ -130,6 +130,19 @@ const allNodesId = () => {
   })
   return idArr
 }
+/**
+ * compute scale，because it cant get from jquery directly
+ * @param el element
+ * @returns {boolean|number}
+ */
+const computeScale = function (el) {
+  const matrix = el.css('transform')
+  if (!matrix || matrix === 'none') {
+    return false
+  }
+  const values = matrix.split('(')[1].split(')')[0].split(',')
+  return Math.sqrt(values[0] * values[0] + values[1] * values[1])
+}
 
 export {
   rtTargetarrArr,
@@ -139,5 +152,6 @@ export {
   isNameExDag,
   setSvgColor,
   allNodesId,
-  rtBantpl
+  rtBantpl,
+  computeScale
 }

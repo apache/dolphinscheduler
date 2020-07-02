@@ -31,7 +31,8 @@ import {
   rtTasksTpl,
   setSvgColor,
   saveTargetarr,
-  rtTargetarrArr
+  rtTargetarrArr,
+  computeScale
 } from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
 import multiDrag from './multiDrag'
@@ -148,12 +149,13 @@ JSP.prototype.draggable = function () {
       scope: 'plant',
       drop: function (ev, ui) {
         let id = 'tasks-' + Math.ceil(Math.random() * 100000) // eslint-disable-line
-        // Get mouse coordinates
-        const left = parseInt(ui.offset.left - $(this).offset().left)
-        let top = parseInt(ui.offset.top - $(this).offset().top) - 10
-        if (top < 25) {
-          top = 25
-        }
+
+        let scale = computeScale($(this))
+        scale = scale || 1
+
+        // Get mouse coordinates and after scale coordinate
+        const left = parseInt(ui.offset.left - $(this).offset().left) / scale
+        const top = parseInt(ui.offset.top - $(this).offset().top) / scale
         // Generate template node
         $('#canvas').append(rtTasksTpl({
           id: id,
