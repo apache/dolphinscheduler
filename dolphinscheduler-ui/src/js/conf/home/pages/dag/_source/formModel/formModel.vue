@@ -305,6 +305,7 @@
         description: '',
         // Node echo data
         backfillItem: {},
+        cacheBackfillItem: {},
         // Resource(list)
         resourcesList: [],
         successNode: 'success',
@@ -580,17 +581,34 @@
         this.isContentBox = false
         // flag Whether to delete a node this.$destroy()
         this.$emit('close', {
+          item: {
+            type: this.cacheBackfillItem.type,
+            id: this.cacheBackfillItem.id,
+            name: this.cacheBackfillItem.name,
+            params: this.cacheBackfillItem.params,
+            description: this.cacheBackfillItem.description,
+            runFlag: this.cacheBackfillItem.runFlag,
+            conditionResult: this.cacheBackfillItem.conditionResult,
+            dependence: this.cacheBackfillItem.dependence,
+            maxRetryTimes: this.cacheBackfillItem.maxRetryTimes,
+            retryInterval: this.cacheBackfillItem.retryInterval,
+            timeout: this.cacheBackfillItem.timeout,
+            taskInstancePriority: this.cacheBackfillItem.taskInstancePriority,
+            workerGroup: this.cacheBackfillItem.workerGroup,
+            status: this.cacheBackfillItem.status,
+            branch: this.cacheBackfillItem.branch
+          },
           flag: flag,
           fromThis: this
         })
       }
-    },
+    }, 
     watch: {
       /**
        * Watch the item change, cache the value it changes
        **/
       _item (val) {
-        this._cacheItem()
+        // this._cacheItem()
       }
     },
     created () {
@@ -653,6 +671,7 @@
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
+      this.cacheBackfillItem = o
       this.isContentBox = true
     },
     mounted () {
