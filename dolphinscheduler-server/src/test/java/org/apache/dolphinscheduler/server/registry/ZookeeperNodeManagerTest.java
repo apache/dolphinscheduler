@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.registry;
 
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -74,7 +74,7 @@ public class ZookeeperNodeManagerTest {
         Set<String> masterNodes = zookeeperNodeManager.getMasterNodes();
         Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
         Assert.assertEquals(1, masterNodes.size());
-        Assert.assertEquals(OSUtils.getHost() + ":" + masterConfig.getListenPort(), masterNodes.iterator().next());
+        Assert.assertEquals(NetUtils.getHost() + ":" + masterConfig.getListenPort(), masterNodes.iterator().next());
     }
 
     @Test
@@ -102,6 +102,6 @@ public class ZookeeperNodeManagerTest {
         Set<String> workerNodes = zookeeperNodeManager.getWorkerGroupNodes("default");
         Assert.assertTrue(CollectionUtils.isNotEmpty(workerNodes));
         Assert.assertEquals(1, workerNodes.size());
-        Assert.assertEquals(OSUtils.getHost() + ":" + workerConfig.getListenPort(), workerNodes.iterator().next());
+        Assert.assertEquals(NetUtils.getHost() + ":" + workerConfig.getListenPort(), workerNodes.iterator().next());
     }
 }
