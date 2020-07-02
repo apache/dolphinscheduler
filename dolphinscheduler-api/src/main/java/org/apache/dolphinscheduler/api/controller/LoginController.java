@@ -52,6 +52,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    
+    private static final String COOKIE_DEFAULT_ROOT_PATH = "/";
 
 
     @Autowired
@@ -106,7 +108,7 @@ public class LoginController extends BaseController {
         for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
             Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
             cookie.setHttpOnly(true);
-            cookie.setPath("/");
+            cookie.setPath(COOKIE_DEFAULT_ROOT_PATH);
             response.addCookie(cookie);
         }
 
