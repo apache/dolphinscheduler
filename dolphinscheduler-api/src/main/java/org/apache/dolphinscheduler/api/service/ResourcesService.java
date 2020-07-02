@@ -1005,10 +1005,23 @@ public class ResourcesService extends BaseService {
             logger.error("resource id {} is directory,can't download it", resourceId);
             throw new RuntimeException("cant't download directory");
         }
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
 
-        String hdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
+        int userId = resource.getUserId();
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            logger.error("user id {} not exists", userId);
+            throw new RuntimeException(String.format("resource owner id %d not exist",userId));
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if(tenant == null){
+            logger.error("tenant id {} not exists", user.getTenantId());
+            throw new RuntimeException(String.format("The tenant id %d of resource owner not exist",user.getTenantId()));
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        String hdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         String localFileName = FileUtils.getDownloadFilename(resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
@@ -1172,8 +1185,8 @@ public class ResourcesService extends BaseService {
      */
     private String getTenantCode(int userId,Result result){
 
-        User user = userMapper.queryDetailsById(userId);
-        if(user == null){
+        User user = userMapper.selectById(userId);
+        if (user == null) {
             logger.error("user {} not exists", userId);
             putMsg(result, Status.USER_NOT_EXIST,userId);
             return null;
