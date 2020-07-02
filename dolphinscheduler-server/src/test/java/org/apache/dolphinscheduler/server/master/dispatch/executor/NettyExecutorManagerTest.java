@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -78,7 +78,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(OSUtils.getHost() + ":" + serverConfig.getListenPort()));
+        executionContext.setHost(Host.of(NetUtils.getHost() + ":" + serverConfig.getListenPort()));
         Boolean execute = nettyExecutorManager.execute(executionContext);
         Assert.assertTrue(execute);
         nettyRemotingServer.close();
@@ -97,7 +97,7 @@ public class NettyExecutorManagerTest {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(OSUtils.getHost() + ":4444"));
+        executionContext.setHost(Host.of(NetUtils.getHost() + ":4444"));
         nettyExecutorManager.execute(executionContext);
 
     }

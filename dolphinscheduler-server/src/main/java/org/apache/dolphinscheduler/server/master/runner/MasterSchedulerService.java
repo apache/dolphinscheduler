@@ -21,6 +21,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -158,6 +159,6 @@ public class MasterSchedulerService extends Thread {
     }
 
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 }
