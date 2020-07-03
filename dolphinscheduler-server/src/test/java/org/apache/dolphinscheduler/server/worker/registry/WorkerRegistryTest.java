@@ -17,7 +17,14 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
@@ -30,13 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-
-
-import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
 /**
  * worker registry test
  */
@@ -44,6 +44,8 @@ import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEP
 @ContextConfiguration(classes={SpringZKServer.class, WorkerRegistry.class,ZookeeperRegistryCenter.class, WorkerConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 
 public class WorkerRegistryTest {
+
+    private static final String TEST_WORKER_GROUP = "test";
 
     @Autowired
     private WorkerRegistry workerRegistry;
@@ -56,23 +58,75 @@ public class WorkerRegistryTest {
 
     @Test
     public void testRegistry() throws InterruptedException {
+        workerConfig.getWorkerGroups().add(TEST_WORKER_GROUP);
         workerRegistry.registry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
-        Assert.assertEquals(DEFAULT_WORKER_GROUP, workerConfig.getWorkerGroup().trim());
-        String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node
-        String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
-        Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
+
+        int i = 0;
+        for (String workerGroup : workerConfig.getWorkerGroups()) {
+            if (0 == i) {
+                Assert.assertEquals(DEFAULT_WORKER_GROUP, workerGroup.trim());
+            } else {
+                Assert.assertEquals(TEST_WORKER_GROUP, workerGroup.trim());
+            }
+            String instancePath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
+            TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
+            String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
+            Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
+            i++;
+        }
+
+        workerRegistry.unRegistry();
+
+        workerConfig.getWorkerGroups().add(StringUtils.EMPTY);
+        workerRegistry.init();
+        workerRegistry.registry();
+        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
+
+        workerRegistry.unRegistry();
+
+        // testEmptyWorkerGroupsRegistry
+        workerConfig.getWorkerGroups().remove(StringUtils.EMPTY);
+        workerConfig.getWorkerGroups().remove(TEST_WORKER_GROUP);
+        workerConfig.getWorkerGroups().remove(DEFAULT_WORKER_GROUP);
+        workerRegistry.init();
+        workerRegistry.registry();
+
+        List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
+        List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
+
+        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
+        Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
+        Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
     }
 
     @Test
     public void testUnRegistry() throws InterruptedException {
+        workerConfig.getWorkerGroups().add(TEST_WORKER_GROUP);
         workerRegistry.registry();
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node
+        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
         workerRegistry.unRegistry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
-        String workerGroupPath = workerPath + "/" + workerConfig.getWorkerGroup().trim();
-        List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(workerGroupPath);
-        Assert.assertTrue(childrenKeys.isEmpty());
+
+        for (String workerGroup : workerConfig.getWorkerGroups()) {
+            String workerGroupPath = workerPath + "/" + workerGroup.trim();
+            List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(workerGroupPath);
+            Assert.assertTrue(childrenKeys.isEmpty());
+        }
+
+        // testEmptyWorkerGroupsUnRegistry
+        workerConfig.getWorkerGroups().remove(TEST_WORKER_GROUP);
+        workerConfig.getWorkerGroups().remove(DEFAULT_WORKER_GROUP);
+        workerRegistry.init();
+        workerRegistry.registry();
+
+        List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
+        List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
+
+        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
+        workerRegistry.unRegistry();
+
+        Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
+        Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
     }
 }
