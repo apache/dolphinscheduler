@@ -23,8 +23,6 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -407,19 +405,6 @@ public class OSUtils {
   public static int getProcessID() {
     RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     return Integer.parseInt(runtimeMXBean.getName().split("@")[0]);
-  }
-
-  /**
-   * get local host
-   * @return host
-   */
-  public static String getHost(){
-    try {
-      return InetAddress.getLocalHost().getHostAddress();
-    } catch (UnknownHostException e) {
-      logger.error(e.getMessage(),e);
-    }
-    return null;
   }
 
   /**
