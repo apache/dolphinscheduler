@@ -170,21 +170,6 @@ public class ResponseFuture {
         }
     }
 
-    @Override
-    public String toString() {
-        return "ResponseFuture{" +
-                "opaque=" + opaque +
-                ", timeoutMillis=" + timeoutMillis +
-                ", invokeCallback=" + invokeCallback +
-                ", releaseSemaphore=" + releaseSemaphore +
-                ", latch=" + latch +
-                ", beginTimestamp=" + beginTimestamp +
-                ", responseCommand=" + responseCommand +
-                ", sendOk=" + sendOk +
-                ", cause=" + cause +
-                '}';
-    }
-
     /**
      * scan future table
      */
@@ -208,5 +193,20 @@ public class ResponseFuture {
                 LOGGER.warn("scanFutureTable, execute callback error", ex);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseFuture{" +
+                "opaque=" + opaque +
+                ", timeoutMillis=" + timeoutMillis +
+                ", invokeCallback=" + invokeCallback +
+                ", releaseSemaphore=" + releaseSemaphore +
+                ", latch=" + latch +
+                ", beginTimestamp=" + beginTimestamp +
+                ", responseCommand=" + responseCommand +
+                ", sendOk=" + sendOk +
+                ", cause=" + cause +
+                '}';
     }
 }
