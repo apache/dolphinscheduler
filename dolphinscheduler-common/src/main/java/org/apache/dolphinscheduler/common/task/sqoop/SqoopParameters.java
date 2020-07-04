@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.task.sqoop;
 
+import org.apache.dolphinscheduler.common.enums.SqoopJobType;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -27,6 +29,23 @@ import java.util.List;
  * sqoop parameters
  */
 public class SqoopParameters  extends AbstractParameters {
+
+    /**
+     * sqoop job type:
+     * CUSTOM - custom sqoop job
+     * TEMPLATE - sqoop template job
+     */
+    private String jobType;
+
+    /**
+     * customJob eq 1, use customShell
+     */
+    private String customShell;
+
+    /**
+     * sqoop job name - map-reduce job name
+     */
+    private String jobName;
 
     /**
      * model type
@@ -52,6 +71,16 @@ public class SqoopParameters  extends AbstractParameters {
      * target params
      */
     private String targetParams;
+
+    /**
+     * hadoop custom param for sqoop job
+     */
+    private List<Property> hadoopCustomParams;
+
+    /**
+     * sqoop advanced param
+     */
+    private List<Property> sqoopAdvancedParams;
 
     public String getModelType() {
         return modelType;
@@ -101,18 +130,74 @@ public class SqoopParameters  extends AbstractParameters {
         this.targetParams = targetParams;
     }
 
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public String getCustomShell() {
+        return customShell;
+    }
+
+    public void setCustomShell(String customShell) {
+        this.customShell = customShell;
+    }
+
+    public List<Property> getHadoopCustomParams() {
+        return hadoopCustomParams;
+    }
+
+    public void setHadoopCustomParams(List<Property> hadoopCustomParams) {
+        this.hadoopCustomParams = hadoopCustomParams;
+    }
+
+    public List<Property> getSqoopAdvancedParams() {
+        return sqoopAdvancedParams;
+    }
+
+    public void setSqoopAdvancedParams(List<Property> sqoopAdvancedParams) {
+        this.sqoopAdvancedParams = sqoopAdvancedParams;
+    }
+
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(modelType)&&
-                concurrency != 0 &&
-                StringUtils.isNotEmpty(sourceType)&&
-                StringUtils.isNotEmpty(targetType)&&
-                StringUtils.isNotEmpty(sourceParams)&&
-                StringUtils.isNotEmpty(targetParams);
+
+        boolean sqoopParamsCheck = false;
+
+        if (StringUtils.isEmpty(jobType)) {
+            return sqoopParamsCheck;
+        }
+
+        if (SqoopJobType.TEMPLATE.getDescp().equals(jobType)) {
+            sqoopParamsCheck = StringUtils.isEmpty(customShell) &&
+                    StringUtils.isNotEmpty(modelType) &&
+                    StringUtils.isNotEmpty(jobName) &&
+                    concurrency != 0 &&
+                    StringUtils.isNotEmpty(sourceType) &&
+                    StringUtils.isNotEmpty(targetType) &&
+                    StringUtils.isNotEmpty(sourceParams) &&
+                    StringUtils.isNotEmpty(targetParams);
+        } else if (SqoopJobType.CUSTOM.getDescp().equals(jobType)) {
+            sqoopParamsCheck = StringUtils.isNotEmpty(customShell) &&
+                    StringUtils.isEmpty(jobName);
+        }
+
+        return sqoopParamsCheck;
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-       return new ArrayList<>();
+        return new ArrayList<>();
     }
 }

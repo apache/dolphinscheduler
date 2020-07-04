@@ -171,7 +171,7 @@
         tr {
           th:last-child,td:last-child {
             background: inherit;
-            width: 50px;
+            width: 60px;
             height: 40px;
             line-height: 40px;
             border-left:1px solid #ecf3ff;
@@ -179,8 +179,11 @@
             right: 0;
             z-index: 2;
           }
+          td:last-child {
+            border-bottom:1px solid #ecf3ff;
+          }
           th:nth-last-child(2) {
-            padding-right: 80px;
+            padding-right: 90px;
           }
         }
       }

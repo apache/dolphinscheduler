@@ -216,6 +216,11 @@
             this.diGuiTree(item)
             
             this.diGuiTree(this.filterJarFile(item1))
+            item1 = item1.filter( item => {
+              if(item.dirctory) {
+                return item
+              }
+            });
             this.udfResourceList = item
             this.udfResourceDirList = item1
             resolve()
