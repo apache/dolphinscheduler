@@ -18,61 +18,108 @@
 package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
+import java.util.concurrent.Executor;
 
+import org.apache.curator.framework.imps.CuratorFrameworkImpl;
+import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
-import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 /**
  * worker registry test
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes={SpringZKServer.class, WorkerRegistry.class,ZookeeperRegistryCenter.class, WorkerConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
-
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class WorkerRegistryTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryTest.class);
 
     private static final String TEST_WORKER_GROUP = "test";
 
-    @Autowired
+    @InjectMocks
     private WorkerRegistry workerRegistry;
 
-    @Autowired
+    @Mock
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
-    @Autowired
+    @Mock
+    private ZookeeperCachedOperator zookeeperCachedOperator;
+
+    @Mock
+    private CuratorFrameworkImpl zkClient;
+
+    @Mock
     private WorkerConfig workerConfig;
 
+    @Before
+    public void before() {
+        Set<String> workerGroups = Sets.newHashSet(DEFAULT_WORKER_GROUP, TEST_WORKER_GROUP);
+        Mockito.when(workerConfig.getWorkerGroups()).thenReturn(workerGroups);
+
+        Mockito.when(zookeeperRegistryCenter.getWorkerPath()).thenReturn("/dolphinscheduler/nodes/worker");
+        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator()).thenReturn(zookeeperCachedOperator);
+        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient()).thenReturn(zkClient);
+        Mockito.when(zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable()).thenReturn(
+                new Listenable<ConnectionStateListener>() {
+                    @Override
+                    public void addListener(ConnectionStateListener connectionStateListener) {
+                        LOGGER.info("add listener");
+                    }
+
+                    @Override
+                    public void addListener(ConnectionStateListener connectionStateListener, Executor executor) {
+                        LOGGER.info("add listener executor");
+                    }
+
+                    @Override
+                    public void removeListener(ConnectionStateListener connectionStateListener) {
+                        LOGGER.info("remove listener");
+                    }
+                });
+
+        Mockito.when(workerConfig.getWorkerHeartbeatInterval()).thenReturn(10);
+
+        Mockito.when(workerConfig.getWorkerReservedMemory()).thenReturn(1.1);
+
+        Mockito.when(workerConfig.getWorkerMaxCpuloadAvg()).thenReturn(1);
+    }
+
     @Test
-    public void testRegistry() throws InterruptedException {
-        workerConfig.getWorkerGroups().add(TEST_WORKER_GROUP);
+    public void testRegistry() {
+
+        workerRegistry.init();
+
         workerRegistry.registry();
+
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
 
         int i = 0;
         for (String workerGroup : workerConfig.getWorkerGroups()) {
+            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
+            String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(workerZkPath);
             if (0 == i) {
-                Assert.assertEquals(DEFAULT_WORKER_GROUP, workerGroup.trim());
+                Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));
             } else {
-                Assert.assertEquals(TEST_WORKER_GROUP, workerGroup.trim());
+                Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/default/"));
             }
-            String instancePath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
-            TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
-            String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
-            Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
             i++;
         }
 
@@ -81,7 +128,6 @@ public class WorkerRegistryTest {
         workerConfig.getWorkerGroups().add(StringUtils.EMPTY);
         workerRegistry.init();
         workerRegistry.registry();
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
 
         workerRegistry.unRegistry();
 
@@ -95,16 +141,15 @@ public class WorkerRegistryTest {
         List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
         List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
 
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
         Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
         Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
     }
 
     @Test
-    public void testUnRegistry() throws InterruptedException {
-        workerConfig.getWorkerGroups().add(TEST_WORKER_GROUP);
+    public void testUnRegistry() {
+        workerRegistry.init();
         workerRegistry.registry();
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
+
         workerRegistry.unRegistry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
 
@@ -120,13 +165,6 @@ public class WorkerRegistryTest {
         workerRegistry.init();
         workerRegistry.registry();
 
-        List<String> testWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + TEST_WORKER_GROUP);
-        List<String> defaultWorkerGroupPathZkChildren = zookeeperRegistryCenter.getChildrenKeys(workerPath + "/" + DEFAULT_WORKER_GROUP);
-
-        TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); // wait heartbeat info write into zk node
         workerRegistry.unRegistry();
-
-        Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
-        Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
     }
 }

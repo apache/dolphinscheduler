@@ -129,9 +129,9 @@ public class WorkerRegistry {
         Set<String> workerZkPaths = getWorkerZkPaths();
         for (String workerZkPath : workerZkPaths) {
             zookeeperRegistryCenter.getZookeeperCachedOperator().remove(workerZkPath);
+            logger.info("worker node : {} unRegistry from ZK {}.", address, workerZkPath);
         }
         this.heartBeatExecutor.shutdownNow();
-        logger.info("worker node : {} unRegistry to ZK.", address);
     }
 
     /**
