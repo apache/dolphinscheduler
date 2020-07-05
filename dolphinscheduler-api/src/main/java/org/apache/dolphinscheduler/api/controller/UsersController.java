@@ -110,13 +110,13 @@ public class UsersController extends BaseController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CREATE_USER_ERROR)
-    public <T> Result registerUser(@RequestParam(value = "userName") String userName,
+    public Result<Object> registerUser(@RequestParam(value = "userName") String userName,
                                   @RequestParam(value = "userPassword") String userPassword,
                                   @RequestParam(value = "repeatPassword") String repeatPassword,
                                   @RequestParam(value = "email") String email) throws Exception {
-        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
         logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, email {}",
                 userName, Constants.PASSWORD_DEFAULT, Constants.PASSWORD_DEFAULT, email);
+        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
         return returnDataList(result);
     }
 
