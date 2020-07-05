@@ -333,10 +333,9 @@ public class SchedulerService extends BaseService {
         if(scheduleStatus == ReleaseState.ONLINE){
             // check process definition release state
             if(processDefinition.getReleaseState() != ReleaseState.ONLINE){
-                ProcessDefinition definition = processDefinitionMapper.selectById(scheduleObj.getProcessDefinitionId());
                 logger.info("not release process definition id: {} , name : {}",
                         processDefinition.getId(), processDefinition.getName());
-                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, definition.getName());
+                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
                 return result;
             }
             // check sub process definition release state
@@ -380,7 +379,7 @@ public class SchedulerService extends BaseService {
             switch (scheduleStatus) {
                 case ONLINE: {
                     logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
-                    setSchedule(project.getId(), id);
+                    setSchedule(project.getId(), scheduleObj);
                     break;
                 }
                 case OFFLINE: {
@@ -472,15 +471,10 @@ public class SchedulerService extends BaseService {
         return result;
     }
 
-    public void setSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public void setSchedule(int projectId, Schedule schedule) throws RuntimeException{
+
+        int scheduleId = schedule.getId();
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
-
-
-        Schedule schedule = processService.querySchedule(scheduleId);
-        if (schedule == null) {
-            logger.warn("process schedule info not exists");
-            return;
-        }
 
         Date startDate = schedule.getStartTime();
         Date endDate = schedule.getEndTime();
