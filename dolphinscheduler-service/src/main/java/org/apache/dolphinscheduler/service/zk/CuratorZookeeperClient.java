@@ -109,6 +109,10 @@ public class CuratorZookeeperClient implements InitializingBean {
         return zookeeperConfig;
     }
 
+    public void setZookeeperConfig(ZookeeperConfig zookeeperConfig) {
+        this.zookeeperConfig = zookeeperConfig;
+    }
+
     public CuratorFramework getZkClient() {
         return zkClient;
     }
