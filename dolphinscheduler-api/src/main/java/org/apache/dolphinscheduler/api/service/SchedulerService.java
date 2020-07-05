@@ -505,7 +505,7 @@ public class SchedulerService extends BaseService {
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
             logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
-            throw new ServiceException(String.format("set offline failure"));
+            throw new ServiceException("set offline failure");
         }
 
     }
