@@ -19,17 +19,40 @@ package org.apache.dolphinscheduler.service.zk;
 import org.junit.Assert;
 import org.junit.Test;
 
-// ZKServer is a process, can't unit test
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 public class ZKServerTest {
 
-
     @Test
-    public void isStarted() {
-        Assert.assertEquals(false, ZKServer.isStarted());
+    public void testRunWithDefaultPort() {
+        AtomicReference<ZKServer> zkServer = new AtomicReference<>();
+        new Thread(() -> {
+            zkServer.set(new ZKServer());
+            zkServer.get().start();
+        }).start();
+        try {
+            TimeUnit.SECONDS.sleep(5);
+            Assert.assertEquals(true, zkServer.get().isStarted());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        zkServer.get().stop();
     }
 
     @Test
-    public void stop() {
-        ZKServer.stop();
+    public void testRunWithCustomPort() {
+        AtomicReference<ZKServer> zkServer = new AtomicReference<>();
+        new Thread(() -> {
+            zkServer.set(new ZKServer(2182));
+            zkServer.get().start();
+        }).start();
+        try {
+            TimeUnit.SECONDS.sleep(5);
+            Assert.assertEquals(true, zkServer.get().isStarted());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        zkServer.get().stop();
     }
 }

@@ -34,44 +34,52 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ZKServer {
     private static final Logger logger = LoggerFactory.getLogger(ZKServer.class);
 
-    private static volatile PublicZooKeeperServerMain zkServer = null;
-
     public static final int DEFAULT_ZK_TEST_PORT = 2181;
+
+    private PublicZooKeeperServerMain zkServer = null;
+
+    private int port = DEFAULT_ZK_TEST_PORT;
 
     private static String dataDir = null;
 
-    private static final AtomicBoolean isStarted = new AtomicBoolean(false);
+    private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     public static void main(String[] args) {
-        if(!isStarted()){
-            ZKServer.start();
-
-            /**
-             *  register hooks, which are called before the process exits
-             */
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    stop();
-                }
-            }));
-        }else{
-            logger.info("zk server aleady started");
+        ZKServer zkServer;
+        if (args.length == 0) {
+            zkServer = new ZKServer();
+        } else {
+            zkServer = new ZKServer(Integer.valueOf(args[0]));
         }
+        zkServer.registerHook();
+        zkServer.start();
+    }
+
+    public ZKServer() {}
+
+    public ZKServer(int port) {
+        this.port = port;
+    }
+
+    private void registerHook() {
+        /**
+         *  register hooks, which are called before the process exits
+         */
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
     }
 
     /**
      * start service
      */
-    public static void start() {
+    public void start() {
         try {
-            startLocalZkServer(DEFAULT_ZK_TEST_PORT);
+            startLocalZkServer(port);
         } catch (Exception e) {
             logger.error("Failed to start ZK: " + e);
         }
     }
 
-    public static boolean isStarted(){
+    public boolean isStarted(){
         return isStarted.get();
     }
 
@@ -94,7 +102,7 @@ public class ZKServer {
      *
      * @param port The port to listen on
      */
-    public static void startLocalZkServer(final int port) {
+    public void startLocalZkServer(final int port) {
         String zkDataDir = System.getProperty("user.dir") +"/zookeeper_data";
         logger.info("zk server starting, data dir path:{}" , zkDataDir);
         startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME,"60");
@@ -108,7 +116,7 @@ public class ZKServer {
      * @param tickTime    zk tick time
      * @param maxClientCnxns    zk max client connections
      */
-    private static synchronized void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
+    private void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
         if (zkServer != null) {
             throw new RuntimeException("Zookeeper server is already started!");
         }
@@ -132,7 +140,7 @@ public class ZKServer {
     /**
      * Stops a local Zk instance, deleting its data directory
      */
-    public static void stop() {
+    public void stop() {
         try {
             stopLocalZkServer(true);
             logger.info("zk server stopped");
@@ -147,15 +155,17 @@ public class ZKServer {
      *
      * @param deleteDataDir Whether or not to delete the data directory
      */
-    private static synchronized void stopLocalZkServer(final boolean deleteDataDir) {
-        if (zkServer != null) {
+    private void stopLocalZkServer(final boolean deleteDataDir) {
+        if (isStarted.compareAndSet(true, false)) {
             try {
+                if (zkServer == null) {
+                    return;
+                }
                 zkServer.shutdown();
                 zkServer = null;
                 if (deleteDataDir) {
                     org.apache.commons.io.FileUtils.deleteDirectory(new File(dataDir));
                 }
-                isStarted.compareAndSet(true, false);
             } catch (Exception e) {
                 logger.warn("Caught exception while stopping ZK server", e);
                 throw new RuntimeException(e);
