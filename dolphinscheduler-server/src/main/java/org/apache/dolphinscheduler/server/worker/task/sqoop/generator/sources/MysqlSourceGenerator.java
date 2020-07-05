@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.QueryType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
@@ -91,7 +91,7 @@ public class MysqlSourceGenerator implements ISourceGenerator {
 
                         if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-hive ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
 
@@ -105,7 +105,7 @@ public class MysqlSourceGenerator implements ISourceGenerator {
 
                         if(StringUtils.isNotEmpty(columnMap.toString())){
                             result.append(" --map-column-java ")
-                                    .append(columnMap.substring(0,columnMap.length()-1));
+                                    .append(columnMap.substring(0,columnMap.length() - 1));
                         }
                     }
                 }

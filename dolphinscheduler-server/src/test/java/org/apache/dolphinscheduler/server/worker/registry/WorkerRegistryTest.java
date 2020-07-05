@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
@@ -36,6 +35,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
+
+import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH;
 /**
  * worker registry test
  */
@@ -58,10 +59,10 @@ public class WorkerRegistryTest {
         workerRegistry.registry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
         Assert.assertEquals(DEFAULT_WORKER_GROUP, workerConfig.getWorkerGroup().trim());
-        String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (OSUtils.getHost() + ":" + workerConfig.getListenPort());
+        String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
         TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(instancePath);
-        Assert.assertEquals(5, heartbeat.split(",").length);
+        Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
     }
 
     @Test

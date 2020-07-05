@@ -16,26 +16,33 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -64,13 +71,27 @@ public class TaskExecuteThread implements Runnable {
     private TaskCallbackService taskCallbackService;
 
     /**
+     * taskExecutionContextCacheManager
+     */
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+
+    /**
+     * task logger
+     */
+    private Logger taskLogger;
+
+    /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService){
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
+            , TaskCallbackService taskCallbackService
+            , Logger taskLogger) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskLogger = taskLogger;
     }
 
     @Override
@@ -80,7 +101,7 @@ public class TaskExecuteThread implements Runnable {
         try {
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
@@ -100,16 +121,7 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            // custom logger
-            Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskExecutionContext.getProcessDefineId(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
-
-
-
-            task = TaskManager.newTask(taskExecutionContext,
-                    taskLogger);
+            task = TaskManager.newTask(taskExecutionContext, taskLogger);
 
             // task init
             task.init();
@@ -134,6 +146,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setAppIds(task.getAppIds());
         } finally {
             try {
+                taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             }catch (Exception e){
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -152,7 +165,7 @@ public class TaskExecuteThread implements Runnable {
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
         if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
+            List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;

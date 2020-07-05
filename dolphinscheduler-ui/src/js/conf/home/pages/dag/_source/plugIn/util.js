@@ -43,9 +43,9 @@ const rtBantpl = () => {
 /**
  * return node html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber, successNode, failedNode }) => {
   let tpl = ''
-  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
+  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-successNode="${successNode || ''}" data-failedNode="${failedNode || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += '<div>'
   tpl += '<div class="state-p"></div>'
   tpl += `<div class="icos icos-${taskType}"></div>`
@@ -130,6 +130,19 @@ const allNodesId = () => {
   })
   return idArr
 }
+/**
+ * compute scale，because it cant get from jquery directly
+ * @param el element
+ * @returns {boolean|number}
+ */
+const computeScale = function (el) {
+  const matrix = el.css('transform')
+  if (!matrix || matrix === 'none') {
+    return false
+  }
+  const values = matrix.split('(')[1].split(')')[0].split(',')
+  return Math.sqrt(values[0] * values[0] + values[1] * values[1])
+}
 
 export {
   rtTargetarrArr,
@@ -139,5 +152,6 @@ export {
   isNameExDag,
   setSvgColor,
   allNodesId,
-  rtBantpl
+  rtBantpl,
+  computeScale
 }
