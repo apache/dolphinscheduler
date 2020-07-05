@@ -110,7 +110,9 @@ public class ZookeeperOperator implements InitializingBean {
         zkClient = builder.build();
         zkClient.start();
         try {
-            zkClient.blockUntilConnected(zookeeperConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS);
+            if (!zkClient.blockUntilConnected(zookeeperConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS)) {
+                throw new Exception("Connect zookeeper expire max wait time");
+            }
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }
