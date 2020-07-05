@@ -173,8 +173,16 @@ public class SchedulerServiceTest {
     @Test
     public void testDeleteSchedule() {
 
-        Mockito.when(quartzExecutors.deleteJob(null, null)).thenReturn(true);
-        schedulerService.deleteSchedule(1, 1);
+        Mockito.when(quartzExecutors.deleteJob("1", "1")).thenReturn(true);
+        Mockito.when(quartzExecutors.buildJobGroupName(1)).thenReturn("1");
+        Mockito.when(quartzExecutors.buildJobName(1)).thenReturn("1");
+       boolean flag = true;
+        try {
+            schedulerService.deleteSchedule(1, 1);
+        }catch (Exception e){
+            flag = false;
+        }
+        Assert.assertTrue(flag);
 
     }
 

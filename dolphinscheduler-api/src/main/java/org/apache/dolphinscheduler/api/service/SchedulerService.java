@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -394,7 +395,7 @@ public class SchedulerService extends BaseService {
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new RuntimeException(result.get(Constants.MSG).toString());
+            throw new ServiceException(result.get(Constants.MSG).toString());
         }
 
         putMsg(result, Status.SUCCESS);
@@ -471,7 +472,7 @@ public class SchedulerService extends BaseService {
         return result;
     }
 
-    public void setSchedule(int projectId, Schedule schedule) throws RuntimeException{
+    public void setSchedule(int projectId, Schedule schedule) {
 
         int scheduleId = schedule.getId();
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
@@ -496,7 +497,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
-    public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public static void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
         String jobName = QuartzExecutors.buildJobName(scheduleId);
@@ -504,7 +505,7 @@ public class SchedulerService extends BaseService {
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
             logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
-            throw new RuntimeException(String.format("set offline failure"));
+            throw new ServiceException(String.format("set offline failure"));
         }
 
     }
