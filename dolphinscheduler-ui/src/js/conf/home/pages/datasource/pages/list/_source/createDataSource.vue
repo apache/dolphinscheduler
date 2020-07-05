@@ -24,16 +24,10 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content">
-            <x-radio-group v-model="type" size="small">
-              <x-radio :label="'MYSQL'">MYSQL</x-radio>
-              <x-radio :label="'POSTGRESQL'">POSTGRESQL</x-radio>
-              <x-radio :label="'HIVE'">HIVE/IMPALA</x-radio>
-              <x-radio :label="'SPARK'">SPARK</x-radio>
-              <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
-              <x-radio :label="'ORACLE'">ORACLE</x-radio>
-              <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
-              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
-            </x-radio-group>
+              <x-select style="width: 100%;" v-model="type">
+                <x-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
+                </x-option>
+              </x-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
@@ -164,6 +158,7 @@
   import {isJson} from '@/module/util/util'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import mSelectInput from './selectInput'
 
   export default {
     name: 'create-datasource',
@@ -200,7 +195,41 @@
         showdDatabase: false,
         showConnectType: false,
         isShowPrincipal:true,
-        prePortMapper:{}
+        prePortMapper:{},
+        datasourceTypeList: [
+          {
+            value: 'MYSQL',
+            label: 'MYSQL'
+          },
+          {
+            value: 'POSTGRESQL',
+            label: 'POSTGRESQL'
+          },
+          {
+            value: 'HIVE',
+            label: 'HIVE/IMPALA'
+          },
+          {
+            value: 'SPARK',
+            label: 'SPARK'
+          },
+          {
+            value: 'CLICKHOUSE',
+            label: 'CLICKHOUSE'
+          },
+          {
+            value: 'ORACLE',
+            label: 'ORACLE'
+          },
+          {
+            value: 'SQLSERVER',
+            label: 'SQLSERVER'
+          },
+          {
+            value: 'DB2',
+            label: 'DB2'
+          }
+        ]
       }
     },
     props: {
@@ -465,7 +494,7 @@
 
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopup, mListBoxF, mSelectInput }
   }
 </script>
 
