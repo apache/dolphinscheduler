@@ -111,7 +111,7 @@ public class ZookeeperOperator implements InitializingBean {
         zkClient.start();
         try {
             if (!zkClient.blockUntilConnected(zookeeperConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS)) {
-                throw new Exception("Connect zookeeper expire max wait time");
+                throw new IllegalStateException("Connect zookeeper expire max wait time");
             }
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
