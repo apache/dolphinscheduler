@@ -974,5 +974,9 @@ public final class Constants {
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
+    /**
+     * system line separator
+     */
+    public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
 }

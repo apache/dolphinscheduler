@@ -75,7 +75,17 @@ public class LoggerService {
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
 
-    String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
+    StringBuilder log = new StringBuilder();
+    if(skipLineNum == 0 ) {
+      log.append("[LOG-PATH]: ")
+          .append(taskInstance.getLogPath())
+          .append(", [HOST]: ")
+          .append(taskInstance.getHost())
+          .append(Constants.SYSTEM_LINE_SEPARATOR);
+    }
+
+    log.append(logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(), skipLineNum, limit));
+
     result.setData(log);
     return result;
   }
