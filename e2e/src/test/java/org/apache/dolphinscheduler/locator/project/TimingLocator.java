@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 
 public class TimingLocator {
     // create timing button
-    public static final By CLICK_TIMING_BUTTON = By.xpath("//div[2]/div/div[3]/div[1]/div/table/tr[2]/td[10]/button[3]");
+    public static final By CLICK_TIMING_BUTTON = By.xpath("//td[10]/button[3]");
 
     public static final By CLICK_EXECUTION_TIMING_BUTTON = By.xpath("//div[3]/button/span");
 
