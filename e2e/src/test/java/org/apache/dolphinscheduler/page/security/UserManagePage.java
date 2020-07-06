@@ -27,7 +27,7 @@ public class UserManagePage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create user
      *
      * @return Whether to enter the specified page after creat tenant
      */
@@ -55,6 +55,39 @@ public class UserManagePage extends PageCommon {
         return ifTitleContains(UserManageData.USER_MANAGE);
     }
 
+    /**
+     * edit user
+     */
+    public boolean editUser() throws InterruptedException {
+
+        // click  user manage
+        Thread.sleep(500);
+        clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        // click  edit user button
+        clickButton(UserManageLocator.EDIT_USER_BUTTON );
+
+        // input user data
+        clearSendInput(UserManageLocator.INPUT_USERNAME, UserManageData.EDIT_USERNAME);
+        clearSendInput(UserManageLocator.INPUT_PASSWORD, UserManageData.EDIT_PASSWORD);
+        clickButton(UserManageLocator.CLICK_TENANT);
+        clickButton(UserManageLocator.SELECT_TENANT);
+        clickButton(UserManageLocator.CLICK_QUEUE);
+        clickButton(UserManageLocator.SELECT_QUEUE);
+        clearSendInput(UserManageLocator.TENANT_INPUT_EMAIL, UserManageData.EDIT_EMAIL);
+        clearSendInput(UserManageLocator.TENANT_INPUT_PHONE, UserManageData.EDIT_PHONE);
+
+        // click  button
+        clickButton(UserManageLocator.SUBMIT);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(UserManageData.USER_MANAGE);
+    }
+
+
+    /**
+     * delete user
+     */
     public boolean deleteUser() throws InterruptedException {
 
         // click  user manage

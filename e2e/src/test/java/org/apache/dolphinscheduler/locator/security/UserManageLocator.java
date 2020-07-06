@@ -20,6 +20,9 @@ import org.openqa.selenium.By;
 
 public class UserManageLocator {
 
+    /**
+     * create user
+     */
     public static final By CLICK_USER_MANAGE = By.xpath("//div[3]/div/a/div/a/span");
 
     public static final By CLICK_CREATE_USER_BUTTON = By.xpath("//span[contains(.,'创建用户')]");
@@ -42,6 +45,15 @@ public class UserManageLocator {
 
     public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
 
+    /**
+     * edit user
+     */
+    public static final By EDIT_USER_BUTTON = By.xpath("//td[10]/button");
+
+
+    /**
+     * delete user
+     */
     public static final By DELETE_USER_BUTTON = By.xpath("//span[2]/button");
 
     public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//div[2]/div/button[2]/span");
