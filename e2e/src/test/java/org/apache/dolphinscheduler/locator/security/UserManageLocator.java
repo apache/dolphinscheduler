@@ -48,8 +48,7 @@ public class UserManageLocator {
     /**
      * edit user
      */
-    public static final By EDIT_USER_BUTTON = By.xpath("//td[10]/button");
-
+    public static final By EDIT_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[3]/td[10]/button");
 
     /**
      * delete user
