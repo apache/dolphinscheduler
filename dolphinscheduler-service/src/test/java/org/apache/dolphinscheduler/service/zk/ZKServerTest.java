@@ -18,11 +18,14 @@ package org.apache.dolphinscheduler.service.zk;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ZKServerTest {
+    private static final Logger log = LoggerFactory.getLogger(ZKServerTest.class);
 
     @Test
     public void testRunWithDefaultPort() {
@@ -35,7 +38,7 @@ public class ZKServerTest {
             TimeUnit.SECONDS.sleep(5);
             Assert.assertEquals(true, zkServer.get().isStarted());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Thread interrupted", e);
         }
         zkServer.get().stop();
     }
@@ -51,7 +54,7 @@ public class ZKServerTest {
             TimeUnit.SECONDS.sleep(5);
             Assert.assertEquals(true, zkServer.get().isStarted());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Thread interrupted", e);
         }
         zkServer.get().stop();
     }
