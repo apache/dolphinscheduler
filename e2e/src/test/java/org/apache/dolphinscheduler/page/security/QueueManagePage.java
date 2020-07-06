@@ -43,6 +43,8 @@ public class QueueManagePage extends PageCommon {
         // click  create queue button
         clickElement(QueueManageLocator.CLICK_CREATE_QUEUE);
 
+        Thread.sleep(1000);
+
         // input queue data
         sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.QUEUE_NAME);
 

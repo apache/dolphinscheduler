@@ -563,7 +563,8 @@
               cacheTaskInfo({item, fromThis}) {
                 self.cacheTasks(item)
               },
-              close ({ flag, fromThis }) {
+              close ({ item,flag, fromThis }) {
+                self.addTasks(item)
                 // Edit status does not allow deletion of nodes
                 if (flag) {
                   jsPlumb.remove(id)

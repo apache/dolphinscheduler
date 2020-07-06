@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -61,16 +61,16 @@ public class DefaultHTMLTemplateTest{
         LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
         map1.put("mysql service name","mysql200");
         map1.put("mysql address","192.168.xx.xx");
+        map1.put("database client connections","190");
         map1.put("port","3306");
         map1.put("no index of number","80");
-        map1.put("database client connections","190");
 
         LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
         map2.put("mysql service name","mysql210");
         map2.put("mysql address","192.168.xx.xx");
+        map2.put("database client connections","90");
         map2.put("port","3306");
         map2.put("no index of number","10");
-        map2.put("database client connections","90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
@@ -84,8 +84,8 @@ public class DefaultHTMLTemplateTest{
     private String generateMockTableTypeResultByHand(){
 
         return Constants.HTML_HEADER_PREFIX +
-                "<thead><tr><th>mysql service name</th><th>mysql address</th><th>port</th><th>no index of number</th><th>database client connections</th></tr></thead>\n" +
-                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>3306</td><td>80</td><td>190</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>3306</td><td>10</td><td>90</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
+                "<thead><tr><th>mysql service name</th><th>mysql address</th><th>database client connections</th><th>port</th><th>no index of number</th></tr></thead>\n" +
+                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>190</td><td>3306</td><td>80</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>90</td><td>3306</td><td>10</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
 
     }
 
