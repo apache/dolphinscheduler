@@ -38,7 +38,9 @@ public class TestUserManage extends BaseTest {
         userManagePage = new UserManagePage(driver);
         //edit user
         System.out.println("start edit user");
-        assert userManagePage.editUser();
+        assert userManagePage.editGeneralUser();
+        assert userManagePage.editAdminlUser();
+
         System.out.println("end edit user");
         System.out.println("===================================");
 
