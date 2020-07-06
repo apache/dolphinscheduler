@@ -364,7 +364,7 @@ public class SqlTask extends AbstractTask {
                        Connection connection){
         if (resultSet != null){
             try {
-                connection.close();
+                resultSet.close();
             } catch (SQLException e) {
 
             }
@@ -372,7 +372,7 @@ public class SqlTask extends AbstractTask {
 
         if (pstmt != null){
             try {
-                connection.close();
+                pstmt.close();
             } catch (SQLException e) {
 
             }
