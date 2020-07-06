@@ -34,6 +34,7 @@ public class TimingPage extends PageCommon {
     public boolean createTiming() throws InterruptedException {
         // click timing button
         System.out.println("Click timing button");
+        Thread.sleep(500);
         clickButton(TimingLocator.CLICK_TIMING_BUTTON);
         System.out.println("Click execution timing button");
         clickButton(TimingLocator.CLICK_EXECUTION_TIMING_BUTTON);
