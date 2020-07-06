@@ -158,7 +158,6 @@
   import {isJson} from '@/module/util/util'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSelectInput from './selectInput'
 
   export default {
     name: 'create-datasource',
@@ -494,7 +493,7 @@
 
     mounted () {
     },
-    components: { mPopup, mListBoxF, mSelectInput }
+    components: { mPopup, mListBoxF }
   }
 </script>
 
