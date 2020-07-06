@@ -33,7 +33,7 @@ public class TestUserManage extends BaseTest {
         System.out.println("===================================");
     }
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","user" },description = "TestEditUser")
+    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "TestEditUser")
     public void testEditUser() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
         //edit user
