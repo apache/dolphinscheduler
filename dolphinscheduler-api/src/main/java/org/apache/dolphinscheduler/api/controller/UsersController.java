@@ -93,6 +93,34 @@ public class UsersController extends BaseController {
     }
 
     /**
+     * user register
+     *
+     * @param userName       user name
+     * @param userPassword   user password
+     * @param repeatPassword repeat password
+     * @param email          user email
+     */
+    @ApiOperation(value="registerUser",notes = "REGISTER_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "repeatPassword", value = "REPEAT_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", type = "String"),
+    })
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(CREATE_USER_ERROR)
+    public <T> Result registerUser(@RequestParam(value = "userName") String userName,
+                                  @RequestParam(value = "userPassword") String userPassword,
+                                  @RequestParam(value = "repeatPassword") String repeatPassword,
+                                  @RequestParam(value = "email") String email) throws Exception {
+        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+        logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, email {}",
+                userName, Constants.PASSWORD_DEFAULT, Constants.PASSWORD_DEFAULT, email);
+        return returnDataList(result);
+    }
+
+    /**
      * query user list paging
      *
      * @param loginUser login user
