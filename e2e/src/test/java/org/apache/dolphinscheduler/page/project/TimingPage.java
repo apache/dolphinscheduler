@@ -34,7 +34,7 @@ public class TimingPage extends PageCommon {
     public boolean createTiming() throws InterruptedException {
         // click timing button
         System.out.println("Click timing button");
-        Thread.sleep(500);
+        Thread.sleep(1000);
         clickButton(TimingLocator.CLICK_TIMING_BUTTON);
         System.out.println("Click execution timing button");
         clickButton(TimingLocator.CLICK_EXECUTION_TIMING_BUTTON);
@@ -46,7 +46,7 @@ public class TimingPage extends PageCommon {
         clickElement(TimingLocator.SELECT_NOTICE_STRATEGY);
         Thread.sleep(500);
         clickElement(TimingLocator.CLICK_PROCESS_PRIORITY);
-        clickElement(TimingLocator.SELECT_PROCESS_PRIORITY_GIGHEST);
+        clickElement(TimingLocator.SELECT_PROCESS_PRIORITY);
         clickElement(TimingLocator.CLICK_WORKER_GROUP);
         clickElement(TimingLocator.SELECT_WORKER_GROUP);
         clickElement(TimingLocator.CLICK_NOTICE_GROUP);
@@ -77,7 +77,7 @@ public class TimingPage extends PageCommon {
         clickElement(TimingLocator.SELECT_NOTICE_STRATEGY);
         Thread.sleep(500);
         clickElement(TimingLocator.CLICK_PROCESS_PRIORITY);
-        clickElement(TimingLocator.SELECT_PROCESS_PRIORITY_GIGHEST);
+        clickElement(TimingLocator.SELECT_PROCESS_PRIORITY);
         clickElement(TimingLocator.CLICK_WORKER_GROUP);
         clickElement(TimingLocator.SELECT_WORKER_GROUP);
         clickElement(TimingLocator.CLICK_NOTICE_GROUP);

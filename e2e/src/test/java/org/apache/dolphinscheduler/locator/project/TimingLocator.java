@@ -31,7 +31,7 @@ public class TimingLocator {
     public static final By SELECT_NOTICE_STRATEGY = By.xpath("//div[2]/div/div/div/ul/li[4]/span");
 
     public static final By CLICK_PROCESS_PRIORITY = By.xpath("//div[7]/div[2]/div/div/div/div/div/span[2]");
-    public static final By SELECT_PROCESS_PRIORITY_GIGHEST  = By.xpath("//li/li/span");
+    public static final By SELECT_PROCESS_PRIORITY  = By.xpath("//li/li/span");
 
     public static final By CLICK_WORKER_GROUP = By.xpath("//div[8]/div[2]/div/div/div/input");
     public static final By SELECT_WORKER_GROUP  = By.xpath("//div[8]/div[2]/div/div[2]/div/div/div/ul/li/span");
