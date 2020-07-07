@@ -62,9 +62,12 @@ public class UserManagePage extends PageCommon {
         //edit general user
         // click  user manage
         Thread.sleep(500);
+        System.out.println("click user manage");
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
+        Thread.sleep(500);
+        System.out.println("click edie general user button");
         clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
 
         // input user data
