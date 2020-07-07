@@ -47,7 +47,7 @@ public class ZKServerTest {
     public void testRunWithCustomPort() {
         AtomicReference<ZKServer> zkServer = new AtomicReference<>();
         new Thread(() -> {
-            zkServer.set(new ZKServer(2182));
+            zkServer.set(new ZKServer(2183, "zk1"));
             zkServer.get().start();
         }).start();
         try {

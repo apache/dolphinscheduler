@@ -36,36 +36,46 @@ public class ZKServer {
 
     public static final int DEFAULT_ZK_TEST_PORT = 2181;
 
-    private PublicZooKeeperServerMain zkServer = null;
-
-    private int port = DEFAULT_ZK_TEST_PORT;
-
-    private static String dataDir = null;
-
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
+
+    private PublicZooKeeperServerMain zooKeeperServerMain = null;
+
+    private int port;
+
+    private String dataDir = null;
+
+    private String prefix;
 
     public static void main(String[] args) {
         ZKServer zkServer;
         if (args.length == 0) {
             zkServer = new ZKServer();
+        } else if (args.length == 1){
+            zkServer = new ZKServer(Integer.valueOf(args[0]), "");
         } else {
-            zkServer = new ZKServer(Integer.valueOf(args[0]));
+            zkServer = new ZKServer(Integer.valueOf(args[0]), args[1]);
         }
         zkServer.registerHook();
         zkServer.start();
     }
 
-    public ZKServer() {}
+    public ZKServer() {
+        this(DEFAULT_ZK_TEST_PORT, "");
+    }
 
-    public ZKServer(int port) {
+    public ZKServer(int port, String prefix) {
         this.port = port;
+        if (prefix.contains("/")) {
+            throw new IllegalArgumentException("The prefix of path may not have '/'");
+        }
+        this.prefix = prefix;
     }
 
     private void registerHook() {
         /**
          *  register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> stop()));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     /**
@@ -103,7 +113,8 @@ public class ZKServer {
      * @param port The port to listen on
      */
     public void startLocalZkServer(final int port) {
-        String zkDataDir = System.getProperty("user.dir") +"/zookeeper_data";
+        String zkDataDir = System.getProperty("user.dir") + ("".equals(prefix) ? prefix : ("/" + prefix)) + "/zookeeper_data";
+        logger.warn("The path of zk server exists");
         logger.info("zk server starting, data dir path:{}" , zkDataDir);
         startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME,"60");
     }
@@ -117,10 +128,10 @@ public class ZKServer {
      * @param maxClientCnxns    zk max client connections
      */
     private void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
-        if (zkServer != null) {
+        if (zooKeeperServerMain != null) {
             throw new RuntimeException("Zookeeper server is already started!");
         }
-        zkServer = new PublicZooKeeperServerMain();
+        zooKeeperServerMain = new PublicZooKeeperServerMain();
         logger.info("Zookeeper data path : {} ", dataDirPath);
         dataDir = dataDirPath;
         final String[] args = new String[]{Integer.toString(port), dataDirPath, Integer.toString(tickTime), maxClientCnxns};
@@ -129,7 +140,7 @@ public class ZKServer {
             logger.info("Zookeeper server started ");
             isStarted.compareAndSet(false, true);
 
-            zkServer.initializeAndRun(args);
+            zooKeeperServerMain.initializeAndRun(args);
         } catch (QuorumPeerConfig.ConfigException e) {
             logger.warn("Caught exception while starting ZK", e);
         } catch (IOException e) {
@@ -158,11 +169,11 @@ public class ZKServer {
     private void stopLocalZkServer(final boolean deleteDataDir) {
         if (isStarted.compareAndSet(true, false)) {
             try {
-                if (zkServer == null) {
+                if (zooKeeperServerMain == null) {
                     return;
                 }
-                zkServer.shutdown();
-                zkServer = null;
+                zooKeeperServerMain.shutdown();
+                zooKeeperServerMain = null;
                 if (deleteDataDir) {
                     org.apache.commons.io.FileUtils.deleteDirectory(new File(dataDir));
                 }
