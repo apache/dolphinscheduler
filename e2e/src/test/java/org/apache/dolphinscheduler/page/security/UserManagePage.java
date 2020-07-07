@@ -61,19 +61,21 @@ public class UserManagePage extends PageCommon {
     public boolean editGeneralUser() throws InterruptedException {
         //edit general user
         // click  user manage
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
-        clickButton(UserManageLocator.EDIT_USER_BUTTON );
+        clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
 
         // input user data
         clearSendInput(UserManageLocator.INPUT_USERNAME, UserManageData.EDIT_USERNAME);
         clearSendInput(UserManageLocator.INPUT_PASSWORD, UserManageData.EDIT_PASSWORD);
+
         clickButton(UserManageLocator.CLICK_TENANT);
         clickButton(UserManageLocator.SELECT_TENANT);
+
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
+
         clearSendInput(UserManageLocator.TENANT_INPUT_EMAIL, UserManageData.EDIT_EMAIL);
         clearSendInput(UserManageLocator.TENANT_INPUT_PHONE, UserManageData.EDIT_PHONE);
 
@@ -90,14 +92,14 @@ public class UserManagePage extends PageCommon {
     public boolean editAdminlUser() throws InterruptedException {
         //edit admin user
         // click  user manage
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
-        clickButton(UserManageLocator.EDIT_USER_BUTTON );
+        clickButton(UserManageLocator.EDIT_ADMIN_USER_BUTTON );
 
         // select tenant
         clickButton(UserManageLocator.CLICK_TENANT);
+
         clickButton(UserManageLocator.SELECT_TENANT);
 
         // click  button
