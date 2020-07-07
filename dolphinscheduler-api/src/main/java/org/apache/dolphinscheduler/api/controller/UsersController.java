@@ -410,5 +410,36 @@ public class UsersController extends BaseController {
         }
     }
 
+    /**
+     * user register
+     *
+     * @param userName       user name
+     * @param userPassword   user password
+     * @param repeatPassword repeat password
+     * @param email          user email
+     */
+    @ApiOperation(value="registerUser",notes = "REGISTER_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "repeatPassword", value = "REPEAT_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", type = "String"),
+    })
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(CREATE_USER_ERROR)
+    public Result<Object> registerUser(@RequestParam(value = "userName") String userName,
+                               @RequestParam(value = "userPassword") String userPassword,
+                               @RequestParam(value = "repeatPassword") String repeatPassword,
+                               @RequestParam(value = "email") String email) throws Exception {
+        userName = userName.replaceAll("[\n|\r|\t]", "");
+        userPassword = userPassword.replaceAll("[\n|\r|\t]", "");
+        repeatPassword = repeatPassword.replaceAll("[\n|\r|\t]", "");
+        email = email.replaceAll("[\n|\r|\t]", "");
+        logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, eamil {}",
+                userName, userPassword, repeatPassword, email);
+        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+        return returnDataList(result);
+    }
 
 }
