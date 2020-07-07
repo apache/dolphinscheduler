@@ -35,6 +35,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 
   public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
   public static final String LOGIN_PATH_PATTERN = "/login";
+  public static final String REGISTER_PATH_PATTERN = "/users/register";
   public static final String PATH_PATTERN = "/**";
   public static final String LOCALE_LANGUAGE_COOKIE = "language";
   public static final int COOKIE_MAX_AGE = 3600;
@@ -76,7 +77,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     //i18n
     registry.addInterceptor(localeChangeInterceptor());
 
-    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN,"/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
+    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
   }
 
 

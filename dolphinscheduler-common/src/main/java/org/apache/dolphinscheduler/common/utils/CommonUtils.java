@@ -48,7 +48,7 @@ public class CommonUtils {
         envPath = envDefaultPath.getPath();
         logger.debug("env path :{}", envPath);
       }else{
-        envPath = System.getProperty("user.home") + File.separator + ".bash_profile";
+        envPath =  "/etc/profile";
       }
     }
 
