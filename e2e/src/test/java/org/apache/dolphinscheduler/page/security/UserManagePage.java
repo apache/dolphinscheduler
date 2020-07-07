@@ -61,6 +61,7 @@ public class UserManagePage extends PageCommon {
     public boolean editGeneralUser() throws InterruptedException {
         //edit general user
         // click  user manage
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
@@ -92,6 +93,7 @@ public class UserManagePage extends PageCommon {
     public boolean editAdminlUser() throws InterruptedException {
         //edit admin user
         // click  user manage
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
