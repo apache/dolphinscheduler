@@ -908,4 +908,37 @@ public class UsersService extends BaseService {
             }
         }
     }
+
+    /**
+     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     *
+     * @param userName       user name
+     * @param userPassword   user password
+     * @param repeatPassword repeat password
+     * @param email          email
+     * @return register result code
+     * @throws Exception exception
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) throws Exception {
+        Map<String, Object> result = new HashMap<>(5);
+
+        //check user params
+        String msg = this.checkUserParams(userName, userPassword, email, "");
+
+        if (!StringUtils.isEmpty(msg)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,msg);
+            return result;
+        }
+
+        if (!userPassword.equals(repeatPassword)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
+            return result;
+        }
+
+        createUser(userName, userPassword, email, 1, "", "", 0);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
 }
