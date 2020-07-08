@@ -61,13 +61,10 @@ public class UserManagePage extends PageCommon {
     public boolean editGeneralUser() throws InterruptedException {
         //edit general user
         // click  user manage
-        Thread.sleep(500);
-        System.out.println("click user manage");
+        System.out.println("start edit general user");
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
-        Thread.sleep(500);
-        System.out.println("click edie general user button");
         clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
 
         // input user data
@@ -85,6 +82,7 @@ public class UserManagePage extends PageCommon {
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
+        System.out.println("end edit general user");
 
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);
@@ -96,7 +94,7 @@ public class UserManagePage extends PageCommon {
     public boolean editAdminlUser() throws InterruptedException {
         //edit admin user
         // click  user manage
-        Thread.sleep(500);
+        System.out.println("start edit admin user");
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
@@ -109,6 +107,7 @@ public class UserManagePage extends PageCommon {
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
+        System.out.println("end edit admin user");
 
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);

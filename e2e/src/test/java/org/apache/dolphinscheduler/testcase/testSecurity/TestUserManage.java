@@ -37,9 +37,8 @@ public class TestUserManage extends BaseTest {
     public void testEditUser() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
         //edit user
-        System.out.println("start edit general user");
+        System.out.println("start edit  user");
         assert userManagePage.editGeneralUser();
-        System.out.println("start edit admin user");
         assert userManagePage.editAdminlUser();
 
         System.out.println("end edit user");
