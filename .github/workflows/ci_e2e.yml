@@ -69,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dslogs
-          path: dolphinscheduler-logs
+          path: /opt/dolphinscheduler/logs
 
 
