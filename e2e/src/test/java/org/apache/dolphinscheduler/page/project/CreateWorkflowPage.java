@@ -191,6 +191,8 @@ public class CreateWorkflowPage extends PageCommon {
     }
 
     public boolean onlineWorkflow() throws InterruptedException {
+        clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+
         // click online button
         System.out.println("Click online workflow button");
         clickButton(CreateWorkflowLocator.CLICK_ONLINE_WORKFLOW_BUTTON);
@@ -199,6 +201,8 @@ public class CreateWorkflowPage extends PageCommon {
     }
 
     public boolean offlineWorkflow() throws InterruptedException {
+        clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+
         // click offline button
         System.out.println("offline workflow");
         Thread.sleep(500);
@@ -210,7 +214,7 @@ public class CreateWorkflowPage extends PageCommon {
 
     public boolean deleteWorkflow() throws InterruptedException {
         //click  delete workflow
-        Thread.sleep(TestConstant.ONE_THOUSAND);
+        Thread.sleep(500);
         clickButton(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
 
         //click confirm delete project

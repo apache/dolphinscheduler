@@ -82,8 +82,8 @@ public class TimingPage extends PageCommon {
         clickElement(TimingLocator.SELECT_WORKER_GROUP);
         clickElement(TimingLocator.CLICK_NOTICE_GROUP);
         clickElement(TimingLocator.SELECT_NOTICE_GROUP);
-        sendInput(TimingLocator.INPUT_RECIPIENT, TimingData.RECIPIENT);
-        sendInput(TimingLocator.INPUT_Cc,TimingData.Cc);
+        sendInput(TimingLocator.INPUT_RECIPIENT, TimingData.EDIT_RECIPIENT);
+        sendInput(TimingLocator.INPUT_Cc,TimingData.EDIT_Cc);
         clickButton(TimingLocator.CLICK_CREATE_BUTTON);
 
         return ifTitleContains(TimingData.TIMING_TITLE );

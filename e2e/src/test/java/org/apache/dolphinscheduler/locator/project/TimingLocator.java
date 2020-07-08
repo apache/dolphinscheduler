@@ -58,5 +58,4 @@ public class TimingLocator {
     //delete timing
     public static final By CLICK_DELETE_TIMING_BUTTON = By.xpath("//div[2]/div[3]/div/div[2]/div[1]/table/tr[2]/td[10]/span/button");
     public static final By CLICK_CONFIRM_DELETE_TIMING_BUTTON = By.xpath("//div[2]/div/button[2]/span");
-
 }

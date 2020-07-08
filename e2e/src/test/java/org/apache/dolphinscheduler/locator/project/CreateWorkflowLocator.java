@@ -189,7 +189,7 @@ public class CreateWorkflowLocator {
      * delete workflow
      */
     //click delete workflow button
-    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//span/button/i");
+    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[10]/span/button");
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
