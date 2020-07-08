@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -96,11 +95,11 @@ public class SchemaUtils {
 
 		String[] schemaVersionArr = schemaVersion.split("\\.");
 		String[] versionArr = version.split("\\.");
-		int arrLength = schemaVersionArr.length < versionArr.length ? schemaVersionArr.length : versionArr.length;
+		int arrLength = Math.min(schemaVersionArr.length, versionArr.length);
 		for(int i = 0 ; i < arrLength ; i++) {
-			if(Integer.valueOf(schemaVersionArr[i]) > Integer.valueOf(versionArr[i])) {
+			if(Integer.parseInt(schemaVersionArr[i]) > Integer.parseInt(versionArr[i])) {
 				return true;
-			}else if(Integer.valueOf(schemaVersionArr[i]) < Integer.valueOf(versionArr[i])) {
+			}else if(Integer.parseInt(schemaVersionArr[i]) < Integer.parseInt(versionArr[i])) {
 				return false;
 			}
 		}
@@ -121,9 +120,6 @@ public class SchemaUtils {
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
-		} catch (IOException e) {
-			logger.error(e.getMessage(),e);
-			throw new RuntimeException("Failed to get product version number description file, failed to read the file", e);
 		}
 		return soft_version;
 	}

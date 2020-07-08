@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 
-
-import com.alibaba.fastjson.JSON;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -27,6 +24,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -38,10 +36,10 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.Set;
+import org.apache.dolphinscheduler.common.utils.*;
 
 
 /**
@@ -142,6 +140,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
                     cancelTaskInstance();
                 }
+                if(processInstance.getState() == ExecutionStatus.READY_PAUSE){
+                    pauseTask();
+                }
                 // task instance finished
                 if (taskInstance.getState().typeIsFinished()){
                     // if task is final result , then remove taskInstance from cache
@@ -176,20 +177,33 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return true;
     }
 
+    /**
+     * pause task if task have not been dispatched to worker, do not dispatch anymore.
+     *
+     */
+    public void pauseTask() {
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(taskInstance == null){
+            return;
+        }
+        if(StringUtils.isBlank(taskInstance.getHost())){
+            taskInstance.setState(ExecutionStatus.PAUSE);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
+        }
+    }
+
 
     /**
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance() throws Exception{
         if(alreadyKilled){
-            return ;
+            return;
         }
         alreadyKilled = true;
-
-        String taskInstanceWorkerGroup = taskInstance.getWorkerGroup();
-
-        // not exists
-        if (!existsValidWorkerGroup(taskInstanceWorkerGroup)){
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(StringUtils.isBlank(taskInstance.getHost())){
             taskInstance.setState(ExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
@@ -239,7 +253,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
     }
 
