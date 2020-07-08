@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class TestTiming extends BaseTest {
     private TimingPage timingPage;
 
-    @Test(groups={"functionTests","createTiming"},dependsOnGroups = { "login","workflow" },description = "TestCreateTiming")
+    @Test(groups={"functionTests","createTiming"},dependsOnGroups = { "login","workflow"},description = "TestCreateTiming")
     public void testCreateTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 
@@ -33,7 +33,7 @@ public class TestTiming extends BaseTest {
         System.out.println("===================================");
 
     }
-    @Test(groups={"functionTests","editTiming"},dependsOnGroups = { "login","workflow" },description = "TestEditTiming")
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow"},description = "TestEditTiming")
     public void testEditTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 
@@ -43,7 +43,7 @@ public class TestTiming extends BaseTest {
         System.out.println("===================================");
     }
 
-    @Test(groups={"functionTests","onlineTiming"},dependsOnGroups = { "login","workflow" },description = "TestOnlineTiming")
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow" },description = "TestOnlineTiming")
     public void testOnlineTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 
@@ -53,7 +53,7 @@ public class TestTiming extends BaseTest {
         System.out.println("===================================");
     }
 
-    @Test(groups={"functionTests","offlineTiming"},dependsOnGroups = { "login","workflow" },description = "TestOfflineTiming")
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow"},description = "TestOfflineTiming")
     public void testOfflineTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 
@@ -63,7 +63,7 @@ public class TestTiming extends BaseTest {
         System.out.println("===================================");
     }
 
-    @Test(groups={"functionTests","deleteTiming"},dependsOnGroups = { "login","workflow" },description = "TestDeleteTiming")
+    @Test(groups={"functionTests","timing"},dependsOnGroups = { "login","workflow"},description = "TestDeleteTiming")
     public void testDeleteTiming() throws InterruptedException {
         timingPage = new TimingPage(driver);
 

@@ -45,8 +45,10 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.SELECT_TENANT);
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
-        sendInput(UserManageLocator.TENANT_INPUT_EMAIL, UserManageData.EMAIL);
-        sendInput(UserManageLocator.TENANT_INPUT_PHONE, UserManageData.PHONE);
+        sendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EMAIL);
+        sendInput(UserManageLocator.INPUT_PHONE, UserManageData.PHONE);
+        clickElement(UserManageLocator.SELECT_STOP_STATE);
+        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
@@ -78,8 +80,11 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
 
-        clearSendInput(UserManageLocator.TENANT_INPUT_EMAIL, UserManageData.EDIT_EMAIL);
-        clearSendInput(UserManageLocator.TENANT_INPUT_PHONE, UserManageData.EDIT_PHONE);
+        clearSendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EDIT_EMAIL);
+        clearSendInput(UserManageLocator.INPUT_PHONE, UserManageData.EDIT_PHONE);
+
+        clickElement(UserManageLocator.SELECT_STOP_STATE);
+        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
