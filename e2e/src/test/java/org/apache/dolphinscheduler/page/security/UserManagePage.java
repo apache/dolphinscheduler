@@ -62,6 +62,7 @@ public class UserManagePage extends PageCommon {
         //edit general user
         // click  user manage
         System.out.println("start edit general user");
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
@@ -95,6 +96,7 @@ public class UserManagePage extends PageCommon {
         //edit admin user
         // click  user manage
         System.out.println("start edit admin user");
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
