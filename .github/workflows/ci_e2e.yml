@@ -18,7 +18,7 @@
 on: ["pull_request"]
 env:
   DOCKER_DIR: ./docker
-  LOG_DIR: /var/lib/docker/volumes/dolphinscheduler-logs/_data
+  LOG_DIR: /tmp/dolphinscheduler
 
 name: e2e Test
 

@@ -225,7 +225,7 @@ volumes:
   dolphinscheduler-postgresql-initdb:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
-  dolphinscheduler-logs:
+  dolphinscheduler-logs: /opt/dolphinscheduler/logs
 
 configs:
   dolphinscheduler-worker-task-env:
