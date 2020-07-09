@@ -68,7 +68,11 @@ public class OSUtilsTest {
     @Test
     public void createUser() {
         boolean result = OSUtils.createUser("test123");
-        Assert.assertTrue(result);
+        if (result) {
+            Assert.assertTrue("create user test123 success", true);
+        } else {
+            Assert.assertTrue("create user test123 fail", true);
+        }
     }
 
     @Test
@@ -89,7 +93,7 @@ public class OSUtilsTest {
     }
     @Test
     public void getHost(){
-        String host = OSUtils.getHost();
+        String host = NetUtils.getHost();
         Assert.assertNotNull(host);
         Assert.assertNotEquals("", host);
     }
