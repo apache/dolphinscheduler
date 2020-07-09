@@ -18,7 +18,7 @@
 on: ["pull_request"]
 env:
   DOCKER_DIR: ./docker
-  LOG_DIR: /tmp/dolphinscheduler
+  LOG_DIR: /var/lib/docker/volumes/dolphinscheduler-logs/_data
 
 name: e2e Test
 
@@ -30,7 +30,6 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
-      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
       - name: checkout submodules
         shell: bash
         run: |
