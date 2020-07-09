@@ -230,5 +230,3 @@ volumes:
 configs:
   dolphinscheduler-worker-task-env:
     file: ./dolphinscheduler_env.sh
-
-privileged: true
