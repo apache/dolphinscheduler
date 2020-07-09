@@ -54,6 +54,7 @@ jobs:
         run: sh $(pwd)/docker/docker-swarm/check
       - name: Prepare e2e env
         run: |
+          docker inspect dolphinscheduler-api
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
@@ -69,6 +70,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dslogs
-          path: /var/lib/docker/volumes/docker-swarm_dolphinscheduler-logs
-
-
+          path: /var/lib/docker/volumes/dolphinscheduler-logs/_data
