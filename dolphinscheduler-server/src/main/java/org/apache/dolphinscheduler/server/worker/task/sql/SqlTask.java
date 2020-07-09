@@ -178,7 +178,7 @@ public class SqlTask extends AbstractTask {
         }
         //new
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime(), paramsMap);
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -364,7 +364,7 @@ public class SqlTask extends AbstractTask {
                        Connection connection){
         if (resultSet != null){
             try {
-                connection.close();
+                resultSet.close();
             } catch (SQLException e) {
 
             }
@@ -372,7 +372,7 @@ public class SqlTask extends AbstractTask {
 
         if (pstmt != null){
             try {
-                connection.close();
+                pstmt.close();
             } catch (SQLException e) {
 
             }
