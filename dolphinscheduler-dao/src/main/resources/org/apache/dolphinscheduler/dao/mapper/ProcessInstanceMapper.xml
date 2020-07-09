@@ -40,7 +40,7 @@
         select *
         from t_ds_process_instance
         order by end_time-start_time desc
-        limit #{N}
+        limit #{size}
     </select>
     <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *

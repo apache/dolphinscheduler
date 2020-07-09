@@ -368,7 +368,7 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance1=insertOne(startTime1,endTime1);
         ProcessInstance processInstance2=insertOne(startTime2,endTime2);
         List<ProcessInstance> processInstances=processInstanceMapper.queryTopNProcessInstanceOrderByDuration(2);
-        assert  isSortedByDuration(processInstances);
+        Assert.assertTrue(isSortedByDuration(processInstances));
         processInstanceMapper.deleteById(processInstance1.getId());
         processInstanceMapper.deleteById(processInstance2.getId());
     }
