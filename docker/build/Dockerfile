@@ -58,7 +58,7 @@ ADD ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
 ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
 RUN chmod +x /root/checkpoint.sh && \
     chmod +x /root/startup-init-conf.sh && \
-    chmod +x /root/startup.sh && \
+    chmod 777 /root/startup.sh && \
     chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     chmod +x /opt/dolphinscheduler/script/*.sh && \
     chmod +x /opt/dolphinscheduler/bin/*.sh && \
