@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 
 /**
@@ -75,7 +75,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			while (!checkZKNodeExists(OSUtils.getHost(), ZKNodeType.MASTER)){
+			while (!checkZKNodeExists(NetUtils.getHost(), ZKNodeType.MASTER)){
 				ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 			}
 
@@ -155,7 +155,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-		if(StringUtils.isEmpty(serverHost) || serverHost.startsWith(OSUtils.getHost())){
+		if(StringUtils.isEmpty(serverHost) || serverHost.startsWith(NetUtils.getHost())){
 			return ;
 		}
 		switch (zkNodeType){
