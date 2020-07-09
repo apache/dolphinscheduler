@@ -36,7 +36,12 @@
         </foreach>
         order by id asc
     </select>
-
+    <select id="queryTopNProcessInstanceOrderByDuration" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        order by end_time-start_time desc
+        limit #{N}
+    </select>
     <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
         from t_ds_process_instance
