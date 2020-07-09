@@ -72,7 +72,7 @@ public class PropertyUtils {
      * @return  judge whether resource upload startup
      */
     public static Boolean getResUploadStartupState(){
-        String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+        String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE).toUpperCase();
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
     }
