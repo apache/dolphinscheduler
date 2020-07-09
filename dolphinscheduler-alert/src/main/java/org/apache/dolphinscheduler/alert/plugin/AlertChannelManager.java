@@ -3,7 +3,7 @@ package org.apache.dolphinscheduler.alert.plugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
-import org.apache.dolphinscheduler.spi.params.AbsPluginParams;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +47,11 @@ public class AlertChannelManager {
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
         checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
 
-        List<AbsPluginParams> params = alertChannelFactory.getParams();
+        List<PluginParams> params = alertChannelFactory.getParams();
         String nameCh = alertChannelFactory.getNameCh();
         String nameEn = alertChannelFactory.getNameEn();
 
-        String paramsJson = PluginParamsTransfer.getAlpacajsJson(params);
+        String paramsJson = PluginParamsTransfer.getParamsJson(params);
 
         //TODO: I think params, nameCh, nameEn should save in mysql .
         //TODO: Then the Web UI can get the configured Alert Plugin and disable there name , params.

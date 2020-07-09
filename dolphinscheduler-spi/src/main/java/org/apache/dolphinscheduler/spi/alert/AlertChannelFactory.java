@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.alert;
 
-import org.apache.dolphinscheduler.spi.params.AbsPluginParams;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Each AlertPlugin need implement this interface
@@ -61,7 +60,7 @@ public interface AlertChannelFactory {
      * @return
      *  this alert plugin params
      */
-    List<AbsPluginParams> getParams();
+    List<PluginParams> getParams();
 
     /**
      * The parameters configured in the alert / xxx.properties file will be in the config map

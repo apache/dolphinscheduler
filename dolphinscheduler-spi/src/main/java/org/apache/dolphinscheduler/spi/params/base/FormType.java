@@ -1,12 +1,10 @@
-package org.apache.dolphinscheduler.spi.params;
+package org.apache.dolphinscheduler.spi.params.base;
 
 public enum FormType {
 
-    TEXT("text"),
+    INPUT("input"),
 
-    RADIO("radio"),
-
-    PASSWORD("password");
+    RADIO("radio");
 
     private String formType;
 

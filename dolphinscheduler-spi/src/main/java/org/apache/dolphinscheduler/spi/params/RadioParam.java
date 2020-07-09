@@ -1,54 +1,46 @@
 package org.apache.dolphinscheduler.spi.params;
 
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.dolphinscheduler.spi.params.base.FormType;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * radio
  */
-public class RadioParam extends AbsPluginParams {
+public class RadioParam extends PluginParams {
 
-    public RadioParam(String name, String label, List<String> optionValues, String defaultValue, boolean isRequired, boolean readOnly) {
-        super(name);
-        requireNonNull(label , "label is null");
-        requireNonNull(optionValues , "optionValues is null");
-        if(optionValues.size() == 0) {
-            throw new RuntimeException("optionValues is empty");
+    private List<ParamsOptions> paramsOptionsList;
+
+    public RadioParam(String name, String label, List<ParamsOptions> paramsOptionsList) {
+        super(name, FormType.RADIO, label);
+        this.paramsOptionsList = paramsOptionsList;
+    }
+
+    public RadioParam(String name, String label) {
+        super(name, FormType.RADIO, label);
+    }
+
+    @JsonProperty("options")
+    public List<ParamsOptions> getParamsOptionsList() {
+        return paramsOptionsList;
+    }
+
+    public void setParamsOptionsList(List<ParamsOptions> paramsOptionsList) {
+        this.paramsOptionsList = paramsOptionsList;
+    }
+
+    public RadioParam addParamsOptions(ParamsOptions paramsOptions) {
+        if(this.paramsOptionsList == null) {
+            this.paramsOptionsList = new ArrayList<>();
         }
 
-        this.alpacajsSchema = new AlpacajsSchema();
-        this.alpacajsSchema.setTitle(label);
-        this.alpacajsSchema.setDefaultValue(defaultValue);
-        this.alpacajsSchema.setType(DataType.STRING.getDataType());
-        this.alpacajsSchema.setRequired(isRequired);
-        this.alpacajsSchema.setEnumValues(optionValues);
-
-        this.alpacajsOptions = new AlpacajsOptions();
-        this.alpacajsOptions.setType(FormType.RADIO.getFormType());
-        this.alpacajsOptions.setReadOnly(readOnly);
-    }
-
-    public List<String> getValues() {
-        return this.alpacajsSchema.getEnumValues();
-    }
-
-    public void setValues(List<String> values) {
-        this.alpacajsSchema.setEnumValues(values);
-    }
-
-    /**
-     * add one value
-     * @param value
-     *  value
-     * @return
-     */
-    public RadioParam addValue(String value) {
-        if (this.alpacajsSchema.getEnumValues() == null) {
-            this.alpacajsSchema.setEnumValues(new ArrayList<>());
-        }
-        this.alpacajsSchema.getEnumValues().add(value);
+        this.paramsOptionsList.add(paramsOptions);
         return this;
     }
+
 }

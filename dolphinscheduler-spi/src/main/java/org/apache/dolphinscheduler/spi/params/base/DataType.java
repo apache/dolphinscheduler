@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.spi.params;
+package org.apache.dolphinscheduler.spi.params.base;
 
 /**
  * param datetype
