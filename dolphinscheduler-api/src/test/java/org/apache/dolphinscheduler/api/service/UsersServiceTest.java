@@ -453,6 +453,51 @@ public class UsersServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(userList));
     }
 
+    @Test
+    public void testRegisterUser() {
+        String userName = "userTest0002~";
+        String userPassword = "userTest";
+        String repeatPassword = "userTest";
+        String email = "123@qq.com";
+        try {
+            //userName error
+            Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            logger.info(result.toString());
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            userName = "userTest0002";
+            userPassword = "userTest000111111111111111";
+            //password error
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            logger.info(result.toString());
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            userPassword = "userTest0002";
+            email = "1q.com";
+            //email error
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            logger.info(result.toString());
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //repeatPassword error
+            email = "7400@qq.com";
+            repeatPassword = "userPassword";
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            logger.info(result.toString());
+            Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+            //success
+            repeatPassword = "userTest0002";
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            logger.info(result.toString());
+            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        } catch (Exception e) {
+            logger.error(Status.CREATE_USER_ERROR.getMsg(),e);
+            Assert.assertTrue(false);
+        }
+    }
+
     /**
      * get user
      * @return
