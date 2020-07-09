@@ -193,4 +193,11 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     ProcessInstance queryLastManualProcess(@Param("processDefinitionId") int definitionId,
                                            @Param("startTime") Date startTime,
                                            @Param("endTime") Date endTime);
+
+    /**
+     * query top n process instance order by running duration
+     * @param size
+     * @return ProcessInstance list
+     */
+    List<ProcessInstance> queryTopNProcessInstanceOrderByDuration(@Param("size") int size);
 }
