@@ -1,19 +1,19 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <div class="clearfix dag-model" >
     <div class="toolbar">
@@ -35,15 +35,15 @@
       <div class="dag-toolbar">
         <div class="assist-btn">
           <x-button
-                  style="vertical-align: middle;"
-                  data-toggle="tooltip"
-                  :title="$t('View variables')"
-                  data-container="body"
-                  type="primary"
-                  size="xsmall"
-                  :disabled="$route.name !== 'projects-instance-details'"
-                  @click="_toggleView"
-                  icon="ans-icon-code">
+            style="vertical-align: middle;"
+            data-toggle="tooltip"
+            :title="$t('View variables')"
+            data-container="body"
+            type="primary"
+            size="xsmall"
+            :disabled="$route.name !== 'projects-instance-details'"
+            @click="_toggleView"
+            icon="ans-icon-code">
           </x-button>
           <x-button
             style="vertical-align: middle;"
@@ -72,54 +72,43 @@
             </a>
           </div>
           <x-button
-                  type="primary"
-                  v-tooltip.light="$t('Format DAG')"
-                  icon="ans-icon-triangle-solid-right"
-                  size="xsmall"
-                  data-container="body"
-                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
-                  style="vertical-align: middle;"
-                  @click="dagAutomaticLayout">
+            type="primary"
+            v-tooltip.light="$t('Format DAG')"
+            icon="ans-icon-triangle-solid-right"
+            size="xsmall"
+            data-container="body"
+            v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
+            style="vertical-align: middle;"
+            @click="dagAutomaticLayout">
           </x-button>
           <x-button
-                  v-tooltip.light="$t('Refresh DAG status')"
-                  data-container="body"
-                  style="vertical-align: middle;"
-                  icon="ans-icon-refresh"
-                  type="primary"
-                  :loading="isRefresh"
-                  v-if="type === 'instance'"
-                  @click="!isRefresh && _refresh()"
-                  size="xsmall" >
+            v-tooltip.light="$t('Refresh DAG status')"
+            data-container="body"
+            style="vertical-align: middle;"
+            icon="ans-icon-refresh"
+            type="primary"
+            :loading="isRefresh"
+            v-if="type === 'instance'"
+            @click="!isRefresh && _refresh()"
+            size="xsmall" >
           </x-button>
           <x-button
-                  v-if="isRtTasks"
-                  style="vertical-align: middle;"
-                  type="primary"
-                  size="xsmall"
-                  icon="ans-icon-play"
-                  @click="_rtNodesDag" >
+            v-if="isRtTasks"
+            style="vertical-align: middle;"
+            type="primary"
+            size="xsmall"
+            icon="ans-icon-play"
+            @click="_rtNodesDag" >
             {{$t('Return_1')}}
           </x-button>
           <x-button
-            type="primary"
-            v-tooltip.light="$t('Close')"
-            icon="ans-icon-off"
-            size="xsmall"
-            data-container="body"
-            v-if="(type === 'instance' || 'definition') "
             style="vertical-align: middle;"
-            @click="_closeDAG">
-            {{$t('Close')}}
-          </x-button>
-          <x-button
-                  style="vertical-align: middle;"
-                  type="primary"
-                  size="xsmall"
-                  :loading="spinnerLoading"
-                  @click="_saveChart"
-                  icon="ans-icon-save"
-                  >
+            type="primary"
+            size="xsmall"
+            :loading="spinnerLoading"
+            @click="_saveChart"
+            icon="ans-icon-save"
+          >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
         </div>
@@ -182,30 +171,30 @@
       dagAutomaticLayout() {
         $('#canvas').html('')
 
-      // Destroy round robin
+        // Destroy round robin
         Dag.init({
-        dag: this,
-        instance: jsPlumb.getInstance({
-          Endpoint: [
-            'Dot', { radius: 1, cssClass: 'dot-style' }
-          ],
-          Connector: 'Bezier',
-          PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          ConnectionOverlays: [
-            [
-              'Arrow',
-              {
-                location: 1,
-                id: 'arrow',
-                length: 12,
-                foldback: 0.8
-              }
-            ]
-          ],
-          Container: 'canvas'
+          dag: this,
+          instance: jsPlumb.getInstance({
+            Endpoint: [
+              'Dot', { radius: 1, cssClass: 'dot-style' }
+            ],
+            Connector: 'Bezier',
+            PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+            HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+            ConnectionOverlays: [
+              [
+                'Arrow',
+                {
+                  location: 1,
+                  id: 'arrow',
+                  length: 12,
+                  foldback: 0.8
+                }
+              ]
+            ],
+            Container: 'canvas'
+          })
         })
-      })
         if (this.tasks.length) {
           Dag.backfill(true)
           if (this.type === 'instance') {
@@ -273,7 +262,7 @@
                   let dom = $(`#${v2.id}`)
                   let state = dom.find('.state-p')
                   let depState = ''
-                   taskList.forEach(item=>{
+                  taskList.forEach(item=>{
                     if(item.name==v1.name) {
                       depState = item.state
                     }
@@ -387,15 +376,6 @@
             }
           })
         })
-      },
-      _closeDAG(){
-        let $name = this.$route.name
-        if($name && $name.indexOf("definition") != -1){
-          this.$router.push({ name: 'projects-definition-list'})
-        }else{
-          this.$router.push({ name: 'projects-instance-list'})
-        }
-
       },
       _verifConditions (value) {
         let tasks = value
