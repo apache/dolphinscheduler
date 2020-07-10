@@ -377,7 +377,7 @@ public class ProcessInstanceMapperTest {
         Date end=new Date(2021,1,1,1,1,1);
         List<ProcessInstance> processInstances=processInstanceMapper.queryTopNProcessInstance(2,start,end);
         Assert.assertTrue(isSortedByDuration(processInstances));
-        Assert.assertEquals(processInstances.size(),1);
+        Assert.assertEquals(1,processInstances.size());
         for(ProcessInstance processInstance:processInstances){
             Assert.assertTrue(processInstance.getState().typeIsSuccess());
         }
