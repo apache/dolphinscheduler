@@ -63,11 +63,17 @@ jobs:
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
       - name: Run e2e Test
         run: cd ./e2e && mvn -B clean test
+      - name cp logs file
+        run: |
+        docker cp dolphinscheduler-api:/opt/dolphinscheduler/logs /var/lib/docker/volumes/dolphinscheduler-logs
+        docker cp dolphinscheduler-master:/opt/dolphinscheduler/logs /var/lib/docker/volumes/dolphinscheduler-logs
+        docker cp dolphinscheduler-worker:/opt/dolphinscheduler/logs /var/lib/docker/volumes/dolphinscheduler-logs
+        docker cp dolphinscheduler-alert:/opt/dolphinscheduler/logs /var/lib/docker/volumes/dolphinscheduler-logs
       - name: Collect logs
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: dslogs
-          path: /var/lib/docker/volumes/dolphinscheduler-logs/_data
+          path: /var/lib/docker/volumes/dolphinscheduler-logs
 
 
