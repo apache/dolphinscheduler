@@ -423,34 +423,34 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<>();
+        List<String> receiversList = new ArrayList<>();
         for(User user:users){
-            receviersList.add(user.getEmail().trim());
+            receiversList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver.trim());
+                receiversList.add(receiver.trim());
             }
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<>();
+        List<String> receiversCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc.trim());
+                receiversCcList.add(receiverCc.trim());
             }
         }
 
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
-                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
+            Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
+                    receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
             if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
