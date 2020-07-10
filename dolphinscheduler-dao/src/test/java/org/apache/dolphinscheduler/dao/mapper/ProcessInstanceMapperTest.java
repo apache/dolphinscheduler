@@ -371,17 +371,22 @@ public class ProcessInstanceMapperTest {
         Date endTime1=new Date(2019,7,9,10,9,14);
         Date startTime2=new Date(2020,7,9,10,9,9);
         Date endTime2=new Date(2020,7,9,10,9,30);
+        Date startTime3=new Date(2020,6,9,10,9,9);
+        Date endTime3=new Date(2020,7,9,10,9,30);
         ProcessInstance processInstance1=insertOne(startTime1,endTime1);
         ProcessInstance processInstance2=insertOne(startTime2,endTime2);
+        ProcessInstance processInstance3=insertOne(startTime3,endTime3);
         Date start=new Date(2020,1,1,1,1,1);
         Date end=new Date(2021,1,1,1,1,1);
         List<ProcessInstance> processInstances=processInstanceMapper.queryTopNProcessInstance(2,start,end);
+        Assert.assertEquals(2,processInstances.size());
         Assert.assertTrue(isSortedByDuration(processInstances));
-        Assert.assertEquals(1,processInstances.size());
         for(ProcessInstance processInstance:processInstances){
             Assert.assertTrue(processInstance.getState().typeIsSuccess());
         }
         processInstanceMapper.deleteById(processInstance1.getId());
         processInstanceMapper.deleteById(processInstance2.getId());
+        processInstanceMapper.deleteById(processInstance3.getId());
+        
     }
 }
