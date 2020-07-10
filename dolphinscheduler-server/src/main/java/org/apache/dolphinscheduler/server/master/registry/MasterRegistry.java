@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
@@ -36,8 +35,6 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 
 /**
  *  master registry
@@ -113,6 +110,14 @@ public class MasterRegistry {
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getMasterPath();
+        heartBeatExecutor.shutdown();
+        try {
+            if (heartBeatExecutor.awaitTermination(masterConfig.getMasterHeartbeatInterval(), TimeUnit.SECONDS)) {
+                logger.warn("The heartbeat executor does not shutdown");
+            }
+        } catch (InterruptedException e) {
+            logger.warn("The heartbeat executor is interrupted");
+        }
         zookeeperRegistryCenter.getZookeeperCachedOperator().remove(localNodePath);
         logger.info("master node : {} unRegistry to ZK.", address);
     }
@@ -137,4 +142,7 @@ public class MasterRegistry {
 
     }
 
+    public ScheduledExecutorService getHeartBeatExecutor() {
+        return heartBeatExecutor;
+    }
 }

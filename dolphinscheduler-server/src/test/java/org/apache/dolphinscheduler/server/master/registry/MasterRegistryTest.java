@@ -67,6 +67,7 @@ public class MasterRegistryTest {
         masterRegistry.unRegistry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
         List<String> childrenKeys = zookeeperRegistryCenter.getZookeeperCachedOperator().getChildrenKeys(masterPath);
+        Assert.assertTrue(masterRegistry.getHeartBeatExecutor().isShutdown());
         Assert.assertTrue(childrenKeys.isEmpty());
     }
 }
