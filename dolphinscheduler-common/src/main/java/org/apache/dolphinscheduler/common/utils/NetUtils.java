@@ -182,7 +182,6 @@ public class NetUtils {
         if (null != result) {
             return result;
         }
-
         return validNetworkInterfaces.get(0);
     }
 
