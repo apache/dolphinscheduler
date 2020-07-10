@@ -64,7 +64,7 @@ jobs:
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
       - name: Run e2e Test
         run: cd ./e2e && mvn -B clean test
-      - name cp logs file
+      - name: cp logs
         run: |
           sudo mkdir -p /opt/dolphinscheduler-logs
           sudo chmod ugo+rwx /opt/dolphinscheduler-logs
