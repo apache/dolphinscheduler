@@ -54,6 +54,8 @@ jobs:
         run: sh $(pwd)/docker/docker-swarm/check
       - name: Prepare e2e env
         run: |
+          sudo mkdir -p /opt/dolphinscheduler-logs
+          sudo chmod ugo+rwx /opt/dolphinscheduler-logs
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i google-chrome*.deb
@@ -66,8 +68,6 @@ jobs:
         run: cd ./e2e && mvn -B clean test
       - name: cp logs
         run: |
-          sudo mkdir -p /opt/dolphinscheduler-logs
-          sudo chmod ugo+rwx /opt/dolphinscheduler-logs
           sudo docker cp dolphinscheduler-api:/opt/dolphinscheduler/logs/dolphinscheduler-api-server.log /opt/dolphinscheduler-logs
           sudo docker cp dolphinscheduler-master:/opt/dolphinscheduler/logs/dolphinscheduler-master.log /opt/dolphinscheduler-logs
           sudo docker cp dolphinscheduler-worker:/opt/dolphinscheduler/logs/dolphinscheduler-worker.log /opt/dolphinscheduler-logs
