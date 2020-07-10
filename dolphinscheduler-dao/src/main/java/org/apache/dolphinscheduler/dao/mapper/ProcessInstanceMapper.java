@@ -199,5 +199,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param size
      * @return ProcessInstance list
      */
-    List<ProcessInstance> queryTopNProcessInstanceOrderByDuration(@Param("size") int size);
+    List<ProcessInstance> queryTopNProcessInstance(@Param("size") int size,
+                                                   @Param("startTime") Date startTime,
+                                                   @Param("endTime") Date endTime);
 }

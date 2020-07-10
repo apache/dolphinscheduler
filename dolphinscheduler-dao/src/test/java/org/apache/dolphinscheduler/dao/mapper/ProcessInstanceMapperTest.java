@@ -52,7 +52,7 @@ public class ProcessInstanceMapperTest {
     ProjectMapper projectMapper;
 
     /**
-     * insert process instance with specified start time and end time
+     * insert process instance with specified start time and end time,set state to SUCCESS
      * @param startTime
      * @param endTime
      * @return
@@ -63,7 +63,7 @@ public class ProcessInstanceMapperTest {
         Date end = endTime;
         processInstance.setStartTime(start);
         processInstance.setEndTime(end);
-        processInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        processInstance.setState(ExecutionStatus.SUCCESS);
 
         processInstanceMapper.insert(processInstance);
         return processInstance;
@@ -366,15 +366,21 @@ public class ProcessInstanceMapperTest {
      *  test query top n process instance order by running duration
      */
     @Test
-    public void testTopN(){
+    public void testQueryTopNProcessInstance(){
         Date startTime1=new Date(2019,7,9,10,9,9);
-        Date endTime1=new Date(2020,7,9,10,9,14);
-        Date startTime2=new Date(2019,7,9,10,9,9);
+        Date endTime1=new Date(2019,7,9,10,9,14);
+        Date startTime2=new Date(2020,7,9,10,9,9);
         Date endTime2=new Date(2020,7,9,10,9,30);
         ProcessInstance processInstance1=insertOne(startTime1,endTime1);
         ProcessInstance processInstance2=insertOne(startTime2,endTime2);
-        List<ProcessInstance> processInstances=processInstanceMapper.queryTopNProcessInstanceOrderByDuration(2);
+        Date start=new Date(2020,1,1,1,1,1);
+        Date end=new Date(2021,1,1,1,1,1);
+        List<ProcessInstance> processInstances=processInstanceMapper.queryTopNProcessInstance(2,start,end);
         Assert.assertTrue(isSortedByDuration(processInstances));
+        Assert.assertTrue(processInstances.size()==1);
+        for(ProcessInstance processInstance:processInstances){
+            Assert.assertTrue(processInstance.getState().typeIsSuccess());
+        }
         processInstanceMapper.deleteById(processInstance1.getId());
         processInstanceMapper.deleteById(processInstance2.getId());
     }
