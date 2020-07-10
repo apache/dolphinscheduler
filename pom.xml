@@ -1071,7 +1071,6 @@
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-alert-plugin</module>
-        <module>dolphinscheduler-job-plugin</module>
         <module>dolphinscheduler-microbench</module>
     </modules>
 </project>
