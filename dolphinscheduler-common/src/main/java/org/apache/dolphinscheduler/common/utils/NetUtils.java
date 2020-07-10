@@ -48,7 +48,7 @@ public class NetUtils {
 
     private static volatile String HOST_ADDRESS;
 
-    public static String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
+    private static  String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
     public static String getHost() {
         if (HOST_ADDRESS != null) {
@@ -181,10 +181,6 @@ public class NetUtils {
 
         if (null != result) {
             return result;
-        }
-
-        if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
-            return null;
         }
 
         return validNetworkInterfaces.get(0);
