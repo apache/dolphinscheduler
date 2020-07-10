@@ -268,4 +268,23 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+
+    @Test
+    public void testRegisterUser() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName","user_test");
+        paramsMap.add("userPassword","123456qwe?");
+        paramsMap.add("repeatPassword", "123456qwe?");
+        paramsMap.add("email","12343534@qq.com");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/register")
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 }
