@@ -210,11 +210,7 @@ services:
     - type: volume
       source: dolphinscheduler-worker-data
       target: /tmp/dolphinscheduler
-    - type: bind
-      source: ./dolphinscheduler-logs
-      target: /opt/dolphinscheduler/logs
-      volume:
-        nocopy: true
+    - ./dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
