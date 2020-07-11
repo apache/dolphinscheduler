@@ -37,12 +37,10 @@ public class AlertManagePage extends PageCommon {
      */
     public boolean createAlert() throws InterruptedException {
         // click  alert manage
+        Thread.sleep(500);
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
-        Thread.sleep(1000);
-
         // click  create alert button
         clickElement(AlertManageLocator.CLICK_CREATE_ALERT);
-        Thread.sleep(1000);
 
         // input alert data
         sendInput(AlertManageLocator.INPUT_ALERT_NAME, AlertManageData.ALERT_NAME);
