@@ -54,7 +54,6 @@ jobs:
         run: sh $(pwd)/docker/docker-swarm/check
       - name: Prepare e2e env
         run: |
-          sudo mkdir -p /opt/dolphinscheduler-logs
           sudo chmod ugo+rwx /opt/dolphinscheduler-logs
           sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -66,17 +65,11 @@ jobs:
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
       - name: Run e2e Test
         run: cd ./e2e && mvn -B clean test
-      - name: cp logs
-        run: |
-          sudo docker cp dolphinscheduler-api:/opt/dolphinscheduler/logs/dolphinscheduler-api-server.log /opt/dolphinscheduler-logs
-          sudo docker cp dolphinscheduler-master:/opt/dolphinscheduler/logs/dolphinscheduler-master.log /opt/dolphinscheduler-logs
-          sudo docker cp dolphinscheduler-worker:/opt/dolphinscheduler/logs/dolphinscheduler-worker.log /opt/dolphinscheduler-logs
-          sudo docker cp dolphinscheduler-alert:/opt/dolphinscheduler/logs/dolphinscheduler-alert.log /opt/dolphinscheduler-logs
       - name: Collect logs
         if: failure()
         uses: actions/upload-artifact@v2
         with:
           name: dslogs
-          path: /opt/dolphinscheduler-logs
+          path: $(pwd)/docker/docker-swarm/dolphinscheduler-logs
 
 

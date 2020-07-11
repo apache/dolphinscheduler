@@ -72,7 +72,7 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - ./dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
@@ -95,7 +95,7 @@ services:
     depends_on:
     - dolphinscheduler-api
     volumes:
-    - dolphinscheduler-logs:/var/log/nginx
+    - ./dolphinscheduler-logs:/var/log/nginx
     networks:
     - dolphinscheduler
 
@@ -133,7 +133,7 @@ services:
     depends_on:
     - dolphinscheduler-postgresql
     volumes:
-    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - ./dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
@@ -168,7 +168,7 @@ services:
     - dolphinscheduler-postgresql
     - dolphinscheduler-zookeeper
     volumes:
-    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - ./dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
 
@@ -210,9 +210,11 @@ services:
     - type: volume
       source: dolphinscheduler-worker-data
       target: /tmp/dolphinscheduler
-    - type: volume
-      source: dolphinscheduler-logs
+    - type: bind
+      source: ./dolphinscheduler-logs
       target: /opt/dolphinscheduler/logs
+      volume:
+        nocopy: true
     networks:
     - dolphinscheduler
 
@@ -225,7 +227,6 @@ volumes:
   dolphinscheduler-postgresql-initdb:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
-  dolphinscheduler-logs:
 
 configs:
   dolphinscheduler-worker-task-env:
