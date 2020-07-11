@@ -16,8 +16,14 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.apache.commons.lang.text.StrBuilder;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 
 /**
  * data source of hive
@@ -39,5 +45,43 @@ public class HiveDataSource extends BaseDataSource {
   @Override
   public DbType dbTypeSelector() {
     return DbType.HIVE;
+  }
+
+  /**
+   * build hive jdbc params,append : ?hive_conf_list
+   *
+   * hive jdbc url template:
+   *
+   * jdbc:hive2://<host1>:<port1>,<host2>:<port2>/dbName;initFile=<file>;sess_var_list?hive_conf_list#hive_var_list
+   *
+   * @param otherParams otherParams
+   * @return filter otherParams
+   */
+  @Override
+  protected String filterOther(String otherParams) {
+    if(StringUtils.isBlank(otherParams)){
+      return "";
+    }
+
+    StrBuilder hiveConfListSb = new StrBuilder();
+    hiveConfListSb.append("?");
+    StrBuilder sessionVarListSb = new StrBuilder();
+
+    String[] otherArray = otherParams.split(";", -1);
+
+    // get the default hive conf var name
+    Set<String> hiveConfSet = Stream.of(ConfVars.values()).map(confVars -> confVars.varname)
+        .collect(Collectors.toSet());
+
+    for (String conf : otherArray) {
+      if (hiveConfSet.contains(conf.split("=")[0])) {
+        hiveConfListSb.append(conf).append(";");
+      } else {
+        sessionVarListSb.append(conf).append(";");
+      }
+    }
+
+    return sessionVarListSb.toString().substring(0, sessionVarListSb.length() - 1) +
+        hiveConfListSb.toString().substring(0, hiveConfListSb.length() - 1);
   }
 }
