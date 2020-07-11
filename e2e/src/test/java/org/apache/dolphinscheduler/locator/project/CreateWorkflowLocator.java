@@ -136,8 +136,7 @@ public class CreateWorkflowLocator {
 
     //select tenant
     public static final By CLICK_TENANT = By.xpath("//div[4]/div/div/div/input");
-    public static final By SELECT_TENANT = By.xpath("//div[2]/div/div/div/ul/li/span");
-
+    public static final By SELECT_TENANT = By.xpath("//div[4]/div/div[2]/div/div/div/ul/li[2]/span");
 
     //click workflow timeout alarm
     public static final By CLICK_WORKFLOW_TIMEOUT_ALARM = By.xpath("//span[2]/span/span");
