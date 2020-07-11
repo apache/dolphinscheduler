@@ -40,7 +40,7 @@
     <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
         from t_ds_process_instance
-        where state = 7
+        where state = #{status}
         and start_time between
         #{startTime} and #{endTime}
         order by end_time-start_time desc
