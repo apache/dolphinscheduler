@@ -110,14 +110,7 @@ public class MasterRegistry {
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getMasterPath();
-        heartBeatExecutor.shutdown();
-        try {
-            if (heartBeatExecutor.awaitTermination(masterConfig.getMasterHeartbeatInterval(), TimeUnit.SECONDS)) {
-                logger.warn("The heartbeat executor does not shutdown");
-            }
-        } catch (InterruptedException e) {
-            logger.warn("The heartbeat executor is interrupted");
-        }
+        heartBeatExecutor.shutdownNow();
         zookeeperRegistryCenter.getZookeeperCachedOperator().remove(localNodePath);
         logger.info("master node : {} unRegistry to ZK.", address);
     }
@@ -142,7 +135,4 @@ public class MasterRegistry {
 
     }
 
-    public ScheduledExecutorService getHeartBeatExecutor() {
-        return heartBeatExecutor;
-    }
 }
