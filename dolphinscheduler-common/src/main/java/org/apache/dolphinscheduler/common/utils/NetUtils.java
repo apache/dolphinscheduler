@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyList;
+import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE;
 
 /**
  * NetUtils
@@ -47,8 +48,6 @@ public class NetUtils {
     private static InetAddress LOCAL_ADDRESS = null;
 
     private static volatile String HOST_ADDRESS;
-
-    private static  String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
     public static String getHost() {
         if (HOST_ADDRESS != null) {
@@ -215,7 +214,7 @@ public class NetUtils {
                 || !networkInterface.isUp();
     }
 
-    public static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
+    private static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
         String preferredNetworkInterface = System.getProperty(DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE);
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
     }
