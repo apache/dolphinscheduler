@@ -85,7 +85,7 @@ public class ZKServer {
         try {
             startLocalZkServer(port);
         } catch (Exception e) {
-            logger.error("Failed to start ZK: " + e);
+            logger.error("Failed to start ZK ", e);
         }
     }
 
