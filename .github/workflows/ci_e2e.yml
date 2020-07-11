@@ -18,7 +18,7 @@
 on: ["pull_request"]
 env:
   DOCKER_DIR: ./docker
-  LOG_DIR: /tmp/dolphinscheduler
+  LOG_DIR: ${{ github.workspace }}/docker/docker-swarm
 
 name: e2e Test
 
@@ -69,6 +69,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dslogs
-          path: $(pwd)/docker/docker-swarm/dolphinscheduler-logs
+          path: ${{ LOG_DIR }}/dolphinscheduler-logs
 
 
