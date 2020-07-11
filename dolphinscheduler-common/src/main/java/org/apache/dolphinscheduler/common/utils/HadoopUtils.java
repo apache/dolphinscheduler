@@ -159,6 +159,7 @@ public class HadoopUtils implements Closeable {
                     }
                 }
             } else if (resUploadType == ResUploadType.S3) {
+                System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
                 configuration.set(Constants.FS_DEFAULTFS, PropertyUtils.getString(Constants.FS_DEFAULTFS));
                 configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
