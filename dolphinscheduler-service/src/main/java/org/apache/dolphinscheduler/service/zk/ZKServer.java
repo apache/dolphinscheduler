@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
@@ -65,10 +66,10 @@ public class ZKServer {
 
     public ZKServer(int port, String prefix) {
         this.port = port;
-        if (prefix.contains("/")) {
+        if (prefix != null && prefix.contains("/")) {
             throw new IllegalArgumentException("The prefix of path may not have '/'");
         }
-        this.prefix = prefix;
+        this.prefix = (prefix == null ? null : prefix.trim());
     }
 
     private void registerHook() {
@@ -113,8 +114,11 @@ public class ZKServer {
      * @param port The port to listen on
      */
     public void startLocalZkServer(final int port) {
-        String zkDataDir = System.getProperty("user.dir") + ("".equals(prefix) ? prefix : ("/" + prefix)) + "/zookeeper_data";
-        logger.warn("The path of zk server exists");
+        String zkDataDir = System.getProperty("user.dir") + (StringUtils.isEmpty(prefix) ? StringUtils.EMPTY : ("/" + prefix)) + "/zookeeper_data";
+        File file = new File(zkDataDir);
+        if (file.exists()) {
+            logger.warn("The path of zk server exists");
+        }
         logger.info("zk server starting, data dir path:{}" , zkDataDir);
         startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME,"60");
     }
@@ -128,23 +132,21 @@ public class ZKServer {
      * @param maxClientCnxns    zk max client connections
      */
     private void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
-        if (zooKeeperServerMain != null) {
-            throw new RuntimeException("Zookeeper server is already started!");
-        }
-        zooKeeperServerMain = new PublicZooKeeperServerMain();
-        logger.info("Zookeeper data path : {} ", dataDirPath);
-        dataDir = dataDirPath;
-        final String[] args = new String[]{Integer.toString(port), dataDirPath, Integer.toString(tickTime), maxClientCnxns};
+        if (isStarted.compareAndSet(false, true)) {
+            zooKeeperServerMain = new PublicZooKeeperServerMain();
+            logger.info("Zookeeper data path : {} ", dataDirPath);
+            dataDir = dataDirPath;
+            final String[] args = new String[]{Integer.toString(port), dataDirPath, Integer.toString(tickTime), maxClientCnxns};
 
-        try {
-            logger.info("Zookeeper server started ");
-            isStarted.compareAndSet(false, true);
+            try {
+                logger.info("Zookeeper server started ");
+                isStarted.compareAndSet(false, true);
 
-            zooKeeperServerMain.initializeAndRun(args);
-        } catch (QuorumPeerConfig.ConfigException e) {
-            logger.warn("Caught exception while starting ZK", e);
-        } catch (IOException e) {
-            logger.warn("Caught exception while starting ZK", e);
+                zooKeeperServerMain.initializeAndRun(args);
+            } catch (QuorumPeerConfig.ConfigException | IOException e) {
+                logger.warn("Caught exception while starting ZK", e);
+                throw new RuntimeException(e);
+            }
         }
     }
 
