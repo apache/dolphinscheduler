@@ -786,6 +786,10 @@ public final class Constants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
+    /**
+     * com.amazonaws.services.s3.enableV4
+     */
+    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
 
     /**
      * loginUserFromKeytab user
