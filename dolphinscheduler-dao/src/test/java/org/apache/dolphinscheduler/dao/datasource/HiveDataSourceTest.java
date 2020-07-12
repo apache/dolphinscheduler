@@ -20,6 +20,10 @@ public class HiveDataSourceTest {
     other = hiveDataSource.filterOther("");
     Assert.assertEquals("", other);
 
+    // only contain hive_site_conf
+    other = hiveDataSource.filterOther("hive.mapred.mode=strict");
+    Assert.assertEquals("?hive.mapred.mode=strict", other);
+
     // contain hive_site_conf at the first
     other = hiveDataSource.filterOther("hive.mapred.mode=strict;charset=UTF-8");
     Assert.assertEquals("charset=UTF-8?hive.mapred.mode=strict", other);
@@ -51,6 +55,12 @@ public class HiveDataSourceTest {
 
     Assert.assertEquals(
         "jdbc:hive2://127.0.0.1:10000/test;charset=UTF-8?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
+        hiveDataSource.getJdbcUrl());
+
+    hiveDataSource.setOther("hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2");
+
+    Assert.assertEquals(
+        "jdbc:hive2://127.0.0.1:10000/test;?hive.mapred.mode=strict;hive.server2.thrift.http.path=hs2",
         hiveDataSource.getJdbcUrl());
 
   }

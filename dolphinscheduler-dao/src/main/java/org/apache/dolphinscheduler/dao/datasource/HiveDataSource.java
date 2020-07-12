@@ -81,7 +81,15 @@ public class HiveDataSource extends BaseDataSource {
       }
     }
 
-    return sessionVarListSb.toString().substring(0, sessionVarListSb.length() - 1) +
-        hiveConfListSb.toString().substring(0, hiveConfListSb.length() - 1);
+    // remove the last ";"
+    if(sessionVarListSb.length() > 0){
+      sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1 );
+    }
+
+    if(hiveConfListSb.length() > 0){
+      hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
+    }
+
+    return sessionVarListSb.toString() + hiveConfListSb.toString();
   }
 }
