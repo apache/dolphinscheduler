@@ -19,13 +19,12 @@ package org.apache.dolphinscheduler.common.task.flink;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * spark parameters
+ * flink parameters
  */
 public class FlinkParameters extends AbstractParameters {
 
@@ -226,6 +225,4 @@ public class FlinkParameters extends AbstractParameters {
     }
     return resourceList;
   }
-
-
 }
