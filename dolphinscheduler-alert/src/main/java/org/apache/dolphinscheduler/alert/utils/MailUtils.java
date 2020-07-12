@@ -65,6 +65,10 @@ public class MailUtils {
 
     public static final AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
 
+    static {
+        System.setProperty("mail.mime.splitlongparameters","false");
+    }
+
 
     /**
      * send mail to receivers
