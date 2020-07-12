@@ -185,6 +185,7 @@ public class ZookeeperNodeManager implements InitializingBean {
             }
         }
     }
+
     /**
      *  get master nodes
      * @return master nodes
