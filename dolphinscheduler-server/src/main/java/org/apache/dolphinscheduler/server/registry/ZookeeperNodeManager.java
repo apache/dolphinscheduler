@@ -131,7 +131,6 @@ public class ZookeeperNodeManager implements InitializingBean {
                     if (event.getType() == TreeCacheEvent.Type.NODE_ADDED) {
                         logger.info("worker group node : {} added.", path);
                         String group = parseGroup(path);
-                        Set<String> workerNodes = workerGroupNodes.getOrDefault(group, new HashSet<>());
                         Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
                         logger.info("currentNodes : {}", currentNodes);
                         syncWorkerGroupNodes(group, currentNodes);
