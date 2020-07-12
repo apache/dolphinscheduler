@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.datasource;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.apache.commons.lang.text.StrBuilder;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 
 /**
@@ -59,13 +59,13 @@ public class HiveDataSource extends BaseDataSource {
    */
   @Override
   protected String filterOther(String otherParams) {
-    if(StringUtils.isBlank(otherParams)){
+    if (StringUtils.isBlank(otherParams)) {
       return "";
     }
 
-    StrBuilder hiveConfListSb = new StrBuilder();
+    StringBuilder hiveConfListSb = new StringBuilder();
     hiveConfListSb.append("?");
-    StrBuilder sessionVarListSb = new StrBuilder();
+    StringBuilder sessionVarListSb = new StringBuilder();
 
     String[] otherArray = otherParams.split(";", -1);
 
@@ -82,11 +82,11 @@ public class HiveDataSource extends BaseDataSource {
     }
 
     // remove the last ";"
-    if(sessionVarListSb.length() > 0){
-      sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1 );
+    if (sessionVarListSb.length() > 0) {
+      sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1);
     }
 
-    if(hiveConfListSb.length() > 0){
+    if (hiveConfListSb.length() > 0) {
       hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
     }
 
