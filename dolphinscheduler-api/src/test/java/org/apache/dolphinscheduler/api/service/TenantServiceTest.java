@@ -88,6 +88,7 @@ public class TenantServiceTest {
             result = tenantService.createTenant(loginUser, "test", "test", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+            
         } catch (Exception e) {
           logger.error("create tenant error",e);
           Assert.assertTrue(false);
