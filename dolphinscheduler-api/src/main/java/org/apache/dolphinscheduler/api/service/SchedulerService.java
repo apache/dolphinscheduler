@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -333,10 +334,9 @@ public class SchedulerService extends BaseService {
         if(scheduleStatus == ReleaseState.ONLINE){
             // check process definition release state
             if(processDefinition.getReleaseState() != ReleaseState.ONLINE){
-                ProcessDefinition definition = processDefinitionMapper.selectById(scheduleObj.getProcessDefinitionId());
                 logger.info("not release process definition id: {} , name : {}",
                         processDefinition.getId(), processDefinition.getName());
-                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, definition.getName());
+                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
                 return result;
             }
             // check sub process definition release state
@@ -380,7 +380,7 @@ public class SchedulerService extends BaseService {
             switch (scheduleStatus) {
                 case ONLINE: {
                     logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
-                    setSchedule(project.getId(), id);
+                    setSchedule(project.getId(), scheduleObj);
                     break;
                 }
                 case OFFLINE: {
@@ -395,7 +395,7 @@ public class SchedulerService extends BaseService {
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new RuntimeException(result.get(Constants.MSG).toString());
+            throw new ServiceException(result.get(Constants.MSG).toString());
         }
 
         putMsg(result, Status.SUCCESS);
@@ -472,15 +472,10 @@ public class SchedulerService extends BaseService {
         return result;
     }
 
-    public void setSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public void setSchedule(int projectId, Schedule schedule) {
+
+        int scheduleId = schedule.getId();
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
-
-
-        Schedule schedule = processService.querySchedule(scheduleId);
-        if (schedule == null) {
-            logger.warn("process schedule info not exists");
-            return;
-        }
 
         Date startDate = schedule.getStartTime();
         Date endDate = schedule.getEndTime();
@@ -502,7 +497,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
-    public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public static void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
         String jobName = QuartzExecutors.buildJobName(scheduleId);
@@ -510,7 +505,7 @@ public class SchedulerService extends BaseService {
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
             logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
-            throw new RuntimeException(String.format("set offline failure"));
+            throw new ServiceException("set offline failure");
         }
 
     }
