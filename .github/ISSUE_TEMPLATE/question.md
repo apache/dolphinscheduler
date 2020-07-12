@@ -1,7 +1,7 @@
 ---
-name: question
-about: have a question wanted to be help
-title: "[QUESTION] question title"
+name: Question
+about: Have a question wanted to be help
+title: "[Question] Question title"
 labels: question
 assignees: ''
 
@@ -19,5 +19,5 @@ A clear and concise description of what the question is.
 **Additional context**
 Add any other context about the problem here.
 
-**Requirement or improvement
+**Requirement or improvement**
 - Please describe about your requirements or improvement suggestions.
