@@ -37,12 +37,12 @@ public class QueueManagePage extends PageCommon {
      */
     public boolean createQueue() throws InterruptedException {
         // click queue manage
-        Thread.sleep(500);
+        Thread.sleep(1000);
         clickElement(QueueManageLocator.CLICK_QUEUE_MANAGE);
 
         // click  create queue button
-        Thread.sleep(500);
-        clickElement(QueueManageLocator.CLICK_CREATE_QUEUE);
+        Thread.sleep(1000);
+        clickButton(QueueManageLocator.CLICK_CREATE_QUEUE);
 
         // input queue data
         sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.QUEUE_NAME);
