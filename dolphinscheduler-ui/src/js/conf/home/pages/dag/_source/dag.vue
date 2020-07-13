@@ -103,7 +103,7 @@
           </x-button>
           <x-button
             type="primary"
-            v-tooltip.light="$t('Close')"
+            v-tooltip.light="$t('Close')" 
             icon="ans-icon-off"
             size="xsmall"
             data-container="body"
