@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.consumer;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -49,13 +50,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
  * TaskUpdateQueue consumer
@@ -330,7 +327,13 @@ public class TaskPriorityQueueConsumer extends Thread{
             }
 
             List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
-            sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
+            Map<UdfFunc,String> udfFuncMap = new HashMap<>();
+            for(UdfFunc udfFunc : udfFuncList) {
+                String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
+                udfFuncMap.put(udfFunc,tenantCode);
+            }
+
+            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
         }
     }
 
@@ -364,20 +367,23 @@ public class TaskPriorityQueueConsumer extends Thread{
     }
 
     /**
-     * get resource full name list
+     * get resource map key is full name and value is tenantCode
      */
-    private List<String> getResourceFullNames(TaskNode taskNode) {
-        List<String> resourceFullNameList = new ArrayList<>();
+    private Map<String,String> getResourceFullNames(TaskNode taskNode) {
+        Map<String,String> resourceMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
+            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
                 Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    resourceFullNameList.addAll(oldVersionResources.stream().map(resource -> resource.getRes()).collect(Collectors.toSet()));
+
+                    oldVersionResources.forEach(
+                            (t)->resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
+                    );
                 }
 
                 // get the resource id in order to get the resource names in batch
@@ -388,13 +394,13 @@ public class TaskPriorityQueueConsumer extends Thread{
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resourceFullNameList.addAll(resources.stream()
-                            .map(resourceInfo -> resourceInfo.getFullName())
-                            .collect(Collectors.toList()));
+                    resources.forEach(
+                            (t)->resourceMap.put(t.getFullName(),processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
+                    );
                 }
             }
         }
 
-        return resourceFullNameList;
+        return resourceMap;
     }
 }
