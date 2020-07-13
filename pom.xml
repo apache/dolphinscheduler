@@ -830,6 +830,7 @@
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
+                        <include>**/service/zk/CuratorZookeeperClientTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
 
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
