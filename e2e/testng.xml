@@ -34,9 +34,9 @@
                 </methods>
             </class>
 
-            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>
-            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>
-            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>
+            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>-->
+            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>-->
+            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>-->
 
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateProject"></class>
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestCreateWorkflow"></class>
@@ -54,8 +54,8 @@
 
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteProject"></class>
-            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteAlert"></class>
-            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>
+            <!--<class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteAlert"></class>-->
+            <!--<class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>-->
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteTenant"></class>
         </classes>

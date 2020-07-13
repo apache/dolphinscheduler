@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 
 public class QueueManageLocator {
     //create queue locator
-    public static final By CLICK_QUEUE_MANAGE = By.xpath("//div[6]/div/a/div/a/span");
+    public static final By CLICK_QUEUE_MANAGE = By.xpath("/html/body/div[1]/div[2]/div/div[1]/div[6]/div/a/div/a/span");
     public static final By CLICK_CREATE_QUEUE = By.xpath("//button/span");
     public static final By INPUT_QUEUE_NAME = By.xpath("//div[2]/div/div/div[2]/div/input");
     public static final By INPUT_QUEUE_VALUE = By.xpath("//div[2]/div[2]/div/input");

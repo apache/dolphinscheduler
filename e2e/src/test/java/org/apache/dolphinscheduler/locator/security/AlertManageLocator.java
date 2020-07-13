@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 
 public class AlertManageLocator {
     //create alert locator
-    public static final By CLICK_ALERT_MANAGE = By.xpath("//div[4]/div/a/div/a/span");
+    public static final By CLICK_ALERT_MANAGE = By.xpath("/html/body/div[1]/div[2]/div/div[1]/div[4]/div/a/div/a/span");
     public static final By CLICK_CREATE_ALERT = By.xpath("//div[1]/div[2]/div/div[2]/div[2]/div/div[1]/button/span");
     public static final By INPUT_ALERT_NAME = By.xpath("//div[2]/div/div[1]/div[2]/div/input");
     public static final By CLICK_ALERT_TYPE = By.xpath("//div[2]/div/div[2]/div/div[2]/div[2]/div/div[1]/div/input");
