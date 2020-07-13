@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 import org.slf4j.LoggerFactory;
@@ -148,7 +148,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                 if ( allDependentTaskFinish() || taskInstance.getState().typeIsFinished()){
                     break;
                 }
-                // updateProcessInstance task instance
+                // update process task
                 taskInstance = processService.findTaskInstanceById(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -172,7 +172,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
     private void initTaskParameters() {
         taskInstance.setLogPath(getTaskLogPath(taskInstance));
-        taskInstance.setHost(OSUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
+        taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
         taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);

@@ -268,7 +268,7 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
         <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
@@ -276,6 +276,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -313,6 +314,7 @@
         description: '',
         // Node echo data
         backfillItem: {},
+        cacheBackfillItem: {},
         // Resource(list)
         resourcesList: [],
         successNode: 'success',
@@ -365,9 +367,11 @@
       taskType: String,
       self: Object,
       preNode: Array,
-      rearList: Array
+      rearList: Array,
+      instanceId: Number
     },
     methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
       /**
        * depend
        */
@@ -493,12 +497,26 @@
         }
         return true
       },
+      _verifWorkGroup() {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id == this.workerGroup;
+        });
+        if(item==undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false;
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
       _verification () {
         // Verify name
         if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if(!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
@@ -571,18 +589,36 @@
         }
         this.isContentBox = false
         // flag Whether to delete a node this.$destroy()
+        
         this.$emit('close', {
+          item: {
+            type: this.cacheBackfillItem.type,
+            id: this.cacheBackfillItem.id,
+            name: this.cacheBackfillItem.name,
+            params: this.cacheBackfillItem.params,
+            description: this.cacheBackfillItem.description,
+            runFlag: this.cacheBackfillItem.runFlag,
+            conditionResult: this.cacheBackfillItem.conditionResult,
+            dependence: this.cacheBackfillItem.dependence,
+            maxRetryTimes: this.cacheBackfillItem.maxRetryTimes,
+            retryInterval: this.cacheBackfillItem.retryInterval,
+            timeout: this.cacheBackfillItem.timeout,
+            taskInstancePriority: this.cacheBackfillItem.taskInstancePriority,
+            workerGroup: this.cacheBackfillItem.workerGroup,
+            status: this.cacheBackfillItem.status,
+            branch: this.cacheBackfillItem.branch
+          },
           flag: flag,
           fromThis: this
         })
       }
-    },
+    }, 
     watch: {
       /**
        * Watch the item change, cache the value it changes
        **/
       _item (val) {
-        this._cacheItem()
+        // this._cacheItem()
       }
     },
     created () {
@@ -628,9 +664,12 @@
             break;
           }
         }
-
-        if(!hasMatch){
-          this.workerGroup = 'default'
+        if(o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList',{
+            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
         } else {
           this.workerGroup = o.workerGroup
         }
@@ -642,10 +681,15 @@
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
+      this.cacheBackfillItem = o
       this.isContentBox = true
     },
     mounted () {
-
+      let self = this
+      $("#cancelBtn").mousedown(function(event){
+        event.preventDefault();
+        self.close()
+      });
     },
     updated () {
     },

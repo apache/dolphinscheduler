@@ -32,7 +32,7 @@
             <span>{{$t('Executor')}}</span>
           </th>
           <th scope="col" style="min-width: 70px">
-            <span>{{$t('Node Type')}}</span>
+            <span style="margin-left: 5px">{{$t('Node Type')}}</span>
           </th>
           <th scope="col" style="min-width: 30px">
             <span>{{$t('State')}}</span>
@@ -57,7 +57,7 @@
               <span>{{$t('Retry Count')}}</span>
             </div>
           </th>
-          <th scope="col" style="min-width: 50px">
+          <th scope="col" style="min-width: 60px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -73,7 +73,7 @@
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
           </td>
-          <td><span>{{item.taskType}}</span></td>
+          <td><span style="margin-left: 5px">{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
           <td>
             <span v-if="item.submitTime">{{item.submitTime | formatDate}}</span>
