@@ -126,7 +126,7 @@ public class CreateWorkflowLocator {
      * save workflow
      */
     //click save workflow button
-    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//button[3]/span");
+    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("/html/body/div[1]/div[2]/div/div[2]/div/div[2]/div[1]/div[2]/button[1]/span");
 
     //input  workflow name
     public static final By INPUT_WORKFLOW_NAME = By.xpath("//input");
