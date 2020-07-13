@@ -92,4 +92,5 @@ public class HiveDataSource extends BaseDataSource {
 
     return sessionVarListSb.toString() + hiveConfListSb.toString();
   }
+  
 }
