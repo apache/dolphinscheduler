@@ -215,3 +215,4 @@ The following components are provided under the Apache License. See project link
 The text of each license is the standard Apache 2.0 license.
     ScriptRunner from https://github.com/mybatis/mybatis-3 Apache 2.0
     mvnw files from https://github.com/takari/maven-wrapper Apache 2.0
+    PropertyPlaceholderHelper from https://github.com/spring-projects/spring-framework Apache 2.0
