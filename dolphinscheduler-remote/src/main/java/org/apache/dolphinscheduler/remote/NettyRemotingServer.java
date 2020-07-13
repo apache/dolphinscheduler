@@ -119,44 +119,39 @@ public class NettyRemotingServer {
      *  server start
      */
     public void start(){
+        if (isStarted.compareAndSet(false, true)) {
+            this.serverBootstrap
+                    .group(this.bossGroup, this.workGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
+                    .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
+                    .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
+                    .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
+                    .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
+                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
 
-        if(this.isStarted.get()){
-            return;
+                        @Override
+                        protected void initChannel(NioSocketChannel ch) throws Exception {
+                            initNettyChannel(ch);
+                        }
+                    });
+
+            ChannelFuture future;
+            try {
+                future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
+            } catch (Exception e) {
+                logger.error("NettyRemotingServer bind fail {}, exit",e.getMessage(), e);
+                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+            }
+            if (future.isSuccess()) {
+                logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
+            } else if (future.cause() != null) {
+                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()), future.cause());
+            } else {
+                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+            }
         }
-
-        this.serverBootstrap
-                .group(this.bossGroup, this.workGroup)
-                .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
-                .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
-                .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
-                .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
-                .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
-                .childHandler(new ChannelInitializer<NioSocketChannel>() {
-
-                    @Override
-                    protected void initChannel(NioSocketChannel ch) throws Exception {
-                        initNettyChannel(ch);
-                    }
-                });
-
-        ChannelFuture future;
-        try {
-            future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
-        } catch (Exception e) {
-            logger.error("NettyRemotingServer bind fail {}, exit",e.getMessage(), e);
-            throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
-        }
-        if (future.isSuccess()) {
-            logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
-        } else if (future.cause() != null) {
-            throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()), future.cause());
-        } else {
-            throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
-        }
-        //
-        isStarted.compareAndSet(false, true);
     }
 
     /**
@@ -208,9 +203,7 @@ public class NettyRemotingServer {
                 if(workGroup != null){
                     this.workGroup.shutdownGracefully();
                 }
-                if(defaultExecutor != null){
-                    defaultExecutor.shutdown();
-                }
+                defaultExecutor.shutdown();
             } catch (Exception ex) {
                 logger.error("netty server close exception", ex);
             }

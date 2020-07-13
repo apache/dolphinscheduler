@@ -24,7 +24,12 @@ body {
   .ans-message-box,.ans-message-wrapper {
     z-index: 121 !important;
   }
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 }
+
 
 @media screen and (max-width: 960px){
   .nav-model {

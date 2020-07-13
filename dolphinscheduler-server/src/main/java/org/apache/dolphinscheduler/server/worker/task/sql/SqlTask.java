@@ -16,15 +16,12 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -37,7 +34,6 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -78,6 +74,10 @@ public class SqlTask extends AbstractTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
+    /**
+     * default query sql limit
+     */
+    private static final int LIMIT = 10000;
 
     public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -85,7 +85,7 @@ public class SqlTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         logger.info("sql task params {}", taskExecutionContext.getTaskParams());
-        this.sqlParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+        this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
@@ -131,8 +131,7 @@ public class SqlTask extends AbstractTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(),
-                    taskExecutionContext.getTenantCode(),
+            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
                     logger);
 
             // execute sql task
@@ -176,9 +175,10 @@ public class SqlTask extends AbstractTask {
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
+        
         //new
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime(), paramsMap);
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -253,29 +253,26 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private void resultProcess(ResultSet resultSet) throws Exception{
-        JSONArray resultJSONArray = new JSONArray();
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
 
-        while (resultSet.next()) {
-            JSONObject mapOfColValues = new JSONObject(true);
+        int rowCount = 0;
+
+        while (rowCount < LIMIT && resultSet.next()) {
+            ObjectNode mapOfColValues = JSONUtils.createObjectNode();
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                mapOfColValues.set(md.getColumnName(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
             }
             resultJSONArray.add(mapOfColValues);
+            rowCount++;
         }
-        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+        String result = JSONUtils.toJsonString(resultJSONArray);
+        logger.debug("execute sql : {}", result);
 
-        // if there is a result set
-        if (!resultJSONArray.isEmpty() ) {
-            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                sendAttachment(sqlParameters.getTitle(),
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }else{
-                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }
-        }
+        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
+                        sqlParameters.getTitle(): taskExecutionContext.getTaskName() + " query result sets",
+                JSONUtils.toJsonString(resultJSONArray));
     }
 
     /**
@@ -327,6 +324,7 @@ public class SqlTask extends AbstractTask {
             }
         }
     }
+    
     /**
      * create connection
      *
@@ -367,7 +365,7 @@ public class SqlTask extends AbstractTask {
                        Connection connection){
         if (resultSet != null){
             try {
-                connection.close();
+                resultSet.close();
             } catch (SQLException e) {
 
             }
@@ -375,7 +373,7 @@ public class SqlTask extends AbstractTask {
 
         if (pstmt != null){
             try {
-                connection.close();
+                pstmt.close();
             } catch (SQLException e) {
 
             }
@@ -426,34 +424,34 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<>();
+        List<String> receiversList = new ArrayList<>();
         for(User user:users){
-            receviersList.add(user.getEmail().trim());
+            receiversList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver.trim());
+                receiversList.add(receiver.trim());
             }
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<>();
+        List<String> receiversCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc.trim());
+                receiversCcList.add(receiverCc.trim());
             }
         }
 
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
-                    receviersCcList, title, content, ShowType.valueOf(showTypeName));
+            Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
+                    receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
             if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }

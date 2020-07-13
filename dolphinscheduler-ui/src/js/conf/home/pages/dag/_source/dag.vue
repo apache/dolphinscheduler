@@ -77,7 +77,7 @@
                   icon="ans-icon-triangle-solid-right"
                   size="xsmall"
                   data-container="body"
-                  v-if="type === 'instance'"
+                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
                   style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
@@ -155,6 +155,7 @@
         isLoading: false,
         taskId: null,
         arg: false,
+
       }
     },
     mixins: [disabledState],
@@ -179,6 +180,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -259,8 +261,15 @@
                 if (v2.name === v1.name) {
                   let dom = $(`#${v2.id}`)
                   let state = dom.find('.state-p')
+                  let depState = ''
+                   taskList.forEach(item=>{
+                    if(item.name==v1.name) {
+                      depState = item.state
+                    }
+                  })
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
+                  dom.attr('data-dependent-depState', depState)
                   state.append(`<strong class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></strong>`)
                   state.find('strong').attr('title', titleTpl(v2, v1.desc))
                 }
@@ -326,11 +335,11 @@
        * Storage interface
        */
       _save (sourceType) {
-        if(this._verifConditions()) {
-          return new Promise((resolve, reject) => {
-            this.spinnerLoading = true
-            // Storage store
-            Dag.saveStore().then(res => {
+        return new Promise((resolve, reject) => {
+          this.spinnerLoading = true
+          // Storage store
+          Dag.saveStore().then(res => {
+            if(this._verifConditions(res.tasks)) {
               if (this.urlParam.id) {
                 /**
                  * Edit
@@ -364,12 +373,12 @@
                   reject(e)
                 })
               }
-            })
+            }
           })
-        }
+        })
       },
-      _verifConditions () {
-        let tasks = this.$store.state.dag.tasks
+      _verifConditions (value) {
+        let tasks = value
         let bool = true
         tasks.map(v=>{
           if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
@@ -379,6 +388,7 @@
         })
         if(!bool) {
           this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
+          this.spinnerLoading = false
           return false
         }
         return true
@@ -553,7 +563,8 @@
               cacheTaskInfo({item, fromThis}) {
                 self.cacheTasks(item)
               },
-              close ({ flag, fromThis }) {
+              close ({ item,flag, fromThis }) {
+                self.addTasks(item)
                 // Edit status does not allow deletion of nodes
                 if (flag) {
                   jsPlumb.remove(id)
@@ -571,7 +582,8 @@
               taskType: type,
               self: self,
               preNode: preNode,
-              rearList: rearList
+              rearList: rearList,
+              instanceId: this.$route.params.id
             }
           })
         })
@@ -608,6 +620,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',

@@ -117,9 +117,12 @@ public class MasterServer {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
         this.nettyRemotingServer.start();
 
-        //
-        this.zkMasterClient.start();
+        // register
         this.masterRegistry.registry();
+
+        // self tolerant
+        this.zkMasterClient.start();
+
         //
         masterSchedulerService.start();
 

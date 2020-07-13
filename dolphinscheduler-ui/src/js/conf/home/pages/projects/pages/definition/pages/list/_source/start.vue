@@ -193,6 +193,7 @@
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
         workerGroup: 'default'
+
       }
     },
     props: {
@@ -277,6 +278,18 @@
       this.workflowName = this.item.name
 
       this._getReceiver()
+      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (stateWorkerGroupsList.length) {
+        this.workerGroup = stateWorkerGroupsList[0].id
+      } else {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.$nextTick(() => {
+            if(res.length>0) {
+              this.workerGroup = res[0].id
+            }
+          })
+        })
+      }
     },
     mounted () {
       this._getNotifyGroupList().then(() => {

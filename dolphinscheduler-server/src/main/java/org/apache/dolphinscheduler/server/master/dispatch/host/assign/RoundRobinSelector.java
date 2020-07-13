@@ -26,22 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> T
  */
 @Service
-public class RoundRobinSelector<T> implements Selector<T> {
+public class RoundRobinSelector<T> extends AbstractSelector<T> {
 
     private final AtomicInteger index = new AtomicInteger(0);
 
     @Override
-    public T select(Collection<T> source) {
-        if (source == null || source.size() == 0) {
-            throw new IllegalArgumentException("Empty source.");
-        }
-
-        /**
-         * if only one , return directly
-         */
-        if (source.size() == 1) {
-            return (T)source.toArray()[0];
-        }
+    public T doSelect(Collection<T> source) {
 
         int size = source.size();
         /**

@@ -55,7 +55,7 @@ const Chart = {
 
 // Corresponding methods for injection of different components
 for (const key in components) {
-  if (components.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(components, key)) {
     Chart[key.toLowerCase()] = (el, data, options) => {
       return init(components[key], el, data, options)
     }

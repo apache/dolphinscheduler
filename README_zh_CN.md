@@ -50,19 +50,9 @@ Dolphin Scheduler Official Website
 
 ![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
 
-### 文档
-
-- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">后端部署文档</a>
-
-- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">前端部署文档</a>
-
-- [**使用手册**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/system-manual.html?_blank "系统使用手册")
-
-- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/upgrade.html?_blank "升级文档")
+### 我要体验
 
 - <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
-
-更多文档请参考 <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/quick-start.html" target="_blank">DolphinScheduler中文在线文档</a>
 
 
 ### 近期研发计划
@@ -83,9 +73,8 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-d
 Artifact:
 
 ```
-dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-backend-bin.tar.gz: Binary package of DolphinScheduler-Backend
-dolphinscheduler-dist/dolphinscheduler-front/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-front-bin.tar.gz: Binary package of DolphinScheduler-UI
-dolphinscheduler-dist/dolphinscheduler-src/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-bin.tar.gz: Binary package of DolphinScheduler
+dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
 ```
 
 ### 感谢

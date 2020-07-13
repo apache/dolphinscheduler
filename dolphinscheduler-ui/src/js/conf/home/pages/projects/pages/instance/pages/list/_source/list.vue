@@ -19,46 +19,48 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th scope="col" width="50">
+          <th scope="col" style="min-width: 50px">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th scope="col" width="30">
+          <th scope="col" style="min-width: 30px">
             <span>{{$t('#')}}</span>
           </th>
-          <th scope="col" width="70">
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th scope="col" width="60">
-            <span>{{$t('Executor')}}</span>
-          </th>
-          <th scope="col" width="70">
-            <span>{{$t('Run Type')}}</span>
-          </th>
-          <th scope="col" width="130">
-            <span>{{$t('Scheduling Time')}}</span>
-          </th>
-          <th scope="col" width="130">
-            <span>{{$t('Start Time')}}</span>
-          </th>
-          <th scope="col" width="130">
-            <span>{{$t('End Time')}}</span>
-          </th>
-          <th scope="col" width="60">
-            <span>{{$t('Duration')}}s</span>
-          </th>
-          <th scope="col" width="60">
-            <span>{{$t('Run Times')}}</span>
-          </th>
-          <th scope="col" width="125">
-            <span>{{$t('host')}}</span>
-          </th>
-          <th scope="col" width="55">
-            <span>{{$t('fault-tolerant sign')}}</span>
-          </th>
-          <th scope="col" width="30">
+          <th scope="col" style="min-width: 30px">
             <span>{{$t('State')}}</span>
           </th>
-          <th scope="col" width="210">
+          <th scope="col" style="min-width: 70px">
+            <span>{{$t('Run Type')}}</span>
+          </th>
+          <th scope="col" style="min-width: 130px">
+            <span>{{$t('Scheduling Time')}}</span>
+          </th>
+          <th scope="col" style="min-width: 130px">
+            <span>{{$t('Start Time')}}</span>
+          </th>
+          <th scope="col" style="min-width: 130px">
+            <span>{{$t('End Time')}}</span>
+          </th>
+          <th scope="col" style="min-width: 60px">
+            <span>{{$t('Duration')}}s</span>
+          </th>
+          <th scope="col" style="min-width: 60px">
+            <span>{{$t('Run Times')}}</span>
+          </th>
+          <th scope="col" style="min-width: 55px">
+            <span>{{$t('fault-tolerant sign')}}</span>
+          </th>
+          <th scope="col" style="min-width: 135px">
+            <span>{{$t('Executor')}}</span>
+          </th>
+          <th scope="col" style="min-width: 100px">
+            <div style="width: 100px">
+              <span>{{$t('host')}}</span>
+            </div>
+          </th>
+          <th scope="col" style="min-width: 210px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -67,12 +69,11 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
-            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
+            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id , query:{id: item.processDefinitionId}}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
           </td>
           <td>
-            <span style="word-break: break-all" v-if="item.executorName">{{item.executorName}}</span>
-            <span v-else>-</span>
+            <span v-html="_rtState(item.state)" style="cursor: pointer;"></span>
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
           <td>
@@ -89,16 +90,16 @@
           </td>
           <td width="70"><span>{{item.duration || '-'}}</span></td>
           <td width="70"><span>{{item.runTimes}}</span></td>
+          <td><span>{{item.recovery}}</span></td>
           <td>
-            <span v-if="item.host">{{item.host}}</span>
+            <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
           </td>
-          <td><span>{{item.recovery}}</span></td>
-
           <td>
-            <span v-html="_rtState(item.state)" style="cursor: pointer;"></span>
+            <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
+            <span v-else>-</span>
           </td>
-          <td>
+          <td style="z-index: inherit;">
             <div v-show="item.disabled">
               <x-button type="info"
                         shape="circle"
@@ -142,7 +143,7 @@
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
-                      placement="bottom-end"
+                      placement="top-end"
                       width="90">
                 <p>{{$t('Delete?')}}</p>
                 <div style="text-align: right; margin: 0;padding-top: 4px;">
@@ -343,11 +344,7 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }else{
-          this.$refs['poptipDeleteAll'].doClose()
-        }
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
        * delete
