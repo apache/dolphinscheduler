@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
+import com.github.rholder.retry.RetryException;
+import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  *  netty executor manager
@@ -133,26 +136,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @throws ExecuteException if error throws ExecuteException
      */
     private void doExecute(final Host host, final Command command) throws ExecuteException {
-        /**
-         * retry count，default retry 3
-         */
-        int retryCount = 3;
-        boolean success = false;
-        do {
-            try {
+        try {
+            RetryerUtils.retryCall(() -> {
                 nettyRemotingClient.send(host, command);
-                success = true;
-            } catch (Exception ex) {
-                logger.error(String.format("send command : %s to %s error", command, host), ex);
-                retryCount--;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignore) {}
-            }
-        } while (retryCount >= 0 && !success);
-
-        if (!success) {
-            throw new ExecuteException(String.format("send command : %s to %s error", command, host));
+                return Boolean.TRUE;
+            });
+        } catch (ExecutionException | RetryException e) {
+            throw new ExecuteException(String.format("send command : %s to %s error", command, host), e);
         }
     }
 
