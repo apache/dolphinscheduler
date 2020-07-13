@@ -17,50 +17,50 @@
 
 package org.apache.dolphinscheduler.server.registry;
 
+import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+
+import java.util.Date;
+import java.util.Set;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
-
-public class HeartBeatTask extends Thread{
+public class HeartBeatTask extends Thread {
 
     private final Logger logger = LoggerFactory.getLogger(HeartBeatTask.class);
 
     private String startTime;
     private double reservedMemory;
     private double maxCpuloadAvg;
-    private String heartBeatPath;
+    private Set<String> heartBeatPaths;
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     public HeartBeatTask(String startTime,
                          double reservedMemory,
                          double maxCpuloadAvg,
-                         String heartBeatPath,
-                         ZookeeperRegistryCenter zookeeperRegistryCenter){
+                         Set<String> heartBeatPaths,
+                         ZookeeperRegistryCenter zookeeperRegistryCenter) {
         this.startTime = startTime;
         this.reservedMemory = reservedMemory;
         this.maxCpuloadAvg = maxCpuloadAvg;
-        this.heartBeatPath = heartBeatPath;
+        this.heartBeatPaths = heartBeatPaths;
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
     }
 
     @Override
     public void run() {
         try {
-
             double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
             double loadAverage = OSUtils.loadAverage();
 
             int status = Constants.NORAML_NODE_STATUS;
 
-            if(availablePhysicalMemorySize < reservedMemory
-                    || loadAverage > maxCpuloadAvg){
-                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
+            if (availablePhysicalMemorySize < reservedMemory
+                    || loadAverage > maxCpuloadAvg) {
+                logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize, loadAverage);
                 status = Constants.ABNORMAL_NODE_STATUS;
             }
 
@@ -76,8 +76,11 @@ public class HeartBeatTask extends Thread{
             builder.append(status).append(COMMA);
             //save process id
             builder.append(OSUtils.getProcessID());
-            zookeeperRegistryCenter.getZookeeperCachedOperator().update(heartBeatPath, builder.toString());
-        } catch (Throwable ex){
+
+            for (String heartBeatPath : heartBeatPaths) {
+                zookeeperRegistryCenter.getZookeeperCachedOperator().update(heartBeatPath, builder.toString());
+            }
+        } catch (Throwable ex) {
             logger.error("error write heartbeat info", ex);
         }
     }
