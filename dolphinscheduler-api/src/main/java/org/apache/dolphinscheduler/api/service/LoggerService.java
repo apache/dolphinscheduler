@@ -69,8 +69,7 @@ public class LoggerService {
     TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
     if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
-      return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(),
-          Status.TASK_INSTANCE_NOT_FOUND.getMsg());
+      return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
     }
 
     String host = getHost(taskInstance.getHost());
