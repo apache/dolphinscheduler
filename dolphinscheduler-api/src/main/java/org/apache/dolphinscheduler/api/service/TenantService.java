@@ -327,11 +327,11 @@ public class TenantService extends BaseService{
    * @return true if tenant code can user, otherwise return false
    */
   public Result verifyTenantCode(String tenantCode) {
-    Result result=new Result();
+    Result result = new Result();
     if (checkTenantExists(tenantCode)) {
       logger.error("tenant {} has exist, can't create again.", tenantCode);
-      putMsg(result, Status.TENANT_NAME_EXIST);
-    }else{
+      putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+    } else {
       putMsg(result, Status.SUCCESS);
     }
     return result;

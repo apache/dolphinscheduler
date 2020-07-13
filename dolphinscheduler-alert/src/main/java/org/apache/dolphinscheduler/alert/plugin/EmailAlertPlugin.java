@@ -71,32 +71,32 @@ public class EmailAlertPlugin implements AlertPlugin {
 
         AlertData alert = info.getAlertData();
 
-        List<String> receviersList = (List<String>) info.getProp(Constants.PLUGIN_DEFAULT_EMAIL_RECEIVERS);
+        List<String> receiversList = (List<String>) info.getProp(Constants.PLUGIN_DEFAULT_EMAIL_RECEIVERS);
 
         // receiving group list
         // custom receiver
         String receivers = alert.getReceivers();
         if (StringUtils.isNotEmpty(receivers)) {
             String[] splits = receivers.split(",");
-            receviersList.addAll(Arrays.asList(splits));
+            receiversList.addAll(Arrays.asList(splits));
         }
 
-        List<String> receviersCcList = new ArrayList<>();
+        List<String> receiversCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = alert.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)) {
             String[] splits = receiversCc.split(",");
-            receviersCcList.addAll(Arrays.asList(splits));
+            receiversCcList.addAll(Arrays.asList(splits));
         }
 
-        if (CollectionUtils.isEmpty(receviersList) && CollectionUtils.isEmpty(receviersCcList)) {
+        if (CollectionUtils.isEmpty(receiversList) && CollectionUtils.isEmpty(receiversCcList)) {
             logger.warn("alert send error : At least one receiver address required");
             retMaps.put(Constants.STATUS, "false");
             retMaps.put(Constants.MESSAGE, "execution failure,At least one receiver address required.");
             return retMaps;
         }
 
-        retMaps = emailManager.send(receviersList, receviersCcList, alert.getTitle(), alert.getContent(),
+        retMaps = emailManager.send(receiversList, receiversCcList, alert.getTitle(), alert.getContent(),
                 alert.getShowType());
 
         //send flag
@@ -124,7 +124,7 @@ public class EmailAlertPlugin implements AlertPlugin {
                     logger.error(e.getMessage(), e);
                 }
             }
-            
+
            if (DingTalkUtils.isEnableDingTalk) {
                 logger.info("Ding Talk is enable.");
                  dingTalkManager.send(info);
