@@ -19,8 +19,8 @@ import i18n from '@/module/i18n'
 /**
  * download file
  */
-let downloadFile = ($url, $obj) => {
-  let param = {
+const downloadFile = ($url, $obj) => {
+  const param = {
     url: $url,
     obj: $obj
   }
@@ -30,9 +30,9 @@ let downloadFile = ($url, $obj) => {
     return
   }
 
-  let generatorInput = function (obj) {
+  const generatorInput = function (obj) {
     let result = ''
-    let keyArr = Object.keys(obj)
+    const keyArr = Object.keys(obj)
     keyArr.forEach(function (key) {
       result += "<input type='hidden' name = '" + key + "' value='" + obj[key] + "'>"
     })

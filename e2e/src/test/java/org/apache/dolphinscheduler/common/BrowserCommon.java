@@ -23,7 +23,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import redis.clients.jedis.Jedis;
-
+import org.openqa.selenium.JavascriptExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +115,7 @@ public class BrowserCommon {
 
     /**
      * Click button element
+     *
      * @param locator By
      * @return clickButton
      */
@@ -127,6 +128,19 @@ public class BrowserCommon {
     }
 
     /**
+     * Click Navigation Bar element
+     *
+     * @param locator By
+     * @return clickButton
+     */
+    public void clickTopElement(By locator) {
+        WebElement element = driver.findElement(locator);
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
+        executor.executeScript("arguments[0].click();", element);
+    }
+
+
+    /**
      * Click element
      *
      * @param locator By
@@ -137,6 +151,7 @@ public class BrowserCommon {
         clickElement.click();
         return clickElement;
     }
+
 
     /**
      * input element
@@ -151,6 +166,7 @@ public class BrowserCommon {
         inputElement.sendKeys(content);
         return inputElement;
     }
+
     /**
      * clear element
      *
@@ -169,9 +185,8 @@ public class BrowserCommon {
      *
      * @param codeMirrorLocator By codeMirror
      * @param codeMirrorLineLocator By codeMirrorLine
-
      */
-    public void inputCodeMirror(By codeMirrorLocator,By codeMirrorLineLocator,String content) {
+    public void inputCodeMirror(By codeMirrorLocator, By codeMirrorLineLocator, String content) {
         WebElement codeMirrorElement = locateElement(codeMirrorLocator);
         WebElement codeMirrorLineElement = locateElement(codeMirrorLineLocator);
         codeMirrorElement.click();
@@ -180,10 +195,11 @@ public class BrowserCommon {
 
     /**
      * move to element
+     *
      * @param locator BY
      * @return actions
      */
-    public Actions moveToElement(By locator){
+    public Actions moveToElement(By locator) {
         return actions.moveToElement(locateElement(locator));
     }
 
@@ -193,14 +209,14 @@ public class BrowserCommon {
      * @param source_locator BY
      * @param target_locator BY
      */
-    public void dragAndDrop(By source_locator, By target_locator){
+    public void dragAndDrop(By source_locator, By target_locator) {
         WebElement sourceElement = locateElement(source_locator);
         WebElement targetElement = locateElement(target_locator);
         actions.dragAndDrop(sourceElement, targetElement).perform();
         actions.release();
     }
 
-    public void moveToDragElement(By target_locator, int X, int Y){
+    public void moveToDragElement(By target_locator, int X, int Y) {
         WebElement targetElement = locateElement(target_locator);
         actions.dragAndDropBy(targetElement, X, Y).perform();
         actions.release();
@@ -237,11 +253,28 @@ public class BrowserCommon {
     }
 
     /**
-     * Multi-window switch handle, according to the handle number passed in
+     * select time
      *
-     * @param num Number starts from 1
-     * @return driver
+     * @return WebElement
      */
+    public WebElement selectDate(String js, By locator_time, String date) {
+        JavascriptExecutor removeAttribute = (JavascriptExecutor) driver;
+        removeAttribute.executeScript("var setDate=" + js + ";setDate.removeAttribute('readonly');");
+        WebElement dateElement = locateElement(locator_time);
+
+        //input date
+        dateElement.clear();
+        dateElement.sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END));
+        dateElement.sendKeys(date);
+        return dateElement;
+    }
+
+        /**
+         * Multi-window switch handle, according to the handle number passed in
+         *
+         * @param num Number starts from 1
+         * @return driver
+         */
     public WebDriver switchHandle(int num) {
         // current handle
         String currentHandle = driver.getWindowHandle();
@@ -314,9 +347,8 @@ public class BrowserCommon {
         executeScript("window.scrollTo(0, document.body.scrollHeight)");
     }
 
-    public void scrollToElementBottom() {
-
-        WebElement webElement = driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[2]/div/div[7]/div[3]"));
+    public void scrollToElementBottom(By locator) {
+        WebElement webElement = locateElement(locator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", webElement);
     }
 

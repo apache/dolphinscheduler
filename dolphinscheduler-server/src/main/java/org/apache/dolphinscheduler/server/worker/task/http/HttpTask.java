@@ -17,24 +17,20 @@
 package org.apache.dolphinscheduler.server.worker.task.http;
 
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.Charsets;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
 import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -66,16 +62,6 @@ public class HttpTask extends AbstractTask {
     private HttpParameters httpParameters;
 
     /**
-     *  process service
-     */
-    private ProcessService processService;
-
-    /**
-     * Convert mill seconds to second unit
-     */
-    protected static final int MAX_CONNECTION_MILLISECONDS = 60000;
-
-    /**
      * application json
      */
     protected static final String APPLICATION_JSON = "application/json";
@@ -85,20 +71,26 @@ public class HttpTask extends AbstractTask {
      */
     protected String output;
 
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
     /**
      * constructor
-     * @param props     props
+     * @param taskExecutionContext     taskExecutionContext
      * @param logger    logger
      */
-    public HttpTask(TaskProps props, Logger logger) {
-        super(props, logger);
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+    public HttpTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
-        logger.info("http task params {}", taskProps.getTaskParams());
-        this.httpParameters = JSONObject.parseObject(taskProps.getTaskParams(), HttpParameters.class);
+        logger.info("http task params {}", taskExecutionContext.getTaskParams());
+        this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
 
         if (!httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
@@ -107,7 +99,7 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void handle() throws Exception {
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         long startTime = System.currentTimeMillis();
@@ -138,20 +130,20 @@ public class HttpTask extends AbstractTask {
      */
     protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                taskProps.getDefinedParams(),
+        // replace placeholder
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
                 httpParameters.getLocalParametersMap(),
-                processInstance.getCmdTypeIfComplement(),
-                processInstance.getScheduleTime());
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
         List<HttpProperty> httpPropertyList = new ArrayList<>();
-        if(httpParameters.getHttpParams() != null && httpParameters.getHttpParams().size() > 0){
+        if(CollectionUtils.isNotEmpty(httpParameters.getHttpParams() )){
             for (HttpProperty httpProperty: httpParameters.getHttpParams()) {
-                String jsonObject = JSONObject.toJSONString(httpProperty);
+                String jsonObject = JSONUtils.toJsonString(httpProperty);
                 String params = ParameterUtils.convertParameterPlaceholders(jsonObject,ParamUtils.convert(paramsMap));
                 logger.info("http request params：{}",params);
-                httpPropertyList.add(JSONObject.parseObject(params,HttpProperty.class));
+                httpPropertyList.add(JSONUtils.parseObject(params,HttpProperty.class));
             }
         }
         addRequestParams(builder,httpPropertyList);
@@ -176,8 +168,7 @@ public class HttpTask extends AbstractTask {
         if (entity == null) {
             return null;
         }
-        String webPage = EntityUtils.toString(entity, StandardCharsets.UTF_8.name());
-        return webPage;
+        return EntityUtils.toString(entity, StandardCharsets.UTF_8.name());
     }
 
     /**
@@ -186,8 +177,7 @@ public class HttpTask extends AbstractTask {
      * @return status code
      */
     protected int getStatusCode(CloseableHttpResponse httpResponse) {
-        int status = httpResponse.getStatusLine().getStatusCode();
-        return status;
+        return httpResponse.getStatusLine().getStatusCode();
     }
 
     /**
@@ -252,8 +242,8 @@ public class HttpTask extends AbstractTask {
      * @param httpPropertyList  http property list
      */
     protected void addRequestParams(RequestBuilder builder,List<HttpProperty> httpPropertyList) {
-        if(httpPropertyList != null && httpPropertyList.size() > 0){
-            JSONObject jsonParam = new JSONObject();
+        if(CollectionUtils.isNotEmpty(httpPropertyList)){
+            ObjectNode jsonParam = JSONUtils.createObjectNode();
             for (HttpProperty property: httpPropertyList){
                 if(property.getHttpParametersType() != null){
                     if (property.getHttpParametersType().equals(HttpParametersType.PARAMETER)){
@@ -276,12 +266,10 @@ public class HttpTask extends AbstractTask {
      * @param httpPropertyList  http property list
      */
     protected void setHeaders(HttpUriRequest request,List<HttpProperty> httpPropertyList) {
-        if(httpPropertyList != null && httpPropertyList.size() > 0){
-            for (HttpProperty property: httpPropertyList){
-                if(property.getHttpParametersType() != null) {
-                    if (property.getHttpParametersType().equals(HttpParametersType.HEADERS)) {
-                        request.addHeader(property.getProp(), property.getValue());
-                    }
+        if(CollectionUtils.isNotEmpty(httpPropertyList)){
+            for (HttpProperty property: httpPropertyList) {
+                if (HttpParametersType.HEADERS.equals(property.getHttpParametersType())) {
+                    request.addHeader(property.getProp(), property.getValue());
                 }
             }
         }
@@ -303,7 +291,7 @@ public class HttpTask extends AbstractTask {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**

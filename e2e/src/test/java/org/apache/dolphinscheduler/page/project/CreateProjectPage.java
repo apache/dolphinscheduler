@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
-import org.apache.dolphinscheduler.data.project.CreatProjectData;
+import org.apache.dolphinscheduler.data.project.CreateProjectData;
 import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
 import org.openqa.selenium.WebDriver;
 
@@ -26,33 +26,49 @@ public class CreateProjectPage extends PageCommon {
     public CreateProjectPage(WebDriver driver) {
         super(driver);
     }
+
     /**
-     * jump page
+     * jump to ProjectManagePage
      */
-    public void jumpProjectManagePage() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
-        clickElement(CreateProjectLocator.PROJECT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+    public boolean jumpProjectManagePage() throws InterruptedException {
+        Thread.sleep(TestConstant.THREE_THOUSAND);
+        clickTopElement(CreateProjectLocator.PROJECT_MANAGE);
+        Thread.sleep(TestConstant.ONE_THOUSAND);
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
     }
 
     /**
-     * creatTenant
+     * create project
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create project
      */
     public boolean createProject() throws InterruptedException {
-        //click  create project
         clickElement(CreateProjectLocator.CREATE_PROJECT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // input create project data
-        sendInput(CreateProjectLocator.PROJECT_NAME, CreatProjectData.PROJECT_NAME);
-        sendInput(CreateProjectLocator.PROJECT_DESCRIPTION, CreatProjectData.DESCRIPTION);
+        sendInput(CreateProjectLocator.PROJECT_NAME, CreateProjectData.PROJECT_NAME);
+        sendInput(CreateProjectLocator.PROJECT_DESCRIPTION, CreateProjectData.DESCRIPTION);
 
         // click submit  button
         clickButton(CreateProjectLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(CreatProjectData.PROJECT_TITLE);
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
+    }
+
+    /**
+     * delete project
+     *
+     * @return Whether to enter the specified page after delete project
+     */
+    public boolean deleteProject() throws InterruptedException {
+        //click  delete project
+        clickElement(CreateProjectLocator.DELETE_PROJECT_BUTTON);
+
+        //click confirm delete project
+        clickElement(CreateProjectLocator.CONFIRM_DELETE_PROJECT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
     }
 }

@@ -32,8 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +43,6 @@ import java.util.*;
  */
 @Service
 public class TaskInstanceService extends BaseService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceService.class);
 
     @Autowired
     ProjectMapper projectMapper;

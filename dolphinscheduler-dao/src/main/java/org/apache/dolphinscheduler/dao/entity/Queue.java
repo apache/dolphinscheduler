@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -45,10 +46,12 @@ public class Queue {
     /**
      * create time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
     /**
      * update time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -104,13 +107,21 @@ public class Queue {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Queue queue1 = (Queue) o;
 
-        if (id != queue1.id) return false;
-        if (!queueName.equals(queue1.queueName)) return false;
+        if (id != queue1.id) {
+            return false;
+        }
+        if (!queueName.equals(queue1.queueName)) {
+            return false;
+        }
         return queue.equals(queue1.queue);
     }
 

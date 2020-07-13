@@ -17,57 +17,75 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * data source of mySQL
  */
 public class MySQLDataSource extends BaseDataSource {
 
-  private static final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
+  private final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
+
+  private final String sensitiveParam = "autoDeserialize=true";
+
+  private final char symbol = '&';
 
   /**
    * gets the JDBC url for the data source connection
-   * @return
+   * @return jdbc url
    */
   @Override
-  public String getJdbcUrl() {
-    String address = getAddress();
-    if (address.lastIndexOf("/") != (address.length() - 1)) {
-      address += "/";
-    }
-    String jdbcUrl = address + getDatabase();
-    if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += "?" + getOther();
-    }
-    return jdbcUrl;
+  public String driverClassSelector() {
+    return Constants.COM_MYSQL_JDBC_DRIVER;
   }
 
   /**
-   * test whether the data source can be connected successfully
-   * @throws Exception
+   * @return db type
    */
   @Override
-  public void isConnectable() throws Exception {
-    Connection con = null;
-    try {
-      Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-    } finally {
-      if (con != null) {
-        try {
-          con.close();
-        } catch (SQLException e) {
-          logger.error("Mysql datasource try conn close conn error", e);
-        }
-      }
-    }
+  public DbType dbTypeSelector() {
+    return DbType.MYSQL;
   }
 
+  @Override
+  protected String filterOther(String other){
+    if(StringUtils.isBlank(other)){
+        return "";
+    }
+    if(other.contains(sensitiveParam)){
+      int index = other.indexOf(sensitiveParam);
+      String tmp = sensitiveParam;
+      if(index == 0 || other.charAt(index + 1) == symbol){
+        tmp = tmp + symbol;
+      } else if(other.charAt(index - 1) == symbol){
+        tmp = symbol + tmp;
+      }
+      logger.warn("sensitive param : {} in otherParams field is filtered", tmp);
+      other = other.replace(tmp, "");
+    }
+    logger.debug("other : {}", other);
+    return other;
+  }
+
+  @Override
+  public String getUser() {
+    if(user.contains(sensitiveParam)){
+      logger.warn("sensitive param : {} in username field is filtered", sensitiveParam);
+      user = user.replace(sensitiveParam, "");
+    }
+    logger.debug("username : {}", user);
+    return user;
+  }
+
+  @Override
+  public String getPassword() {
+    if(password.contains(sensitiveParam)){
+      logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
+      password = password.replace(sensitiveParam, "");
+    }
+    return password;
+  }
 }

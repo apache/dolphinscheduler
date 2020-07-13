@@ -60,7 +60,7 @@ public enum TaskStateType {
                 default:
                     break;
         }
-        return null;
+        return new int[0];
     }
 
 }

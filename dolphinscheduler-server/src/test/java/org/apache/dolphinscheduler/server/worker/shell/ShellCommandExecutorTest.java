@@ -16,14 +16,12 @@
  */
 package org.apache.dolphinscheduler.server.worker.shell;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -32,6 +30,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.*;
 
 import java.util.Date;
 
@@ -55,20 +54,20 @@ public class ShellCommandExecutorTest {
 
         TaskProps taskProps = new TaskProps();
         // processDefineId_processInstanceId_taskInstanceId
-        taskProps.setTaskDir("/opt/soft/program/tmp/dolphinscheduler/exec/flow/5/36/2864/7657");
+        taskProps.setExecutePath("/opt/soft/program/tmp/dolphinscheduler/exec/flow/5/36/2864/7657");
         taskProps.setTaskAppId("36_2864_7657");
         // set tenant -> task execute linux user
         taskProps.setTenantCode("hdfs");
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(7657);
+        taskProps.setTaskInstanceId(7657);
 
 
 
         TaskInstance taskInstance = processService.findTaskInstanceById(7657);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 
@@ -79,7 +78,9 @@ public class ShellCommandExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+
+        AbstractTask task = null;
 
         logger.info("task info : {}", task);
 

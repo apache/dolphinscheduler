@@ -211,11 +211,43 @@ const router = new Router({
           }
         },
         {
+          path: '/resource/file/createFolder',
+          name: 'resource-file-createFolder',
+          component: resolve => require(['../pages/resource/pages/file/pages/createFolder/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
+          path: '/resource/file/subFileFolder/:id',
+          name: 'resource-file-subFileFolder',
+          component: resolve => require(['../pages/resource/pages/file/pages/subFileFolder/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
+          path: '/resource/file/subFile/:id',
+          name: 'resource-file-subFile',
+          component: resolve => require(['../pages/resource/pages/file/pages/subFile/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
           path: '/resource/file/list/:id',
           name: 'resource-file-details',
           component: resolve => require(['../pages/resource/pages/file/pages/details/index'], resolve),
           meta: {
             title: `${i18n.$t('File Details')}`
+          }
+        },
+        {
+          path: '/resource/file/subdirectory/:id',
+          name: 'resource-file-subdirectory',
+          component: resolve => require(['../pages/resource/pages/file/pages/subdirectory/index'], resolve),
+          meta: {
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -235,16 +267,40 @@ const router = new Router({
           },
           children: [
             {
-              path: '/resource/udf/resource',
-              name: 'resource-udf-resource',
+              path: '/resource/udf',
+              name: 'resource-udf',
               component: resolve => require(['../pages/resource/pages/udf/pages/resource/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Resources')}`
               }
             },
             {
-              path: '/resource/udf/function',
-              name: 'resource-udf-function',
+              path: '/resource/udf/subUdfDirectory/:id',
+              name: 'resource-udf-subUdfDirectory',
+              component: resolve => require(['../pages/resource/pages/udf/pages/subUdfDirectory/index'], resolve),
+              meta: {
+                title: `${i18n.$t('UDF Resources')}`
+              }
+            },
+            {
+              path: '/resource/udf/createUdfFolder',
+              name: 'resource-udf-createUdfFolder',
+              component: resolve => require(['../pages/resource/pages/udf/pages/createUdfFolder/index'], resolve),
+              meta: {
+                title: `${i18n.$t('Create Resource')}`
+              }
+            },
+            {
+              path: '/resource/udf/subCreateUdfFolder/:id',
+              name: 'resource-udf-subCreateUdfFolder',
+              component: resolve => require(['../pages/resource/pages/udf/pages/subUdfFolder/index'], resolve),
+              meta: {
+                title: `${i18n.$t('Create Resource')}`
+              }
+            },
+            {
+              path: '/resource/func',
+              name: 'resource-func',
               component: resolve => require(['../pages/resource/pages/udf/pages/function/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Function')}`
@@ -378,7 +434,7 @@ const router = new Router({
       name: 'monitor',
       component: resolve => require(['../pages/monitor/index'], resolve),
       meta: {
-        title: `monitor`
+        title: 'monitor'
       },
       redirect: {
         name: 'servers-master'
@@ -405,7 +461,7 @@ const router = new Router({
           name: 'servers-alert',
           component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
           meta: {
-            title: `Alert`
+            title: 'Alert'
           }
         },
         {
@@ -413,7 +469,7 @@ const router = new Router({
           name: 'servers-rpcserver',
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
-            title: `Rpcserver`
+            title: 'Rpcserver'
           }
         },
         {
@@ -421,7 +477,7 @@ const router = new Router({
           name: 'servers-zookeeper',
           component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
           meta: {
-            title: `Zookeeper`
+            title: 'Zookeeper'
           }
         },
         {
@@ -429,7 +485,7 @@ const router = new Router({
           name: 'servers-apiserver',
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
           meta: {
-            title: `Apiserver`
+            title: 'Apiserver'
           }
         },
         {
@@ -437,7 +493,7 @@ const router = new Router({
           name: 'servers-db',
           component: resolve => require(['../pages/monitor/pages/servers/db'], resolve),
           meta: {
-            title: `DB`
+            title: 'DB'
           }
         },
         {
@@ -445,7 +501,7 @@ const router = new Router({
           name: 'statistics',
           component: resolve => require(['../pages/monitor/pages/servers/statistics'], resolve),
           meta: {
-            title: `statistics`
+            title: 'statistics'
           }
         }
       ]
@@ -454,7 +510,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  let $body = $('body')
+  const $body = $('body')
   $body.find('.tooltip.fade.top.in').remove()
   if (to.meta.title) {
     document.title = `${to.meta.title} - DolphinScheduler`

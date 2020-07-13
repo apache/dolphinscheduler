@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * users controller test
  */
 public class UsersControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
     @Test
     public void testCreateUser() throws Exception {
@@ -260,6 +260,25 @@ public class UsersControllerTest extends AbstractControllerTest{
 
         MvcResult mvcResult = mockMvc.perform(get("/users/list")
                 .header(SESSION_ID, sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testRegisterUser() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName","user_test");
+        paramsMap.add("userPassword","123456qwe?");
+        paramsMap.add("repeatPassword", "123456qwe?");
+        paramsMap.add("email","12343534@qq.com");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/register")
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();

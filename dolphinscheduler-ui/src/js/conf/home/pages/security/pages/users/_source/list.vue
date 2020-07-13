@@ -26,7 +26,7 @@
             <span>{{$t('User Name')}}</span>
           </th>
           <th>
-            <span>用户类型</span>
+            <span>{{$t('User Type')}}</span>
           </th>
           <th>
             <span>{{$t('Tenant')}}</span>
@@ -40,7 +40,9 @@
           <th>
             <span>{{$t('Phone')}}</span>
           </th>
-
+          <th id="state">
+            <span>{{$t('State')}}</span>
+          </th>
           <th>
             <span>{{$t('Create Time')}}</span>
           </th>
@@ -70,6 +72,10 @@
           </td>
           <td>
             <span>{{item.phone || '-'}}</span>
+          </td>
+          <td>
+            <span v-if="item.state == 1">{{$t('Enable')}}</span>
+            <span v-else>{{$t('Disable')}}</span>
           </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
@@ -144,7 +150,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization']),
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization','getResourceList']),
       _closeDelete (i) {
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
@@ -215,44 +221,69 @@
           })
         })
       },
+      /*
+        getAllLeaf
+       */
+      getAllLeaf (data) {
+        let result = []
+        let getLeaf = (data)=> {
+          data.forEach(item => {
+            if (item.children.length==0) {
+              result.push(item)
+            } else {
+              getLeaf(item.children)
+            }
+          })
+        }
+        getLeaf(data)
+        return result
+      },
       _authFile (item, i) {
         this.$refs[`poptip-auth-${i}`][0].doClose()
-        this.getAuthList({
+        this.getResourceList({
           id: item.id,
           type: 'file',
           category: 'resources'
         }).then(data => {
-          let sourceListPrs = _.map(data[0], v => {
-            return {
-              id: v.id,
-              name: v.alias,
-              type: v.type
-            }
-          })
+          // let sourceListPrs = _.map(data[0], v => {
+          //   return {
+          //     id: v.id,
+          //     name: v.alias,
+          //     type: v.type
+          //   }
+          // })
           let fileSourceList = []
           let udfSourceList = []
-          sourceListPrs.forEach((value,index,array)=>{
+          data[0].forEach((value,index,array)=>{
             if(value.type =='FILE'){
               fileSourceList.push(value)
             } else{
               udfSourceList.push(value)
             }
           })
-          let targetListPrs = _.map(data[1], v => {
-            return {
-              id: v.id,
-              name: v.alias,
-              type: v.type
-            }
-          })
           let fileTargetList = []
           let udfTargetList = []
-          targetListPrs.forEach((value,index,array)=>{
+
+          let pathId = []
+          data[1].forEach(v=>{
+            let arr = []
+            arr[0] = v
+            if(this.getAllLeaf(arr).length>0) {
+              pathId.push(this.getAllLeaf(arr)[0])
+            }
+          })
+          data[1].forEach((value,index,array)=>{
             if(value.type =='FILE'){
               fileTargetList.push(value)
             } else{
               udfTargetList.push(value)
             }
+          })
+          fileTargetList = _.map(fileTargetList, v => {
+            return v.id
+          })
+          udfTargetList = _.map(udfTargetList, v => {
+            return v.id
           })
           let self = this
           let modal = this.$modal.dialog({

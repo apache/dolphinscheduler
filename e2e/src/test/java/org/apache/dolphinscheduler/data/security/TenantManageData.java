@@ -20,23 +20,17 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
-import org.apache.dolphinscheduler.data.LoginData;
 
 public class TenantManageData {
     /**
-     * Tenant URL
-     */
-    public static final String TENANAT_URL =  LoginData.URL + "/ui/#/security/tenant";
-
-    /**
      * Tenant Code
      */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code2";
+    public static final String TENANT_CODE = "selenium_tenant_code_1";
 
     /**
      * Tenant Name
      */
-    public static final String TENANAT_NAME = "dolphinscheduler_tenant_Name";
+    public static final String TENANT_NAME = "selenium_tenant_Name";
 
     /**
      * Queue
@@ -46,9 +40,9 @@ public class TenantManageData {
     /**
      * Description
      */
-    public static final String DESCRIPTION = "creat tenant test";
+    public static final String DESCRIPTION = "create tenant test";
 
-    public static final String TENANAT_MANAGE = "Tenant Manage - DolphinScheduler";
+    public static final String TENANT_MANAGE = "租户管理 - DolphinScheduler";
 
 
 

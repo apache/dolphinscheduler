@@ -1,0 +1,234 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/component: alert
+spec:
+  replicas: {{ .Values.alert.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      app.kubernetes.io/component: alert
+  strategy:
+    type: {{ .Values.alert.strategy.type | quote }}
+    rollingUpdate:
+      maxSurge: {{ .Values.alert.strategy.rollingUpdate.maxSurge | quote }}
+      maxUnavailable: {{ .Values.alert.strategy.rollingUpdate.maxUnavailable | quote }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/managed-by: {{ .Release.Service }}
+        app.kubernetes.io/component: alert
+    spec:
+      {{- if .Values.alert.affinity }}
+      affinity: {{- toYaml .Values.alert.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.alert.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.alert.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.alert.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: init-postgresql
+          image: busybox:1.31.0
+          command:
+            - /bin/sh
+            - -ec
+            - |
+              while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+                  counter=$((counter+1))
+                  if [ $counter == 5 ]; then
+                      echo "Error: Couldn't connect to postgresql."
+                      exit 1
+                  fi
+                  echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+                  sleep 60
+              done
+          env:
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+            {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+              {{- end }}
+      containers:
+        - name: {{ include "dolphinscheduler.fullname" . }}-alert
+          image: {{ include "dolphinscheduler.image.repository" . | quote }}
+          args:
+            - "alert-server"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
+            - name: XLS_FILE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: XLS_FILE_PATH
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SERVER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SERVER_HOST
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SERVER_PORT
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SENDER
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SENDER
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_USER
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_PASSWD
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_PASSWD
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_STARTTLS_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_STARTTLS_ENABLE
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_SSL_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_SSL_ENABLE
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: MAIL_SMTP_SSL_TRUST
+              valueFrom:
+                configMapKeyRef:
+                  key: MAIL_SMTP_SSL_TRUST
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: ENTERPRISE_WECHAT_ENABLE
+              valueFrom:
+                configMapKeyRef:
+                  key: ENTERPRISE_WECHAT_ENABLE
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: ENTERPRISE_WECHAT_CORP_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: ENTERPRISE_WECHAT_CORP_ID
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: ENTERPRISE_WECHAT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: ENTERPRISE_WECHAT_SECRET
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: ENTERPRISE_WECHAT_AGENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: ENTERPRISE_WECHAT_AGENT_ID
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: ENTERPRISE_WECHAT_USERS
+              valueFrom:
+                configMapKeyRef:
+                  key: ENTERPRISE_WECHAT_USERS
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: POSTGRESQL_HOST
+              {{- if .Values.postgresql.enabled }}
+              value: {{ template "dolphinscheduler.postgresql.fullname" . }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.host | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PORT
+              {{- if .Values.postgresql.enabled }}
+              value: "5432"
+              {{- else }}
+              value: {{ .Values.externalDatabase.port }}
+              {{- end }}
+            - name: POSTGRESQL_USERNAME
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlUsername }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.username | quote }}
+              {{- end }}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{- if .Values.postgresql.enabled }}
+                  name: {{ template "dolphinscheduler.postgresql.fullname" . }}
+                  key: postgresql-password
+                  {{- else }}
+                  name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
+                  key: db-password
+                  {{- end }}
+            - name: POSTGRESQL_DATABASE
+              {{- if .Values.postgresql.enabled }}
+              value: {{ .Values.postgresql.postgresqlDatabase }}
+              {{- else }}
+              value: {{ .Values.externalDatabase.database | quote }}
+              {{- end }}
+          {{- if .Values.alert.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - /root/checkpoint.sh
+                - AlertServer
+            initialDelaySeconds: {{ .Values.alert.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.alert.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.alert.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.alert.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.alert.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.alert.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - /root/checkpoint.sh
+                - AlertServer
+            initialDelaySeconds: {{ .Values.alert.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.alert.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.alert.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.alert.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.alert.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "/opt/dolphinscheduler/logs"
+              name: {{ include "dolphinscheduler.fullname" . }}-alert
+      volumes:
+        - name: {{ include "dolphinscheduler.fullname" . }}-alert
+          {{- if .Values.alert.persistentVolumeClaim.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-alert
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

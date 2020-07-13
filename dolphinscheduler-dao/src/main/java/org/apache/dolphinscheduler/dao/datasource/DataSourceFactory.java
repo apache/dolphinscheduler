@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,12 @@ public class DataSourceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSourceFactory.class);
 
+  /**
+   * getDatasource
+   * @param dbType dbType
+   * @param parameter parameter
+   * @return getDatasource
+   */
   public static BaseDataSource getDatasource(DbType dbType, String parameter) {
     try {
       switch (dbType) {

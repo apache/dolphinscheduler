@@ -20,20 +20,45 @@ workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/install_config.conf
 
+txt=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    txt="''"
+fi
+
+declare -A workersGroupMap=()
+
+workersGroup=(${workers//,/ })
+for workerGroup in ${workersGroup[@]}
+do
+  echo $workerGroup;
+  worker=`echo $workerGroup|awk -F':' '{print $1}'`
+  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
+  workersGroupMap+=([$worker]=$groupName)
+done
+
+
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-    if ! ssh -p $sshPort $host test -e $installPath; then
-      ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+  if ! ssh -p $sshPort $host test -e $installPath; then
+    ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+  fi
+
+  echo "scp dirs to $host/$installPath starting"
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
+
+  for dsDir in bin conf lib script sql ui install.sh
+  do
+    # if worker in workersGroupMap
+    if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
+      sed -i ${txt} "s#worker.group.*#worker.group=${workersGroupMap[${host}]}#g" ${dsDir}/worker.properties
     fi
 
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
-	scp -P $sshPort -r $workDir/../bin  $host:$installPath
-	scp -P $sshPort -r $workDir/../conf  $host:$installPath
-	scp -P $sshPort -r $workDir/../lib   $host:$installPath
-	scp -P $sshPort -r $workDir/../script  $host:$installPath
-	scp -P $sshPort -r $workDir/../sql  $host:$installPath
-	scp -P $sshPort -r $workDir/../ui  $host:$installPath
-	scp -P $sshPort  $workDir/../install.sh  $host:$installPath
+    echo "start to scp $dsDir to $host/$installPath"
+    scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
+  done
+
+  echo "scp dirs to $host/$installPath complete"
 done

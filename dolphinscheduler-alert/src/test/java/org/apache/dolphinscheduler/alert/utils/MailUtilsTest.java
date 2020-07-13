@@ -23,17 +23,17 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.Ignore;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import org.apache.dolphinscheduler.common.utils.*;
 
 
 /**
  */
-@Ignore
 public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
@@ -59,7 +59,7 @@ public class MailUtilsTest {
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(4);
 
-        MailUtils.sendMails(Arrays.asList(receivers),Arrays.asList(receiversCc),alert.getTitle(),alert.getContent(), ShowType.TEXT);
+        MailUtils.sendMails(Arrays.asList(receivers),Arrays.asList(receiversCc),alert.getTitle(),alert.getContent(), ShowType.TEXT.getDescp());
     }
 
 
@@ -71,7 +71,7 @@ public class MailUtilsTest {
         String[] mails = new String[]{"xx@xx.com"};
 
         for(Alert alert : alerts){
-            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), alert.getShowType());
+            MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
         }
 
     }
@@ -112,7 +112,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing", alert.getContent(), ShowType.TABLE.getDescp());
     }
 
     /**
@@ -138,8 +138,10 @@ public class MailUtilsTest {
      * Table
      */
     @Test
-    public void addAlertTable(){
+    public void testAddAlertTable(){
+        logger.info("testAddAlertTable");
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TABLE);
@@ -149,6 +151,7 @@ public class MailUtilsTest {
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
         alertDao.addAlert(alert);
+        logger.info("" +alert);
     }
 
     @Test
@@ -168,7 +171,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.ATTACHMENT);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.ATTACHMENT.getDescp());
     }
 
     @Test
@@ -181,7 +184,7 @@ public class MailUtilsTest {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
-        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.TABLEATTACHMENT);
+        MailUtils.sendMails(Arrays.asList(mails),"gaojing",alert.getContent(),ShowType.TABLEATTACHMENT.getDescp());
     }
 
 }

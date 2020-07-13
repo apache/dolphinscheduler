@@ -19,7 +19,10 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
+          <x-button-group size="small">
+            <x-button type="ghost"  @click="() => this.$router.push({name: 'resource-udf-createUdfFolder'})">{{$t('Create folder')}}</x-button>
+            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
+          </x-button-group>
         </template>
       </m-conditions>
     </template>
@@ -34,8 +37,7 @@
       <template v-if="!udfResourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading">
-      </m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
 </template>
@@ -58,11 +60,13 @@
         isLoading: false,
         udfResourcesList: [],
         searchParams: {
+          id: -1,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
           type: 'UDF'
-        }
+        },
+        isLeft: true
       }
     },
     mixins: [listUrlParamHandle],
@@ -94,6 +98,11 @@
         this._debounceGET()
       },
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
           if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
@@ -120,6 +129,9 @@
     },
     mounted () {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }

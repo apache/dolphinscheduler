@@ -40,7 +40,7 @@ public class HttpUtils {
 	/**
 	 * get http request content
 	 * @param url url
-	 * @return http response
+	 * @return http get request response content
 	 */
 	public static String get(String url){
 		CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -81,17 +81,15 @@ public class HttpUtils {
 				logger.error(e.getMessage(),e);
 			}
 
-			if (httpget != null && !httpget.isAborted()) {
+			if (!httpget.isAborted()) {
 				httpget.releaseConnection();
 				httpget.abort();
 			}
 
-			if (httpclient != null) {
-				try {
-					httpclient.close();
-				} catch (IOException e) {
-					logger.error(e.getMessage(),e);
-				}
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(),e);
 			}
 		}
 		return responseContent;

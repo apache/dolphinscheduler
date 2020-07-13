@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -31,6 +32,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -44,18 +46,8 @@ public class ProcessScheduleJob implements Job {
      */
     private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleJob.class);
 
-    /**
-     * process service
-     */
-    private static ProcessService processService;
-
-
-    /**
-     * init
-     * @param processService process dao
-     */
-    public static void init(ProcessService processService) {
-        ProcessScheduleJob.processService = processService;
+    public ProcessService getProcessService(){
+        return SpringApplicationContext.getBean(ProcessService.class);
     }
 
     /**
@@ -67,7 +59,7 @@ public class ProcessScheduleJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        Assert.notNull(processService, "please call init() method first");
+        Assert.notNull(getProcessService(), "please call init() method first");
 
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
 
@@ -83,7 +75,7 @@ public class ProcessScheduleJob implements Job {
         logger.info("scheduled fire time :{}, fire time :{}, process id :{}", scheduledFireTime, fireTime, scheduleId);
 
         // query schedule
-        Schedule schedule = processService.querySchedule(scheduleId);
+        Schedule schedule = getProcessService().querySchedule(scheduleId);
         if (schedule == null) {
             logger.warn("process schedule does not exist in db，delete schedule job in quartz, projectId:{}, scheduleId:{}", projectId, scheduleId);
             deleteJob(projectId, scheduleId);
@@ -91,7 +83,7 @@ public class ProcessScheduleJob implements Job {
         }
 
 
-        ProcessDefinition processDefinition = processService.findProcessDefineById(schedule.getProcessDefinitionId());
+        ProcessDefinition processDefinition = getProcessService().findProcessDefineById(schedule.getProcessDefinitionId());
         // release state : online/offline
         ReleaseState releaseState = processDefinition.getReleaseState();
         if (processDefinition == null || releaseState == ReleaseState.OFFLINE) {
@@ -107,11 +99,12 @@ public class ProcessScheduleJob implements Job {
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
-        command.setWorkerGroupId(schedule.getWorkerGroupId());
+        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : schedule.getWorkerGroup();
+        command.setWorkerGroup(workerGroup);
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
 
-        processService.createCommand(command);
+        getProcessService().createCommand(command);
     }
 
 

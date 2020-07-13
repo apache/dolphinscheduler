@@ -18,8 +18,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 
-import java.util.Date;
-
 /**
  *  heartbeat for ZK reigster res info
  */
@@ -85,48 +83,9 @@ public class ResInfo {
      */
     public static String getResInfoJson(double cpuUsage , double memoryUsage,double loadAverage){
         ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage,loadAverage);
-        return JSONUtils.toJson(resInfo);
+        return JSONUtils.toJsonString(resInfo);
     }
 
-
-    /**
-     * get heart beat info
-     * @param now now
-     * @return heart beat info
-     */
-    public static String getHeartBeatInfo(Date now){
-        return buildHeartbeatForZKInfo(OSUtils.getHost(),
-                OSUtils.getProcessID(),
-                OSUtils.cpuUsage(),
-                OSUtils.memoryUsage(),
-                OSUtils.loadAverage(),
-                DateUtils.dateToString(now),
-                DateUtils.dateToString(now));
-
-    }
-
-    /**
-     * build heartbeat info for zk
-     * @param host host
-     * @param port port
-     * @param cpuUsage cpu usage
-     * @param memoryUsage memory usage
-     * @param loadAverage load average
-     * @param createTime create time
-     * @param lastHeartbeatTime last heartbeat time
-     * @return  heartbeat info
-     */
-    public static String buildHeartbeatForZKInfo(String host , int port ,
-                                         double cpuUsage , double memoryUsage,double loadAverage,
-                                         String createTime,String lastHeartbeatTime){
-
-        return host + Constants.COMMA + port + Constants.COMMA
-                + cpuUsage + Constants.COMMA
-                + memoryUsage + Constants.COMMA
-                + loadAverage + Constants.COMMA
-                + createTime + Constants.COMMA
-                + lastHeartbeatTime;
-    }
 
     /**
      * parse heartbeat info for zk
@@ -143,13 +102,13 @@ public class ResInfo {
 
         }
         Server masterServer = new Server();
-        masterServer.setHost(masterArray[0]);
-        masterServer.setPort(Integer.parseInt(masterArray[1]));
-        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]),
-                Double.parseDouble(masterArray[3]),
-                Double.parseDouble(masterArray[4])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[5]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[6]));
+        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[0]),
+                Double.parseDouble(masterArray[1]),
+                Double.parseDouble(masterArray[2])));
+        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[6]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[7]));
+        //set process id
+        masterServer.setId(Integer.parseInt(masterArray[9]));
         return masterServer;
     }
 

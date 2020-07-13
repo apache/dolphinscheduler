@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * login controller test
  */
 public class LoginControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
 
     @Test
@@ -55,7 +55,6 @@ public class LoginControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testSignOut() throws Exception {

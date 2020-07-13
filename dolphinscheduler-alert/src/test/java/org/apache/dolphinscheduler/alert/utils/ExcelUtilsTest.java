@@ -89,4 +89,14 @@ public class ExcelUtilsTest {
         ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
 
     }
+
+    /**
+     * Test GenExcelFile (check directory)
+     */
+    @Test
+    public void testGenExcelFileByCheckDir() {
+        ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", "/tmp/xls");
+        File file = new File("/tmp/xls" + Constants.SINGLE_SLASH + "t" + Constants.EXCEL_SUFFIX_XLS);
+        file.delete();
+    }
 }

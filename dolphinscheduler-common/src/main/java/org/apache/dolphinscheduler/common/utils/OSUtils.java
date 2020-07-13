@@ -16,16 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,14 +23,25 @@ import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.shell.ShellExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
 
 /**
  * os utils
@@ -50,12 +51,26 @@ public class OSUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(OSUtils.class);
 
+  public static final ThreadLocal<Logger> taskLoggerThreadLocal = new ThreadLocal<>();
+
   private static final SystemInfo SI = new SystemInfo();
   public static final String TWO_DECIMAL = "0.00";
+
+  /**
+   * return -1 when the function can not get hardware env info
+   * e.g {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+   */
+  public static final double NEGATIVE_ONE = -1;
 
   private static HardwareAbstractionLayer hal = SI.getHardware();
 
   private OSUtils() {}
+
+  /**
+   * Initialization regularization, solve the problem of pre-compilation performance,
+   * avoid the thread safety problem of multi-thread operation
+   */
+  private static final Pattern PATTERN = Pattern.compile("\\s+");
 
 
   /**
@@ -112,9 +127,11 @@ public class OSUtils {
    */
   public static double loadAverage() {
     double loadAverage =  hal.getProcessor().getSystemLoadAverage();
+    if (Double.isNaN(loadAverage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-
     df.setRoundingMode(RoundingMode.HALF_UP);
     return Double.parseDouble(df.format(loadAverage));
   }
@@ -127,10 +144,12 @@ public class OSUtils {
   public static double cpuUsage() {
     CentralProcessor processor = hal.getProcessor();
     double cpuUsage = processor.getSystemCpuLoad();
+    if (Double.isNaN(cpuUsage)) {
+      return NEGATIVE_ONE;
+    }
 
     DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
     df.setRoundingMode(RoundingMode.HALF_UP);
-
     return Double.parseDouble(df.format(cpuUsage));
   }
 
@@ -219,8 +238,7 @@ public class OSUtils {
 
     List<String> users = new ArrayList<>();
     while (startPos <= endPos) {
-      Pattern pattern = Pattern.compile("\\s+");
-      users.addAll(Arrays.asList(pattern.split(lines[startPos])));
+      users.addAll(Arrays.asList(PATTERN.split(lines[startPos])));
       startPos++;
     }
 
@@ -236,7 +254,9 @@ public class OSUtils {
     try {
       String userGroup = OSUtils.getGroup();
       if (StringUtils.isEmpty(userGroup)) {
-        logger.error("{} group does not exist for this operating system.", userGroup);
+        String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
+        LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
+        LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), errorLog);
         return false;
       }
       if (isMacOS()) {
@@ -248,7 +268,8 @@ public class OSUtils {
       }
       return true;
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      LoggerUtils.logError(Optional.ofNullable(logger), e);
+      LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
     }
 
     return false;
@@ -261,10 +282,14 @@ public class OSUtils {
    * @throws IOException in case of an I/O error
    */
   private static void createLinuxUser(String userName, String userGroup) throws IOException {
-    logger.info("create linux os user : {}", userName);
-    String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+    String infoLog1 = String.format("create linux os user : %s", userName);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
 
-    logger.info("execute cmd : {}", cmd);
+    String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+    String infoLog2 = String.format("execute cmd : %s", cmd);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
     OSUtils.exeCmd(cmd);
   }
 
@@ -275,13 +300,24 @@ public class OSUtils {
    * @throws IOException in case of an I/O error
    */
   private static void createMacUser(String userName, String userGroup) throws IOException {
-    logger.info("create mac os user : {}", userName);
-    String userCreateCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
-    String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
 
-    logger.info("create user command : {}", userCreateCmd);
-    OSUtils.exeCmd(userCreateCmd);
-    logger.info("append user to group : {}", appendGroupCmd);
+    Optional<Logger> optionalLogger = Optional.ofNullable(logger);
+    Optional<Logger> optionalTaskLogger = Optional.ofNullable(taskLoggerThreadLocal.get());
+
+    String infoLog1 = String.format("create mac os user : %s", userName);
+    LoggerUtils.logInfo(optionalLogger, infoLog1);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog1);
+
+    String createUserCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
+    String infoLog2 = String.format("create user command : %s", createUserCmd);
+    LoggerUtils.logInfo(optionalLogger, infoLog2);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog2);
+    OSUtils.exeCmd(createUserCmd);
+
+    String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
+    String infoLog3 = String.format("append user to group : %s", appendGroupCmd);
+    LoggerUtils.logInfo(optionalLogger, infoLog3);
+    LoggerUtils.logInfo(optionalTaskLogger, infoLog3);
     OSUtils.exeCmd(appendGroupCmd);
   }
 
@@ -292,14 +328,20 @@ public class OSUtils {
    * @throws IOException in case of an I/O error
    */
   private static void createWindowsUser(String userName, String userGroup) throws IOException {
-    logger.info("create windows os user : {}", userName);
-    String userCreateCmd = String.format("net user \"%s\" /add", userName);
-    String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
+    String infoLog1 = String.format("create windows os user : %s", userName);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog1);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog1);
 
-    logger.info("execute create user command : {}", userCreateCmd);
+    String userCreateCmd = String.format("net user \"%s\" /add", userName);
+    String infoLog2 = String.format("execute create user command : %s", userCreateCmd);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog2);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog2);
     OSUtils.exeCmd(userCreateCmd);
 
-    logger.info("execute append user to group : {}", appendGroupCmd);
+    String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
+    String infoLog3 = String.format("execute append user to group : %s", appendGroupCmd);
+    LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog3);
+    LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog3);
     OSUtils.exeCmd(appendGroupCmd);
   }
 
@@ -313,7 +355,7 @@ public class OSUtils {
       String currentProcUserName = System.getProperty("user.name");
       String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
       String line = result.split("\n")[22];
-      String group = Pattern.compile("\\s+").split(line)[1];
+      String group = PATTERN.split(line)[1];
       if (group.charAt(0) == '*') {
         return group.substring(1);
       } else {
@@ -338,28 +380,12 @@ public class OSUtils {
    * @throws IOException errors
    */
   public static String exeCmd(String command) throws IOException {
-    BufferedReader br = null;
-
-    try {
-      Process p = Runtime.getRuntime().exec(command);
-      br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-      String line;
-      StringBuilder sb = new StringBuilder();
-
-      while ((line = br.readLine()) != null) {
-        sb.append(line + "\n");
-      }
-
-      return sb.toString();
-    } finally {
-      if (br != null) {
-        try {
-          br.close();
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
+    StringTokenizer st = new StringTokenizer(command);
+    String[] cmdArray = new String[st.countTokens()];
+    for (int i = 0; st.hasMoreTokens(); i++) {
+      cmdArray[i] = st.nextToken();
     }
+    return exeShell(cmdArray);
   }
 
   /**
@@ -368,7 +394,7 @@ public class OSUtils {
    * @return result of execute the shell
    * @throws IOException errors
    */
-  public static String exeShell(String command) throws IOException {
+  public static String exeShell(String[] command) throws IOException {
     return ShellExecutor.execCommand(command);
   }
 
@@ -382,26 +408,11 @@ public class OSUtils {
   }
 
   /**
-   * get local host
-   * @return host
-   */
-  public static String getHost(){
-    try {
-      return InetAddress.getLocalHost().getHostAddress();
-    } catch (UnknownHostException e) {
-      logger.error(e.getMessage(),e);
-    }
-    return null;
-  }
-
-
-  /**
    * whether is macOS
    * @return true if mac
    */
   public static boolean isMacOS() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Mac");
+    return getOSName().startsWith("Mac");
   }
 
 
@@ -410,22 +421,31 @@ public class OSUtils {
    * @return true if windows
    */
   public static boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
+    return getOSName().startsWith("Windows");
+  }
+
+  /**
+   * get current OS name
+   * @return current OS name
+   */
+  public static String getOSName() {
+    return System.getProperty("os.name");
   }
 
   /**
    * check memory and cpu usage
+   * @param systemCpuLoad systemCpuLoad
+   * @param systemReservedMemory systemReservedMemory
    * @return check memory and cpu usage
    */
   public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){
-    // judging usage
+    // system load average
     double loadAverage = OSUtils.loadAverage();
-    //
+    // system available physical memory
     double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
 
     if(loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory){
-      logger.warn("load or availablePhysicalMemorySize(G) is too high, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
+      logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
       return false;
     }else{
       return true;

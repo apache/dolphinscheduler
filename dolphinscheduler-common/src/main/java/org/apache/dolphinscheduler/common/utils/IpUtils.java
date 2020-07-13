@@ -17,16 +17,11 @@
 package org.apache.dolphinscheduler.common.utils;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
  * http utils
  */
 public class IpUtils {
 
-  private static final Logger logger = LoggerFactory.getLogger(IpUtils.class);
   public static final String DOT = ".";
 
   /**
@@ -54,12 +49,11 @@ public class IpUtils {
     ipNumbers[2] = ipLong >> 8 & tmp;
     ipNumbers[3] = ipLong & tmp;
 
-    StringBuilder sb = new StringBuilder(16);
-    sb.append(ipNumbers[0]).append(DOT)
-            .append(ipNumbers[1]).append(DOT)
-            .append(ipNumbers[2]).append(DOT)
-            .append(ipNumbers[3]);
-    return sb.toString();
+    String sb = ipNumbers[0] + DOT +
+            ipNumbers[1] + DOT +
+            ipNumbers[2] + DOT +
+            ipNumbers[3];
+    return sb;
   }
 
 }

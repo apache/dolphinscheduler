@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * zookeeper conf
  */
 @Component
-@PropertySource("classpath:common.properties")
+@PropertySource("classpath:zookeeper.properties")
 public class ZookeeperConfig {
 
     //zk connect config
@@ -51,6 +51,9 @@ public class ZookeeperConfig {
 
     @Value("${zookeeper.dolphinscheduler.root:/dolphinscheduler}")
     private String dsRoot;
+
+    @Value("${zookeeper.max.wait.time:10000}")
+    private int maxWaitTime;
 
     public String getServerList() {
         return serverList;
@@ -114,5 +117,13 @@ public class ZookeeperConfig {
 
     public void setDsRoot(String dsRoot) {
         this.dsRoot = dsRoot;
+    }
+
+    public int getMaxWaitTime() {
+        return maxWaitTime;
+    }
+
+    public void setMaxWaitTime(int maxWaitTime) {
+        this.maxWaitTime = maxWaitTime;
     }
 }

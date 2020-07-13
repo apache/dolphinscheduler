@@ -155,6 +155,8 @@
   import { mapState, mapActions } from 'vuex'
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
+  import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
+  import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
@@ -260,6 +262,86 @@
           }
         })
       },
+      _fileChildUpdate (type,data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mFileChildUpdate, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                id: data
+              }
+            })
+          }
+        })
+      },
+      _resourceChildUpdate (type,data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mResourceChildUpdate, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                id: data
+              }
+            })
+          }
+        })
+      },
       /**
        * Upload popup layer display
        */
@@ -305,7 +387,6 @@
       .logo-m {
         width: 36px;
         height: 36px;
-        background: url("./m_logo.png");
         margin: 0 auto;
         position: relative;
         top: 12px;

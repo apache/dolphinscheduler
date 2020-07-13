@@ -16,18 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.sql;
 
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -97,22 +96,22 @@ public class SqlExecutorTest {
      */
     private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, int taskInstId) throws Exception {
         TaskProps taskProps = new TaskProps();
-        taskProps.setTaskDir("");
+        taskProps.setExecutePath("");
         // processDefineId_processInstanceId_taskInstanceId
         taskProps.setTaskAppId(taskAppId);
         // set tenant -> task execute linux user
         taskProps.setTenantCode(tenantCode);
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(taskInstId);
-        taskProps.setNodeName(nodeName);
+        taskProps.setTaskInstanceId(taskInstId);
+        taskProps.setTaskName(nodeName);
         taskProps.setCmdTypeIfComplement(CommandType.START_PROCESS);
 
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         taskProps.setTaskParams(taskNode.getParams());
 
 
@@ -123,9 +122,10 @@ public class SqlExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+        AbstractTask task = null;
 
-        logger.info("task info : {}", task);
+                logger.info("task info : {}", task);
 
         // job init
         task.init();

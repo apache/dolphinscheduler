@@ -16,13 +16,14 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.slf4j.Logger;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.slf4j.Logger;
 
 /**
  *  logger utils
@@ -79,7 +80,7 @@ public class LoggerUtils {
      */
     public static List<String> getAppIds(String log, Logger logger) {
 
-        List<String> appIds = new ArrayList<String>();
+        List<String> appIds = new ArrayList<>();
 
         Matcher matcher = APPLICATION_REGEX.matcher(log);
 
@@ -92,5 +93,25 @@ public class LoggerUtils {
             }
         }
         return appIds;
+    }
+
+    public static void logError(Optional<Logger> optionalLogger
+            , String error) {
+        optionalLogger.ifPresent((Logger logger) -> logger.error(error));
+    }
+
+    public static void logError(Optional<Logger> optionalLogger
+            , Throwable e) {
+        optionalLogger.ifPresent((Logger logger) -> logger.error(e.getMessage(), e));
+    }
+
+    public static void logError(Optional<Logger> optionalLogger
+            , String error, Throwable e) {
+        optionalLogger.ifPresent((Logger logger) -> logger.error(error, e));
+    }
+
+    public static void logInfo(Optional<Logger> optionalLogger
+            , String info) {
+        optionalLogger.ifPresent((Logger logger) -> logger.info(info));
     }
 }

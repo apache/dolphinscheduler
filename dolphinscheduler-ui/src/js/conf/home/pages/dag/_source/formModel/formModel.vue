@@ -90,7 +90,7 @@
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
         </div>
 
@@ -252,6 +252,7 @@
           v-if="taskType === 'CONDITIONS'"
           ref="CONDITIONS"
           @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
@@ -259,7 +260,7 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
         <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
@@ -267,6 +268,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import { mapActions } from 'vuex'
   import mLog from './log'
   import mMr from './tasks/mr'
   import mSql from './tasks/sql'
@@ -303,6 +305,7 @@
         description: '',
         // Node echo data
         backfillItem: {},
+        cacheBackfillItem: {},
         // Resource(list)
         resourcesList: [],
         successNode: 'success',
@@ -332,7 +335,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1,
+        workerGroup: 'default',
         stateList:[
           {
             value: 'success',
@@ -355,9 +358,11 @@
       taskType: String,
       self: Object,
       preNode: Array,
-      rearList: Array
+      rearList: Array,
+      instanceId: Number
     },
     methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
       /**
        * depend
        */
@@ -429,7 +434,7 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
@@ -438,6 +443,8 @@
       },
 
       _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
             type: this.taskType,
@@ -446,12 +453,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -464,7 +474,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -478,12 +488,26 @@
         }
         return true
       },
+      _verifWorkGroup() {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id == this.workerGroup;
+        });
+        if(item==undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false;
+        }
+        return true
+      },
       /**
        * Global verification procedure
        */
       _verification () {
         // Verify name
         if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if(!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
@@ -513,7 +537,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
           },
@@ -556,18 +580,36 @@
         }
         this.isContentBox = false
         // flag Whether to delete a node this.$destroy()
+        
         this.$emit('close', {
+          item: {
+            type: this.cacheBackfillItem.type,
+            id: this.cacheBackfillItem.id,
+            name: this.cacheBackfillItem.name,
+            params: this.cacheBackfillItem.params,
+            description: this.cacheBackfillItem.description,
+            runFlag: this.cacheBackfillItem.runFlag,
+            conditionResult: this.cacheBackfillItem.conditionResult,
+            dependence: this.cacheBackfillItem.dependence,
+            maxRetryTimes: this.cacheBackfillItem.maxRetryTimes,
+            retryInterval: this.cacheBackfillItem.retryInterval,
+            timeout: this.cacheBackfillItem.timeout,
+            taskInstancePriority: this.cacheBackfillItem.taskInstancePriority,
+            workerGroup: this.cacheBackfillItem.workerGroup,
+            status: this.cacheBackfillItem.status,
+            branch: this.cacheBackfillItem.branch
+          },
           flag: flag,
           fromThis: this
         })
       }
-    },
+    }, 
     watch: {
       /**
        * Watch the item change, cache the value it changes
        **/
       _item (val) {
-        this._cacheItem()
+        // this._cacheItem()
       }
     },
     created () {
@@ -605,30 +647,40 @@
           this.failedBranch = o.conditionResult.failedNode[0]
         }
           // If the workergroup has been deleted, set the default workergroup
-          var hasMatch = false;
-          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroupId == workerGroupId) {
-              hasMatch = true;
-              break;
-            }
+        var hasMatch = false;
+        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup == workerGroup) {
+            hasMatch = true;
+            break;
           }
-
-          if(!hasMatch){
-            this.workerGroupId = -1
-          }else{
-            this.workerGroupId = o.workerGroupId
-          }
+        }
+        if(o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList',{
+            pageSize: 10, pageNo: 1, processInstanceId: this.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
+        } else {
+          this.workerGroup = o.workerGroup
+        }
 
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
 
+      } else {
+        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
+      this.cacheBackfillItem = o
       this.isContentBox = true
     },
     mounted () {
-
+      let self = this
+      $("#cancelBtn").mousedown(function(event){
+        event.preventDefault();
+        self.close()
+      });
     },
     updated () {
     },
@@ -657,7 +709,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroup: this.workerGroup,
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
     },
@@ -686,4 +740,9 @@
 
 <style lang="scss" rel="stylesheet/scss">
   @import "./formModel";
+  .ans-radio-disabled {
+    .ans-radio-inner:after {
+      background-color: #6F8391
+    }
+  }
 </style>

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.task.http;
 import org.apache.dolphinscheduler.common.enums.HttpCheckCondition;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.process.HttpProperty;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.commons.lang.StringUtils;
 
@@ -55,6 +56,17 @@ public class HttpParameters extends AbstractParameters {
     private String condition;
 
 
+    /**
+     * Connect Timeout
+     * Unit: ms
+     */
+    private int connectTimeout ;
+
+    /**
+     * Socket Timeout
+     * Unit: ms
+     */
+    private int socketTimeout ;
 
     @Override
     public boolean checkParameters() {
@@ -62,7 +74,7 @@ public class HttpParameters extends AbstractParameters {
     }
 
     @Override
-    public List<String> getResourceFilesList() {
+    public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
     }
 
@@ -104,5 +116,21 @@ public class HttpParameters extends AbstractParameters {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(int socketTimeout) {
+        this.socketTimeout = socketTimeout;
     }
 }

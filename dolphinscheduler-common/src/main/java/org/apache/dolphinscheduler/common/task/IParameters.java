@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.task;
 
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+
 import java.util.List;
 
 /**
@@ -25,7 +27,7 @@ public interface IParameters {
     /**
      * check parameters is valid
      *
-     * @return
+     * @return result
      */
     boolean checkParameters();
 
@@ -34,5 +36,5 @@ public interface IParameters {
      *
      * @return resource files list
      */
-    List<String> getResourceFilesList();
+    List<ResourceInfo> getResourceFilesList();
 }

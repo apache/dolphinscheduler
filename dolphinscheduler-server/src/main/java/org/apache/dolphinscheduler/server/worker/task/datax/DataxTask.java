@@ -17,58 +17,47 @@
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
+import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
+import com.alibaba.druid.sql.ast.statement.*;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.utils.DataxUtils;
+import org.apache.dolphinscheduler.server.utils.ParamUtils;
+import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
+import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
+import org.slf4j.Logger;
+
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
-import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.server.utils.DataxUtils;
-import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
-
-import com.alibaba.druid.sql.ast.SQLStatement;
-import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
-import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
-import com.alibaba.druid.sql.ast.statement.SQLSelect;
-import com.alibaba.druid.sql.ast.statement.SQLSelectItem;
-import com.alibaba.druid.sql.ast.statement.SQLSelectQueryBlock;
-import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
-import com.alibaba.druid.sql.ast.statement.SQLUnionQuery;
-import com.alibaba.druid.sql.parser.SQLStatementParser;
-import com.alibaba.fastjson.JSONObject;
+import java.sql.*;
+import java.util.*;
 
 
 /**
@@ -97,39 +86,27 @@ public class DataxTask extends AbstractTask {
     private DataxParameters dataXParameters;
 
     /**
-     * task dir
-     */
-    private String taskDir;
-
-    /**
      * shell command executor
      */
     private ShellCommandExecutor shellCommandExecutor;
 
     /**
-     * process dao
+     * taskExecutionContext
      */
-    private ProcessService processService;
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
-     * 
-     * @param props
-     *            props
-     * @param logger
-     *            logger
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
      */
-    public DataxTask(TaskProps props, Logger logger) {
-        super(props, logger);
+    public DataxTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
 
-        this.taskDir = props.getTaskDir();
-        logger.info("task dir : {}", taskDir);
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getTaskDir(), props.getTaskAppId(),
-            props.getTaskInstId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
-            props.getTaskTimeout(), logger);
-
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,logger);
     }
 
     /**
@@ -137,8 +114,8 @@ public class DataxTask extends AbstractTask {
      */
     @Override
     public void init() {
-        logger.info("datax task params {}", taskProps.getTaskParams());
-        dataXParameters = JSONUtils.parseObject(taskProps.getTaskParams(), DataxParameters.class);
+        logger.info("datax task params {}", taskExecutionContext.getTaskParams());
+        dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
 
         if (!dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
@@ -147,132 +124,183 @@ public class DataxTask extends AbstractTask {
 
     /**
      * run DataX process
-     * 
-     * @throws Exception
+     *
+     * @throws Exception if error throws Exception
      */
     @Override
-    public void handle()
-        throws Exception {
+    public void handle() throws Exception {
         try {
             // set the name of the current thread
-            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
-            // run datax process
-            String jsonFilePath = buildDataxJsonFile();
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath);
-            exitStatusCode = shellCommandExecutor.run(shellCommandFilePath, processService);
+            // combining local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                    taskExecutionContext.getDefinedParams(),
+                    dataXParameters.getLocalParametersMap(),
+                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                    taskExecutionContext.getScheduleTime());
+
+            // run datax procesDataSourceService.s
+            String jsonFilePath = buildDataxJsonFile(paramsMap);
+            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
         }
         catch (Exception e) {
-            exitStatusCode = -1;
+            logger.error("datax task failure", e);
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             throw e;
         }
     }
 
     /**
      * cancel DataX process
-     * 
-     * @param cancelApplication
-     * @throws Exception
+     *
+     * @param cancelApplication cancelApplication
+     * @throws Exception if error throws Exception
      */
     @Override
     public void cancelApplication(boolean cancelApplication)
-        throws Exception {
+            throws Exception {
         // cancel process
         shellCommandExecutor.cancelApplication();
     }
 
     /**
      * build datax configuration file
-     * 
-     * @return
-     * @throws Exception
+     *
+     * @return datax json file name
+     * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile()
-        throws Exception {
+    private String buildDataxJsonFile(Map<String, Property> paramsMap)
+            throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
+        String json;
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
             return fileName;
         }
 
-        JSONObject job = new JSONObject();
-        job.put("content", buildDataxJobContentJson());
-        job.put("setting", buildDataxJobSettingJson());
+        if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()){
+            json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
+        }else {
+            ObjectNode job = JSONUtils.createObjectNode();
+            job.putArray("content").addAll(buildDataxJobContentJson());
+            job.set("setting", buildDataxJobSettingJson());
 
-        JSONObject root = new JSONObject();
-        root.put("job", job);
-        root.put("core", buildDataxCoreJson());
+            ObjectNode root = JSONUtils.createObjectNode();
+            root.set("job", job);
+            root.set("core", buildDataxCoreJson());
+            json = root.toString();
+        }
 
-        logger.debug("datax job json : {}", root.toString());
+        // replace placeholder
+        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+
+        logger.debug("datax job json : {}", json);
 
         // create datax json file
-        FileUtils.writeStringToFile(new File(fileName), root.toString(), Charset.forName("UTF-8"));
+        FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
         return fileName;
     }
 
     /**
      * build datax job config
-     * 
-     * @return
-     * @throws SQLException
+     *
+     * @return collection of datax job config JSONObject
+     * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson()
-        throws SQLException {
-        DataSource dataSource = processService.findDataSourceById(dataXParameters.getDataSource());
-        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(dataSource.getType(),
-            dataSource.getConnectionParams());
+    private List<ObjectNode> buildDataxJobContentJson() {
 
-        DataSource dataTarget = processService.findDataSourceById(dataXParameters.getDataTarget());
-        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(dataTarget.getType(),
-            dataTarget.getConnectionParams());
+        DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
-        List<JSONObject> readerConnArr = new ArrayList<>();
-        JSONObject readerConn = new JSONObject();
-        readerConn.put("querySql", new String[] {dataXParameters.getSql()});
-        readerConn.put("jdbcUrl", new String[] {dataSourceCfg.getJdbcUrl()});
+        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                dataxTaskExecutionContext.getSourceConnectionParams());
+
+        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataxTaskExecutionContext.getTargetConnectionParams());
+
+        List<ObjectNode> readerConnArr = new ArrayList<>();
+        ObjectNode readerConn = JSONUtils.createObjectNode();
+
+        ArrayNode sqlArr = readerConn.putArray("querySql");
+        for (String sql : new String[]{dataXParameters.getSql()}) {
+            sqlArr.add(sql);
+        }
+
+        ArrayNode urlArr = readerConn.putArray("jdbcUrl");
+        for (String url : new String[]{dataSourceCfg.getJdbcUrl()}) {
+            urlArr.add(url);
+        }
+
         readerConnArr.add(readerConn);
 
-        JSONObject readerParam = new JSONObject();
+        ObjectNode readerParam = JSONUtils.createObjectNode();
         readerParam.put("username", dataSourceCfg.getUser());
         readerParam.put("password", dataSourceCfg.getPassword());
-        readerParam.put("connection", readerConnArr);
+        readerParam.putArray("connection").addAll(readerConnArr);
 
-        JSONObject reader = new JSONObject();
-        reader.put("name", DataxUtils.getReaderPluginName(dataSource.getType()));
-        reader.put("parameter", readerParam);
 
-        List<JSONObject> writerConnArr = new ArrayList<>();
-        JSONObject writerConn = new JSONObject();
-        writerConn.put("table", new String[] {dataXParameters.getTargetTable()});
+        ObjectNode reader = JSONUtils.createObjectNode();
+        reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
+        reader.set("parameter", readerParam);
+
+        List<ObjectNode> writerConnArr = new ArrayList<>();
+        ObjectNode writerConn = JSONUtils.createObjectNode();
+        ArrayNode tableArr = writerConn.putArray("table");
+        for (String table : new String[]{dataXParameters.getTargetTable()}) {
+            tableArr.add(table);
+        }
+
         writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
         writerConnArr.add(writerConn);
 
-        JSONObject writerParam = new JSONObject();
+        ObjectNode writerParam = JSONUtils.createObjectNode();
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
-        writerParam.put("column",
-            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, dataXParameters.getSql()));
-        writerParam.put("connection", writerConnArr);
+
+        String[] columns = parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataSourceCfg, dataXParameters.getSql());
+
+        ArrayNode columnArr = writerParam.putArray("column");
+        for (String column : columns) {
+            columnArr.add(column);
+        }
+        writerParam.putArray("connection").addAll(writerConnArr);
+
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
-            writerParam.put("preSql", dataXParameters.getPreStatements());
+            ArrayNode preSqlArr = writerParam.putArray("preSql");
+            for (String preSql : dataXParameters.getPreStatements()) {
+                preSqlArr.add(preSql);
+            }
+
         }
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
-            writerParam.put("postSql", dataXParameters.getPostStatements());
+            ArrayNode postSqlArr = writerParam.putArray("postSql");
+            for (String postSql : dataXParameters.getPostStatements()) {
+                postSqlArr.add(postSql);
+            }
         }
 
-        JSONObject writer = new JSONObject();
-        writer.put("name", DataxUtils.getWriterPluginName(dataTarget.getType()));
-        writer.put("parameter", writerParam);
+        ObjectNode writer = JSONUtils.createObjectNode();
+        writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
+        writer.set("parameter", writerParam);
 
-        List<JSONObject> contentList = new ArrayList<>();
-        JSONObject content = new JSONObject();
-        content.put("reader", reader);
-        content.put("writer", writer);
+        List<ObjectNode> contentList = new ArrayList<>();
+        ObjectNode content = JSONUtils.createObjectNode();
+        content.put("reader", reader.toString());
+        content.put("writer", writer.toString());
         contentList.add(content);
 
         return contentList;
@@ -280,11 +308,13 @@ public class DataxTask extends AbstractTask {
 
     /**
      * build datax setting config
-     * 
-     * @return
+     *
+     * @return datax setting config JSONObject
      */
-    private JSONObject buildDataxJobSettingJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxJobSettingJson() {
+
+        ObjectNode speed = JSONUtils.createObjectNode();
+
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -295,19 +325,20 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject errorLimit = new JSONObject();
+        ObjectNode errorLimit = JSONUtils.createObjectNode();
         errorLimit.put("record", 0);
         errorLimit.put("percentage", 0);
 
-        JSONObject setting = new JSONObject();
-        setting.put("speed", speed);
-        setting.put("errorLimit", errorLimit);
+        ObjectNode setting = JSONUtils.createObjectNode();
+        setting.put("speed", speed.toString());
+        setting.put("errorLimit", errorLimit.toString());
 
         return setting;
     }
 
-    private JSONObject buildDataxCoreJson() {
-        JSONObject speed = new JSONObject();
+    private ObjectNode buildDataxCoreJson() {
+
+        ObjectNode speed = JSONUtils.createObjectNode();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
         if (dataXParameters.getJobSpeedByte() > 0) {
@@ -318,28 +349,32 @@ public class DataxTask extends AbstractTask {
             speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
-        JSONObject channel = new JSONObject();
-        channel.put("speed", speed);
+        ObjectNode channel = JSONUtils.createObjectNode();
+        channel.set("speed", speed);
 
-        JSONObject transport = new JSONObject();
-        transport.put("channel", channel);
+        ObjectNode transport = JSONUtils.createObjectNode();
+        transport.set("channel", channel);
 
-        JSONObject core = new JSONObject();
-        core.put("transport", transport);
+        ObjectNode core = JSONUtils.createObjectNode();
+        core.set("transport", transport);
 
         return core;
     }
 
     /**
      * create command
-     * 
-     * @return
-     * @throws Exception
+     *
+     * @return shell command file name
+     * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath)
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.%s", taskDir, taskProps.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
+        String fileName = String.format("%s/%s_node.%s",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(),
+                OSUtils.isWindows() ? "bat" : "sh");
+
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -353,18 +388,9 @@ public class DataxTask extends AbstractTask {
         sbr.append(DATAX_HOME_EVN);
         sbr.append(" ");
         sbr.append(jobConfigFilePath);
-        String dataxCommand = sbr.toString();
 
-        // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-
-        // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(), dataXParameters.getLocalParametersMap(),
-            processInstance.getCmdTypeIfComplement(), processInstance.getScheduleTime());
-        if (paramsMap != null) {
-            dataxCommand = ParameterUtils.convertParameterPlaceholders(dataxCommand, ParamUtils.convert(paramsMap));
-        }
+        // replace placeholder
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
 
         logger.debug("raw script : {}", dataxCommand);
 
@@ -385,7 +411,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * parsing synchronized column names in SQL statements
-     * 
+     *
      * @param dsType
      *            the database type of the data source
      * @param dtType
@@ -394,7 +420,7 @@ public class DataxTask extends AbstractTask {
      *            the database connection parameters of the data source
      * @param sql
      *            sql for data synchronization
-     * @return
+     * @return Keyword converted column names
      */
     private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
@@ -411,13 +437,13 @@ public class DataxTask extends AbstractTask {
 
     /**
      * try grammatical parsing column
-     * 
+     *
      * @param dbType
      *            database type
      * @param sql
      *            sql for data synchronization
      * @return column name array
-     * @throws RuntimeException
+     * @throws RuntimeException if error throws RuntimeException
      */
     private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
         String[] columnNames;
@@ -441,7 +467,7 @@ public class DataxTask extends AbstractTask {
             }
 
             notNull(selectItemList,
-                String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
+                    String.format("select query type [%s] is not support", sqlSelect.getQuery().toString()));
 
             columnNames = new String[selectItemList.size()];
             for (int i = 0; i < selectItemList.size(); i++ ) {
@@ -461,12 +487,12 @@ public class DataxTask extends AbstractTask {
                     }
                 } else {
                     throw new RuntimeException(
-                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 if (columnName == null) {
                     throw new RuntimeException(
-                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 columnNames[i] = columnName;
@@ -482,7 +508,7 @@ public class DataxTask extends AbstractTask {
 
     /**
      * try to execute sql to resolve column names
-     * 
+     *
      * @param baseDataSource
      *            the database connection parameters
      * @param sql
@@ -495,10 +521,10 @@ public class DataxTask extends AbstractTask {
         sql = sql.replace(";", "");
 
         try (
-            Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
-                baseDataSource.getPassword());
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            ResultSet resultSet = stmt.executeQuery()) {
+                Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
+                        baseDataSource.getPassword());
+                PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet resultSet = stmt.executeQuery()) {
 
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();

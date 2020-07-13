@@ -13,7 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ */ 
 <template>
   <div class="update-udf-model">
     <div class="update-udf-box">
@@ -25,8 +25,8 @@
                     size="small"
                     v-model="udfName"
                     :disabled="progress !== 0"
-                    style="width: 268px"
-                    :placeholder="$t('Please enter resource name')"
+                    style="width: 535px"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
             <div class="p1" style="position: absolute;">
@@ -66,7 +66,9 @@
         udfDesc: '',
         file: '',
         progress: 0,
-        spinnerLoading: false
+        spinnerLoading: false,
+        pid: null,
+        currentDir: ''
       }
     },
     props: {
@@ -77,6 +79,10 @@
        * validation
        */
       _validation () {
+        if (!this.currentDir) {
+          this.$message.warning(`${i18n.$t('Please select UDF resources directory')}`)
+          return false
+        }
         if (!this.udfName) {
           this.$message.warning(`${i18n.$t('Please enter file name')}`)
           return false
@@ -90,7 +96,7 @@
       _verifyName () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/resourceVerifyName', {
-            name: this.udfName,
+            fullName: '/'+this.currentDir+'/'+this.udfName,
             type: 'UDF'
           }).then(res => {
             resolve()
@@ -100,11 +106,17 @@
           })
         })
       },
+      receivedValue(pid,name) {
+        this.pid = pid
+        this.currentDir = name
+      },
       _formDataUpdate () {
         let self = this
         let formData = new FormData()
         formData.append('file', this.file)
         formData.append('type', 'UDF')
+        formData.append('pid', this.pid)
+        formData.append('currentDir', this.currentDir)
         formData.append('name', this.udfName)
         formData.append('description', this.udfDesc)
         this.spinnerLoading = true

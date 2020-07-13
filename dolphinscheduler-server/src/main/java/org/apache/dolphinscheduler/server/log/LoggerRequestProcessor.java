@@ -17,11 +17,12 @@
 package org.apache.dolphinscheduler.server.log;
 
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,21 +61,21 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         final CommandType commandType = command.getType();
         switch (commandType){
             case GET_LOG_BYTES_REQUEST:
-                GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
+                GetLogBytesRequestCommand getLogRequest = JsonSerializer.deserialize(
                         command.getBody(), GetLogBytesRequestCommand.class);
                 byte[] bytes = getFileContentBytes(getLogRequest.getPath());
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
                 break;
             case VIEW_WHOLE_LOG_REQUEST:
-                ViewLogRequestCommand viewLogRequest = FastJsonSerializer.deserialize(
+                ViewLogRequestCommand viewLogRequest = JsonSerializer.deserialize(
                         command.getBody(), ViewLogRequestCommand.class);
                 String msg = readWholeFileContent(viewLogRequest.getPath());
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
             case ROLL_VIEW_LOG_REQUEST:
-                RollViewLogRequestCommand rollViewLogRequest = FastJsonSerializer.deserialize(
+                RollViewLogRequestCommand rollViewLogRequest = JsonSerializer.deserialize(
                         command.getBody(), RollViewLogRequestCommand.class);
                 List<String> lines = readPartFileContent(rollViewLogRequest.getPath(),
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
@@ -84,6 +85,25 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 }
                 RollViewLogResponseCommand rollViewLogRequestResponse = new RollViewLogResponseCommand(builder.toString());
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
+                break;
+            case REMOVE_TAK_LOG_REQUEST:
+                RemoveTaskLogRequestCommand removeTaskLogRequest = JsonSerializer.deserialize(
+                        command.getBody(), RemoveTaskLogRequestCommand.class);
+
+                String taskLogPath = removeTaskLogRequest.getPath();
+
+                File taskLogFile = new File(taskLogPath);
+                Boolean status = true;
+                try {
+                    if (taskLogFile.exists()){
+                        status = taskLogFile.delete();
+                    }
+                }catch (Exception e){
+                    status = false;
+                }
+
+                RemoveTaskLogResponseCommand removeTaskLogResponse = new RemoveTaskLogResponseCommand(status);
+                channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType");
@@ -116,16 +136,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         }catch (IOException e){
             logger.error("get file bytes error",e);
         }finally {
-            if (bos != null){
-                try {
-                    bos.close();
-                } catch (IOException ignore) {}
-            }
-            if (in != null){
-                try {
-                    in.close();
-                } catch (IOException ignore) {}
-            }
+            IOUtils.closeQuietly(bos);
+            IOUtils.closeQuietly(in);
         }
         return new byte[0];
     }
@@ -146,7 +158,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         } catch (IOException e) {
             logger.error("read file error",e);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -168,11 +180,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         }catch (IOException e){
             logger.error("read file error",e);
         }finally {
-            try {
-                if (br != null){
-                    br.close();
-                }
-            } catch (IOException ignore) {}
+            IOUtils.closeQuietly(br);
         }
         return "";
     }

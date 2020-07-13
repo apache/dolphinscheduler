@@ -16,23 +16,41 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.util.Optional;
+
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
-
 /**
  * file utils
  */
 public class FileUtils {
     public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
+    public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH,"/tmp/dolphinscheduler");
+
+    public static final ThreadLocal<Logger> taskLoggerThreadLocal = new ThreadLocal<>();
 
     /**
      * get file suffix
@@ -44,7 +62,7 @@ public class FileUtils {
 
         String fileSuffix = "";
         if (StringUtils.isNotEmpty(filename)) {
-            int lastIndex = filename.lastIndexOf(".");
+            int lastIndex = filename.lastIndexOf('.');
             if (lastIndex > 0) {
                 fileSuffix = filename.substring(lastIndex + 1);
             }
@@ -59,7 +77,14 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        return String.format("%s/%s/%s", PropertyUtils.getString(DATA_DOWNLOAD_BASEDIR_PATH), DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -70,7 +95,13 @@ public class FileUtils {
      * @return local file path
      */
     public static String getUploadFilename(String tenantCode, String filename) {
-        return String.format("%s/%s/resources/%s", PropertyUtils.getString(DATA_BASEDIR_PATH), tenantCode, filename);
+        String fileName = String.format("%s/%s/resources/%s", DATA_BASEDIR, tenantCode, filename);
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -82,9 +113,14 @@ public class FileUtils {
      * @return directory of process execution
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
-
-        return String.format("%s/process/%s/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId),Integer.toString(taskInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -95,15 +131,21 @@ public class FileUtils {
      * @return directory of process instances
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
-        return String.format("%s/process/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s", DATA_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixs() {
-        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS);
+        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS, RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE);
     }
 
     /**
@@ -112,24 +154,40 @@ public class FileUtils {
      * @param userName user name
      * @throws IOException errors
      */
-    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException{
+    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException {
         //if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
-        if (execLocalPathFile.exists()){
+        if (execLocalPathFile.exists()) {
             org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
         }
 
         //create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        logger.info("create dir success {}" , execLocalPath);
-
+        String mkdirLog = "create dir success " + execLocalPath;
+        LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
+        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
 
         //if not exists this user,then create
-        if (!OSUtils.getUserList().contains(userName)){
-            OSUtils.createUser(userName);
+        OSUtils.taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
+        try {
+            if (!OSUtils.getUserList().contains(userName)) {
+                boolean isSuccessCreateUser = OSUtils.createUser(userName);
+
+                String infoLog;
+                if (isSuccessCreateUser) {
+                    infoLog = String.format("create user name success %s", userName);
+                } else {
+                    infoLog = String.format("create user name fail %s", userName);
+                }
+                LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
+                LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
+            }
+        } catch (Throwable e) {
+            LoggerUtils.logError(Optional.ofNullable(logger), e);
+            LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
         }
-        logger.info("create user name success {}", userName);
+        OSUtils.taskLoggerThreadLocal.remove();
     }
 
 
@@ -325,10 +383,8 @@ public class FileUtils {
             }
         } else {
             File parent = file.getParentFile();
-            if (parent != null) {
-                if (!parent.mkdirs() && !parent.isDirectory()) {
+            if (parent != null && !parent.mkdirs() && !parent.isDirectory()) {
                     throw new IOException("Directory '" + parent + "' could not be created");
-                }
             }
         }
         return new FileOutputStream(file, append);

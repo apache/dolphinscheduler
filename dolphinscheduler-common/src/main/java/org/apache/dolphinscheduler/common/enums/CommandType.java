@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * command types
  */
@@ -64,5 +67,21 @@ public enum CommandType {
 
     public String getDescp() {
         return descp;
+    }
+
+    private static final Map<Integer, CommandType> COMMAND_TYPE_MAP = new HashMap<>();
+
+    static {
+        for (CommandType commandType : CommandType.values()) {
+            COMMAND_TYPE_MAP.put(commandType.code,commandType);
+        }
+    }
+
+
+    public static CommandType of(Integer status) {
+        if (COMMAND_TYPE_MAP.containsKey(status)) {
+            return COMMAND_TYPE_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid status : " + status);
     }
 }

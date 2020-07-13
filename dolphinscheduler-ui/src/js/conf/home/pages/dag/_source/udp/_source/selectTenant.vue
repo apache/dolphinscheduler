@@ -40,8 +40,8 @@
     mixins: [disabledState],
     props: {
       value: {
-        type: Number,
-        default: -1
+        type: String,
+        default: 'default'
       }
     },
     model: {
@@ -55,7 +55,7 @@
         }
 			})
       if(!result) {
-        this.value = -1
+        this.value = 'default'
       }
     },
     methods: {

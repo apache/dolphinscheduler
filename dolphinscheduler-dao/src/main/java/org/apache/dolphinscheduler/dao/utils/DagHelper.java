@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -360,5 +360,49 @@ public class DagHelper {
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(taskNodeList);
         return processDag;
+    }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  DAG<String, TaskNode, TaskNodeRelation> dag
+                                            ){
+        boolean result = false;
+        Set<String> subsequentNodes = dag.getSubsequentNodes(parentNodeName);
+        if(CollectionUtils.isEmpty(subsequentNodes)){
+            return result;
+        }
+        for(String nodeName : subsequentNodes){
+            TaskNode taskNode = dag.getNode(nodeName);
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
+     */
+    public static boolean haveConditionsAfterNode(String parentNodeName,
+                                                  List<TaskNode> taskNodes
+    ){
+        boolean result = false;
+        if(CollectionUtils.isEmpty(taskNodes)){
+            return result;
+        }
+        for(TaskNode taskNode : taskNodes){
+            List<String> preTasksList = JSONUtils.toList(taskNode.getPreTasks(), String.class);
+            if(preTasksList.contains(parentNodeName) && taskNode.isConditionsTask()){
+                return true;
+            }
+        }
+        return result;
     }
 }

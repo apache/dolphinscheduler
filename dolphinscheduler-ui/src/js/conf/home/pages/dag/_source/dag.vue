@@ -25,7 +25,7 @@
              :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.description">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -77,7 +77,7 @@
                   icon="ans-icon-triangle-solid-right"
                   size="xsmall"
                   data-container="body"
-                  v-if="type === 'instance'"
+                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
                   style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
@@ -155,6 +155,7 @@
         isLoading: false,
         taskId: null,
         arg: false,
+
       }
     },
     mixins: [disabledState],
@@ -177,8 +178,9 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -259,8 +261,15 @@
                 if (v2.name === v1.name) {
                   let dom = $(`#${v2.id}`)
                   let state = dom.find('.state-p')
+                  let depState = ''
+                   taskList.forEach(item=>{
+                    if(item.name==v1.name) {
+                      depState = item.state
+                    }
+                  })
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
+                  dom.attr('data-dependent-depState', depState)
                   state.append(`<strong class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></strong>`)
                   state.find('strong').attr('title', titleTpl(v2, v1.desc))
                 }
@@ -293,7 +302,7 @@
         let is = true
         let code = ''
 
-        if (!item.disable) {
+        if (item.disable) {
           return
         }
 
@@ -330,41 +339,59 @@
           this.spinnerLoading = true
           // Storage store
           Dag.saveStore().then(res => {
-            if (this.urlParam.id) {
-              /**
-               * Edit
-               * @param saveInstanceEditDAGChart => Process instance editing
-               * @param saveEditDAGChart => Process definition editing
-               */
-              this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.spinnerLoading = false
-                reject(e)
-              })
-            } else {
-              // New
-              this.saveDAGchart().then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
-                if (sourceType !== 'affirm') {
-                  // Jump process definition
-                  this.$router.push({ name: 'projects-definition-list' })
-                }
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.setName('')
-                this.spinnerLoading = false
-                reject(e)
-              })
+            if(this._verifConditions(res.tasks)) {
+              if (this.urlParam.id) {
+                /**
+                 * Edit
+                 * @param saveInstanceEditDAGChart => Process instance editing
+                 * @param saveEditDAGChart => Process definition editing
+                 */
+                this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              } else {
+                // New
+                this.saveDAGchart().then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
+                  if (sourceType !== 'affirm') {
+                    // Jump process definition
+                    this.$router.push({ name: 'projects-definition-list' })
+                  }
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.setName('')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              }
             }
           })
         })
+      },
+      _verifConditions (value) {
+        let tasks = value
+        let bool = true
+        tasks.map(v=>{
+          if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
+            bool = false
+            return false
+          }
+        })
+        if(!bool) {
+          this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
+          this.spinnerLoading = false
+          return false
+        }
+        return true
       },
       /**
        * Global parameter
@@ -536,7 +563,8 @@
               cacheTaskInfo({item, fromThis}) {
                 self.cacheTasks(item)
               },
-              close ({ flag, fromThis }) {
+              close ({ item,flag, fromThis }) {
+                self.addTasks(item)
                 // Edit status does not allow deletion of nodes
                 if (flag) {
                   jsPlumb.remove(id)
@@ -554,7 +582,8 @@
               taskType: type,
               self: self,
               preNode: preNode,
-              rearList: rearList
+              rearList: rearList,
+              instanceId: this.$route.params.id
             }
           })
         })
@@ -589,8 +618,9 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',

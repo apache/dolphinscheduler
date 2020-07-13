@@ -16,7 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
+import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HdfsSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HiveSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.MysqlSourceGenerator;
@@ -60,15 +62,24 @@ public class SqoopJobGenerator {
      * @param sqoopParameters
      * @return
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters){
-        createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
-        if(sourceGenerator == null || targetGenerator == null){
-            return null;
+    public String generateSqoopJob(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext){
+
+        String sqoopScripts = "";
+
+        if (SqoopJobType.TEMPLATE.getDescp().equals(sqoopParameters.getJobType())) {
+            createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
+            if(sourceGenerator == null || targetGenerator == null){
+                throw new RuntimeException("sqoop task source type or target type is null");
+            }
+
+            sqoopScripts =  commonGenerator.generate(sqoopParameters)
+                    + sourceGenerator.generate(sqoopParameters,taskExecutionContext)
+                    + targetGenerator.generate(sqoopParameters,taskExecutionContext);
+        } else if (SqoopJobType.CUSTOM.getDescp().equals(sqoopParameters.getJobType())) {
+            sqoopScripts =  sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
         }
 
-        return commonGenerator.generate(sqoopParameters)
-                + sourceGenerator.generate(sqoopParameters)
-                + targetGenerator.generate(sqoopParameters);
+        return sqoopScripts;
     }
 
     /**
