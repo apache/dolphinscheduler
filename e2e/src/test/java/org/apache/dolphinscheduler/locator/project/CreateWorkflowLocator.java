@@ -24,7 +24,6 @@ public class CreateWorkflowLocator {
     /**
      * jump workflow define page
      */
-
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
