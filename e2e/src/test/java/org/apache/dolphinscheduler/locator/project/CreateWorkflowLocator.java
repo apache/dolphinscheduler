@@ -178,4 +178,5 @@ public class CreateWorkflowLocator {
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
+    
 }
