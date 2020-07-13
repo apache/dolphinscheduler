@@ -51,4 +51,5 @@ public class EmailManager {
 
         return MailUtils.sendMails(receiversList,title, content, showType);
     }
+    
 }

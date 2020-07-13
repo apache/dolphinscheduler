@@ -225,6 +225,4 @@ public class FlinkParameters extends AbstractParameters {
     }
     return resourceList;
   }
-
-
 }
