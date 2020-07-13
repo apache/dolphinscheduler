@@ -60,9 +60,9 @@ public class AlertSender {
             users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
 
             // receiving group list
-            List<String> receviersList = new ArrayList<>();
+            List<String> receiversList = new ArrayList<>();
             for (User user : users) {
-                receviersList.add(user.getEmail());
+                receiversList.add(user.getEmail());
             }
 
             AlertData alertData = new AlertData();
@@ -78,17 +78,17 @@ public class AlertSender {
             AlertInfo alertInfo = new AlertInfo();
             alertInfo.setAlertData(alertData);
 
-            alertInfo.addProp("receivers", receviersList);
+            alertInfo.addProp("receivers", receiversList);
 
             AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL_ID);
             retMaps = emailPlugin.process(alertInfo);
 
             if (retMaps == null) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
-                logger.info("alert send error : return value is null");
+                logger.error("alert send error : return value is null");
             } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
-                logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+                logger.error("alert send error : {}", retMaps.get(Constants.MESSAGE));
             } else {
                 alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, (String) retMaps.get(Constants.MESSAGE), alert.getId());
                 logger.info("alert send success");

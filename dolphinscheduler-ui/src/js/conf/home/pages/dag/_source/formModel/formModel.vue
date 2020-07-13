@@ -260,7 +260,7 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
         <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
@@ -580,6 +580,7 @@
         }
         this.isContentBox = false
         // flag Whether to delete a node this.$destroy()
+        
         this.$emit('close', {
           item: {
             type: this.cacheBackfillItem.type,
@@ -675,7 +676,11 @@
       this.isContentBox = true
     },
     mounted () {
-
+      let self = this
+      $("#cancelBtn").mousedown(function(event){
+        event.preventDefault();
+        self.close()
+      });
     },
     updated () {
     },
