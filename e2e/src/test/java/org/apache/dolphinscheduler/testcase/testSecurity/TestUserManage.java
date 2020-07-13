@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.testcase.testSecurity;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.security.UserManagePage;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 public class TestUserManage extends BaseTest {
@@ -33,6 +34,7 @@ public class TestUserManage extends BaseTest {
         System.out.println("===================================");
     }
 
+    @Ignore
     @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "TestEditUser")
     public void testEditUser() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
