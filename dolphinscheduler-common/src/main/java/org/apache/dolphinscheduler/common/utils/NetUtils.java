@@ -21,13 +21,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyList;
+import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE;
 
 /**
  * NetUtils
@@ -171,9 +169,19 @@ public class NetUtils {
             logger.warn("ValidNetworkInterfaces exception", e);
         }
 
+        NetworkInterface result = null;
+        // Try to specify config NetWork Interface
+        for (NetworkInterface networkInterface : validNetworkInterfaces) {
+            if (isSpecifyNetworkInterface(networkInterface)) {
+                result = networkInterface;
+                break;
+            }
+        }
 
+        if (null != result) {
+            return result;
+        }
         return validNetworkInterfaces.get(0);
-
     }
 
     /**
@@ -206,4 +214,8 @@ public class NetUtils {
                 || !networkInterface.isUp();
     }
 
+    private static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
+        String preferredNetworkInterface = System.getProperty(DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE);
+        return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
+    }
 }
