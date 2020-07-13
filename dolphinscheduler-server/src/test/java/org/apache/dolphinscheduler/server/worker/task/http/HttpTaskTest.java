@@ -92,7 +92,6 @@ public class HttpTaskTest {
                         "\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"https://github.com/\"," +
                         "\"connectTimeout\":\"1000\",\"socketTimeout\":\"1000\"}");
 
-
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
