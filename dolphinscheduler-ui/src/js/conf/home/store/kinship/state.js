@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-import localStore from '@/module/util/localStorage'
-
-// Get the name of the item currently clicked
-let projectName = localStore.getItem('projectName')
-
 export default {
-  projectName: '',
   sourceWorkFlowId: '',
   workList: [],
   locations: [],
