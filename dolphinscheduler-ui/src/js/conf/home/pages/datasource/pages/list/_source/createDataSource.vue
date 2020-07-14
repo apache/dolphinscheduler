@@ -434,12 +434,13 @@
           this.showdDatabase = false;
         }
 
-        if (value== 'ORACLE') {
+        if (value== 'ORACLE' && !this.item.id) {
           this.showConnectType = true;
           this.connectType = 'ORACLE_SERVICE_NAME'
+        } else if(value== 'ORACLE' && this.item.id) {
+          this.showConnectType = true;
         } else {
           this.showConnectType = false;
-          this.connectType = ''
         }
 
         if(value == 'REMOTESERVER') {
