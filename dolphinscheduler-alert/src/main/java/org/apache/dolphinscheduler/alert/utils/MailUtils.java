@@ -70,7 +70,6 @@ public class MailUtils {
         System.setProperty("mail.mime.splitlongparameters","false");
     }
 
-
     /**
      * send mail to receivers
      * @param receivers the receiver list
