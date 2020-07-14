@@ -788,7 +788,7 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
-                        <include>**/dao/mapper/WorkFlowLineageMapperTest.java</include>
+                        <!--<include>**/dao/mapper/WorkFlowLineageMapperTest.java</include>-->
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
