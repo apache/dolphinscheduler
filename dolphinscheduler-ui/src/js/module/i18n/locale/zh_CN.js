@@ -612,7 +612,7 @@ export default {
   'KinshipState1': '已上线',
   'KinshipState0': '工作流未上线',
   'KinshipState10': '调度未上线',
-  'Dag label display control': 'Dag节点名称显隐'
+  'Dag label display control': 'Dag节点名称显隐',
   'Enable': '启用',
   'Disable': '停用',
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
