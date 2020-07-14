@@ -31,7 +31,6 @@ public class CreateProjectPage extends PageCommon {
      * jump to ProjectManagePage
      */
     public boolean jumpProjectManagePage() throws InterruptedException {
-        Thread.sleep(TestConstant.THREE_THOUSAND);
         clickTopElement(CreateProjectLocator.PROJECT_MANAGE);
         Thread.sleep(TestConstant.ONE_THOUSAND);
         return ifTitleContains(CreateProjectData.PROJECT_TITLE);

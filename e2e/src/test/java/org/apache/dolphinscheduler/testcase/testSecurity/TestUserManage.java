@@ -23,13 +23,25 @@ import org.testng.annotations.Test;
 public class TestUserManage extends BaseTest {
     private UserManagePage userManagePage;
 
-    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "TestUserManage")
-    public void testUserManage() throws InterruptedException {
+    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "TestCreateUser")
+    public void testCreateUser() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
-        //assert user manage page
+        //create user
         System.out.println("start create user");
         assert userManagePage.createUser();
         System.out.println("end create user");
+        System.out.println("===================================");
+    }
+
+    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "TestEditUser")
+    public void testEditUser() throws InterruptedException {
+        userManagePage = new UserManagePage(driver);
+        //edit user
+        System.out.println("start edit  user");
+        assert userManagePage.editGeneralUser();
+        assert userManagePage.editAdminlUser();
+
+        System.out.println("end edit user");
         System.out.println("===================================");
 
     }

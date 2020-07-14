@@ -40,6 +40,10 @@ public class TestCreateWorkflow extends BaseTest {
         assert createWorkflowPage.createWorkflow();
         assert createWorkflowPage.saveWorkflow();
         System.out.println("end create workflow");
+
+        System.out.println("start online workflow");
+        assert createWorkflowPage.onlineWorkflow();
+        System.out.println("end online workflow");
         System.out.println("===================================");
     }
 }

@@ -145,6 +145,11 @@ if len(zookeeperHosts) > 0 and "clientPort" in config['configurations']['zoo.cfg
     zookeeperPort = ":" + clientPort + ","
     dolphin_zookeeper_map['zookeeper.quorum'] = zookeeperPort.join(zookeeperHosts) + ":" + clientPort
 dolphin_zookeeper_map.update(config['configurations']['dolphin-zookeeper'])
-
+if 'spring.servlet.multipart.max-file-size' in dolphin_app_api_map:
+    file_size = dolphin_app_api_map['spring.servlet.multipart.max-file-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-file-size'] = file_size + "MB"
+if 'spring.servlet.multipart.max-request-size' in dolphin_app_api_map:
+    request_size = dolphin_app_api_map['spring.servlet.multipart.max-request-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-request-size'] = request_size + "MB"
 
 
