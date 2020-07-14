@@ -125,14 +125,17 @@ public class UserManagePage extends PageCommon {
      * delete user
      */
     public boolean deleteUser() throws InterruptedException {
-
+        System.out.println("jump to user manage");
+        Thread.sleep(500);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  delete user button
+        System.out.println("click delete user");
         clickButton(UserManageLocator.DELETE_USER_BUTTON );
 
         // click confirm delete button
+        System.out.println("click confirm delete user");
         clickButton(UserManageLocator.CONFIRM_DELETE_USER_BUTTON);
 
         // Whether to enter the specified page after submit
