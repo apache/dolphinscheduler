@@ -345,4 +345,5 @@ public class MailUtils {
         retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
+    
 }
