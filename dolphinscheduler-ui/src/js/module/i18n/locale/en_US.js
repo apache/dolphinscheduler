@@ -612,7 +612,7 @@ export default {
   'KinshipState1': 'Online',
   'KinshipState0': 'Workflow is not online',
   'KinshipState10': 'Scheduling is not online',
-  'Dag label display control': 'Dag label display control'
+  'Dag label display control': 'Dag label display control',
   'Enable': 'Enable',
   'Timeout Settings': 'Timeout Settings',
   'Connect Timeout':'Connect Timeout',
