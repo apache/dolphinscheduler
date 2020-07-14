@@ -91,7 +91,8 @@
           return false
         }
         // Verify timeout duration Non 0 positive integer
-        if (this.enable && !parseInt(this.interval) && !_.isInteger(this.interval)) {
+        const reg = /^[1-9]\d*$/
+        if (this.enable && !reg.test(this.interval)) {
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }

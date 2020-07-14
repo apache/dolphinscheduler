@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -818,7 +818,7 @@
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <!--<include>**/server/worker/processor/TaskCallbackServiceTest.java</include>-->
-                        <!--<include>**/server/worker/registry/WorkerRegistryTest.java</include>-->
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
@@ -854,6 +854,7 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
+                        <include>**/dao/datasource/HiveDataSourceTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
@@ -918,7 +919,7 @@
                         <exclude>**/dist/**</exclude>
                         <exclude>**/licenses/**</exclude>
                         <exclude>.github/**</exclude>
-                        <exclude>sql/soft_version</exclude>
+                        <exclude>**/sql/soft_version</exclude>
                         <exclude>**/common/utils/ScriptRunner.java</exclude>
                         <exclude>**/*.json</exclude>
                         <!-- document files -->

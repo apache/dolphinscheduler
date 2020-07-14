@@ -27,28 +27,29 @@ import java.util.Map;
 public class EmailManager {
     /**
      * email send
-     * @param receviersList the receiver list
-     * @param receviersCcList the cc List
+     * @param receiversList the receiver list
+     * @param receiversCcList the cc List
      * @param title the title
      * @param content the content
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receviersList,List<String> receviersCcList,String title,String content,String showType){
+    public Map<String,Object> send(List<String> receiversList,List<String> receiversCcList,String title,String content,String showType){
 
-        return MailUtils.sendMails(receviersList, receviersCcList, title, content, showType);
+        return MailUtils.sendMails(receiversList, receiversCcList, title, content, showType);
     }
 
     /**
      * msg send
-     * @param receviersList the receiver list
+     * @param receiversList the receiver list
      * @param title the title
      * @param content the content
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receviersList,String title,String content,String showType){
+    public Map<String,Object> send(List<String> receiversList,String title,String content,String showType){
 
-        return MailUtils.sendMails(receviersList,title, content, showType);
+        return MailUtils.sendMails(receiversList,title, content, showType);
     }
+    
 }
