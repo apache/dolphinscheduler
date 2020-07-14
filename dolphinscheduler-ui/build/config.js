@@ -213,8 +213,7 @@ const baseConfig = {
     new VueLoaderPlugin(),
     new webpack.ProvidePlugin({ vue: 'Vue', _: 'lodash',jQuery:"jquery/dist/jquery.min.js",$:"jquery/dist/jquery.min.js" }),
     new webpack.DefinePlugin({
-      PUBLIC_PATH: JSON.stringify(process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : ''),
-      ISMOCK: JSON.stringify(process.env.ISMOCK ? process.env.ISMOCK : '') // mock env
+      PUBLIC_PATH: JSON.stringify(process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : '')
     }),
     ...pages
   ]
