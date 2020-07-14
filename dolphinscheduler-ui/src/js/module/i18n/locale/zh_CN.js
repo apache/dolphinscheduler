@@ -613,4 +613,6 @@ export default {
   'Connect timeout be a positive integer': '连接超时必须为数字',
   'Socket Timeout be a positive integer': 'Socket超时必须为数字',
   'ms':'毫秒'
+  'Remote Exec' : '远程执行',
+  'Please select the remote server': '请选择数据主机'
 }

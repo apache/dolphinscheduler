@@ -48,131 +48,133 @@ import java.util.Set;
  */
 public class ShellTask extends AbstractTask {
 
-  /**
-   * shell parameters
-   */
-  private ShellParameters shellParameters;
+    /**
+     * shell parameters
+     */
+    private ShellParameters shellParameters;
 
-  /**
-   * shell command executor
-   */
-  private ShellCommandExecutor shellCommandExecutor;
+    /**
+     * shell command executor
+     */
+    private ShellCommandExecutor shellCommandExecutor;
 
-  /**
-   *  taskExecutionContext
-   */
-  private TaskExecutionContext taskExecutionContext;
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
 
-  /**
-   * constructor
-   * @param taskExecutionContext taskExecutionContext
-   * @param logger    logger
-   */
-  public ShellTask(TaskExecutionContext taskExecutionContext, Logger logger) {
-    super(taskExecutionContext, logger);
+    /**
+     * constructor
+     *
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger               logger
+     */
+    public ShellTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
 
-    this.taskExecutionContext = taskExecutionContext;
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+        this.taskExecutionContext = taskExecutionContext;
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskExecutionContext,
             logger);
-  }
-
-  @Override
-  public void init() {
-    logger.info("shell task params {}", taskExecutionContext.getTaskParams());
-
-    shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
-
-    if (!shellParameters.checkParameters()) {
-      throw new RuntimeException("shell task params is not valid");
     }
-  }
 
-  @Override
-  public void handle() throws Exception {
-    try {
-      // construct process
-      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
-      setExitStatusCode(commandExecuteResult.getExitStatusCode());
-      setAppIds(commandExecuteResult.getAppIds());
-      setProcessId(commandExecuteResult.getProcessId());
-    } catch (Exception e) {
-      logger.error("shell task error", e);
-      setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-      throw e;
+    @Override
+    public void init() {
+        logger.info("shell task params {}", taskExecutionContext.getTaskParams());
+
+        shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
+
+        if (!shellParameters.checkParameters()) {
+            throw new RuntimeException("shell task params is not valid");
+        }
     }
-  }
 
-  @Override
-  public void cancelApplication(boolean cancelApplication) throws Exception {
-    // cancel process
-    shellCommandExecutor.cancelApplication();
-  }
+    @Override
+    public void handle() throws Exception {
+        try {
+            // construct process
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
+        } catch (Exception e) {
+            logger.error("shell task error", e);
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
+            throw e;
+        }
+    }
 
-  /**
-   * create command
-   * @return file name
-   * @throws Exception exception
-   */
-  private String buildCommand() throws Exception {
-    // generate scripts
-    String fileName = String.format("%s/%s_node.%s",
+    @Override
+    public void cancelApplication(boolean cancelApplication) throws Exception {
+        // cancel process
+        shellCommandExecutor.cancelApplication();
+    }
+
+    /**
+     * create command
+     *
+     * @return file name
+     * @throws Exception exception
+     */
+    private String buildCommand() throws Exception {
+        // generate scripts
+        String fileName = String.format("%s/%s_node.sh",
             taskExecutionContext.getExecutePath(),
             taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
-    Path path = new File(fileName).toPath();
+        Path path = new File(fileName).toPath();
 
-    if (Files.exists(path)) {
-      return fileName;
-    }
+        if (Files.exists(path)) {
+            return fileName;
+        }
 
-    String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-    /**
-     *  combining local and global parameters
-     */
-    Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        /**
+         *  combining local and global parameters
+         */
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
             taskExecutionContext.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
-    if (paramsMap != null){
-      script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        if (paramsMap != null) {
+            script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        }
+        // new
+        // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+        if (paramsMap != null) {
+            if (taskExecutionContext.getScheduleTime() != null) {
+                String dateTime = DateUtils.format(taskExecutionContext.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
+                Property p = new Property();
+                p.setValue(dateTime);
+                p.setProp(Constants.PARAMETER_SHECDULE_TIME);
+                paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+            }
+            script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
+        }
+
+        shellParameters.setRawScript(script);
+
+        logger.info("raw script : {}", shellParameters.getRawScript());
+        logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+        if (OSUtils.isWindows()) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
+        Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+
+        return fileName;
     }
-    // new
-    // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if (paramsMap != null) {
-      if (taskExecutionContext.getScheduleTime() != null) {
-        String dateTime = DateUtils.format(taskExecutionContext.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
-        Property p = new Property();
-        p.setValue(dateTime);
-        p.setProp(Constants.PARAMETER_SHECDULE_TIME);
-        paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
-      }
-      script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
+
+    @Override
+    public AbstractParameters getParameters() {
+        return shellParameters;
     }
-
-    shellParameters.setRawScript(script);
-
-    logger.info("raw script : {}", shellParameters.getRawScript());
-    logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
-
-    Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
-    FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-    if (OSUtils.isWindows()) {
-      Files.createFile(path);
-    } else {
-      Files.createFile(path, attr);
-    }
-
-    Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-
-    return fileName;
-  }
-
-  @Override
-  public AbstractParameters getParameters() {
-    return shellParameters;
-  }
 
 }

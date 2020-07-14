@@ -906,6 +906,7 @@ public final class Constants {
     public static final String ORACLE = "ORACLE";
     public static final String SQLSERVER = "SQLSERVER";
     public static final String DB2 = "DB2";
+    public static final String REMOTESERVER = "REMOTESERVER";
 
     /**
      * jdbc url
@@ -926,6 +927,8 @@ public final class Constants {
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
     public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
+    public static final String HOST = "host";
+    public static final String PORT = "port";
 
 
     /**
@@ -937,6 +940,7 @@ public final class Constants {
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
+    public static final int REMOTESERVER_TIME_OUT = 3000000;
 
 
     /**

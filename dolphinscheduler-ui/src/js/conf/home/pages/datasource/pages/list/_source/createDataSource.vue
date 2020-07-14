@@ -32,7 +32,8 @@
               <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
               <x-radio :label="'ORACLE'">ORACLE</x-radio>
               <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
-              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
+              <x-radio :label="'DB2'">DB2</x-radio>
+              <x-radio :label="'REMOTESERVER'" class="radio-label-last" >REMOTESERVER</x-radio>
             </x-radio-group>
           </template>
         </m-list-box-f>
@@ -116,7 +117,7 @@
             </x-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f v-if="showDbParam">
           <template slot="name"><strong :class="{hidden:showdDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
@@ -137,7 +138,7 @@
             </x-radio-group>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f v-if="showDbParam">
           <template slot="name">{{$t('jdbc connect parameters')}}</template>
           <template slot="content">
             <x-input
@@ -198,6 +199,7 @@
         testLoading: false,
         showPrincipal: true,
         showdDatabase: false,
+        showDbParam: true,
         showConnectType: false,
         isShowPrincipal:true,
         prePortMapper:{}
@@ -405,6 +407,9 @@
           case 'DB2':
             defaultPort = '50000'
             break
+          case 'REMOTESERVER':
+            defaultPort = '22'
+            break
           default:
             break
 
@@ -437,6 +442,12 @@
         } else {
           this.showConnectType = false;
         }
+
+        if(value == 'REMOTESERVER') {
+          this.showDbParam = false;
+          this.showdDatabase = true;
+        }
+
         //Set default port for each type datasource
         this._setDefaultValues(value)
 

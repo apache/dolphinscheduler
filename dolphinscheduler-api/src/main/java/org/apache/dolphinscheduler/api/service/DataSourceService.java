@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -443,6 +445,28 @@ public class DataSourceService extends BaseService{
         return connection;
     }
 
+    /**
+     * get remote sever session
+     *
+     * @param parameter parameter
+     * @return session for remote server
+     */
+    private Session getRemoteSession(String parameter) {
+        Session session = null;
+        try {
+            RemoteServerSource serverSource = JSON.parseObject(parameter, RemoteServerSource.class);
+            JSch jsch = new JSch();
+            session = jsch.getSession(serverSource.getUser(), serverSource.getHost(), serverSource.getPort());
+            session.setPassword(serverSource.getPassword());
+            session.setConfig("StrictHostKeyChecking", "no");
+            // making a connection with timeout.
+            session.connect(Constants.REMOTESERVER_TIME_OUT);
+        } catch (Exception e) {
+            session = null;
+            logger.error(e.getMessage(),e);
+        }
+        return session;
+    }
 
     /**
      * check connection
@@ -453,6 +477,19 @@ public class DataSourceService extends BaseService{
      */
     public boolean checkConnection(DbType type, String parameter) {
         Boolean isConnection = false;
+
+        if (Constants.REMOTESERVER.equals(type.name())) {
+            Session session = getRemoteSession(parameter);
+            if (session != null) {
+                isConnection = true;
+                try {
+                    session.disconnect();
+                } catch (Exception e) {
+                    logger.error("close connection fail at DataSourceService::checkConnection()", e);
+                }
+            }
+        }
+
         Connection con = getConnection(type, parameter);
         if (con != null) {
             isConnection = true;
@@ -528,6 +565,10 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, password);
+        if (Constants.REMOTESERVER.equals(type.name())) {
+            parameterMap.put(Constants.HOST, host);
+            parameterMap.put(Constants.PORT, port);
+        }
         if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             parameterMap.put(Constants.PRINCIPAL,principal);
