@@ -14,28 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.security;
+package org.apache.dolphinscheduler.data.project;
 
-
-public class UserManageData  {
+public class RunWorkflowData {
     /**
-     * create user
+     * run workflow data
      */
-    public static final String USERNAME = "selenium_user_1";
+    //input shell task name
+    public static final String RECIPIENT  = "123456789@qq.com";
 
-    public static final String PASSWORD = "123456qwe";
+    //input shell task description
+    public static final String Cc = "qwe12312sds@qq.com";
 
-    public static final String EMAIL = "123456789@qq.com";
+    public static final String RUN_WORKFLOW_TITLE = "工作流定义 - DolphinScheduler";
 
-    public static final String PHONE = "15811112222";
 
-    public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
-
-    /**
-     * edit user
-     */
-    public static final String EDIT_USERNAME = "selenium_user_edit";
-    public static final String EDIT_PASSWORD = "123456qwe";
-    public static final String EDIT_EMAIL = "123456_edit@qq.com";
-    public static final String EDIT_PHONE = "15800001111";
 }
