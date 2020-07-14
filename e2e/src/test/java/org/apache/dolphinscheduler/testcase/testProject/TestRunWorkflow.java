@@ -14,33 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.testDeleteData;
+package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.project.CreateProjectPage;
 import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
+import org.apache.dolphinscheduler.page.project.RunWorkflowPage;
 import org.testng.annotations.Test;
 
-public class TestDeleteWorkflow extends BaseTest {
+public class TestRunWorkflow extends BaseTest {
     private CreateWorkflowPage createWorkflowPage;
     private CreateProjectPage createProjectPage;
+    private RunWorkflowPage runWorkflowPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","workflow"},description = "TestDeleteWorkflow")
-    public void testDeleteWorkflow() throws InterruptedException {
+
+    @Test(groups={"functionTests","runWorkflow"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
+    public void testRunWorkflow() throws InterruptedException {
+        runWorkflowPage = new RunWorkflowPage(driver);
+
         createProjectPage = new CreateProjectPage(driver);
-        //jump to project manage page
-//        System.out.println("jump to the project manage page to delete workflow");
-//        createProjectPage.jumpProjectManagePage();
-
-        createWorkflowPage = new CreateWorkflowPage(driver);
-//        createWorkflowPage.jumpWorkflowPage();
-        System.out.println("start offline workflow");
-        assert createWorkflowPage.offlineWorkflow();
-        System.out.println("end offline workflow");
-
-        System.out.println("start delete workflow");
-        assert createWorkflowPage.deleteWorkflow();
-        System.out.println("end delete workflow");
+        System.out.println("start run workflow");
+        assert runWorkflowPage.runWorkflow();
+        System.out.println("end run workflow");
         System.out.println("===================================");
     }
 }
