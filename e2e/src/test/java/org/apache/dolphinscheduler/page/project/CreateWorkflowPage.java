@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.CreateWorkflowData;
 import org.apache.dolphinscheduler.locator.project.CreateWorkflowLocator;
+import org.apache.dolphinscheduler.locator.project.RunWorkflowLocator;
 import org.openqa.selenium.WebDriver;
 
 public class CreateWorkflowPage extends PageCommon {
@@ -183,13 +184,37 @@ public class CreateWorkflowPage extends PageCommon {
         Thread.sleep(TestConstant.ONE_THOUSAND);
 
         //click add button
-        clickButton(CreateWorkflowLocator.CLICK_ADD_BUTTON);
         System.out.println("submit workflow");
+        clickButton(CreateWorkflowLocator.CLICK_ADD_BUTTON);
+
         return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
     }
 
+    public boolean onlineWorkflow() throws InterruptedException {
+        clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+
+        // click online button
+        System.out.println("Click online workflow button");
+        clickButton(CreateWorkflowLocator.CLICK_ONLINE_WORKFLOW_BUTTON);
+
+        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+    }
+
+    public boolean offlineWorkflow() throws InterruptedException {
+        clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+
+        // click offline button
+        System.out.println("offline workflow");
+        Thread.sleep(500);
+        clickButton(CreateWorkflowLocator.CLICK_OFFLINE_WORKFLOW_BUTTON);
+
+        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+    }
+
+
     public boolean deleteWorkflow() throws InterruptedException {
-        //click  delete project
+        //click  delete workflow
+        Thread.sleep(500);
         clickButton(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
 
         //click confirm delete project

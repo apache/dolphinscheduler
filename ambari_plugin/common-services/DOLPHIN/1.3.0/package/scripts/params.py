@@ -114,10 +114,6 @@ else:
 
 dolphin_common_map_tmp = config['configurations']['dolphin-common']
 data_basedir_path = dolphin_common_map_tmp['data.basedir.path']
-process_exec_basepath = data_basedir_path + '/exec'
-data_download_basedir_path = data_basedir_path + '/download'
-dolphin_common_map['process.exec.basepath'] = process_exec_basepath
-dolphin_common_map['data.download.basedir.path'] = data_download_basedir_path
 dolphin_common_map['dolphinscheduler.env.path'] = dolphin_env_path
 dolphin_common_map.update(config['configurations']['dolphin-common'])
 
@@ -149,6 +145,11 @@ if len(zookeeperHosts) > 0 and "clientPort" in config['configurations']['zoo.cfg
     zookeeperPort = ":" + clientPort + ","
     dolphin_zookeeper_map['zookeeper.quorum'] = zookeeperPort.join(zookeeperHosts) + ":" + clientPort
 dolphin_zookeeper_map.update(config['configurations']['dolphin-zookeeper'])
-
+if 'spring.servlet.multipart.max-file-size' in dolphin_app_api_map:
+    file_size = dolphin_app_api_map['spring.servlet.multipart.max-file-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-file-size'] = file_size + "MB"
+if 'spring.servlet.multipart.max-request-size' in dolphin_app_api_map:
+    request_size = dolphin_app_api_map['spring.servlet.multipart.max-request-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-request-size'] = request_size + "MB"
 
 

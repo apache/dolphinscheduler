@@ -16,9 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -28,8 +26,8 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
 import org.slf4j.Logger;
@@ -65,7 +63,7 @@ public class HadoopUtils implements Closeable {
 
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 7), TimeUnit.DAYS)
+            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 2), TimeUnit.HOURS)
             .build(new CacheLoader<String, HadoopUtils>() {
                 @Override
                 public HadoopUtils load(String key) throws Exception {
@@ -112,7 +110,7 @@ public class HadoopUtils implements Closeable {
         try {
             configuration = new Configuration();
 
-            String resourceStorageType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+            String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
             if (resUploadType == ResUploadType.HDFS) {
@@ -161,6 +159,7 @@ public class HadoopUtils implements Closeable {
                     }
                 }
             } else if (resUploadType == ResUploadType.S3) {
+                System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
                 configuration.set(Constants.FS_DEFAULTFS, PropertyUtils.getString(Constants.FS_DEFAULTFS));
                 configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
@@ -187,7 +186,7 @@ public class HadoopUtils implements Closeable {
      * @param applicationId application id
      * @return url of application
      */
-    public String getApplicationUrl(String applicationId) {
+    public String getApplicationUrl(String applicationId) throws Exception {
         /**
          * if rmHaIds contains xx, it signs not use resourcemanager
          * otherwise:
@@ -195,21 +194,21 @@ public class HadoopUtils implements Closeable {
          *  if rmHaIds not empty: resourcemanager HA enabled
          */
         String appUrl = "";
-        //not use resourcemanager
-        if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)) {
 
-            yarnEnabled = false;
-            logger.warn("should not step here");
-        } else if (!StringUtils.isEmpty(rmHaIds)) {
+        if (StringUtils.isEmpty(rmHaIds)){
+            //single resourcemanager enabled
+            appUrl = appAddress;
+            yarnEnabled = true;
+        } else {
             //resourcemanager HA enabled
             appUrl = getAppAddress(appAddress, rmHaIds);
             yarnEnabled = true;
             logger.info("application url : {}", appUrl);
-        } else {
-            //single resourcemanager enabled
-            yarnEnabled = true;
         }
 
+        if(StringUtils.isBlank(appUrl)){
+            throw new Exception("application url is blank");
+        }
         return String.format(appUrl, applicationId);
     }
 
@@ -408,9 +407,8 @@ public class HadoopUtils implements Closeable {
      *
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
-     * @throws JSONException json exception
      */
-    public ExecutionStatus getApplicationStatus(String applicationId) throws JSONException {
+    public ExecutionStatus getApplicationStatus(String applicationId) throws Exception {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
@@ -421,15 +419,18 @@ public class HadoopUtils implements Closeable {
 
         String responseContent = HttpUtils.get(applicationUrl);
         if (responseContent != null) {
-            JSONObject jsonObject = JSON.parseObject(responseContent);
-            result = jsonObject.getJSONObject("app").getString("finalStatus");
+            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            result = jsonObject.path("app").path("finalStatus").asText();
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = HttpUtils.get(jobHistoryUrl);
-            JSONObject jsonObject = JSONObject.parseObject(responseContent);
-            result = jsonObject.getJSONObject("job").getString("state");
+            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            if (!jsonObject.has("job")){
+                return ExecutionStatus.FAILURE;
+            }
+            result = jsonObject.path("job").path("state").asText();
         }
 
         switch (result) {
@@ -469,6 +470,7 @@ public class HadoopUtils implements Closeable {
      * hdfs resource dir
      *
      * @param tenantCode tenant code
+     * @param resourceType resource type
      * @return hdfs resource dir
      */
     public static String getHdfsDir(ResourceType resourceType, String tenantCode) {
@@ -669,10 +671,13 @@ public class HadoopUtils implements Closeable {
                 return null;
             }
             //to json
-            JSONObject jsonObject = JSON.parseObject(retStr);
+            ObjectNode jsonObject = JSONUtils.parseObject(retStr);
 
             //get ResourceManager state
-            return jsonObject.getJSONObject("clusterInfo").getString("haState");
+            if (!jsonObject.has("clusterInfo")){
+                return null;
+            }
+            return jsonObject.get("clusterInfo").path("haState").asText();
         }
 
     }

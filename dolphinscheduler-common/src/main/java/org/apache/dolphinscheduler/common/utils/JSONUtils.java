@@ -22,12 +22,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.*;
+
 
 /**
  * json utils
@@ -39,33 +44,46 @@ public class JSONUtils {
     /**
      * can use static singleton, inject: just make sure to reuse!
      */
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .setTimeZone(TimeZone.getDefault())
+            ;
 
     private JSONUtils() {
     }
 
-    static {
-        //Feature that determines whether encountering of unknown properties, false means not analyzer unknown properties
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).setTimeZone(TimeZone.getDefault());
-        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).setTimeZone(TimeZone.getDefault());
+
+    public static ArrayNode createArrayNode() {
+        return objectMapper.createArrayNode();
+    }
+
+    public static ObjectNode createObjectNode() {
+        return objectMapper.createObjectNode();
+    }
+
+    public static JsonNode toJsonNode(Object obj) {
+        return objectMapper.valueToTree(obj);
     }
 
     /**
      * json representation of object
      *
      * @param object object
+     * @param feature feature
      * @return object to json string
      */
-    public static String toJson(Object object) {
+    public static String toJsonString(Object object, SerializationFeature feature) {
         try {
-            return objectMapper.writeValueAsString(object);
+            ObjectWriter writer = objectMapper.writer(feature);
+            return writer.writeValueAsString(object);
         } catch (Exception e) {
             logger.error("object to json exception!", e);
         }
 
         return null;
     }
-
 
     /**
      * This method deserializes the specified Json into an object of the specified class. It is not
@@ -94,7 +112,6 @@ public class JSONUtils {
         return null;
     }
 
-
     /**
      * json to list
      *
@@ -105,16 +122,18 @@ public class JSONUtils {
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
         if (StringUtils.isEmpty(json)) {
-            return new ArrayList<>();
-        }
-        try {
-            return objectMapper.readValue(json, new TypeReference<List<T>>() {
-            });
-        } catch (Exception e) {
-            logger.error("JSONArray.parseArray exception!", e);
+            return Collections.emptyList();
         }
 
-        return new ArrayList<>();
+        try {
+
+            CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
+            return objectMapper.readValue(json, listType);
+        } catch (Exception e) {
+            logger.error("parse list exception!", e);
+        }
+
+        return Collections.emptyList();
     }
 
 
@@ -259,7 +278,11 @@ public class JSONUtils {
         @Override
         public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             JsonNode node = p.getCodec().readTree(p);
-            return node.toString();
+            if (node instanceof TextNode) {
+                return node.asText();
+            } else {
+                return node.toString();
+            }
         }
 
     }

@@ -62,7 +62,47 @@
         </x-radio-group>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Flink Version')}}</div>
+      <div slot="content">
+        <x-select
+          style="width: 100px;"
+          v-model="flinkVersion"
+          :disabled="isDetails">
+          <x-option
+            v-for="version in flinkVersionList"
+            :key="version.code"
+            :value="version.code"
+            :label="version.code">
+          </x-option>
+        </x-select>
+      </div>
+    </m-list-box>
     <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
+        <span class="sp2">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="jobManagerMemory"
+            :placeholder="$t('Please enter jobManager memory')"
+            style="width: 200px;"
+            autocomplete="off">
+        </x-input>
+        </span>
+        <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
+        <span class="sp2">
+          <x-input
+            :disabled="isDetails"
+            type="input"
+            v-model="taskManagerMemory"
+            :placeholder="$t('Please enter the taskManager memory')"
+            style="width: 186px;"
+            autocomplete="off">
+        </x-input>
+        </span>
+      </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('slot')}}</span>
         <span class="sp2">
@@ -70,48 +110,25 @@
                   :disabled="isDetails"
                   type="input"
                   v-model="slot"
-                  :placeholder="$t('Please enter driver core number')"
+                  :placeholder="$t('Please enter solt number')"
                   style="width: 200px;"
                   autocomplete="off">
         </x-input>
         </span>
+        <div v-if="flinkVersion !== '>=1.10'">
         <span class="sp1 sp3">{{$t('taskManager')}}</span>
         <span class="sp2">
           <x-input
                   :disabled="isDetails"
                   type="input"
                   v-model="taskManager"
-                  :placeholder="$t('Please enter driver memory use')"
+                  :placeholder="$t('Please enter taskManager number')"
                   style="width: 186px;"
                   autocomplete="off">
         </x-input>
         </span>
+        </div>
       </div>
-      <div class="clearfix list">
-        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="jobManagerMemory"
-                  :placeholder="$t('Please enter the number of Executor')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-        <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
-        <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="taskManagerMemory"
-                  :placeholder="$t('Please enter the Executor memory')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
-        </span>
-      </div>
-
     </div>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
@@ -193,12 +210,10 @@
         slot: 1,
         // Driver Number of memory
         taskManager: '2',
-        // Executor Number
+        // jobManager Memory
         jobManagerMemory: '1G',
-        // Executor Number of memory
+        // taskManager Memory
         taskManagerMemory: '2G',
-        // Executor Number of cores
-        executorCores: 2,
         // Command line argument
         mainArgs: '',
         // Other parameters
@@ -207,6 +222,11 @@
         programType: 'SCALA',
         // Program type(List)
         programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
+
+        flinkVersion:'<1.10',
+        // Flink Versions(List)
+        flinkVersionList: [{ code: '<1.10' }, { code: '>=1.10' }],
+
         normalizer(node) {
           return {
             label: node.name
@@ -268,37 +288,22 @@
         }
 
         if (!this.jobManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the number of Executor')}`)
+          this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
           return false
         }
 
         if (!Number.isInteger(parseInt(this.jobManagerMemory))) {
-          this.$message.warning(`${i18n.$t('The number of Executors should be a positive integer')}`)
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
           return false
         }
 
         if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
-          return false
-        }
-
-        if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter the taskManager memory')}`)
           return false
         }
 
         if (!_.isNumber(parseInt(this.taskManagerMemory))) {
           this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-          return false
-        }
-
-        if (!this.executorCores) {
-          this.$message.warning(`${i18n.$t('Please enter ExecutorPlease enter Executor core number')}`)
-          return false
-        }
-
-        if (!Number.isInteger(parseInt(this.executorCores))) {
-          this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
           return false
         }
 
@@ -324,11 +329,11 @@
             return {id: v}
           }),
           localParams: this.localParams,
+          flinkVersion: this.flinkVersion,
           slot: this.slot,
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
-          executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -459,7 +464,6 @@
           taskManager: this.taskManager,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
-          executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -485,10 +489,12 @@
             this.mainJar = o.params.mainJar.id || ''
           }
           this.deployMode = o.params.deployMode || ''
+          this.flinkVersion = o.params.flinkVersion || '<1.10'
           this.slot = o.params.slot || 1
           this.taskManager = o.params.taskManager || '2'
           this.jobManagerMemory = o.params.jobManagerMemory || '1G'
           this.taskManagerMemory = o.params.taskManagerMemory || '2G'
+
 
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others

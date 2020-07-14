@@ -85,6 +85,39 @@
         </x-input>
       </div>
     </m-list-box>
+
+
+    <m-list-box  >
+      <div slot="text">{{$t('Timeout Settings')}}</div>
+      <div slot="content">
+        <label class="label-box">
+          <div style="padding-top: 5px;">
+            <x-switch
+              v-model="timeoutSettings"
+              :disabled="isDetails"
+            ></x-switch>
+          </div>
+        </label>
+      </div>
+    </m-list-box>
+
+    <div class="clearfix list" v-if = "timeoutSettings" >
+      <div class="text-box">
+        <span>{{$t('Connect Timeout')}}</span>
+      </div>
+      <div class="cont-box">
+        <span  class="label-box"  style="width: 193px;display: inline-block;" >
+          <x-input v-model='connectTimeout' maxlength="7" />
+        </span>
+        <span>{{$t('ms')}}</span>
+        <span class="text-b">{{$t('Socket Timeout')}}</span>
+        <span  class="label-box" style="width: 193px;display: inline-block;" >
+          <x-input v-model='socketTimeout' maxlength="7" />
+        </span>
+        <span>{{$t('ms')}}</span>
+      </div>
+    </div>
+
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -110,6 +143,10 @@
     name: 'http',
     data () {
       return {
+        timeoutSettings: false,
+        connectTimeout : 60000 ,
+        socketTimeout :  60000 ,
+
         url: '',
         condition: '',
         localParams: [],
@@ -152,6 +189,14 @@
         if (!this.$refs.refHttpParams._verifValue()) {
           return false
         }
+        if (!_.isNumber(parseInt(this.socketTimeout))) {
+          this.$message.warning(`${i18n.$t('Socket Timeout be a positive integer')}`)
+          return false
+        }
+        if (!_.isNumber(parseInt(this.connectTimeout))) {
+          this.$message.warning(`${i18n.$t('Connect timeout be a positive integer')}`)
+          return false
+        }
         // storage
         this.$emit('on-params', {
           localParams: this.localParams,
@@ -159,7 +204,9 @@
           url: this.url,
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
-          condition: this.condition
+          condition: this.condition,
+          connectTimeout : this.connectTimeout ,
+          socketTimeout : this.socketTimeout
         })
         return true
       }
@@ -172,7 +219,9 @@
           url: this.url,
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
-          condition: this.condition
+          condition: this.condition,
+          connectTimeout : this.connectTimeout ,
+          socketTimeout : this.socketTimeout
         }
       }
     },
@@ -193,6 +242,11 @@
           this.httpMethod = o.params.httpMethod || 'GET'
           this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
           this.condition = o.params.condition || ''
+          this.connectTimeout = o.params.connectTimeout
+          this.socketTimeout = o.params.socketTimeout
+          if(this.connectTimeout != 60000 || this.socketTimeout != 60000 ){
+            this.timeoutSettings = true
+          }
           // backfill localParams
           let localParams = o.params.localParams || []
           if (localParams.length) {
