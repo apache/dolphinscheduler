@@ -65,6 +65,10 @@ public class MailUtils {
 
     public static final AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
 
+    //Solve the problem of messy Chinese name in excel attachment
+    static {
+        System.setProperty("mail.mime.splitlongparameters","false");
+    }
 
     /**
      * send mail to receivers
@@ -341,4 +345,5 @@ public class MailUtils {
         retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
+    
 }
