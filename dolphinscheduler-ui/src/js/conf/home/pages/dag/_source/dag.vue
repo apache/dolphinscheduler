@@ -103,7 +103,7 @@
           </x-button>
           <x-button
             type="primary"
-            v-tooltip.light="$t('Close')"
+            v-tooltip.light="$t('Close')" 
             icon="ans-icon-off"
             size="xsmall"
             data-container="body"
@@ -191,7 +191,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -639,7 +639,7 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -679,3 +679,5 @@
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
 </style>
+
+

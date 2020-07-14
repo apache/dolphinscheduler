@@ -24,7 +24,6 @@ public class CreateWorkflowLocator {
     /**
      * jump workflow define page
      */
-
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
@@ -179,4 +178,5 @@ public class CreateWorkflowLocator {
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
+    
 }
