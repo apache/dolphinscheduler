@@ -115,7 +115,7 @@ public class UserManagePage extends PageCommon {
         // click  button
         clickButton(UserManageLocator.SUBMIT);
         System.out.println("end edit admin user");
-
+        Thread.sleep(500);
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);
     }
@@ -126,7 +126,6 @@ public class UserManagePage extends PageCommon {
      */
     public boolean deleteUser() throws InterruptedException {
         System.out.println("jump to user manage");
-        Thread.sleep(500);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
