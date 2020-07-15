@@ -25,6 +25,8 @@ services:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
+    ports:
+    - 5432:5432
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     networks:
@@ -39,6 +41,8 @@ services:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
+    ports:
+    - 2181:2181
     volumes:
     - dolphinscheduler-zookeeper:/bitnami/zookeeper
     networks:
@@ -58,6 +62,8 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+    ports:
+    - 12345:12345
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30
