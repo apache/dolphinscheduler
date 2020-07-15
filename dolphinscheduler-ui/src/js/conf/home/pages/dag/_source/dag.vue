@@ -102,6 +102,17 @@
             {{$t('Return_1')}}
           </x-button>
           <x-button
+            type="primary"
+            v-tooltip.light="$t('Close')" 
+            icon="ans-icon-off"
+            size="xsmall"
+            data-container="body"
+            v-if="(type === 'instance' || 'definition') "
+            style="vertical-align: middle;"
+            @click="_closeDAG">
+            {{$t('Close')}}
+          </x-button>
+          <x-button
                   style="vertical-align: middle;"
                   type="primary"
                   size="xsmall"
@@ -376,6 +387,14 @@
             }
           })
         })
+      },
+      _closeDAG(){
+        let $name = this.$route.name
+        if($name && $name.indexOf("definition") != -1){
+          this.$router.push({ name: 'projects-definition-list'})
+        }else{
+          this.$router.push({ name: 'projects-instance-list'})
+        }
       },
       _verifConditions (value) {
         let tasks = value
@@ -660,3 +679,5 @@
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
 </style>
+
+
