@@ -167,6 +167,23 @@ public class BrowserCommon {
         return inputElement;
     }
 
+
+    /**
+     * input element after clearing
+     *
+     * @param locator By
+     * @param content Input content
+     * @return inputElement
+     */
+    public WebElement clearSendInput(By locator, String content) {
+        WebElement inputElement = locateElement(locator);
+        //input date
+        inputElement.clear();
+        inputElement.sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END));
+        inputElement.sendKeys(content);
+        return inputElement;
+    }
+
     /**
      * clear element
      *
