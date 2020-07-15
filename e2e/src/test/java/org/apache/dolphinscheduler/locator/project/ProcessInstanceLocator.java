@@ -26,4 +26,6 @@ public class ProcessInstanceLocator {
     // click rerun button
     public static final By CLICK_RERUN_BUTTON = By.xpath("//tr[2]/td[14]/div[1]/button[2]");
 
+    //assert rerun type
+    public static final By RUNNING_TYPE  = By.xpath("//tr[2]/td[5]/span");
 }

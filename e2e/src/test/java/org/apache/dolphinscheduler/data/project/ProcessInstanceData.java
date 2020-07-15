@@ -19,5 +19,7 @@ package org.apache.dolphinscheduler.data.project;
 public class ProcessInstanceData {
     //Process Instance page title
     public static final String PROCESS_INSTANCE_TITLE = "工作流实例 - DolphinScheduler";
+    public static final String RERUN_TYPE= "重跑";
+
 
 }
