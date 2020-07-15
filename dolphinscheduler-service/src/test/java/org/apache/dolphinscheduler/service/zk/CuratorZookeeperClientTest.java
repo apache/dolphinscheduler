@@ -46,7 +46,7 @@ public class CuratorZookeeperClientTest {
 
     @Test
     public void testAfterPropertiesSet() throws Exception {
-        TimeUnit.SECONDS.sleep(5);
+        TimeUnit.SECONDS.sleep(10);
         CuratorZookeeperClient zookeeperClient = new CuratorZookeeperClient();
         ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
         zookeeperConfig.setServerList("127.0.0.1:2185");
@@ -57,6 +57,7 @@ public class CuratorZookeeperClientTest {
         zookeeperConfig.setConnectionTimeoutMs(30000);
         zookeeperConfig.setDigest(" ");
         zookeeperConfig.setDsRoot("/dolphinscheduler");
+        zookeeperConfig.setMaxWaitTime(30000);
         zookeeperClient.setZookeeperConfig(zookeeperConfig);
         System.out.println("start");
         zookeeperClient.afterPropertiesSet();
