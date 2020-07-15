@@ -26,9 +26,10 @@
         <classes>
             <class name="org.apache.dolphinscheduler.testcase.TestLogin"></class>
             <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTenantManage"></class>
-            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>-->
-            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>-->
-            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>-->
+
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>
 
             <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestUserManage">
                 <methods>
@@ -48,12 +49,6 @@
                     <include name="testOnlineTiming" />
                     <include name="testOfflineTiming" />
                     <include name="testDeleteTiming" />
-                </methods>
-            </class>
-
-            <class name="org.apache.dolphinscheduler.testcase.testProject.TestProcessInstance">
-                <methods>
-                    <include name="testRerun" />
                 </methods>
             </class>
 
