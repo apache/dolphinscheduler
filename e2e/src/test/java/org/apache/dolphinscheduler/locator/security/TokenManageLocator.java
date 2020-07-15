@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 
 public class TokenManageLocator {
     //create token
-    public static final By CLICK_TOKEN_MANAGE = By.xpath("//div[7]/div/a/div/a/span");
+    public static final By CLICK_TOKEN_MANAGE = By.xpath("/html/body/div[1]/div[2]/div/div[1]/div[7]/div/a/div/a/span");
 
     public static final By CLICK_CREATE_TOKEN = By.xpath("//div[2]/div/div[2]/div[2]/div/div[1]/button/span");
 
