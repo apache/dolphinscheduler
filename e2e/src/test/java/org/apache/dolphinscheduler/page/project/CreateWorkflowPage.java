@@ -215,7 +215,7 @@ public class CreateWorkflowPage extends PageCommon {
     public boolean deleteWorkflow() throws InterruptedException {
         //click  delete workflow
         Thread.sleep(500);
-
+        clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
         clickButton(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
 
         //click confirm delete project

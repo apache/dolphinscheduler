@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class TestProcessInstance extends BaseTest {
     private ProcessInstancePage processInstancePage;
 
-    @Test(groups={"functionTests","processInstance"},dependsOnGroups = { "login","workflow" },description = "CreateProjectTest")
+    @Test(groups={"functionTests","processInstance"},dependsOnGroups = { "login","workflow" },description = "testRerun")
     public void testRerun() throws InterruptedException {
         processInstancePage = new ProcessInstancePage(driver);
         //rerun workflow
