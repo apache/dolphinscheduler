@@ -76,8 +76,8 @@ else:
 dolphin_alert_map = {}
 wechat_push_url = 'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=$token'
 wechat_token_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpId&corpsecret=$secret'
-wechat_team_send_msg = '{\"toparty\":\"$toParty\",\"agentid\":\"$agentId\",\"msgtype\":\"text\",\"text\":{\"content\":\"$msg\"},\"safe\":\"0\"}'
-wechat_user_send_msg = '{\"touser\":\"$toUser\",\"agentid\":\"$agentId\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"$msg\"}}'
+wechat_team_send_msg = '{\"toparty\":\"{toParty}\",\"agentid\":\"{agentId}\",\"msgtype\":\"text\",\"text\":{\"content\":\"{msg}\"},\"safe\":\"0\"}'
+wechat_user_send_msg = '{\"touser\":\"{toUser}\",\"agentid\":\"{agentId}\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}'
 
 dolphin_alert_map['enterprise.wechat.push.ur'] = wechat_push_url
 dolphin_alert_map['enterprise.wechat.token.url'] = wechat_token_url
