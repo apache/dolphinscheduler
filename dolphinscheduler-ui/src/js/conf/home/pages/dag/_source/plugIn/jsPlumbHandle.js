@@ -85,11 +85,10 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   // Monitor line click
   this.JspInstance.bind('click', e => {
     // Untie event
-  if (this.config.isDblclick) {
-    findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
-    }
     if (this.config.isClick) {
       this.connectClick(e)
+    } else {
+      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
     }
   })
 
