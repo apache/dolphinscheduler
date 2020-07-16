@@ -35,16 +35,22 @@ mail.smtp.ssl.trust=${MAIL_SMTP_SSL_TRUST}
 #xls file path,need create if not exist
 xls.file.path=${XLS_FILE_PATH}
 
+# plugins dir
+plugin.dir=${ALERT_PLUGIN_DIR}
+
 # Enterprise WeChat configuration
 enterprise.wechat.enable=${ENTERPRISE_WECHAT_ENABLE}
 enterprise.wechat.corp.id=${ENTERPRISE_WECHAT_CORP_ID}
 enterprise.wechat.secret=${ENTERPRISE_WECHAT_SECRET}
 enterprise.wechat.agent.id=${ENTERPRISE_WECHAT_AGENT_ID}
 enterprise.wechat.users=${ENTERPRISE_WECHAT_USERS}
-enterprise.wechat.token.url=https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpId&corpsecret=$secret
-enterprise.wechat.push.url=https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=$token
-enterprise.wechat.team.send.msg={\"toparty\":\"$toParty\",\"agentid\":\"$agentId\",\"msgtype\":\"text\",\"text\":{\"content\":\"$msg\"},\"safe\":\"0\"}
-enterprise.wechat.user.send.msg={\"touser\":\"$toUser\",\"agentid\":\"$agentId\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"$msg\"}}
+enterprise.wechat.token.url=https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={secret}
+enterprise.wechat.push.url=https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}
+enterprise.wechat.team.send.msg={\"toparty\":\"{toParty}\",\"agentid\":\"{agentId}\",\"msgtype\":\"text\",\"text\":{\"content\":\"{msg}\"},\"safe\":\"0\"}
+enterprise.wechat.user.send.msg={\"touser\":\"{toUser}\",\"agentid\":\"{agentId}\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}
+
+
+
 
 
 
