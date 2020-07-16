@@ -47,7 +47,6 @@ export default {
   'Confirm add': '确认添加',
   'The newly created sub-Process has not yet been executed and cannot enter the sub-Process': '新创建子工作流还未执行，不能进入子工作流',
   'The task has not been executed and cannot enter the sub-Process': '该任务还未执行，不能进入子工作流',
-  'Please enter name (required)': '请输入名称（必填）',
   'Name already exists': '名称已存在请重新输入',
   'Download Log': '下载日志',
   'Refresh Log': '刷新日志',
@@ -595,5 +594,15 @@ export default {
   'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
   'Please confirm whether the workflow has been saved before downloading': '下载前请确定工作流是否已保存',
-  'User name length is between 3 and 39': '用户名长度在3～39之间'
+  'User name length is between 3 and 39': '用户名长度在3～39之间',
+  'Timeout Settings': '超时设置',
+  'Connect Timeout':'连接超时',
+  'Socket Timeout':'Socket超时',
+  'Connect timeout be a positive integer': '连接超时必须为数字',
+  'Socket Timeout be a positive integer': 'Socket超时必须为数字',
+  'ms':'毫秒',
+  zkDirectory: 'zk注册目录',
+  'Directory detail': '查看目录详情',
+  'Connection name': '连线名',
+  'Current connection settings': '当前连线设置'
 }
