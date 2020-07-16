@@ -29,16 +29,3 @@
   kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
 
 {{- end }}
-
-2. Get the Dolphinscheduler URL by running:
-
-{{- if .Values.ingress.enabled }}
-
-  export HOSTNAME=$(kubectl get ingress --namespace {{ .Release.Namespace }} {{ template "dolphinscheduler.fullname" . }} -o jsonpath='{.spec.rules[0].host}')
-  echo "Dolphinscheduler URL: http://$HOSTNAME/"
-
-{{- else }}
-
-  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ template "dolphinscheduler.fullname" . }}-frontend 8888:8888
-
-{{- end }}
