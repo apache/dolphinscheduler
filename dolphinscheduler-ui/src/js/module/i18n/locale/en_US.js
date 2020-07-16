@@ -619,4 +619,7 @@ export default {
   'User name length is between 3 and 39': 'User name length is between 3 and 39',
   'Please Enter Url': 'Please Enter Url eg. 127.0.0.1:7077',
   'Master': 'Master'
+  zkDirectory: 'zkDirectory',
+  'Directory detail': 'Directory detail'
+
 }

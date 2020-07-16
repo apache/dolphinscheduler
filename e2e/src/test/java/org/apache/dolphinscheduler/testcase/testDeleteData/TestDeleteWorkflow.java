@@ -29,12 +29,15 @@ public class TestDeleteWorkflow extends BaseTest {
     public void testDeleteWorkflow() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         //jump to project manage page
-        System.out.println("jump to the project manage page to delete workflow");
-        createProjectPage.jumpProjectManagePage();
+//        System.out.println("jump to the project manage page to delete workflow");
+//        createProjectPage.jumpProjectManagePage();
 
         createWorkflowPage = new CreateWorkflowPage(driver);
-        createWorkflowPage.jumpWorkflowPage();
-        //assert tenant manage page
+//        createWorkflowPage.jumpWorkflowPage();
+        System.out.println("start offline workflow");
+        assert createWorkflowPage.offlineWorkflow();
+        System.out.println("end offline workflow");
+
         System.out.println("start delete workflow");
         assert createWorkflowPage.deleteWorkflow();
         System.out.println("end delete workflow");

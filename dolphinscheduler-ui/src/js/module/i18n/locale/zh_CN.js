@@ -619,4 +619,7 @@ export default {
   'ms':'毫秒',
   'Please Enter Url': '请直接填写地址,例如:127.0.0.1:7077',
   'Master': 'Master'
+  zkDirectory: 'zk注册目录',
+  'Directory detail': '查看目录详情'
+
 }
