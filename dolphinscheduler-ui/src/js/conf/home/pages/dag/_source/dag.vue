@@ -142,6 +142,7 @@
   import { allNodesId } from './plugIn/util'
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
+  import mFormLineModel from './formModel/formLineModel'
   import { formatDate } from '@/module/filter/filter'
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
@@ -176,7 +177,7 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
-      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName']),
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
 
       // DAG automatic layout
       dagAutomaticLayout() {
@@ -201,9 +202,14 @@
                 length: 12,
                 foldback: 0.8
               }
-            ]
+            ],
+            ['Label', {
+                location: 0.5,
+                id: 'label'
+            }]
           ],
-          Container: 'canvas'
+          Container: 'canvas',
+          ConnectionsDetachable: true
         })
       })
         if (this.tasks.length) {
@@ -517,8 +523,42 @@
        * Create a node popup layer
        * @param Object id
        */
+      _createLineLabel({id, sourceId, targetId}) {
+        // $('#jsPlumb_2_50').text('111')
+        let self = this
+        self.$modal.destroy()
+        const removeNodesEvent = (fromThis) => {
+          // Manually destroy events inside the component
+          fromThis.$destroy()
+          // Close the popup
+          eventModel.remove()
+        }
+        eventModel = this.$drawer({
+          render (h) {
+            return h(mFormLineModel,{
+              on: {
+                addLineInfo ({ item, fromThis }) {
+                  self.addConnects(item)
+                  setTimeout(() => {
+                    removeNodesEvent(fromThis)
+                  }, 100)
+                },
+                cancel ({fromThis}) {
+                  removeNodesEvent(fromThis)
+                }
+              },
+              props: {
+                id: id,
+                sourceId: sourceId,
+                targetId: targetId
+              }
+            })
+          }
+        })
+      },
       _createNodes ({ id, type }) {
         let self = this
+        self.$modal.destroy()
         let preNode = []
         let rearNode = []
         let rearList = []
@@ -649,9 +689,14 @@
                 length: 12,
                 foldback: 0.8
               }
-            ]
+            ],
+            ['Label', {
+                location: 0.5,
+                id: 'label'
+            }]
           ],
-          Container: 'canvas'
+          Container: 'canvas',
+          ConnectionsDetachable: true
         })
       })
     },
@@ -679,5 +724,3 @@
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
 </style>
-
-
