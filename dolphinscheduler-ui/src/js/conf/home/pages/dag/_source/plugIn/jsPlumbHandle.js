@@ -499,6 +499,16 @@ JSP.prototype.removeNodes = function ($id) {
 
   // callback onRemoveNodes event
   this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
+  let connects = []
+  _.map(this.JspInstance.getConnections(), v => {
+    connects.push({
+      endPointSourceId: v.sourceId,
+      endPointTargetId: v.targetId,
+      label: v._jsPlumb.overlays.label.canvas.innerText
+    })
+  })
+  // Storage line dependence
+  store.commit('dag/setConnects', connects)
 }
 
 /**
