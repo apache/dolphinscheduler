@@ -66,7 +66,7 @@ public class TimingPage extends PageCommon {
         System.out.println("Click timing  management button");
         Thread.sleep(1000);
         clickButton(TimingLocator.CLICK_TIMING_MANAGEMENT_BUTTON);
-        Thread.sleep(500);
+        Thread.sleep(1000);
         System.out.println("Click edit timing button");
         clickButton(TimingLocator.CLICK_EDIT_TIMING_BUTTON);
         System.out.println("Click execution timing button");

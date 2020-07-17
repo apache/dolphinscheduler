@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
-public class CreateProjectData {
+public class ProjectData {
     // create project name
     public static final String PROJECT_NAME = "selenium_project_1";
     // create project description
