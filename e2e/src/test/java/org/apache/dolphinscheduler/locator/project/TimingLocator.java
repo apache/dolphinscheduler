@@ -45,9 +45,9 @@ public class TimingLocator {
     public static final By CLICK_CREATE_BUTTON  = By.xpath("//div[12]/button[2]/span");
 
     //edit timing
-    public static final By CLICK_TIMING_MANAGEMENT_BUTTON = By.xpath("//div[2]/div/div[3]/div[1]/div/table/tr[2]/td[10]/button[6]");
+    public static final By CLICK_TIMING_MANAGEMENT_BUTTON = By.xpath("//tr[2]/td[10]/button[6]");
 
-    public static final By CLICK_EDIT_TIMING_BUTTON = By.xpath("//div[2]/div[3]/div/div[2]/div[1]/table/tr[2]/td[10]/button[1]");
+    public static final By CLICK_EDIT_TIMING_BUTTON = By.xpath("//tr[2]/td[10]/button[1]/i");
 
     //online timing
     public static final By CLICK_ONLINE_TIMING_BUTTON = By.xpath("//td[10]/button[2]");
