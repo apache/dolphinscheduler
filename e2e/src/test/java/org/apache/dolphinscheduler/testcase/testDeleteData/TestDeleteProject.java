@@ -17,15 +17,15 @@
 package org.apache.dolphinscheduler.testcase.testDeleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.project.ProjectPage;
 import org.testng.annotations.Test;
 
 public class TestDeleteProject extends BaseTest {
-    private CreateProjectPage createProjectPage;
+    private ProjectPage createProjectPage;
 
     @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "TestDeleteProject")
     public void testDeleteProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
+        createProjectPage = new ProjectPage(driver);
         //jump to project manage page
         System.out.println("jump to the project manage page to delete project");
         createProjectPage.jumpProjectManagePage();
