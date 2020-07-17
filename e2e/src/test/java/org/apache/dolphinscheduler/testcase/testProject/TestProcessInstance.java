@@ -17,25 +17,19 @@
 package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.ProjectPage;
-import org.apache.dolphinscheduler.page.project.WorkflowDefinePage;
-import org.apache.dolphinscheduler.page.project.RunWorkflowPage;
+import org.apache.dolphinscheduler.page.project.ProcessInstancePage;
 import org.testng.annotations.Test;
 
-public class TestRunWorkflow extends BaseTest {
-    private WorkflowDefinePage createWorkflowPage;
-    private ProjectPage projectPage;
-    private RunWorkflowPage runWorkflowPage;
+public class TestProcessInstance extends BaseTest {
+    private ProcessInstancePage processInstancePage;
 
-
-    @Test(groups={"functionTests","runWorkflow"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
-    public void testRunWorkflow() throws InterruptedException {
-        runWorkflowPage = new RunWorkflowPage(driver);
-
-        projectPage = new ProjectPage(driver);
-        System.out.println("start run workflow");
-        assert runWorkflowPage.runWorkflow();
-        System.out.println("end run workflow");
+    @Test(groups={"functionTests","processInstance"},dependsOnGroups = { "login","workflow" },description = "testRerun")
+    public void testRerun() throws InterruptedException {
+        processInstancePage = new ProcessInstancePage(driver);
+        //rerun workflow
+        System.out.println("start rerun  workflow");
+        processInstancePage.rerunWorkflowPage();
+        System.out.println("end rerun  workflow");
         System.out.println("===================================");
     }
 }
