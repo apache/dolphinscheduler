@@ -78,11 +78,11 @@ public class WorkerRegistry {
     private String startTime;
 
 
-    private String workerGroup;
+    private Set<String> workerGroups;
 
     @PostConstruct
     public void init(){
-        this.workerGroup = workerConfig.getWorkerGroup();
+        this.workerGroups = workerConfig.getWorkerGroups();
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -92,22 +92,26 @@ public class WorkerRegistry {
      */
     public void registry() {
         String address = OSUtils.getHost();
-        String localNodePath = getWorkerPath();
-        zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-        zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if(newState == ConnectionState.LOST){
-                    logger.error("worker : {} connection lost from zookeeper", address);
-                } else if(newState == ConnectionState.RECONNECTED){
-                    logger.info("worker : {} reconnected to zookeeper", address);
-                    zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-                } else if(newState == ConnectionState.SUSPENDED){
-                    logger.warn("worker : {} connection SUSPENDED ", address);
-                }
-            }
-        });
+        Set<String> workerZkPaths = getWorkerZkPaths();
         int workerHeartbeatInterval = workerConfig.getWorkerHeartbeatInterval();
+
+        for (String workerZKPath : workerZkPaths) {
+            zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(workerZKPath, "");
+            zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
+                @Override
+                public void stateChanged(CuratorFramework client, ConnectionState newState) {
+                    if (newState == ConnectionState.LOST) {
+                        logger.error("worker : {} connection lost from zookeeper", address);
+                    } else if (newState == ConnectionState.RECONNECTED) {
+                        logger.info("worker : {} reconnected to zookeeper", address);
+                        zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(workerZKPath, "");
+                    } else if (newState == ConnectionState.SUSPENDED) {
+                        logger.warn("worker : {} connection SUSPENDED ", address);
+                    }
+                }
+            });
+            logger.info("worker node : {} registry to ZK {} successfully", address, workerZKPath);
+        }
 
         HeartBeatTask heartBeatTask = new HeartBeatTask(this.startTime,
                 this.workerConfig.getWorkerReservedMemory(),
@@ -156,8 +160,8 @@ public class WorkerRegistry {
     }
 
     /**
-     *  get local address
-     * @return
+     * get local address
+     * @return local address
      */
     private String getLocalAddress(){
         return OSUtils.getHost() + Constants.COLON + workerConfig.getListenPort();
