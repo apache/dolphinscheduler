@@ -49,4 +49,4 @@ dependencies:
 - name: zookeeper
   version: 5.x.x
   repository: https://charts.bitnami.com/bitnami
-  condition: redis.enabled
+  condition: zookeeper.enabled

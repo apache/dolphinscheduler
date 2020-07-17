@@ -55,8 +55,8 @@ public class EnterpriseWeChatUtilsTest {
     private static final String enterpriseWechatUsers="LiGang,journey";
     private static final String msg = "hello world";
 
-    private static final String enterpriseWechatTeamSendMsg = "{\\\"toparty\\\":\\\"$toParty\\\",\\\"agentid\\\":\\\"$agentId\\\",\\\"msgtype\\\":\\\"text\\\",\\\"text\\\":{\\\"content\\\":\\\"$msg\\\"},\\\"safe\\\":\\\"0\\\"}";
-    private static final String enterpriseWechatUserSendMsg = "{\\\"touser\\\":\\\"$toUser\\\",\\\"agentid\\\":\\\"$agentId\\\",\\\"msgtype\\\":\\\"markdown\\\",\\\"markdown\\\":{\\\"content\\\":\\\"$msg\\\"}}";
+    private static final String enterpriseWechatTeamSendMsg = "{\\\"toparty\\\":\\\"{toParty}\\\",\\\"agentid\\\":\\\"{agentId}\\\",\\\"msgtype\\\":\\\"text\\\",\\\"text\\\":{\\\"content\\\":\\\"{msg}\\\"},\\\"safe\\\":\\\"0\\\"}";
+    private static final String enterpriseWechatUserSendMsg = "{\\\"touser\\\":\\\"{toUser}\\\",\\\"agentid\\\":\\\"{agentId}\\\",\\\"msgtype\\\":\\\"markdown\\\",\\\"markdown\\\":{\\\"content\\\":\\\"{msg}\\\"}}";
 
     @Before
     public void init(){

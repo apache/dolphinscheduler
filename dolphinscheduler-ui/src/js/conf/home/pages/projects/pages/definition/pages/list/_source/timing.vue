@@ -280,8 +280,6 @@
 
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-          let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-          if (!notifyGroupListS.length) {
             this.store.dispatch('dag/getNotifyGroupList').then(res => {
               this.notifyGroupList = res
               if (this.notifyGroupList.length) {
@@ -290,10 +288,6 @@
                 reject(new Error(0))
               }
             })
-          } else {
-            this.notifyGroupList = notifyGroupListS
-            resolve()
-          }
         })
       },
       ok () {
