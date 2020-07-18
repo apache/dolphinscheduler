@@ -19,7 +19,7 @@
 zookeeper.quorum=${ZOOKEEPER_QUORUM}
 
 # dolphinscheduler root directory
-#zookeeper.dolphinscheduler.root=/dolphinscheduler
+zookeeper.dolphinscheduler.root=${ZOOKEEPER_ROOT}
 
 # dolphinscheduler failover directory
 #zookeeper.session.timeout=60000
