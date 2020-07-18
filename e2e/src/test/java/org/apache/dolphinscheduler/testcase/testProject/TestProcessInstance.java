@@ -14,26 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.testDeleteData;
+package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.ProjectPage;
+import org.apache.dolphinscheduler.page.project.ProcessInstancePage;
 import org.testng.annotations.Test;
 
-public class TestDeleteProject extends BaseTest {
-    private ProjectPage createProjectPage;
+public class TestProcessInstance extends BaseTest {
+    private ProcessInstancePage processInstancePage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "TestDeleteProject")
-    public void testDeleteProject() throws InterruptedException {
-        createProjectPage = new ProjectPage(driver);
-        //jump to project manage page
-        System.out.println("jump to the project manage page to delete project");
-        createProjectPage.jumpProjectManagePage();
-
-        //assert tenant manage page
-        System.out.println("start delete project");
-        assert createProjectPage.deleteProject();
-        System.out.println("end delete project");
+    @Test(groups={"functionTests","processInstance"},dependsOnGroups = { "login","workflow" },description = "testRerun")
+    public void testRerun() throws InterruptedException {
+        processInstancePage = new ProcessInstancePage(driver);
+        //rerun workflow
+        System.out.println("start rerun  workflow");
+        processInstancePage.rerunWorkflowPage();
+        System.out.println("end rerun  workflow");
         System.out.println("===================================");
     }
 }

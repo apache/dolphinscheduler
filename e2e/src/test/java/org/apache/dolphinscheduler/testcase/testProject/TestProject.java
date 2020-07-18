@@ -14,26 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.testcase.testDeleteData;
+package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.project.ProjectPage;
 import org.testng.annotations.Test;
 
-public class TestDeleteProject extends BaseTest {
-    private ProjectPage createProjectPage;
+public class TestProject extends BaseTest {
+    private ProjectPage projectPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "TestDeleteProject")
-    public void testDeleteProject() throws InterruptedException {
-        createProjectPage = new ProjectPage(driver);
-        //jump to project manage page
-        System.out.println("jump to the project manage page to delete project");
-        createProjectPage.jumpProjectManagePage();
-
-        //assert tenant manage page
-        System.out.println("start delete project");
-        assert createProjectPage.deleteProject();
-        System.out.println("end delete project");
+    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest")
+    public void testCreateProject() throws InterruptedException {
+        projectPage = new ProjectPage(driver);
+        // enter user manage page
+        System.out.println("jump to the projectManage page to create project ");
+        projectPage.jumpProjectManagePage();
+        //assert user manage page
+        System.out.println("start create project");
+        assert projectPage.createProject();
+        System.out.println("end create project");
         System.out.println("===================================");
     }
+
 }
+

@@ -14,28 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.security;
+package org.apache.dolphinscheduler.page.project;
+
+import org.apache.dolphinscheduler.common.PageCommon;
+import org.apache.dolphinscheduler.locator.project.ProcessInstanceLocator;
+import org.openqa.selenium.WebDriver;
+import org.apache.dolphinscheduler.data.project.ProcessInstanceData;
 
 
-public class UserManageData  {
-    /**
-     * create user
-     */
-    public static final String USERNAME = "selenium_user_1";
+public class ProcessInstancePage extends PageCommon {
+    public ProcessInstancePage(WebDriver driver) {
+        super(driver);
+    }
 
-    public static final String PASSWORD = "123456qwe";
-
-    public static final String EMAIL = "123456789@qq.com";
-
-    public static final String PHONE = "15811112222";
-
-    public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
 
     /**
-     * edit user
+     * rerun workflow page
      */
-    public static final String EDIT_USERNAME = "selenium_user_edit";
-    public static final String EDIT_PASSWORD = "123456qwe";
-    public static final String EDIT_EMAIL = "123456_edit@qq.com";
-    public static final String EDIT_PHONE = "15800001111";
+    public boolean rerunWorkflowPage() throws InterruptedException {
+        clickTopElement(ProcessInstanceLocator.CLICK_PROCESS_INSTANCE_NAME);
+        clickTopElement(ProcessInstanceLocator.CLICK_RERUN_BUTTON);
+        return ifTitleContains(ProcessInstanceData.PROCESS_INSTANCE_TITLE);
+    }
+
 }
