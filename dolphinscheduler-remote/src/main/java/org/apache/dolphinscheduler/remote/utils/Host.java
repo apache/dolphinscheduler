@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *  server address
+ * server address
  */
 public class Host implements Serializable {
 
@@ -39,6 +39,11 @@ public class Host implements Serializable {
      */
     private int port;
 
+    /**
+     * weight
+     */
+    private int weight;
+
     public Host() {
     }
 
@@ -46,6 +51,13 @@ public class Host implements Serializable {
         this.ip = ip;
         this.port = port;
         this.address = ip + ":" + port;
+    }
+
+    public Host(String ip, int port, int weight) {
+        this.ip = ip;
+        this.port = port;
+        this.address = ip + ":" + port;
+        this.weight = weight;
     }
 
     public String getAddress() {
@@ -65,6 +77,14 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
     }
 
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
     public int getPort() {
         return port;
     }
@@ -76,29 +96,37 @@ public class Host implements Serializable {
 
     /**
      * address convert host
+     *
      * @param address address
      * @return host
      */
-    public static Host of(String address){
-        if(address == null) {
+    public static Host of(String address) {
+        if (address == null) {
             throw new IllegalArgumentException("Host : address is null.");
         }
         String[] parts = address.split(":");
-        if (parts.length != 2) {
+        if (parts.length < 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
-        Host host = new Host(parts[0], Integer.parseInt(parts[1]));
+        Host host = null;
+        if (parts.length == 2) {
+            host = new Host(parts[0], Integer.parseInt(parts[1]));
+        }
+        if (parts.length == 3) {
+            host = new Host(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        }
         return host;
     }
 
     /**
      * whether old version
+     *
      * @param address address
      * @return old version is true , otherwise is false
      */
-    public static Boolean isOldVersion(String address){
+    public static Boolean isOldVersion(String address) {
         String[] parts = address.split(":");
-        return parts.length != 2 ? true : false;
+        return parts.length != 2 && parts.length != 3;
     }
 
     @Override

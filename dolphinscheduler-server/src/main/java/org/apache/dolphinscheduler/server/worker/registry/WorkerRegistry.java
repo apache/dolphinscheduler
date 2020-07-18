@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SLASH;
-
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -43,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 
 /**
@@ -142,6 +141,7 @@ public class WorkerRegistry {
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
+        String weight=getWorkerWeight();
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);
@@ -152,6 +152,7 @@ public class WorkerRegistry {
             // trim and lower case is need
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
             workerZkPathBuilder.append(address);
+            workerZkPathBuilder.append(weight).append(SLASH);
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
@@ -162,5 +163,12 @@ public class WorkerRegistry {
      */
     private String getLocalAddress() {
         return NetUtils.getHost() + ":" + workerConfig.getListenPort();
+    }
+
+    /**
+     * get Worker Weight
+     */
+    private String getWorkerWeight(){
+        return ":"+workerConfig.getWeight();
     }
 }
