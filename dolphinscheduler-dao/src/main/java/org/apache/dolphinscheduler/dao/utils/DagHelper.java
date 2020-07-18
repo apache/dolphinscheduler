@@ -138,8 +138,10 @@ public class DagHelper {
                 resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList, visitedNodeNameList));
             }
         }
+        if (null != startNode) {
+            visitedNodeNameList.add(startNode.getName());
+        }
         resultList.add(startNode);
-        visitedNodeNameList.add(startNode.getName());
         return resultList;
     }
 
@@ -161,7 +163,9 @@ public class DagHelper {
             resultList.add(startNode);
         }
         if (CollectionUtils.isEmpty(depList)) {
-            visitedNodeNameList.add(startNode.getName());
+            if (null != startNode) {
+                visitedNodeNameList.add(startNode.getName());
+            }
             return resultList;
         }
         for (String depNodeName : depList) {
@@ -172,7 +176,9 @@ public class DagHelper {
                 resultList.addAll(getFlowNodeListPre(start, recoveryNodeNameList, taskNodeList, visitedNodeNameList));
             }
         }
-        visitedNodeNameList.add(startNode.getName());
+        if (null != startNode) {
+            visitedNodeNameList.add(startNode.getName());
+        }
         return resultList;
     }
 
