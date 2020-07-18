@@ -115,7 +115,7 @@ public class CheckUtils {
    *
    * @param parameter parameter
    * @param taskType task type
-   * @return true if taks node parameters are valid, otherwise return false
+   * @return true if task node parameters are valid, otherwise return false
    */
   public static boolean checkTaskNodeParameters(String parameter, String taskType) {
     AbstractParameters abstractParameters = TaskParametersUtils.getParameters(taskType, parameter);

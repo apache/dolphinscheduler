@@ -130,8 +130,7 @@ public class SqlTask extends AbstractTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(),
-                    taskExecutionContext.getTenantCode(),
+            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
                     logger);
 
             // execute sql task
@@ -175,9 +174,10 @@ public class SqlTask extends AbstractTask {
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
+        
         //new
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime(), paramsMap);
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -269,16 +269,9 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         logger.debug("execute sql : {}", result);
 
-        // if there is a result set
-        if (!resultJSONArray.isEmpty(null) ) {
-            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                sendAttachment(sqlParameters.getTitle(),
-                        JSONUtils.toJsonString(resultJSONArray));
-            }else{
-                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONUtils.toJsonString(resultJSONArray));
-            }
-        }
+        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
+                        sqlParameters.getTitle(): taskExecutionContext.getTaskName() + " query result sets",
+                JSONUtils.toJsonString(resultJSONArray));
     }
 
     /**
@@ -330,6 +323,7 @@ public class SqlTask extends AbstractTask {
             }
         }
     }
+    
     /**
      * create connection
      *
@@ -370,7 +364,7 @@ public class SqlTask extends AbstractTask {
                        Connection connection){
         if (resultSet != null){
             try {
-                connection.close();
+                resultSet.close();
             } catch (SQLException e) {
 
             }
@@ -378,7 +372,7 @@ public class SqlTask extends AbstractTask {
 
         if (pstmt != null){
             try {
-                connection.close();
+                pstmt.close();
             } catch (SQLException e) {
 
             }
@@ -429,27 +423,27 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<>();
+        List<String> receiversList = new ArrayList<>();
         for(User user:users){
-            receviersList.add(user.getEmail().trim());
+            receiversList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver.trim());
+                receiversList.add(receiver.trim());
             }
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<>();
+        List<String> receiversCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc.trim());
+                receiversCcList.add(receiverCc.trim());
             }
         }
 

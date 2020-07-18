@@ -140,6 +140,8 @@ public class Constants {
 
     public static final String DINGTALK_ENABLE = "dingtalk.isEnable";
 
+
+
     /**
      * plugin config
      */
