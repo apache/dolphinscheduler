@@ -44,6 +44,11 @@ public class Host implements Serializable {
      */
     private int weight;
 
+    /**
+     * workGroup
+     */
+    private String workGroup;
+
     public Host() {
     }
 
@@ -92,6 +97,14 @@ public class Host implements Serializable {
     public void setPort(int port) {
         this.port = port;
         this.address = ip + ":" + port;
+    }
+
+    public String getWorkGroup() {
+        return workGroup;
+    }
+
+    public void setWorkGroup(String workGroup) {
+        this.workGroup = workGroup;
     }
 
     /**
