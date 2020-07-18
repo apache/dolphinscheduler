@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import com.sun.mail.smtp.SMTPProvider;
+import com.sun.mail.smtp.SMTPSSLProvider;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
@@ -29,17 +31,8 @@ import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
+import javax.mail.*;
+import javax.mail.internet.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +53,7 @@ public class MailSender {
 
     private List<String> receivers;
     private List<String> receiverCcs;
-    private String mailProtocol = "smtp";
+    private String mailProtocol = "SMTP";
     private String mailSmtpHost;
     private String mailSmtpPort;
     private String mailSender;
@@ -296,7 +289,9 @@ public class MailSender {
             }
         };
 
-        return Session.getInstance(props, auth);
+        Session session = Session.getInstance(props, auth);
+        session.addProvider(new SMTPProvider());
+        return session;
     }
 
     /**
@@ -371,6 +366,8 @@ public class MailSender {
         }
 
         // send
+        email.setDebug(true);
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         email.send();
 
         alertResult.setStatus("true");

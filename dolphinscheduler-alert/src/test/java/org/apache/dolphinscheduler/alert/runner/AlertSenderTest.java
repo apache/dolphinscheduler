@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.dolphinscheduler.alert.runner;
 
 import com.google.common.collect.ImmutableList;
@@ -16,7 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -158,7 +173,7 @@ public class AlertSenderTest {
         InputParam mailSmtpHost = new InputParam("mailServerHost", "mail.smtp.host");
         mailSmtpHost.addValidate(Validate.buildValidate()
                 .setRequired(true))
-                .setValue("smtp.analysys.com.cn");
+                .setValue("smtp.exmail.qq.com");
 
         InputParam mailSmtpPort = new InputParam("mailServerPort", "mail.smtp.port");
         mailSmtpPort.addValidate(Validate.buildValidate()
@@ -167,38 +182,40 @@ public class AlertSenderTest {
                 .setValue(25);
 
         InputParam mailSender = new InputParam("mailSender", "mail.sender");
-        mailSender.addValidate(Validate.buildValidate().setRequired(true)).setValue("alert@analysys.com.cn");
+        mailSender.addValidate(Validate.buildValidate().setRequired(true))
+                .setValue("easyscheduler@analysys.com.cn");
 
         RadioParam enableSmtpAuth = new RadioParam("enableSmtpAuth",
                 "mail.smtp.auth");
         enableSmtpAuth.addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(true)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.buildValidate().setRequired(true))
+                .setValue(true);
 
 
         InputParam mailUser = new InputParam("mailUser", "mail.user");
         mailUser.setPlaceholder("if enable use authentication, you need input user");
-        mailUser.setValue("alert@analysys.com.cn");
+        mailUser.setValue("easyscheduler@analysys.com.cn");
 
         PasswordParam mailPassword = new PasswordParam("mailPasswd", "mail.passwd");
         mailPassword.setPlaceholder("if enable use authentication, you need input password");
-        mailPassword.setValue("nR6zA9ReFLzMPrqv");
+        mailPassword.setValue("BR9nq5e8");
 
         RadioParam enableTls = new RadioParam("starttlsEnable", "mail.smtp.starttls.enable");
         enableTls.addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(true)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.buildValidate().setRequired(true))
+                .setValue(true);
 
         RadioParam enableSsl = new RadioParam("sslEnable", "mail.smtp.ssl.enable");
         enableSsl.addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .setValue(false)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.buildValidate().setRequired(true))
+                .setValue(false);
 
         InputParam sslTrust = new InputParam("mailSmtpSslTrust", "mail.smtp.ssl.trust");
-        sslTrust.setValue("*").addValidate(Validate.buildValidate().setRequired(true));
+        sslTrust.addValidate(Validate.buildValidate().setRequired(true))
+                .setValue("smtp.exmail.qq.com");
 
         List<ParamsOptions> emailShowTypeList = new ArrayList<>();
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false));
