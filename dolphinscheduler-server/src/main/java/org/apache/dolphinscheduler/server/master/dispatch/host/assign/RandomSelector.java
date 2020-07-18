@@ -34,7 +34,6 @@ public class RandomSelector extends AbstractSelector<Host> {
     public Host doSelect(final Collection<Host> source) {
 
         List<Host> hosts = new ArrayList<>(source);
-
         int size = hosts.size();
         int[] weights = new int[size];
         int totalWeight = 0;
