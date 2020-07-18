@@ -89,4 +89,34 @@ public class CommonUtilsTest {
         }
         Assert.assertTrue(true);
     }
+
+
+    @Test
+    public void encodePassword() {
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("IUAjJCVeJiohUUFaWFNXQA==",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("IUAjJCVeJio1ZGZnZXIoQA==",CommonUtils.encodePassword("5dfger(@"));
+    }
+
+    @Test
+    public void decodePassword() {
+        Assert.assertEquals("",CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456",CommonUtils.decodePassword("IUAjJCVeJioxMjM0NTY="));
+        Assert.assertEquals("!QAZXSW@",CommonUtils.decodePassword("IUAjJCVeJiohUUFaWFNXQA=="));
+        Assert.assertEquals("5dfger(@",CommonUtils.decodePassword("IUAjJCVeJio1ZGZnZXIoQA=="));
+    }
+    @Test
+    public void encodeAnddecodePassword() {
+        Assert.assertEquals(CommonUtils.encodePassword(""),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("")))) ;
+        Assert.assertEquals(CommonUtils.encodePassword("dolphinscheduler"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("dolphinscheduler")))) ;
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZmdlcihA")))) ;
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFmdlcihA"))));
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZmdlc3ihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZmdlc3ihA"))));
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkS^8DFZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkS^8DFZmdlcihA"))));
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZC你好dlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZC你好dlcihA"))));
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZm#$%^&*(dlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZm#$%^&*(dlcihA"))));
+        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDF~!@#$%^&*()ZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDF~!@#$%^&*()ZmdlcihA"))));
+    }
+    
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.hadoop.conf.Configuration;
@@ -23,14 +24,16 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * common utils
  */
 public class CommonUtils {
   private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+
+  private static final Base64 BASE64 = new Base64();
 
   private CommonUtils() {
     throw new IllegalStateException("CommonUtils class");
@@ -90,4 +93,30 @@ public class CommonUtils {
               PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
     }
   }
+
+  /**
+   * encode password
+   * @param password
+   * @return
+   */
+  public static String encodePassword(String password) {
+    if(StringUtils.isEmpty(password)){return StringUtils.EMPTY; }
+    String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+    String passwordWithSalt = salt + password  ;
+    return  new String(BASE64.encode(passwordWithSalt.getBytes(Charset.forName(Constants.UTF_8))));
+  }
+
+  /**
+   * decode password
+   * @param password
+   * @return
+   */
+  public static String decodePassword(String password) {
+    if(StringUtils.isEmpty(password)){return StringUtils.EMPTY ; }
+    String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+    String passwordWithSalt = new String(BASE64.decode(password),Charset.forName(Constants.UTF_8)) ;
+    return passwordWithSalt.substring(salt.length()) ;
+  }
+
+
 }
