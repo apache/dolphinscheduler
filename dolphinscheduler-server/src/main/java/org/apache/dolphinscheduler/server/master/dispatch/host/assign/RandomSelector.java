@@ -30,8 +30,6 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomSelector extends AbstractSelector<Host> {
 
-    private final Random random = new Random();
-
     @Override
     public Host doSelect(final Collection<Host> source) {
 
