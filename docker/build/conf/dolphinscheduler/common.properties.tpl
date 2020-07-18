@@ -25,13 +25,13 @@ dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
 data.basedir.path=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH}
 
 # resource upload startup type : HDFS,S3,NONE
-resource.storage.type=NONE
+resource.storage.type=${RESOURCE_STORAGE_TYPE}
 
 #============================================================================
 # HDFS
 #============================================================================
 # resource store on HDFS/S3 path, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
-#resource.upload.path=/dolphinscheduler
+resource.upload.path=${RESOURCE_UPLOAD_PATH}
 
 # whether kerberos starts
 #hadoop.security.authentication.startup.state=false
@@ -58,16 +58,16 @@ kerberos.expire.time=7
 # S3
 #============================================================================
 # if resource.storage.type=S3，the value like: s3a://dolphinscheduler ; if resource.storage.type=HDFS, When namenode HA is enabled, you need to copy core-site.xml and hdfs-site.xml to conf dir
-fs.defaultFS=hdfs://mycluster:8020
+fs.defaultFS=${FS_DEFAULT_FS}
 
 # if resource.storage.type=S3，s3 endpoint
-#fs.s3a.endpoint=http://192.168.199.91:9010
+fs.s3a.endpoint=${FS_S3A_ENDPOINT}
 
 # if resource.storage.type=S3，s3 access key
-#fs.s3a.access.key=A3DXS30FO22544RE
+fs.s3a.access.key=${FS_S3A_ACCESS_KEY}
 
 # if resource.storage.type=S3，s3 secret key
-#fs.s3a.secret.key=OloCLq3n+8+sdPHUhJ21XrSxTC+JK
+fs.s3a.secret.key=${FS_S3A_SECRET_KEY}
 
 # if not use hadoop resourcemanager, please keep default value; if resourcemanager HA enable, please type the HA ips ; if resourcemanager is single, make this value empty  TODO
 yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx

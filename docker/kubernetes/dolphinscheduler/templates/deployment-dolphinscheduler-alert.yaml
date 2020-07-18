@@ -43,6 +43,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/component: alert
+      {{- if .Values.alert.annotations }}
+      annotations:
+        {{- toYaml .Values.alert.annotations | nindent 8 }}
+      {{- end }}
     spec:
       {{- if .Values.alert.affinity }}
       affinity: {{- toYaml .Values.alert.affinity | nindent 8 }}
@@ -54,34 +58,38 @@ spec:
       tolerations: {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        - name: init-postgresql
+        - name: init-database
           image: busybox:1.31.0
           command:
             - /bin/sh
             - -ec
             - |
-              while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+              while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
                   counter=$((counter+1))
                   if [ $counter == 5 ]; then
-                      echo "Error: Couldn't connect to postgresql."
+                      echo "Error: Couldn't connect to database."
                       exit 1
                   fi
-                  echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+                  echo "Trying to connect to database at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
                   sleep 60
               done
           env:
-            - name: POSTGRESQL_HOST
+            - name: DATABASE_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
               {{- else }}
               value: {{ .Values.externalDatabase.host | quote }}
             {{- end }}
-            - name: POSTGRESQL_PORT
+            - name: DATABASE_PORT
               {{- if .Values.postgresql.enabled }}
               value: "5432"
               {{- else }}
-              value: {{ .Values.externalDatabase.port }}
+              value: {{ .Values.externalDatabase.port | quote }}
               {{- end }}
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           image: {{ include "dolphinscheduler.image.repository" . | quote }}
@@ -89,8 +97,15 @@ spec:
             - "alert-server"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+            - name: DOLPHINSCHEDULER_OPTS
+              value: {{ default "" .Values.alert.jvmOptions }}
             - name: TZ
               value: {{ .Values.timezone }}
+            - name: ALERT_PLUGIN_DIR
+              valueFrom:
+                configMapKeyRef:
+                  key: ALERT_PLUGIN_DIR
+                  name: {{ include "dolphinscheduler.fullname" . }}-alert
             - name: XLS_FILE_PATH
               valueFrom:
                 configMapKeyRef:
@@ -161,25 +176,37 @@ spec:
                 configMapKeyRef:
                   key: ENTERPRISE_WECHAT_USERS
                   name: {{ include "dolphinscheduler.fullname" . }}-alert
-            - name: POSTGRESQL_HOST
+            - name: DATABASE_TYPE
+              {{- if .Values.postgresql.enabled }}
+              value: "postgresql"
+              {{- else }}
+              value: {{ .Values.externalDatabase.type | quote }}
+              {{- end }}
+            - name: DATABASE_DRIVER
+              {{- if .Values.postgresql.enabled }}
+              value: "org.postgresql.Driver"
+              {{- else }}
+              value: {{ .Values.externalDatabase.driver | quote }}
+              {{- end }}
+            - name: DATABASE_HOST
               {{- if .Values.postgresql.enabled }}
               value: {{ template "dolphinscheduler.postgresql.fullname" . }}
               {{- else }}
               value: {{ .Values.externalDatabase.host | quote }}
               {{- end }}
-            - name: POSTGRESQL_PORT
+            - name: DATABASE_PORT
               {{- if .Values.postgresql.enabled }}
               value: "5432"
               {{- else }}
-              value: {{ .Values.externalDatabase.port }}
+              value: {{ .Values.externalDatabase.port | quote }}
               {{- end }}
-            - name: POSTGRESQL_USERNAME
+            - name: DATABASE_USERNAME
               {{- if .Values.postgresql.enabled }}
               value: {{ .Values.postgresql.postgresqlUsername }}
               {{- else }}
               value: {{ .Values.externalDatabase.username | quote }}
               {{- end }}
-            - name: POSTGRESQL_PASSWORD
+            - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   {{- if .Values.postgresql.enabled }}
@@ -189,12 +216,57 @@ spec:
                   name: {{ printf "%s-%s" .Release.Name "externaldb"  }}
                   key: db-password
                   {{- end }}
-            - name: POSTGRESQL_DATABASE
+            - name: DATABASE_DATABASE
               {{- if .Values.postgresql.enabled }}
               value: {{ .Values.postgresql.postgresqlDatabase }}
               {{- else }}
               value: {{ .Values.externalDatabase.database | quote }}
               {{- end }}
+            - name: DATABASE_PARAMS
+              {{- if .Values.postgresql.enabled }}
+              value: "characterEncoding=utf8"
+              {{- else }}
+              value: {{ .Values.externalDatabase.params | quote }}
+              {{- end }}
+            - name: RESOURCE_STORAGE_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  key: RESOURCE_STORAGE_TYPE
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            - name: RESOURCE_UPLOAD_PATH
+              valueFrom:
+                configMapKeyRef:
+                  key: RESOURCE_UPLOAD_PATH
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            - name: FS_DEFAULT_FS
+              valueFrom:
+                configMapKeyRef:
+                  key: FS_DEFAULT_FS
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            - name: FS_S3A_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: FS_S3A_ENDPOINT
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            - name: FS_S3A_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: FS_S3A_ACCESS_KEY
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+            - name: FS_S3A_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: FS_S3A_SECRET_KEY
+                  name: {{ include "dolphinscheduler.fullname" . }}-common
+          {{- if .Values.alert.resources }}
+          resources:
+            limits:
+              memory: {{ .Values.alert.resources.limits.memory }}
+              cpu: {{ .Values.alert.resources.limits.cpu }}
+            requests:
+              memory: {{ .Values.alert.resources.requests.memory }}
+              cpu: {{ .Values.alert.resources.requests.cpu }}
+          {{- end }}
           {{- if .Values.alert.livenessProbe.enabled }}
           livenessProbe:
             exec:

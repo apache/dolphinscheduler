@@ -76,14 +76,9 @@
         return '-'
       },
       _getNotifyGroupList () {
-        let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-        if (!notifyGroupListS.length) {
           this.store.dispatch('dag/getNotifyGroupList').then(res => {
             this.notifyGroupList = res
           })
-        } else {
-          this.notifyGroupList = notifyGroupListS
-        }
       },
       _getWorkerGroupList () {
         let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []

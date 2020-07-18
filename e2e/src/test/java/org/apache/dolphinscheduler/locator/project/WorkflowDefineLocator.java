@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.locator.project;
 
 import org.openqa.selenium.By;
 
-public class CreateWorkflowLocator {
+public class WorkflowDefineLocator {
 
     /**
      * jump workflow define page

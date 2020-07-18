@@ -243,16 +243,10 @@
       },
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-          let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-          if (!notifyGroupListS.length) {
             this.store.dispatch('dag/getNotifyGroupList').then(res => {
               this.notifyGroupList = res
               resolve()
             })
-          } else {
-            this.notifyGroupList = notifyGroupListS
-            resolve()
-          }
         })
       },
       _getReceiver () {
