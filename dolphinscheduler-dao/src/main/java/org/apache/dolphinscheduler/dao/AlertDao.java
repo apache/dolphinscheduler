@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.dao;
 
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
@@ -48,10 +51,18 @@ public class AlertDao extends AbstractBaseDao {
     @Autowired
     private UserAlertGroupMapper userAlertGroupMapper;
 
+    @Autowired
+    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+
+    @Autowired
+    private AlertGroupMapper alertGroupMapper;
+
     @Override
     protected void init() {
         alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
         userAlertGroupMapper = ConnectionFactory.getInstance().getMapper(UserAlertGroupMapper.class);
+        alertPluginInstanceMapper = ConnectionFactory.getInstance().getMapper(AlertPluginInstanceMapper.class);
+        alertGroupMapper = ConnectionFactory.getInstance().getMapper(AlertGroupMapper.class);
     }
 
     /**
@@ -178,5 +189,30 @@ public class AlertDao extends AbstractBaseDao {
      */
     public AlertMapper getAlertMapper() {
         return alertMapper;
+    }
+
+    /**
+     * list all alert plugin instance by alert group id
+     * @param alertGroupId alert group id
+     * @return AlertPluginInstance list
+     */
+    public List<AlertPluginInstance> listInstanceByAlertGroupId(int alertGroupId) {
+        return alertPluginInstanceMapper.queryByAlertGroupId(alertGroupId);
+    }
+
+    public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {
+        return alertPluginInstanceMapper;
+    }
+
+    public void setAlertPluginInstanceMapper(AlertPluginInstanceMapper alertPluginInstanceMapper) {
+        this.alertPluginInstanceMapper = alertPluginInstanceMapper;
+    }
+
+    public AlertGroupMapper getAlertGroupMapper() {
+        return alertGroupMapper;
+    }
+
+    public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
+        this.alertGroupMapper = alertGroupMapper;
     }
 }

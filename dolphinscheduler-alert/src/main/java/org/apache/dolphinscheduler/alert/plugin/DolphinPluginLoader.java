@@ -26,33 +26,41 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Alert Plugin Loader
- * Load Alert Plugin from pom when development and run server in IDE
- * Load Alert Plugin from the plugin directory when running on the server
+ * Plugin Loader
+ * Load Plugin from pom when development and run server in IDE
+ * Load Plugin from the plugin directory when running on the server
  */
-public class AlertPluginLoader {
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginLoader.class);
+public class DolphinPluginLoader {
+    private static final Logger logger = LoggerFactory.getLogger(DolphinPluginLoader.class);
 
-    private static final ImmutableList<String> ALERT_SPI_PACKAGES = ImmutableList.<String>builder()
+    /**
+     * All third-party jar packages used in the classes which in spi package need to be add
+     */
+    private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String>builder()
             .add("org.apache.dolphinscheduler.spi.")
+            .add("com.fasterxml.jackson.core.")
+            .add("com.fasterxml.jackson.databind.")
+            .add("org.apache.commons.collections.")
+            .add("org.apache.poi.hssf.usermodel.")
+            .add("org.apache.poi.ss.usermodel.")
             .build();
 
     private final File installedPluginsDir;
-    private final List<String> plugins;
+    private final List<String> configPlugins;
     private final ArtifactResolver resolver;
-    private final AlertChannelManager alertChannelManager;
+    private final List<DolphinPluginManager> dolphinPluginManagerList;
 
 
-    public AlertPluginLoader(DolphinPluginManagerConfig config, AlertChannelManager alertChannelManager) {
+    public DolphinPluginLoader(DolphinPluginManagerConfig config, List<DolphinPluginManager> dolphinPluginManagerList) {
         installedPluginsDir = config.getInstalledPluginsDir();
         if (config.getPlugins() == null) {
-            this.plugins = ImmutableList.of();
+            this.configPlugins = ImmutableList.of();
         }
         else {
-            this.plugins = ImmutableList.copyOf(config.getPlugins());
+            this.configPlugins = ImmutableList.copyOf(config.getPlugins());
         }
 
-        this.alertChannelManager = requireNonNull(alertChannelManager, "alertChannelManager is null");
+        this.dolphinPluginManagerList = requireNonNull(dolphinPluginManagerList, "dolphinPluginManagerList is null");
         this.resolver = new ArtifactResolver(config.getMavenLocalRepository(), config.getMavenRemoteRepository());
     }
 
@@ -65,7 +73,7 @@ public class AlertPluginLoader {
             }
         }
 
-        for (String plugin : plugins) {
+        for (String plugin : configPlugins) {
             loadPlugin(plugin);
         }
     }
@@ -88,15 +96,9 @@ public class AlertPluginLoader {
         checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
             logger.info("Installing {}", plugin.getClass().getName());
-            installPlugin(plugin);
-        }
-    }
-
-    public void installPlugin(DolphinSchedulerPlugin plugin)
-    {
-        for (AlertChannelFactory alertChannelFactory : plugin.getAlertChannelFactorys()) {
-            logger.info("Registering Alert Plugin '{}'", alertChannelFactory.getId());
-            alertChannelManager.addAlertChannelFactory(alertChannelFactory);
+            for(DolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
+                dolphinPluginManager.installPlugin(plugin);
+            }
         }
     }
 
@@ -162,7 +164,7 @@ public class AlertPluginLoader {
     private URLClassLoader createClassLoader(List<URL> urls)
     {
         ClassLoader parent = getClass().getClassLoader();
-        return new DolphinPluginClassLoader(urls, parent, ALERT_SPI_PACKAGES);
+        return new DolphinPluginClassLoader(urls, parent, DOLPHIN_SPI_PACKAGES);
     }
 
 

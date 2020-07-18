@@ -19,18 +19,8 @@ import java.util.List;
  */
 public class EmailAlertChannelFactory implements AlertChannelFactory {
     @Override
-    public String getNameEn() {
+    public String getName() {
         return "email alert";
-    }
-
-    @Override
-    public String getNameCh() {
-        return "邮件";
-    }
-
-    @Override
-    public String getId() {
-        return "email_alert";
     }
 
     @Override

@@ -16,8 +16,9 @@
  */
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.alert.plugin.AlertChannelManager;
-import org.apache.dolphinscheduler.alert.plugin.AlertPluginLoader;
+import com.google.common.collect.ImmutableList;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
+import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
@@ -42,13 +44,15 @@ public class AlertServer {
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
+    private PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
+
     private AlertSender alertSender;
 
     private static AlertServer instance;
 
-    private AlertChannelManager alertChannelManager;
+    private AlertPluginManager alertPluginManager;
 
-    private DolphinPluginManagerConfig dolphinPluginManagerConfig;
+    private DolphinPluginManagerConfig alertPluginManagerConfig;
 
     public static final String ALERT_PLUGIN_BINDING = "alert.plugin.binding";
 
@@ -68,18 +72,18 @@ public class AlertServer {
     }
 
     private void initPlugin() {
-        alertChannelManager = new AlertChannelManager();
-        dolphinPluginManagerConfig = new DolphinPluginManagerConfig();
-        dolphinPluginManagerConfig.setPlugins(PropertyUtils.getString(ALERT_PLUGIN_BINDING));
+        alertPluginManager = new AlertPluginManager();
+        alertPluginManagerConfig = new DolphinPluginManagerConfig();
+        alertPluginManagerConfig.setPlugins(PropertyUtils.getString(ALERT_PLUGIN_BINDING));
         if (StringUtils.isNotBlank(PropertyUtils.getString(ALERT_PLUGIN_DIR))) {
-            dolphinPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(ALERT_PLUGIN_DIR).trim());
+            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(ALERT_PLUGIN_DIR).trim());
         }
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY))) {
-            dolphinPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
+            alertPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(MAVEN_LOCAL_REPOSITORY).trim());
         }
 
-        AlertPluginLoader alertPluginLoader = new AlertPluginLoader(dolphinPluginManagerConfig, alertChannelManager);
+        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
         try {
             alertPluginLoader.loadPlugins();
         } catch (Exception e) {
@@ -100,13 +104,14 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao, alertChannelManager);
+            alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
             alertSender.run();
         }
     }
 
 
     public static void main(String[] args) {
+        System.out.println(System.getProperty("user.dir"));
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
     }

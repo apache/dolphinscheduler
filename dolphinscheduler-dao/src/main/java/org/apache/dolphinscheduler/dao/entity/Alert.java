@@ -43,6 +43,7 @@ public class Alert {
     /**
      * show_type
      */
+    //TODO ShowType should be delete from Alert, Because showType is move to the plugin params
     @TableField(value = "show_type")
     private ShowType showType;
     /**
@@ -53,6 +54,7 @@ public class Alert {
     /**
      * alert_type
      */
+    //TODO alertType should be delete from Alert, because alert type is decide by the AlertPlugin instance
     @TableField(value = "alert_type")
     private AlertType alertType;
     /**
@@ -73,11 +75,13 @@ public class Alert {
     /**
      * receivers
      */
+    //TODO receivers should be delete from Alert, because only email alert need receivers . And receivers is move to Email Alert Plugin params.
     @TableField("receivers")
     private String receivers;
     /**
      * receivers_cc
      */
+    //TODO receivers_cc should be delete from Alert, because only email alert need receivers_cc . And receivers_cc is move to Email Alert Plugin params.
     @TableField("receivers_cc")
     private String receiversCc;
     /**

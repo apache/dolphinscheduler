@@ -16,13 +16,16 @@ import static java.util.Objects.requireNonNull;
  */
 public class DolphinPluginManagerConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(DolphinPluginManagerConfig.class);
-
     /**
      * The dir of the Alert Plugin in.
      * When AlertServer is running on the server, it will load the Alert Plugin from this directory.
      */
-    private File installedPluginsDir = new File("plugin/alert");
+    private File installedPluginsDir;
+
+    /**
+     * The plugin should be load.
+     * The installedPluginsDir is empty when we development and run server in IDEA. Then we can config which plugin should be load by param name alert.plugin.binding in the alert.properties file
+     */
     private List<String> plugins;
 
     /**

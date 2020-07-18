@@ -1,5 +1,7 @@
 package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
@@ -17,26 +19,24 @@ import static java.util.Objects.requireNonNull;
 /**
  * load the configured alert plugin and manager them
  */
-public class AlertChannelManager {
-    private static final Logger logger = LoggerFactory.getLogger(AlertChannelManager.class);
-
-    private static final String CONFIG_DIR = "alerts";
+public class AlertPluginManager extends DolphinPluginManager {
+    private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
-    private final Map<String, AlertChannel> configuredAlertChannelMap = new ConcurrentHashMap<>();
+    private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
 
     public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory)
     {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
 
-        if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getId(), alertChannelFactory) != null) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getId()));
+        if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getName(), alertChannelFactory) != null) {
+            throw new IllegalArgumentException(format("Alert Plugin '{}' is already registered", alertChannelFactory.getName()));
         }
 
         try {
-            loadConfiguredAlertChannel(alertChannelFactory.getId());
+            loadConfiguredAlertChannel(alertChannelFactory.getName());
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load , read config file failed.", alertChannelFactory.getId()));
+            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load , read config file failed.", alertChannelFactory.getName()));
         }
     }
 
@@ -47,18 +47,9 @@ public class AlertChannelManager {
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
         checkState(alertChannelFactory != null, "Alert Plugin {} is not registered", name);
 
-        List<PluginParams> params = alertChannelFactory.getParams();
-        String nameCh = alertChannelFactory.getNameCh();
-        String nameEn = alertChannelFactory.getNameEn();
-
-        String paramsJson = PluginParamsTransfer.getParamsJson(params);
-
-        //TODO: I think params, nameCh, nameEn should save in mysql .
-        //TODO: Then the Web UI can get the configured Alert Plugin and disable there name , params.
-
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(alertChannelFactory.getClass().getClassLoader())) {
             AlertChannel alertChannel = alertChannelFactory.create();
-            this.configuredAlertChannelMap.put(name, alertChannel);
+            this.alertChannelMap.put(name, alertChannel);
         }
 
         logger.info("-- Loaded Alert Plugin {} --", name);
@@ -68,7 +59,21 @@ public class AlertChannelManager {
         return alertChannelFactoryMap;
     }
 
-    public Map<String, AlertChannel> getConfiguredAlertChannelMap() {
-        return configuredAlertChannelMap;
+    public Map<String, AlertChannel> getAlertChannelMap() {
+        return alertChannelMap;
+    }
+
+    @Override
+    public void installPlugin(DolphinSchedulerPlugin dolphinSchedulerPlugin) {
+        for (AlertChannelFactory alertChannelFactory : dolphinSchedulerPlugin.getAlertChannelFactorys()) {
+            logger.info("Registering Alert Plugin '{}'", alertChannelFactory.getName());
+            this.addAlertChannelFactory(alertChannelFactory);
+            List<PluginParams> params = alertChannelFactory.getParams();
+            String nameEn = alertChannelFactory.getName();
+            String paramsJson = PluginParamsTransfer.getParamsJson(params);
+
+            PluginDefine pluginDefine = new PluginDefine(nameEn, "alert", paramsJson);
+            pluginDao.addOrUpdatePluginDefine(pluginDefine);
+        }
     }
 }

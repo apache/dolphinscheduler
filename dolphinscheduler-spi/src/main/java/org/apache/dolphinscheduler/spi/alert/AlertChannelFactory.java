@@ -28,32 +28,14 @@ import java.util.List;
 public interface AlertChannelFactory {
 
     /**
-     * chinese name
-     * this alert plugin name eg: email , message ...
-     * name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
+     * plugin name
+     * Must be UNIQUE .
+     * This alert plugin name eg: email , message ...
+     * Name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
      * @return
-     *  this alert plugin chinese name
+     *  this alert plugin name
      */
-    String getNameCh();
-
-    /**
-     * english name
-     * this alert plugin name eg: email , message ...
-     * name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
-     * @return
-     *  this alert plugin english name
-     */
-    String getNameEn();
-
-    /**
-     * id should be used as the configuration file name of the plugin.
-     * eg: If you develop and use an alert plugin named email_alert, you should add a configuration file in the conf/alert directory as email_alert.properties
-     * and the name of the file should be equal to the return value of the 'getId()' method , like 'email_alert'
-     * @return
-     *  this alert plugin id
-     */
-    String getId();
-
+    String getName();
 
     /**
      * Returns the configurable parameters that this plugin needs to display on the web ui

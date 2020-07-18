@@ -16,24 +16,20 @@
  */
 package org.apache.dolphinscheduler.alert.runner;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.dolphinscheduler.alert.plugin.AlertChannelManager;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * alert sender
@@ -44,25 +40,26 @@ public class AlertSender {
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private AlertChannelManager alertChannelManager;
+    private PluginDao pluginDao;
+    private AlertPluginManager alertPluginManager;
 
-    public AlertSender(AlertChannelManager alertChannelManager) {
-        this.alertChannelManager = alertChannelManager;
+    public AlertSender(AlertPluginManager alertPluginManager) {
+        this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertChannelManager alertChannelManager) {
+    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
         super();
         this.alertList = alertList;
         this.alertDao = alertDao;
-        this.alertChannelManager = alertChannelManager;
+        this.pluginDao = pluginDao;
+        this.alertPluginManager = alertPluginManager;
     }
 
     public void run() {
         for (Alert alert : alertList) {
             //get alert group from alert
             int alertGroupId = alert.getAlertGroupId();
-            //TODO: get alert plugin instance from the alert group
-            List<Object> alertInstanceList = new ArrayList<>();
+            List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
 
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
@@ -70,20 +67,18 @@ public class AlertSender {
                     .setLog(alert.getLog())
                     .setTitle(alert.getTitle());
 
-            //TODO: iterator all alert plugin instance and call the 'process' method
-
-            for(Object instance : alertInstanceList) {
-                if(alertChannelManager == null || alertChannelManager.getConfiguredAlertChannelMap().size() == 0) {
+            for(AlertPluginInstance instance : alertInstanceList) {
+                if(alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
                     logger.warn("No Alert Plugin configured. Can not send alert info. ");
                     return;
                 }
 
-                String pluginName = "";
-                String pluginInstanceName = "";
+                String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
+                String pluginInstanceName = instance.getInstanceName();
                 AlertInfo alertInfo = new AlertInfo();
                 alertInfo.setAlertData(alertData);
-                alertInfo.setAlertParams("alert plugin instance params json data");
-                AlertChannel alertChannel = alertChannelManager.getConfiguredAlertChannelMap().get(pluginName);
+                alertInfo.setAlertParams(instance.getPluginInstanceParams());
+                AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
                 AlertResult alertResult =alertChannel.process(alertInfo);
 
                 if (alertResult == null) {
