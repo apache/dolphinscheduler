@@ -14,14 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
@@ -215,19 +216,6 @@ public class UdfFunc {
 
     @Override
     public String toString() {
-        return "UdfFunc{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", funcName='" + funcName + '\'' +
-                ", className='" + className + '\'' +
-                ", argTypes='" + argTypes + '\'' +
-                ", database='" + database + '\'' +
-                ", description='" + description + '\'' +
-                ", resourceId=" + resourceId +
-                ", resourceName='" + resourceName + '\'' +
-                ", type=" + type +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+        return JSONUtils.toJsonString(this);
     }
 }
