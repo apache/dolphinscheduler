@@ -46,10 +46,31 @@ public class RoundRobinSelectorTest {
         Assert.assertEquals("192.168.1.2", result.getIp());
         result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
         Assert.assertEquals("192.168.1.1", result.getIp());
+        // add new host
         result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
         Assert.assertEquals("192.168.1.1", result.getIp());
         result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
         Assert.assertEquals("192.168.1.2", result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.3",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.3",result.getIp());
+        // remove host3
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+
     }
 
 }
