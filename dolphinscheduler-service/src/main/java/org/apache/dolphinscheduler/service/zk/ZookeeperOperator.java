@@ -49,6 +49,7 @@ public class ZookeeperOperator implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperOperator.class);
 
+    @Autowired
     private CuratorZookeeperClient zookeeperClient;
 
     @Override
