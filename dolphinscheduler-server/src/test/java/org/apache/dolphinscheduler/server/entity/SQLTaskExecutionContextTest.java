@@ -31,7 +31,7 @@ import org.junit.Test;
 public class SQLTaskExecutionContextTest {
 
   @Test
-  public void testJson() {
+  public void testTaskExecutionContext() {
     String contextJson = "{\n"
         + "    \"taskInstanceId\":32,\n"
         + "    \"taskName\":\"test-hive-func\",\n"
@@ -157,20 +157,16 @@ public class SQLTaskExecutionContextTest {
     assertEquals(parseSqlTask.getWarningGroupId(), 0);
     assertNull(parseSqlTask.getUdfFuncTenantCodeMap());
 
-    contextJson = "{\n"
-        + "    \"warningGroupId\":0,\n"
-        + "    \"connectionParams\":null,\n"
-        + "    \"udfFuncTenantCodeMap\":{\n"
-        + "        \"{\\\"id\\\":2,\\\"userId\\\":0,\\\"funcName\\\":null,\\\"className\\\":null,"
-        + "\\\"argTypes\\\":\\\"2\\\",\\\"database\\\":null,\\\"description\\\":null,"
-        + "\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name2\\\",\\\"type\\\":null,"
-        + "\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map2\",\n"
-        + "        \"{\\\"id\\\":1,\\\"userId\\\":0,\\\"funcName\\\":null,\\\"className\\\":null,"
-        + "\\\"argTypes\\\":\\\"1\\\",\\\"database\\\":null,\\\"description\\\":null,"
-        + "\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name1\\\",\\\"type\\\":null,"
-        + "\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map1\"\n"
-        + "    }\n"
-        + "}";
+    contextJson = "{\"warningGroupId\":0,"
+        + "\"connectionParams\":null,"
+        + "\"udfFuncTenantCodeMap\":{\""
+        + "{\\\"id\\\":2,\\\"userId\\\":0,"
+        + "\\\"funcName\\\":null,\\\"className\\\":null,\\\"argTypes\\\":\\\"2\\\",\\\"database\\\":null,\\\"description\\\":null,\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name2\\\",\\\"type\\\":null,\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map2\","
+        + "\"{\\\"id\\\":1,\\\"userId\\\":0,\\\"funcName\\\":null,"
+        + "\\\"className\\\":null,\\\"argTypes\\\":\\\"1\\\","
+        + "\\\"database\\\":null,\\\"description\\\":null,"
+        + "\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name1\\\","
+        + "\\\"type\\\":null,\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map1\"}}\n";
     SQLTaskExecutionContext parseSqlTask2 = JSONUtils.parseObject(contextJson, SQLTaskExecutionContext.class);
 
     assertNotNull(parseSqlTask2);
