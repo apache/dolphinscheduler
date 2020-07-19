@@ -65,6 +65,14 @@ public class Host implements Serializable {
         this.weight = weight;
     }
 
+    public Host(String ip, int port, int weight,String workGroup) {
+        this.ip = ip;
+        this.port = port;
+        this.address = ip + ":" + port;
+        this.weight = weight;
+        this.workGroup=workGroup;
+    }
+
     public String getAddress() {
         return address;
     }
