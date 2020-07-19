@@ -249,8 +249,6 @@ public final class Constants {
 
     public static final String WORKER_RESERVED_MEMORY = "worker.reserved.memory";
 
-    public static final String WORKER_WEIGHT = "worker.weight";
-
     public static final String MASTER_MAX_CPULOAD_AVG = "master.max.cpuload.avg";
 
     public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
