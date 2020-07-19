@@ -14,13 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.project;
+package org.apache.dolphinscheduler.locator.project;
 
-public class CreateProjectData {
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project_1";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+import org.openqa.selenium.By;
+
+public class ProcessInstanceLocator {
+    // jump Process Instance page
+    //click Process Instance name
+    public static final By CLICK_PROCESS_INSTANCE_NAME = By.xpath("//div[3]/div/ul/li[2]");
+
+    // click rerun button
+    public static final By CLICK_RERUN_BUTTON = By.xpath("//tr[2]/td[14]/div[1]/button[2]");
+
+    //assert rerun type
+    public static final By RUNNING_TYPE  = By.xpath("//tr[2]/td[5]/span");
 }
