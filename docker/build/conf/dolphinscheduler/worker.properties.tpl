@@ -35,3 +35,6 @@ worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 
 # default worker group
 #worker.group=${WORKER_GROUP}
+
+# default worker weight
+#worker.weight=${WORKER_WEIGHT}
