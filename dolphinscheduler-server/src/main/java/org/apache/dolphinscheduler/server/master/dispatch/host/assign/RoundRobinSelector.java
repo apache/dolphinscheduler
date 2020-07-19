@@ -32,13 +32,10 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class RoundRobinSelector extends AbstractSelector<Host> {
 
-    private final AtomicInteger currentWeight = new AtomicInteger(0);
-
     private ConcurrentMap<String, ConcurrentMap<String, WeightedRoundRobin>> workGroupWeightMap = new ConcurrentHashMap<>();
 
     private static final int RECYCLE_PERIOD = 100000;
 
-    // 原子更新锁
     private AtomicBoolean updateLock = new AtomicBoolean();
 
     protected static class WeightedRoundRobin {
@@ -60,7 +57,7 @@ public class RoundRobinSelector extends AbstractSelector<Host> {
         }
 
         void sel(int total) {
-            current.addAndGet(-1 * total);
+            current.addAndGet(-1L * total);
         }
 
         long getLastUpdate() {
@@ -122,16 +119,13 @@ public class RoundRobinSelector extends AbstractSelector<Host> {
         }
 
 
-
-        if (!updateLock.get() && hosts.size() != map.size()) {
-            if (updateLock.compareAndSet(false, true)) {
-                try {
-                    ConcurrentMap<String, WeightedRoundRobin> newMap = new ConcurrentHashMap<>(map);
-                    newMap.entrySet().removeIf(item -> now - item.getValue().getLastUpdate() > RECYCLE_PERIOD);
-                    workGroupWeightMap.put(key, newMap);
-                } finally {
-                    updateLock.set(false);
-                }
+        if (!updateLock.get() && hosts.size() != map.size() && updateLock.compareAndSet(false, true)) {
+            try {
+                ConcurrentMap<String, WeightedRoundRobin> newMap = new ConcurrentHashMap<>(map);
+                newMap.entrySet().removeIf(item -> now - item.getValue().getLastUpdate() > RECYCLE_PERIOD);
+                workGroupWeightMap.put(key, newMap);
+            } finally {
+                updateLock.set(false);
             }
         }
 
