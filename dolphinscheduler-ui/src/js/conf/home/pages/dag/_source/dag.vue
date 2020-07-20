@@ -558,7 +558,6 @@
       },
       _createNodes ({ id, type }) {
         let self = this
-        self.$modal.destroy()
         let preNode = []
         let rearNode = []
         let rearList = []
@@ -589,6 +588,7 @@
           preNode = []
         }
         if (eventModel) {
+          // Close the popup
           eventModel.remove()
         }
 
