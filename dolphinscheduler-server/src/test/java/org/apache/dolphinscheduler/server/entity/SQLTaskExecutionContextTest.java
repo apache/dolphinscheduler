@@ -154,14 +154,16 @@ public class SQLTaskExecutionContextTest {
     SQLTaskExecutionContext parseSqlTask = JSONUtils.parseObject(contextJson, SQLTaskExecutionContext.class);
 
     assertNotNull(parseSqlTask);
-    assertEquals(parseSqlTask.getWarningGroupId(), 0);
+    assertEquals(0,parseSqlTask.getWarningGroupId());
     assertNull(parseSqlTask.getUdfFuncTenantCodeMap());
 
     contextJson = "{\"warningGroupId\":0,"
         + "\"connectionParams\":null,"
         + "\"udfFuncTenantCodeMap\":{\""
         + "{\\\"id\\\":2,\\\"userId\\\":0,"
-        + "\\\"funcName\\\":null,\\\"className\\\":null,\\\"argTypes\\\":\\\"2\\\",\\\"database\\\":null,\\\"description\\\":null,\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name2\\\",\\\"type\\\":null,\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map2\","
+        + "\\\"funcName\\\":null,\\\"className\\\":null,\\\"argTypes\\\":\\\"2\\\",\\\"database\\\":null,"
+        + "\\\"description\\\":null,\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name2\\\",\\\"type\\\":null,"
+        + "\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map2\","
         + "\"{\\\"id\\\":1,\\\"userId\\\":0,\\\"funcName\\\":null,"
         + "\\\"className\\\":null,\\\"argTypes\\\":\\\"1\\\","
         + "\\\"database\\\":null,\\\"description\\\":null,"
@@ -170,8 +172,8 @@ public class SQLTaskExecutionContextTest {
     SQLTaskExecutionContext parseSqlTask2 = JSONUtils.parseObject(contextJson, SQLTaskExecutionContext.class);
 
     assertNotNull(parseSqlTask2);
-    assertEquals(parseSqlTask2.getWarningGroupId(), 0);
-    assertEquals(parseSqlTask2.getUdfFuncTenantCodeMap().size(), 2);
+    assertEquals(0,parseSqlTask2.getWarningGroupId());
+    assertEquals(2,parseSqlTask2.getUdfFuncTenantCodeMap().size());
   }
 
 }
