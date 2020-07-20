@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.UdfFuncDeserializer;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Map;
