@@ -169,6 +169,7 @@ public class SQLTaskExecutionContextTest {
         + "\\\"database\\\":null,\\\"description\\\":null,"
         + "\\\"resourceId\\\":0,\\\"resourceName\\\":\\\"name1\\\","
         + "\\\"type\\\":null,\\\"createTime\\\":null,\\\"updateTime\\\":null}\":\"map1\"}}\n";
+
     SQLTaskExecutionContext parseSqlTask2 = JSONUtils.parseObject(contextJson, SQLTaskExecutionContext.class);
 
     assertNotNull(parseSqlTask2);
