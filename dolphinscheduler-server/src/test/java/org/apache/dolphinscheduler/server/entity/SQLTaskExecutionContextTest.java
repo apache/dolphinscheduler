@@ -30,6 +30,9 @@ import org.junit.Test;
 
 public class SQLTaskExecutionContextTest {
 
+  /**
+   * test parse  josn String to TaskExecutionContext
+   */
   @Test
   public void testTaskExecutionContext() {
     String contextJson = "{\n"
@@ -144,8 +147,13 @@ public class SQLTaskExecutionContextTest {
     assertEquals(sqlTaskExecutionContext.getUdfFuncTenantCodeMap().size(), parseSqlTask.getUdfFuncTenantCodeMap().size());
   }
 
+  /**
+   * test the SQLTaskExecutionContext
+   */
   @Test
   public void testSqlTaskExecutionContextParse() {
+
+    // SQLTaskExecutionContext.udfFuncTenantCodeMap is null
     String contextJson = "{\n"
         + "    \"warningGroupId\":0,\n"
         + "    \"connectionParams\":null,\n"
@@ -157,6 +165,7 @@ public class SQLTaskExecutionContextTest {
     assertEquals(0,parseSqlTask.getWarningGroupId());
     assertNull(parseSqlTask.getUdfFuncTenantCodeMap());
 
+    // SQLTaskExecutionContext.udfFuncTenantCodeMap is not null
     contextJson = "{\"warningGroupId\":0,"
         + "\"connectionParams\":null,"
         + "\"udfFuncTenantCodeMap\":{\""
