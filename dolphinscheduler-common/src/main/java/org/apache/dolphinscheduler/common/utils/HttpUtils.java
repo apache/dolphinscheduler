@@ -16,7 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.hadoop.security.authentication.client.AuthenticatedURL;
+import org.apache.hadoop.security.authentication.client.AuthenticationException;
 import org.apache.hadoop.security.authentication.client.KerberosAuthenticator;
 import org.apache.hadoop.security.authentication.server.AuthenticationToken;
 import org.apache.http.HttpEntity;
@@ -28,9 +31,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.kerberos.client.KerberosRestTemplate;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * http utils
@@ -46,14 +51,24 @@ public class HttpUtils {
 	 * @param url url
 	 * @return http get request response content
 	 */
-	public static String get(String url) {
+	public static String get(String url){
 
 		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
 			System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
 					PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-			KerberosRestTemplate restTemplate =
-					new KerberosRestTemplate(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
-			String responseContent = restTemplate.getForObject(url, String.class);
+			AuthenticatedURL.Token token = new AuthenticatedURL.Token();
+			String responseContent = null;
+			try {
+				URL applicationUrl = new URL(url);
+				HttpURLConnection connection =new AuthenticatedURL().openConnection(applicationUrl,token);
+				String result = IOUtils.toString(connection.getInputStream());
+			} catch (MalformedURLException e) {
+				logger.error("application url format is error", e);
+			} catch (IOException e) {
+				logger.error("Network request failed with IOException", e);
+			} catch (AuthenticationException e) {
+				logger.error("Kerberos serious failure", e);
+			}
 			return responseContent;
 
 		} else {
