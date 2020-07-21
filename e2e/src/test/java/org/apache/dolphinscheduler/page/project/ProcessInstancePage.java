@@ -32,6 +32,7 @@ public class ProcessInstancePage extends PageCommon {
      * rerun workflow page
      */
     public boolean rerunWorkflowPage() throws InterruptedException {
+        Thread.sleep(2000);
         clickTopElement(ProcessInstanceLocator.CLICK_PROCESS_INSTANCE_NAME);
         clickTopElement(ProcessInstanceLocator.CLICK_RERUN_BUTTON);
         return ifTitleContains(ProcessInstanceData.PROCESS_INSTANCE_TITLE);
