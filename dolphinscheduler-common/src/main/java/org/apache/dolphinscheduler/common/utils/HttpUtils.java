@@ -59,7 +59,7 @@ public class HttpUtils {
 			try {
 				URL applicationUrl = new URL(url);
 				HttpURLConnection connection =new AuthenticatedURL().openConnection(applicationUrl,token);
-				String result = IOUtils.toString(connection.getInputStream());
+				responseContent = IOUtils.toString(connection.getInputStream());
 			} catch (MalformedURLException e) {
 				logger.error("application url format is error", e);
 			} catch (IOException e) {
