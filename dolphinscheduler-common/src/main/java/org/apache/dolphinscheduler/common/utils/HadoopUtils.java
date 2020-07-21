@@ -63,7 +63,7 @@ public class HadoopUtils implements Closeable {
 
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 7), TimeUnit.DAYS)
+            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 2), TimeUnit.HOURS)
             .build(new CacheLoader<String, HadoopUtils>() {
                 @Override
                 public HadoopUtils load(String key) throws Exception {
@@ -110,7 +110,7 @@ public class HadoopUtils implements Closeable {
         try {
             configuration = new Configuration();
 
-            String resourceStorageType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+            String resourceStorageType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
             ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
             if (resUploadType == ResUploadType.HDFS) {
@@ -159,6 +159,7 @@ public class HadoopUtils implements Closeable {
                     }
                 }
             } else if (resUploadType == ResUploadType.S3) {
+                System.setProperty(Constants.AWS_S3_V4, Constants.STRING_TRUE);
                 configuration.set(Constants.FS_DEFAULTFS, PropertyUtils.getString(Constants.FS_DEFAULTFS));
                 configuration.set(Constants.FS_S3A_ENDPOINT, PropertyUtils.getString(Constants.FS_S3A_ENDPOINT));
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
