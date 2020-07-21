@@ -181,6 +181,10 @@
 
       // DAG automatic layout
       dagAutomaticLayout() {
+        if(this.store.state.dag.isEditDag) {
+          this.$message.warning(`${i18n.$t('Please save the DAG before formatting')}`)
+          return false
+        }
         $('#canvas').html('')
 
       // Destroy round robin
