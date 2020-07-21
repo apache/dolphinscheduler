@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-
+import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ public class SQLTaskExecutionContext implements Serializable {
     /**
      * udf function tenant code map
      */
+    @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
     private Map<UdfFunc,String> udfFuncTenantCodeMap;
 
 
