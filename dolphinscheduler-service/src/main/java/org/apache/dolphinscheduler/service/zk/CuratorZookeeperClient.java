@@ -96,11 +96,11 @@ public class CuratorZookeeperClient implements InitializingBean {
 
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {
             if(newState == ConnectionState.LOST){
-                logger.error("connection lost from zookeeper, zookeeper address: {}", zookeeperConfig.getServerList());
+                logger.error("connection lost from zookeeper");
             } else if(newState == ConnectionState.RECONNECTED){
-                logger.info("reconnected to zookeeper, zookeeper address: {}", zookeeperConfig.getServerList());
+                logger.info("reconnected to zookeeper");
             } else if(newState == ConnectionState.SUSPENDED){
-                logger.warn("connection SUSPENDED to zookeeper, zookeeper address: {}", zookeeperConfig.getServerList());
+                logger.warn("connection SUSPENDED to zookeeper");
             }
         });
     }
