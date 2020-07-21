@@ -47,7 +47,6 @@ export default {
   'Confirm add': '确认添加',
   'The newly created sub-Process has not yet been executed and cannot enter the sub-Process': '新创建子工作流还未执行，不能进入子工作流',
   'The task has not been executed and cannot enter the sub-Process': '该任务还未执行，不能进入子工作流',
-  'Please enter name (required)': '请输入名称（必填）',
   'Name already exists': '名称已存在请重新输入',
   'Download Log': '下载日志',
   'Refresh Log': '刷新日志',
@@ -618,5 +617,8 @@ export default {
   'Socket Timeout be a positive integer': 'Socket超时必须为数字',
   'ms':'毫秒',
   zkDirectory: 'zk注册目录',
-  'Directory detail': '查看目录详情'
+  'Directory detail': '查看目录详情',
+  'Connection name': '连线名',
+  'Current connection settings': '当前连线设置',
+  'Please save the DAG before formatting': '格式化前请先保存DAG'
 }
