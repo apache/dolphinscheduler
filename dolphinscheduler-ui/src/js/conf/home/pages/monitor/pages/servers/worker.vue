@@ -22,7 +22,6 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Process Pid')}}: {{item.port}}</span>
               <span>{{$t('Zk registration directory')}}: <a href="javascript:" @click="_showZkDirectories(item)" class="links">{{$t('Directory detail')}}</a></span>
             </div>
             <div class="right">
