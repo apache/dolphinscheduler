@@ -620,5 +620,6 @@ export default {
   zkDirectory: 'zkDirectory',
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
-  'Current connection settings': 'Current connection settings'
+  'Current connection settings': 'Current connection settings',
+  'Please save the DAG before formatting': 'Please save the DAG before formatting'
 }
