@@ -118,6 +118,7 @@
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
+        <spring-security-kerberos.version>1.0.1.RELEASE</spring-security-kerberos.version>
     </properties>
 
     <dependencyManagement>
@@ -544,6 +545,11 @@
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retry.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.kerberos</groupId>
+                <artifactId>spring-security-kerberos-client</artifactId>
+                <version>${spring-security-kerberos.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
