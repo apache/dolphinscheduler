@@ -619,6 +619,9 @@ export default {
   'User name length is between 3 and 39': 'User name length is between 3 and 39',
   zkDirectory: 'zkDirectory',
   'Directory detail': 'Directory detail',
+  'Connection name': 'Connection name',
+  'Current connection settings': 'Current connection settings',
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
   'Disable': 'Disable',
   'Remote Exec' : 'Remote Exec',
   'Please select the remote server': 'Please select the remote server'

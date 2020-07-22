@@ -19,12 +19,11 @@ package org.apache.dolphinscheduler.locator.project;
 
 import org.openqa.selenium.By;
 
-public class CreateWorkflowLocator {
+public class WorkflowDefineLocator {
 
     /**
      * jump workflow define page
      */
-
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
@@ -119,14 +118,14 @@ public class CreateWorkflowLocator {
     public static final By CLICK_DELETE_CUSTOM_PARAMETERS = By.xpath("//div[2]/span/a/em");
 
     //click submit button
-    public static final By CLICK_SUBMIT_BUTTON = By.xpath("//button[2]/span");
+    public static final By CLICK_SUBMIT_BUTTON = By.xpath("//div[3]/div/button[2]/span");
 
 
     /**
      * save workflow
      */
     //click save workflow button
-    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//button/span");
+    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//div[2]/div[1]/div[2]/button[2]");
 
     //input  workflow name
     public static final By INPUT_WORKFLOW_NAME = By.xpath("//input");
@@ -166,8 +165,7 @@ public class CreateWorkflowLocator {
     public static final By CLICK_DELETE_WORKFLOW_GLOBAL_PARAMETERS = By.xpath("//div[2]/span/a/em");
 
     //click add button
-    public static final By CLICK_ADD_BUTTON = By.xpath("//button[2]/span");
-
+    public static final By CLICK_ADD_BUTTON = By.xpath("//div[2]/div/button[2]/span");    
     //scroll to element bottom
     public static final By SCROLL_BOTTOM = By.xpath("//span/a/em");
 
@@ -192,4 +190,5 @@ public class CreateWorkflowLocator {
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
+    
 }
