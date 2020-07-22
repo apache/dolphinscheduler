@@ -48,8 +48,8 @@ public class EnterpriseWeChatUtils {
 
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL == null ? null : ENTERPRISE_WE_CHAT_TOKEN_URL
-            .replaceAll("\\$corpId", ENTERPRISE_WE_CHAT_CORP_ID)
-            .replaceAll("\\$secret", ENTERPRISE_WE_CHAT_SECRET);
+    .replaceAll("\\{corpId\\}", ENTERPRISE_WE_CHAT_CORP_ID)
+    .replaceAll("\\{secret\\}", ENTERPRISE_WE_CHAT_SECRET);
 
     private static final String ENTERPRISE_WE_CHAT_PUSH_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
 
@@ -120,9 +120,9 @@ public class EnterpriseWeChatUtils {
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\$toParty", toParty)
-                .replaceAll("\\$agentId", agentId)
-                .replaceAll("\\$msg", msg);
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", toParty)
+        .replaceAll("\\{agentId\\}", agentId)
+        .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -135,9 +135,9 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
-        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\$toParty", listParty)
-                .replaceAll("\\$agentId", agentId)
-                .replaceAll("\\$msg", msg);
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", listParty)
+        .replaceAll("\\{agentId\\}", agentId)
+        .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -149,9 +149,9 @@ public class EnterpriseWeChatUtils {
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\$toUser", toUser)
-                .replaceAll("\\$agentId", agentId)
-                .replaceAll("\\$msg", msg);
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", toUser)
+        .replaceAll("\\{agentId\\}", agentId)
+        .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -164,9 +164,9 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
-        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\$toUser", listUser)
-                .replaceAll("\\$agentId", agentId)
-                .replaceAll("\\$msg", msg);
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", listUser)
+        .replaceAll("\\{agentId\\}", agentId)
+        .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -179,7 +179,7 @@ public class EnterpriseWeChatUtils {
      * @throws IOException the IOException
      */
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
-        String enterpriseWeChatPushUrlReplace = ENTERPRISE_WE_CHAT_PUSH_URL.replaceAll("\\$token", token);
+        String enterpriseWeChatPushUrlReplace = ENTERPRISE_WE_CHAT_PUSH_URL.replaceAll("\\{token\\}", token);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try {

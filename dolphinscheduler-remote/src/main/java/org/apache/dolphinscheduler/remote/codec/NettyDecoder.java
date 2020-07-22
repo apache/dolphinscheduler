@@ -55,19 +55,15 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
             case MAGIC:
                 checkMagic(in.readByte());
                 checkpoint(State.COMMAND);
-                break;
             case COMMAND:
                 commandHeader.setType(in.readByte());
                 checkpoint(State.OPAQUE);
-                break;
             case OPAQUE:
                 commandHeader.setOpaque(in.readLong());
                 checkpoint(State.BODY_LENGTH);
-                break;
             case BODY_LENGTH:
                 commandHeader.setBodyLength(in.readInt());
                 checkpoint(State.BODY);
-                break;
             case BODY:
                 byte[] body = new byte[commandHeader.getBodyLength()];
                 in.readBytes(body);
@@ -79,7 +75,6 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 out.add(packet);
                 //
                 checkpoint(State.MAGIC);
-                break;
             default:
                 logger.warn("unknown decoder state {}", state());
         }

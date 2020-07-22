@@ -33,11 +33,9 @@ public class PreconditionsTest {
      */
     @Test
     public void testCheckNotNull() throws Exception {
-        String testReference = "test reference";
-        //test  reference is not null
+        String testReference = "test object";
         Assert.assertEquals(testReference, Preconditions.checkNotNull(testReference));
-        Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference,"reference is null"));
-        Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference,"%s is null",testReference));
+        Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference,"object is null"));
 
         //test  reference is  null
         try {
@@ -51,120 +49,19 @@ public class PreconditionsTest {
         } catch (NullPointerException ex) {
             assertNull(ex.getMessage());
         }
-        //test  reference is  null ,expect contains errorMessage
+
         try {
-            Preconditions.checkNotNull(null,"reference is null");
+            Preconditions.checkNotNull(null,"object is null");
         } catch (NullPointerException ex) {
-            assertThat(ex.getMessage(), containsString("reference is null"));
+            assertThat(ex.getMessage(), containsString("object is null"));
         }
 
         try {
-            Preconditions.checkNotNull("","reference is null");
+            Preconditions.checkNotNull("","object is null");
         } catch (NullPointerException ex) {
-            assertThat(ex.getMessage(), containsString("reference is null"));
+            assertThat(ex.getMessage(), containsString("object is null"));
         }
 
-        //test  reference is  null ,expect contains errorMessageTemplate and errorMessageArgs
-        try {
-            Preconditions.checkNotNull(null,"%s is null",testReference);
-        } catch (NullPointerException ex) {
-            assertThat(ex.getMessage(), containsString(testReference + " is null"));
-        }
-
-        try {
-            Preconditions.checkNotNull("","%s is null",testReference);
-        } catch (NullPointerException ex) {
-            assertThat(ex.getMessage(), containsString(testReference + " is null"));
-        }
     }
 
-    /**
-     * Test checkArgument
-     */
-    @Test
-    public void testCheckArgument() throws Exception {
-
-        int argument = 100;
-        //boolean condition is true
-        Preconditions.checkArgument(argument > 0 && argument < 200);
-
-        //boolean condition is false
-        try {
-            Preconditions.checkArgument(argument > 0 && argument < 50);
-        } catch (IllegalArgumentException ex) {
-            assertNull(ex.getMessage());
-        }
-
-        //boolean condition is false ,expect contains errorMessage
-        try {
-            Preconditions.checkArgument(argument > 300, "argument is error");
-        } catch (IllegalArgumentException ex) {
-            assertThat(ex.getMessage(), containsString("argument is error"));
-        }
-
-        //boolean condition is false,expect contains errorMessageTemplate and errorMessageArgs
-        try {
-            Preconditions.checkArgument(argument > 0 && argument < 99, "argument %s is error",argument);
-        } catch (IllegalArgumentException ex) {
-            assertThat(ex.getMessage(), containsString( "argument " + argument +  " is error"));
-        }
-    }
-
-    /**
-     * Test checkState
-     */
-    @Test
-    public void testCheckState() throws Exception {
-        int state = 1;
-        //boolean condition is true
-        Preconditions.checkState(state == 1);
-        Preconditions.checkState(state > -1);
-
-        //boolean condition is false
-        try {
-            Preconditions.checkState(state > 2);
-        } catch (IllegalStateException ex) {
-            assertNull(ex.getMessage());
-        }
-
-        //boolean condition is false ,expect contains errorMessage
-        try {
-            Preconditions.checkState(state < 1, "state is error");
-        } catch (IllegalStateException ex) {
-            assertThat(ex.getMessage(), containsString("state is error"));
-        }
-
-        //boolean condition is false,expect contains errorMessageTemplate and errorMessageArgs
-        try {
-            Preconditions.checkState(state < -1 , "state %s is error",state);
-        } catch (IllegalStateException ex) {
-            assertThat(ex.getMessage(), containsString( "state " + state +  " is error"));
-        }
-    }
-
-    /**
-     * Test checkElementIndex
-     */
-    @Test
-    public void testCheckElementIndex() throws Exception {
-        int index = 2;
-        int size = 30;
-
-        //boolean condition is true
-        Preconditions.checkElementIndex(index, size);
-
-        //boolean condition is false
-        try {
-            Preconditions.checkElementIndex(-1, 10);
-        } catch (IndexOutOfBoundsException ex) {
-            assertThat(ex.getMessage(), containsString("Index: -1, Size: 10"));
-        }
-
-        //boolean condition is false ,expect contains errorMessage
-        try {
-            Preconditions.checkElementIndex(100, 50, "index is greater than size");
-        } catch (IndexOutOfBoundsException ex) {
-            assertThat(ex.getMessage(), containsString("index is greater than size Index: 100, Size: 50"));
-        }
-    }
 }

@@ -48,7 +48,7 @@ public class CommonUtils {
         envPath = envDefaultPath.getPath();
         logger.debug("env path :{}", envPath);
       }else{
-        envPath = System.getProperty("user.home") + File.separator + ".bash_profile";
+        envPath =  "/etc/profile";
       }
     }
 
@@ -70,7 +70,7 @@ public class CommonUtils {
    * @return true if upload resource is HDFS and kerberos startup
    */
   public static boolean getKerberosStartupState(){
-    String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+    String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
     ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
     Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
     return resUploadType == ResUploadType.HDFS && kerberosStartupState;

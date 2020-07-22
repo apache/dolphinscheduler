@@ -40,10 +40,8 @@ public class DependentUtils {
             case AND:
                 if(dependResultList.contains(DependResult.FAILED)){
                     dependResult = DependResult.FAILED;
-                }else if(dependResultList.contains(DependResult.WAITING)){
+                } if(dependResultList.contains(DependResult.WAITING)){
                     dependResult = DependResult.WAITING;
-                }else{
-                    dependResult = DependResult.SUCCESS;
                 }
                 break;
             case OR:
@@ -71,6 +69,9 @@ public class DependentUtils {
     public static List<DateInterval> getDateIntervalList(Date businessDate, String dateValue){
         List<DateInterval> result = new ArrayList<>();
         switch (dateValue){
+            case "currentHour":
+                result = DependentDateUtils.getLastHoursInterval(businessDate, 0);
+                break;
             case "last1Hour":
                 result =  DependentDateUtils.getLastHoursInterval(businessDate, 1);
                 break;
@@ -79,6 +80,9 @@ public class DependentUtils {
                 break;
             case "last3Hours":
                 result =  DependentDateUtils.getLastHoursInterval(businessDate, 3);
+                break;
+            case "last24Hours":
+                result = DependentDateUtils.getSpecialLastDayInterval(businessDate);
                 break;
             case "today":
                 result =  DependentDateUtils.getTodayInterval(businessDate);

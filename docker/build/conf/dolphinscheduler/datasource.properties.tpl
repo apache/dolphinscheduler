@@ -15,16 +15,11 @@
 # limitations under the License.
 #
 
-
-# mysql
-#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-#spring.datasource.url=jdbc:mysql://192.168.xx.xx:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
-
-# postgre
-spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}?characterEncoding=utf8
-spring.datasource.username=${POSTGRESQL_USERNAME}
-spring.datasource.password=${POSTGRESQL_PASSWORD}
+# db
+spring.datasource.driver-class-name=${DATABASE_DRIVER}
+spring.datasource.url=jdbc:${DATABASE_TYPE}://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_DATABASE}?${DATABASE_PARAMS}
+spring.datasource.username=${DATABASE_USERNAME}
+spring.datasource.password=${DATABASE_PASSWORD}
 
 ## base spring data source configuration todo need to remove
 #spring.datasource.type=com.alibaba.druid.pool.DruidDataSource

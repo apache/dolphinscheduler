@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
@@ -109,7 +110,9 @@ public class ZookeeperOperator implements InitializingBean {
         zkClient = builder.build();
         zkClient.start();
         try {
-            zkClient.blockUntilConnected();
+            if (!zkClient.blockUntilConnected(zookeeperConfig.getMaxWaitTime(), TimeUnit.MILLISECONDS)) {
+                throw new IllegalStateException("Connect zookeeper expire max wait time");
+            }
         } catch (final Exception ex) {
             throw new RuntimeException(ex);
         }

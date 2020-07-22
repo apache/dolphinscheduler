@@ -186,7 +186,7 @@
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
-        workerGroup: 'default',
+        workerGroup: '',
         previewTimes: []
       }
     },
@@ -280,8 +280,6 @@
 
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-          let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-          if (!notifyGroupListS.length) {
             this.store.dispatch('dag/getNotifyGroupList').then(res => {
               this.notifyGroupList = res
               if (this.notifyGroupList.length) {
@@ -290,10 +288,6 @@
                 reject(new Error(0))
               }
             })
-          } else {
-            this.notifyGroupList = notifyGroupListS
-            resolve()
-          }
         })
       },
       ok () {
@@ -309,6 +303,20 @@
     watch: {
     },
     created () {
+      if(this.item.workerGroup===undefined) {
+        let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+        if (stateWorkerGroupsList.length) {
+          this.workerGroup = stateWorkerGroupsList[0].id
+        } else {
+          this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+            this.$nextTick(() => {
+              this.workerGroup = res[0].id
+            })
+          })
+        }
+      } else {
+        this.workerGroup = this.item.workerGroup
+      }
       if(this.item.crontab !== null){
         this.crontab = this.item.crontab
       }
@@ -336,7 +344,6 @@
     },
     mounted () {
       let item = this.item
-
       // Determine whether to echo
       if (this.item.crontab) {
         this.crontab = item.crontab
@@ -344,7 +351,6 @@
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
-        this.workerGroup = item.workerGroup || 'default'
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
