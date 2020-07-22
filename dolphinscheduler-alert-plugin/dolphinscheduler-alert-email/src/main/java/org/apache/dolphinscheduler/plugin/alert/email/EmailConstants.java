@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-public class Constants {
+public class EmailConstants {
 
 
 

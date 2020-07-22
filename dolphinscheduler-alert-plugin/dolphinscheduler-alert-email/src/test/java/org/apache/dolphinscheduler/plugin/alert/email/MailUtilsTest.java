@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;

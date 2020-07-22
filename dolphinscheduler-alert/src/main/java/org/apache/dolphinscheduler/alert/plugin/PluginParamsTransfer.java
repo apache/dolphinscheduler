@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params;
+package org.apache.dolphinscheduler.alert.plugin;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.List;

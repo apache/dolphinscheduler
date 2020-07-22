@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.apache.dolphinscheduler.plugin.alert.email.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +62,8 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         if (StringUtils.isNotEmpty(content)){
             List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
-            if(!showAll && mapItemsList.size() > Constants.NUMBER_1000){
-                mapItemsList = mapItemsList.subList(0,Constants.NUMBER_1000);
+            if(!showAll && mapItemsList.size() > EmailConstants.NUMBER_1000){
+                mapItemsList = mapItemsList.subList(0, EmailConstants.NUMBER_1000);
             }
 
             StringBuilder contents = new StringBuilder(200);
@@ -77,17 +77,17 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
                 Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
 
-                StringBuilder t = new StringBuilder(Constants.TR);
-                StringBuilder cs = new StringBuilder(Constants.TR);
+                StringBuilder t = new StringBuilder(EmailConstants.TR);
+                StringBuilder cs = new StringBuilder(EmailConstants.TR);
                 while (iterator.hasNext()){
 
                     Map.Entry<String, Object> entry = iterator.next();
-                    t.append(Constants.TH).append(entry.getKey()).append(Constants.TH_END);
-                    cs.append(Constants.TD).append(String.valueOf(entry.getValue())).append(Constants.TD_END);
+                    t.append(EmailConstants.TH).append(entry.getKey()).append(EmailConstants.TH_END);
+                    cs.append(EmailConstants.TD).append(String.valueOf(entry.getValue())).append(EmailConstants.TD_END);
 
                 }
-                t.append(Constants.TR_END);
-                cs.append(Constants.TR_END);
+                t.append(EmailConstants.TR_END);
+                cs.append(EmailConstants.TR_END);
                 if (flag){
                     title = t.toString();
                 }
@@ -113,9 +113,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
             for (JsonNode jsonNode : list){
-                contents.append(Constants.TR);
-                contents.append(Constants.TD).append(jsonNode.toString()).append(Constants.TD_END);
-                contents.append(Constants.TR_END);
+                contents.append(EmailConstants.TR);
+                contents.append(EmailConstants.TD).append(jsonNode.toString()).append(EmailConstants.TD_END);
+                contents.append(EmailConstants.TR_END);
             }
 
             return getMessageFromHtmlTemplate(null,contents.toString());
@@ -136,7 +136,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         requireNonNull(content, "content must not null");
         String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n",title);
 
-        return Constants.HTML_HEADER_PREFIX +htmlTableThead + content + Constants.TABLE_BODY_HTML_TAIL;
+        return EmailConstants.HTML_HEADER_PREFIX +htmlTableThead + content + EmailConstants.TABLE_BODY_HTML_TAIL;
     }
 
 }
