@@ -39,7 +39,6 @@ public class KerberosHttpClientTest {
             responseContent = kerberosHttpClient.get(applicationUrl,
                     PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
             Assert.assertNull(responseContent);
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
