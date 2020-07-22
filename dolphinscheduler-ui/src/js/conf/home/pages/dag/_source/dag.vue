@@ -102,6 +102,17 @@
             {{$t('Return_1')}}
           </x-button>
           <x-button
+            type="primary"
+            v-tooltip.light="$t('Close')" 
+            icon="ans-icon-off"
+            size="xsmall"
+            data-container="body"
+            v-if="(type === 'instance' || 'definition') "
+            style="vertical-align: middle;"
+            @click="_closeDAG">
+            {{$t('Close')}}
+          </x-button>
+          <x-button
                   style="vertical-align: middle;"
                   type="primary"
                   size="xsmall"
@@ -131,6 +142,7 @@
   import { allNodesId } from './plugIn/util'
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
+  import mFormLineModel from './formModel/formLineModel'
   import { formatDate } from '@/module/filter/filter'
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
@@ -165,10 +177,14 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
-      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName']),
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
 
       // DAG automatic layout
       dagAutomaticLayout() {
+        if(this.store.state.dag.isEditDag) {
+          this.$message.warning(`${i18n.$t('Please save the DAG before formatting')}`)
+          return false
+        }
         $('#canvas').html('')
 
       // Destroy round robin
@@ -190,9 +206,14 @@
                 length: 12,
                 foldback: 0.8
               }
-            ]
+            ],
+            ['Label', {
+                location: 0.5,
+                id: 'label'
+            }]
           ],
-          Container: 'canvas'
+          Container: 'canvas',
+          ConnectionsDetachable: true
         })
       })
         if (this.tasks.length) {
@@ -377,6 +398,14 @@
           })
         })
       },
+      _closeDAG(){
+        let $name = this.$route.name
+        if($name && $name.indexOf("definition") != -1){
+          this.$router.push({ name: 'projects-definition-list'})
+        }else{
+          this.$router.push({ name: 'projects-instance-list'})
+        }
+      },
       _verifConditions (value) {
         let tasks = value
         let bool = true
@@ -498,6 +527,40 @@
        * Create a node popup layer
        * @param Object id
        */
+      _createLineLabel({id, sourceId, targetId}) {
+        // $('#jsPlumb_2_50').text('111')
+        let self = this
+        self.$modal.destroy()
+        const removeNodesEvent = (fromThis) => {
+          // Manually destroy events inside the component
+          fromThis.$destroy()
+          // Close the popup
+          eventModel.remove()
+        }
+        eventModel = this.$drawer({
+          className: 'dagMask',
+          render (h) {
+            return h(mFormLineModel,{
+              on: {
+                addLineInfo ({ item, fromThis }) {
+                  self.addConnects(item)
+                  setTimeout(() => {
+                    removeNodesEvent(fromThis)
+                  }, 100)
+                },
+                cancel ({fromThis}) {
+                  removeNodesEvent(fromThis)
+                }
+              },
+              props: {
+                id: id,
+                sourceId: sourceId,
+                targetId: targetId
+              }
+            })
+          }
+        })
+      },
       _createNodes ({ id, type }) {
         let self = this
         let preNode = []
@@ -530,6 +593,7 @@
           preNode = []
         }
         if (eventModel) {
+          // Close the popup
           eventModel.remove()
         }
 
@@ -547,6 +611,7 @@
           closable: false,
           direction: 'right',
           escClose: true,
+          className: 'dagMask',
           render: h => h(mFormModel, {
             on: {
               addTaskInfo ({ item, fromThis }) {
@@ -630,9 +695,14 @@
                 length: 12,
                 foldback: 0.8
               }
-            ]
+            ],
+            ['Label', {
+                location: 0.5,
+                id: 'label'
+            }]
           ],
-          Container: 'canvas'
+          Container: 'canvas',
+          ConnectionsDetachable: true
         })
       })
     },
