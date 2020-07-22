@@ -77,6 +77,9 @@
             })
         },
         ok() {
+          if($(`#${this.id}`).prev().attr('class')==='jtk-overlay') {
+            $(`#${this.id}`).prev().empty()
+          }
           $(`#${this.id}`).text(this.labelName)
             this.$emit('addLineInfo', {
               item: {
@@ -92,12 +95,11 @@
       
     },
     created () {
-        let connects = this.store.state.dag.connects
-        connects.filter( item => {
-            if(item.endPointSourceId===this.sourceId && item.endPointTargetId===this.targetId) {
-                this.labelName =  item.label
-            }
-        });
+      if($(`#${this.id}`).prev().attr('class').indexOf('jtk-overlay')!==-1) {
+        this.labelName = $(`#${this.id}`).prev().text()
+      } else {
+        this.labelName = $(`#${this.id}`).text()
+      }
     },
     mounted () {
       
