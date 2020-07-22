@@ -320,7 +320,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskNode taskNode
      */
     private void setSSHTaskRelation(SSHTaskExecutionContext sshTaskExecutionContext, TaskNode taskNode) {
-        SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
+        SqlParameters sqlParameters = JSONUtils.parseObject(taskNode.getParams(), SqlParameters.class);
         int datasourceId = sqlParameters.getDatasource();
         DataSource datasource = processService.findDataSourceById(datasourceId);
         sshTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());

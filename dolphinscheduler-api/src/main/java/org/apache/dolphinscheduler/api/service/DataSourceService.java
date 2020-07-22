@@ -454,7 +454,7 @@ public class DataSourceService extends BaseService{
     private Session getRemoteSession(String parameter) {
         Session session = null;
         try {
-            RemoteServerSource serverSource = JSON.parseObject(parameter, RemoteServerSource.class);
+            RemoteServerSource serverSource = JSONUtils.parseObject(parameter, RemoteServerSource.class);
             JSch jsch = new JSch();
             session = jsch.getSession(serverSource.getUser(), serverSource.getHost(), serverSource.getPort());
             session.setPassword(serverSource.getPassword());
