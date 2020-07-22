@@ -1852,16 +1852,4 @@ public class ProcessService {
                 processInstanceById.getId(),
                 taskInstance.getId());
     }
-
-    /**
-     * return top n SUCCESS process instance order by running time which started between startTime and endTime
-     * @param size
-     * @param startTime
-     * @param endTime
-     * @return
-     */
-    public List<ProcessInstance> topNLongestRunningProcessInstance(int size,Date startTime,Date endTime){
-        return processInstanceMapper.queryTopNProcessInstance(size,startTime,endTime,ExecutionStatus.SUCCESS);
-    }
-
 }

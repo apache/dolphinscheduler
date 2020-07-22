@@ -983,5 +983,7 @@ public final class Constants {
      */
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
 
+    public static final String START_TIME="start time";
+    public static final String END_TIME="end time";
 
 }
