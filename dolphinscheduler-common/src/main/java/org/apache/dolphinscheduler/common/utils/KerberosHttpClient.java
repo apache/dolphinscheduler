@@ -20,6 +20,7 @@ import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
@@ -132,7 +133,8 @@ public class KerberosHttpClient {
             Subject serviceSubject = lc.getSubject();
             return Subject.doAs(serviceSubject, (PrivilegedAction<String>) () -> {
                 CloseableHttpClient httpClient = buildSpengoHttpClient();
-                String responseContent = HttpUtils.getResponseContentString(url, httpClient);
+                HttpGet httpget = new HttpGet(url);
+                String responseContent = HttpUtils.getResponseContentString(httpget, httpClient);
                 return responseContent;
             });
         } catch (LoginException le) {

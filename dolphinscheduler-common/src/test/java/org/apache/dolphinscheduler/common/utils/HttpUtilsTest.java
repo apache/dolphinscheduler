@@ -17,6 +17,11 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -41,5 +46,20 @@ public class HttpUtilsTest {
 
 		result = HttpUtils.get("https://123.333.111.33/ccc");
 		Assert.assertNull(result);
+	}
+
+	@Test
+	public void testGetResponseContentString() {
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		HttpGet httpget = new HttpGet("https://github.com/manifest.json");
+		/** set timeout、request time、socket timeout */
+		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+				.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+				.setSocketTimeout(Constants.SOCKET_TIMEOUT)
+				.setRedirectsEnabled(true)
+				.build();
+		httpget.setConfig(requestConfig);
+		String responseContent = HttpUtils.getResponseContentString(httpget,httpclient);
+		Assert.assertNotNull(responseContent);
 	}
 }

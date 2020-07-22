@@ -64,7 +64,7 @@ public class HttpUtils {
 					.setRedirectsEnabled(true)
 					.build();
 			httpget.setConfig(requestConfig);
-			String responseContent = getResponseContentString(url,httpclient);
+			String responseContent = getResponseContentString(httpget,httpclient);
 			return responseContent;
 		}
 
@@ -73,14 +73,13 @@ public class HttpUtils {
 	/**
 	 * get http response content
 	 *
-	 * @param url url
+	 * @param httpget httpget
 	 * @param httpClient  httpClient
 	 * @return http get request response content
 	 */
-	public static String getResponseContentString(String url, CloseableHttpClient httpClient) {
+	public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
 		String responseContent = null;
 		CloseableHttpResponse response = null;
-		HttpGet httpget = new HttpGet(url);
 		try {
 			response = httpClient.execute(httpget);
 			//check response status is 200
