@@ -26,7 +26,7 @@ import java.util.concurrent.Executor;
 import org.apache.curator.framework.imps.CuratorFrameworkImpl;
 import org.apache.curator.framework.listen.Listenable;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -113,7 +113,7 @@ public class WorkerRegistryTest {
 
         int i = 0;
         for (String workerGroup : workerConfig.getWorkerGroups()) {
-            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (NetUtils.getHost() + ":" + workerConfig.getListenPort());
+            String workerZkPath = workerPath + "/" + workerGroup.trim() + "/" + (OSUtils.getHost() + ":" + workerConfig.getListenPort());
             String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(workerZkPath);
             if (0 == i) {
                 Assert.assertTrue(workerZkPath.startsWith("/dolphinscheduler/nodes/worker/test/"));
