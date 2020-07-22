@@ -729,24 +729,6 @@
                     <skip>false</skip><!--not skip compile test classes-->
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-enforcer-plugin</artifactId>-->
-                <!--<version>3.0.0-M1</version>-->
-                <!--<configuration>-->
-                    <!--<rules>-->
-                        <!--<requireUpperBoundDeps>-->
-                            <!--<excludes combine.children="append">-->
-                                <!--&lt;!&ndash; TODO: fix this in Airlift resolver &ndash;&gt;-->
-                                <!--<exclude>org.codehaus.plexus:plexus-utils</exclude>-->
-                                <!--<exclude>com.google.guava:guava</exclude>-->
-                                <!--<exclude>com.fasterxml.jackson.core:jackson-core</exclude>-->
-                                <!--<exclude>com.google.j2objc:j2objc-annotations</exclude>-->
-                            <!--</excludes>-->
-                        <!--</requireUpperBoundDeps>-->
-                    <!--</rules>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
