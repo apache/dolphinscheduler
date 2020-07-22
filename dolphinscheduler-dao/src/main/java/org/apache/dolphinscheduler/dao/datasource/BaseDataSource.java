@@ -132,6 +132,7 @@ public abstract class BaseDataSource {
         case MYSQL:
         case ORACLE:
         case POSTGRESQL:
+        case PRESTO:
           separator = "?";
           break;
         case DB2:
