@@ -44,8 +44,7 @@ public class HttpUtils {
 	 * @return http get request response content
 	 */
 	public static String get(String url){
-
-
+		
 		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
 			String responseContent;
 			KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
@@ -65,49 +64,59 @@ public class HttpUtils {
 					.setRedirectsEnabled(true)
 					.build();
 			httpget.setConfig(requestConfig);
-			String responseContent = null;
-			CloseableHttpResponse response = null;
-
-			try {
-				response = httpclient.execute(httpget);
-				//check response status is 200
-				if (response.getStatusLine().getStatusCode() == 200) {
-					HttpEntity entity = response.getEntity();
-					if (entity != null) {
-						responseContent = EntityUtils.toString(entity, Constants.UTF_8);
-					} else {
-						logger.warn("http entity is null");
-					}
-				} else {
-					logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			} finally {
-				try {
-					if (response != null) {
-						EntityUtils.consume(response.getEntity());
-						response.close();
-					}
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-				}
-
-				if (!httpget.isAborted()) {
-					httpget.releaseConnection();
-					httpget.abort();
-				}
-
-				try {
-					httpclient.close();
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-				}
-			}
+			String responseContent = getResponseContentString(url,httpclient);
 			return responseContent;
 		}
 
+	}
 
+	/**
+	 * get http response content
+	 *
+	 * @param url url
+	 * @param httpClient  httpClient
+	 * @return http get request response content
+	 */
+	public static String getResponseContentString(String url, CloseableHttpClient httpClient) {
+		String responseContent = null;
+		CloseableHttpResponse response = null;
+		HttpGet httpget = null;
+		try {
+			httpget = new HttpGet(url);
+			response = httpClient.execute(httpget);
+			//check response status is 200
+			if (response.getStatusLine().getStatusCode() == 200) {
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					responseContent = EntityUtils.toString(entity, Constants.UTF_8);
+				} else {
+					logger.warn("http entity is null");
+				}
+			} else {
+				logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
+			}
+		} catch (IOException ioe) {
+			logger.error(ioe.getMessage(), ioe);
+		} finally {
+			try {
+				if (response != null) {
+					EntityUtils.consume(response.getEntity());
+					response.close();
+				}
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+			if (!httpget.isAborted()) {
+				httpget.releaseConnection();
+				httpget.abort();
+			}
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+		return responseContent;
 	}
 
 
