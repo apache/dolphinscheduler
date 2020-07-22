@@ -16,10 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.hadoop.security.authentication.client.AuthenticatedURL;
-import org.apache.hadoop.security.authentication.client.AuthenticationException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,9 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * http utils
@@ -51,22 +45,13 @@ public class HttpUtils {
 	 */
 	public static String get(String url){
 
+
 		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-			System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
-					PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-			AuthenticatedURL.Token token = new AuthenticatedURL.Token();
-			String responseContent = null;
-			try {
-				URL applicationUrl = new URL(url);
-				HttpURLConnection connection =new AuthenticatedURL().openConnection(applicationUrl,token);
-				responseContent = IOUtils.toString(connection.getInputStream());
-			} catch (MalformedURLException e) {
-				logger.error("application url format is error", e);
-			} catch (IOException e) {
-				logger.error("Network request failed with IOException", e);
-			} catch (AuthenticationException e) {
-				logger.error("Kerberos serious failure", e);
-			}
+			String responseContent;
+			KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+			responseContent = kerberosHttpClient.get(url,
+					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
 			return responseContent;
 
 		} else {
