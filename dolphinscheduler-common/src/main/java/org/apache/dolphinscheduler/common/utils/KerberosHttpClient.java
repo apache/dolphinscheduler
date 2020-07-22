@@ -102,12 +102,12 @@ public class KerberosHttpClient {
     }
 
     public String get(final String url, final String userId) {
-        logger.info(String.format("Calling KerberosHttpClient %s %s %s", this.principal, this.keyTabLocation, url));
+        logger.info("Calling KerberosHttpClient {} {} {}", this.principal, this.keyTabLocation, url);
         Configuration config = new Configuration() {
             @SuppressWarnings("serial")
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-                Map<String, Object> options = new HashMap();
+                Map<String, Object> options = new HashMap<String, Object>(9);
                 options.put("useTicketCache", "false");
                 options.put("useKeyTab", "true");
                 options.put("keyTab", keyTabLocation);

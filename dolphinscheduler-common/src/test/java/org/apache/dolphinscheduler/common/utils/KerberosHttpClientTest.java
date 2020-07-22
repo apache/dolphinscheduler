@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class KerberosHttpClientTest {
                         PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
                 responseContent = kerberosHttpClient.get(applicationUrl,
                         PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
-                logger.info(responseContent);
+                Assert.assertNull(responseContent);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
