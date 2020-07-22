@@ -116,13 +116,11 @@ class DolphinPluginClassLoader
 
     private boolean isSpiClass(String name)
     {
-        // todo maybe make this more precise and only match base package
         return spiPackages.stream().anyMatch(name::startsWith);
     }
 
     private boolean isSpiResource(String name)
     {
-        // todo maybe make this more precise and only match base package
         return spiResources.stream().anyMatch(name::startsWith);
     }
 

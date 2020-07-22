@@ -23,7 +23,6 @@ import java.util.List;
 
 /**
  * Each AlertPlugin need implement this interface
- * @author gaojun
  */
 public interface AlertChannelFactory {
 

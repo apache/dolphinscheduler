@@ -27,10 +27,6 @@ import org.junit.Test;
 
 /**
  * DolphinPluginLoader Tester.
- *
- * @author <Authors name>
- * @version 1.0
- * @since <pre>七月 16, 2020</pre>
  */
 public class DolphinPluginLoaderTest {
 

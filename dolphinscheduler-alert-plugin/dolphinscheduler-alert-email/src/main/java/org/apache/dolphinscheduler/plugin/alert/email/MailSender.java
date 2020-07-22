@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import com.sun.mail.smtp.SMTPProvider;
-import com.sun.mail.smtp.SMTPSSLProvider;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;

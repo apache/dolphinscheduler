@@ -54,10 +54,6 @@ import java.util.List;
 
 /**
  * AlertSender Tester.
- *
- * @author <Authors name>
- * @version 1.0
- * @since <pre>七月 17, 2020</pre>
  */
 public class AlertSenderTest {
 

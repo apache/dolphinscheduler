@@ -33,9 +33,6 @@ import java.util.List;
 /**
  * PluginParamsTransfer Tester.
  *
- * @author <Authors name>
- * @version 1.0
- * @since <pre>六月 23, 2020</pre>
  */
 public class PluginParamsTransferTest {
 
