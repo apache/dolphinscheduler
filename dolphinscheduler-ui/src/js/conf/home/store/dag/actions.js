@@ -255,6 +255,7 @@ export default {
         syncDefine: state.syncDefine
       }, res => {
         resolve(res)
+        state.isEditDag = false
       }).catch(e => {
         reject(e)
       })
