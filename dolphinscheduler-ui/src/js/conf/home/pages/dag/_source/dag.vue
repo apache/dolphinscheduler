@@ -538,6 +538,7 @@
           eventModel.remove()
         }
         eventModel = this.$drawer({
+          className: 'dagMask',
           render (h) {
             return h(mFormLineModel,{
               on: {
@@ -610,6 +611,7 @@
           closable: false,
           direction: 'right',
           escClose: true,
+          className: 'dagMask',
           render: h => h(mFormModel, {
             on: {
               addTaskInfo ({ item, fromThis }) {
