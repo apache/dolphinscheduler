@@ -80,9 +80,8 @@ public class HttpUtils {
 	public static String getResponseContentString(String url, CloseableHttpClient httpClient) {
 		String responseContent = null;
 		CloseableHttpResponse response = null;
-		HttpGet httpget = null;
+		HttpGet httpget = new HttpGet(url);
 		try {
-			httpget = new HttpGet(url);
 			response = httpClient.execute(httpget);
 			//check response status is 200
 			if (response.getStatusLine().getStatusCode() == 200) {

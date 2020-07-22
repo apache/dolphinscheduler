@@ -16,21 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.http.HttpEntity;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +35,6 @@ import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -131,7 +125,7 @@ public class KerberosHttpClient {
         princ.add(new KerberosPrincipal(userId));
         Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
 
-        LoginContext lc = null;
+        LoginContext lc;
         try {
             lc = new LoginContext("", sub, null, config);
             lc.login();
