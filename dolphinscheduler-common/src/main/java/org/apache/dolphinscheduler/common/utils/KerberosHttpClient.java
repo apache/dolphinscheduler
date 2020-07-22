@@ -54,7 +54,6 @@ public class KerberosHttpClient {
     private String keyTabLocation;
 
 
-
     public KerberosHttpClient(String principal, String keyTabLocation) {
         super();
         this.principal = principal;
