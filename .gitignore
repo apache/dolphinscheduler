@@ -41,6 +41,10 @@ dolphinscheduler-server/src/main/resources/logback.xml
 dolphinscheduler-ui/dist/
 dolphinscheduler-ui/node
 dolphinscheduler-dao/src/main/resources/dao/data_source.properties
+.factorypath
+**/*.gz
+**/Chart.lock
+docker/docker-swarm/dolphinscheduler-logs/
 
 .mvn/wrapper/*.jar
 
