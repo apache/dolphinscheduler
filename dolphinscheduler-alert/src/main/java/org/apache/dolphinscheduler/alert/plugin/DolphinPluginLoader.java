@@ -54,11 +54,7 @@ public class DolphinPluginLoader {
      */
     private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String>builder()
             .add("org.apache.dolphinscheduler.spi.")
-            .add("com.fasterxml.jackson.core.")
-            .add("com.fasterxml.jackson.databind.")
-            .add("org.apache.commons.collections.")
-            .add("org.apache.poi.hssf.usermodel.")
-            .add("org.apache.poi.ss.usermodel.")
+            .add("com.fasterxml.jackson.annotation.")
             .build();
 
     private final File installedPluginsDir;
