@@ -44,8 +44,8 @@ public class HttpUtils {
 	 * @return http get request response content
 	 */
 	public static String get(String url){
-		
-		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+		boolean kerberState =PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+		if (kerberState) {
 			String responseContent;
 			KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
 					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
@@ -64,8 +64,7 @@ public class HttpUtils {
 					.setRedirectsEnabled(true)
 					.build();
 			httpget.setConfig(requestConfig);
-			String responseContent = getResponseContentString(httpget,httpclient);
-			return responseContent;
+			return getResponseContentString(httpget,httpclient);
 		}
 
 	}

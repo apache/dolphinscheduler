@@ -92,8 +92,7 @@ public class KerberosHttpClient {
             }
         });
         builder.setDefaultCredentialsProvider(credentialsProvider);
-        CloseableHttpClient httpClient = builder.build();
-        return httpClient;
+        return builder.build();
     }
 
     public String get(final String url, final String userId) {
@@ -102,7 +101,7 @@ public class KerberosHttpClient {
             @SuppressWarnings("serial")
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-                Map<String, Object> options = new HashMap<String, Object>(9);
+                Map<String, Object> options = new HashMap<>(9);
                 options.put("useTicketCache", "false");
                 options.put("useKeyTab", "true");
                 options.put("keyTab", keyTabLocation);
@@ -116,9 +115,9 @@ public class KerberosHttpClient {
                         AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
             }
         };
-        Set<Principal> princ = new HashSet<Principal>(1);
+        Set<Principal> princ = new HashSet<>(1);
         princ.add(new KerberosPrincipal(userId));
-        Subject sub = new Subject(false, princ, new HashSet<Object>(), new HashSet<Object>());
+        Subject sub = new Subject(false, princ, new HashSet<>(), new HashSet<>());
 
         LoginContext lc;
         try {
@@ -128,8 +127,7 @@ public class KerberosHttpClient {
             return Subject.doAs(serviceSubject, (PrivilegedAction<String>) () -> {
                 CloseableHttpClient httpClient = buildSpengoHttpClient();
                 HttpGet httpget = new HttpGet(url);
-                String responseContent = HttpUtils.getResponseContentString(httpget, httpClient);
-                return responseContent;
+                return HttpUtils.getResponseContentString(httpget, httpClient);
             });
         } catch (LoginException le) {
             logger.error("Kerberos authentication failed ", le);
