@@ -28,7 +28,6 @@ public enum Status {
     SUCCESS(0, "success", "成功"),
 
     INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
     USER_NAME_EXIST(10003, "user name already exists", "用户名已存在"),
@@ -249,7 +248,8 @@ public enum Status {
 
 
     COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error", "查询各状态任务实例数错误"),
-
+    NEGTIVE_SIZE_NUMBER_ERROR(80002,"query size number error","查询size错误"),
+    START_TIME_BIGGER_THAN_END_TIME_ERROR(80003,"start time bigger than end time error","开始时间在结束时间之后错误"),
     QUEUE_COUNT_ERROR(90001,"queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error", "获取kerberos启动状态错误"),

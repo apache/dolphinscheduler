@@ -99,6 +99,50 @@ public class ProcessInstanceService extends BaseDAGService {
     UsersService usersService;
 
     /**
+     * return top n SUCCESS process instance order by running time which started between startTime and endTime
+     * @param loginUser
+     * @param projectName
+     * @param size
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser,String projectName,int size, String startTime, String endTime) {
+        Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByName(projectName);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        if (0 > size) {
+            putMsg(result, Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
+            return result;
+        }
+        if (Objects.isNull(startTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.START_TIME);
+            return result;
+        }
+        Date start=DateUtils.stringToDate(startTime);
+        if (Objects.isNull(endTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.END_TIME);
+            return result;
+        }
+        // TODO the format really matters
+        Date end=DateUtils.stringToDate(endTime);
+        if (start.getTime() > end.getTime()) {
+            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
+            return result;
+        }
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(size, start, end, ExecutionStatus.SUCCESS);
+        result.put(DATA_LIST, processInstances);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
      * query process instance by id
      *
      * @param loginUser login user
@@ -625,5 +669,6 @@ public class ProcessInstanceService extends BaseDAGService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
 
 }

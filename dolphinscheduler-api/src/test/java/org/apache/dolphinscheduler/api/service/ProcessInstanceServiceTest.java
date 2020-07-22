@@ -129,22 +129,44 @@ public class ProcessInstanceServiceTest {
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
-        //executor null
-        when(usersService.queryUser(loginUser.getId())).thenReturn(null);
-        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
-        Map<String, Object> executorExistRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
-                "2020-01-02 00:00:00", "", "admin", ExecutionStatus.SUBMITTED_SUCCESS,
-                "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS, executorExistRes.get(Constants.STATUS));
 
-        //executor name empty
-        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(0), Mockito.any(),
-                eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
-        Map<String, Object> executorEmptyRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
-                "2020-01-02 00:00:00", "", "", ExecutionStatus.SUBMITTED_SUCCESS,
-                "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS, executorEmptyRes.get(Constants.STATUS));
 
+    }
+
+    @Test
+    public void testQueryTopNLongestRunningProcessInstance(){
+        String projectName = "project_test1";
+        User loginUser = getAdminUser();
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+        int size=10;
+        String startTime="2020-01-01 00:00:00";
+        String endTime="2020-08-02 00:00:00";
+        Date start = DateUtils.getScheduleDate(startTime);
+        Date end = DateUtils.getScheduleDate(endTime);
+
+        //project auth fail
+        when(projectMapper.queryByName(projectName)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
+        Map<String, Object> proejctAuthFailRes = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,projectName,size,startTime,endTime);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        ProcessInstance processInstance = getProcessInstance();
+        List<ProcessInstance> processInstanceList = new ArrayList<>();
+        Page<ProcessInstance> pageReturn = new Page<>(1, 10);
+        processInstanceList.add(processInstance);
+        pageReturn.setRecords(processInstanceList);
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
+        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
+        when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
+        Map<String, Object> successRes = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,projectName,size,startTime,endTime);
+
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
