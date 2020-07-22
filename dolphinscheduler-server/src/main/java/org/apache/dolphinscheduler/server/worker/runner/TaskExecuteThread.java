@@ -16,25 +16,35 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.utils.*;
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Set;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -63,13 +73,27 @@ public class TaskExecuteThread implements Runnable {
     private TaskCallbackService taskCallbackService;
 
     /**
+     * taskExecutionContextCacheManager
+     */
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+
+    /**
+     * task logger
+     */
+    private Logger taskLogger;
+
+    /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService){
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
+            , TaskCallbackService taskCallbackService
+            , Logger taskLogger) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskLogger = taskLogger;
     }
 
     @Override
@@ -84,7 +108,6 @@ public class TaskExecuteThread implements Runnable {
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
                     taskExecutionContext.getResources(),
-                    taskExecutionContext.getTenantCode(),
                     logger);
 
             taskExecutionContext.setTaskParams(taskNode.getParams());
@@ -99,16 +122,7 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            // custom logger
-            Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskExecutionContext.getProcessDefineId(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
-
-
-
-            task = TaskManager.newTask(taskExecutionContext,
-                    taskLogger);
+            task = TaskManager.newTask(taskExecutionContext, taskLogger);
 
             // task init
             task.init();
@@ -133,6 +147,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setAppIds(task.getAppIds());
         } finally {
             try {
+                taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             }catch (Exception e){
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -213,22 +228,25 @@ public class TaskExecuteThread implements Runnable {
      * @param logger
      */
     private void downloadResource(String execLocalPath,
-                                  List<String> projectRes,
-                                  String tenantCode,
+                                  Map<String,String> projectRes,
                                   Logger logger) throws Exception {
-        if (CollectionUtils.isEmpty(projectRes)){
+        if (MapUtils.isEmpty(projectRes)){
             return;
         }
 
-        for (String resource : projectRes) {
-            File resFile = new File(execLocalPath, resource);
+        Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
+
+        for (Map.Entry<String,String> resource : resEntries) {
+            String fullName = resource.getKey();
+            String tenantCode = resource.getValue();
+            File resFile = new File(execLocalPath, fullName);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, resource);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, fullName);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resource, false, true);
+                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
                 }catch (Exception e){
                     logger.error(e.getMessage(),e);
                     throw new RuntimeException(e.getMessage());
