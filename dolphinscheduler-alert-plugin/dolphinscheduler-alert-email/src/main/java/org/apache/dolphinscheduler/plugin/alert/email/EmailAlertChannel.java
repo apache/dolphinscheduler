@@ -1,13 +1,16 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +24,11 @@ public class EmailAlertChannel implements AlertChannel {
 
         AlertData alert = info.getAlertData();
         String alertParams = info.getAlertParams();
-        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
+        List<PluginParams> pluginParams = JSONUtils.toList(alertParams, PluginParams.class);
+        Map<String, String> paramsMap = new HashMap<>();
+        for(PluginParams param : pluginParams) {
+            paramsMap.put(param.getName(), param.getValue().toString());
+        }
         MailSender mailSender = new MailSender(paramsMap);
 
         AlertResult alertResult = mailSender.sendMails(alert.getTitle(), alert.getContent());

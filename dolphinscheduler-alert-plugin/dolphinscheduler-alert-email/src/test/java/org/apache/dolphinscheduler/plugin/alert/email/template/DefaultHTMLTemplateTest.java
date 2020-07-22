@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
-import org.apache.dolphinscheduler.plugin.alert.email.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,14 +82,14 @@ public class DefaultHTMLTemplateTest {
 
     private String generateMockTableTypeResultByHand(){
 
-        return Constants.HTML_HEADER_PREFIX +
+        return EmailConstants.HTML_HEADER_PREFIX +
                 "<thead><tr><th>mysql service name</th><th>mysql address</th><th>database client connections</th><th>port</th><th>no index of number</th></tr></thead>\n" +
-                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>190</td><td>3306</td><td>80</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>90</td><td>3306</td><td>10</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
+                "<tr><td>mysql200</td><td>192.168.xx.xx</td><td>190</td><td>3306</td><td>80</td></tr><tr><td>mysql210</td><td>192.168.xx.xx</td><td>90</td><td>3306</td><td>10</td></tr>" + EmailConstants.TABLE_BODY_HTML_TAIL;
 
     }
 
     private String generateMockTextTypeResultByHand(){
 
-        return Constants.HTML_HEADER_PREFIX + "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"190\",\"port\":\"3306\",\"no index of number\":\"80\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"90\",\"port\":\"3306\",\"no index of number\":\"10\"}</td></tr>" + Constants.TABLE_BODY_HTML_TAIL;
+        return EmailConstants.HTML_HEADER_PREFIX + "<tr><td>{\"mysql service name\":\"mysql200\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"190\",\"port\":\"3306\",\"no index of number\":\"80\"}</td></tr><tr><td>{\"mysql service name\":\"mysql210\",\"mysql address\":\"192.168.xx.xx\",\"database client connections\":\"90\",\"port\":\"3306\",\"no index of number\":\"10\"}</td></tr>" + EmailConstants.TABLE_BODY_HTML_TAIL;
     }
 }

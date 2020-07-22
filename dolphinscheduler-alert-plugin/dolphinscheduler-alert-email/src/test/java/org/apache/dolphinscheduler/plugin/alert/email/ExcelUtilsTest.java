@@ -15,10 +15,9 @@
  * limitations under the License.
  */
 
-package java.org.apache.dolphinscheduler.spi.utils;
+package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.spi.utils.DSConstants;
-import org.apache.dolphinscheduler.spi.utils.ExcelUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,7 +79,7 @@ public class ExcelUtilsTest {
         ExcelUtils.genExcelFile(correctContent, title, xlsFilePath);
 
         //Test file exists
-        File xlsFile = new File(xlsFilePath + DSConstants.SINGLE_SLASH + title + DSConstants.EXCEL_SUFFIX_XLS);
+        File xlsFile = new File(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
         assertTrue(xlsFile.exists());
 
         //Expected RuntimeException
@@ -100,7 +99,7 @@ public class ExcelUtilsTest {
     @Test
     public void testGenExcelFileByCheckDir() {
         ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", "/tmp/xls");
-        File file = new File("/tmp/xls" + DSConstants.SINGLE_SLASH + "t" + DSConstants.EXCEL_SUFFIX_XLS);
+        File file = new File("/tmp/xls" + Constants.SINGLE_SLASH + "t" + Constants.EXCEL_SUFFIX_XLS);
         file.delete();
     }
 }

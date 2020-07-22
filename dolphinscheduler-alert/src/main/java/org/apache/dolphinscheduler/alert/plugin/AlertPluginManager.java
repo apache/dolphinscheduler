@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.List;

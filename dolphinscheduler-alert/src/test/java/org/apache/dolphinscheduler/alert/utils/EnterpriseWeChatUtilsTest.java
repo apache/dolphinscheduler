@@ -18,10 +18,10 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -17,16 +17,14 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import com.sun.mail.smtp.SMTPProvider;
-import com.sun.mail.smtp.SMTPSSLProvider;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.CollectionUtils;
-import org.apache.dolphinscheduler.spi.utils.DSConstants;
-import org.apache.dolphinscheduler.spi.utils.ExcelUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +111,7 @@ public class MailSender {
         showType = config.get(MailParamsConstants.SHOW_TYPE);
         requireNonNull(showType, MailParamsConstants.SHOW_TYPE + " must not null");
 
-        xlsFilePath = config.get(Constants.XLS_FILE_PATH);
+        xlsFilePath = config.get(EmailConstants.XLS_FILE_PATH);
         if (StringUtils.isBlank(xlsFilePath)) {
             xlsFilePath = "/tmp/xls";
         }
@@ -166,7 +164,7 @@ public class MailSender {
                 Session session = getSession();
                 email.setMailSession(session);
                 email.setFrom(mailSender);
-                email.setCharset(DSConstants.UTF_8);
+                email.setCharset(Constants.UTF_8);
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
                     for (String receiver : receivers) {
@@ -188,7 +186,7 @@ public class MailSender {
         }else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + DSConstants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
 
                 attachment(title,content,partContent);
 
@@ -276,7 +274,7 @@ public class MailSender {
         props.setProperty(MailParamsConstants.MAIL_SMTP_HOST, mailSmtpHost);
         props.setProperty(MailParamsConstants.MAIL_SMTP_PORT, mailSmtpPort);
         props.setProperty(MailParamsConstants.MAIL_SMTP_AUTH, enableSmtpAuth);
-        props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
+        props.setProperty(EmailConstants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
         props.setProperty(MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE, mailUseStartTLS);
         props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, mailUseSSL);
         props.setProperty(MailParamsConstants.MAIL_SMTP_SSL_TRUST, sslTrust);
@@ -318,10 +316,10 @@ public class MailSender {
         MimeMultipart partList = new MimeMultipart();
         // set signature
         MimeBodyPart part1 = new MimeBodyPart();
-        part1.setContent(partContent, Constants.TEXT_HTML_CHARSET_UTF_8);
+        part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + DSConstants.SINGLE_SLASH +  title + DSConstants.EXCEL_SUFFIX_XLS);
+        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -330,7 +328,7 @@ public class MailSender {
         ExcelUtils.genExcelFile(content,title,xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + DSConstants.EXCEL_SUFFIX_XLS,DSConstants.UTF_8,"B"));
+        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
