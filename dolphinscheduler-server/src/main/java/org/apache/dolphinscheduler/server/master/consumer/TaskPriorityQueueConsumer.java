@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.SqoopJobType;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -31,11 +33,11 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -48,13 +50,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
  * TaskUpdateQueue consumer
@@ -85,6 +83,13 @@ public class TaskPriorityQueueConsumer extends Thread{
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
     @PostConstruct
     public void init(){
         super.setName("TaskUpdateQueueConsumerThread");
@@ -93,14 +98,27 @@ public class TaskPriorityQueueConsumer extends Thread{
 
     @Override
     public void run() {
+        List<String> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()){
             try {
-                // if not task , blocking here
-                String taskPriorityInfo = taskPriorityQueue.take();
-
-                TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
-
-                dispatch(taskPriority.getTaskId());
+                int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
+                failedDispatchTasks.clear();
+                for(int i = 0; i < fetchTaskNum; i++){
+                    if(taskPriorityQueue.size() <= 0){
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                        continue;
+                    }
+                    // if not task , blocking here
+                    String taskPriorityInfo = taskPriorityQueue.take();
+                    TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+                    boolean dispatchResult = dispatch(taskPriority.getTaskId());
+                    if(!dispatchResult){
+                        failedDispatchTasks.add(taskPriorityInfo);
+                    }
+                }
+                for(String dispatchFailedTask : failedDispatchTasks){
+                    taskPriorityQueue.put(dispatchFailedTask);
+                }
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
             }
@@ -114,21 +132,20 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private Boolean dispatch(int taskInstanceId){
-        TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
-        ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
-        Boolean result = false;
-        while (Stopper.isRunning()){
-            try {
-                result = dispatcher.dispatch(executionContext);
-            } catch (ExecuteException e) {
-                logger.error("dispatch error",e);
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }
+    private boolean dispatch(int taskInstanceId){
+        boolean result = false;
+        try {
+            TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
+            ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 
-            if (result || taskInstanceIsFinalState(taskInstanceId)){
-                break;
+            if (taskInstanceIsFinalState(taskInstanceId)){
+                // when task finish, ignore this task, there is no need to dispatch anymore
+                return true;
+            }else{
+                result = dispatcher.dispatch(executionContext);
             }
+        } catch (ExecuteException e) {
+            logger.error("dispatch error",e);
         }
         return result;
     }
@@ -310,7 +327,13 @@ public class TaskPriorityQueueConsumer extends Thread{
             }
 
             List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
-            sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
+            Map<UdfFunc,String> udfFuncMap = new HashMap<>();
+            for(UdfFunc udfFunc : udfFuncList) {
+                String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
+                udfFuncMap.put(udfFunc,tenantCode);
+            }
+
+            sqlTaskExecutionContext.setUdfFuncTenantCodeMap(udfFuncMap);
         }
     }
 
@@ -344,20 +367,23 @@ public class TaskPriorityQueueConsumer extends Thread{
     }
 
     /**
-     * get resource full name list
+     * get resource map key is full name and value is tenantCode
      */
-    private List<String> getResourceFullNames(TaskNode taskNode) {
-        List<String> resourceFullNameList = new ArrayList<>();
+    private Map<String,String> getResourceFullNames(TaskNode taskNode) {
+        Map<String,String> resourceMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
+            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
                 Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    resourceFullNameList.addAll(oldVersionResources.stream().map(resource -> resource.getRes()).collect(Collectors.toSet()));
+
+                    oldVersionResources.forEach(
+                            (t)->resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
+                    );
                 }
 
                 // get the resource id in order to get the resource names in batch
@@ -368,13 +394,13 @@ public class TaskPriorityQueueConsumer extends Thread{
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resourceFullNameList.addAll(resources.stream()
-                            .map(resourceInfo -> resourceInfo.getFullName())
-                            .collect(Collectors.toList()));
+                    resources.forEach(
+                            (t)->resourceMap.put(t.getFullName(),processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
+                    );
                 }
             }
         }
 
-        return resourceFullNameList;
+        return resourceMap;
     }
 }

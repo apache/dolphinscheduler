@@ -25,14 +25,14 @@ import org.apache.dolphinscheduler.common.enums.DbType;
  */
 public class OracleDataSource extends BaseDataSource {
 
-    private DbConnectType type;
+    private DbConnectType connectType;
 
-    public DbConnectType getType() {
-        return type;
+    public DbConnectType getConnectType() {
+        return connectType;
     }
 
-    public void setType(DbConnectType type) {
-        this.type = type;
+    public void setConnectType(DbConnectType connectType) {
+        this.connectType = connectType;
     }
 
     /**
@@ -48,7 +48,7 @@ public class OracleDataSource extends BaseDataSource {
      */
     @Override
     protected void appendDatabase(StringBuilder jdbcUrl) {
-        if (getType() == DbConnectType.ORACLE_SID) {
+        if (getConnectType() == DbConnectType.ORACLE_SID) {
             jdbcUrl.append(":");
         } else {
             jdbcUrl.append("/");
