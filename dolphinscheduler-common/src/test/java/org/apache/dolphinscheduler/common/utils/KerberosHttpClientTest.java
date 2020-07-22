@@ -28,18 +28,18 @@ import org.slf4j.LoggerFactory;
 public class KerberosHttpClientTest {
     public static final Logger logger = LoggerFactory.getLogger(KerberosHttpClientTest.class);
     private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
+
     @Test
     public void get() {
         try {
             String applicationUrl = hadoopUtils.getApplicationUrl("application_1542010131334_0029");
-            if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-                String responseContent;
-                KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                        PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
-                responseContent = kerberosHttpClient.get(applicationUrl,
-                        PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
-                Assert.assertNull(responseContent);
-            }
+            String responseContent;
+            KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+            responseContent = kerberosHttpClient.get(applicationUrl,
+                    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
+            Assert.assertNull(responseContent);
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
