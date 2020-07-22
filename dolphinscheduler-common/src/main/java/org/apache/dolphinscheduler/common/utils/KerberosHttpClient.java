@@ -53,18 +53,12 @@ public class KerberosHttpClient {
     private String principal;
     private String keyTabLocation;
 
-    public KerberosHttpClient() {
-    }
+
 
     public KerberosHttpClient(String principal, String keyTabLocation) {
         super();
         this.principal = principal;
         this.keyTabLocation = keyTabLocation;
-    }
-
-    public KerberosHttpClient(String principal, String keyTabLocation, String krb5Location) {
-        this(principal, keyTabLocation);
-        System.setProperty("java.security.krb5.conf", krb5Location);
     }
 
     public KerberosHttpClient(String principal, String keyTabLocation, boolean isDebug) {

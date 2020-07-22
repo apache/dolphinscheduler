@@ -33,33 +33,45 @@ import org.slf4j.LoggerFactory;
 public class HttpUtilsTest {
 
 
-	public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
+    public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
+    private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
 
+    @Test
+    public void testGetTest() {
+        //success
+        String result = HttpUtils.get("https://github.com/manifest.json");
+        Assert.assertNotNull(result);
+        ObjectNode jsonObject = JSONUtils.parseObject(result);
+        Assert.assertEquals("GitHub", jsonObject.path("name").asText());
+        result = HttpUtils.get("https://123.333.111.33/ccc");
+        Assert.assertNull(result);
+    }
 
-	@Test
-	public void testGetTest(){
-		//success
-		String result = HttpUtils.get("https://github.com/manifest.json");
-		Assert.assertNotNull(result);
-		ObjectNode jsonObject = JSONUtils.parseObject(result);
-		Assert.assertEquals("GitHub", jsonObject.path("name").asText());
+    @Test
+    public void testGetByKerberos() {
+        try {
+            String applicationUrl = hadoopUtils.getApplicationUrl("application_1542010131334_0029");
+            String responseContent;
+            responseContent = HttpUtils.get(applicationUrl);
+            Assert.assertNull(responseContent);
 
-		result = HttpUtils.get("https://123.333.111.33/ccc");
-		Assert.assertNull(result);
-	}
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
 
-	@Test
-	public void testGetResponseContentString() {
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpGet httpget = new HttpGet("https://github.com/manifest.json");
-		/** set timeout、request time、socket timeout */
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
-				.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
-				.setSocketTimeout(Constants.SOCKET_TIMEOUT)
-				.setRedirectsEnabled(true)
-				.build();
-		httpget.setConfig(requestConfig);
-		String responseContent = HttpUtils.getResponseContentString(httpget,httpclient);
-		Assert.assertNotNull(responseContent);
-	}
+    @Test
+    public void testGetResponseContentString() {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpget = new HttpGet("https://github.com/manifest.json");
+        /** set timeout、request time、socket timeout */
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+                .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+                .setSocketTimeout(Constants.SOCKET_TIMEOUT)
+                .setRedirectsEnabled(true)
+                .build();
+        httpget.setConfig(requestConfig);
+        String responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
+        Assert.assertNotNull(responseContent);
+    }
 }
