@@ -45,6 +45,7 @@ import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -112,20 +113,18 @@ public class KerberosHttpClient {
             @SuppressWarnings("serial")
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
+                Map<String, Object> options = new HashMap();
+                options.put("useTicketCache", "false");
+                options.put("useKeyTab", "true");
+                options.put("keyTab", keyTabLocation);
+                options.put("refreshKrb5Config", "true");
+                options.put("principal", principal);
+                options.put("storeKey", "true");
+                options.put("doNotPrompt", "true");
+                options.put("isInitiator", "true");
+                options.put("debug", "true");
                 return new AppConfigurationEntry[]{new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, new HashMap<String, Object>() {
-                    {
-                        put("useTicketCache", "false");
-                        put("useKeyTab", "true");
-                        put("keyTab", keyTabLocation);
-                        put("refreshKrb5Config", "true");
-                        put("principal", principal);
-                        put("storeKey", "true");
-                        put("doNotPrompt", "true");
-                        put("isInitiator", "true");
-                        put("debug", "true");
-                    }
-                })};
+                        AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
             }
         };
         Set<Principal> princ = new HashSet<Principal>(1);
