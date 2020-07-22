@@ -595,5 +595,9 @@ export default {
   'Please delete all non-existent resources': 'Please delete all non-existent resources',
   'The Worker group no longer exists, please select the correct Worker group!': 'The Worker group no longer exists, please select the correct Worker group!',
   'Please confirm whether the workflow has been saved before downloading': 'Please confirm whether the workflow has been saved before downloading',
-  'User name length is between 3 and 39': 'User name length is between 3 and 39'
+  'User name length is between 3 and 39': 'User name length is between 3 and 39',
+  zkDirectory: 'zkDirectory',
+  'Directory detail': 'Directory detail',
+  'Connection name': 'Connection name',
+  'Current connection settings': 'Current connection settings'
 }
