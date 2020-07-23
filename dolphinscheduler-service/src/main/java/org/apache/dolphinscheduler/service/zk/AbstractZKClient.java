@@ -326,7 +326,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	@Override
 	public String toString() {
 		return "AbstractZKClient{" +
-				"zkClient=" + zkClient +
+				"zkClient=" + getZkClient() +
 				", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
 				", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
 				", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +
