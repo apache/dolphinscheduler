@@ -16,9 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.json.JSONException;
 import org.junit.Test;
@@ -43,13 +44,13 @@ public class DependentParamTest {
                 "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
                 "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
 
-        JSONObject taskNode = JSONUtils.parseObject(dependentJson);
-        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
-            String taskType = taskNode.getString("type");
+        ObjectNode taskNode = JSONUtils.parseObject(dependentJson);
+        if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
+            String taskType = taskNode.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addExportSpecialParam(taskNode);
+            JsonNode dependent = addTaskParam.addExportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
@@ -57,13 +58,13 @@ public class DependentParamTest {
         String dependentEmpty = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
                 "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"}";
 
-        JSONObject taskEmpty = JSONUtils.parseObject(dependentEmpty);
-        if (StringUtils.isNotEmpty(taskEmpty.getString("type"))) {
-            String taskType = taskEmpty.getString("type");
+        ObjectNode taskEmpty = JSONUtils.parseObject(dependentEmpty);
+        if (StringUtils.isNotEmpty(taskEmpty.path("type").asText())) {
+            String taskType = taskEmpty.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addImportSpecialParam(taskEmpty);
+            JsonNode dependent = addTaskParam.addImportSpecialParam(taskEmpty);
 
             JSONAssert.assertEquals(taskEmpty.toString(), dependent.toString(), false);
         }
@@ -81,13 +82,13 @@ public class DependentParamTest {
                 "\"projectId\":1,\"cycle\":\"day\",\"definitionId\":7}],\"relation\":\"AND\"}]," +
                 "\"relation\":\"AND\"},\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
 
-        JSONObject taskNode = JSONUtils.parseObject(dependentJson);
-        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
-            String taskType = taskNode.getString("type");
+        ObjectNode taskNode = JSONUtils.parseObject(dependentJson);
+        if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
+            String taskType = taskNode.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNode);
+            JsonNode dependent = addTaskParam.addImportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
@@ -97,13 +98,13 @@ public class DependentParamTest {
                 "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
                 ",\"name\":\"dependent\",\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
 
-        JSONObject taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
-        if (StringUtils.isNotEmpty(taskNodeEmpty.getString("type"))) {
-            String taskType = taskNodeEmpty.getString("type");
+        JsonNode taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
+        if (StringUtils.isNotEmpty(taskNodeEmpty.path("type").asText())) {
+            String taskType = taskNodeEmpty.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNode);
+            JsonNode dependent = addTaskParam.addImportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNodeEmpty.toString(), dependent.toString(), false);
         }

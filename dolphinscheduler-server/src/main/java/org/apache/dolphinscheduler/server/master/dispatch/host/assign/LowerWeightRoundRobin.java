@@ -22,7 +22,7 @@ import java.util.Collection;
 /**
  *  lower weight round robin
  */
-public class LowerWeightRoundRobin implements Selector<HostWeight>{
+public class LowerWeightRoundRobin extends AbstractSelector<HostWeight>{
 
     /**
      * select
@@ -30,7 +30,7 @@ public class LowerWeightRoundRobin implements Selector<HostWeight>{
      * @return HostWeight
      */
     @Override
-    public HostWeight select(Collection<HostWeight> sources){
+    public HostWeight doSelect(Collection<HostWeight> sources){
         int totalWeight = 0;
         int lowWeight = 0;
         HostWeight lowerNode = null;

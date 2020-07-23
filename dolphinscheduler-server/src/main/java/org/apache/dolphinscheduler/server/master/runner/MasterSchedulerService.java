@@ -21,6 +21,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -45,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class MasterSchedulerService extends Thread {
 
     /**
-     * logger of MasterSchedulerThread
+     * logger of MasterSchedulerService
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
 
@@ -79,7 +80,7 @@ public class MasterSchedulerService extends Thread {
 
 
     /**
-     * constructor of MasterSchedulerThread
+     * constructor of MasterSchedulerService
      */
     @PostConstruct
     public void init(){
@@ -90,7 +91,7 @@ public class MasterSchedulerService extends Thread {
 
     @Override
     public void start(){
-        super.setName("MasterSchedulerThread");
+        super.setName("MasterSchedulerService");
         super.start();
     }
 
@@ -108,7 +109,7 @@ public class MasterSchedulerService extends Thread {
     }
 
     /**
-     * run of MasterSchedulerThread
+     * run of MasterSchedulerService
      */
     @Override
     public void run() {
@@ -158,6 +159,6 @@ public class MasterSchedulerService extends Thread {
     }
 
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 }

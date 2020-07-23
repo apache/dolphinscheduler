@@ -22,12 +22,6 @@
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
-		<name>alert.template</name>
-		<value>html</value>
-		<description>alter msg template, default is html template</description>
-		<on-ambari-upgrade add="true"/>
-	</property>
-	<property>
 		<name>mail.protocol</name>
 		<value>SMTP</value>
 		<description></description>

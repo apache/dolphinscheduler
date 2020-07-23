@@ -39,7 +39,7 @@ export HOSTNAME=`hostname`
 
 DOLPHINSCHEDULER_LIB_JARS={{dolphin_lib_jars}}
 
-DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms4g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
+DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms1g -Xss512k -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=10m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
 STOP_TIMEOUT=5
 
 log={{dolphin_log_dir}}/dolphinscheduler-$command-$HOSTNAME.out

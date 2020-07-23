@@ -16,13 +16,10 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -67,7 +64,7 @@ public class DingTalkUtilsTest {
 //            logger.info(PropertyUtils.getString(Constants.DINGTALK_WEBHOOK));
 //           String rsp = DingTalkUtils.sendDingTalkMsg(msgTosend, Constants.UTF_8);
 //           logger.info("send msg result:{}",rsp);
-//            String errmsg = JSON.parseObject(rsp).getString("errmsg");
+//            String errmsg = JSONUtils.parseObject(rsp).getString("errmsg");
 //            Assert.assertEquals("ok", errmsg);
 //        }  catch (Exception e) {
 //            e.printStackTrace();

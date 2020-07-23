@@ -36,12 +36,6 @@ public class OSUtilsTest {
 
 
     @Test
-    public void getHost(){
-        logger.info(OSUtils.getHost());
-    }
-
-
-    @Test
     public void memoryUsage() {
         logger.info("memoryUsage : {}", OSUtils.memoryUsage());// 0.3361799418926239
     }

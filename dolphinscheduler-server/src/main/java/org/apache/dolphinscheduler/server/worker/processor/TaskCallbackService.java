@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -33,19 +32,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
- *  taks callback service
+ *  task callback service
  */
 @Service
 public class TaskCallbackService {
 
     private final Logger logger = LoggerFactory.getLogger(TaskCallbackService.class);
+    private static final int [] RETRY_BACKOFF = { 1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200 };
 
     /**
      *  remote channels
@@ -57,6 +55,7 @@ public class TaskCallbackService {
      */
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
+
 
     /**
      * netty remoting client
@@ -95,25 +94,43 @@ public class TaskCallbackService {
         if(newChannel != null){
             return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
         }
-        logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
+        logger.warn("original master : {} for task : {} is not reachable, random select master",
+                nettyRemoteChannel.getHost(),
+                taskInstanceId);
         Set<String> masterNodes = null;
+        int ntries = 0;
         while (Stopper.isRunning()) {
             masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
             if (CollectionUtils.isEmpty(masterNodes)) {
-                logger.error("no available master node");
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }else {
-                break;
+                logger.info("try {} times but not find any master for task : {}.",
+                        ntries + 1,
+                        taskInstanceId);
+                masterNodes = null;
+                ThreadUtils.sleep(pause(ntries++));
+                continue;
             }
-        }
-        for(String masterNode : masterNodes){
-            newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
-            if(newChannel != null){
-                return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+            logger.info("try {} times to find {} masters for task : {}.",
+                    ntries + 1,
+                    masterNodes.size(),
+                    taskInstanceId);
+            for (String masterNode : masterNodes) {
+                newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+                if (newChannel != null) {
+                    return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+                }
             }
+            masterNodes = null;
+            ThreadUtils.sleep(pause(ntries++));
         }
-        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable", masterNodes));
+
+        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
+
+
+    public int pause(int ntries){
+        return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
+    }
+
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId){
         NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel, opaque);
