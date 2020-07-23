@@ -41,6 +41,7 @@ public enum ExecutionStatus {
      * 9 kill
      * 10 waiting thread
      * 11 waiting depend node complete
+     * 12 forced success
      */
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXEUTION(1, "running"),
@@ -53,7 +54,8 @@ public enum ExecutionStatus {
     NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
     KILL(9, "kill"),
     WAITTING_THREAD(10, "waiting thread"),
-    WAITTING_DEPEND(11, "waiting depend node complete");
+    WAITTING_DEPEND(11, "waiting depend node complete"),
+    FORCED_SUCCESS(12, "forced success");
 
     ExecutionStatus(int code, String descp){
         this.code = code;
@@ -77,7 +79,7 @@ public enum ExecutionStatus {
   * @return status
   */
    public boolean typeIsSuccess(){
-     return this == SUCCESS;
+     return this == SUCCESS || this == FORCED_SUCCESS;
    }
 
  /**

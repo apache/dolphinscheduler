@@ -189,4 +189,9 @@ public class TaskInstanceServiceTest {
             result.put(Constants.MSG, status.getMsg());
         }
     }
+
+    @Test
+    public void forceSingleTaskSuccess() {
+        // TODO: 加入测试
+    }
 }

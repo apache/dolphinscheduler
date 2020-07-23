@@ -34,6 +34,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 
 /**
@@ -101,6 +102,30 @@ public class TaskInstanceController extends BaseController {
         Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
+    }
+
+    /**
+     * change one single task instance's state from failure to forced success
+     *
+     * @param loginUser      login user
+     * @param projectName    project name
+     * @param taskInstanceId task instance id
+     * @return the result code and msg
+     */
+    @ApiOperation(value = "force-success", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INTSTANCE_ID", required = true, dataType = "Int", example = "2")
+    })
+    @PostMapping(value = "/force-success")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(FORCE_TASK_SUCCESS_ERROR)
+    public Result forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                         @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
+        logger.info("force task success, login user: {}, project:{}, task instance id:{}",
+                loginUser.getUserName(), projectName, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceSingleTaskSuccess(loginUser, projectName, taskInstanceId);
+        return returnDataList(result);
     }
 
 }
