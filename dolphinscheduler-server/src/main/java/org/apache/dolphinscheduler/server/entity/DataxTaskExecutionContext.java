@@ -24,6 +24,10 @@ import java.io.Serializable;
  */
 public class DataxTaskExecutionContext implements Serializable{
 
+    public static void main(String[] args) {
+
+    }
+
     /**
      * dataSourceId
      */
