@@ -93,14 +93,24 @@ public class Session {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Session session = (Session) o;
 
-        if (userId != session.userId) return false;
-        if (!id.equals(session.id)) return false;
-        if (!lastLoginTime.equals(session.lastLoginTime)) return false;
+        if (userId != session.userId) {
+            return false;
+        }
+        if (!id.equals(session.id)) {
+            return false;
+        }
+        if (!lastLoginTime.equals(session.lastLoginTime)) {
+            return false;
+        }
         return ip.equals(session.ip);
     }
 
