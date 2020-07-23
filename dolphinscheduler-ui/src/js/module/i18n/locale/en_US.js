@@ -622,7 +622,6 @@ export default {
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
   'Please save the DAG before formatting': 'Please save the DAG before formatting',
-  'Disable': 'Disable',
   'Remote Exec' : 'Remote Exec',
   'Please select the remote server': 'Please select the remote server'
 }

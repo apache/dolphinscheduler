@@ -246,7 +246,7 @@ public class DataSourceService extends BaseService{
             host = hostsPorts[0];
             port = hostsPorts[1];
         }
-        
+
         String separator;
         switch (dataSource.getType()) {
             case HIVE:
