@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 import com.github.rholder.retry.RetryException;
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -31,6 +34,7 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -138,24 +142,21 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @return log path
      */
     private String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return "/Users/wang/logs/dolphinscheduler/task-" + taskExecutionContext.getProcessDefineId() +
-                "-" + taskExecutionContext.getProcessInstanceId() + "-" +
+        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                .getLogger("ROOT")
+                .getAppender("TASKLOGFILE"))
+                .getDiscriminator()).getLogBase();
+        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+            return baseLog + Constants.SINGLE_SLASH +
+                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskExecutionContext.getTaskInstanceId() + ".log";
+        }
+        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                baseLog +  Constants.SINGLE_SLASH +
+                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
                 taskExecutionContext.getTaskInstanceId() + ".log";
-//        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-//                .getLogger("ROOT")
-//                .getAppender("TASKLOGFILE"))
-//                .getDiscriminator()).getLogBase();
-//        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-//            return baseLog + Constants.SINGLE_SLASH +
-//                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-//                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-//                    taskExecutionContext.getTaskInstanceId() + ".log";
-//        }
-//        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-//                baseLog +  Constants.SINGLE_SLASH +
-//                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-//                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-//                taskExecutionContext.getTaskInstanceId() + ".log";
     }
 
     /**

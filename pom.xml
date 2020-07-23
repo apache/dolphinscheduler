@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -785,12 +785,14 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/entity/UdfFuncTest.java</include>
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
                         <!--<include>**/remote/NettyRemotingClientTest.java</include>-->
                         <include>**/remote/ResponseFutureTest.java</include>
                         <!--<include>**/server/log/LoggerServerTest.java</include>-->
+                        <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
@@ -817,7 +819,7 @@
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <!--<include>**/server/worker/processor/TaskCallbackServiceTest.java</include>-->
-                        <!--<include>**/server/worker/registry/WorkerRegistryTest.java</include>-->
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
@@ -830,6 +832,7 @@
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
+                        <include>**/service/zk/CuratorZookeeperClientTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
 
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
@@ -852,6 +855,7 @@
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
+                        <include>**/dao/datasource/HiveDataSourceTest.java</include>
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
@@ -915,7 +919,7 @@
                         <exclude>**/dist/**</exclude>
                         <exclude>**/licenses/**</exclude>
                         <exclude>.github/**</exclude>
-                        <exclude>sql/soft_version</exclude>
+                        <exclude>**/sql/soft_version</exclude>
                         <exclude>**/common/utils/ScriptRunner.java</exclude>
                         <exclude>**/*.json</exclude>
                         <!-- document files -->

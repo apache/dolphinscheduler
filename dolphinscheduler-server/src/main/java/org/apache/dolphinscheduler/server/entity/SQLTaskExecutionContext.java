@@ -18,9 +18,10 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-
+import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 /**
  *  SQL Task ExecutionContext
@@ -38,9 +39,10 @@ public class SQLTaskExecutionContext implements Serializable {
      */
     private String connectionParams;
     /**
-     * udf function list
+     * udf function tenant code map
      */
-    private List<UdfFunc> udfFuncList;
+    @JsonDeserialize(keyUsing = UdfFuncDeserializer.class)
+    private Map<UdfFunc,String> udfFuncTenantCodeMap;
 
 
     public int getWarningGroupId() {
@@ -51,12 +53,12 @@ public class SQLTaskExecutionContext implements Serializable {
         this.warningGroupId = warningGroupId;
     }
 
-    public List<UdfFunc> getUdfFuncList() {
-        return udfFuncList;
+    public Map<UdfFunc, String> getUdfFuncTenantCodeMap() {
+        return udfFuncTenantCodeMap;
     }
 
-    public void setUdfFuncList(List<UdfFunc> udfFuncList) {
-        this.udfFuncList = udfFuncList;
+    public void setUdfFuncTenantCodeMap(Map<UdfFunc, String> udfFuncTenantCodeMap) {
+        this.udfFuncTenantCodeMap = udfFuncTenantCodeMap;
     }
 
     public String getConnectionParams() {
@@ -72,7 +74,7 @@ public class SQLTaskExecutionContext implements Serializable {
         return "SQLTaskExecutionContext{" +
                 "warningGroupId=" + warningGroupId +
                 ", connectionParams='" + connectionParams + '\'' +
-                ", udfFuncList=" + udfFuncList +
+                ", udfFuncTenantCodeMap=" + udfFuncTenantCodeMap +
                 '}';
     }
 }

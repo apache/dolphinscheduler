@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,10 +28,11 @@ import org.apache.dolphinscheduler.common.utils.*;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 /**
  * task instance
@@ -219,7 +221,7 @@ public class TaskInstance implements Serializable {
 
 
     @TableField(exist = false)
-    private List<String> resources;
+    private Map<String,String> resources;
 
     /**
      * delay execution time
@@ -472,8 +474,12 @@ public class TaskInstance implements Serializable {
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
 
-    public List<String> getResources() {
+    public Map<String, String> getResources() {
         return resources;
+    }
+
+    public void setResources(Map<String, String> resources) {
+        this.resources = resources;
     }
 
     public boolean isSubProcess(){
@@ -488,9 +494,7 @@ public class TaskInstance implements Serializable {
         return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
 
-    public void setResources(List<String> resources) {
-        this.resources = resources;
-    }
+
 
     /**
      * determine if you can try again

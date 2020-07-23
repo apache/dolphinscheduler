@@ -47,7 +47,6 @@ export default {
   'Confirm add': '确认添加',
   'The newly created sub-Process has not yet been executed and cannot enter the sub-Process': '新创建子工作流还未执行，不能进入子工作流',
   'The task has not been executed and cannot enter the sub-Process': '该任务还未执行，不能进入子工作流',
-  'Please enter name (required)': '请输入名称（必填）',
   'Name already exists': '名称已存在请重新输入',
   'Download Log': '下载日志',
   'Refresh Log': '刷新日志',
@@ -114,6 +113,10 @@ export default {
   'Memory should be a positive integer': '内存数为数字',
   'Please enter ExecutorPlease enter Executor core number': '请填写Executor内核数',
   'Core number should be positive integer': '内核数为正整数',
+  'Please enter jobManager memory': '请输入JobManager内存数',
+  'Please enter the taskManager memory': '请输入TaskManager内存数',
+  'Please enter solt number': '请输入solt数量',
+  'Please enter taskManager number': '请输入taskManager数量',
   'SQL Type': 'sql类型',
   Title: '主题',
   'Please enter the title of email': '请输入邮件主题',
@@ -612,5 +615,10 @@ export default {
   'Socket Timeout':'Socket超时',
   'Connect timeout be a positive integer': '连接超时必须为数字',
   'Socket Timeout be a positive integer': 'Socket超时必须为数字',
-  'ms':'毫秒'
+  'ms':'毫秒',
+  zkDirectory: 'zk注册目录',
+  'Directory detail': '查看目录详情',
+  'Connection name': '连线名',
+  'Current connection settings': '当前连线设置',
+  'Please save the DAG before formatting': '格式化前请先保存DAG'
 }

@@ -113,6 +113,10 @@ export default {
   'Memory should be a positive integer': 'Memory should be a positive integer',
   'Please enter ExecutorPlease enter Executor core number': 'Please enter ExecutorPlease enter Executor core number',
   'Core number should be positive integer': 'Core number should be positive integer',
+  'Please enter jobManager memory': 'Please enter jobManager memory',
+  'Please enter the taskManager memory': 'Please enter the taskManager memory',
+  'Please enter solt number': 'Please enter solt number',
+  'Please enter taskManager number': 'Please enter taskManager number',
   'SQL Type': 'SQL Type',
   Title: 'Title',
   'Please enter the title of email': 'Please enter the title of email',
@@ -612,5 +616,10 @@ export default {
   'Disable': 'Disable',
   'The Worker group no longer exists, please select the correct Worker group!': 'The Worker group no longer exists, please select the correct Worker group!',
   'Please confirm whether the workflow has been saved before downloading': 'Please confirm whether the workflow has been saved before downloading',
-  'User name length is between 3 and 39': 'User name length is between 3 and 39'
+  'User name length is between 3 and 39': 'User name length is between 3 and 39',
+  zkDirectory: 'zkDirectory',
+  'Directory detail': 'Directory detail',
+  'Connection name': 'Connection name',
+  'Current connection settings': 'Current connection settings',
+  'Please save the DAG before formatting': 'Please save the DAG before formatting'
 }
