@@ -200,6 +200,7 @@ public class ProcessService {
         cmdTypeMap.put(CommandType.REPEAT_RUNNING,1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS,1);
         cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS,1);
+        cmdTypeMap.put(CommandType.RESUME_FROM_FORCED_SUCCESS,1);
         CommandType commandType = command.getCommandType();
 
         if(cmdTypeMap.containsKey(commandType)){
