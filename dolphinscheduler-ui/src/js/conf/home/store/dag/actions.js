@@ -230,6 +230,7 @@ export default {
         id: payload
       }, res => {
         resolve(res)
+        state.isEditDag = false
       }).catch(e => {
         reject(e)
       })
