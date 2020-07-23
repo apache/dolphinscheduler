@@ -590,5 +590,7 @@ export default {
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
   'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required',
   'Unauthorized or deleted resources': 'Unauthorized or deleted resources',
-  'Please delete all non-existent resources': 'Please delete all non-existent resources'
+  'Please delete all non-existent resources': 'Please delete all non-existent resources',
+  'Enable': 'Enable',
+  'Disable': 'Disable'
 }
