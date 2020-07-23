@@ -53,6 +53,24 @@ public class ProcessInstanceMapperTest {
 
 
     /**
+     * insert process instance with specified start time and end time,set state to SUCCESS
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    private ProcessInstance insertOne(Date startTime, Date endTime) {
+        ProcessInstance processInstance = new ProcessInstance();
+        Date start = startTime;
+        Date end = endTime;
+        processInstance.setStartTime(start);
+        processInstance.setEndTime(end);
+        processInstance.setState(ExecutionStatus.SUCCESS);
+
+        processInstanceMapper.insert(processInstance);
+        return processInstance;
+    }
+    /**
      * insert
      * @return ProcessInstance
      */
@@ -327,6 +345,51 @@ public class ProcessInstanceMapperTest {
         Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());
+
+    }
+    
+    /**
+     * test whether it is in descending order by running duration
+     *
+     * @param processInstances
+     * @return
+     */
+    private boolean isSortedByDuration(List<ProcessInstance> processInstances) {
+        for (int i = 1; i < processInstances.size(); i++) {
+            long d1 = processInstances.get(i).getEndTime().getTime() - processInstances.get(i).getStartTime().getTime();
+            long d2 = processInstances.get(i - 1).getEndTime().getTime() - processInstances.get(i - 1).getStartTime().getTime();
+            if (d1 > d2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * test query top n process instance order by running duration
+     */
+    @Test
+    public void testQueryTopNProcessInstance() {
+        Date startTime1 = new Date(2019, 7, 9, 10, 9, 9);
+        Date endTime1 = new Date(2019, 7, 9, 10, 9, 14);
+        Date startTime2 = new Date(2020, 7, 9, 10, 9, 9);
+        Date endTime2 = new Date(2020, 7, 9, 10, 9, 30);
+        Date startTime3 = new Date(2020, 6, 9, 10, 9, 9);
+        Date endTime3 = new Date(2020, 7, 9, 10, 9, 30);
+        ProcessInstance processInstance1 = insertOne(startTime1, endTime1);
+        ProcessInstance processInstance2 = insertOne(startTime2, endTime2);
+        ProcessInstance processInstance3 = insertOne(startTime3, endTime3);
+        Date start = new Date(2020, 1, 1, 1, 1, 1);
+        Date end = new Date(2021, 1, 1, 1, 1, 1);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end,ExecutionStatus.SUCCESS);
+        Assert.assertEquals(2, processInstances.size());
+        Assert.assertTrue(isSortedByDuration(processInstances));
+        for (ProcessInstance processInstance : processInstances) {
+            Assert.assertTrue(processInstance.getState().typeIsSuccess());
+        }
+        processInstanceMapper.deleteById(processInstance1.getId());
+        processInstanceMapper.deleteById(processInstance2.getId());
+        processInstanceMapper.deleteById(processInstance3.getId());
 
     }
 }

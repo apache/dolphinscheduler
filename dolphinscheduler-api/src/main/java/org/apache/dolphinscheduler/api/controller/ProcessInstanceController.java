@@ -204,6 +204,28 @@ public class ProcessInstanceController extends BaseController {
         return returnDataList(result);
     }
 
+    @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "startTime", value = "PROCESS_INSTANCE_START_TIME", dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "PROCESS_INSTANCE_END_TIME", dataType = "String"),
+    })
+    @GetMapping(value = "/top-n")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    public Result queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                         @RequestParam("size") Integer size,
+                                                         @RequestParam(value = "startTime",required = true) String startTime,
+                                                         @RequestParam(value = "endTime",required = true) String endTime
+
+    ){
+        logger.info("query top {} SUCCESS process instance order by running time which started between startTime and endTime ,login user:{},project name:{}",size,
+                loginUser.getUserName(),projectName);
+        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,projectName,size,startTime,endTime);
+        return returnDataList(result);
+    }
+
     /**
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
