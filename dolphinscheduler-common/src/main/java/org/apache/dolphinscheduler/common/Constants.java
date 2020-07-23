@@ -979,6 +979,11 @@ public final class Constants {
     public static final int ABNORMAL_NODE_STATUS = 1;
 
     /**
+     * system line separator
+     */
+    public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
+
+    /**
      * net system properties
      */
     public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
