@@ -1,13 +1,15 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG] bug title "
+title: "[Bug][Module Name] Bug title "
 labels: bug
 assignees: ''
 
 ---
 
 *For better global communication, please give priority to using English description, thx! *
+
+*Please review https://dolphinscheduler.apache.org/en-us/docs/development/issue.html when describe an issue.*
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -32,5 +34,5 @@ If applicable, add screenshots to help explain your problem.
 **Additional context**
 Add any other context about the problem here.
 
-**Requirement or improvement
+**Requirement or improvement**
 - Please describe about your requirements or improvement suggestions.

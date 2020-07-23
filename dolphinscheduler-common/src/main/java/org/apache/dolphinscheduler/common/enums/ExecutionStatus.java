@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
+import java.util.HashMap;
+
 /**
  * running status for workflow and task nodes
  *
@@ -62,6 +64,13 @@ public enum ExecutionStatus {
     private final int code;
     private final String descp;
 
+    private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP=new HashMap<>();
+
+    static {
+       for (ExecutionStatus executionStatus:ExecutionStatus.values()){
+           EXECUTION_STATUS_MAP.put(executionStatus.code,executionStatus);
+       }
+    }
 
  /**
   * status is success
@@ -86,14 +95,14 @@ public enum ExecutionStatus {
    public boolean typeIsFinished(){
 
        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-               || typeIsWaittingThread();
+               || typeIsStop();
    }
 
     /**
      * status is waiting thread
      * @return status
      */
-   public boolean typeIsWaittingThread(){
+   public boolean typeIsWaitingThread(){
        return this == WAITTING_THREAD;
    }
 
@@ -104,6 +113,13 @@ public enum ExecutionStatus {
    public boolean typeIsPause(){
        return this == PAUSE;
    }
+    /**
+     * status is pause
+     * @return status
+     */
+    public boolean typeIsStop(){
+        return this == STOP;
+    }
 
     /**
      * status is running
@@ -130,11 +146,9 @@ public enum ExecutionStatus {
     }
 
     public static ExecutionStatus of(int status){
-        for(ExecutionStatus es : values()){
-            if(es.getCode() == status){
-                return es;
-            }
-        }
+       if(EXECUTION_STATUS_MAP.containsKey(status)){
+           return EXECUTION_STATUS_MAP.get(status);
+       }
         throw new IllegalArgumentException("invalid status : " + status);
     }
 }

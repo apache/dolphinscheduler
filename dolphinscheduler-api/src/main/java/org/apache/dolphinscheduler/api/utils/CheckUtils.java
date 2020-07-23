@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.utils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 
@@ -115,7 +115,7 @@ public class CheckUtils {
    *
    * @param parameter parameter
    * @param taskType task type
-   * @return true if taks node parameters are valid, otherwise return false
+   * @return true if task node parameters are valid, otherwise return false
    */
   public static boolean checkTaskNodeParameters(String parameter, String taskType) {
     AbstractParameters abstractParameters = TaskParametersUtils.getParameters(taskType, parameter);
