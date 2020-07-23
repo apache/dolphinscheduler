@@ -45,6 +45,11 @@ public class TaskExecuteResponseCommand implements Serializable {
      */
     private int status;
 
+    /**
+     *  start time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date startTime;
 
     /**
      *  end time
@@ -78,6 +83,14 @@ public class TaskExecuteResponseCommand implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public Date getEndTime() {

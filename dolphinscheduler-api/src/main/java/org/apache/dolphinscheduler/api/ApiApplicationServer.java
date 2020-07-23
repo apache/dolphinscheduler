@@ -22,7 +22,6 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
@@ -33,6 +32,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
+    System.setProperty("spring.profiles.active", "api");
     SpringApplication.run(ApiApplicationServer.class, args);
   }
 

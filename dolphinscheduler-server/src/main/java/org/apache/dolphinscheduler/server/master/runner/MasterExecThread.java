@@ -473,7 +473,8 @@ public class MasterExecThread implements Runnable {
             taskInstance.setAlertFlag(Flag.NO);
 
             // task instance start time
-            taskInstance.setStartTime(new Date());
+            // reason: Delete this code because of the addition of the deferred execution feature.
+            // taskInstance.setStartTime(new Date());
 
             // task instance flag
             taskInstance.setFlag(Flag.YES);
@@ -503,6 +504,12 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
 
+            // delay execution time
+            taskInstance.setDelayTime(taskNode.getDelayTime());
+
+            // the timeout that waits for the dependent instance(s) to start
+
+            // the detection interval for whether the dependent instance(s) is(are) started.
         }
         return taskInstance;
     }

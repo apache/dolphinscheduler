@@ -134,6 +134,7 @@ public class TaskResponseService {
                 break;
             case RESULT:
                 processService.changeTaskState(taskResponseEvent.getState(),
+                        taskResponseEvent.getStartTime(),
                         taskResponseEvent.getEndTime(),
                         taskResponseEvent.getProcessId(),
                         taskResponseEvent.getAppIds(),

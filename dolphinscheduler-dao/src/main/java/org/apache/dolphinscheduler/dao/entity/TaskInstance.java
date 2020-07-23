@@ -83,6 +83,12 @@ public class TaskInstance implements Serializable {
     private ExecutionStatus state;
 
     /**
+     * task first submit time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date firstSubmitTime;
+
+    /**
      * task submit time
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
@@ -215,7 +221,10 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private List<String> resources;
 
-
+    /**
+     * delay execution time
+     */
+    private int delayTime;
 
     public void init(String host,Date startTime,String executePath){
         this.host = host;
@@ -294,6 +303,14 @@ public class TaskInstance implements Serializable {
 
     public void setState(ExecutionStatus state) {
         this.state = state;
+    }
+
+    public Date getFirstSubmitTime() {
+        return firstSubmitTime;
+    }
+
+    public void setFirstSubmitTime(Date firstSubmitTime) {
+        this.firstSubmitTime = firstSubmitTime;
     }
 
     public Date getSubmitTime() {
@@ -525,6 +542,14 @@ public class TaskInstance implements Serializable {
 
     public void setDependentResult(String dependentResult) {
         this.dependentResult = dependentResult;
+    }
+
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
     }
 
     @Override

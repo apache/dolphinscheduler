@@ -91,9 +91,10 @@ public class TaskResponseEvent {
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId){
+    public static TaskResponseEvent newResult(ExecutionStatus state, Date startTime, Date endTime, int processId, String appIds, int taskInstanceId){
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
+        event.setStartTime(startTime);
         event.setEndTime(endTime);
         event.setProcessId(processId);
         event.setAppIds(appIds);

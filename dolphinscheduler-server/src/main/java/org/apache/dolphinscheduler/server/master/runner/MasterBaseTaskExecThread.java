@@ -20,7 +20,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -32,9 +32,10 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 import java.util.concurrent.Callable;
+
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
 
 /**
@@ -271,6 +272,5 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
         return logPath;
     }
-
 
 }

@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1005,7 +1004,7 @@ public class ProcessService {
                         taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
                     }
                     taskInstance.setEndTime(null);
-                    taskInstance.setStartTime(new Date());
+                    //taskInstance.setStartTime(new Date());
                     taskInstance.setFlag(Flag.YES);
                     taskInstance.setHost(null);
                     taskInstance.setId(0);
@@ -1016,6 +1015,9 @@ public class ProcessService {
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
         taskInstance.setSubmitTime(new Date());
+        if (taskInstance.getRetryTimes() == 0) {
+            taskInstance.setFirstSubmitTime(new Date());
+        }
         boolean saveResult = saveTaskInstance(taskInstance);
         if(!saveResult){
             return null;
@@ -1403,6 +1405,7 @@ public class ProcessService {
      * @param taskInstId taskInstId
      */
     public void changeTaskState(ExecutionStatus state,
+                                Date startTime,
                                 Date endTime,
                                 int processId,
                                 String appIds,
@@ -1411,6 +1414,7 @@ public class ProcessService {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
+        taskInstance.setStartTime(startTime);
         taskInstance.setEndTime(endTime);
         saveTaskInstance(taskInstance);
     }

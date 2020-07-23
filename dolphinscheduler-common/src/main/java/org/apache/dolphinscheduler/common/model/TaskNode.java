@@ -136,6 +136,11 @@ public class TaskNode {
   @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
   private String timeout;
 
+  /**
+   * delay execution time
+   */
+  private int delayTime;
+
   public String getId() {
     return id;
   }
@@ -352,5 +357,13 @@ public class TaskNode {
 
   public void setWorkerGroupId(Integer workerGroupId) {
     this.workerGroupId = workerGroupId;
+  }
+
+  public int getDelayTime() {
+    return delayTime;
+  }
+
+  public void setDelayTime(int delayTime) {
+    this.delayTime = delayTime;
   }
 }

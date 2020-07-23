@@ -53,7 +53,8 @@ public enum ExecutionStatus {
     NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
     KILL(9, "kill"),
     WAITTING_THREAD(10, "waiting thread"),
-    WAITTING_DEPEND(11, "waiting depend node complete");
+    WAITTING_DEPEND(11, "waiting depend node complete"),
+    DELAY_EXECUTION(13, "delay execution");
 
     ExecutionStatus(int code, String descp){
         this.code = code;
@@ -126,7 +127,7 @@ public enum ExecutionStatus {
      * @return status
      */
    public boolean typeIsRunning(){
-       return this == RUNNING_EXEUTION || this == WAITTING_DEPEND;
+       return this == RUNNING_EXEUTION || this == WAITTING_DEPEND || this == DELAY_EXECUTION;
    }
 
     /**

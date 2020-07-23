@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
@@ -42,6 +43,12 @@ public class TaskExecutionContext implements Serializable{
      *  task name
      */
     private String taskName;
+
+    /**
+     *  task first submit time
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date firstSubmitTime;
 
     /**
      *  task start time
@@ -171,6 +178,16 @@ public class TaskExecutionContext implements Serializable{
     private String workerGroup;
 
     /**
+     * delay execution time
+     */
+    private int delayTime;
+
+    /**
+     * current execution status
+     */
+    private ExecutionStatus currentExecutionStatus;
+
+    /**
      * resources full name
      */
     private List<String> resources;
@@ -214,6 +231,14 @@ public class TaskExecutionContext implements Serializable{
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    public Date getFirstSubmitTime() {
+        return firstSubmitTime;
+    }
+
+    public void setFirstSubmitTime(Date firstSubmitTime) {
+        this.firstSubmitTime = firstSubmitTime;
     }
 
     public Date getStartTime() {
@@ -408,6 +433,22 @@ public class TaskExecutionContext implements Serializable{
         this.workerGroup = workerGroup;
     }
 
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
+
+    public ExecutionStatus getCurrentExecutionStatus() {
+        return currentExecutionStatus;
+    }
+
+    public void setCurrentExecutionStatus(ExecutionStatus currentExecutionStatus) {
+        this.currentExecutionStatus = currentExecutionStatus;
+    }
+
     public SQLTaskExecutionContext getSqlTaskExecutionContext() {
         return sqlTaskExecutionContext;
     }
@@ -491,6 +532,7 @@ public class TaskExecutionContext implements Serializable{
                 ", taskTimeoutStrategy=" + taskTimeoutStrategy +
                 ", taskTimeout=" + taskTimeout +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", delayTime=" + delayTime +
                 ", resources=" + resources +
                 ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
                 ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +

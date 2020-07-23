@@ -18,11 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
 import com.github.rholder.retry.RetryException;
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -34,7 +31,6 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -97,7 +93,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             return;
         }
 
-         taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
 
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
@@ -122,7 +118,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        // tell master that task is in executing
+        // tell master the status of this task (RUNNING_EXECUTION or DELAY_EXECUTION)
         final Command ackCommand = buildAckCommand(taskExecutionContext).convert2Command();
 
         try {
@@ -142,21 +138,24 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @return log path
      */
     private String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                .getLogger("ROOT")
-                .getAppender("TASKLOGFILE"))
-                .getDiscriminator()).getLogBase();
-        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-            return baseLog + Constants.SINGLE_SLASH +
-                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                    taskExecutionContext.getTaskInstanceId() + ".log";
-        }
-        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                baseLog +  Constants.SINGLE_SLASH +
-                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+        return "/Users/wang/logs/dolphinscheduler/task-" + taskExecutionContext.getProcessDefineId() +
+                "-" + taskExecutionContext.getProcessInstanceId() + "-" +
                 taskExecutionContext.getTaskInstanceId() + ".log";
+//        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+//                .getLogger("ROOT")
+//                .getAppender("TASKLOGFILE"))
+//                .getDiscriminator()).getLogBase();
+//        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+//            return baseLog + Constants.SINGLE_SLASH +
+//                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+//                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+//                    taskExecutionContext.getTaskInstanceId() + ".log";
+//        }
+//        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+//                baseLog +  Constants.SINGLE_SLASH +
+//                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+//                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+//                taskExecutionContext.getTaskInstanceId() + ".log";
     }
 
     /**
@@ -167,10 +166,17 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private TaskExecuteAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
+        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime()) > 0) {
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
+            ackCommand.setStatus(ExecutionStatus.DELAY_EXECUTION.getCode());
+            ackCommand.setStartTime(null);
+        } else {
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXEUTION);
+            ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
+            ackCommand.setStartTime(new Date());
+        }
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
-        ackCommand.setStartTime(new Date());
         if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);
         }else{

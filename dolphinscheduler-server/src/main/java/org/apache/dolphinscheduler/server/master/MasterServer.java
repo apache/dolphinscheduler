@@ -99,6 +99,7 @@ public class MasterServer {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
+        System.setProperty("spring.profiles.active","master");
         new SpringApplicationBuilder(MasterServer.class).web(WebApplicationType.NONE).run(args);
     }
 
