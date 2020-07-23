@@ -102,4 +102,11 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      */
     @MapKey("id")
     List<Map<String, Object>> listResources();
+
+    /**
+     * list all resource ids by user id
+     * @return resource ids list
+     */
+    @MapKey("id")
+    List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
 }
