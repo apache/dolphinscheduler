@@ -195,7 +195,7 @@ public class AlertSenderTest {
 
         PasswordParam mailPassword = new PasswordParam("mailPasswd", "mail.passwd");
         mailPassword.setPlaceholder("if enable use authentication, you need input password");
-        mailPassword.setValue("BR9nq5e8");
+        mailPassword.setValue("xxxxxxx");
 
         RadioParam enableTls = new RadioParam("starttlsEnable", "mail.smtp.starttls.enable");
         enableTls.addParamsOptions(new ParamsOptions("YES", true, false))
