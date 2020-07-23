@@ -604,5 +604,6 @@ export default {
   zkDirectory: 'zk注册目录',
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
-  'Current connection settings': '当前连线设置'
+  'Current connection settings': '当前连线设置',
+  'Please save the DAG before formatting': '格式化前请先保存DAG'
 }
