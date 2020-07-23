@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.*;
