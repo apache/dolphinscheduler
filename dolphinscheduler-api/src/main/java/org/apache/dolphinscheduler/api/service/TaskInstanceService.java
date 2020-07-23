@@ -138,4 +138,51 @@ public class TaskInstanceService extends BaseService {
 
         return result;
     }
+
+    /**
+     * change one single task instance's state from failure to forced success
+     *
+     * @param loginUser      login user
+     * @param projectName    project name
+     * @param taskInstanceId task instance id
+     * @return the result code and msg
+     */
+    public Map<String, Object> forceSingleTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        // check user auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status status = (Status) checkResult.get(Constants.STATUS);
+        if (status != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        // check whether the task instance can be found
+        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
+        if (task == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        // check whether the task instance state type is failure
+        if (!task.getState().typeIsFailure()) {
+            // FIXME: 这个status的msg中是包含参数的，需要处理一下（已完善，待测试）
+            putMsg(result, Status.TASK_INSTANCE_STATE_OPETATION_ERROR, taskInstanceId, task.getState().toString());
+            return result;
+        }
+
+        // change the state of the task instance
+        task.setState(ExecutionStatus.FORCED_SUCCESS);
+        int changedNum = taskInstanceMapper.updateById(task);
+        if (changedNum > 0) {
+            putMsg(result, Status.SUCCESS);
+        }
+        else {
+            // FIXME: 或许应该再加一个状态码
+            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+        }
+
+        return result;
+    }
 }

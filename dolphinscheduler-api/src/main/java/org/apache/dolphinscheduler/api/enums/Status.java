@@ -176,6 +176,8 @@ public enum Status {
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
     USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
+    FORCE_TASK_SUCCESS_ERROR(10150, "force task success error", "强制成功任务实例错误"),
+    TASK_INSTANCE_STATE_OPETATION_ERROR(10151, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
