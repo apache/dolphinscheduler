@@ -82,22 +82,6 @@ export default {
   },
   // Watch the cacheParams
   watch: {
-    remote(val) {
-      if (val) {
-        this._getDatasourceData().then(res => {
-          this.datasource = (this.datasourceList.length && this.datasourceList[0].id) || "";
-          this.$emit("on-dsData", {
-            type: this.type,
-            datasource: this.datasource
-          });
-        });
-      } else {
-         this.$emit("on-dsData", {
-          remote: this.remote,
-          datasource: ""
-        });
-      }
-    },
     datasource(val) {
       this.$emit("on-dsData", {
         remote: this.remote,
@@ -106,10 +90,23 @@ export default {
     }
   },
   created() {
-    this.$emit("on-dsData", {
-      remote: this.remote,
-      datasource: this.datasource
-    });
+      // init data
+      this._getDatasourceData().then(res => {
+        if (_.isEmpty(this.data)) {
+          this.$nextTick(() => {
+            this.datasource = this.datasourceList[0].id
+          })
+        } else {
+          this.remote = this.data.remote
+          this.$nextTick(() => {
+            this.datasource = this.data.datasource
+          })
+        }
+        this.$emit('on-dsData', {
+          remote: this.remote,
+          datasource: this.datasource
+        })
+      })
   },
   mounted() {},
   components: {}

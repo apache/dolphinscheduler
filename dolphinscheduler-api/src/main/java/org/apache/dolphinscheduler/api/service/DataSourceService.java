@@ -234,14 +234,20 @@ public class DataSourceService extends BaseService{
         // jdbc connection params
         String other = datasourceForm.getOther();
         String address = datasourceForm.getAddress();
-
-        String[] hostsPorts = getHostsAndPort(address,hostSeperator);
         // ip host
-        String host = hostsPorts[0];
-        // prot
-        String port = hostsPorts[1];
-        String separator = "";
-
+        String host = null;
+        // port
+        String port = null;
+        if (DbType.REMOTESERVER.equals(dataSource.getType())) {
+            host = ((RemoteServerSource)datasourceForm).getHost();
+            port = ((RemoteServerSource)datasourceForm).getPort();
+        } else {
+            String[] hostsPorts = getHostsAndPort(address,hostSeperator);
+            host = hostsPorts[0];
+            port = hostsPorts[1];
+        }
+        
+        String separator;
         switch (dataSource.getType()) {
             case HIVE:
             case SQLSERVER:
@@ -456,7 +462,7 @@ public class DataSourceService extends BaseService{
         try {
             RemoteServerSource serverSource = JSONUtils.parseObject(parameter, RemoteServerSource.class);
             JSch jsch = new JSch();
-            session = jsch.getSession(serverSource.getUser(), serverSource.getHost(), serverSource.getPort());
+            session = jsch.getSession(serverSource.getUser(), serverSource.getHost(), Integer.parseInt(serverSource.getPort()));
             session.setPassword(serverSource.getPassword());
             session.setConfig("StrictHostKeyChecking", "no");
             // making a connection with timeout.

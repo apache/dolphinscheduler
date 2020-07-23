@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 public class RemoteServerSource extends BaseDataSource {
 
     private String host;
-    private int port;
+    private String port;
 
     /**
      * Remote server has no driver class name
@@ -52,11 +52,11 @@ public class RemoteServerSource extends BaseDataSource {
         this.host = host;
     }
 
-    public int getPort() {
+    public String getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public void setPort(String port) {
         this.port = port;
     }
 }

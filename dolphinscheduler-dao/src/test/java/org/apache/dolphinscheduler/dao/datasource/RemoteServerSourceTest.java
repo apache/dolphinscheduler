@@ -55,7 +55,7 @@ public class RemoteServerSourceTest {
 
     @Test
     public void testSetPort() {
-        remoteServerSource.setPort(22);
+        remoteServerSource.setPort("22");
     }
 
 }

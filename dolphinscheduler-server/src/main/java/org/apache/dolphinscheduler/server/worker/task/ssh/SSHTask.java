@@ -154,7 +154,7 @@ public class SSHTask extends AbstractTask {
 
     private void openSession(RemoteServerSource remote) throws Exception {
         JSch jsch = new JSch();
-        session = jsch.getSession(remote.getUser(), remote.getHost(), remote.getPort());
+        session = jsch.getSession(remote.getUser(), remote.getHost(), Integer.parseInt(remote.getPort()));
         session.setPassword(remote.getPassword());
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect(Constants.REMOTESERVER_TIME_OUT);
