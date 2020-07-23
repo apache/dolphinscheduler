@@ -28,18 +28,22 @@ startStop=$1
 shift
 command=$1
 shift
+docker=$1
+shift
 
 echo "Begin $startStop $command......"
 
-BIN_DIR=`dirname $0`
-BIN_DIR=`cd "$BIN_DIR"; pwd`
+BIN_DIR=$(dirname $0)
+BIN_DIR=$(
+  cd "$BIN_DIR"
+  pwd
+)
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
 source /etc/profile
 
 export JAVA_HOME=$JAVA_HOME
-#export JAVA_HOME=/opt/soft/jdk
-export HOSTNAME=`hostname`
+export HOSTNAME=$(hostname)
 
 export DOLPHINSCHEDULER_PID_DIR=$DOLPHINSCHEDULER_HOME/pid
 export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
@@ -78,50 +82,54 @@ else
 fi
 
 case $startStop in
-  (start)
-    [ -w "$DOLPHINSCHEDULER_PID_DIR" ] ||  mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
+start)
+  [ -w "$DOLPHINSCHEDULER_PID_DIR" ] || mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
 
-    if [ -f $pid ]; then
-      if kill -0 `cat $pid` > /dev/null 2>&1; then
-        echo $command running as process `cat $pid`.  Stop it first.
-        exit 1
-      fi
+  if [ -f $pid ]; then
+    if kill -0 $(cat $pid) >/dev/null 2>&1; then
+      echo $command running as process $(cat $pid). Stop it first.
+      exit 1
     fi
+  fi
 
-    echo starting $command, logging to $log
+  echo starting $command, logging to $log
 
-    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
+  exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
 
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
-    echo $! > $pid
-    ;;
+  # if the runtime is docker, the logs should print to stdout
+  if [ $docker ]; then
+    ln -s /dev/stdout $log
+  fi
+  echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
+  nohup $JAVA_HOME/bin/java $exec_command >$log 2>&1 &
+  echo $! >$pid
+  ;;
 
-  (stop)
+stop)
 
-      if [ -f $pid ]; then
-        TARGET_PID=`cat $pid`
-        if kill -0 $TARGET_PID > /dev/null 2>&1; then
-          echo stopping $command
-          kill $TARGET_PID
-          sleep $STOP_TIMEOUT
-          if kill -0 $TARGET_PID > /dev/null 2>&1; then
-            echo "$command did not stop gracefully after $STOP_TIMEOUT seconds: killing with kill -9"
-            kill -9 $TARGET_PID
-          fi
-        else
-          echo no $command to stop
-        fi
-        rm -f $pid
-      else
-        echo no $command to stop
+  if [ -f $pid ]; then
+    TARGET_PID=$(cat $pid)
+    if kill -0 $TARGET_PID >/dev/null 2>&1; then
+      echo stopping $command
+      kill $TARGET_PID
+      sleep $STOP_TIMEOUT
+      if kill -0 $TARGET_PID >/dev/null 2>&1; then
+        echo "$command did not stop gracefully after $STOP_TIMEOUT seconds: killing with kill -9"
+        kill -9 $TARGET_PID
       fi
-      ;;
+    else
+      echo no $command to stop
+    fi
+    rm -f $pid
+  else
+    echo no $command to stop
+  fi
+  ;;
 
-  (*)
-    echo $usage
-    exit 1
-    ;;
+*)
+  echo $usage
+  exit 1
+  ;;
 
 esac
 

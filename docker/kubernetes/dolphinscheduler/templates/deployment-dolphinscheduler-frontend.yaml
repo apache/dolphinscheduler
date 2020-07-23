@@ -61,6 +61,31 @@ spec:
       imagePullSecrets:
       - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
       {{- end }}
+      initContainers:
+        - name: init-logs
+          image: busybox:1.31.0
+          command:
+            - /bin/sh 
+            - -ec 
+            - |
+              mkdir -p /var/log/nginx
+              if [ $PERSISTENT_ENABLED == "true" ]; then
+                touch /var/log/nginx/access.log
+                touch /var/log/nginx/error.log
+              else
+                ln -s /dev/stdout /var/log/nginx/access.log
+                ln -s /dev/stderr /var/log/nginx/error.log
+              fi
+          env:
+            - name: PERSISTENT_ENABLED
+              {{- if .Values.frontend.persistentVolumeClaim.enabled}}
+              value: "true"
+              {{- else }}
+              value: "false"
+              {{- end }}
+          volumeMounts:
+            - mountPath: "/var/log/nginx"
+              name: {{ include "dolphinscheduler.fullname" . }}-frontend
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-frontend
           image: {{ include "dolphinscheduler.image.repository" . | quote }}

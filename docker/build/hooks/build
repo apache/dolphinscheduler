@@ -38,16 +38,8 @@ echo "Repo: $DOCKER_REPO"
 
 echo -e "Current Directory is $(pwd)\n"
 
-# maven package(Project Directory)
-echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
-mvn -B clean compile package -Prelease -Dmaven.test.skip=true
-
-# mv dolphinscheduler-bin.tar.gz file to docker/build directory
-echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/docker/build/\n"
-mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin.tar.gz $(pwd)/docker/build/
-
 # docker build
-echo -e "docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/docker/build/\n"
-sudo docker build --build-arg VERSION=${VERSION} -t $DOCKER_REPO:${VERSION} $(pwd)/docker/build/
+echo -e "docker build -f docker/build/Dockerfile -t $DOCKER_REPO:${VERSION} $(pwd)\n"
+docker build -f docker/build/Dockerfile -t $DOCKER_REPO:${VERSION} $(pwd)
 
 echo "------ dolphinscheduler end   - build -------"
