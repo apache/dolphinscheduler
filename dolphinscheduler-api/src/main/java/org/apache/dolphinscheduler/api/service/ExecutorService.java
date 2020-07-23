@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 
+import com.sun.org.apache.bcel.internal.generic.BREAKPOINT;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
@@ -264,6 +265,9 @@ public class ExecutorService extends BaseService{
                     result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE, ExecutionStatus.READY_PAUSE);
                 }
                 break;
+            case RESUME_FROM_FORCED_SUCCESS:
+                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RESUME_FROM_FORCED_SUCCESS);
+                break;
             default:
                 logger.error("unknown execute type : {}", executeType);
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
@@ -310,6 +314,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             case START_FAILURE_TASK_PROCESS:
+            case RESUME_FROM_FORCED_SUCCESS:
                 if (executionStatus.typeIsFailure()) {
                     checkResult = true;
                 }
