@@ -91,4 +91,3 @@ jobs:
           mkdir -p ${LOG_DIR}
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml logs dolphinscheduler-postgresql > ${LOG_DIR}/db.txt
         continue-on-error: true
-
