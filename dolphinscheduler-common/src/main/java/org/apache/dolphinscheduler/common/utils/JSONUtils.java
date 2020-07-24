@@ -48,6 +48,7 @@ public class JSONUtils {
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(ALLOW_SINGLE_QUOTES, true)
             .setTimeZone(TimeZone.getDefault())
             ;
 
