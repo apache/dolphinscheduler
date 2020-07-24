@@ -37,11 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
