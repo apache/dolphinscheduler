@@ -17,29 +17,41 @@
 package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
-import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
+import org.apache.dolphinscheduler.page.project.ProjectPage;
+import org.apache.dolphinscheduler.page.project.WorkflowDefinePage;
 import org.testng.annotations.Test;
 
-public class TestCreateWorkflow extends BaseTest {
-    private CreateWorkflowPage createWorkflowPage;
-    private CreateProjectPage createProjectPage;
+public class TestWorkflowDefine extends BaseTest {
+    private WorkflowDefinePage workflowDefinePage;
+    private ProjectPage projectPage;
 
-
-    @Test(groups={"functionTests","workflow"},dependsOnGroups = { "login" },description = "TestCreateWorkflow")
+    /**
+     * test Create WorkflowDefine
+     * @throws InterruptedException
+     */
+    @Test(groups={"functionTests","workflow"},dependsOnGroups = { "login" },description = "TestWorkflowDefine")
     public void testCreateWorkflow() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
+        projectPage = new ProjectPage(driver);
         System.out.println("jump to the projectManage page to create workflow");
-        createProjectPage.jumpProjectManagePage();
+        projectPage.jumpProjectManagePage();
 
-        createWorkflowPage = new CreateWorkflowPage(driver);
+        workflowDefinePage = new WorkflowDefinePage(driver);
         System.out.println("Click on the project name to jump to the project homepage");
-        createWorkflowPage.jumpWorkflowPage();
+        workflowDefinePage.jumpWorkflowPage();
 
         System.out.println("start create workflow");
-        assert createWorkflowPage.createWorkflow();
-        assert createWorkflowPage.saveWorkflow();
+        assert workflowDefinePage.createWorkflow();
+        assert workflowDefinePage.saveWorkflow();
         System.out.println("end create workflow");
+        System.out.println("===================================");
+    }
+
+    @Test(groups={"functionTests","workflow"},dependsOnGroups = { "login" },description = "TestOnlineWorkflow")
+    public void testOnlineWorkflow() throws InterruptedException {
+        workflowDefinePage = new WorkflowDefinePage(driver);
+        System.out.println("start online workflow");
+        assert workflowDefinePage.onlineWorkflow();
+        System.out.println("end online workflow");
         System.out.println("===================================");
     }
 }
