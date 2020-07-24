@@ -27,10 +27,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.action.GetPropertyAction;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({OSUtils.class, GetPropertyAction.class})
+@PrepareForTest({OSUtils.class})
 public class ProcessImplForWin32Test {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessBuilderForWin32Test.class);
@@ -38,7 +37,6 @@ public class ProcessImplForWin32Test {
     @Before
     public void before() {
         PowerMockito.mockStatic(OSUtils.class);
-        PowerMockito.mockStatic(GetPropertyAction.class);
         PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
     }
 

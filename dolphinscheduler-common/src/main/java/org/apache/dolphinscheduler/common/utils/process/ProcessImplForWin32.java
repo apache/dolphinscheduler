@@ -21,7 +21,6 @@ import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import java.lang.reflect.Field;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import sun.security.action.GetPropertyAction;
 
 import java.io.*;
 import java.security.AccessController;
@@ -420,9 +419,15 @@ public class ProcessImplForWin32 extends Process {
     {
         String cmdstr;
         final SecurityManager security = System.getSecurityManager();
-        GetPropertyAction action = new GetPropertyAction("jdk.lang.Process.allowAmbiguousCommands",
-                (security == null) ? "true" : "false");
-        final boolean allowAmbiguousCommands = !"false".equalsIgnoreCase(action.run());
+        String allowAmbiguousCommandsProperty = (String) AccessController.doPrivileged((PrivilegedAction) () -> {
+
+            String allowAmbiguousCommands = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
+            if (null != allowAmbiguousCommands) {
+                return allowAmbiguousCommands;
+            }
+            return (security == null) ? "true" : "false";
+        });
+        final boolean allowAmbiguousCommands = !"false".equalsIgnoreCase(allowAmbiguousCommandsProperty);
         if (allowAmbiguousCommands && security == null) {
             // Legacy mode.
 
