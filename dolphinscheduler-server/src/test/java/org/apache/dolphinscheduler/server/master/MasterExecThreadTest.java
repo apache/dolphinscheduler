@@ -84,7 +84,7 @@ public class MasterExecThreadTest {
         Mockito.when(processInstance.getScheduleTime()).thenReturn(DateUtils.stringToDate("2020-01-01 00:00:00"));
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-05 23:00:00");
+        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-31 23:00:00");
         Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
@@ -115,7 +115,7 @@ public class MasterExecThreadTest {
             method.setAccessible(true);
             method.invoke(masterExecThread);
             // one create save, and 1-30 for next save, and last day 31 no save
-            verify(processService, times(5)).saveProcessInstance(processInstance);
+            verify(processService, times(31)).saveProcessInstance(processInstance);
         }catch (Exception e){
             e.printStackTrace();
             Assert.assertTrue(false);
@@ -134,7 +134,7 @@ public class MasterExecThreadTest {
             method.setAccessible(true);
             method.invoke(masterExecThread);
             // one create save, and 15(1 to 31 step 2) for next save, and last day 31 no save
-            verify(processService, times(2)).saveProcessInstance(processInstance);
+            verify(processService, times(15)).saveProcessInstance(processInstance);
         }catch (Exception e){
             Assert.assertTrue(false);
         }
