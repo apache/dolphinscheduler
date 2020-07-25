@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import io.netty.channel.Channel;
+import java.util.Date;
+
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -50,8 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-import java.util.Date;
+import io.netty.channel.Channel;
 
 /**
  * test task call back service
@@ -189,6 +189,7 @@ public class TaskCallbackServiceTest {
 
         nettyRemotingServer.close();
         nettyRemotingClient.close();
+        masterRegistry.unRegistry();
     }
 
     @Test

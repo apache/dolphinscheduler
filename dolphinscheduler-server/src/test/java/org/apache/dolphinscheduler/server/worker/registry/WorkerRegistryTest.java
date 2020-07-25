@@ -143,6 +143,7 @@ public class WorkerRegistryTest {
 
         Assert.assertEquals(0, testWorkerGroupPathZkChildren.size());
         Assert.assertEquals(0, defaultWorkerGroupPathZkChildren.size());
+        workerRegistry.unRegistry();
     }
 
     @Test
