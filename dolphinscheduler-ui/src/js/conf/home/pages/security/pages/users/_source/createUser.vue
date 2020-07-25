@@ -84,7 +84,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('Phone')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Phone')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -158,6 +158,9 @@
       _verification () {
         let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/ // eslint-disable-line
 
+        // Mobile phone number regular
+        let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
+
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         let userNameLength = this.userName.length
@@ -193,6 +196,14 @@
           this.$message.warning(`${i18n.$t('Please enter the correct email format')}`)
           return false
         }
+        // Verify phone
+        if (this.phone) {
+          if (!regPhone.test(this.phone)) {
+            this.$message.warning(`${i18n.$t('Please enter the correct mobile phone format')}`)
+            return false
+          }
+        }
+
         return true
       },
       _getQueueList () {
