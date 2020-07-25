@@ -419,7 +419,7 @@ public class ProcessImplForWin32 extends Process {
     {
         String cmdstr;
         final SecurityManager security = System.getSecurityManager();
-        String allowAmbiguousCommandsProperty = (String) AccessController.doPrivileged((PrivilegedAction) () -> {
+        String allowAmbiguousCommandsProperty = AccessController.doPrivileged((PrivilegedAction<String>) () -> {
             String allowAmbiguousCommands = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
             if (null != allowAmbiguousCommands) {
                 return allowAmbiguousCommands;
