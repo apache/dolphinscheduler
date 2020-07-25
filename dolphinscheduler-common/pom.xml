@@ -581,7 +581,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.prestosql</groupId>
+			<groupId>com.facebook.presto</groupId>
 			<artifactId>presto-jdbc</artifactId>
 		</dependency>
 
