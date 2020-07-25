@@ -580,6 +580,11 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>io.prestosql</groupId>
+			<artifactId>presto-jdbc</artifactId>
+		</dependency>
+
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
