@@ -69,4 +69,11 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("startTime") Date startTime,
                                                     @Param("endTime") Date endTime
     );
+
+    List<Integer> queryTaskByPIdAndStateAndType(@Param("processInstanceId") Integer processInstanceId,
+                                                     @Param("state") int state,
+                                                     @Param("taskType") String taskType);
+
+    List<Integer> queryTasksBySubProcessTaskIdAndState(@Param("subProcessTaskId") Integer subProcessTaskId,
+                                                       @Param("state") Integer state);
 }
