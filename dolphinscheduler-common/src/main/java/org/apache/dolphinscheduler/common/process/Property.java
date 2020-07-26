@@ -140,5 +140,51 @@ public class Property implements Serializable {
             '}';
   }
 
+  public static Builder newBuilder() {
+    return new Builder();
+  }
 
+  public static final class Builder {
+
+    private String prop;
+    private Direct direct;
+    private DataType type;
+    private String value;
+
+    private Builder() {
+    }
+
+    public static Builder aProperty() {
+      return new Builder();
+    }
+
+    public Builder prop(String prop) {
+      this.prop = prop;
+      return this;
+    }
+
+    public Builder direct(Direct direct) {
+      this.direct = direct;
+      return this;
+    }
+
+    public Builder type(DataType type) {
+      this.type = type;
+      return this;
+    }
+
+    public Builder value(String value) {
+      this.value = value;
+      return this;
+    }
+
+    public Property build() {
+      Property property = new Property();
+      property.setProp(prop);
+      property.setDirect(direct);
+      property.setType(type);
+      property.setValue(value);
+      return property;
+    }
+  }
 }

@@ -43,45 +43,62 @@ public class ParamUtils {
      * @param scheduleTime      schedule time
      * @return global params
      */
-    public static Map<String,Property> convert(Map<String,Property> globalParams,
-                                                           Map<String,String> globalParamsMap,
-                                                           Map<String,Property> localParams,
+    public static Map<String, Property> convert(Map<String, Property> globalParams,
+                                                           Map<String, String> globalParamsMap,
+                                                           Map<String, Property> localParams,
                                                            CommandType commandType,
-                                                           Date scheduleTime){
-        if (globalParams == null
-                && localParams == null){
+                                                           Date scheduleTime) {
+        if (globalParams == null && localParams == null) {
             return null;
         }
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
-        Map<String,String> timeParams = BusinessTimeUtils
+        Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(commandType,
                         scheduleTime);
 
-        if (globalParamsMap != null){
+        if (globalParamsMap != null) {
             timeParams.putAll(globalParamsMap);
         }
 
-        if (globalParams != null && localParams != null){
+        if (globalParams != null && localParams != null) {
             globalParams.putAll(localParams);
-        }else if (globalParams == null && localParams != null){
+        } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
         }
-        Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
-        while (iter.hasNext()){
-            Map.Entry<String, Property> en = iter.next();
+
+        /**
+         * time parameter
+         */
+        for (Map.Entry<String, String> timeParam : timeParams.entrySet()) {
+            Property property = Property
+                .newBuilder()
+                .prop(timeParam.getKey())
+                .direct(Direct.IN)
+                .value(timeParam.getValue())
+                .type(DataType.VARCHAR)
+                .build();
+            globalParams.put(timeParam.getKey(), property);
+        }
+
+        /**
+         *  local parameter refers to global parameter with the same name
+         *  note: the global parameters of the process instance here are solidified parameters,
+         *  and there are no variables in them.
+         */
+        for (Map.Entry<String, Property> en : globalParams.entrySet()) {
             Property property = en.getValue();
 
             if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().startsWith("$")){
+                && property.getValue().startsWith("$")) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
                  *  and there are no variables in them.
                  */
                 String val = property.getValue();
-                val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
+                val = ParameterUtils.convertParameterPlaceholders(val, timeParams);
                 property.setValue(val);
             }
         }
