@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.slf4j.Logger;
@@ -123,12 +122,12 @@ public class MasterExecThread implements Runnable {
     /**
      * alert manager
      */
-    private AlertManager alertManager = new AlertManager();
+    private AlertManager alertManager;
 
     /**
      * the object of DAG
      */
-    private DAG<String,TaskNode,TaskNodeRelation> dag;
+    private DAG<String, TaskNode, TaskNodeRelation> dag;
 
     /**
      *  process service
@@ -151,15 +150,20 @@ public class MasterExecThread implements Runnable {
      * @param processService processService
      * @param nettyRemotingClient nettyRemotingClient
      */
-    public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
+    public MasterExecThread(ProcessInstance processInstance
+            , ProcessService processService
+            , NettyRemotingClient nettyRemotingClient
+            , AlertManager alertManager
+            , MasterConfig masterConfig) {
         this.processService = processService;
 
         this.processInstance = processInstance;
-        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        this.masterConfig = masterConfig;
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
         this.nettyRemotingClient = nettyRemotingClient;
+        this.alertManager = alertManager;
     }
 
 
