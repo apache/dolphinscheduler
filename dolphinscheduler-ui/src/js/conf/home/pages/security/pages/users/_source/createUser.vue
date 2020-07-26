@@ -84,7 +84,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Phone')}}</template>
+          <template slot="name">{{$t('Phone')}}</template>
           <template slot="content">
             <x-input
                     type="input"
