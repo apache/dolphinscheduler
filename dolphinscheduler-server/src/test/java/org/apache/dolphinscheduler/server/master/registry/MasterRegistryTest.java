@@ -38,7 +38,7 @@ import static org.apache.dolphinscheduler.common.Constants.HEARTBEAT_FOR_ZOOKEEP
  * master registry test
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes={SpringZKServer.class, MasterRegistry.class,ZookeeperRegistryCenter.class, MasterConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class })
+@ContextConfiguration(classes={SpringZKServer.class, MasterRegistry.class,ZookeeperRegistryCenter.class, MasterConfig.class, ZookeeperCachedOperator.class, ZookeeperConfig.class})
 public class MasterRegistryTest {
 
     @Autowired
