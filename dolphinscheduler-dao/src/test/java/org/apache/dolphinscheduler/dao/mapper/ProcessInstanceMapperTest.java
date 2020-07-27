@@ -113,7 +113,7 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 = processInstanceMapper.queryDetailById(processInstance.getId());
-        Assert.assertNotEquals(processInstance1, 50);
+        Assert.assertNotNull(processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
