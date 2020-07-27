@@ -26,7 +26,7 @@ CREATE TABLE `t_ds_plugin_define` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
 CREATE TABLE `t_ds_alert_plugin_instance` (
@@ -38,6 +38,6 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `alert_group_id` int DEFAULT NULL,
   `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
