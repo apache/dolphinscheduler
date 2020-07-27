@@ -52,12 +52,12 @@ public class ThreadPoolExecutors {
 
     public static ThreadPoolExecutors getInstance(String name, int maxThreads){
 
-        if (null == threadPoolExecutorsReference.get()) {
+        if (null == threadPoolExecutorsReference) {
 
             synchronized (ThreadPoolExecutors.class) {
 
-                if(null == threadPoolExecutorsReference.get()) {
-                    threadPoolExecutorsReference.set(new ThreadPoolExecutors());
+                if(null == threadPoolExecutorsReference) {
+                    threadPoolExecutorsReference=new AtomicReference<>(new ThreadPoolExecutors());
                 }
                 if(null == executor) {
                     executor = new Executor(null == name? "thread_pool" : name, maxThreads == 0? Runtime.getRuntime().availableProcessors() * 3 : maxThreads);
