@@ -214,7 +214,7 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                          @RequestParam("size") Integer size,
                                                          @RequestParam(value = "startTime",required = true) String startTime,
