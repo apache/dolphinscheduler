@@ -620,6 +620,8 @@ export default {
   'Please Enter Url': 'Please Enter Url eg. 127.0.0.1:7077',
   'Master': 'Master'
   zkDirectory: 'zkDirectory',
-  'Directory detail': 'Directory detail'
-
+  'Directory detail': 'Directory detail',
+  'Connection name': 'Connection name',
+  'Current connection settings': 'Current connection settings',
+  'Please save the DAG before formatting': 'Please save the DAG before formatting'
 }

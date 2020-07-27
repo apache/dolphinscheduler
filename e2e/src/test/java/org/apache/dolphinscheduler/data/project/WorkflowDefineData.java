@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
-public class CreateWorkflowData {
+public class WorkflowDefineData {
     /**
      * create workflow data
      */
