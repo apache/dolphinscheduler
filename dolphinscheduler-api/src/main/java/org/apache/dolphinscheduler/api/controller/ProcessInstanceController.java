@@ -220,9 +220,9 @@ public class ProcessInstanceController extends BaseController {
                                                          @RequestParam(value = "endTime",required = true) String endTime
 
     ){
-        logger.info("query top {} SUCCESS process instance order by running time which started between startTime and endTime ,login user:{},project name:{}",size,
-                loginUser.getUserName(),projectName);
-        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,projectName,size,startTime,endTime);
+        logger.info("query top {} SUCCESS process instance order by running time which started between {} and {} ,login user:{},project name:{}", size, startTime, endTime
+                loginUser.getUserName(), projectName);
+        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
         return returnDataList(result);
     }
 
