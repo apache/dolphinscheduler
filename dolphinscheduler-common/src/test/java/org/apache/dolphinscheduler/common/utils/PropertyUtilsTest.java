@@ -27,6 +27,5 @@ public class PropertyUtilsTest {
     @Test
     public void getString() {
         assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULTFS));
-        Assert.assertNotEquals(-1,PropertyUtils.getInt("spring.redis.port"));
     }
 }
