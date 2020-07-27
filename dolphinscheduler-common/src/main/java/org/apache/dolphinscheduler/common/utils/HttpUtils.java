@@ -34,7 +34,6 @@ import java.io.IOException;
  */
 public class HttpUtils {
 
-
 	public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
 	/**
@@ -43,12 +42,14 @@ public class HttpUtils {
 	 * @param url url
 	 * @return http get request response content
 	 */
-	public static String get(String url){
-		boolean kerberState =PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+	public static String get(String url) {
+		boolean kerberState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
 		if (kerberState) {
 			String responseContent;
-			KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+			KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(
+					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
+					PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
 			responseContent = kerberosHttpClient.get(url,
 					PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
 			return responseContent;
@@ -60,11 +61,9 @@ public class HttpUtils {
 			/** set timeout、request time、socket timeout */
 			RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
 					.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
-					.setSocketTimeout(Constants.SOCKET_TIMEOUT)
-					.setRedirectsEnabled(true)
-					.build();
+					.setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
 			httpget.setConfig(requestConfig);
-			return getResponseContentString(httpget,httpclient);
+			return getResponseContentString(httpget, httpclient);
 		}
 
 	}
@@ -72,8 +71,8 @@ public class HttpUtils {
 	/**
 	 * get http response content
 	 *
-	 * @param httpget httpget
-	 * @param httpClient  httpClient
+	 * @param httpget    httpget
+	 * @param httpClient httpClient
 	 * @return http get request response content
 	 */
 	public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
@@ -81,7 +80,7 @@ public class HttpUtils {
 		CloseableHttpResponse response = null;
 		try {
 			response = httpClient.execute(httpget);
-			//check response status is 200
+			// check response status is 200
 			if (response.getStatusLine().getStatusCode() == 200) {
 				HttpEntity entity = response.getEntity();
 				if (entity != null) {
@@ -115,6 +114,5 @@ public class HttpUtils {
 		}
 		return responseContent;
 	}
-
 
 }
