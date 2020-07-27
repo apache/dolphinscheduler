@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -220,8 +221,8 @@ public class ProcessInstanceController extends BaseController {
                                                          @RequestParam(value = "endTime",required = true) String endTime
 
     ){
-        projectName=projectName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query top {} SUCCESS process instance order by running time which started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
+        projectName=ParameterUtils.handleEscapes(projectName);
+        logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
                 loginUser.getUserName(), projectName);
         Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
         return returnDataList(result);
@@ -243,9 +244,9 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                            @RequestParam("processInstanceId") Integer processInstanceId
+    public Result<ProcessInstance> deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                             @RequestParam("processInstanceId") Integer processInstanceId
     ) {
         logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                 loginUser.getUserName(), projectName, processInstanceId);
