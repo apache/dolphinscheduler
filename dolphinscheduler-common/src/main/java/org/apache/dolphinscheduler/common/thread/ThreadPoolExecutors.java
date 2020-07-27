@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -40,7 +41,7 @@ public class ThreadPoolExecutors {
 
     private static final Logger logger = LoggerFactory.getLogger(ThreadPoolExecutors.class);
     private static Executor executor;
-    private static volatile ThreadPoolExecutors threadPoolExecutors;
+    private static AtomicReference<ThreadPoolExecutors> threadPoolExecutorsReference;
 
     private ThreadPoolExecutors(){}
 
@@ -51,12 +52,12 @@ public class ThreadPoolExecutors {
 
     public static ThreadPoolExecutors getInstance(String name, int maxThreads){
 
-        if (null == threadPoolExecutors) {
+        if (null == threadPoolExecutorsReference.get()) {
 
             synchronized (ThreadPoolExecutors.class) {
 
-                if(null == threadPoolExecutors) {
-                    threadPoolExecutors = new ThreadPoolExecutors();
+                if(null == threadPoolExecutorsReference.get()) {
+                    threadPoolExecutorsReference.set(new ThreadPoolExecutors());
                 }
                 if(null == executor) {
                     executor = new Executor(null == name? "thread_pool" : name, maxThreads == 0? Runtime.getRuntime().availableProcessors() * 3 : maxThreads);
@@ -64,7 +65,7 @@ public class ThreadPoolExecutors {
             }
         }
 
-        return threadPoolExecutors;
+        return threadPoolExecutorsReference.get();
     }
 
     /**
