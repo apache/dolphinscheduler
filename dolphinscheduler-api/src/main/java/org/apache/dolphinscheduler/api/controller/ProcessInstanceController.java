@@ -221,7 +221,7 @@ public class ProcessInstanceController extends BaseController {
                                                          @RequestParam(value = "endTime",required = true) String endTime
 
     ){
-        projectName=ParameterUtils.handleEscapes(projectName);
+        projectName=projectName.replaceAll("[\n|\r\t]", "_");
         logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
                 loginUser.getUserName(), projectName);
         Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
