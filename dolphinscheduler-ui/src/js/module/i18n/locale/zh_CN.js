@@ -617,7 +617,7 @@ export default {
   'Socket Timeout be a positive integer': 'Socket超时必须为数字',
   'ms':'毫秒',
   'Please Enter Url': '请直接填写地址,例如:127.0.0.1:7077',
-  'Master': 'Master'
+  'Master': 'Master',
   zkDirectory: 'zk注册目录',
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
