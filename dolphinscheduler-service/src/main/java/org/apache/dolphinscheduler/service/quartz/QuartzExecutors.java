@@ -65,7 +65,7 @@ public class QuartzExecutors {
   /**
    * instance of QuartzExecutors
    */
-  private static volatile AtomicReference<QuartzExecutors> INSTANCE_REFERENCE = new AtomicReference<>();
+  private static AtomicReference<QuartzExecutors> INSTANCE_REFERENCE = new AtomicReference<>();
 
   /**
    * load conf

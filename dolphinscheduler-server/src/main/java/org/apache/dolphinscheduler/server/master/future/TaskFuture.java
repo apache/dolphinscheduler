@@ -56,7 +56,7 @@ public class TaskFuture {
     /**
      *  response command
      */
-    private AtomicReference<Command> responseCommandReference;
+    private AtomicReference<Command> responseCommandReference=new AtomicReference<>();
 
     private volatile boolean sendOk = true;
 
@@ -84,7 +84,7 @@ public class TaskFuture {
      * @param responseCommand responseCommand
      */
     public void putResponse(final Command responseCommand) {
-        this.responseCommandReference = new AtomicReference<>(responseCommand);
+        this.responseCommandReference.compareAndSet(null,responseCommand);
         this.latch.countDown();
         FUTURE_TABLE.remove(opaque);
     }
@@ -139,7 +139,7 @@ public class TaskFuture {
     }
 
     public void setResponseCommand(Command responseCommand) {
-        this.responseCommandReference = new AtomicReference<>(responseCommand);
+        this.responseCommandReference.compareAndSet(null,responseCommand);
     }
 
 
