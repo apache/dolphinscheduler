@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -64,7 +65,7 @@ public class QuartzExecutors {
   /**
    * instance of QuartzExecutors
    */
-  private static volatile QuartzExecutors INSTANCE = null;
+  private static volatile AtomicReference<QuartzExecutors> INSTANCE_REFERENCE = new AtomicReference<>();
 
   /**
    * load conf
@@ -85,18 +86,13 @@ public class QuartzExecutors {
    * @return instance of Quartz Executors
    */
   public static QuartzExecutors getInstance() {
-    if (INSTANCE == null) {
-      synchronized (QuartzExecutors.class) {
-        // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
-        if (INSTANCE == null) {
+      while (INSTANCE_REFERENCE.get() == null) {
           QuartzExecutors quartzExecutors = new QuartzExecutors();
           //finish QuartzExecutors init
           quartzExecutors.init();
-          INSTANCE = quartzExecutors;
-        }
+          INSTANCE_REFERENCE.compareAndSet(null, quartzExecutors);
       }
-    }
-    return INSTANCE;
+      return INSTANCE_REFERENCE.get();
   }
 
 
