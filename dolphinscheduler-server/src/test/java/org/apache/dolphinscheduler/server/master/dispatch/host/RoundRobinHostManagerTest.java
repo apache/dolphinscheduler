@@ -75,5 +75,6 @@ public class RoundRobinHostManagerTest {
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));
         Assert.assertTrue(host.getAddress().equalsIgnoreCase(NetUtils.getHost() + ":" + workerConfig.getListenPort()));
+        workerRegistry.unRegistry();
     }
 }

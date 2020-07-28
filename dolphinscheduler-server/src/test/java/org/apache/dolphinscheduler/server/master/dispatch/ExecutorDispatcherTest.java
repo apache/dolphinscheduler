@@ -79,5 +79,7 @@ public class ExecutorDispatcherTest {
 
         ExecutionContext executionContext = ExecutionContextTestUtils.getExecutionContext(port);
         executorDispatcher.dispatch(executionContext);
+
+        workerRegistry.unRegistry();
     }
 }
