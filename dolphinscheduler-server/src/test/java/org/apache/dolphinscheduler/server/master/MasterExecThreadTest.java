@@ -128,7 +128,7 @@ public class MasterExecThreadTest {
      * @throws ParseException
      */
     @Test
-    public void testParallelWithSchedule() throws ParseException {
+    public void testParallelWithSchedule() {
         try{
             Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
