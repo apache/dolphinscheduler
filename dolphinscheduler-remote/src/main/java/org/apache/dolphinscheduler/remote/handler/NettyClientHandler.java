@@ -75,7 +75,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
@@ -88,7 +88,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         processReceived(ctx.channel(), (Command)msg);
     }
 
@@ -169,7 +169,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("exceptionCaught : {}", cause);
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
