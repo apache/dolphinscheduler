@@ -34,7 +34,12 @@ do
   echo $workerGroup;
   worker=`echo $workerGroup|awk -F':' '{print $1}'`
   groupName=`echo $workerGroup|awk -F':' '{print $2}'`
-  workersGroupMap+=([$worker]=$groupName)
+  if [ -z ${workersGroupMap[$worker]} ];then
+      workersGroupMap+=([$worker]=$groupName)
+  else
+      finalGroupName="${workersGroupMap[$worker]},$groupName"
+      workersGroupMap[$worker]=$finalGroupName
+  fi
 done
 
 
@@ -53,7 +58,7 @@ do
   do
     # if worker in workersGroupMap
     if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
-      sed -i ${txt} "s#worker.group.*#worker.group=${workersGroupMap[${host}]}#g" ${dsDir}/worker.properties
+      sed -i ${txt} "s#worker.groups.*#worker.groups=${workersGroupMap[${host}]}#g" ${dsDir}/worker.properties
     fi
 
     echo "start to scp $dsDir to $host/$installPath"
