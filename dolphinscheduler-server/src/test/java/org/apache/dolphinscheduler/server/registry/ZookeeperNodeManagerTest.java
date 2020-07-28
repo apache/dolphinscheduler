@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -41,7 +42,7 @@ import java.util.Set;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
-        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
+        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class, CuratorZookeeperClient.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class})
 public class ZookeeperNodeManagerTest {
 

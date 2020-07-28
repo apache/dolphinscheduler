@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -50,7 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -73,7 +73,8 @@ import java.util.Date;
         TaskResponseService.class,
         TaskAckProcessor.class,
         TaskResponseProcessor.class,
-        TaskExecuteProcessor.class})
+        TaskExecuteProcessor.class,
+        CuratorZookeeperClient.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
