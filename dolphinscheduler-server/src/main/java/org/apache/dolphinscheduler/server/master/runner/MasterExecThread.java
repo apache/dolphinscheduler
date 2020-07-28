@@ -670,6 +670,11 @@ public class MasterExecThread implements Runnable {
         }
 
         TaskNode taskNode = dag.getNode(taskName);
+        // condition node directly return success
+        if (taskNode.isConditionsTask()) {
+            return DependResult.SUCCESS;
+        }
+
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
             if(!dag.containsNode(depsNode)
@@ -682,10 +687,16 @@ public class MasterExecThread implements Runnable {
                 return DependResult.WAITING;
             }
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
-            // conditions task would not return failed.
-            if(depTaskState.typeIsFailure()
-                    && !DagHelper.haveConditionsAfterNode(depsNode, dag )
-                    && !dag.getNode(depsNode).isConditionsTask()){
+            // conditions task should be handled separately
+            if (dag.getNode(depsNode).isConditionsTask()) {
+                List<String> tmpTaskList = parseConditionTask(depsNode);
+                if (tmpTaskList.contains(taskName)){
+                    return DependResult.SUCCESS;
+                }
+                return DependResult.FAILED;
+            }
+
+            if(depTaskState.typeIsFailure()){
                 return DependResult.FAILED;
             }
 
