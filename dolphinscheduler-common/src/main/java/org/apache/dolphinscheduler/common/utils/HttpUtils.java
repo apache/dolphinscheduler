@@ -43,28 +43,15 @@ public class HttpUtils {
      * @return http get request response content
      */
     public static String get(String url) {
-	boolean kerberState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-	if (kerberState) {
-	    String responseContent;
-	    KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(
-		    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-		    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
-		    PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
-	    responseContent = kerberosHttpClient.get(url,
-		    PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
-	    return responseContent;
 
-	} else {
-	    CloseableHttpClient httpclient = HttpClients.createDefault();
-
-	    HttpGet httpget = new HttpGet(url);
-	    /** set timeout、request time、socket timeout */
-	    RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
-		    .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
-		    .setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
-	    httpget.setConfig(requestConfig);
-	    return getResponseContentString(httpget, httpclient);
-	}
+	CloseableHttpClient httpclient = HttpClients.createDefault();
+	HttpGet httpget = new HttpGet(url);
+	/** set timeout、request time、socket timeout */
+	RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+		.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+		.setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
+	httpget.setConfig(requestConfig);
+	return getResponseContentString(httpget, httpclient);
 
     }
 

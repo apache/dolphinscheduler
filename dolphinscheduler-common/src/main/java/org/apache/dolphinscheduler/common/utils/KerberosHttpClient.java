@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
@@ -132,6 +133,24 @@ public class KerberosHttpClient {
 	    logger.error("Kerberos authentication failed ", le);
 	}
 	return null;
+    }
+
+    /**
+     * get http request content by kerberosClient
+     *
+     * @param url url
+     * @return http get request response content
+     */
+    public static String get(String url) {
+
+	String responseContent;
+	KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(
+		PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+		PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
+		PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+	responseContent = kerberosHttpClient.get(url, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
+	return responseContent;
+
     }
 
 }
