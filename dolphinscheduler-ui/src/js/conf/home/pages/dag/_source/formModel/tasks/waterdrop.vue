@@ -180,6 +180,15 @@
           this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
+        // noRes
+        if (!this.resourceNameVal.resourceList) {
+          this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
+          return false
+        }
+        if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length==0) {
+          this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
+          return false
+        }
         // Process resourcelist
         let dataProcessing= _.map(this.resourceList, v => {
           return {
