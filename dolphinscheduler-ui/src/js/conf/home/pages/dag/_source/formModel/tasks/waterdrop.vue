@@ -196,10 +196,14 @@
           }
         })
         //verify deploy mode
+        let deployMode = this.deployMode
+        let master = this.master
+        let masterUrl = this.masterUrl
+        
         if(this.deployMode == 'local'){
-          this.master = 'local'
-          this.masterUrl = ''
-          this.deployMode = 'client'
+          master = 'local'
+          masterUrl = ''
+          deployMode = 'client'
         }
         // get local params
         let locparams = ''
@@ -211,8 +215,8 @@
         let tureScript = ''
         this.resourceNameVal.resourceList.forEach(v=>{
           tureScript = tureScript + this.baseScript +
-            ' --master '+ this.master + this.masterUrl +
-            ' --deploy-mode '+ this.deployMode +
+            ' --master '+ master + masterUrl +
+            ' --deploy-mode '+ deployMode +
             ' --queue '+ this.queue +
             ' --config ' +  v.res +
             locparams + ' \n'
@@ -348,7 +352,11 @@
         this.noRes = result
         return {
           resourceList: resourceIdArr,
-          localParams: this.localParams
+          localParams: this.localParams,
+          deployMode: this.deployMode,
+          master: this.master,
+          masterUrl: this.masterUrl,
+          queue:this.queue,
         }
       }
     },
@@ -360,6 +368,10 @@
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
+        this.master = o.params.master || 'yarn'
+        this.deployMode =  o.params.deployMode || 'client'
+        this.masterUrl = o.params.masterUrl || ''
+        this.queue = o.params.queue || 'default'
         this.rawScript = o.params.rawScript || ''
 
         // backfill resourceList
