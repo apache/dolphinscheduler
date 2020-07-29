@@ -53,12 +53,18 @@ public class HttpUtils {
 
 	public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
-
-	private static CloseableHttpClient httpClient;
-
 	private HttpUtils() {
 
 	}
+
+	public static CloseableHttpClient getInstance(){
+		return HttpClientInstance.httpClient;
+	}
+
+	private static class HttpClientInstance{
+		private static final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
+	}
+
 
 	private static PoolingHttpClientConnectionManager cm;
 
@@ -112,20 +118,14 @@ public class HttpUtils {
 	}
 
 
-	public static synchronized CloseableHttpClient getHttpClient() {
-		if (null == httpClient) {
-			httpClient = HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
-			;
-		}
-		return httpClient;
-	}
+
 	/**
 	 * get http request content
 	 * @param url url
 	 * @return http get request response content
 	 */
 	public static String get(String url){
-		CloseableHttpClient httpclient = HttpUtils.getHttpClient();
+		CloseableHttpClient httpclient = HttpUtils.getInstance();
 
 		HttpGet httpget = new HttpGet(url);
 		String responseContent = null;
