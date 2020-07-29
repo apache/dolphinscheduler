@@ -87,7 +87,7 @@ public class SqlTask extends AbstractTask {
         logger.info("sql task params {}", taskExecutionContext.getTaskParams());
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
-        if (sqlParameters == null || (!sqlParameters.checkParameters())) {
+        if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
 
@@ -367,7 +367,7 @@ public class SqlTask extends AbstractTask {
             try {
                 resultSet.close();
             } catch (SQLException e) {
-                logger.error("close result set error :",e);
+                logger.error("close result set error : {}",e.getMessage(),e);
             }
         }
 
@@ -375,7 +375,7 @@ public class SqlTask extends AbstractTask {
             try {
                 pstmt.close();
             } catch (SQLException e) {
-                logger.error("close prepared statement error :",e);
+                logger.error("close prepared statement error : {}",e.getMessage(),e);
             }
         }
 
@@ -383,7 +383,7 @@ public class SqlTask extends AbstractTask {
             try {
                 connection.close();
             } catch (SQLException e) {
-                logger.error("close connection error :",e);
+                logger.error("close connection error : {}",e.getMessage(),e);
             }
         }
     }
