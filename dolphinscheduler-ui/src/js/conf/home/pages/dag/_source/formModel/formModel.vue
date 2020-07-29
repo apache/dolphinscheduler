@@ -586,7 +586,7 @@
           fromThis: this
         })
       }
-    },
+    }, 
     watch: {
       /**
        * Watch the item change, cache the value it changes
