@@ -308,10 +308,10 @@ public class MasterExecThread implements Runnable {
                     processInstance.getProcessDefinition().getGlobalParamList(),
                     CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
             processInstance.setId(0);
+            processInstance.setStartTime(new Date());
+            processInstance.setEndTime(null);
             processService.saveProcessInstance(processInstance);
         }
-
-
     }
 
 
@@ -802,7 +802,7 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0 || retryTaskExists()){
+        if(activeTaskNode.size() > 0 || hasRetryTaskInStandBy()){
             // active task and retry task exists
             return runningState(state);
         }
@@ -850,24 +850,6 @@ public class MasterExecThread implements Runnable {
         }
 
         return state;
-    }
-
-    /**
-     * whether standby task list have retry tasks
-     * @return
-     */
-    private boolean retryTaskExists() {
-
-        boolean result = false;
-
-        for(String taskName : readyToSubmitTaskList.keySet()){
-            TaskInstance task = readyToSubmitTaskList.get(taskName);
-            if(task.getState().typeIsFailure()){
-                result = true;
-                break;
-            }
-        }
-        return result;
     }
 
     /**
