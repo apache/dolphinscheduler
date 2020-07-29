@@ -205,6 +205,16 @@ public class ProcessInstanceController extends BaseController {
         return returnDataList(result);
     }
 
+    /**
+     * query top n process instance order by running duration
+     *
+     * @param loginUser     login user
+     * @param projectName   project name
+     * @param size          number of process instance
+     * @param startTime     start time
+     * @param endTime       end time
+     * @return              list of process instance
+     */
     @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", dataType = "Int", example = "10"),
@@ -220,7 +230,7 @@ public class ProcessInstanceController extends BaseController {
                                                          @RequestParam(value = "startTime",required = true) String startTime,
                                                          @RequestParam(value = "endTime",required = true) String endTime
 
-    ){
+    ) {
         projectName=ParameterUtils.handleEscapes(projectName);
         logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
                 loginUser.getUserName(), projectName);

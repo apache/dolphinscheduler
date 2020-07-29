@@ -148,7 +148,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testQueryTopNLongestRunningProcessInstance(){
+    public void testQueryTopNLongestRunningProcessInstance() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>(5);

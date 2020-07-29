@@ -107,7 +107,7 @@ public class ProcessInstanceService extends BaseDAGService {
      * @param endTime
      * @return
      */
-    public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser,String projectName,int size, String startTime, String endTime) {
+    public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime) {
         Map<String, Object> result = new HashMap<>();
 
         Project project = projectMapper.queryByName(projectName);
@@ -125,13 +125,13 @@ public class ProcessInstanceService extends BaseDAGService {
             putMsg(result, Status.DATA_IS_NULL, Constants.START_TIME);
             return result;
         }
-        Date start=DateUtils.stringToDate(startTime);
+        Date start = DateUtils.stringToDate(startTime);
         if (Objects.isNull(endTime)) {
             putMsg(result, Status.DATA_IS_NULL, Constants.END_TIME);
             return result;
         }
-        Date end=DateUtils.stringToDate(endTime);
-        if(start == null || end == null){
+        Date end = DateUtils.stringToDate(endTime);
+        if(start == null || end == null) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
             return result;
         }
