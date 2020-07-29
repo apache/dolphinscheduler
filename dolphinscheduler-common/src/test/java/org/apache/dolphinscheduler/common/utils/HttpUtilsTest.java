@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -41,5 +42,12 @@ public class HttpUtilsTest {
 
 		result = HttpUtils.get("https://123.333.111.33/ccc");
 		Assert.assertNull(result);
+	}
+
+	@Test
+	public void testGetHttpClient() {
+		CloseableHttpClient httpClient1 = HttpUtils.getHttpClient();
+		CloseableHttpClient httpClient2 = HttpUtils.getHttpClient();
+		Assert.assertEquals(httpClient1, httpClient2);
 	}
 }
