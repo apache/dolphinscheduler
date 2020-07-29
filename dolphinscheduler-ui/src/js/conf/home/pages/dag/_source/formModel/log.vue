@@ -303,26 +303,25 @@
             color: #0097e0;
             font-size: 12px;
             margin-left: 10px;
-            em {
+            i {
               vertical-align: middle;
             }
           }
           .clock {
-            >em {
+            >i {
               font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
           }
           .refresh-log {
-            >em {
-              text-decoration: none;
+            >i {
               font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
             &.active {
-              >em {
+              >i {
                 -webkit-transition-property: -webkit-transform;
                 -webkit-transition-duration: 1s;
                 -moz-transition-property: -moz-transform;
@@ -369,16 +368,5 @@
       }
     }
   }
-  @-webkit-keyframes rotateloading{from{-webkit-transform: rotate(0deg)}
-    to{-webkit-transform: rotate(360deg)}
-  }
-  @-moz-keyframes rotateloading{from{-moz-transform: rotate(0deg)}
-    to{-moz-transform: rotate(359deg)}
-  }
-  @-o-keyframes rotateloading{from{-o-transform: rotate(0deg)}
-    to{-o-transform: rotate(359deg)}
-  }
-  @keyframes rotateloading{from{transform: rotate(0deg)}
-    to{transform: rotate(359deg)}
-  }
+
 </style>
