@@ -38,7 +38,7 @@
                 type="text"
                 v-model="name"
                 :disabled="isDetails"
-                :placeholder="$t('Please enter name(required)')"
+                :placeholder="$t('Please enter name (required)')"
                 maxlength="100"
                 @on-blur="_verifName()"
                 autocomplete="off">
@@ -586,7 +586,7 @@
           fromThis: this
         })
       }
-    }, 
+    },
     watch: {
       /**
        * Watch the item change, cache the value it changes
