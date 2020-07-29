@@ -305,10 +305,10 @@ public class MasterExecThread implements Runnable {
                     processInstance.getProcessDefinition().getGlobalParamList(),
                     CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
             processInstance.setId(0);
+            processInstance.setStartTime(new Date());
+            processInstance.setEndTime(null);
             processService.saveProcessInstance(processInstance);
         }
-
-
     }
 
 
