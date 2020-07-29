@@ -352,7 +352,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result getNodeListByDefinitionId(
             @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-            @RequestParam("processDefinitionId") Integer processDefinitionId) throws Exception{
+            @RequestParam("processDefinitionId") Integer processDefinitionId) throws Exception {
         logger.info("query task node name list by definitionId, login user:{}, project name:{}, id : {}",
                 loginUser.getUserName(), projectName, processDefinitionId);
         Map<String, Object> result = processDefinitionService.getTaskNodeListByDefinitionId(processDefinitionId);

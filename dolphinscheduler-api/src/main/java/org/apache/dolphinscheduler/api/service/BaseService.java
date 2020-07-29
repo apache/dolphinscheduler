@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * base service
  */
-public class BaseService{
+public class BaseService {
 
     /**
      * check admin
@@ -118,7 +118,7 @@ public class BaseService{
      * @param tenantCode tenant code
      * @throws Exception if hdfs operation exception
      */
-    protected void createTenantDirIfNotExists(String tenantCode)throws Exception{
+    protected void createTenantDirIfNotExists(String tenantCode) throws Exception {
 
         String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
         String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
