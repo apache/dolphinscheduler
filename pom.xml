@@ -788,13 +788,14 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
-                        <!--<include>**/dao/mapper/WorkFlowLineageMapperTest.java</include>-->
+                        <include>**/dao/entity/UdfFuncTest.java</include>
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
                         <!--<include>**/remote/NettyRemotingClientTest.java</include>-->
                         <include>**/remote/ResponseFutureTest.java</include>
                         <!--<include>**/server/log/LoggerServerTest.java</include>-->
+                        <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <!--<include>**/server/log/TaskLogDiscriminatorTest.java</include>-->
@@ -821,7 +822,7 @@
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <!--<include>**/server/worker/processor/TaskCallbackServiceTest.java</include>-->
-                        <!--<include>**/server/worker/registry/WorkerRegistryTest.java</include>-->
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
@@ -834,6 +835,7 @@
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
+                        <include>**/service/zk/CuratorZookeeperClientTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
 
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>

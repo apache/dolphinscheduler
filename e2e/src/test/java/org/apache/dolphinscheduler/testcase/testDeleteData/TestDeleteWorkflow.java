@@ -17,24 +17,29 @@
 package org.apache.dolphinscheduler.testcase.testDeleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
-import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
+import org.apache.dolphinscheduler.page.project.ProjectPage;
+import org.apache.dolphinscheduler.page.project.WorkflowDefinePage;
 import org.testng.annotations.Test;
 
 public class TestDeleteWorkflow extends BaseTest {
-    private CreateWorkflowPage createWorkflowPage;
-    private CreateProjectPage createProjectPage;
+    private WorkflowDefinePage createWorkflowPage;
+    private ProjectPage createProjectPage;
+
+    /**
+     * offline workflow
+     * @throws InterruptedException
+     */
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","workflow"},description = "TestDeleteWorkflow")
+    public void testOfflineWorkflow() throws InterruptedException {
+        createWorkflowPage = new WorkflowDefinePage(driver);
+        System.out.println("start offline workflow");
+        assert createWorkflowPage.offlineWorkflow();
+        System.out.println("end offline workflow");
+        System.out.println("===================================");
+    }
 
     @Test(groups={"functionTests"},dependsOnGroups = { "login","workflow"},description = "TestDeleteWorkflow")
     public void testDeleteWorkflow() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        //jump to project manage page
-        System.out.println("jump to the project manage page to delete workflow");
-        createProjectPage.jumpProjectManagePage();
-
-        createWorkflowPage = new CreateWorkflowPage(driver);
-        createWorkflowPage.jumpWorkflowPage();
-        //assert tenant manage page
         System.out.println("start delete workflow");
         assert createWorkflowPage.deleteWorkflow();
         System.out.println("end delete workflow");

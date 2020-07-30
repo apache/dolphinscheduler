@@ -77,8 +77,8 @@ else:
 dolphin_alert_map = {}
 wechat_push_url = 'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=$token'
 wechat_token_url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpId&corpsecret=$secret'
-wechat_team_send_msg = '{\"toparty\":\"$toParty\",\"agentid\":\"$agentId\",\"msgtype\":\"text\",\"text\":{\"content\":\"$msg\"},\"safe\":\"0\"}'
-wechat_user_send_msg = '{\"touser\":\"$toUser\",\"agentid\":\"$agentId\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"$msg\"}}'
+wechat_team_send_msg = '{\"toparty\":\"{toParty}\",\"agentid\":\"{agentId}\",\"msgtype\":\"text\",\"text\":{\"content\":\"{msg}\"},\"safe\":\"0\"}'
+wechat_user_send_msg = '{\"touser\":\"{toUser}\",\"agentid\":\"{agentId}\",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}'
 
 dolphin_alert_config_map = config['configurations']['dolphin-alert']
 
@@ -145,6 +145,11 @@ if len(zookeeperHosts) > 0 and "clientPort" in config['configurations']['zoo.cfg
     zookeeperPort = ":" + clientPort + ","
     dolphin_zookeeper_map['zookeeper.quorum'] = zookeeperPort.join(zookeeperHosts) + ":" + clientPort
 dolphin_zookeeper_map.update(config['configurations']['dolphin-zookeeper'])
-
+if 'spring.servlet.multipart.max-file-size' in dolphin_app_api_map:
+    file_size = dolphin_app_api_map['spring.servlet.multipart.max-file-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-file-size'] = file_size + "MB"
+if 'spring.servlet.multipart.max-request-size' in dolphin_app_api_map:
+    request_size = dolphin_app_api_map['spring.servlet.multipart.max-request-size']
+    dolphin_app_api_map['spring.servlet.multipart.max-request-size'] = request_size + "MB"
 
 

@@ -16,7 +16,7 @@ Official Website: https://dolphinscheduler.apache.org
 #### 你可以运行一个dolphinscheduler实例
 ```
 $ docker run -dit --name dolphinscheduler \ 
--e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -e POSTGRESQL_DATABASE=dolphinscheduler \
+-e DATABASE_USERNAME=test -e DATABASE_PASSWORD=test -e DATABASE_DATABASE=dolphinscheduler \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -25,14 +25,14 @@ dolphinscheduler all
 
 同时，默认的`Zookeeper`也会在`startup.sh`脚本中被创建。
 
-#### 或者通过环境变量 **`POSTGRESQL_HOST`** **`POSTGRESQL_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
+#### 或者通过环境变量 **`DATABASE_HOST`** **`DATABASE_PORT`** **`ZOOKEEPER_QUORUM`** 使用已存在的服务
 
 你可以指定一个已经存在的 **`Postgres`** 服务. 如下:
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -42,7 +42,7 @@ dolphinscheduler all
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" -e POSTGRESQL_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" -e DATABASE_DATABASE="dolphinscheduler" \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -56,8 +56,8 @@ dolphinscheduler all
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler master-server
 ```
 
@@ -66,8 +66,8 @@ dolphinscheduler master-server
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler worker-server
 ```
 
@@ -75,8 +75,8 @@ dolphinscheduler worker-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 -p 12345:12345 \
 dolphinscheduler api-server
 ```
@@ -85,8 +85,8 @@ dolphinscheduler api-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e DATABASE_HOST="192.168.x.x" -e DATABASE_PORT="5432" -e DATABASE_DATABASE="dolphinscheduler" \
+-e DATABASE_USERNAME="test" -e DATABASE_PASSWORD="test" \
 dolphinscheduler alert-server
 ```
 
@@ -99,7 +99,7 @@ $ docker run -dit --name dolphinscheduler \
 dolphinscheduler frontend
 ```
 
-**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `POSTGRESQL_HOST` `POSTGRESQL_PORT` `POSTGRESQL_DATABASE` `POSTGRESQL_USERNAME` `POSTGRESQL_PASSWORD` `ZOOKEEPER_QUORUM`。
+**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `DATABASE_HOST` `DATABASE_PORT` `DATABASE_DATABASE` `DATABASE_USERNAME` `DATABASE_PASSWORD` `ZOOKEEPER_QUORUM`。
 
 ## 如何构建一个docker镜像
 
@@ -124,33 +124,51 @@ c:\incubator-dolphinscheduler>.\docker\build\hooks\build.bat
 
 Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些变量不是必须的，但是可以帮助你更容易配置镜像并根据你的需求定义相应的服务配置。
 
-**`POSTGRESQL_HOST`**
+**`DATABASE_TYPE`**
 
-配置`PostgreSQL`的`HOST`， 默认值 `127.0.0.1`。
-
-**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
-
-**`POSTGRESQL_PORT`**
-
-配置`PostgreSQL`的`PORT`， 默认值 `5432`。
+配置`database`的`TYPE`， 默认值 `postgresql`。
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
 
-**`POSTGRESQL_USERNAME`**
+**`DATABASE_DRIVER`**
 
-配置`PostgreSQL`的`USERNAME`， 默认值 `root`。
-
-**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
-
-**`POSTGRESQL_PASSWORD`**
-
-配置`PostgreSQL`的`PASSWORD`， 默认值 `root`。
+配置`database`的`DRIVER`， 默认值 `org.postgresql.Driver`。
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
 
-**`POSTGRESQL_DATABASE`**
+**`DATABASE_HOST`**
 
-配置`PostgreSQL`的`DATABASE`， 默认值 `dolphinscheduler`。
+配置`database`的`HOST`， 默认值 `127.0.0.1`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`DATABASE_PORT`**
+
+配置`database`的`PORT`， 默认值 `5432`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`DATABASE_USERNAME`**
+
+配置`database`的`USERNAME`， 默认值 `root`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`DATABASE_PASSWORD`**
+
+配置`database`的`PASSWORD`， 默认值 `root`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`DATABASE_DATABASE`**
+
+配置`database`的`DATABASE`， 默认值 `dolphinscheduler`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`DATABASE_PARAMS`**
+
+配置`database`的`PARAMS`， 默认值 `characterEncoding=utf8`。
 
 **注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
 
