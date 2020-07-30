@@ -600,7 +600,7 @@ public class DataSourceService extends BaseService{
      * @param datasourceId data source id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result delete(User loginUser, int datasourceId) {
         Result result = new Result();
         try {
