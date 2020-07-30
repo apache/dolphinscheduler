@@ -17,11 +17,13 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ public class HttpUtilsTest {
 	} catch (Exception e) {
 	    logger.error(e.getMessage(), e);
 	}
+
     }
 
     @Test
@@ -71,4 +74,13 @@ public class HttpUtilsTest {
 	String responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
 	Assert.assertNotNull(responseContent);
     }
+
+
+	@Test
+	public void testGetHttpClient() {
+		CloseableHttpClient httpClient1 = HttpUtils.getInstance();
+		CloseableHttpClient httpClient2 = HttpUtils.getInstance();
+		Assert.assertEquals(httpClient1, httpClient2);
+	}
+
 }

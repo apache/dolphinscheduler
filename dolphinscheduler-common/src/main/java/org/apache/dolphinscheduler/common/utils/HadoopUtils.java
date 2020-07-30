@@ -453,7 +453,7 @@ public class HadoopUtils implements Closeable {
 
             case Constants.RUNNING:
             default:
-                return ExecutionStatus.RUNNING_EXEUTION;
+                return ExecutionStatus.RUNNING_EXECUTION;
         }
     }
 

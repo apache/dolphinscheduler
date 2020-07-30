@@ -153,7 +153,7 @@ const tasksState = {
     icoUnicode: 'ans-icon-dot-circle',
     isSpin: false
   },
-  RUNNING_EXEUTION: {
+  RUNNING_EXECUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
