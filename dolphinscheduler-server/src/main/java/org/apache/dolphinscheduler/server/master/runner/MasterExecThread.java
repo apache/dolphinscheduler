@@ -302,7 +302,7 @@ public class MasterExecThread implements Runnable {
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
             }
 
-            processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+            processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                     processInstance.getProcessDefinition().getGlobalParamMap(),
                     processInstance.getProcessDefinition().getGlobalParamList(),
@@ -725,7 +725,7 @@ public class MasterExecThread implements Runnable {
             // if the running task is not completed, the state remains unchanged
             return state;
         }else{
-            return ExecutionStatus.RUNNING_EXEUTION;
+            return ExecutionStatus.RUNNING_EXECUTION;
         }
     }
 
@@ -835,11 +835,11 @@ public class MasterExecThread implements Runnable {
         }
 
         // success
-        if(state == ExecutionStatus.RUNNING_EXEUTION){
+        if(state == ExecutionStatus.RUNNING_EXECUTION){
             List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
-                return ExecutionStatus.RUNNING_EXEUTION;
+                return ExecutionStatus.RUNNING_EXECUTION;
             }else if(CollectionUtils.isNotEmpty(killTasks)){
                 // tasks maybe killed manually
                 return ExecutionStatus.FAILURE;

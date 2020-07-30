@@ -124,11 +124,11 @@ public class ProcessInstanceMapperTest {
     public void testQueryByHostAndStates() {
         ProcessInstance processInstance = insertOne();
         processInstance.setHost("192.168.2.155");
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByHostAndStatus(null, stateArray);
@@ -145,7 +145,7 @@ public class ProcessInstanceMapperTest {
 
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -155,7 +155,7 @@ public class ProcessInstanceMapperTest {
 
         ProcessInstance processInstance = insertOne();
         processInstance.setProcessDefinitionId(processDefinition.getId());
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setIsSubProcess(Flag.NO);
         processInstance.setStartTime(new Date());
 
@@ -188,12 +188,12 @@ public class ProcessInstanceMapperTest {
     public void testSetFailoverByHostAndStateArray() {
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessInstance processInstance = insertOne();
 
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setHost("192.168.2.220");
         processInstanceMapper.updateById(processInstance);
         String host = processInstance.getHost();
@@ -214,9 +214,9 @@ public class ProcessInstanceMapperTest {
 
         ProcessInstance processInstance = insertOne();
 
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
-        processInstanceMapper.updateProcessInstanceByState(ExecutionStatus.RUNNING_EXEUTION, ExecutionStatus.SUCCESS);
+        processInstanceMapper.updateProcessInstanceByState(ExecutionStatus.RUNNING_EXECUTION, ExecutionStatus.SUCCESS);
 
         ProcessInstance processInstance1 = processInstanceMapper.selectById(processInstance.getId());
 
@@ -294,11 +294,11 @@ public class ProcessInstanceMapperTest {
     @Test
     public void testQueryLastRunningProcess() {
         ProcessInstance processInstance = insertOne();
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
         ProcessInstance processInstance1 = processInstanceMapper.queryLastRunningProcess(processInstance.getProcessDefinitionId(), null, null , stateArray);
