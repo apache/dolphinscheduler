@@ -42,8 +42,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
+<<<<<<< HEAD
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class, CuratorZookeeperClient.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class})
+=======
+        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, CuratorZookeeperClient.class})
+>>>>>>> 0c5754c3f2216d3262c12bee0ecb9ea559a85419
 public class ZookeeperNodeManagerTest {
 
     @Autowired

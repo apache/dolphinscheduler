@@ -44,7 +44,7 @@ public enum ExecutionStatus {
      * 12 delay execution
      */
     SUBMITTED_SUCCESS(0, "submit success"),
-    RUNNING_EXEUTION(1, "running"),
+    RUNNING_EXECUTION(1, "running"),
     READY_PAUSE(2, "ready pause"),
     PAUSE(3, "pause"),
     READY_STOP(4, "ready stop"),
@@ -128,7 +128,7 @@ public enum ExecutionStatus {
      * @return status
      */
    public boolean typeIsRunning(){
-       return this == RUNNING_EXEUTION || this == WAITTING_DEPEND || this == DELAY_EXECUTION;
+       return this == RUNNING_EXECUTION || this == WAITTING_DEPEND || this == DELAY_EXECUTION;
    }
 
     /**

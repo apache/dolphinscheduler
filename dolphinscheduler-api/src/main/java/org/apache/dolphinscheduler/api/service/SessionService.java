@@ -81,7 +81,7 @@ public class SessionService extends BaseService{
    * @param ip ip
    * @return session string
    */
-  @Transactional(rollbackFor = Exception.class)
+  @Transactional(rollbackFor = RuntimeException.class)
   public String createSession(User user, String ip) {
     Session session = null;
 

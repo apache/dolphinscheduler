@@ -172,8 +172,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             ackCommand.setStatus(ExecutionStatus.DELAY_EXECUTION.getCode());
             ackCommand.setStartTime(null);
         } else {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXEUTION);
-            ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+            ackCommand.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
             ackCommand.setStartTime(new Date());
         }
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));

@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -53,7 +52,7 @@ public class ProcessService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
@@ -106,7 +105,7 @@ public class ProcessService {
      * @param command found command
      * @return process instance
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         //cannot construct process instance, return null;
@@ -132,7 +131,7 @@ public class ProcessService {
      * @param command command
      * @param message message
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
@@ -453,7 +452,7 @@ public class ProcessService {
                                                        Command command,
                                                        Map<String, String> cmdParam){
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
         processInstance.setRunTimes(1);
@@ -615,7 +614,7 @@ public class ProcessService {
         }
         processInstance.setHost(host);
 
-        ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXEUTION;
+        ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXECUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType){
             case START_PROCESS:
@@ -826,7 +825,7 @@ public class ProcessService {
      * @param taskInstance taskInstance
      * @return task instance
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public TaskInstance submitTask(TaskInstance taskInstance){
         ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         logger.info("start submit task : {}, instance id:{}, state: {}",
@@ -1069,7 +1068,7 @@ public class ProcessService {
                 // running or killed
                 // the task already exists in task queue
                 // return state
-                state == ExecutionStatus.RUNNING_EXEUTION
+                state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.KILL
                         || checkTaskExistsInTaskQueue(taskInstance)
                 ){
@@ -1480,7 +1479,7 @@ public class ProcessService {
      * process need failover process instance
      * @param processInstance processInstance
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
         //1 update processInstance host is null
         processInstance.setHost(Constants.NULL);
