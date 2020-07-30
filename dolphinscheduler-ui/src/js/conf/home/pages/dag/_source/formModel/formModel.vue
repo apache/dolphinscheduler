@@ -162,6 +162,14 @@
           ref="SHELL"
           :backfill-item="backfillItem">
         </m-shell>
+        <!-- waterdrop node -->
+        <m-waterdrop
+          v-if="taskType === 'WATERDROP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="WATERDROP"
+          :backfill-item="backfillItem">
+        </m-waterdrop>
         <!-- sub_process node -->
         <m-sub-process
           v-if="taskType === 'SUB_PROCESS'"
@@ -274,6 +282,7 @@
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
+  import mWaterdrop from './tasks/waterdrop'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -701,6 +710,7 @@
     components: {
       mMr,
       mShell,
+      mWaterdrop,
       mSubProcess,
       mProcedure,
       mSql,

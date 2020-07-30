@@ -243,6 +243,10 @@ const tasksType = {
     desc: 'SHELL',
     color: '#646464'
   },
+  WATERDROP: {
+    desc: 'WATERDROP',
+    color: '#646465'
+  },
   SUB_PROCESS: {
     desc: 'SUB_PROCESS',
     color: '#0097e0'
