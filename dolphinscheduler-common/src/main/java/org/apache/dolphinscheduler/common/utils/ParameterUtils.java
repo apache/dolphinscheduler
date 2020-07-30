@@ -207,7 +207,7 @@ public class ParameterUtils {
   public static String handleEscapes(String inputString){
 
     if(StringUtils.isNotEmpty(inputString)){
-      return inputString.replace("%", "////%");
+      return inputString.replace("%", "////%").replaceAll("[\n|\r\t]", "_");
     }
     return inputString;
   }
