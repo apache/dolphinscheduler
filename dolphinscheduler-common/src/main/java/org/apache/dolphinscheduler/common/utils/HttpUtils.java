@@ -169,11 +169,7 @@ public class HttpUtils {
 		httpget.releaseConnection();
 		httpget.abort();
 	    }
-	    try {
-		httpClient.close();
-	    } catch (IOException e) {
-		logger.error(e.getMessage(), e);
-	    }
+
 	}
 	return responseContent;
     }
