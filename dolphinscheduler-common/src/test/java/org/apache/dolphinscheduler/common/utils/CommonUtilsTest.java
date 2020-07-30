@@ -108,7 +108,7 @@ public class CommonUtilsTest {
 
 
     @Test
-    public void encodePasswordOff() {
+    public void encodePassword() {
         Assert.assertEquals("",CommonUtils.encodePassword(""));
         Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
         Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
@@ -116,7 +116,7 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void decodePasswordOff() {
+    public void decodePassword() {
         Assert.assertEquals("",CommonUtils.decodePassword(""));
         Assert.assertEquals("123456",CommonUtils.decodePassword("123456"));
         Assert.assertEquals("!QAZXSW@",CommonUtils.decodePassword("!QAZXSW@"));
