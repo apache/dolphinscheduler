@@ -46,8 +46,8 @@ public class HttpUtilsTest {
 
 	@Test
 	public void testGetHttpClient() {
-		CloseableHttpClient httpClient1 = HttpUtils.getHttpClient();
-		CloseableHttpClient httpClient2 = HttpUtils.getHttpClient();
+		CloseableHttpClient httpClient1 = HttpUtils.getInstance();
+		CloseableHttpClient httpClient2 = HttpUtils.getInstance();
 		Assert.assertEquals(httpClient1, httpClient2);
 	}
 }
