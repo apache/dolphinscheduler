@@ -104,7 +104,7 @@ public class DataSourceServiceTest {
     public void buildParameter(){
         String param = dataSourceService.buildParameter("","", DbType.ORACLE, "192.168.9.1","1521","im"
                 ,"","test","test", DbConnectType.ORACLE_SERVICE_NAME,"");
-        String expected = "{\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
+        String expected = "{\"connectType\":\"ORACLE_SERVICE_NAME\",\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
     }
 
