@@ -14,26 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import kinship from './kinship'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    kinship,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+package org.apache.dolphinscheduler.dao.mapper;
+
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.ibatis.annotations.Param;
+import java.util.List;
+import java.util.Set;
+
+public interface WorkFlowLineageMapper {
+
+    public List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectId") int projectId);
+
+    public List<WorkFlowLineage> queryByIds(@Param("ids") Set<Integer> ids, @Param("projectId") int projectId);
+
+    public List<WorkFlowRelation> querySourceTarget(@Param("id") int id);
+}

@@ -14,26 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import kinship from './kinship'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    kinship,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+package org.apache.dolphinscheduler.dao.entity;
+
+public class WorkFlowRelation {
+    private int sourceWorkFlowId;
+    private int targetWorkFlowId;
+
+    public int getSourceWorkFlowId() {
+        return sourceWorkFlowId;
+    }
+
+    public void setSourceWorkFlowId(int sourceWorkFlowId) {
+        this.sourceWorkFlowId = sourceWorkFlowId;
+    }
+
+    public int getTargetWorkFlowId() {
+        return targetWorkFlowId;
+    }
+
+    public void setTargetWorkFlowId(int targetWorkFlowId) {
+        this.targetWorkFlowId = targetWorkFlowId;
+    }
+}
