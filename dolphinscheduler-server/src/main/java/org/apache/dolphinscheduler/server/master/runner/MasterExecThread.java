@@ -470,9 +470,6 @@ public class MasterExecThread implements Runnable {
             // task instance whether alert
             taskInstance.setAlertFlag(Flag.NO);
 
-            // task instance start time
-            // taskInstance.setStartTime(new Date());
-
             // task instance flag
             taskInstance.setFlag(Flag.YES);
 

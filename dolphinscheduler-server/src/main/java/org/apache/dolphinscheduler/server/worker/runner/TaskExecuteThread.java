@@ -104,7 +104,9 @@ public class TaskExecuteThread implements Runnable {
             TaskNode taskNode = JSONUtils.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
             delayExecutionIfNeeded();
-            taskExecutionContext.setStartTime(new Date());
+            if (taskExecutionContext.getStartTime() == null) {
+                taskExecutionContext.setStartTime(new Date());
+            }
             if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXEUTION) {
                 changeTaskExecutionStatusToRunning();
             }
@@ -270,7 +272,7 @@ public class TaskExecuteThread implements Runnable {
      */
     private void delayExecutionIfNeeded() {
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
-                taskExecutionContext.getDelayTime());
+                taskExecutionContext.getDelayTime() * 60L);
         logger.info("delay execution time: {} s", remainTime <= 0 ? 0 : remainTime);
         if (remainTime > 0) {
             try {

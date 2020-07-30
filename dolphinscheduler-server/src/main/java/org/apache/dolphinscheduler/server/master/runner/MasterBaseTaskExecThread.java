@@ -172,9 +172,11 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
                 return true;
             }
-            // task cannot submit when running
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task, but task [%s] state already be running. ", taskInstance.getName()));
+            // task cannot be submitted because its execution state is RUNNING or DELAY.
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION
+                    || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION){
+                logger.info(String.format("submit to task, but the status of the task [%s] is already running or delayed.",
+                        taskInstance.getName()));
                 return true;
             }
             logger.info("task ready to submit: {}", taskInstance);

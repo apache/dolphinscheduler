@@ -167,7 +167,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private TaskExecuteAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime()) > 0) {
+        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L) > 0) {
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
             ackCommand.setStatus(ExecutionStatus.DELAY_EXECUTION.getCode());
             ackCommand.setStartTime(null);
