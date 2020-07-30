@@ -34,7 +34,7 @@ export default {
   'View log': '查看日志',
   'Enter this child node': '进入该子节点',
   'Node name': '节点名称',
-  'Please enter name(required)': '请输入名称(必填)',
+  'Please enter name (required)': '请输入名称(必填)',
   'Run flag': '运行标志',
   Normal: '正常',
   'Prohibition execution': '禁止执行',
