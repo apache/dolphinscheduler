@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.registry;
 
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -37,18 +34,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * zookeeper node manager test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
-<<<<<<< HEAD
-        ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class, CuratorZookeeperClient.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class})
-=======
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, CuratorZookeeperClient.class})
->>>>>>> 0c5754c3f2216d3262c12bee0ecb9ea559a85419
 public class ZookeeperNodeManagerTest {
 
     @Autowired
