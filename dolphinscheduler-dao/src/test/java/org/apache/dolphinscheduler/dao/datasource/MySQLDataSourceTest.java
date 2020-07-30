@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,10 +46,8 @@ public class MySQLDataSourceTest {
         String sensitivePwd= "test_pwd?autoDeserialize=true";
         dataSource.setPassword(sensitivePwd);
         Assert.assertEquals("test_pwd?", dataSource.getPassword());
-        safePwd= "";
-        dataSource.setPassword(safePwd);
-        Assert.assertEquals("", dataSource.getPassword());
     }
+
 
     @Test
     public void testFilterOther(){
@@ -64,4 +64,23 @@ public class MySQLDataSourceTest {
         other = dataSource.filterOther("serverTimezone=Asia/Shanghai&autoDeserialize=true&characterEncoding=utf8");
         Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8", other);
     }
+
+    @Test
+    public void testGetPasswordWithDecodePassword(){
+        MySQLDataSource dataSource = new MySQLDataSource();
+        String password= "";
+        dataSource.setPassword(password);
+        Assert.assertEquals("", dataSource.getPassword());
+        password= "IUAjJCVeJioxMjM0NTY=";
+        dataSource.setPassword(password);
+        Assert.assertNotNull(dataSource.getPassword());
+
+        boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
+        if(encryptionEnable){
+            Assert.assertEquals("123456", dataSource.getPassword());
+        }else {
+            Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+        }
+    }
+
 }

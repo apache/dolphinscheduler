@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -106,4 +107,21 @@ public class DataSourceServiceTest {
         String expected = "{\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
     }
+
+    @Test
+    public void buildParameterWithDecodePassword(){
+        String param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
+                ,"","test","123456", null,"");
+        String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"123456\"}";
+        boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
+        if(encryptionEnable){
+            expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"IUAjJCVeJioxMjM0NTY=\"}";
+        }
+        Assert.assertEquals(expected, param);
+    }
+
+
+
+
+
 }
