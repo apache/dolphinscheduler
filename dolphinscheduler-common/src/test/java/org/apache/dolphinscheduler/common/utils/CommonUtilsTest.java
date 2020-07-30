@@ -90,22 +90,39 @@ public class CommonUtilsTest {
         Assert.assertTrue(true);
     }
 
-
     @Test
-    public void encodePassword() {
+    public void encodePasswordOn() {
         Assert.assertEquals("",CommonUtils.encodePassword(""));
-        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=",CommonUtils.encodePassword("123456"));
-        Assert.assertEquals("IUAjJCVeJiohUUFaWFNXQA==",CommonUtils.encodePassword("!QAZXSW@"));
-        Assert.assertEquals("IUAjJCVeJio1ZGZnZXIoQA==",CommonUtils.encodePassword("5dfger(@"));
+        Assert.assertNotEquals("IUAjJCVeJioxMjM0NTY=",CommonUtils.encodePassword("123456"));
+        Assert.assertNotEquals("IUAjJCVeJiohUUFaWFNXQA==",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertNotEquals("IUAjJCVeJio1ZGZnZXIoQA==",CommonUtils.encodePassword("5dfger(@"));
     }
 
     @Test
-    public void decodePassword() {
+    public void decodePasswordOn() {
         Assert.assertEquals("",CommonUtils.decodePassword(""));
-        Assert.assertEquals("123456",CommonUtils.decodePassword("IUAjJCVeJioxMjM0NTY="));
-        Assert.assertEquals("!QAZXSW@",CommonUtils.decodePassword("IUAjJCVeJiohUUFaWFNXQA=="));
-        Assert.assertEquals("5dfger(@",CommonUtils.decodePassword("IUAjJCVeJio1ZGZnZXIoQA=="));
+        Assert.assertNotEquals("123456",CommonUtils.decodePassword("IUAjJCVeJioxMjM0NTY="));
+        Assert.assertNotEquals("!QAZXSW@",CommonUtils.decodePassword("IUAjJCVeJiohUUFaWFNXQA=="));
+        Assert.assertNotEquals("5dfger(@",CommonUtils.decodePassword("IUAjJCVeJio1ZGZnZXIoQA=="));
     }
+
+
+    @Test
+    public void encodePasswordOff() {
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@",CommonUtils.encodePassword("5dfger(@"));
+    }
+
+    @Test
+    public void decodePasswordOff() {
+        Assert.assertEquals("",CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456",CommonUtils.decodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@",CommonUtils.decodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@",CommonUtils.decodePassword("5dfger(@"));
+    }
+
     @Test
     public void encodeAnddecodePassword() {
         Assert.assertEquals(CommonUtils.encodePassword(""),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("")))) ;

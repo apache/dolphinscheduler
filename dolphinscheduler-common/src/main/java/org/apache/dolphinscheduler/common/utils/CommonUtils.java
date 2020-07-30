@@ -101,6 +101,10 @@ public class CommonUtils {
    */
   public static String encodePassword(String password) {
     if(StringUtils.isEmpty(password)){return StringUtils.EMPTY; }
+    //if encryption is not turned on, return directly
+    if ( !PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false)){ return password; }
+
+    // Using Base64 + salt to process password
     String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
     String passwordWithSalt = salt + password  ;
     return  new String(BASE64.encode(passwordWithSalt.getBytes(Charset.forName(Constants.UTF_8))));
@@ -113,6 +117,11 @@ public class CommonUtils {
    */
   public static String decodePassword(String password) {
     if(StringUtils.isEmpty(password)){return StringUtils.EMPTY ; }
+
+    //if encryption is not turned on, return directly
+    if ( !PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false)){ return password; }
+
+    // Using Base64 + salt to process password
     String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
     String passwordWithSalt = new String(BASE64.decode(password),Charset.forName(Constants.UTF_8)) ;
     return passwordWithSalt.substring(salt.length()) ;

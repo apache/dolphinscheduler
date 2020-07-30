@@ -993,5 +993,6 @@ public final class Constants {
      * datasource encryption salt
      */
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
+    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 }
