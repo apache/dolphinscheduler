@@ -28,7 +28,7 @@ const stateType = [
     code: 'SUBMITTED_SUCCESS',
     label: `${i18n.$t('Submitted successfully')}`
   }, {
-    code: 'RUNNING_EXEUTION',
+    code: 'RUNNING_EXECUTION',
     label: `${i18n.$t('Running')}`
   }, {
     code: 'READY_PAUSE',
