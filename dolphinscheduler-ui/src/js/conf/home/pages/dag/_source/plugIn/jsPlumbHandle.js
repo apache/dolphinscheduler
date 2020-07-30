@@ -632,10 +632,10 @@ JSP.prototype.saveStore = function () {
     // task
     _.map(_.cloneDeep(store.state.dag.tasks), v => {
       if (is(v.id)) {
-        const preTasks = []
-        const id = $(`#${v.id}`)
-        const tar = id.attr('data-targetarr')
-        const idDep = tar ? id.attr('data-targetarr').split(',') : []
+        let preTasks = []
+        let id = $(`#${v.id}`)
+        let tar = id.attr('data-targetarr')
+        let idDep = tar ? id.attr('data-targetarr').split(',') : []
         if (idDep.length) {
           _.map(idDep, v1 => {
             preTasks.push($(`#${v1}`).find('.name-p').text())
