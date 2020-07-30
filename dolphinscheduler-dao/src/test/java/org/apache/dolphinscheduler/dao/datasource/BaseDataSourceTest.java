@@ -112,4 +112,18 @@ public class BaseDataSourceTest {
 
 
   }
+
+  @Test
+  public void testGetPassword() {
+    String mysqlDriverClass = new MySQLDataSource().driverClassSelector();
+    Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDriverClass);
+
+    String password = new MySQLDataSource().getPassword();
+    Assert.assertEquals("",password);
+
+  }
+
+
+
+
 }

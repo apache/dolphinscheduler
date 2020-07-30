@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * common utils
@@ -102,12 +102,13 @@ public class CommonUtils {
   public static String encodePassword(String password) {
     if(StringUtils.isEmpty(password)){return StringUtils.EMPTY; }
     //if encryption is not turned on, return directly
-    if ( !PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false)){ return password; }
+    boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
+    if ( !encryptionEnable){ return password; }
 
     // Using Base64 + salt to process password
     String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
     String passwordWithSalt = salt + password  ;
-    return  new String(BASE64.encode(passwordWithSalt.getBytes(Charset.forName(Constants.UTF_8))));
+    return  new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
   }
 
   /**
@@ -119,11 +120,12 @@ public class CommonUtils {
     if(StringUtils.isEmpty(password)){return StringUtils.EMPTY ; }
 
     //if encryption is not turned on, return directly
-    if ( !PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false)){ return password; }
+    boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
+    if ( !encryptionEnable){ return password; }
 
     // Using Base64 + salt to process password
     String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
-    String passwordWithSalt = new String(BASE64.decode(password),Charset.forName(Constants.UTF_8)) ;
+    String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8) ;
     return passwordWithSalt.substring(salt.length()) ;
   }
 

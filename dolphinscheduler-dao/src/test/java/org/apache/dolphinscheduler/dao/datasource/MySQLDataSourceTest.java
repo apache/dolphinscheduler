@@ -44,6 +44,9 @@ public class MySQLDataSourceTest {
         String sensitivePwd= "test_pwd?autoDeserialize=true";
         dataSource.setPassword(sensitivePwd);
         Assert.assertEquals("test_pwd?", dataSource.getPassword());
+        safePwd= "";
+        dataSource.setPassword(safePwd);
+        Assert.assertEquals("", dataSource.getPassword());
     }
 
     @Test
