@@ -18,16 +18,14 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.*;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
@@ -567,6 +565,7 @@ public class TaskInstance implements Serializable {
                 ", processInstanceName='" + processInstanceName + '\'' +
                 ", taskJson='" + taskJson + '\'' +
                 ", state=" + state +
+                ", firstSubmitTime=" + firstSubmitTime +
                 ", submitTime=" + submitTime +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
@@ -590,6 +589,7 @@ public class TaskInstance implements Serializable {
                 ", workerGroup='" + workerGroup + '\'' +
                 ", executorId=" + executorId +
                 ", executorName='" + executorName + '\'' +
+                ", delayTime=" + delayTime +
                 '}';
     }
 }

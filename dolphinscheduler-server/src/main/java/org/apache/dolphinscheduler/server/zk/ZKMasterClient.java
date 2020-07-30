@@ -256,6 +256,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return true if task instance start time after worker server start date
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
+		// TODO startTime可能为空
 		if(StringUtils.isEmpty(taskInstance.getHost())){
 			return false;
 		}

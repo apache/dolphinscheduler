@@ -17,14 +17,6 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import com.github.rholder.retry.RetryException;
-import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.Set;
-
 import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -47,7 +39,10 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 
 /**
@@ -113,6 +108,7 @@ public class TaskExecuteThread implements Runnable {
             if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXEUTION) {
                 changeTaskExecutionStatusToRunning();
             }
+            logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
 
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
@@ -148,7 +144,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
@@ -157,11 +153,11 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
         } finally {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(responseCommand.getStatus()));
             try {
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.of(responseCommand.getStatus()));
                 taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
-            }catch (Exception e){
+            } catch (Exception e) {
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
                 taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             }
@@ -281,7 +277,8 @@ public class TaskExecuteThread implements Runnable {
                 Thread.sleep(remainTime * 1000);
             } catch (Exception e) {
                 logger.error("exception", e);
-                logger.error("delay task execution failure, the task will be executed directly. instance id:{}, task id:{}",
+                logger.error("delay task execution failure, the task will be executed directly." +
+                                " process instance id:{}, task instance id:{}",
                             taskExecutionContext.getProcessInstanceId(),
                             taskExecutionContext.getTaskInstanceId());
             }

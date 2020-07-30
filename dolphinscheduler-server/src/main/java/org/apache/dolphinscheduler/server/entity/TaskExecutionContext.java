@@ -507,6 +507,8 @@ public class TaskExecutionContext implements Serializable{
         return "TaskExecutionContext{" +
                 "taskInstanceId=" + taskInstanceId +
                 ", taskName='" + taskName + '\'' +
+                ", currentExecutionStatus=" + currentExecutionStatus +
+                ", firstSubmitTime=" + firstSubmitTime +
                 ", startTime=" + startTime +
                 ", taskType='" + taskType + '\'' +
                 ", host='" + host + '\'' +

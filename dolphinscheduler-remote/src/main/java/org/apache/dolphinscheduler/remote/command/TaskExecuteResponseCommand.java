@@ -134,6 +134,7 @@ public class TaskExecuteResponseCommand implements Serializable {
         return "TaskExecuteResponseCommand{" +
                 "taskInstanceId=" + taskInstanceId +
                 ", status=" + status +
+                ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", processId=" + processId +
                 ", appIds='" + appIds + '\'' +

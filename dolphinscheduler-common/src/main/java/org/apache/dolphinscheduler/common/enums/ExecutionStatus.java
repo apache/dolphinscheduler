@@ -41,6 +41,7 @@ public enum ExecutionStatus {
      * 9 kill
      * 10 waiting thread
      * 11 waiting depend node complete
+     * 12 delay execution
      */
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXEUTION(1, "running"),
@@ -54,7 +55,7 @@ public enum ExecutionStatus {
     KILL(9, "kill"),
     WAITTING_THREAD(10, "waiting thread"),
     WAITTING_DEPEND(11, "waiting depend node complete"),
-    DELAY_EXECUTION(13, "delay execution");
+    DELAY_EXECUTION(12, "delay execution");
 
     ExecutionStatus(int code, String descp){
         this.code = code;

@@ -332,6 +332,7 @@ public class TaskNode {
             ", taskInstancePriority=" + taskInstancePriority +
             ", timeout='" + timeout + '\'' +
             ", workerGroup='" + workerGroup + '\'' +
+            ", delayTime=" + delayTime +
             '}';
   }
 

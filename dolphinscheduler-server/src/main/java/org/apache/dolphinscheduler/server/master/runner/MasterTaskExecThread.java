@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -39,7 +40,6 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
 import java.util.Set;
-import org.apache.dolphinscheduler.common.utils.*;
 
 
 /**
@@ -264,6 +264,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * @return remain time
      */
     private long getRemaintime(long timeoutSeconds) {
+        // TODO startTime可能为NULL
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
         return timeoutSeconds - usedTime;
