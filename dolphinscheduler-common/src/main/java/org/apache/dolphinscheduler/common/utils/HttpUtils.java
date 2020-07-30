@@ -128,9 +128,7 @@ public class HttpUtils {
 		CloseableHttpClient httpclient = HttpUtils.getInstance();
 
 		HttpGet httpget = new HttpGet(url);
-		String responseContent = null;
-		CloseableHttpResponse response = null;
-
+		return getResponseContentString(httpget,httpclient);
     }
 
     /**
