@@ -84,11 +84,10 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   // Monitor line click
   this.JspInstance.bind('click', e => {
     // Untie event
-  if (this.config.isDblclick) {
-    findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
-    }
     if (this.config.isClick) {
       this.connectClick(e)
+    } else {
+      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
     }
   })
 
@@ -496,6 +495,16 @@ JSP.prototype.removeNodes = function ($id) {
 
   // callback onRemoveNodes event
   this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
+  let connects = []
+  _.map(this.JspInstance.getConnections(), v => {
+    connects.push({
+      endPointSourceId: v.sourceId,
+      endPointTargetId: v.targetId,
+      label: v._jsPlumb.overlays.label.canvas.innerText
+    })
+  })
+  // Storage line dependence
+  store.commit('dag/setConnects', connects)
 }
 
 /**
