@@ -72,6 +72,10 @@ elif [ "$command" = "alert-server" ]; then
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
+elif [ "$command" = "zookeeper-server" ]; then
+  #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
+  LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
+  CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
