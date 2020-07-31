@@ -107,7 +107,7 @@ public class CommonUtils {
 
     // Using Base64 + salt to process password
     String salt = PropertyUtils.getString(Constants.DATASOURCE_ENCRYPTION_SALT,Constants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
-    String passwordWithSalt = salt + password  ;
+    String passwordWithSalt = salt + new String(BASE64.encode(password.getBytes(StandardCharsets.UTF_8)))   ;
     return  new String(BASE64.encode(passwordWithSalt.getBytes(StandardCharsets.UTF_8)));
   }
 
@@ -130,7 +130,7 @@ public class CommonUtils {
       logger.warn("There is a password and salt mismatch: {} ",password);
       return password;
     }
-    return passwordWithSalt.substring(salt.length()) ;
+    return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8) ;
   }
 
 

@@ -132,7 +132,7 @@ public class BaseDataSourceTest {
     String password= "";
     dataSource.setPassword(password);
     Assert.assertEquals("", dataSource.getPassword());
-    password= "IUAjJCVeJioxMjM0NTY=";
+    password= "IUAjJCVeJipNVEl6TkRVMg==";
     dataSource.setPassword(password);
     Assert.assertNotNull(dataSource.getPassword());
     Assert.assertNotNull(dataSource.getPassword());
@@ -148,12 +148,12 @@ public class BaseDataSourceTest {
 
     dataSource.setPassword(password);
     PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
-    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
 
     dataSource.setPassword(password);
-    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
-    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
-    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
 
 
   }

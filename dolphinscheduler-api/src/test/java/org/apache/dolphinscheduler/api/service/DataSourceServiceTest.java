@@ -113,7 +113,7 @@ public class DataSourceServiceTest {
         PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
         String param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
                 ,"","test","123456", null,"");
-        String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"IUAjJCVeJioxMjM0NTY=\"}";
+        String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\"}";
         Assert.assertEquals(expected, param);
 
 
