@@ -48,8 +48,7 @@ public class TaskManager {
                                      Logger logger)
       throws IllegalArgumentException {
     switch (EnumUtils.getEnum(TaskType.class,taskExecutionContext.getTaskType())) {
-        case SHELL:
-        return new ShellTask(taskExecutionContext, logger);
+      case SHELL:
       case WATERDROP:
         return new ShellTask(taskExecutionContext, logger);
       case PROCEDURE:
