@@ -57,9 +57,10 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      *  When the current channel is not active,
      *  the current channel has reached the end of its life cycle
      * @param ctx channel handler context
+     * @throws Exception
      */
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.channel().close();
     }
 
@@ -71,7 +72,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         processReceived(ctx.channel(), (Command)msg);
     }
 
@@ -138,7 +139,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("exceptionCaught : {}",cause.getMessage(), cause);
         ctx.channel().close();
     }
@@ -150,7 +151,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @throws Exception
      */
     @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel ch = ctx.channel();
         ChannelConfig config = ch.config();
 
