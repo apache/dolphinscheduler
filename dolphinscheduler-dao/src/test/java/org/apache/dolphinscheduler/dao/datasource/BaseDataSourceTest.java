@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -115,11 +117,44 @@ public class BaseDataSourceTest {
 
   @Test
   public void testGetPassword() {
-    String mysqlDriverClass = new MySQLDataSource().driverClassSelector();
-    Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDriverClass);
+    BaseDataSource dataSource = new BaseDataSource() {
+      @Override
+      public String driverClassSelector() {
+        return null;
+      }
 
-    String password = new MySQLDataSource().getPassword();
-    Assert.assertEquals("",password);
+      @Override
+      public DbType dbTypeSelector() {
+        return null;
+      }
+    };
+
+    String password= "";
+    dataSource.setPassword(password);
+    Assert.assertEquals("", dataSource.getPassword());
+    password= "IUAjJCVeJioxMjM0NTY=";
+    dataSource.setPassword(password);
+    Assert.assertNotNull(dataSource.getPassword());
+    Assert.assertNotNull(dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+    Assert.assertEquals("123456", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    Assert.assertEquals("123456", dataSource.getPassword());
+    Assert.assertEquals("123456", dataSource.getPassword());
+    Assert.assertEquals("123456", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+
 
   }
 

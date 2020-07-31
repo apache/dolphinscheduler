@@ -74,13 +74,26 @@ public class MySQLDataSourceTest {
         password= "IUAjJCVeJioxMjM0NTY=";
         dataSource.setPassword(password);
         Assert.assertNotNull(dataSource.getPassword());
+        Assert.assertNotNull(dataSource.getPassword());
 
-        boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
-        if(encryptionEnable){
-            Assert.assertEquals("123456", dataSource.getPassword());
-        }else {
-            Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
-        }
+        dataSource.setPassword(password);
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+        Assert.assertEquals("123456", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        Assert.assertEquals("123456", dataSource.getPassword());
+        Assert.assertEquals("123456", dataSource.getPassword());
+        Assert.assertEquals("123456", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=", dataSource.getPassword());
+
     }
 
 }

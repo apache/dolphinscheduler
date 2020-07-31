@@ -93,50 +93,40 @@ public class CommonUtilsTest {
 
     @Test
     public void encodePassword() {
-        boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
-        if(encryptionEnable){
-            Assert.assertEquals("",CommonUtils.encodePassword(""));
-            Assert.assertNotEquals("IUAjJCVeJioxMjM0NTY=",CommonUtils.encodePassword("123456"));
-            Assert.assertNotEquals("IUAjJCVeJiohUUFaWFNXQA==",CommonUtils.encodePassword("!QAZXSW@"));
-            Assert.assertNotEquals("IUAjJCVeJio1ZGZnZXIoQA==",CommonUtils.encodePassword("5dfger(@"));
-        }else {
-            Assert.assertEquals("",CommonUtils.encodePassword(""));
-            Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
-            Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
-            Assert.assertEquals("5dfger(@",CommonUtils.encodePassword("5dfger(@"));
-        }
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("IUAjJCVeJioxMjM0NTY=",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("IUAjJCVeJiohUUFaWFNXQA==",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("IUAjJCVeJio1ZGZnZXIoQA==",CommonUtils.encodePassword("5dfger(@"));
 
 
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@",CommonUtils.encodePassword("5dfger(@"));
 
     }
 
     @Test
     public void decodePassword() {
-        boolean encryptionEnable =  PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE,false);
-        if(encryptionEnable){
-            Assert.assertEquals("",CommonUtils.decodePassword(""));
-            Assert.assertNotEquals("123456",CommonUtils.decodePassword("IUAjJCVeJioxMjM0NTY="));
-            Assert.assertNotEquals("!QAZXSW@",CommonUtils.decodePassword("IUAjJCVeJiohUUFaWFNXQA=="));
-            Assert.assertNotEquals("5dfger(@",CommonUtils.decodePassword("IUAjJCVeJio1ZGZnZXIoQA=="));
-        }else {
-            Assert.assertEquals("", CommonUtils.decodePassword(""));
-            Assert.assertEquals("123456", CommonUtils.decodePassword("123456"));
-            Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("!QAZXSW@"));
-            Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("5dfger(@"));
-        }
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+
+        Assert.assertEquals("", CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456", CommonUtils.decodePassword("IUAjJCVeJioxMjM0NTY="));
+        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("IUAjJCVeJiohUUFaWFNXQA=="));
+        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("IUAjJCVeJio1ZGZnZXIoQA=="));
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+
+        Assert.assertEquals("", CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456", CommonUtils.decodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("5dfger(@"));
     }
 
-    @Test
-    public void encodeAnddecodePassword() {
-        Assert.assertEquals(CommonUtils.encodePassword(""),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("")))) ;
-        Assert.assertEquals(CommonUtils.encodePassword("dolphinscheduler"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("dolphinscheduler")))) ;
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZmdlcihA")))) ;
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFmdlcihA"))));
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZmdlc3ihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZmdlc3ihA"))));
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkS^8DFZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkS^8DFZmdlcihA"))));
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZC你好dlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZC你好dlcihA"))));
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDFZm#$%^&*(dlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDFZm#$%^&*(dlcihA"))));
-        Assert.assertEquals(CommonUtils.encodePassword("ITVkSDF~!@#$%^&*()ZmdlcihA"),CommonUtils.encodePassword(CommonUtils.decodePassword(CommonUtils.encodePassword("ITVkSDF~!@#$%^&*()ZmdlcihA"))));
-    }
-    
 }
