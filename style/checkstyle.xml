@@ -186,19 +186,38 @@
         </module>
 
         <module name="Indentation">
-            <property name="basicOffset" value="2"/>
+            <property name="basicOffset" value="4"/>
             <property name="braceAdjustment" value="0"/>
-            <property name="caseIndent" value="2"/>
-            <property name="throwsIndent" value="4"/>
+            <property name="caseIndent" value="4"/>
+            <property name="throwsIndent" value="2"/>
             <property name="lineWrappingIndentation" value="4"/>
-            <property name="arrayInitIndent" value="2"/>
+            <property name="arrayInitIndent" value="4"/>
         </module>
 
-        <module name="UnusedImports"/>
-
+        <module name="IllegalImport">
+            <property name="regexp" value="true"/>
+            <property name="illegalPkgs"
+              value="^com\.google\.api\.client\.repackaged, ^avro\.shaded, ^org\.apache\.hadoop\.hbase\.shaded, ^org\.apache\.hadoop\.shaded,
+                      ^javax\.ws\.rs\.ext, ^cc\.concurrent\.mango\.util\.concurrent, ^org\.apache\.curator\.shaded,
+                      ^org\.apache\.curator-test\.shaded, ^com\.sun\.istack, ^org\.apache\.directory\.api\.util,
+                      ^org\.apache\.commons\.lang, ^org\.jetbrains\.annotations, ^jline\.internal, ^com\.cronutils\.utils,
+                      ^javax\.ws\.rs\.ext, ^org\.apache\.commons\.collections, ^org\.apache\.commons\.logging,
+                      ^org\.jboss\.netty\.util\.internal, ^com\.sun\.javafx, ^io\.reactivex\.annotations,
+                      ^org\.apache\.commons\.compress\.compressors\.lz4, ^org\.codehaus\.jackson"/>
+            <property name="illegalClasses"
+              value="^java\.sql\.Date, ^java\.util\.logging\.Logging, ^org\.apache\.logging\.log4j\.Logger,
+                      ^org\.apache\.hadoop\.util\.StringUtils, ^groovy\.lang\.Lazy, ^org\.springframework\.util\.concurrent\.ListenableFuture,
+                      ^sun\.misc\.BASE64Encoder, ^sun\.misc\.BASE64Decoder, ^jdk\.internal\.jline\.internal\.Nullable"/>
+        </module>
         <module name="RedundantImport"/>
-
-        <module name="MethodParamPad"/>
+        <module name="UnusedImports"/>
+        <module name="ImportOrder">
+            <property name="groups" value="java,javax,org,com"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="true"/>
+            <property name="option" value="top"/>
+            <property name="sortStaticImportsAlphabetically" value="true"/>
+        </module>
 
         <module name="NoWhitespaceBefore">
             <property name="tokens" value="COMMA, SEMI, POST_INC, POST_DEC, DOT, ELLIPSIS, METHOD_REF"/>
