@@ -209,6 +209,7 @@
                       ^org\.apache\.hadoop\.util\.StringUtils, ^groovy\.lang\.Lazy, ^org\.springframework\.util\.concurrent\.ListenableFuture,
                       ^sun\.misc\.BASE64Encoder, ^sun\.misc\.BASE64Decoder, ^jdk\.internal\.jline\.internal\.Nullable"/>
         </module>
+      
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="ImportOrder">
