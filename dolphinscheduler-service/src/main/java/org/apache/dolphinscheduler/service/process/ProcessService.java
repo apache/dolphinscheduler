@@ -53,6 +53,7 @@ public class ProcessService {
 
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
@@ -1065,10 +1066,11 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState){
         ExecutionStatus state = taskInstance.getState();
         if(
-                // running or killed
+                // running, delayed or killed
                 // the task already exists in task queue
                 // return state
                 state == ExecutionStatus.RUNNING_EXECUTION
+                        || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
                         || checkTaskExistsInTaskQueue(taskInstance)
                 ){

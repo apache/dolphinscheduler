@@ -235,7 +235,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		boolean taskNeedFailover = true;
 
 		//now no host will execute this task instance,so no need to failover the task
-		if(taskInstance.getHost() == null){
+		if(taskInstance.getHost() == null || taskInstance.getStartTime() == null){
 			return false;
 		}
 
@@ -256,7 +256,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return true if task instance start time after worker server start date
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
-		// TODO startTime可能为空
 		if(StringUtils.isEmpty(taskInstance.getHost())){
 			return false;
 		}

@@ -151,7 +151,14 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     break;
                 }
                 if(checkTimeout){
-                    long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), taskTimeoutParameter.getInterval() * 60L);
+                    // TODO In the original design, it may happen that the actual task is not execution timeout
+                    //  but the master will send a timeout alert because the task may wait a long time in the queue.
+                    //  In the existing design, startTime may not be initialized when it is used,
+                    //  because it needs to wait for the worker to update it.
+                    //  Due to the above two reasons, may there are more reasons, how to determine whether the task
+                    //  is overtime (worker may crash) in the Master has become a problem to be solved.
+                    // long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), taskTimeoutParameter.getInterval() * 60L);
+                    long remainTime = DateUtils.getRemainTime(taskInstance.getSubmitTime(), taskTimeoutParameter.getInterval() * 60L);
                     if (remainTime < 0) {
                         logger.warn("task id: {} execution time out",taskInstance.getId());
                         // process define
