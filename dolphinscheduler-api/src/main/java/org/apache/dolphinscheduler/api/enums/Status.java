@@ -181,6 +181,8 @@ public enum Status {
     PROCESS_DEFINITION_IDS_IS_EMPTY(10152,"process definition ids is empty", "工作流IDS不能为空"),
     COPY_OR_MOVE_PROCESS_DEFINITION_ERROR(10153,"copy or move process definition error", "复制或者移动工作流错误"),
 
+    QUERY_WORKFLOW_LINEAGE_ERROR(10154,"query workflow lineage error", "查询血缘失败"),
+
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
@@ -253,7 +255,8 @@ public enum Status {
 
 
     COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error", "查询各状态任务实例数错误"),
-
+    NEGTIVE_SIZE_NUMBER_ERROR(80002,"query size number error","查询size错误"),
+    START_TIME_BIGGER_THAN_END_TIME_ERROR(80003,"start time bigger than end time error","开始时间在结束时间之后错误"),
     QUEUE_COUNT_ERROR(90001,"queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error", "获取kerberos启动状态错误"),

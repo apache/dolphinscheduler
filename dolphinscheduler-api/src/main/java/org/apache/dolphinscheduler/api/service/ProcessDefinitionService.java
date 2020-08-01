@@ -609,7 +609,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionId process definition id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
 
         Map<String, Object> result = new HashMap<>();
@@ -675,7 +675,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param releaseState release state
      * @return release result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, int releaseState) {
         HashMap<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -922,7 +922,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param currentProjectName current project name
      * @return import process
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>();
         String processMetaJson = FileUtils.file2String(file);

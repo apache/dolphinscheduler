@@ -302,16 +302,16 @@ public class MasterExecThread implements Runnable {
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
             }
 
-            processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+            processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                     processInstance.getProcessDefinition().getGlobalParamMap(),
                     processInstance.getProcessDefinition().getGlobalParamList(),
                     CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
             processInstance.setId(0);
+            processInstance.setStartTime(new Date());
+            processInstance.setEndTime(null);
             processService.saveProcessInstance(processInstance);
         }
-
-
     }
 
 
@@ -725,7 +725,7 @@ public class MasterExecThread implements Runnable {
             // if the running task is not completed, the state remains unchanged
             return state;
         }else{
-            return ExecutionStatus.RUNNING_EXEUTION;
+            return ExecutionStatus.RUNNING_EXECUTION;
         }
     }
 
@@ -802,7 +802,7 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0 || retryTaskExists()){
+        if(activeTaskNode.size() > 0 || hasRetryTaskInStandBy()){
             // active task and retry task exists
             return runningState(state);
         }
@@ -835,11 +835,11 @@ public class MasterExecThread implements Runnable {
         }
 
         // success
-        if(state == ExecutionStatus.RUNNING_EXEUTION){
+        if(state == ExecutionStatus.RUNNING_EXECUTION){
             List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
-                return ExecutionStatus.RUNNING_EXEUTION;
+                return ExecutionStatus.RUNNING_EXECUTION;
             }else if(CollectionUtils.isNotEmpty(killTasks)){
                 // tasks maybe killed manually
                 return ExecutionStatus.FAILURE;
@@ -850,24 +850,6 @@ public class MasterExecThread implements Runnable {
         }
 
         return state;
-    }
-
-    /**
-     * whether standby task list have retry tasks
-     * @return
-     */
-    private boolean retryTaskExists() {
-
-        boolean result = false;
-
-        for(String taskName : readyToSubmitTaskList.keySet()){
-            TaskInstance task = readyToSubmitTaskList.get(taskName);
-            if(task.getState().typeIsFailure()){
-                result = true;
-                break;
-            }
-        }
-        return result;
     }
 
     /**
