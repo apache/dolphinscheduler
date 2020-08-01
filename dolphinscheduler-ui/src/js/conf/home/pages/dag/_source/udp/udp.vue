@@ -26,7 +26,7 @@
                 type="text"
                 v-model="name"
                 :disabled="router.history.current.name === 'projects-instance-details'"
-                :placeholder="$t('Please enter name(required)')">
+                :placeholder="$t('Please enter name (required)')">
         </x-input>
       </div>
 
