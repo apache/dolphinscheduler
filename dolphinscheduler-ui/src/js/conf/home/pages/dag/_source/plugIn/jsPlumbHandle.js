@@ -478,9 +478,9 @@ JSP.prototype.handleEventRemove = function () {
 JSP.prototype.removeNodes = function ($id) {
   // Delete node processing(data-targetarr)
   _.map(tasksAll(), v => {
-    const targetarr = v.targetarr.split(',')
+    let targetarr = v.targetarr.split(',')
     if (targetarr.length) {
-      const newArr = _.filter(targetarr, v1 => v1 !== $id)
+      let newArr = _.filter(targetarr, v1 => v1 !== $id)
       $(`#${v.id}`).attr('data-targetarr', newArr.toString())
     }
   })
@@ -496,8 +496,7 @@ JSP.prototype.removeNodes = function ($id) {
   _.map(this.JspInstance.getConnections(), v => {
     connects.push({
       endPointSourceId: v.sourceId,
-      endPointTargetId: v.targetId,
-      label: v._jsPlumb.overlays.label.canvas.innerText
+      endPointTargetId: v.targetId
     })
   })
   // Storage line dependence
@@ -512,8 +511,8 @@ JSP.prototype.removeConnect = function ($connect) {
     return
   }
   // Remove connections and remove node and node dependencies
-  const targetId = $connect.targetId
-  const sourceId = $connect.sourceId
+  let targetId = $connect.targetId
+  let sourceId = $connect.sourceId
   let targetarr = rtTargetarrArr(targetId)
   if (targetarr.length) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
