@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 
+import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
@@ -190,7 +191,7 @@ public class ProcessInstanceService extends BaseService {
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
-        result.put(Constants.DATA_LIST, processInstance);
+        result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -265,7 +266,7 @@ public class ProcessInstanceService extends BaseService {
 
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
         pageInfo.setLists(processInstances);
-        result.put(Constants.DATA_LIST, pageInfo);
+        result.put(DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -296,7 +297,7 @@ public class ProcessInstanceService extends BaseService {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
-        result.put(Constants.DATA_LIST, resultMap);
+        result.put(DATA_LIST, resultMap);
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -385,7 +386,7 @@ public class ProcessInstanceService extends BaseService {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("subProcessInstanceId", subWorkflowInstance.getId());
-        result.put(Constants.DATA_LIST, dataMap);
+        result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -524,7 +525,7 @@ public class ProcessInstanceService extends BaseService {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("parentWorkflowInstance", parentWorkflowInstance.getId());
-        result.put(Constants.DATA_LIST, dataMap);
+        result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -641,7 +642,7 @@ public class ProcessInstanceService extends BaseService {
         resultMap.put(GLOBAL_PARAMS, globalParams);
         resultMap.put(LOCAL_PARAMS, localUserDefParams);
 
-        result.put(Constants.DATA_LIST, resultMap);
+        result.put(DATA_LIST, resultMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -691,7 +692,7 @@ public class ProcessInstanceService extends BaseService {
         }
         ganttDto.setTasks(taskList);
 
-        result.put(Constants.DATA_LIST, ganttDto);
+        result.put(DATA_LIST, ganttDto);
         putMsg(result, Status.SUCCESS);
         return result;
     }
