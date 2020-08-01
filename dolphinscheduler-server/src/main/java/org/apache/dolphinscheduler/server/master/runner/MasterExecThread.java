@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import net.sf.jsqlparser.expression.NextValExpression;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
