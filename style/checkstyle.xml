@@ -212,6 +212,7 @@
       
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
+      
         <module name="ImportOrder">
             <property name="groups" value="java,javax,org,com"/>
             <property name="ordered" value="true"/>
