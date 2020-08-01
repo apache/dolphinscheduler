@@ -120,7 +120,7 @@ export default {
    * object {}
    */
   addTasks (state, payload) {
-    const i = _.findIndex(state.tasks, v => v.id === payload.id)
+    let i = _.findIndex(state.tasks, v => v.id === payload.id)
     if (i !== -1) {
       state.tasks[i] = Object.assign(state.tasks[i], {}, payload)
     } else {
@@ -131,7 +131,7 @@ export default {
     } else {
       state.cacheTasks[payload.id] = payload
     }
-    const dom = $(`#${payload.id}`)
+    let dom = $(`#${payload.id}`)
     state.locations[payload.id] = _.assign(state.locations[payload.id], {
       name: dom.find('.name-p').text(),
       targetarr: dom.attr('data-targetarr'),
