@@ -131,7 +131,6 @@
   import { allNodesId } from './plugIn/util'
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
-  import mFormLineModel from './formModel/formLineModel'
   import { formatDate } from '@/module/filter/filter'
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
