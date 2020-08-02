@@ -675,7 +675,6 @@ public class MasterExecThread implements Runnable {
             if(!completeTaskList.containsKey(depsNode)){
                 return DependResult.WAITING;
             }
-            // depend node has already complete.
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
             if(depTaskState.typeIsPause() || depTaskState.typeIsCancel()){
                 return DependResult.WAITING;
@@ -684,18 +683,34 @@ public class MasterExecThread implements Runnable {
             if(taskNode.isConditionsTask()){
                 continue;
             }
-            if(dag.getNode(depsNode).isConditionsTask()){
-                //condition task need check the branch to run
-                List<String> nextTaskList = parseConditionTask(depsNode);
-                if(!nextTaskList.contains(taskName)){
-                    return DependResult.FAILED;
-                }
-            }else if(depTaskState.typeIsFailure()){
+            if(!dependTaskSuccess(depsNode, taskName)){
                 return DependResult.FAILED;
             }
         }
         logger.info("taskName: {} completeDependTaskList: {}", taskName, Arrays.toString(completeTaskList.keySet().toArray()));
         return DependResult.SUCCESS;
+    }
+
+    /**
+     * depend node is completed, but here need check the condition task branch is the next node
+     * @param dependNodeName
+     * @param nextNodeName
+     * @return
+     */
+    private boolean dependTaskSuccess(String dependNodeName, String nextNodeName){
+        if(dag.getNode(dependNodeName).isConditionsTask()){
+            //condition task need check the branch to run
+            List<String> nextTaskList = parseConditionTask(dependNodeName);
+            if(!nextTaskList.contains(nextNodeName)){
+                return false;
+            }
+        }else {
+            ExecutionStatus depTaskState = completeTaskList.get(dependNodeName).getState();
+            if(depTaskState.typeIsFailure()){
+                return false;
+            }
+        }
+        return true;
     }
 
 
