@@ -107,7 +107,7 @@ public class TaskExecuteThread implements Runnable {
             if (taskExecutionContext.getStartTime() == null) {
                 taskExecutionContext.setStartTime(new Date());
             }
-            if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXEUTION) {
+            if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXECUTION) {
                 changeTaskExecutionStatusToRunning();
             }
             logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
@@ -291,7 +291,7 @@ public class TaskExecuteThread implements Runnable {
      * send an ack to change the status of the task
      */
     private void changeTaskExecutionStatusToRunning() {
-        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXEUTION);
+        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         Command ackCommand = buildAckCommand().convert2Command();
         try {
             RetryerUtils.retryCall(() -> {
