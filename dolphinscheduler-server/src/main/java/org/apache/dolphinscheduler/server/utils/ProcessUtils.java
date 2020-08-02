@@ -16,13 +16,12 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
@@ -30,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -58,9 +57,8 @@ public class ProcessUtils {
    * build command line characters
    * @param commandList command list
    * @return command
-   * @throws IOException io exception
    */
-  public static String buildCommandStr(List<String> commandList) throws IOException {
+  public static String buildCommandStr(List<String> commandList) {
     String cmdstr;
     String[] cmd = commandList.toArray(new String[commandList.size()]);
     SecurityManager security = System.getSecurityManager();
@@ -115,9 +113,8 @@ public class ProcessUtils {
    *
    * @param path path
    * @return executable path
-   * @throws IOException io exception
    */
-  private static String getExecutablePath(String path) throws IOException {
+  private static String getExecutablePath(String path) {
     boolean pathIsQuoted = isQuoted(true, path, "Executable name has embedded quote, split the arguments");
 
     File fileToRun = new File(pathIsQuoted ? path.substring(1, path.length() - 1) : path);
@@ -191,11 +188,6 @@ public class ProcessUtils {
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
           {' ', '\t', '<', '>'}, {' ', '\t'}};
-
-  /**
-   * matcher
-   */
-  private static Matcher matcher;
 
   /**
    * create command line
@@ -283,10 +275,8 @@ public class ProcessUtils {
    * @param logger      logger
    * @param tenantCode  tenant code
    * @param executePath     execute path
-   * @throws IOException io exception
    */
-  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String executePath)
-          throws IOException {
+  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String executePath) {
     if (appIds.size() > 0) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
@@ -318,7 +308,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application error", e);
+        logger.error("kill application error : {}",e.getMessage(),e);
       }
     }
   }
