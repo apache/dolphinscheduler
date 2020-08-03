@@ -385,7 +385,7 @@ public class TaskPriorityQueueConsumer extends Thread{
 
                 // get the resource id in order to get the resource names in batch
                 Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
-                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
+                Set<Integer> resourceIdsSet = resourceIdStream.filter(resId-> resId != 0).collect(Collectors.toSet());
 
                 if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
