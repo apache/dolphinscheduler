@@ -1554,7 +1554,9 @@ public class ProcessService {
      * @return tenant code
      */
     public String queryTenantCodeByResName(String resName,ResourceType resourceType){
-        return resourceMapper.queryTenantCodeByResourceName(resName, resourceType.ordinal());
+        // in order to query tenant code successful although the version is older
+        String fullName = resName.startsWith("/") ? resName : String.format("/%s",resName);
+        return resourceMapper.queryTenantCodeByResourceName(fullName, resourceType.ordinal());
     }
 
     /**
