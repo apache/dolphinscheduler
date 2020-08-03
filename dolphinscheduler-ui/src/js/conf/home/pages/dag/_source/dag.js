@@ -52,7 +52,9 @@ Dag.prototype.setConfig = function (o) {
  */
 Dag.prototype.create = function () {
   const self = this
-  jsPlumb.ready(() => {
+  let plumbIns = jsPlumb.getInstance()
+  plumbIns.reset()
+  plumbIns.ready(() => {
     JSP.init({
       dag: this.dag,
       instance: this.instance,
@@ -304,7 +306,9 @@ Dag.prototype.backfill = function (arg) {
 
     locationsValue = dataObject
     const self = this
-    jsPlumb.ready(() => {
+    let plumbIns = jsPlumb.getInstance()
+    plumbIns.reset()
+    plumbIns.ready(() => {
       JSP.init({
         dag: this.dag,
         instance: this.instance,
@@ -326,7 +330,9 @@ Dag.prototype.backfill = function (arg) {
     })
   } else {
     const self = this
-    jsPlumb.ready(() => {
+    let plumbIns = jsPlumb.getInstance()
+    plumbIns.reset()
+    plumbIns.ready(() => {
       JSP.init({
         dag: this.dag,
         instance: this.instance,
