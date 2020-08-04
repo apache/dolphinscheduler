@@ -16,6 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -26,11 +31,6 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,23 +63,15 @@ public class ResourcesController extends BaseController {
     private UdfFuncService udfFuncService;
 
     /**
-     * create resource
+     * create directory
      *
-     * @param loginUser login user
-     * @param alias alias
-     * @param description description
-     * @param type type
-     * @return create result code
-     */
-
-    /**
      * @param loginUser   login user
      * @param type        type
      * @param alias       alias
      * @param description description
      * @param pid         parent id
      * @param currentDir  current directory
-     * @return
+     * @return create result code
      */
     @ApiOperation(value = "createDirctory", notes = "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -140,6 +132,7 @@ public class ResourcesController extends BaseController {
      * @param resourceId  resource id
      * @param type        resource type
      * @param description description
+     * @param file        resource file
      * @return update result code
      */
     @ApiOperation(value = "updateResource", notes = "UPDATE_RESOURCE_NOTES")
@@ -147,7 +140,8 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
     @PostMapping(value = "/update")
     @ApiException(UPDATE_RESOURCE_ERROR)
@@ -155,10 +149,11 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "id") int resourceId,
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value = "name") String alias,
-                                 @RequestParam(value = "description", required = false) String description) {
-        logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
-                loginUser.getUserName(), type, alias, description);
-        return resourceService.updateResource(loginUser, resourceId, alias, description, type);
+                                 @RequestParam(value = "description", required = false) String description,
+                                 @RequestParam(value = "file" ,required = false) MultipartFile file) {
+        logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}, file: {}",
+                loginUser.getUserName(), type, alias, description, file);
+        return resourceService.updateResource(loginUser, resourceId, alias, description, type, file);
     }
 
     /**
