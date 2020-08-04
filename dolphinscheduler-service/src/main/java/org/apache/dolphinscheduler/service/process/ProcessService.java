@@ -1290,6 +1290,12 @@ public class ProcessService {
         return taskInstanceMapper.queryTaskByPIdAndStateAndType(instanceId, state.ordinal(), taskType.toString());
     }
 
+    /**
+     * get tasks in sub_process by sub_process task id and state
+     * @param taskId task id
+     * @param state task instance state
+     * @return task instance id list
+     */
     public List<Integer> findTaskIdBySubProcessTaskIdAndState(int taskId, ExecutionStatus state){
         return taskInstanceMapper.queryTasksBySubProcessTaskIdAndState(taskId, state.ordinal());
     }
