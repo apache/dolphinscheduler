@@ -433,7 +433,6 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userPassword") String userPassword,
                                @RequestParam(value = "repeatPassword") String repeatPassword,
                                @RequestParam(value = "email") String email) throws Exception {
-<<<<<<< HEAD
         String parameterFormat = "[\n|\r|\t]";
         userName = userName.replaceAll(parameterFormat, "");
         userPassword = userPassword.replaceAll(parameterFormat, "");
