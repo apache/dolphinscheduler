@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.remote.command;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
-
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 /**
  *  execute task response command
@@ -44,12 +44,6 @@ public class TaskExecuteResponseCommand implements Serializable {
      *  status
      */
     private int status;
-
-    /**
-     *  start time
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private Date startTime;
 
     /**
      *  end time
@@ -83,14 +77,6 @@ public class TaskExecuteResponseCommand implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
     }
 
     public Date getEndTime() {
@@ -134,7 +120,6 @@ public class TaskExecuteResponseCommand implements Serializable {
         return "TaskExecuteResponseCommand{" +
                 "taskInstanceId=" + taskInstanceId +
                 ", status=" + status +
-                ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", processId=" + processId +
                 ", appIds='" + appIds + '\'' +

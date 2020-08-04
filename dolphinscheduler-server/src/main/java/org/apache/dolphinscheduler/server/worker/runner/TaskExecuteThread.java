@@ -16,6 +16,15 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
 import com.github.rholder.retry.RetryException;
 import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,7 +34,11 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -38,11 +51,6 @@ import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 
 /**
@@ -141,7 +149,6 @@ public class TaskExecuteThread implements Runnable {
             task.after();
 
             responseCommand.setStatus(task.getExitStatus().getCode());
-            responseCommand.setStartTime(taskExecutionContext.getStartTime());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
@@ -150,7 +157,6 @@ public class TaskExecuteThread implements Runnable {
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
-            responseCommand.setStartTime(taskExecutionContext.getStartTime());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
@@ -273,10 +279,10 @@ public class TaskExecuteThread implements Runnable {
     private void delayExecutionIfNeeded() {
         long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
                 taskExecutionContext.getDelayTime() * 60L);
-        logger.info("delay execution time: {} s", remainTime <= 0 ? 0 : remainTime);
+        logger.info("delay execution time: {} s", remainTime < 0 ? 0 : remainTime);
         if (remainTime > 0) {
             try {
-                Thread.sleep(remainTime * 1000);
+                Thread.sleep(remainTime * Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 logger.error("exception", e);
                 logger.error("delay task execution failure, the task will be executed directly." +

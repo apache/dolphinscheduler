@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-
-import java.util.Date;
 
 /**
  * task event
@@ -91,10 +91,9 @@ public class TaskResponseEvent {
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state, Date startTime, Date endTime, int processId, String appIds, int taskInstanceId){
+    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId){
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
-        event.setStartTime(startTime);
         event.setEndTime(endTime);
         event.setProcessId(processId);
         event.setAppIds(appIds);

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import java.util.Date;
+
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -42,8 +44,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 /**
  * test task execute thread
@@ -75,7 +75,6 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setTaskType("sql");
         taskExecutionContext.setFirstSubmitTime(new Date());
         taskExecutionContext.setDelayTime(0);
-        taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath("/tmp/test.log");
         taskExecutionContext.setHost("localhost");
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/exec/process/1/2/3/4");
