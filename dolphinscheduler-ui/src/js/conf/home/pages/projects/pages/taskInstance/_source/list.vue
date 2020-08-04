@@ -98,6 +98,7 @@
                     data-toggle="tooltip"
                     :title="$t('View log')"
                     icon="ans-icon-log"
+                    :disabled="item.taskType==='SUB_PROCESS'? true: false"
                     @click="_refreshLog(item)">
             </x-button>
           </td>
