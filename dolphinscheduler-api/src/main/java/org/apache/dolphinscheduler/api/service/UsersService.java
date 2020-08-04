@@ -936,8 +936,9 @@ public class UsersService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
+        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, user);
         return result;
     }
 
@@ -977,8 +978,9 @@ public class UsersService extends BaseService {
         Date now = new Date();
         user.setUpdateTime(now);
         userMapper.updateById(user);
-
+        User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, responseUser);
         return result;
     }
 }

@@ -287,12 +287,11 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-<<<<<<< HEAD
 
     @Test
     public void testActivateUser() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userName","test_ai");
+        paramsMap.add("userName","user_test");
 
         MvcResult mvcResult = mockMvc.perform(post("/users/activate")
                 .header(SESSION_ID, sessionId)
@@ -305,6 +304,4 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-=======
->>>>>>> upstream/dev
 }
