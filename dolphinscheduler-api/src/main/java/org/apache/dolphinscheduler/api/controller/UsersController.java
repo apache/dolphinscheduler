@@ -50,7 +50,6 @@ public class UsersController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
-
     @Autowired
     private UsersService usersService;
 
@@ -433,11 +432,10 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userPassword") String userPassword,
                                @RequestParam(value = "repeatPassword") String repeatPassword,
                                @RequestParam(value = "email") String email) throws Exception {
-        String parameterFormat = "[\n|\r|\t]";
-        userName = userName.replaceAll(parameterFormat, "");
-        userPassword = userPassword.replaceAll(parameterFormat, "");
-        repeatPassword = repeatPassword.replaceAll(parameterFormat, "");
-        email = email.replaceAll(parameterFormat, "");
+        userName = ParameterUtils.handleEscapes(userName);
+        userPassword = ParameterUtils.handleEscapes(userPassword);
+        repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
+        email = ParameterUtils.handleEscapes(email);
         logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, eamil {}",
                 userName, Constants.PASSWORD_DEFAULT, Constants.PASSWORD_DEFAULT, email);
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
@@ -458,8 +456,7 @@ public class UsersController extends BaseController {
     @ApiException(UPDATE_USER_ERROR)
     public Result<Object> activateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "userName") String userName) {
-        String parameterFormat = "[\n|\r|\t]";
-        userName = userName.replaceAll(parameterFormat, "");
+        userName = ParameterUtils.handleEscapes(userName);
         logger.info("login user {}, activate user, userName: {}",
                 loginUser.getUserName(), userName);
         Map<String, Object> result = usersService.activateUser(loginUser, userName);

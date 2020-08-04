@@ -922,7 +922,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
@@ -949,7 +949,7 @@ public class UsersService extends BaseService {
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         if (!isAdmin(loginUser)) {

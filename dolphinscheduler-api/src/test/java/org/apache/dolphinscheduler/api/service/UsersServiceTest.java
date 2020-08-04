@@ -462,38 +462,32 @@ public class UsersServiceTest {
         try {
             //userName error
             Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0002";
             userPassword = "userTest000111111111111111";
             //password error
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0002";
             email = "1q.com";
             //email error
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             //repeatPassword error
             email = "7400@qq.com";
             repeatPassword = "userPassword";
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             //success
             repeatPassword = "userTest0002";
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
-            logger.error(Status.CREATE_USER_ERROR.getMsg(),e);
             Assert.assertTrue(false);
         }
     }
@@ -518,22 +512,18 @@ public class UsersServiceTest {
             userName = "userTest10013";
             result = usersService.activateUser(user, userName);
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-            logger.info(result.toString());
 
             //user state error
             userName = "userTest0001";
             when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
             result = usersService.activateUser(user, userName);
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
-            logger.info(result.toString());
 
             //success
             when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getDisabledUser());
             result = usersService.activateUser(user, userName);
-            logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
-            logger.error("activate user error",e);
             Assert.assertTrue(false);
         }
     }

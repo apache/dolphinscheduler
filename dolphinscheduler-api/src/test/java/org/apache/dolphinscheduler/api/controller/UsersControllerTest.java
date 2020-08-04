@@ -285,7 +285,6 @@ public class UsersControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
@@ -302,6 +301,5 @@ public class UsersControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
