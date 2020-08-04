@@ -333,6 +333,7 @@ export default {
   'Drag the file into the current upload window': '请将文件拖拽到当前上传窗口内！',
   'Drag area upload': '拖动区域上传',
   Upload: '上传',
+  'ReUpload File': '重新上传文件',
   'Please enter file name': '请输入文件名',
   'Please select the file to upload': '请选择要上传的文件',
   'Resources manage': '资源中心',
