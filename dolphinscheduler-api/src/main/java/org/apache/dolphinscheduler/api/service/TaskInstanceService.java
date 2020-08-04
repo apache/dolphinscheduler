@@ -179,7 +179,7 @@ public class TaskInstanceService extends BaseService {
             putMsg(result, Status.SUCCESS);
         }
         else {
-            // FIXME: 或许应该再加一个状态码
+            // FIXME: 或许应该再加一个状态码，如果按照process的执行逻辑，那么是不需要的
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
