@@ -180,7 +180,7 @@ public class DataAnalysisServiceTest {
 
         List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>(1);
         ExecuteStatusCount executeStatusCount = new ExecuteStatusCount();
-        executeStatusCount.setExecutionStatus(ExecutionStatus.RUNNING_EXEUTION);
+        executeStatusCount.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskInstanceStateCounts.add(executeStatusCount);
 
         return  taskInstanceStateCounts;

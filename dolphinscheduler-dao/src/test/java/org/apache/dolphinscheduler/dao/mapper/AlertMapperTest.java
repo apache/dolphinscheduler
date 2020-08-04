@@ -54,7 +54,6 @@ public class AlertMapperTest {
     @Test
     public void testInsert(){
         Alert expectedAlert = createAlert();
-        assertNotNull(expectedAlert.getId());
         assertThat(expectedAlert.getId(), greaterThan(0));
     }
 

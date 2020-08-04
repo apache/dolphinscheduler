@@ -63,7 +63,6 @@ public class AccessTokenMapperTest {
         Integer userId = 1;
 
         AccessToken accessToken = createAccessToken(userId);
-        assertNotNull(accessToken.getId());
         assertThat(accessToken.getId(), greaterThan(0));
     }
 

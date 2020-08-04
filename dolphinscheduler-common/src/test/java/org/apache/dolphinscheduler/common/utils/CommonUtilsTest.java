@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -89,4 +90,42 @@ public class CommonUtilsTest {
         }
         Assert.assertTrue(true);
     }
+
+    @Test
+    public void encodePassword() {
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("IUAjJCVeJipJVkZCV2xoVFYwQT0=",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("IUAjJCVeJipOV1JtWjJWeUtFQT0=",CommonUtils.encodePassword("5dfger(@"));
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+
+        Assert.assertEquals("",CommonUtils.encodePassword(""));
+        Assert.assertEquals("123456",CommonUtils.encodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@",CommonUtils.encodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@",CommonUtils.encodePassword("5dfger(@"));
+
+    }
+
+    @Test
+    public void decodePassword() {
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+
+        Assert.assertEquals("", CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456", CommonUtils.decodePassword("IUAjJCVeJipNVEl6TkRVMg=="));
+        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("IUAjJCVeJipJVkZCV2xoVFYwQT0="));
+        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("IUAjJCVeJipOV1JtWjJWeUtFQT0="));
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+
+        Assert.assertEquals("", CommonUtils.decodePassword(""));
+        Assert.assertEquals("123456", CommonUtils.decodePassword("123456"));
+        Assert.assertEquals("!QAZXSW@", CommonUtils.decodePassword("!QAZXSW@"));
+        Assert.assertEquals("5dfger(@", CommonUtils.decodePassword("5dfger(@"));
+    }
+
 }
