@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.utils;
 
 
+import com.amazonaws.services.simpleworkflow.model.TaskList;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -262,7 +263,7 @@ public class DagHelper {
      * @return start Vertex list
      */
     public static Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag,
-                                                    Map<String, TaskInstance> completeTaskList){
+                                                    Map<String, TaskInstance> completeTaskList, List<TaskNode> allNodes){
 
         if(completeTaskList == null){
             completeTaskList = new HashMap<>();
@@ -286,10 +287,10 @@ public class DagHelper {
                 continue;
             }
             // then submit the post nodes
-            Collection<String> postNodes = getStartVertex(start, dag, completeTaskList);
+            Collection<String> postNodes = getStartVertex(start, dag, completeTaskList, allNodes);
             for(String post : postNodes){
                 TaskNode postNode = dag.getNode(post);
-                if(taskNodeCanSubmit(postNode, dag, completeTaskList)){
+                if(taskNodeCanSubmit(postNode, dag, completeTaskList, allNodes)){
                     tmpStartVertexs.add(post);
                 }
             }
@@ -307,7 +308,8 @@ public class DagHelper {
      */
     public static boolean taskNodeCanSubmit(TaskNode taskNode,
                                             DAG<String, TaskNode, TaskNodeRelation> dag,
-                                            Map<String, TaskInstance> completeTaskList) {
+                                            Map<String, TaskInstance> completeTaskList,
+                                            List<TaskNode> allNodes) {
 
         List<String> dependList = taskNode.getDepList();
         if(dependList == null){
@@ -316,6 +318,10 @@ public class DagHelper {
 
         for(String dependNodeName : dependList){
             TaskNode dependNode = dag.getNode(dependNodeName);
+            // when executing resume_from_forced_success, depend node may be not in dag
+            if (dependNode == null) {
+                dependNode = findNodeByName(allNodes, dependNodeName);
+            }
             if(!dependNode.isForbidden() && !completeTaskList.containsKey(dependNodeName)){
                 return false;
             }
@@ -323,6 +329,16 @@ public class DagHelper {
         return true;
     }
 
+
+    /**
+     * generate process data and return all task nodes
+     * @param processDefinitionJson process definition json
+     * @return task nodes list
+     */
+    public static List<TaskNode> getAllTaskNodesFromFlowJson(String processDefinitionJson) {
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+        return processData.getTasks();
+    }
 
     /***
      * build dag graph

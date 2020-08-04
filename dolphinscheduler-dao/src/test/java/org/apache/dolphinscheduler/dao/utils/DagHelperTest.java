@@ -58,21 +58,21 @@ public class DagHelperTest {
         node2.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         TaskNode nodex = dag.getNode("4");
         nodex.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-        canSubmit = DagHelper.taskNodeCanSubmit(taskNode3, dag, completeTaskList);
+        canSubmit = DagHelper.taskNodeCanSubmit(taskNode3, dag, completeTaskList, null);
         Assert.assertEquals(canSubmit, true);
 
         // 2forbidden, 3 cannot be submit
         completeTaskList.putIfAbsent("2", new TaskInstance());
         TaskNode nodey = dag.getNode("4");
         nodey.setRunFlag("");
-        canSubmit = DagHelper.taskNodeCanSubmit(taskNode3, dag, completeTaskList);
+        canSubmit = DagHelper.taskNodeCanSubmit(taskNode3, dag, completeTaskList, null);
         Assert.assertEquals(canSubmit, false);
 
         // 2/3 forbidden submit 5
         TaskNode node3 = dag.getNode("3");
         node3.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         TaskNode node5 = dag.getNode("5");
-        canSubmit = DagHelper.taskNodeCanSubmit(node5, dag, completeTaskList);
+        canSubmit = DagHelper.taskNodeCanSubmit(node5, dag, completeTaskList, null);
         Assert.assertEquals(canSubmit, true);
    }
 
