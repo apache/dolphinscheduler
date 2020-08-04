@@ -499,8 +499,13 @@
     .ans-select {
       .tag-container-disabled {
         .tag-wrapper {
+          &:hover {
+            background-color: #fff;
+          }
           background-color: #fff;
-          color: #6d859e;
+          .tag-text {
+            color: #6d859e;
+          }
         }
       }
     }
