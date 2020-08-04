@@ -72,8 +72,6 @@ public class MasterExecThreadTest {
         applicationContext = mock(ApplicationContext.class);
         config = new MasterConfig();
         config.setMasterExecTaskNum(1);
-        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
-        springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
 
         processInstance = mock(ProcessInstance.class);
@@ -84,14 +82,17 @@ public class MasterExecThreadTest {
         Mockito.when(processInstance.getScheduleTime()).thenReturn(DateUtils.stringToDate("2020-01-01 00:00:00"));
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
-        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-31 23:00:00");
+        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
         Mockito.when(processInstance.getCommandParam()).thenReturn(JSONUtils.toJsonString(cmdParam));
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setGlobalParamMap(Collections.EMPTY_MAP);
         processDefinition.setGlobalParamList(Collections.EMPTY_LIST);
         Mockito.when(processInstance.getProcessDefinition()).thenReturn(processDefinition);
 
-        masterExecThread = PowerMockito.spy(new MasterExecThread(processInstance, processService,null));
+        masterExecThread = PowerMockito.spy(new MasterExecThread(
+                processInstance
+                , processService
+                ,null, null, config));
         // prepareProcess init dag
         Field dag = MasterExecThread.class.getDeclaredField("dag");
         dag.setAccessible(true);
@@ -114,11 +115,11 @@ public class MasterExecThreadTest {
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(masterExecThread);
-            // one create save, and 1-30 for next save, and last day 31 no save
-            verify(processService, times(31)).saveProcessInstance(processInstance);
+            // one create save, and 1-30 for next save, and last day 20 no save
+            verify(processService, times(20)).saveProcessInstance(processInstance);
         }catch (Exception e){
             e.printStackTrace();
-            Assert.assertTrue(false);
+            Assert.fail();
         }
     }
 
@@ -133,10 +134,10 @@ public class MasterExecThreadTest {
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
             method.setAccessible(true);
             method.invoke(masterExecThread);
-            // one create save, and 15(1 to 31 step 2) for next save, and last day 31 no save
-            verify(processService, times(15)).saveProcessInstance(processInstance);
+            // one create save, and 9(1 to 20 step 2) for next save, and last day 31 no save
+            verify(processService, times(9)).saveProcessInstance(processInstance);
         }catch (Exception e){
-            Assert.assertTrue(false);
+            Assert.fail();
         }
     }
 

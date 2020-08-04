@@ -82,6 +82,8 @@ public class MySQLDataSource extends BaseDataSource {
 
   @Override
   public String getPassword() {
+    // password need decode
+    password = super.getPassword();
     if(password.contains(sensitiveParam)){
       logger.warn("sensitive param : {} in password field is filtered", sensitiveParam);
       password = password.replace(sensitiveParam, "");
