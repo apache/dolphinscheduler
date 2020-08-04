@@ -287,6 +287,7 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+<<<<<<< HEAD
 
     @Test
     public void testActivateUser() throws Exception {
@@ -304,4 +305,6 @@ public class UsersControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+=======
+>>>>>>> upstream/dev
 }

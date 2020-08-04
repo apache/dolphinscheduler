@@ -38,7 +38,7 @@
                 type="text"
                 v-model="name"
                 :disabled="isDetails"
-                :placeholder="$t('Please enter name(required)')"
+                :placeholder="$t('Please enter name (required)')"
                 maxlength="100"
                 @on-blur="_verifName()"
                 autocomplete="off">
@@ -162,6 +162,14 @@
           ref="SHELL"
           :backfill-item="backfillItem">
         </m-shell>
+        <!-- waterdrop node -->
+        <m-waterdrop
+          v-if="taskType === 'WATERDROP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="WATERDROP"
+          :backfill-item="backfillItem">
+        </m-waterdrop>
         <!-- sub_process node -->
         <m-sub-process
           v-if="taskType === 'SUB_PROCESS'"
@@ -260,7 +268,7 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
         <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
@@ -274,6 +282,7 @@
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
+  import mWaterdrop from './tasks/waterdrop'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -581,23 +590,7 @@
         this.isContentBox = false
         // flag Whether to delete a node this.$destroy()
         this.$emit('close', {
-          item: {
-            type: this.cacheBackfillItem.type,
-            id: this.cacheBackfillItem.id,
-            name: this.cacheBackfillItem.name,
-            params: this.cacheBackfillItem.params,
-            description: this.cacheBackfillItem.description,
-            runFlag: this.cacheBackfillItem.runFlag,
-            conditionResult: this.cacheBackfillItem.conditionResult,
-            dependence: this.cacheBackfillItem.dependence,
-            maxRetryTimes: this.cacheBackfillItem.maxRetryTimes,
-            retryInterval: this.cacheBackfillItem.retryInterval,
-            timeout: this.cacheBackfillItem.timeout,
-            taskInstancePriority: this.cacheBackfillItem.taskInstancePriority,
-            workerGroup: this.cacheBackfillItem.workerGroup,
-            status: this.cacheBackfillItem.status,
-            branch: this.cacheBackfillItem.branch
-          },
+          item: this.cacheBackfillItem,
           flag: flag,
           fromThis: this
         })
@@ -671,11 +664,15 @@
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
-      this.cacheBackfillItem = o
+      this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
     },
     mounted () {
-
+      let self = this
+      $("#cancelBtn").mousedown(function(event){
+        event.preventDefault();
+        self.close()
+      });
     },
     updated () {
     },
@@ -713,6 +710,7 @@
     components: {
       mMr,
       mShell,
+      mWaterdrop,
       mSubProcess,
       mProcedure,
       mSql,

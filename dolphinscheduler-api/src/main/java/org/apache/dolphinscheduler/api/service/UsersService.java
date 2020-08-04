@@ -139,14 +139,14 @@ public class UsersService extends BaseService {
 
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public User createUser(String userName,
                                           String userPassword,
                                           String email,
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws Exception {
+                                          int state) {
         User user = new User();
         Date now = new Date();
 
@@ -431,7 +431,7 @@ public class UsersService extends BaseService {
      * @param projectIds project id array
      * @return grant result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -481,7 +481,7 @@ public class UsersService extends BaseService {
      * @param resourceIds resource id array
      * @return grant result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -578,7 +578,7 @@ public class UsersService extends BaseService {
      * @param udfIds udf id array
      * @return grant result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>(5);
 
@@ -625,7 +625,7 @@ public class UsersService extends BaseService {
      * @param datasourceIds  data source id array
      * @return grant result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -920,8 +920,8 @@ public class UsersService extends BaseService {
      * @return register result code
      * @throws Exception exception
      */
-    @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) throws Exception {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>(5);
 
         //check user params
@@ -936,7 +936,6 @@ public class UsersService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-
         createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
         return result;

@@ -786,6 +786,10 @@ public final class Constants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
+    /**
+     * com.amazonaws.services.s3.enableV4
+     */
+    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
 
     /**
      * loginUserFromKeytab user
@@ -827,7 +831,7 @@ public final class Constants {
 
     public static final int[] NOT_TERMINATED_STATES = new int[]{
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal(),
             ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
@@ -974,5 +978,23 @@ public final class Constants {
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
+    public static final String START_TIME = "start time";
+    public static final String END_TIME = "end time";
+    /**
+     * system line separator
+     */
+    public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
+    /**
+     * net system properties
+     */
+    public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
+
+
+    /**
+     * datasource encryption salt
+     */
+    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
+    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
+    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 }

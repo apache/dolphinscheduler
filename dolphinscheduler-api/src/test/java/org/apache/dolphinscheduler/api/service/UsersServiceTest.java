@@ -498,6 +498,7 @@ public class UsersServiceTest {
         }
     }
 
+<<<<<<< HEAD
     @Test
     public void testActivateUser() {
         User user = new User();
@@ -551,6 +552,8 @@ public class UsersServiceTest {
         return user;
     }
 
+=======
+>>>>>>> upstream/dev
     /**
      * get user
      * @return

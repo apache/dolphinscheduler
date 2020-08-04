@@ -14,13 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.project;
 
-public class CreateProjectData {
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project_1";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+import actions from './actions'
+import getters from './getters'
+import mutations from './mutations'
+import state from './state'
+
+export default {
+  strict: true,
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
 }

@@ -35,7 +35,7 @@ public enum Status {
     USER_NAME_NULL(10004,"user name is null", "用户名不能为空"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
-    TENANT_NAME_EXIST(10009, "tenant code already exists", "租户编码不能为空"),
+    TENANT_NAME_EXIST(10009, "tenant code {0} already exists", "租户编码[{0}]已存在"),
     USER_NOT_EXIST(10010, "user {0} not exists", "用户[{0}]不存在"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found", "告警组不存在"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists", "告警组名称已存在"),
@@ -168,15 +168,15 @@ public enum Status {
     PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error", "预览调度配置错误"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error", "解析调度表达式错误"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end", "开始时间不能和结束时间一样"),
-    DELETE_TENANT_BY_ID_FAIL(10142,"delete tenant by id fail, for there are {0} process instances in executing using it", "删除租户失败，有[{0}]个运行中的工作流实例正在使用"),
-    DELETE_TENANT_BY_ID_FAIL_DEFINES(10143,"delete tenant by id fail, for there are {0} process definitions using it", "删除租户失败，有[{0}]个工作流定义正在使用"),
-    DELETE_TENANT_BY_ID_FAIL_USERS(10144,"delete tenant by id fail, for there are {0} users using it", "删除租户失败，有[{0}]个用户正在使用"),
-    DELETE_WORKER_GROUP_BY_ID_FAIL(10145,"delete worker group by id fail, for there are {0} process instances in executing using it", "删除Worker分组失败，有[{0}]个运行中的工作流实例正在使用"),
-    QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
-    DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
+    DELETE_TENANT_BY_ID_FAIL(100142,"delete tenant by id fail, for there are {0} process instances in executing using it", "删除租户失败，有[{0}]个运行中的工作流实例正在使用"),
+    DELETE_TENANT_BY_ID_FAIL_DEFINES(100143,"delete tenant by id fail, for there are {0} process definitions using it", "删除租户失败，有[{0}]个工作流定义正在使用"),
+    DELETE_TENANT_BY_ID_FAIL_USERS(100144,"delete tenant by id fail, for there are {0} users using it", "删除租户失败，有[{0}]个用户正在使用"),
+    DELETE_WORKER_GROUP_BY_ID_FAIL(100145,"delete worker group by id fail, for there are {0} process instances in executing using it", "删除Worker分组失败，有[{0}]个运行中的工作流实例正在使用"),
+    QUERY_WORKER_GROUP_FAIL(100146,"query worker group fail ", "查询worker分组失败"),
+    DELETE_WORKER_GROUP_FAIL(100147,"delete worker group fail ", "删除worker分组失败"),
+    QUERY_WORKFLOW_LINEAGE_ERROR(10143,"query workflow lineage error", "查询血缘失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
     USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
-
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
@@ -249,7 +249,8 @@ public enum Status {
 
 
     COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error", "查询各状态任务实例数错误"),
-
+    NEGTIVE_SIZE_NUMBER_ERROR(80002,"query size number error","查询size错误"),
+    START_TIME_BIGGER_THAN_END_TIME_ERROR(80003,"start time bigger than end time error","开始时间在结束时间之后错误"),
     QUEUE_COUNT_ERROR(90001,"queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error", "获取kerberos启动状态错误"),
