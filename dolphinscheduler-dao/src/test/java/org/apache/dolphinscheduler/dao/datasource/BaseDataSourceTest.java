@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -112,4 +114,51 @@ public class BaseDataSourceTest {
 
 
   }
+
+  @Test
+  public void testGetPassword() {
+    BaseDataSource dataSource = new BaseDataSource() {
+      @Override
+      public String driverClassSelector() {
+        return null;
+      }
+
+      @Override
+      public DbType dbTypeSelector() {
+        return null;
+      }
+    };
+
+    String password= "";
+    dataSource.setPassword(password);
+    Assert.assertEquals("", dataSource.getPassword());
+    password= "IUAjJCVeJipNVEl6TkRVMg==";
+    dataSource.setPassword(password);
+    Assert.assertNotNull(dataSource.getPassword());
+    Assert.assertNotNull(dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+    Assert.assertEquals("123456", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    Assert.assertEquals("123456", dataSource.getPassword());
+    Assert.assertEquals("123456", dataSource.getPassword());
+    Assert.assertEquals("123456", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+
+    dataSource.setPassword(password);
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+    Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+
+
+  }
+
+
+
+
 }
