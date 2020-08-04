@@ -53,6 +53,7 @@ sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${k
 sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
+sed -i ${txt} "s\#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/zookeeper.properties
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
@@ -97,3 +98,7 @@ sh ${workDir}/script/remove-zk-node.sh $zkRoot
 # 6.startup
 echo "6.startup"
 sh ${workDir}/script/start-all.sh
+
+# 7.query status
+echo "7.query status"
+sh ${workDir}/script/status-all.sh

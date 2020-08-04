@@ -149,6 +149,7 @@ public class ZooKeeperState {
 			return sendThread.ret;
 		} catch (InterruptedException e) {
 			logger.error("send " + cmd + " to server " + host + ":" + port + " failed!", e);
+			Thread.currentThread().interrupt();
 		}
 		return "";
 	}

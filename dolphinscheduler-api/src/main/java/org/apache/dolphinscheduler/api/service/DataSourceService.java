@@ -527,7 +527,7 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
-        parameterMap.put(Constants.PASSWORD, password);
+        parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
         if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             parameterMap.put(Constants.PRINCIPAL,principal);
@@ -600,7 +600,7 @@ public class DataSourceService extends BaseService{
      * @param datasourceId data source id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result delete(User loginUser, int datasourceId) {
         Result result = new Result();
         try {
