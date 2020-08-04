@@ -495,5 +495,15 @@
     color: #ff0000;
     padding-right: 4px;
   }
+  .udfs-model {
+    .ans-select {
+      .tag-container-disabled {
+        .tag-wrapper {
+          background-color: #fff;
+          color: #6d859e;
+        }
+      }
+    }
+  }
 </style>
 
