@@ -100,6 +100,7 @@ public class LogPromise {
         try {
             latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
         }
         PROMISES.remove(opaque);
         return this.result;

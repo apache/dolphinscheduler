@@ -83,6 +83,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
         try {
             Thread.sleep(500);
         } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
         }
         super.close();
     }

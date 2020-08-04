@@ -97,7 +97,7 @@ public class MasterSchedulerService extends Thread {
     }
 
     @Override
-    public void start(){
+    public synchronized void start(){
         super.setName("MasterSchedulerService");
         super.start();
     }
@@ -107,7 +107,9 @@ public class MasterSchedulerService extends Thread {
         boolean terminated = false;
         try {
             terminated = masterExecService.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException ignore) {}
+        } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
+        }
         if(!terminated){
             logger.warn("masterExecService shutdown without terminated, increase await time");
         }
