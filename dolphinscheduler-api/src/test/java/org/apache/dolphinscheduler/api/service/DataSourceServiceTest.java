@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -103,7 +104,28 @@ public class DataSourceServiceTest {
     public void buildParameter(){
         String param = dataSourceService.buildParameter("","", DbType.ORACLE, "192.168.9.1","1521","im"
                 ,"","test","test", DbConnectType.ORACLE_SERVICE_NAME,"");
-        String expected = "{\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
+        String expected = "{\"connectType\":\"ORACLE_SERVICE_NAME\",\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
     }
+
+    @Test
+    public void buildParameterWithDecodePassword(){
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+        String param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
+                ,"","test","123456", null,"");
+        String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\"}";
+        Assert.assertEquals(expected, param);
+
+
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+        param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
+                ,"","test","123456", null,"");
+        expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"123456\"}";
+        Assert.assertEquals(expected, param);
+    }
+
+
+
+
+
 }

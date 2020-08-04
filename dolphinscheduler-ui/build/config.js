@@ -116,7 +116,6 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     minify: minifierConfig
   })
 })
-
 const baseConfig = {
   entry: jsEntry,
   output: {
