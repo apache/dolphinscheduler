@@ -153,7 +153,7 @@ const tasksState = {
     icoUnicode: 'ans-icon-dot-circle',
     isSpin: false
   },
-  RUNNING_EXEUTION: {
+  RUNNING_EXECUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
@@ -242,6 +242,10 @@ const tasksType = {
   SHELL: {
     desc: 'SHELL',
     color: '#646464'
+  },
+  WATERDROP: {
+    desc: 'WATERDROP',
+    color: '#646465'
   },
   SUB_PROCESS: {
     desc: 'SUB_PROCESS',

@@ -89,6 +89,7 @@ public class TaskResponseService {
             eventQueue.put(taskResponseEvent);
         } catch (InterruptedException e) {
             logger.error("put task : {} error :{}", taskResponseEvent,e);
+            Thread.currentThread().interrupt();
         }
     }
 

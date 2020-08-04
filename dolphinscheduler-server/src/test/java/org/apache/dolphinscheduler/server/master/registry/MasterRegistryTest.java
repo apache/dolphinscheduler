@@ -58,6 +58,7 @@ public class MasterRegistryTest {
         String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);
         Assert.assertEquals(HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH, heartbeat.split(",").length);
+        masterRegistry.unRegistry();
     }
 
     @Test

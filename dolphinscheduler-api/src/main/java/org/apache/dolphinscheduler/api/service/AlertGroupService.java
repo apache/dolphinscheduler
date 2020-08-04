@@ -177,7 +177,7 @@ public class AlertGroupService extends BaseService{
      * @param id alert group id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
