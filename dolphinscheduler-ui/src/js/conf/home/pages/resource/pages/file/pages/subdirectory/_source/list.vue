@@ -40,7 +40,7 @@
           <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th scope="col" width="140">
+          <th scope="col" width="160">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -79,6 +79,18 @@
                     @click="_edit(item,$index)"
                     icon="ans-icon-edit">
             </x-button>
+
+            <x-button
+                    type="info"
+                    shape="circle"
+                    size="xsmall"
+                    data-toggle="tooltip"
+                    :title="$t('ReUpload File')"
+                    :disabled="item.directory? true: false"
+                    @click="_childReUpload(item)"
+                    icon="ans-icon-upload">
+            </x-button>
+
             <x-button
                     type="info"
                     shape="circle"
@@ -132,6 +144,7 @@
   import { mapActions } from 'vuex'
   import { filtTypeArr } from '../../_source/common'
   import { bytesToSize } from '@/module/util/util'
+  import { findComponentDownward } from '@/module/util'
   import { downloadFile } from '@/module/download'
   import localStore from '@/module/util/localStorage'
 
@@ -161,6 +174,9 @@
         } else {
           this.$router.push({ path: `/resource/file/list/${item.id}` })
         }
+      },
+      _childReUpload (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileChildReUpload('FILE',item,this.$route.params.id)
       },
       _downloadFile (item) {
         downloadFile('/dolphinscheduler/resources/download', {

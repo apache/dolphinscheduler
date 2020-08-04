@@ -42,22 +42,4 @@ public class ResourceInfo {
   public void setRes(String res) {
     this.res = res;
   }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    ResourceInfo that = (ResourceInfo) o;
-
-    if (id != that.id) return false;
-    return res.equals(that.res);
-  }
-
-  @Override
-  public int hashCode() {
-    int result = id;
-    result = 31 * result + res.hashCode();
-    return result;
-  }
 }

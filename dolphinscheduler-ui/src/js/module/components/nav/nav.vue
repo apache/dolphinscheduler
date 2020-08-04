@@ -155,7 +155,9 @@
   import { mapState, mapActions } from 'vuex'
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
+  import mFileReUpload from '@/module/components/fileUpdate/fileReUpload'
   import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
+  import mFileChildReUpdate from '@/module/components/fileUpdate/fileChildReUpdate'
   import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
@@ -259,6 +261,91 @@
                 }
               })
             }
+          }
+        })
+      },
+      /* fileReUpload */
+      _fileReUpload (type,item) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mFileReUpload, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                fileName: item.fileName,
+                desc: item.description,
+                id: item.id
+              }
+            })
+          }
+        })
+      },
+      _fileChildReUpload (type,item,data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'update-file-modal',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mFileChildReUpdate, {
+              on: {
+                onProgress (val) {
+                  self.progress = val
+                },
+                onUpdate () {
+                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+                  self.isUpdate = false
+                  self.progress = 0
+                  modal.remove()
+                },
+                onArchive () {
+                  self.isUpdate = true
+                },
+                close () {
+                  self.progress = 0
+                  modal.remove()
+                }
+              },
+              props: {
+                type: type,
+                fileName: item.fileName,
+                desc: item.description,
+                id: item.id
+              }
+            })
           }
         })
       },
@@ -372,7 +459,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar, mDefinitionUpdate }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileReUpload, mFileChildReUpdate }
   }
 </script>
 
