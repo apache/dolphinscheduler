@@ -335,6 +335,7 @@ export default {
   Delete: 'Delete',
   'Please enter keyword': 'Please enter keyword',
   'File Upload': 'File Upload',
+  'File ReUpload': 'File ReUpload',
   'Drag the file into the current upload window': 'Drag the file into the current upload window',
   'Drag area upload': 'Drag area upload',
   Upload: 'Upload',
