@@ -495,5 +495,20 @@
     color: #ff0000;
     padding-right: 4px;
   }
+  .udfs-model {
+    .ans-select {
+      .tag-container-disabled {
+        .tag-wrapper {
+          &:hover {
+            background-color: #fff;
+          }
+          background-color: #fff;
+          .tag-text {
+            color: #6d859e;
+          }
+        }
+      }
+    }
+  }
 </style>
 
