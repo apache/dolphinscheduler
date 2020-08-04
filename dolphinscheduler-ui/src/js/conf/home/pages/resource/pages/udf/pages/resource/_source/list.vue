@@ -43,7 +43,7 @@
           <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th scope="col" width="110">
+          <th scope="col" width="130">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -76,6 +76,16 @@
             <span v-else>-</span>
           </td>
           <td>
+            <x-button
+                    type="info"
+                    shape="circle"
+                    size="xsmall"
+                    data-toggle="tooltip"
+                    :title="$t('ReUpload File')"
+                    :disabled="item.directory? true: false"
+                    @click="_reUpload(item)"
+                    icon="ans-icon-upload">
+            </x-button>
             <x-button
                     type="info"
                     shape="circle"
@@ -127,6 +137,7 @@
   import mRename from './rename'
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
+  import { findComponentDownward } from '@/module/util'
   import localStore from '@/module/util/localStorage'
   export default {
     name: 'udf-manage-list',
@@ -153,6 +164,12 @@
           localStore.setItem('currentDir', `${item.fullName}`)
           this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
         }
+      },
+      /**
+       * File Upload
+       */
+      _reUpload (item) {
+        findComponentDownward(this.$root, 'roof-nav')._fileReUpload('UDF', item)
       },
       _rtSize (val) {
         return bytesToSize(parseInt(val))
