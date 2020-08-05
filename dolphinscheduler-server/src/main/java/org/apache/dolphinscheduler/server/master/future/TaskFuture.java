@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  *  task fulture
@@ -55,7 +56,7 @@ public class TaskFuture {
     /**
      *  response command
      */
-    private volatile Command responseCommand;
+    private  AtomicReference<Command> responseCommandReference = new AtomicReference<>();
 
     private volatile boolean sendOk = true;
 
@@ -74,7 +75,7 @@ public class TaskFuture {
      */
     public Command waitResponse() throws InterruptedException {
         this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-        return this.responseCommand;
+        return this.responseCommandReference.get();
     }
 
     /**
@@ -83,7 +84,7 @@ public class TaskFuture {
      * @param responseCommand responseCommand
      */
     public void putResponse(final Command responseCommand) {
-        this.responseCommand = responseCommand;
+        responseCommandReference.set(responseCommand);
         this.latch.countDown();
         FUTURE_TABLE.remove(opaque);
     }
@@ -134,11 +135,11 @@ public class TaskFuture {
     }
 
     public Command getResponseCommand() {
-        return responseCommand;
+        return responseCommandReference.get();
     }
 
     public void setResponseCommand(Command responseCommand) {
-        this.responseCommand = responseCommand;
+        responseCommandReference.set(responseCommand);
     }
 
 
@@ -166,7 +167,7 @@ public class TaskFuture {
                 ", timeoutMillis=" + timeoutMillis +
                 ", latch=" + latch +
                 ", beginTimestamp=" + beginTimestamp +
-                ", responseCommand=" + responseCommand +
+                ", responseCommand=" + responseCommandReference.get() +
                 ", sendOk=" + sendOk +
                 ", cause=" + cause +
                 '}';
