@@ -364,9 +364,10 @@
       }
     },
     mounted () {
+      // Added delay loading in script input box
       setTimeout(() => {
         this._handlerEditor()
-      }, 200)
+      }, 350)
     },
     destroyed () {
       if (editor) {
