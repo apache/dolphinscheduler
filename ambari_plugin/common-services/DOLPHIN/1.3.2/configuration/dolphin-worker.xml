@@ -59,7 +59,7 @@
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
-		<name>worker.group</name>
+		<name>worker.groups</name>
 		<value>default</value>
 		<description>default worker group</description>
 		<on-ambari-upgrade add="true"/>
