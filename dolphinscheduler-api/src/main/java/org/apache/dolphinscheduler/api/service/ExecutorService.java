@@ -266,7 +266,11 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             case RESUME_FROM_FORCED_SUCCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RESUME_FROM_FORCED_SUCCESS);
+                if (!this.checkValidForcedSuccessTask(processInstanceId)) {
+                    putMsg(result, Status.NO_VALID_FORCED_SUCCESS_TASK, processInstance.getName());
+                } else {
+                    result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RESUME_FROM_FORCED_SUCCESS);
+                }
                 break;
             default:
                 logger.error("unknown execute type : {}", executeType);
@@ -600,4 +604,26 @@ public class ExecutorService extends BaseService{
         return null;
     }
 
+    /**
+     * check if the process instance contains valid forced success task
+     *
+     * @param processInstanceId
+     * @return
+     */
+    private boolean checkValidForcedSuccessTask(int processInstanceId) {
+        List<Integer> forcedSuccessList = processService.findTaskIdByInstanceState(processInstanceId, ExecutionStatus.FORCED_SUCCESS);
+        if (forcedSuccessList != null && forcedSuccessList.size() > 0) {
+            return true;
+        }
+
+        List<Integer> failedSubList = processService.findTaskIdByInstanceStatusAndType(processInstanceId,
+                new ExecutionStatus[]{ExecutionStatus.FAILURE, ExecutionStatus.KILL, ExecutionStatus.NEED_FAULT_TOLERANCE},
+                TaskType.SUB_PROCESS);
+        for (int i = 0; i < failedSubList.size(); i++) {
+            if (processService.haveForcedSuccessInSubProcess(failedSubList.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
