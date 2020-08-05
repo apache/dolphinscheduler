@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -917,10 +918,11 @@ public class UsersService extends BaseService {
      * @param repeatPassword repeat password
      * @param email          email
      * @return register result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
@@ -934,10 +936,51 @@ public class UsersService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-
-        createUser(userName, userPassword, email, 1, "", "", 0);
+        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, user);
         return result;
     }
 
+    /**
+     * activate user, only system admin have permission, change user state code 0 to 1
+     *
+     * @param loginUser login user
+     * @return create result code
+     */
+    public Map<String, Object> activateUser(User loginUser, String userName) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        if (!CheckUtils.checkUserName(userName)){
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        User user = userMapper.queryByUserNameAccurately(userName);
+
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
+
+        if (user.getState() != Flag.NO.ordinal()) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        user.setState(Flag.YES.ordinal());
+        Date now = new Date();
+        user.setUpdateTime(now);
+        userMapper.updateById(user);
+        User responseUser = userMapper.queryByUserNameAccurately(userName);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, responseUser);
+        return result;
+    }
 }
