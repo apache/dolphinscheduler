@@ -19,11 +19,13 @@ import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * session service implement
  */
+@Service
 public class SessionServiceImpl extends BaseService implements SessionService {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
