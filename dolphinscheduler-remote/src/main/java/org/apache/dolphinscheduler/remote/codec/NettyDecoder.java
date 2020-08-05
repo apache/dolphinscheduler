@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.remote.codec;
 
 
+import java.util.List;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -26,8 +28,6 @@ import org.apache.dolphinscheduler.remote.command.CommandHeader;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  *  netty decoder
@@ -55,15 +55,18 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
             case MAGIC:
                 checkMagic(in.readByte());
                 checkpoint(State.COMMAND);
+                break;
             case COMMAND:
                 commandHeader.setType(in.readByte());
                 checkpoint(State.OPAQUE);
+                break;
             case OPAQUE:
                 commandHeader.setOpaque(in.readLong());
                 checkpoint(State.BODY_LENGTH);
             case BODY_LENGTH:
                 commandHeader.setBodyLength(in.readInt());
                 checkpoint(State.BODY);
+                break;
             case BODY:
                 byte[] body = new byte[commandHeader.getBodyLength()];
                 in.readBytes(body);
@@ -75,6 +78,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 out.add(packet);
                 //
                 checkpoint(State.MAGIC);
+                break;
             default:
                 logger.warn("unknown decoder state {}", state());
         }

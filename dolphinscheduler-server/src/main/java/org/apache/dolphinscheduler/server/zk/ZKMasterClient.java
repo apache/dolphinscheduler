@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.zk;
 
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
@@ -37,9 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.List;
 
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
@@ -235,7 +235,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		boolean taskNeedFailover = true;
 
 		//now no host will execute this task instance,so no need to failover the task
-		if(taskInstance.getHost() == null || taskInstance.getStartTime() == null){
+		if(taskInstance.getHost() == null){
 			return false;
 		}
 
