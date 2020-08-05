@@ -19,6 +19,25 @@ import _ from 'lodash'
 import io from '@/module/io'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
+// delete 'definitionList' from tasks
+const deleteDefinitionList = (tasks) => {
+  const newTasks = [];
+  tasks.forEach(item => {
+    const newItem = Object.assign({}, item);
+    if(newItem.dependence && newItem.dependence.dependTaskList) {
+      newItem.dependence.dependTaskList.forEach(dependTaskItem => {
+        if (dependTaskItem.dependItemList) {
+          dependTaskItem.dependItemList.forEach(dependItem => {
+            Reflect.deleteProperty(dependItem, 'definitionList');
+          })
+        }
+      })
+    }
+    newTasks.push(newItem);
+  });
+  return newTasks;
+}
+
 export default {
   /**
    *  Task status acquisition
@@ -193,7 +212,7 @@ export default {
     return new Promise((resolve, reject) => {
       const data = {
         globalParams: state.globalParams,
-        tasks: state.tasks,
+        tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
         timeout: state.timeout
       }
@@ -217,7 +236,7 @@ export default {
     return new Promise((resolve, reject) => {
       const data = {
         globalParams: state.globalParams,
-        tasks: state.tasks,
+        tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
         timeout: state.timeout
       }
