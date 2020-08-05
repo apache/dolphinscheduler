@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.dolphinscheduler.dao.entity.Session;
