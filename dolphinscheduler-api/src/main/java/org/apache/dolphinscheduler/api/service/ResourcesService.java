@@ -287,6 +287,7 @@ public class ResourcesService extends BaseService {
      * @param name          name
      * @param desc          description
      * @param type          resource type
+     * @param file          resource file
      * @return  update result code
      */
     @Transactional(rollbackFor = Exception.class)
@@ -294,7 +295,8 @@ public class ResourcesService extends BaseService {
                                  int resourceId,
                                  String name,
                                  String desc,
-                                 ResourceType type) {
+                                 ResourceType type,
+                                 MultipartFile file) {
         Result result = new Result();
 
         // if resource upload startup
@@ -328,6 +330,42 @@ public class ResourcesService extends BaseService {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
+        }
+
+        if (file != null) {
+
+            // file is empty
+            if (file.isEmpty()) {
+                logger.error("file is empty: {}", file.getOriginalFilename());
+                putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
+                return result;
+            }
+
+            // file suffix
+            String fileSuffix = FileUtils.suffix(file.getOriginalFilename());
+            String nameSuffix = FileUtils.suffix(name);
+
+            // determine file suffix
+            if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
+                /**
+                 * rename file suffix and original suffix must be consistent
+                 */
+                logger.error("rename file suffix and original suffix must be consistent: {}", file.getOriginalFilename());
+                putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
+                return result;
+            }
+
+            //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
+            if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(FileUtils.suffix(originFullName))) {
+                logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
+                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
+                return result;
+            }
+            if (file.getSize() > Constants.MAX_FILE_SIZE) {
+                logger.error("file size is too large: {}", file.getOriginalFilename());
+                putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
+                return result;
+            }
         }
 
         // query tenant by user id
@@ -379,26 +417,33 @@ public class ResourcesService extends BaseService {
         }
 
         // updateResource data
-        List<Integer> childrenResource = listAllChildren(resource,false);
+
         Date now = new Date();
 
         resource.setAlias(name);
         resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
+        if (file != null) {
+            resource.setFileName(file.getOriginalFilename());
+            resource.setSize(file.getSize());
+        }
 
         try {
             resourcesMapper.updateById(resource);
-            if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
-                String matcherFullName = Matcher.quoteReplacement(fullName);
-                List<Resource> childResourceList = new ArrayList<>();
-                List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
-                childResourceList = resourceList.stream().map(t -> {
-                    t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
-                    t.setUpdateTime(now);
-                    return t;
-                }).collect(Collectors.toList());
-                resourcesMapper.batchUpdateResource(childResourceList);
+            if (resource.isDirectory()) {
+                List<Integer> childrenResource = listAllChildren(resource,false);
+                if (CollectionUtils.isNotEmpty(childrenResource)) {
+                    String matcherFullName = Matcher.quoteReplacement(fullName);
+                    List<Resource> childResourceList = new ArrayList<>();
+                    List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
+                    childResourceList = resourceList.stream().map(t -> {
+                        t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
+                        t.setUpdateTime(now);
+                        return t;
+                    }).collect(Collectors.toList());
+                    resourcesMapper.batchUpdateResource(childResourceList);
+                }
             }
 
             putMsg(result, Status.SUCCESS);
@@ -414,10 +459,30 @@ public class ResourcesService extends BaseService {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
             throw new ServiceException(Status.UPDATE_RESOURCE_ERROR);
         }
+
         // if name unchanged, return directly without moving on HDFS
-        if (originResourceName.equals(name)) {
+        if (originResourceName.equals(name) && file == null) {
             return result;
         }
+
+        if (file != null) {
+            // fail upload
+            if (!upload(loginUser, fullName, file, type)) {
+                logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
+                putMsg(result, Status.HDFS_OPERATION_ERROR);
+                throw new RuntimeException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
+            }
+            if (!fullName.equals(originFullName)) {
+                try {
+                    HadoopUtils.getInstance().delete(originHdfsFileName,false);
+                } catch (IOException e) {
+                    logger.error(e.getMessage(),e);
+                    throw new RuntimeException(String.format("delete resource: %s failed.", originFullName));
+                }
+            }
+            return result;
+        }
+
 
         // get the path of dest file in hdfs
         String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
