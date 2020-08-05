@@ -34,7 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +74,14 @@ public class HadoopUtils implements Closeable {
             });
 
     private static volatile boolean yarnEnabled = false;
+
+    static {
+        if(OSUtils.isWindows()){
+            // load hadoop.dll for use hadoop on windows platform
+            String hadoopHome = System.getenv("HADOOP_HOME");
+            System.load(Paths.get(hadoopHome, "bin/hadoop.dll").toAbsolutePath().toString());
+        }
+    }
 
     private Configuration configuration;
     private FileSystem fs;
@@ -165,6 +175,13 @@ public class HadoopUtils implements Closeable {
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
                 configuration.set(Constants.FS_S3A_SECRET_KEY, PropertyUtils.getString(Constants.FS_S3A_SECRET_KEY));
                 fs = FileSystem.get(configuration);
+            } else if (resUploadType == ResUploadType.OSS) {
+                configuration.set("fs.oss.impl", "org.apache.hadoop.fs.aliyun.oss.AliyunOSSFileSystem");
+                configuration.set(Constants.FS_DEFAULTFS, PropertyUtils.getString(Constants.FS_DEFAULTFS));
+                configuration.set(Constants.FS_OSS_ACCESS_KEY_ID, PropertyUtils.getString(Constants.FS_OSS_ACCESS_KEY_ID));
+                configuration.set(Constants.FS_OSS_ACCESS_KEY_SECRET, PropertyUtils.getString(Constants.FS_OSS_ACCESS_KEY_SECRET));
+                configuration.set(Constants.FS_OSS_ENDPOINT, PropertyUtils.getString(Constants.FS_OSS_ENDPOINT));
+                fs = FileSystem.get(new URI("oss://" + PropertyUtils.getString(Constants.FS_OSS_BUCKET)), configuration);
             }
 
 
