@@ -76,8 +76,10 @@ public class ResourceMapperTest {
         resource.setDirectory(false);
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
-        resourceMapper.insert(resource);
-        return resource;
+        if( resourceMapper.insert(resource)>0 ){
+            return resource;
+        }
+        throw new RuntimeException("insert data error");
     }
 
     /**
@@ -93,8 +95,10 @@ public class ResourceMapperTest {
         resource.setAlias(alias);
         resource.setFullName(fullName);
         resource.setUserId(user.getId());
-        resourceMapper.insert(resource);
-        return resource;
+        if( resourceMapper.insert(resource) > 0 ){
+            return resource;
+        }
+        throw new RuntimeException("insert data error");
     }
 
     /**
@@ -124,8 +128,10 @@ public class ResourceMapperTest {
         user.setCreateTime(new Date());
         user.setTenantId(1);
         user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
+        if(userMapper.insert(user)>0){
+            return user;
+        }
+        throw new RuntimeException("insert data error");
     }
 
     /**
