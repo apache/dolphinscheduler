@@ -348,7 +348,7 @@ public class ProcessUtils {
    * @return pids
    * @throws Exception exception
    */
-  public static String getPidsStr(int processId)throws Exception {
+  public static String getPidsStr(int processId) throws Exception {
     StringBuilder sb = new StringBuilder();
     Matcher mat;
     // pstree pid get sub pids
