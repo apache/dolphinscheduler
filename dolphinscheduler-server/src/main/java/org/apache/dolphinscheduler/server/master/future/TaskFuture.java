@@ -60,7 +60,7 @@ public class TaskFuture {
 
     private volatile boolean sendOk = true;
 
-    private volatile Throwable cause;
+    private  AtomicReference<Throwable> causeReference;
 
     public TaskFuture(long opaque, long timeoutMillis) {
         this.opaque = opaque;
@@ -115,11 +115,11 @@ public class TaskFuture {
     }
 
     public void setCause(Throwable cause) {
-        this.cause = cause;
+        causeReference.set(cause);
     }
 
     public Throwable getCause() {
-        return cause;
+        return causeReference.get();
     }
 
     public long getOpaque() {
@@ -169,7 +169,7 @@ public class TaskFuture {
                 ", beginTimestamp=" + beginTimestamp +
                 ", responseCommand=" + responseCommandReference.get() +
                 ", sendOk=" + sendOk +
-                ", cause=" + cause +
+                ", cause=" + causeReference.get() +
                 '}';
     }
 }
