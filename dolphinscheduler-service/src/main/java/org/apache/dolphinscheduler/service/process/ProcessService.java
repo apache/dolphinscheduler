@@ -38,7 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -692,19 +691,23 @@ public class ProcessService {
             case SCHEDULER:
                 break;
             case RESUME_FROM_FORCED_SUCCESS:
-                // TODO： 在这里初始化processInstance的时候可能需要加入startnodelist参数
-
                 // find forced-success tasks here
                 List<Integer> forcedSuccessList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.FORCED_SUCCESS);
                 // deal with sub_process nodes
-                List<Integer> failedSubList = this.findTaskIdByInstanceStateAndType(processInstance.getId(), ExecutionStatus.FAILURE, TaskType.SUB_PROCESS);
-                List<Integer> toleranceSubList = this.findTaskIdByInstanceStateAndType(processInstance.getId(), ExecutionStatus.NEED_FAULT_TOLERANCE, TaskType.SUB_PROCESS);
-                List<Integer> killedSubList = this.findTaskIdByInstanceStateAndType(processInstance.getId(), ExecutionStatus.KILL, TaskType.SUB_PROCESS);
+//                List<Integer> failedSubList = this.findTaskIdByInstanceStatusAndType(processInstance.getId(), ExecutionStatus.FAILURE, TaskType.SUB_PROCESS);
+//                List<Integer> toleranceSubList = this.findTaskIdByInstanceStatusAndType(processInstance.getId(), ExecutionStatus.NEED_FAULT_TOLERANCE, TaskType.SUB_PROCESS);
+//                List<Integer> killedSubList = this.findTaskIdByInstanceStatusAndType(processInstance.getId(), ExecutionStatus.KILL, TaskType.SUB_PROCESS);
+//
+//                failedSubList.addAll(toleranceSubList);
+//                failedSubList.addAll(killedSubList);
+                List<Integer> failedSubList = this.findTaskIdByInstanceStatusAndType(processInstance.getId(),
+                        new ExecutionStatus[]{ExecutionStatus.FAILURE, ExecutionStatus.KILL, ExecutionStatus.NEED_FAULT_TOLERANCE},
+                        TaskType.SUB_PROCESS);
 
-                failedSubList.addAll(toleranceSubList);
-                failedSubList.addAll(killedSubList);
                 for (int i = 0; i < failedSubList.size(); i++) {
-                    List<Integer> tmpResultList = this.findTaskIdBySubProcessTaskIdAndState(failedSubList.get(i), ExecutionStatus.FORCED_SUCCESS);
+                    List<Integer> tmpResultList = this.findTaskIdInSubProcessByStatusAndType(failedSubList.get(i),
+                            new ExecutionStatus[]{ExecutionStatus.FORCED_SUCCESS},
+                            null);
                     // if there is forced success in the sub_process
                     if (tmpResultList != null && tmpResultList.size() > 0) {
                         forcedSuccessList.add(failedSubList.get(i));
@@ -1281,23 +1284,36 @@ public class ProcessService {
 
     /**
      * get id list by task state and type
-     * @param instanceId process instance id
-     * @param state task instance state
+     * @param processInstanceId process instance id
+     * @param states task instance state array
      * @param taskType task type
      * @return task instance id list
      */
-    public List<Integer> findTaskIdByInstanceStateAndType(int instanceId, ExecutionStatus state, TaskType taskType){
-        return taskInstanceMapper.queryTaskByPIdAndStateAndType(instanceId, state.ordinal(), taskType.toString());
+    public List<Integer> findTaskIdByInstanceStatusAndType(int processInstanceId, ExecutionStatus[] states, TaskType taskType){
+        int[] stateArray = new int[states.length];
+        for (int i = 0; i < states.length; i++) {
+            stateArray[i] = states[i].ordinal();
+        }
+        return taskInstanceMapper.queryTaskByPIdAndStatusAndType(processInstanceId, stateArray, taskType.toString());
     }
 
     /**
-     * get tasks in sub_process by sub_process task id and state
-     * @param taskId task id
-     * @param state task instance state
+     * get tasks in sub_process by sub_process task id and state and type
+     * if param type is null, it queries all types
+     * @param taskId task instance id
+     * @param states task instance state array
+     * @param taskType task type
      * @return task instance id list
      */
-    public List<Integer> findTaskIdBySubProcessTaskIdAndState(int taskId, ExecutionStatus state){
-        return taskInstanceMapper.queryTasksBySubProcessTaskIdAndState(taskId, state.ordinal());
+    public List<Integer> findTaskIdInSubProcessByStatusAndType(int taskId, ExecutionStatus[] states, TaskType taskType){
+        int[] stateArray = new int[states.length];
+        for (int i = 0; i < states.length; i++) {
+            stateArray[i] = states[i].ordinal();
+        }
+        if (taskType == null) {
+            return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, stateArray, null);
+        }
+        return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, stateArray, taskType.toString());
     }
 
     /**
