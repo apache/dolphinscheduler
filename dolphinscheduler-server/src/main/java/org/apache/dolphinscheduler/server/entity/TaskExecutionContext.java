@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,13 +38,14 @@ public class TaskExecutionContext implements Serializable{
 
 
     /**
-     *  taks name
+     *  task name
      */
     private String taskName;
 
     /**
      *  task start time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
@@ -91,6 +92,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  process instance schedule time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date scheduleTime;
 
     /**
@@ -168,9 +170,9 @@ public class TaskExecutionContext implements Serializable{
     private String workerGroup;
 
     /**
-     * resources full name
+     * resources full name and tenant code
      */
-    private List<String> resources;
+    private Map<String,String> resources;
 
     /**
      *  sql TaskExecutionContext
@@ -431,7 +433,7 @@ public class TaskExecutionContext implements Serializable{
 
     public Command toCommand(){
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(this));
+        requestCommand.setTaskExecutionContext(JsonSerializer.serializeToString(this));
         return requestCommand.convert2Command();
     }
 
@@ -443,11 +445,11 @@ public class TaskExecutionContext implements Serializable{
         this.dependenceTaskExecutionContext = dependenceTaskExecutionContext;
     }
 
-    public List<String> getResources() {
+    public Map<String, String> getResources() {
         return resources;
     }
 
-    public void setResources(List<String> resources) {
+    public void setResources(Map<String, String> resources) {
         this.resources = resources;
     }
 

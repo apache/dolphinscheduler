@@ -26,7 +26,7 @@
                 type="text"
                 v-model="name"
                 :disabled="router.history.current.name === 'projects-instance-details'"
-                :placeholder="$t('Please enter name(required)')">
+                :placeholder="$t('Please enter name (required)')">
         </x-input>
       </div>
 
@@ -169,17 +169,12 @@
           this.$emit('onUdp')
         }
 
-        // Edit => direct storage
-        if (this.store.state.dag.name) {
+        // verify that the name exists
+        this.store.dispatch('dag/verifDAGName', this.name).then(res => {
           _verif()
-        } else {
-          // New First verify that the name exists
-          this.store.dispatch('dag/verifDAGName', this.name).then(res => {
-            _verif()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-          })
-        }
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       },
       /**
        * Close the popup
@@ -205,7 +200,14 @@
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
-      this.tenantId = dag.tenantId || -1
+      this.$nextTick(() => {
+        if (dag.tenantId === -1) {
+          this.tenantId = this.store.state.user.userInfo.tenantId
+        } else {
+          this.tenantId = dag.tenantId
+        }
+      })
+
     },
     mounted () {},
     components: {FormTenant, mLocalParams }

@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,10 +37,17 @@ public class HttpUtilsTest {
 		//success
 		String result = HttpUtils.get("https://github.com/manifest.json");
 		Assert.assertNotNull(result);
-		JSONObject jsonObject = JSON.parseObject(result);
-		Assert.assertEquals("GitHub", jsonObject.getString("name"));
+		ObjectNode jsonObject = JSONUtils.parseObject(result);
+		Assert.assertEquals("GitHub", jsonObject.path("name").asText());
 
 		result = HttpUtils.get("https://123.333.111.33/ccc");
 		Assert.assertNull(result);
+	}
+
+	@Test
+	public void testGetHttpClient() {
+		CloseableHttpClient httpClient1 = HttpUtils.getInstance();
+		CloseableHttpClient httpClient2 = HttpUtils.getInstance();
+		Assert.assertEquals(httpClient1, httpClient2);
 	}
 }

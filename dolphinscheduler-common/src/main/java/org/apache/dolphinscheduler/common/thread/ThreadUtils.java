@@ -231,6 +231,8 @@ public class ThreadUtils {
     public static void sleep(final long millis) {
         try {
             Thread.sleep(millis);
-        } catch (final InterruptedException ignore) {}
+        } catch (final InterruptedException ignore) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

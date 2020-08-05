@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -36,7 +35,6 @@ import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.slf4j.Logger;
@@ -124,12 +122,12 @@ public class MasterExecThread implements Runnable {
     /**
      * alert manager
      */
-    private AlertManager alertManager = new AlertManager();
+    private AlertManager alertManager;
 
     /**
      * the object of DAG
      */
-    private DAG<String,TaskNode,TaskNodeRelation> dag;
+    private DAG<String, TaskNode, TaskNodeRelation> dag;
 
     /**
      *  process service
@@ -152,15 +150,20 @@ public class MasterExecThread implements Runnable {
      * @param processService processService
      * @param nettyRemotingClient nettyRemotingClient
      */
-    public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
+    public MasterExecThread(ProcessInstance processInstance
+            , ProcessService processService
+            , NettyRemotingClient nettyRemotingClient
+            , AlertManager alertManager
+            , MasterConfig masterConfig) {
         this.processService = processService;
 
         this.processInstance = processInstance;
-        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        this.masterConfig = masterConfig;
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
         this.nettyRemotingClient = nettyRemotingClient;
+        this.alertManager = alertManager;
     }
 
 
@@ -249,6 +252,9 @@ public class MasterExecThread implements Runnable {
         }
 
         while(Stopper.isRunning()){
+
+            logger.info("process {} start to complement {} data",
+                    processInstance.getId(), DateUtils.dateToString(scheduleDate));
             // prepare dag and other info
             prepareProcess();
 
@@ -263,13 +269,13 @@ public class MasterExecThread implements Runnable {
             // execute process ,waiting for end
             runProcess();
 
+            endProcess();
             // process instance failure ，no more complements
             if(!processInstance.getState().typeIsSuccess()){
                 logger.info("process {} state {}, complement not completely!",
                         processInstance.getId(), processInstance.getState());
                 break;
             }
-
             //  current process instance success ,next execute
             if(null == iterator){
                 // loop by day
@@ -288,33 +294,24 @@ public class MasterExecThread implements Runnable {
                 }
                 scheduleDate = iterator.next();
             }
-
-            logger.info("process {} start to complement {} data",
-                    processInstance.getId(), DateUtils.dateToString(scheduleDate));
+            // flow end
             // execute next process instance complement data
             processInstance.setScheduleTime(scheduleDate);
             if(cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_START_NODE_STRING)){
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
-                processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
+                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
             }
 
-            List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
-            for(TaskInstance taskInstance : taskInstanceList){
-                taskInstance.setFlag(Flag.NO);
-                processService.updateTaskInstance(taskInstance);
-            }
-            processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+            processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
                     processInstance.getProcessDefinition().getGlobalParamMap(),
                     processInstance.getProcessDefinition().getGlobalParamList(),
                     CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-
+            processInstance.setId(0);
+            processInstance.setStartTime(new Date());
+            processInstance.setEndTime(null);
             processService.saveProcessInstance(processInstance);
         }
-
-        // flow end
-        endProcess();
-
     }
 
 
@@ -338,7 +335,7 @@ public class MasterExecThread implements Runnable {
     private void endProcess() {
         processInstance.setEndTime(new Date());
         processService.updateProcessInstance(processInstance);
-        if(processInstance.getState().typeIsWaittingThread()){
+        if(processInstance.getState().typeIsWaitingThread()){
             processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
@@ -467,7 +464,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance node json
-            taskInstance.setTaskJson(JSON.toJSONString(taskNode));
+            taskInstance.setTaskJson(JSONUtils.toJsonString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
@@ -496,6 +493,7 @@ public class MasterExecThread implements Runnable {
             }
 
             String processWorkerGroup = processInstance.getWorkerGroup();
+            processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
             String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
             if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
                 taskInstance.setWorkerGroup(processWorkerGroup);
@@ -727,7 +725,7 @@ public class MasterExecThread implements Runnable {
             // if the running task is not completed, the state remains unchanged
             return state;
         }else{
-            return ExecutionStatus.RUNNING_EXEUTION;
+            return ExecutionStatus.RUNNING_EXECUTION;
         }
     }
 
@@ -804,7 +802,8 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0 || haveRetryTaskStandBy()){
+        if(activeTaskNode.size() > 0 || hasRetryTaskInStandBy()){
+            // active task and retry task exists
             return runningState(state);
         }
         // process failure
@@ -827,7 +826,8 @@ public class MasterExecThread implements Runnable {
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
             if(CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
+                    || CollectionUtils.isNotEmpty(killList)
+                    || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -835,10 +835,14 @@ public class MasterExecThread implements Runnable {
         }
 
         // success
-        if(state == ExecutionStatus.RUNNING_EXEUTION){
+        if(state == ExecutionStatus.RUNNING_EXECUTION){
+            List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
             if(readyToSubmitTaskList.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
-                return ExecutionStatus.RUNNING_EXEUTION;
+                return ExecutionStatus.RUNNING_EXECUTION;
+            }else if(CollectionUtils.isNotEmpty(killTasks)){
+                // tasks maybe killed manually
+                return ExecutionStatus.FAILURE;
             }else{
                 //  if the waiting queue is empty and the status is in progress, then success
                 return ExecutionStatus.SUCCESS;
@@ -846,24 +850,6 @@ public class MasterExecThread implements Runnable {
         }
 
         return state;
-    }
-
-    /**
-     * whether standby task list have retry tasks
-     * @return
-     */
-    private boolean haveRetryTaskStandBy() {
-
-        boolean result = false;
-
-        for(String taskName : readyToSubmitTaskList.keySet()){
-            TaskInstance task = readyToSubmitTaskList.get(taskName);
-            if(task.getState().typeIsFailure()){
-                result = true;
-                break;
-            }
-        }
-        return result;
     }
 
     /**
@@ -1040,6 +1026,7 @@ public class MasterExecThread implements Runnable {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(),e);
+                Thread.currentThread().interrupt();
             }
             updateProcessInstanceState();
         }

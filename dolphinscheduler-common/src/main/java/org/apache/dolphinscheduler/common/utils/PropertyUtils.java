@@ -72,7 +72,7 @@ public class PropertyUtils {
      * @return  judge whether resource upload startup
      */
     public static Boolean getResUploadStartupState(){
-        String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+        String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
     }
@@ -85,6 +85,16 @@ public class PropertyUtils {
      */
     public static String getString(String key) {
         return properties.getProperty(key.trim());
+    }
+
+    /**
+     * get property value with upper case
+     *
+     * @param key property name
+     * @return property value  with upper case
+     */
+    public static String getUpperCaseString(String key) {
+        return properties.getProperty(key.trim()).toUpperCase();
     }
 
     /**
@@ -240,4 +250,14 @@ public class PropertyUtils {
         }
         return matchedProperties;
     }
+
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    public static void setValue(String key, String value) {
+        properties.setProperty(key,value);
+    }
+
 }

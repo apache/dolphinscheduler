@@ -20,10 +20,11 @@ commons-cli-1.2.jar
 commons-codec-1.6.jar
 commons-collections-3.2.2.jar
 commons-collections4-4.1.jar
-commons-compiler-3.0.12.jar
 commons-compress-1.4.1.jar
+commons-compiler-3.0.12.jar
 commons-configuration-1.10.jar
 commons-daemon-1.0.13.jar
+commons-beanutils-1.7.0.jar
 commons-dbcp-1.4.jar
 commons-email-1.5.jar
 commons-httpclient-3.0.1.jar
@@ -43,7 +44,6 @@ datanucleus-core-4.1.6.jar
 datanucleus-rdbms-4.1.7.jar
 derby-10.14.2.0.jar
 druid-1.1.14.jar
-fastjson-1.2.61.jar
 gson-2.8.5.jar
 guava-20.0.jar
 guice-3.0.jar

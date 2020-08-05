@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import java.nio.charset.StandardCharsets;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -33,11 +34,11 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -96,6 +98,53 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     UsersService usersService;
 
+    /**
+     * return top n SUCCESS process instance order by running time which started between startTime and endTime
+     * @param loginUser
+     * @param projectName
+     * @param size
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime) {
+        Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByName(projectName);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        if (0 > size) {
+            putMsg(result, Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
+            return result;
+        }
+        if (Objects.isNull(startTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.START_TIME);
+            return result;
+        }
+        Date start = DateUtils.stringToDate(startTime);
+        if (Objects.isNull(endTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.END_TIME);
+            return result;
+        }
+        Date end = DateUtils.stringToDate(endTime);
+        if(start == null || end == null) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
+            return result;
+        }
+        if (start.getTime() > end.getTime()) {
+            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
+            return result;
+        }
+
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(size, start, end, ExecutionStatus.SUCCESS);
+        result.put(DATA_LIST, processInstances);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
     /**
      * query process instance by id
      *
@@ -242,7 +291,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 if(logResult.getCode() == Status.SUCCESS.ordinal()){
                     String log = (String) logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
-                    taskInstance.setDependentResult(JSONUtils.toJson(resultMap));
+                    taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
                 }
             }
         }
@@ -380,7 +429,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 return result;
             }
 
-            originDefParams = JSONUtils.toJson(processData.getGlobalParams());
+            originDefParams = JSONUtils.toJsonString(processData.getGlobalParams());
             List<Property> globalParamList = processData.getGlobalParams();
             Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
@@ -464,7 +513,7 @@ public class ProcessInstanceService extends BaseDAGService {
      * @param processInstanceId process instance id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -476,8 +525,6 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstanceId);
-
         if (null == processInstance) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
@@ -485,8 +532,11 @@ public class ProcessInstanceService extends BaseDAGService {
 
 
 
+        processService.removeTaskLogFile(processInstanceId);
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
+
+
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
 
@@ -504,9 +554,8 @@ public class ProcessInstanceService extends BaseDAGService {
      *
      * @param processInstanceId process instance id
      * @return variables data
-     * @throws Exception exception
      */
-    public Map<String, Object> viewVariables( Integer processInstanceId) throws Exception {
+    public Map<String, Object> viewVariables(Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>(5);
 
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
@@ -530,16 +579,16 @@ public class ProcessInstanceService extends BaseDAGService {
         List<Property> globalParams = new ArrayList<>();
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSON.parseArray(userDefinedParams, Property.class);
+                globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
 
 
         List<TaskNode> taskNodeList = workflowData.getTasks();
 
         // global param string
-        String globalParamStr = JSON.toJSONString(globalParams);
+        String globalParamStr = JSONUtils.toJsonString(globalParams);
         globalParamStr = ParameterUtils.convertParameterPlaceholders(globalParamStr, timeParams);
-        globalParams = JSON.parseArray(globalParamStr, Property.class);
+        globalParams = JSONUtils.toList(globalParamStr, Property.class);
         for (Property property : globalParams) {
             timeParams.put(property.getProp(), property.getValue());
         }
@@ -552,7 +601,8 @@ public class ProcessInstanceService extends BaseDAGService {
             String localParams = map.get(LOCAL_PARAMS);
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = JSON.parseArray(localParams, Property.class);
+                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());
                 localParamsMap.put("localParamsList",localParamsList);
