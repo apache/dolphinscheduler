@@ -1449,7 +1449,6 @@ public class ProcessService {
      * @param taskInstId taskInstId
      */
     public void changeTaskState(ExecutionStatus state,
-                                Date startTime,
                                 Date endTime,
                                 int processId,
                                 String appIds,
@@ -1458,7 +1457,6 @@ public class ProcessService {
         taskInstance.setPid(processId);
         taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
-        taskInstance.setStartTime(startTime);
         taskInstance.setEndTime(endTime);
         saveTaskInstance(taskInstance);
     }
