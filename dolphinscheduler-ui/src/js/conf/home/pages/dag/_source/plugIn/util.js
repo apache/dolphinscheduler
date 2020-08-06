@@ -32,7 +32,7 @@ const rtTargetarrArr = (id) => {
  */
 const saveTargetarr = (valId, domId) => {
   let $target = $(`#${domId}`)
-  let targetStr = $target.attr('data-targetarr') ? $target.attr('data-targetarr') + `,${valId}` : `${valId}`
+  let targetStr = $target.attr('data-targetarr') ? $target.attr('data-targetarr') + `,${valId}` : `${valId}`;
   $target.attr('data-targetarr', targetStr)
 }
 

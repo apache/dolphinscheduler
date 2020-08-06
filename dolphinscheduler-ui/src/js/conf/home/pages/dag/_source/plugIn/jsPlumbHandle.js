@@ -687,14 +687,14 @@ JSP.prototype.saveStore = function () {
 
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
-    const sourceId = info.sourceId// 出
-    const targetId = info.targetId// 入
+    let sourceId = info['sourceId']// 出
+    let targetId = info['targetId']// 入
     /**
      * Recursive search for nodes
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (const i in arr) {
+      for (let i in arr) {
         if (arr[i] === targetId) {
           recursiveVal = targetId
         } else {
