@@ -128,6 +128,14 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
+        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L) > 0) {
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
+            taskExecutionContext.setStartTime(null);
+        } else {
+            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+            taskExecutionContext.setStartTime(new Date());
+        }
+
         // tell master the status of this task (RUNNING_EXECUTION or DELAY_EXECUTION)
         final Command ackCommand = buildAckCommand(taskExecutionContext).convert2Command();
 
@@ -173,17 +181,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private TaskExecuteAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L) > 0) {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-            ackCommand.setStatus(ExecutionStatus.DELAY_EXECUTION.getCode());
-            ackCommand.setStartTime(null);
-        } else {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            ackCommand.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
-            ackCommand.setStartTime(new Date());
-        }
+        ackCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
+        ackCommand.setStartTime(taskExecutionContext.getStartTime());
         if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);
         }else{
