@@ -522,9 +522,9 @@
         } else {
           rearList = []
         }
-        let targetarr = $(`#${id}`).attr('data-targetarr')
-        if (targetarr) {
-          let nodearr = targetarr.split(',')
+        let target = $(`#${id}`).attr('data-targetarr')
+        if (target) {
+          let nodearr = target.split(',')
           nodearr.forEach(v => {
             let nodeobj = {}
             nodeobj.value = $(`#${v}`).find('.name-p').text()
