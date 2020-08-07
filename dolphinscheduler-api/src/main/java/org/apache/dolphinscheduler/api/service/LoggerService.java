@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.nio.charset.StandardCharsets;
+import javax.annotation.PreDestroy;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,8 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
-
 /**
  * log service
  */
@@ -39,17 +40,19 @@ public class LoggerService {
 
   private static final Logger logger = LoggerFactory.getLogger(LoggerService.class);
 
+  private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
+
   @Autowired
   private ProcessService processService;
 
   private final LogClientService logClient;
 
-  public LoggerService(){
+  public LoggerService() {
     logClient = new LogClientService();
   }
 
   @PreDestroy
-  public void close(){
+  public void close() {
     logClient.close();
   }
 
@@ -65,22 +68,32 @@ public class LoggerService {
 
     TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
-    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())){
-      return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
+    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
+      return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
     }
 
     String host = getHost(taskInstance.getHost());
 
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
-    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
+    logger.info("log host : {} , logPath : {} , logServer port : {}", host, taskInstance.getLogPath(),
+            Constants.RPC_PORT);
 
-    String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
+    StringBuilder log = new StringBuilder();
+    if (skipLineNum == 0) {
+      String head = String.format(LOG_HEAD_FORMAT,
+          taskInstance.getLogPath(),
+          host,
+          Constants.SYSTEM_LINE_SEPARATOR);
+      log.append(head);
+    }
+
+    log.append(logClient
+        .rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(), skipLineNum, limit));
+
     result.setData(log);
     return result;
   }
-
-
 
 
   /**
@@ -91,22 +104,27 @@ public class LoggerService {
    */
   public byte[] getLogBytes(int taskInstId) {
     TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
-    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())){
+    if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
       throw new RuntimeException("task instance is null or host is null");
     }
     String host = getHost(taskInstance.getHost());
-
-    return logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath());
+    byte[] head = String.format(LOG_HEAD_FORMAT,
+        taskInstance.getLogPath(),
+        host,
+        Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
+    return ArrayUtils.addAll(head,
+        logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath()));
   }
 
 
   /**
    * get host
+   *
    * @param address address
    * @return old version return true ,otherwise return false
    */
-  private String getHost(String address){
-    if (Host.isOldVersion(address)){
+  private String getHost(String address) {
+    if (Host.isOldVersion(address)) {
       return address;
     }
     return Host.of(address).getIp();
