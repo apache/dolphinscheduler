@@ -28,7 +28,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +69,18 @@ public class TaskInstanceControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void forceSingleTaskSuccess() {
-        // TODO： 加入测试
+    public void forceSingleTaskSuccess() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("taskInstanceId","104");
+
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success","test")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
 }

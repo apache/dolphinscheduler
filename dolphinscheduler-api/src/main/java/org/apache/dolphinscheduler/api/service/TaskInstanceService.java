@@ -167,7 +167,6 @@ public class TaskInstanceService extends BaseService {
 
         // check whether the task instance state type is failure
         if (!task.getState().typeIsFailure()) {
-            // FIXME: 这个status的msg中是包含参数的，需要处理一下（已完善，待测试）
             putMsg(result, Status.TASK_INSTANCE_STATE_OPETATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
@@ -179,7 +178,6 @@ public class TaskInstanceService extends BaseService {
             putMsg(result, Status.SUCCESS);
         }
         else {
-            // FIXME: 或许应该再加一个状态码，如果按照process的执行逻辑，那么是不需要的
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
