@@ -74,7 +74,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.getCode().intValue());
+        assert result != null;
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
