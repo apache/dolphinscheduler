@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -176,7 +177,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             String taskParameter = taskNode.getParams();
             AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
             if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
+                Set<Integer> tempSet = params.getResourceFilesList().stream().filter(t->t.getId()!=0).map(ResourceInfo::getId).collect(Collectors.toSet());
                 resourceIds.addAll(tempSet);
             }
         }
