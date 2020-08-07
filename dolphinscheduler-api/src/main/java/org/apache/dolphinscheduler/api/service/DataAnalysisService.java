@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -153,6 +154,8 @@ public class DataAnalysisService extends BaseService{
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
+            // process state count needs to remove state of forced success
+            taskCountResult.removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
         }
