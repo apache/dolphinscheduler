@@ -243,7 +243,8 @@ public class DataAnalysisService extends BaseService{
         // init data map
         /**
          * START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
-         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
+         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD,
+         RESUME_FROM_FORCED_SUCCESS;
          */
         dataMap.put(CommandType.START_PROCESS,commonCommand);
         dataMap.put(CommandType.START_CURRENT_TASK_PROCESS,commonCommand);
@@ -256,6 +257,7 @@ public class DataAnalysisService extends BaseService{
         dataMap.put(CommandType.PAUSE,commonCommand);
         dataMap.put(CommandType.STOP,commonCommand);
         dataMap.put(CommandType.RECOVER_WAITTING_THREAD,commonCommand);
+        dataMap.put(CommandType.RESUME_FROM_FORCED_SUCCESS, commonCommand);
 
         // put command state
         for (CommandCount executeStatusCount : commandStateCounts){
