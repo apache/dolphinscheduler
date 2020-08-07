@@ -64,7 +64,7 @@ public class TaskInstanceMapperTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName("ut task");
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
         taskInstance.setTaskJson("{}");
@@ -118,7 +118,7 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
         List<Integer> taskInstances = taskInstanceMapper.queryTaskByProcessIdAndState(
                 task.getProcessInstanceId(),
-                ExecutionStatus.RUNNING_EXEUTION.ordinal()
+                ExecutionStatus.RUNNING_EXECUTION.ordinal()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -162,7 +162,7 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.queryByHostAndStatus(
-                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXEUTION.ordinal()}
+                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()}
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -179,7 +179,7 @@ public class TaskInstanceMapperTest {
 
         int setResult = taskInstanceMapper.setFailoverByHostAndStateArray(
                 task.getHost(),
-                new int[]{ExecutionStatus.RUNNING_EXEUTION.ordinal()},
+                new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()},
                 ExecutionStatus.NEED_FAULT_TOLERANCE
         );
         taskInstanceMapper.deleteById(task.getId());
@@ -268,7 +268,7 @@ public class TaskInstanceMapperTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setProcessDefinitionId(definition.getId());
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setName("ut process");
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());

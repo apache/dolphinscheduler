@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,4 +68,17 @@ public class FileUtilsTest {
             Assert.assertTrue(false);
         }
     }
+
+    @Test
+    public void testSetValue() {
+        try {
+            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+            Assert.assertTrue(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
+            PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+            Assert.assertFalse(PropertyUtils.getBoolean(Constants.DATASOURCE_ENCRYPTION_ENABLE));
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
+    }
+
 }

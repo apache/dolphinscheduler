@@ -74,6 +74,9 @@
   .icos-SHELL {
     background: url("../img/toolbar_SHELL.png") no-repeat 50% 50%;
   }
+  .icos-WATERDROP {
+    background: url("../img/toolbar_WATERDROP.png") no-repeat 50% 50%;
+  }
   .icos-SUB_PROCESS {
     background: url("../img/toolbar_SUB_PROCESS.png") no-repeat 50% 50%;
   }
@@ -560,9 +563,9 @@ svg path:hover {
   }
 }
 
-.ans-drawer.ans-drawer-right {
-  width: 628px;
-  left: auto;
+.ans-modal-box.ans-drawer.ans-drawer-right.dagMask.mask {
+    width: 628px;
+    left: auto;
 }
 
 

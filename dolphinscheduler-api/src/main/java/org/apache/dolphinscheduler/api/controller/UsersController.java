@@ -432,14 +432,34 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userPassword") String userPassword,
                                @RequestParam(value = "repeatPassword") String repeatPassword,
                                @RequestParam(value = "email") String email) throws Exception {
-        userName = userName.replaceAll("[\n|\r|\t]", "");
-        userPassword = userPassword.replaceAll("[\n|\r|\t]", "");
-        repeatPassword = repeatPassword.replaceAll("[\n|\r|\t]", "");
-        email = email.replaceAll("[\n|\r|\t]", "");
+        userName = ParameterUtils.handleEscapes(userName);
+        userPassword = ParameterUtils.handleEscapes(userPassword);
+        repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
+        email = ParameterUtils.handleEscapes(email);
         logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, eamil {}",
-                userName, userPassword, repeatPassword, email);
+                userName, Constants.PASSWORD_DEFAULT, Constants.PASSWORD_DEFAULT, email);
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
         return returnDataList(result);
     }
 
+    /**
+     * user activate
+     *
+     * @param userName       user name
+     */
+    @ApiOperation(value="activateUser",notes = "ACTIVATE_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+    })
+    @PostMapping("/activate")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_USER_ERROR)
+    public Result<Object> activateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "userName") String userName) {
+        userName = ParameterUtils.handleEscapes(userName);
+        logger.info("login user {}, activate user, userName: {}",
+                loginUser.getUserName(), userName);
+        Map<String, Object> result = usersService.activateUser(loginUser, userName);
+        return returnDataList(result);
+    }
 }
