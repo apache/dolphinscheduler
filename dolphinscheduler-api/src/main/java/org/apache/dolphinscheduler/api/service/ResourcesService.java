@@ -86,7 +86,7 @@ public class ResourcesService extends BaseService {
      * @param currentDir current directory
      * @return create directory result
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result createDirectory(User loginUser,
                                  String name,
                                  String description,
@@ -160,7 +160,7 @@ public class ResourcesService extends BaseService {
      * @param currentDir current directory
      * @return create result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result createResource(User loginUser,
                                  String name,
                                  String desc,
@@ -288,7 +288,7 @@ public class ResourcesService extends BaseService {
      * @param type          resource type
      * @return  update result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result updateResource(User loginUser,
                                  int resourceId,
                                  String name,
@@ -827,7 +827,7 @@ public class ResourcesService extends BaseService {
      * @param content content
      * @return create result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory) {
         Result result = new Result();
         // if resource upload startup
@@ -889,7 +889,7 @@ public class ResourcesService extends BaseService {
      * @param content content
      * @return update result cod
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 

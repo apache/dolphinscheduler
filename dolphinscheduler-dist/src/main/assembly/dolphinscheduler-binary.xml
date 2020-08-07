@@ -189,6 +189,7 @@
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
 				<include>dolphinscheduler-daemon.sh</include>
+				<include>status-all.sh</include>
 			</includes>
 			<outputDirectory>./bin</outputDirectory>
 		</fileSet>

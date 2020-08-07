@@ -53,7 +53,7 @@
 
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class>
 
-            <class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">
+            <!-- <class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">
                 <methods>
                     <include name="testCreateTiming" />
                     <include name="testEditTiming" />
@@ -61,7 +61,7 @@
                     <include name="testOfflineTiming" />
                     <include name="testDeleteTiming" />
                 </methods>
-            </class>
+            </class> -->
             <class name="org.apache.dolphinscheduler.testcase.testProject.TestProcessInstance">
                 <methods>
                     <include name="testRerun" />
@@ -78,7 +78,7 @@
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteProject"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteAlert"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>
-            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>
+<!--            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>-->
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteTenant"></class>
         </classes>
     </test>
