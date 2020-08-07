@@ -121,7 +121,7 @@ public class MasterCommandTest {
                     new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
 
             DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
-            Collection<String> start = DagHelper.getStartVertex("1", dag, null, null);
+            Collection<String> start = DagHelper.getStartVertex("1", dag, null);
 
             System.out.println(start.toString());
 

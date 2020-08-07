@@ -263,7 +263,7 @@ public class DagHelper {
      * @return start Vertex list
      */
     public static Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag,
-                                                    Map<String, TaskInstance> completeTaskList, List<TaskNode> allNodes){
+                                                    Map<String, TaskInstance> completeTaskList){
 
         if(completeTaskList == null){
             completeTaskList = new HashMap<>();
@@ -287,10 +287,10 @@ public class DagHelper {
                 continue;
             }
             // then submit the post nodes
-            Collection<String> postNodes = getStartVertex(start, dag, completeTaskList, allNodes);
+            Collection<String> postNodes = getStartVertex(start, dag, completeTaskList);
             for(String post : postNodes){
                 TaskNode postNode = dag.getNode(post);
-                if(taskNodeCanSubmit(postNode, dag, completeTaskList, allNodes)){
+                if(taskNodeCanSubmit(postNode, dag, completeTaskList)){
                     tmpStartVertexs.add(post);
                 }
             }
@@ -308,8 +308,7 @@ public class DagHelper {
      */
     public static boolean taskNodeCanSubmit(TaskNode taskNode,
                                             DAG<String, TaskNode, TaskNodeRelation> dag,
-                                            Map<String, TaskInstance> completeTaskList,
-                                            List<TaskNode> allNodes) {
+                                            Map<String, TaskInstance> completeTaskList) {
 
         List<String> dependList = taskNode.getDepList();
         if(dependList == null){
@@ -318,10 +317,6 @@ public class DagHelper {
 
         for(String dependNodeName : dependList){
             TaskNode dependNode = dag.getNode(dependNodeName);
-            // when executing resume_from_forced_success, depend node may be not in dag
-            if (dependNode == null) {
-                dependNode = findNodeByName(allNodes, dependNodeName);
-            }
             if(!dependNode.isForbidden() && !completeTaskList.containsKey(dependNodeName)){
                 return false;
             }
@@ -329,16 +324,6 @@ public class DagHelper {
         return true;
     }
 
-
-    /**
-     * generate process data and return all task nodes
-     * @param processDefinitionJson process definition json
-     * @return task nodes list
-     */
-    public static List<TaskNode> getAllTaskNodesFromFlowJson(String processDefinitionJson) {
-        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
-        return processData.getTasks();
-    }
 
     /***
      * build dag graph
