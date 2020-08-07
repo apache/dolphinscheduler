@@ -45,6 +45,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
@@ -192,6 +193,32 @@ public class TaskInstanceServiceTest {
 
     @Test
     public void forceSingleTaskSuccess() {
-        // TODO: 加入测试
+        User user = getAdminUser();
+        String projectName = "test";
+        Project project = getProject(projectName);
+        int taskId = 1;
+        TaskInstance task = getTaskInstance();
+
+        Map<String, Object> tmpResult = new HashMap<>(5);
+        putMsg(tmpResult, Status.SUCCESS);
+        when(projectMapper.queryByName("test")).thenReturn(project);
+        when(projectService.checkProjectAndAuth(user, project, projectName)).thenReturn(tmpResult);
+
+        // test task not found
+        when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
+        Map<String, Object> taskNotFoundRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
+
+        // test task instance state error
+        task.setState(ExecutionStatus.SUCCESS);
+        when(taskInstanceMapper.selectById(1)).thenReturn(task);
+        Map<String, Object> taskStateErrorRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPETATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
+
+        // test success
+        task.setState(ExecutionStatus.FAILURE);
+        when(taskInstanceMapper.updateById(task)).thenReturn(1);
+        Map<String, Object> successRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 }
