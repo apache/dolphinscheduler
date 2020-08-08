@@ -30,6 +30,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +47,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.quartz.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuartzExecutors.class)
@@ -57,8 +57,7 @@ public class SchedulerServiceTest {
     @InjectMocks
     private SchedulerService schedulerService;
 
-
-    @Autowired
+    @Mock
     private ExecutorService executorService;
 
     @Mock
@@ -176,10 +175,10 @@ public class SchedulerServiceTest {
         Mockito.when(quartzExecutors.deleteJob("1", "1")).thenReturn(true);
         Mockito.when(quartzExecutors.buildJobGroupName(1)).thenReturn("1");
         Mockito.when(quartzExecutors.buildJobName(1)).thenReturn("1");
-       boolean flag = true;
+        boolean flag = true;
         try {
             schedulerService.deleteSchedule(1, 1);
-        }catch (Exception e){
+        } catch (Exception e) {
             flag = false;
         }
         Assert.assertTrue(flag);

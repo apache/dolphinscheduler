@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
@@ -26,6 +27,11 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,25 +41,19 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"sun.security.*", "javax.net.*"})
 public class DataSourceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
 
     @InjectMocks
-    private DataSourceService dataSourceService;
+    private DataSourceServiceImpl dataSourceService;
+
     @Mock
     private DataSourceMapper dataSourceMapper;
 
     @Test
-    public void queryDataSourceListTest(){
+    public void queryDataSourceListTest() {
 
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -62,35 +62,35 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void verifyDataSourceNameTest(){
+    public void verifyDataSourceNameTest() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         String dataSourceName = "dataSource1";
         PowerMockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(getDataSourceList());
         Result result = dataSourceService.verifyDataSourceName(loginUser, dataSourceName);
-        Assert.assertEquals(Status.DATASOURCE_EXIST.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.DATASOURCE_EXIST.getMsg(), result.getMsg());
     }
 
     @Test
-    public void queryDataSourceTest(){
+    public void queryDataSourceTest() {
         PowerMockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(null);
         Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt());
-        Assert.assertEquals(((Status)result.get(Constants.STATUS)).getCode(),Status.RESOURCE_NOT_EXIST.getCode());
+        Assert.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.RESOURCE_NOT_EXIST.getCode());
 
         PowerMockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(getOracleDataSource());
         result = dataSourceService.queryDataSource(Mockito.anyInt());
-        Assert.assertEquals(((Status)result.get(Constants.STATUS)).getCode(),Status.SUCCESS.getCode());
+        Assert.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.SUCCESS.getCode());
     }
 
 
-    private List<DataSource> getDataSourceList(){
+    private List<DataSource> getDataSourceList() {
 
-        List<DataSource> dataSources =  new ArrayList<>();
+        List<DataSource> dataSources = new ArrayList<>();
         dataSources.add(getOracleDataSource());
         return dataSources;
     }
 
-    private DataSource getOracleDataSource(){
+    private DataSource getOracleDataSource() {
         DataSource dataSource = new DataSource();
         dataSource.setName("test");
         dataSource.setNote("Note");
@@ -101,31 +101,28 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void buildParameter(){
-        String param = dataSourceService.buildParameter("","", DbType.ORACLE, "192.168.9.1","1521","im"
-                ,"","test","test", DbConnectType.ORACLE_SERVICE_NAME,"");
+    public void buildParameter() {
+        String param = dataSourceService.buildParameter("", "", DbType.ORACLE, "192.168.9.1", "1521", "im"
+                , "", "test", "test", DbConnectType.ORACLE_SERVICE_NAME, "");
         String expected = "{\"connectType\":\"ORACLE_SERVICE_NAME\",\"type\":\"ORACLE_SERVICE_NAME\",\"address\":\"jdbc:oracle:thin:@//192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:oracle:thin:@//192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"test\"}";
         Assert.assertEquals(expected, param);
     }
 
     @Test
-    public void buildParameterWithDecodePassword(){
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
-        String param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
-                ,"","test","123456", null,"");
+    public void buildParameterWithDecodePassword() {
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "true");
+        String param = dataSourceService.buildParameter("name", "desc", DbType.MYSQL, "192.168.9.1", "1521", "im"
+                , "", "test", "123456", null, "");
         String expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"IUAjJCVeJipNVEl6TkRVMg==\"}";
         Assert.assertEquals(expected, param);
 
 
-        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
-        param = dataSourceService.buildParameter("name","desc", DbType.MYSQL, "192.168.9.1","1521","im"
-                ,"","test","123456", null,"");
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE, "false");
+        param = dataSourceService.buildParameter("name", "desc", DbType.MYSQL, "192.168.9.1", "1521", "im"
+                , "", "test", "123456", null, "");
         expected = "{\"type\":null,\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"user\":\"test\",\"password\":\"123456\"}";
         Assert.assertEquals(expected, param);
     }
-
-
-
 
 
 }
