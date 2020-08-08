@@ -31,7 +31,7 @@ public interface LoggerService {
      * @param limit limit
      * @return log string data
      */
-    Result queryLog(int taskInstId, int skipLineNum, int limit);
+    Result<String> queryLog(int taskInstId, int skipLineNum, int limit);
 
 
     /**

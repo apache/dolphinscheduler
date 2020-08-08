@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -76,7 +77,8 @@ public class LoggerServiceImpl implements LoggerService {
      * @param limit limit
      * @return log string data
      */
-    public Result queryLog(int taskInstId, int skipLineNum, int limit) {
+    @SuppressWarnings("unchecked")
+    public Result<String> queryLog(int taskInstId, int skipLineNum, int limit) {
 
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
@@ -86,7 +88,7 @@ public class LoggerServiceImpl implements LoggerService {
 
         String host = getHost(taskInstance.getHost());
 
-        Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
+        Result<String> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
         logger.info("log host : {} , logPath : {} , logServer port : {}", host, taskInstance.getLogPath(),
                 Constants.RPC_PORT);
@@ -103,7 +105,7 @@ public class LoggerServiceImpl implements LoggerService {
         log.append(logClient
                 .rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(), skipLineNum, limit));
 
-        result.setData(log);
+        result.setData(log.toString());
         return result;
     }
 
@@ -117,7 +119,7 @@ public class LoggerServiceImpl implements LoggerService {
     public byte[] getLogBytes(int taskInstId) {
         TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
-            throw new RuntimeException("task instance is null or host is null");
+            throw new ServiceException("task instance is null or host is null");
         }
         String host = getHost(taskInstance.getHost());
         byte[] head = String.format(LOG_HEAD_FORMAT,
@@ -136,7 +138,7 @@ public class LoggerServiceImpl implements LoggerService {
      * @return old version return true ,otherwise return false
      */
     private String getHost(String address) {
-        if (Host.isOldVersion(address)) {
+        if (Boolean.TRUE.equals(Host.isOldVersion(address))) {
             return address;
         }
         return Host.of(address).getIp();
