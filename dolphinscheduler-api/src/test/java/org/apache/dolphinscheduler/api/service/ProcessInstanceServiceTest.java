@@ -62,7 +62,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-//@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
