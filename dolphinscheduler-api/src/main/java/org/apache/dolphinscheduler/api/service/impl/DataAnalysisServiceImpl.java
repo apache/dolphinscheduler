@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
@@ -97,43 +98,12 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      */
     public Map<String, Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
-        Map<String, Object> result = new HashMap<>(5);
-        boolean checkProject = checkProject(loginUser, projectId, result);
-        if (!checkProject) {
-            return result;
-        }
-
-        /**
-         * find all the task lists in the project under the user
-         * statistics based on task status execution, failure, completion, wait, total
-         */
-        Date start;
-        Date end;
-
-        try {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            putErrorRequestParamsMsg(result);
-            return result;
-        }
-
-        Integer[] projectIds = getProjectIdsArrays(loginUser, projectId);
-        List<ExecuteStatusCount> taskInstanceStateCounts =
-                taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds);
-
-        if (taskInstanceStateCounts != null) {
-            TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
-    }
-
-    private void putErrorRequestParamsMsg(Map<String, Object> result) {
-        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
+        return countStateByProject(
+                loginUser,
+                projectId,
+                startDate,
+                endDate,
+                (start, end, projectIds) -> this.taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds));
     }
 
     /**
@@ -146,7 +116,16 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @return process instance state count data
      */
     public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
+        return this.countStateByProject(
+                loginUser,
+                projectId,
+                startDate,
+                endDate,
+                (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+    }
 
+    private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
+            , TriFunction<Date, Date, Integer[], List<ExecuteStatusCount>> instanceStateCounter) {
         Map<String, Object> result = new HashMap<>(5);
         boolean checkProject = checkProject(loginUser, projectId, result);
         if (!checkProject) {
@@ -165,8 +144,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         }
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<ExecuteStatusCount> processInstanceStateCounts =
-                processInstanceMapper.countInstanceStateByUser(start, end,
-                        projectIdArray);
+                instanceStateCounter.apply(start, end, projectIdArray);
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
@@ -392,5 +370,10 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             return projectService.hasProjectAndPerm(loginUser, project, result);
         }
         return true;
+    }
+
+    private void putErrorRequestParamsMsg(Map<String, Object> result) {
+        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
     }
 }
