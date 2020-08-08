@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,10 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
     @Autowired
     private ProcessService processService;
+
+    private static final String COMMAND_STATE = "commandState";
+
+    private static final String ERROR_COMMAND_STATE = "errorCommandState";
 
     /**
      * statistical task instance status data
@@ -227,12 +232,12 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
                 errorCommandMapper.countCommandState(
                         start, end, projectIdArray);
 
-        //
-        Map<CommandType, Map<String, Integer>> dataMap = new HashMap<>();
+        // enumMap
+        Map<CommandType, Map<String, Integer>> dataMap = new EnumMap<>(CommandType.class);
 
         Map<String, Integer> commonCommand = new HashMap<>();
-        commonCommand.put("commandState", 0);
-        commonCommand.put("errorCommandState", 0);
+        commonCommand.put(COMMAND_STATE, 0);
+        commonCommand.put(ERROR_COMMAND_STATE, 0);
 
 
         // init data map
@@ -255,21 +260,21 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         // put command state
         for (CommandCount executeStatusCount : commandStateCounts) {
             Map<String, Integer> commandStateCountsMap = new HashMap<>(dataMap.get(executeStatusCount.getCommandType()));
-            commandStateCountsMap.put("commandState", executeStatusCount.getCount());
+            commandStateCountsMap.put(COMMAND_STATE, executeStatusCount.getCount());
             dataMap.put(executeStatusCount.getCommandType(), commandStateCountsMap);
         }
 
         // put error command state
         for (CommandCount errorExecutionStatus : errorCommandStateCounts) {
             Map<String, Integer> errorCommandStateCountsMap = new HashMap<>(dataMap.get(errorExecutionStatus.getCommandType()));
-            errorCommandStateCountsMap.put("errorCommandState", errorExecutionStatus.getCount());
+            errorCommandStateCountsMap.put(ERROR_COMMAND_STATE, errorExecutionStatus.getCount());
             dataMap.put(errorExecutionStatus.getCommandType(), errorCommandStateCountsMap);
         }
 
         List<CommandStateCount> list = new ArrayList<>();
         for (Map.Entry<CommandType, Map<String, Integer>> next : dataMap.entrySet()) {
-            CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get("errorCommandState"),
-                    next.getValue().get("commandState"), next.getKey());
+            CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get(ERROR_COMMAND_STATE),
+                    next.getValue().get(COMMAND_STATE), next.getKey());
             list.add(commandStateCount);
         }
 
@@ -284,7 +289,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             projectIds.add(projectId);
         } else if (loginUser.getUserType() == UserType.GENERAL_USER) {
             projectIds = processService.getProjectIdListHavePerm(loginUser.getId());
-            if (projectIds.size() == 0) {
+            if (projectIds.isEmpty()) {
                 projectIds.add(0);
             }
         }
