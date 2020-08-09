@@ -16,9 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.UdfFuncServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,6 +31,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,10 +50,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(PropertyUtils.class)
@@ -56,11 +59,14 @@ public class UdfFuncServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceTest.class);
 
     @InjectMocks
-    private UdfFuncService udfFuncService;
+    private UdfFuncServiceImpl udfFuncService;
+
     @Mock
     private ResourceMapper resourceMapper;
+
     @Mock
     private UdfFuncMapper udfFuncMapper;
+
     @Mock
     private UDFUserMapper udfUserMapper;
 
@@ -71,41 +77,41 @@ public class UdfFuncServiceTest {
     }
 
     @Test
-    public  void testCreateUdfFunction(){
+    public void testCreateUdfFunction() {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         //hdfs not start
         Result result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
         //resource not exist
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, Integer.MAX_VALUE);
         logger.info(result.toString());
-        Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
         PowerMockito.when(resourceMapper.selectById(1)).thenReturn(getResource());
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
-    public  void testQueryUdfFuncDetail(){
+    public void testQueryUdfFuncDetail() {
 
         PowerMockito.when(udfFuncMapper.selectById(1)).thenReturn(getUdfFunc());
         //resource not exist
         Map<String, Object> result = udfFuncService.queryUdfFuncDetail(2);
         logger.info(result.toString());
-        Assert.assertEquals(Status.RESOURCE_NOT_EXIST,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.RESOURCE_NOT_EXIST, result.get(Constants.STATUS));
         // success
         result = udfFuncService.queryUdfFuncDetail(1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
-    public  void testUpdateUdfFunc(){
+    public void testUpdateUdfFunc() {
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         PowerMockito.when(udfFuncMapper.selectUdfById(1)).thenReturn(getUdfFunc());
@@ -114,76 +120,77 @@ public class UdfFuncServiceTest {
         //UDF_FUNCTION_NOT_EXIST
         Map<String, Object> result = udfFuncService.updateUdfFunc(12, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.UDF_FUNCTION_NOT_EXIST,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.UDF_FUNCTION_NOT_EXIST, result.get(Constants.STATUS));
 
         //HDFS_NOT_STARTUP
         result = udfFuncService.updateUdfFunc(1, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.HDFS_NOT_STARTUP,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.HDFS_NOT_STARTUP, result.get(Constants.STATUS));
 
         //RESOURCE_NOT_EXIST
         PowerMockito.when(udfFuncMapper.selectUdfById(11)).thenReturn(getUdfFunc());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         result = udfFuncService.updateUdfFunc(11, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 12);
         logger.info(result.toString());
-        Assert.assertEquals(Status.RESOURCE_NOT_EXIST,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.RESOURCE_NOT_EXIST, result.get(Constants.STATUS));
 
         //success
         result = udfFuncService.updateUdfFunc(11, "UdfFuncServiceTest", "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String", "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
 
     @Test
-    public  void testQueryUdfFuncListPaging(){
+    @SuppressWarnings("unchecked")
+    public void testQueryUdfFuncListPaging() {
 
-        IPage<UdfFunc> page = new Page<>(1,10);
+        IPage<UdfFunc> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getList());
-        Mockito.when(udfFuncMapper.queryUdfFuncPaging(Mockito.any(Page.class), Mockito.eq(0),Mockito.eq("test"))).thenReturn(page);
-        Map<String, Object> result = udfFuncService.queryUdfFuncListPaging(getLoginUser(),"test",1,10);
+        Mockito.when(udfFuncMapper.queryUdfFuncPaging(Mockito.any(Page.class), Mockito.eq(0), Mockito.eq("test"))).thenReturn(page);
+        Map<String, Object> result = udfFuncService.queryUdfFuncListPaging(getLoginUser(), "test", 1, 10);
         logger.info(result.toString());
         PageInfo pageInfo = (PageInfo) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
 
     @Test
-    public  void testQueryResourceList(){
+    @SuppressWarnings("unchecked")
+    public void testQueryResourceList() {
         Mockito.when(udfFuncMapper.getUdfFuncByType(1, 1)).thenReturn(getList());
-        Map<String, Object> result = udfFuncService.queryResourceList(getLoginUser(),1);
+        Map<String, Object> result = udfFuncService.queryResourceList(getLoginUser(), 1);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<UdfFunc> udfFuncList = (List<UdfFunc>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(udfFuncList));
     }
 
     @Test
-    public  void testDelete(){
-        Result result= udfFuncService.delete(122);
+    public void testDelete() {
+        Result result = udfFuncService.delete(122);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
-    public  void testVerifyUdfFuncByName(){
+    public void testVerifyUdfFuncByName() {
 
         //success
         Mockito.when(udfFuncMapper.queryUdfByIdStr(null, "UdfFuncServiceTest")).thenReturn(getList());
         Result result = udfFuncService.verifyUdfFuncByName("test");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         //exist
         result = udfFuncService.verifyUdfFuncByName("UdfFuncServiceTest");
         logger.info(result.toString());
-        Assert.assertEquals(Status.UDF_FUNCTION_EXISTS.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.UDF_FUNCTION_EXISTS.getMsg(), result.getMsg());
     }
 
     /**
      * create admin user
-     * @return
      */
-    private User getLoginUser(){
+    private User getLoginUser() {
 
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -194,7 +201,7 @@ public class UdfFuncServiceTest {
     /**
      * get resourceId
      */
-    private Resource getResource(){
+    private Resource getResource() {
 
         Resource resource = new Resource();
         resource.setId(1);
@@ -203,15 +210,16 @@ public class UdfFuncServiceTest {
     }
 
 
-    private List<UdfFunc> getList(){
+    private List<UdfFunc> getList() {
         List<UdfFunc> udfFuncList = new ArrayList<>();
         udfFuncList.add(getUdfFunc());
-        return  udfFuncList;
+        return udfFuncList;
     }
+
     /**
-     *  get UdfFunc id
+     * get UdfFunc id
      */
-    private UdfFunc getUdfFunc(){
+    private UdfFunc getUdfFunc() {
         UdfFunc udfFunc = new UdfFunc();
         udfFunc.setFuncName("UdfFuncServiceTest");
         udfFunc.setClassName("org.apache.dolphinscheduler.api.service.UdfFuncServiceTest");
