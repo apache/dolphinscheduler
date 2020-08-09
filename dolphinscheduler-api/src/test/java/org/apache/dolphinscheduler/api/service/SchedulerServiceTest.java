@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -26,10 +27,14 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +46,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.quartz.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(QuartzExecutors.class)
@@ -55,10 +54,12 @@ public class SchedulerServiceTest {
 
 
     @InjectMocks
-    private SchedulerService schedulerService;
+    private SchedulerServiceImpl schedulerService;
 
+    @Mock
+    private ProjectService projectService;
 
-    @Autowired
+    @Mock
     private ExecutorService executorService;
 
     @Mock
@@ -72,10 +73,6 @@ public class SchedulerServiceTest {
 
     @Mock
     private ProjectMapper projectMapper;
-    @Mock
-    private ProjectUserMapper projectUserMapper;
-    @Mock
-    private ProjectService projectService;
 
     @Mock
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -107,7 +104,7 @@ public class SchedulerServiceTest {
         String projectName = "test";
         User loginUser = new User();
         loginUser.setId(1);
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result;
         Project project = getProject(projectName);
 
 
@@ -167,22 +164,6 @@ public class SchedulerServiceTest {
         Mockito.when(quartzExecutors.deleteJob(null, null)).thenReturn(true);
         result = schedulerService.setScheduleState(loginUser, projectName, 1, ReleaseState.OFFLINE);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testDeleteSchedule() {
-
-        Mockito.when(quartzExecutors.deleteJob("1", "1")).thenReturn(true);
-        Mockito.when(quartzExecutors.buildJobGroupName(1)).thenReturn("1");
-        Mockito.when(quartzExecutors.buildJobName(1)).thenReturn("1");
-       boolean flag = true;
-        try {
-            schedulerService.deleteSchedule(1, 1);
-        }catch (Exception e){
-            flag = false;
-        }
-        Assert.assertTrue(flag);
 
     }
 

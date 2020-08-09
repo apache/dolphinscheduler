@@ -16,9 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -30,6 +32,14 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,41 +47,32 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import java.text.MessageFormat;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceTest.class);
 
     @InjectMocks
-    private TaskInstanceService taskInstanceService;
+    private TaskInstanceServiceImpl taskInstanceService;
 
     @Mock
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
 
     @Mock
-    ProjectService projectService;
+    private ProjectService projectService;
 
     @Mock
-    ProcessService processService;
+    private ProcessService processService;
 
     @Mock
-    TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceMapper taskInstanceMapper;
 
     @Mock
-    ProcessInstanceService processInstanceService;
+    private ProcessInstanceService processInstanceService;
 
     @Mock
-    UsersService usersService;
+    private UsersService usersService;
 
     @Test
     public void queryTaskListPaging(){
