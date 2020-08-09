@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.MoreSupplierUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
@@ -648,9 +649,8 @@ public class ProcessInstanceServiceImpl extends BaseDAGService implements Proces
      *
      * @param processInstanceId process instance id
      * @return gantt tree data
-     * @throws Exception exception when json parse
      */
-    public Map<String, Object> viewGantt(Integer processInstanceId) throws Exception {
+    public Map<String, Object> viewGantt(Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>();
 
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
@@ -663,7 +663,7 @@ public class ProcessInstanceServiceImpl extends BaseDAGService implements Proces
 
         DAG<String, TaskNode, TaskNodeRelation> dag = processInstance2DAG(processInstance);
         //topological sort
-        List<String> nodeList = dag.topologicalSort();
+        List<String> nodeList = MoreSupplierUtils.throwing(dag::topologicalSort);
 
         ganttDto.setTaskNames(nodeList);
 

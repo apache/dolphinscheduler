@@ -231,7 +231,7 @@ public class QueueServiceImpl extends BaseService implements QueueService {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
-    public Result verifyQueue(String queue, String queueName) {
+    public Result<?> verifyQueue(String queue, String queueName) {
         Result result = new Result();
 
         if (StringUtils.isEmpty(queue)) {

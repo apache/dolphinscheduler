@@ -145,8 +145,7 @@ public interface ProcessInstanceService {
      *
      * @param processInstanceId process instance id
      * @return gantt tree data
-     * @throws Exception exception when json parse
      */
-    Map<String, Object> viewGantt(Integer processInstanceId) throws Exception;
+    Map<String, Object> viewGantt(Integer processInstanceId);
 
 }
