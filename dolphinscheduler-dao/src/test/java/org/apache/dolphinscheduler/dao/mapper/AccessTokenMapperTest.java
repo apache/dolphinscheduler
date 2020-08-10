@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-@Rollback(true)
+@Rollback
 public class AccessTokenMapperTest {
 
     @Autowired
@@ -201,7 +201,11 @@ public class AccessTokenMapperTest {
         user.setUpdateTime(DateUtils.getCurrentDate());
         user.setQueue("default");
 
-        userMapper.insert(user);
+        int status=  userMapper.insert(user);
+
+        if( status < 0 ){
+            Assert.fail("insert data error");
+        }
 
         return user;
     }
@@ -224,8 +228,11 @@ public class AccessTokenMapperTest {
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         accessToken.setExpireTime(DateUtils.getCurrentDate());
 
-        accessTokenMapper.insert(accessToken);
+       int status= accessTokenMapper.insert(accessToken);
 
+       if( status < 0 ){
+           Assert.fail("insert data error");
+       }
         return accessToken;
     }
 

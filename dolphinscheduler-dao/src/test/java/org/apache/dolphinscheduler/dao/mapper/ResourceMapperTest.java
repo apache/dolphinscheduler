@@ -78,7 +78,9 @@ public class ResourceMapperTest {
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
         int status = resourceMapper.insert(resource);
-        Assert.assertTrue(status > 0);
+        if( status < 0 ){
+            Assert.fail("insert data error");
+        }
         return resource;
     }
 
@@ -97,7 +99,9 @@ public class ResourceMapperTest {
         resource.setFullName(fullName);
         resource.setUserId(user.getId());
         int status = resourceMapper.insert(resource);
-        Assert.assertTrue(status > 0);
+        if( status < 0 ){
+            Assert.fail("insert data error");
+        }
         return resource;
     }
 
@@ -391,6 +395,8 @@ public class ResourceMapperTest {
         List<Resource> resourceList = new ArrayList<>();
         resourceList.add(resource);
         int result = resourceMapper.batchUpdateResource(resourceList);
-        Assert.assertTrue(result > 0);
+        if( result < 0 ){
+            Assert.fail("insert data error");
+        }
     }
 }
