@@ -36,7 +36,7 @@ import {
 } from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
 
-const JSP = function () {
+let JSP = function () {
   this.dag = {}
   this.selectedElement = {}
 
@@ -687,8 +687,17 @@ JSP.prototype.saveStore = function () {
 
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
+    console.log(info)
     let sourceId = info['sourceId']// 出
     let targetId = info['targetId']// 入
+    console.log(sourceId,targetId)
+    /**
+    * When connecting, connection is prohibited when the sourceId and target nodes are empty
+    */
+    if(!sourceId && !targetId) {
+      Vue.$message.warning(`${i18n.$t('This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow')}`)
+      return false
+    }
     /**
      * Recursive search for nodes
      */
