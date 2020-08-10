@@ -34,6 +34,7 @@ const saveTargetarr = (valId, domId) => {
   let $target = $(`#${domId}`)
   let targetStr = $target.attr('data-targetarr') ? $target.attr('data-targetarr') + `,${valId}` : `${valId}`;
   $target.attr('data-targetarr', targetStr)
+  console.log(targetStr)
 }
 
 const rtBantpl = () => {
