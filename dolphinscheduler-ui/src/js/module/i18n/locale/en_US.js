@@ -600,5 +600,6 @@ export default {
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
-  'Please save the DAG before formatting': 'Please save the DAG before formatting'
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
+  'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow': 'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow'
 }
