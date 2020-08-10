@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,26 +31,46 @@ import java.util.List;
 public class RoundRobinSelectorTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSelectWithIllegalArgumentException(){
+    public void testSelectWithIllegalArgumentException() {
         RoundRobinSelector selector = new RoundRobinSelector();
         selector.select(Collections.EMPTY_LIST);
     }
 
     @Test
-    public void testSelect1(){
-        RoundRobinSelector<String> selector = new RoundRobinSelector();
-        String result = selector.select(Arrays.asList("1"));
-        Assert.assertTrue(StringUtils.isNotEmpty(result));
-        Assert.assertTrue(result.equalsIgnoreCase("1"));
+    public void testSelect1() {
+        RoundRobinSelector selector = new RoundRobinSelector();
+        Host result = null;
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1", result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2", result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1", result.getIp());
+        // add new host
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1", result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2", result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.3",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris"), new Host("192.168.1.3", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.3",result.getIp());
+        // remove host3
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.2",result.getIp());
+        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, "kris"), new Host("192.168.1.2", 80, 10, "kris")));
+        Assert.assertEquals("192.168.1.1",result.getIp());
+
     }
 
-    @Test
-    public void testSelect(){
-        RoundRobinSelector<Integer> selector = new RoundRobinSelector();
-        List<Integer> sources = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
-        int result = selector.select(sources);
-        Assert.assertTrue(result == 1);
-        int result2 = selector.select(Arrays.asList(1,2,3,4,5,6,7));
-        Assert.assertTrue(result2 == 2);
-    }
 }

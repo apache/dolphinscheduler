@@ -16,7 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,16 +38,16 @@ public class RandomSelectorTest {
 
     @Test
     public void testSelect1(){
-        RandomSelector<String> selector = new RandomSelector();
-        String result = selector.select(Arrays.asList("1"));
-        Assert.assertTrue(StringUtils.isNotEmpty(result));
-        Assert.assertTrue(result.equalsIgnoreCase("1"));
+        RandomSelector selector = new RandomSelector();
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.2",80,20)));
+        Assert.assertNotNull(result);
     }
 
     @Test
     public void testSelect(){
-        RandomSelector<Integer> selector = new RandomSelector();
-        int result = selector.select(Arrays.asList(1,2,3,4,5,6,7));
-        Assert.assertTrue(result >= 1 && result <= 7);
+        RandomSelector selector = new RandomSelector();
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.1",80,20)));
+        Assert.assertNotNull(result);
+
     }
 }
