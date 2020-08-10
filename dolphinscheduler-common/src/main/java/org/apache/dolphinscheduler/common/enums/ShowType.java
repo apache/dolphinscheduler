@@ -23,11 +23,13 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum ShowType {
     /**
+     * -1 NONE;
      * 0 TABLE;
      * 1 TEXT;
      * 2 attachment;
      * 3 TABLE+attachment;
      */
+    NONE(-1, "none"),
     TABLE(0, "table"),
     TEXT(1, "text"),
     ATTACHMENT(2, "attachment"),

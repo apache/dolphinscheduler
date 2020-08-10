@@ -453,7 +453,8 @@ public class SqlTask extends AbstractTask {
             Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
                     receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
             if(!(boolean) mailResult.get(STATUS)){
-                throw new RuntimeException("send mail failed!");
+                // You should not throw an exception when send mail fails.
+                logger.error("send mail failed!");
             }
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
