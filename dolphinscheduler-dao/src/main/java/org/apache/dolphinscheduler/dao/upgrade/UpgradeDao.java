@@ -297,11 +297,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 for (int i = 0 ;i < tasks.size() ; i++){
                     JSONObject task = tasks.getJSONObject(i);
                     Integer workerGroupId = task.getInteger("workerGroupId");
-                    if (workerGroupId == null || workerGroupId == -1) {
-                        task.put("workerGroup", "default");
-                    }else {
-                        task.put("workerGroup", oldWorkerGroupMap.get(workerGroupId));
+                    if (workerGroupId != null) {
+                        if (workerGroupId == -1) {
+                            task.put("workerGroup", "default");
+                        } else {
+                            task.put("workerGroup", oldWorkerGroupMap.get(workerGroupId));
+                        }
                     }
+
                 }
 
                 jsonObject.remove(jsonObject.getString("tasks"));
