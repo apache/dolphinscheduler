@@ -564,7 +564,7 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/udf-func/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UDF_FUNCTION_LIST_PAGING_ERROR)
-    public Result queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryUdfFuncListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("pageNo") Integer pageNo,
                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                    @RequestParam("pageSize") Integer pageSize
@@ -581,23 +581,23 @@ public class ResourcesController extends BaseController {
     }
 
     /**
-     * query resource list by type
+     * query udf func list by type
      *
      * @param loginUser login user
      * @param type      resource type
      * @return resource list
      */
-    @ApiOperation(value = "queryResourceList", notes = "QUERY_RESOURCE_LIST_NOTES")
+    @ApiOperation(value = "queryUdfFuncList", notes = "QUERY_UDF_FUNC_LIST_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataType = "UdfType")
     })
     @GetMapping(value = "/udf-func/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
-    public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
-        logger.info("query datasource list, user:{}, type:{}", loginUser.getUserName(), type);
-        Map<String, Object> result = udfFuncService.queryResourceList(loginUser, type.ordinal());
+        logger.info("query udf func list, user:{}, type:{}", loginUser.getUserName(), type);
+        Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }
 

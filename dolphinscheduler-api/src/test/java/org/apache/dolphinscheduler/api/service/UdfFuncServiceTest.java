@@ -151,7 +151,7 @@ public class UdfFuncServiceTest {
     @Test
     public  void testQueryResourceList(){
         Mockito.when(udfFuncMapper.getUdfFuncByType(1, 1)).thenReturn(getList());
-        Map<String, Object> result = udfFuncService.queryResourceList(getLoginUser(),1);
+        Map<String, Object> result = udfFuncService.queryUdfFuncList(getLoginUser(),1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         List<UdfFunc> udfFuncList = (List<UdfFunc>) result.get(Constants.DATA_LIST);
