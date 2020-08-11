@@ -691,6 +691,9 @@ JSP.prototype.handleEvent = function () {
     let sourceId = info['sourceId']// 出
     let targetId = info['targetId']// 入
     console.log(sourceId,targetId)
+    let rtTargetarr = rtTargetarrArr(targetId)
+    let rtSoucearr = rtTargetarrArr(sourceId)
+    console.log(rtTargetarr,rtSoucearr)
     /**
     * When connecting, connection is prohibited when the sourceId and target nodes are empty
     */
@@ -703,30 +706,32 @@ JSP.prototype.handleEvent = function () {
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (let i in arr) {
-        if (arr[i] === targetId) {
-          recursiveVal = targetId
-        } else {
-          recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
+        for (let i in arr) {
+          if (arr[i] === targetId) {
+            recursiveVal = targetId
+          } else {
+            recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
+          }
         }
-      }
       return recursiveVal
     }
-
+    
     // Connection to connected nodes is not allowed
-    if (_.findIndex(rtTargetarrArr(targetId), v => v === sourceId) !== -1) {
+    if (_.findIndex(rtTargetarr, v => v == sourceId) !== -1) {
+      console.log(rtTargetarr,'not allowed')
       return false
     }
-
+    
     // Recursive form to find if the target Targetarr has a sourceId
-    if (recursiveTargetarr(rtTargetarrArr(sourceId), targetId)) {
+    if (recursiveTargetarr(rtSoucearr, targetId)) {
+      console.log('has a sourceId')
       return false
     }
-
-    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber') === 2) {
+    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && parseInt($(`#${sourceId}`).attr('data-nodenumber')) === 2) {
       return false
     } else {
-      $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) + 1)
+      console.log('data-nodenumber')
+      $(`#${sourceId}`).attr('data-nodenumber', parseInt($(`#${sourceId}`).attr('data-nodenumber')) + 1)
     }
 
     // Storage node dependency information
