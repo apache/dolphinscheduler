@@ -718,7 +718,7 @@ JSP.prototype.handleEvent = function () {
     }
     
     // Connection to connected nodes is not allowed
-    if (_.findIndex(rtTargetarr, v => v == sourceId) !== -1) {
+    if (_.findIndex(rtTargetarr, v => v === sourceId) !== -1) {
       console.log(rtTargetarr,'not allowed')
       return false
     }
