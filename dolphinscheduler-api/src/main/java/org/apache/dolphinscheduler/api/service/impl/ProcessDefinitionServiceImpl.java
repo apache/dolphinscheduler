@@ -1536,17 +1536,17 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         Map<String, Object> result = new HashMap<>();
         List<String> failedProcessList = new ArrayList<>();
 
-        if (StringUtils.isEmpty(processDefinitionIds)) {
-            putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, processDefinitionIds);
-            return result;
-        }
-
         //check src project auth
         Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
         if (checkResult != null) {
             return checkResult;
         }
 
+        if (StringUtils.isEmpty(processDefinitionIds)) {
+            putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, processDefinitionIds);
+            return result;
+        }
+        
         Project targetProject = projectMapper.queryDetailById(targetProjectId);
         if(targetProject == null){
             putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);

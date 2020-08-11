@@ -116,10 +116,10 @@ public class ProcessDefinitionController extends BaseController {
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
         logger.info("batch copy process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-                loginUser.getUserName(),
-                projectName,
-                processDefinitionIds,
-                String.valueOf(targetProjectId));
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(projectName),
+                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
 
         return returnDataList(
                 processDefinitionService.batchCopyProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
@@ -147,10 +147,10 @@ public class ProcessDefinitionController extends BaseController {
                                         @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
                                         @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
         logger.info("batch move process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-                loginUser.getUserName(),
-                projectName,
-                processDefinitionIds,
-                String.valueOf(targetProjectId));
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(projectName),
+                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
 
         return returnDataList(
                 processDefinitionService.batchMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
