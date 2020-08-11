@@ -134,11 +134,12 @@ public class TaskResponseService {
                         taskResponseEvent.getTaskInstanceId());
                 break;
             case RESULT:
-                processService.changeTaskState(taskResponseEvent.getState(),
+            	processService.changeTaskState(taskResponseEvent.getState(),
                         taskResponseEvent.getEndTime(),
                         taskResponseEvent.getProcessId(),
                         taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getTaskInstanceId());
+                        taskResponseEvent.getTaskInstanceId(),
+                        taskResponseEvent.getVarPool());
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);

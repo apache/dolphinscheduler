@@ -1398,19 +1398,22 @@ public class ProcessService {
      * @param state state
      * @param endTime endTime
      * @param taskInstId taskInstId
+     * @param varPool varPool
      */
     public void changeTaskState(ExecutionStatus state,
-                                Date endTime,
-                                int processId,
-                                String appIds,
-                                int taskInstId) {
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
-        taskInstance.setPid(processId);
-        taskInstance.setAppLink(appIds);
-        taskInstance.setState(state);
-        taskInstance.setEndTime(endTime);
-        saveTaskInstance(taskInstance);
-    }
+					            Date endTime,
+					            int processId,
+					            String appIds,
+					            int taskInstId,
+					            String varPool) {
+		TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
+		taskInstance.setPid(processId);
+		taskInstance.setAppLink(appIds);
+		taskInstance.setState(state);
+		taskInstance.setEndTime(endTime);
+		taskInstance.setVarPool(varPool);
+		saveTaskInstance(taskInstance);
+	}
 
     /**
      * convert integer list to string list

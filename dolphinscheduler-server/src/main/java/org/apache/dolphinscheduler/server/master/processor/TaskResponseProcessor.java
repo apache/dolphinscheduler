@@ -85,12 +85,13 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
 
         ExecutionStatus responseStatus = ExecutionStatus.of(responseCommand.getStatus());
 
-        // TaskResponseEvent
+     // TaskResponseEvent
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
-                responseCommand.getTaskInstanceId());
+                responseCommand.getTaskInstanceId(),
+                responseCommand.getVarPool());
 
         taskResponseService.addResponse(taskResponseEvent);
 
