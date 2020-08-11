@@ -53,7 +53,7 @@ public class AlertGroupService extends BaseService{
      *
      * @return alert group list
      */
-    public HashMap<String, Object> queryAlertGroup() {
+    public HashMap<String, Object> queryAlertgroup() {
 
         HashMap<String, Object> result = new HashMap<>();
         List<AlertGroup> alertGroups = alertGroupMapper.queryAllGroupList();

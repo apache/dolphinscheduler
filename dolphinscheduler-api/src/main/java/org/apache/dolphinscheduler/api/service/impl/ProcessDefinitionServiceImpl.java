@@ -148,7 +148,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return create result code
      * @throws JsonProcessingException JsonProcessingException
      */
-    @Override
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        String projectName,
                                                        String name,
@@ -243,7 +242,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param projectName project name
      * @return definition list
      */
-    @Override
     public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
         HashMap<String, Object> result = new HashMap<>(5);
@@ -274,7 +272,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param userId      user id
      * @return process definition page
      */
-    @Override
     public Map<String, Object> queryProcessDefinitionListPaging(User loginUser, String projectName, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -307,7 +304,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param processId   process definition id
      * @return process definition detail
      */
-    @Override
     public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
 
 
@@ -343,7 +339,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param connects              connects for nodes
      * @return update result code
      */
-    @Override
     public Map<String, Object> updateProcessDefinition(User loginUser, String projectName, int id, String name,
                                                        String processDefinitionJson, String desc,
                                                        String locations, String connects) {
@@ -415,7 +410,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param name        name
      * @return true if process definition name not exists, otherwise false
      */
-    @Override
     public Map<String, Object> verifyProcessDefinitionName(User loginUser, String projectName, String name) {
 
         Map<String, Object> result = new HashMap<>();
@@ -444,7 +438,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return delete result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    @Override
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -511,7 +504,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return release result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    @Override
     public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, int releaseState) {
         HashMap<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -583,7 +575,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param processDefinitionIds
      * @param response
      */
-    @Override
     public void batchExportProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds, HttpServletResponse response) {
 
         if (StringUtils.isEmpty(processDefinitionIds)) {
@@ -760,7 +751,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return import process
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    @Override
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
@@ -1119,7 +1109,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param processDefinitionJson process definition json
      * @return check result code
      */
-    @Override
     public Map<String, Object> checkProcessNodeList(ProcessData processData, String processDefinitionJson) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -1171,7 +1160,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param defineId define id
      * @return task node list
      */
-    @Override
     public Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -1209,7 +1197,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param defineIdList define id list
      * @return task node list
      */
-    @Override
     public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) {
         Map<String, Object> result = new HashMap<>();
 
@@ -1248,7 +1235,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param projectId project id
      * @return process definitions in the project
      */
-    @Override
     public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
         HashMap<String, Object> result = new HashMap<>(5);
