@@ -58,6 +58,7 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> queryProcessDefinitionList(User loginUser,
                                                    String projectName);
+
     /**
      * query process definition list paging
      *
@@ -194,7 +195,6 @@ public interface ProcessDefinitionService {
      * @param currentProjectName current project name
      * @return import process
      */
-
     Map<String, Object> importProcessDefinition(User loginUser,
                                                 MultipartFile file,
                                                 String currentProjectName);
