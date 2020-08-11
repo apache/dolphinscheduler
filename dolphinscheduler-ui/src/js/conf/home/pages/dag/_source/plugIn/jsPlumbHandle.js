@@ -710,7 +710,8 @@ JSP.prototype.handleEvent = function () {
           if (arr[i] === targetId) {
             recursiveVal = targetId
           } else {
-            recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
+            let targetArr = rtTargetarrArr(arr[i])
+            recursiveTargetarr(targetArr, targetId)
           }
         }
       return recursiveVal
