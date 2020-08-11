@@ -95,39 +95,65 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * copy or move process definition
+     * copy  process definition
      *
      * @param loginUser   login user
      * @param projectName project name
-     * @param isCopy  isCopy
      * @param processDefinitionIds   process definition ids
      * @param targetProjectId target project id
      * @return copy result code
      */
-    @ApiOperation(value = "copyOrMoveProcessDefinition", notes= "COPY_OR_MOVE_PROCESS_DEFINITION_NOTES")
+    @ApiOperation(value = "copyProcessDefinition", notes= "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer"),
-            @ApiImplicitParam(name = "isCopy", value = "IS_COPY", required = true, type = "boolean")
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
     })
-    @PostMapping(value = "/copy-or-move")
+    @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COPY_OR_MOVE_PROCESS_DEFINITION_ERROR)
-    public Result copyOrMoveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                              @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
-                                              @RequestParam(value = "targetProjectId",required = true) int targetProjectId,
-                                              @RequestParam(value = "isCopy", required = true) boolean isCopy)  {
+    @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
+    public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
+                                        @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
+        logger.info("batch copy process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
+                loginUser.getUserName(),
+                projectName,
+                processDefinitionIds,
+               String.valueOf(targetProjectId));
 
+        return returnDataList(
+                processDefinitionService.batchCopyProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
+    }
 
-        logger.info("batch {} process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
-                isCopy?"copy":"move",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(projectName),
-                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
-                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
+    /**
+     * move process definition
+     *
+     * @param loginUser   login user
+     * @param projectName project name
+     * @param processDefinitionIds   process definition ids
+     * @param targetProjectId target project id
+     * @return move result code
+     */
+    @ApiOperation(value = "moveProcessDefinition", notes= "MOVE_PROCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
+    })
+    @PostMapping(value = "/move")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(BATCH_MOVE_PROCESS_DEFINITION_ERROR)
+    public Result moveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
+                                        @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
+        logger.info("batch move process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
+                loginUser.getUserName(),
+                projectName,
+                processDefinitionIds,
+                String.valueOf(targetProjectId));
 
-        return returnDataList(processDefinitionService.batchCopyOrMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId,isCopy));
+        return returnDataList(
+                processDefinitionService.batchMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
     }
 
     /**

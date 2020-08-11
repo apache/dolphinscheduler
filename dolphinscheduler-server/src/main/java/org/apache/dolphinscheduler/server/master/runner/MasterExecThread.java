@@ -1026,6 +1026,7 @@ public class MasterExecThread implements Runnable {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(),e);
+                Thread.currentThread().interrupt();
             }
             updateProcessInstanceState();
         }

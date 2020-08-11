@@ -179,9 +179,9 @@ public enum Status {
     MOVE_PROCESS_DEFINITION_ERROR(10150,"move process definition from {0} to {1} error : {2}", "从{0}移动工作流到{1}错误 : {2}"),
     QUERY_USER_CREATED_PROJECT_ERROR(10151,"query user created project error error", "查询用户创建的项目错误"),
     PROCESS_DEFINITION_IDS_IS_EMPTY(10152,"process definition ids is empty", "工作流IDS不能为空"),
-    COPY_OR_MOVE_PROCESS_DEFINITION_ERROR(10153,"copy or move process definition error", "复制或者移动工作流错误"),
-
-    QUERY_WORKFLOW_LINEAGE_ERROR(10154,"query workflow lineage error", "查询血缘失败"),
+    BATCH_COPY_PROCESS_DEFINITION_ERROR(10153,"batch copy process definition error", "复制工作流错误"),
+    BATCH_MOVE_PROCESS_DEFINITION_ERROR(10154,"batch move process definition error", "移动工作流错误"),
+    QUERY_WORKFLOW_LINEAGE_ERROR(10155,"query workflow lineage error", "查询血缘失败"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

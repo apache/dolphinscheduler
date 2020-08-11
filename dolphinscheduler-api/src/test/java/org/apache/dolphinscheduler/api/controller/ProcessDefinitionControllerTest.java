@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -37,7 +38,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class ProcessDefinitionControllerTest {
     private ProcessDefinitionController processDefinitionController;
 
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private ProcessDefinitionServiceImpl processDefinitionService;
 
     protected User user;
 
@@ -190,8 +190,8 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.batchCopyOrMoveProcessDefinition(user,projectName,id,targetProjectId,true)).thenReturn(result);
-        Result response = processDefinitionController.copyOrMoveProcessDefinition(user, projectName,id,targetProjectId,true);
+        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user,projectName,id,targetProjectId)).thenReturn(result);
+        Result response = processDefinitionController.copyProcessDefinition(user, projectName,id,targetProjectId);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
@@ -206,8 +206,8 @@ public class ProcessDefinitionControllerTest {
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.batchCopyOrMoveProcessDefinition(user,projectName,id,targetProjectId,false)).thenReturn(result);
-        Result response = processDefinitionController.copyOrMoveProcessDefinition(user, projectName,id,targetProjectId,false);
+        Mockito.when(processDefinitionService.batchMoveProcessDefinition(user,projectName,id,targetProjectId)).thenReturn(result);
+        Result response = processDefinitionController.moveProcessDefinition(user, projectName,id,targetProjectId);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
@@ -361,9 +361,7 @@ public class ProcessDefinitionControllerTest {
         String processDefinitionIds = "1,2";
         String projectName = "test";
         HttpServletResponse response = new MockHttpServletResponse();
-        ProcessDefinitionService service = new ProcessDefinitionService();
-        ProcessDefinitionService spy = Mockito.spy(service);
-        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
+        Mockito.doNothing().when(this.processDefinitionService).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
         processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
     }
 

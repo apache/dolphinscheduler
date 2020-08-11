@@ -238,6 +238,10 @@ This environment variable sets max cpu load avg for `worker-server`. The default
 
 This environment variable sets reserved memory for `worker-server`. The default value is `0.1`.
 
+**`WORKER_WEIGHT`**
+
+This environment variable sets port for `worker-server`. The default value is `100`.
+
 **`WORKER_LISTEN_PORT`**
 
 This environment variable sets port for `worker-server`. The default value is `1234`.
