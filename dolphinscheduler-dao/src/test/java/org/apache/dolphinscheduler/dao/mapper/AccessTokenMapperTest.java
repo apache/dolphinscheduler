@@ -101,7 +101,7 @@ public class AccessTokenMapperTest {
         Integer userId = 1;
         AccessToken accessToken = createAccessToken(userId);
         int result = accessToken.hashCode();
-        assertTrue(result > 0 );
+        assertNotNull(result);
     }
 
     /**
