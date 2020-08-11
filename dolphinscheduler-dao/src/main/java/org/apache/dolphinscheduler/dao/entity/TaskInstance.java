@@ -208,6 +208,11 @@ public class TaskInstance implements Serializable {
     private int executorId;
 
     /**
+     * varPool string
+     */
+    private String varPool;
+    
+    /**
      * executor name
      */
     @TableField(exist = false)
@@ -225,7 +230,14 @@ public class TaskInstance implements Serializable {
         this.executePath = executePath;
     }
 
-
+    public String getVarPool() {
+    	return varPool;
+    }
+    
+    public void setVarPool(String varPool) {
+    	this.varPool = varPool;
+    }
+    
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }

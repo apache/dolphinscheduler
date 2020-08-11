@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -626,14 +627,22 @@ public class MasterExecThread implements Runnable {
      * submit post node
      * @param parentNodeName parent node name
      */
+    private Map<String,Object> propToValue = new HashMap<String, Object>();
     private void submitPostNode(String parentNodeName){
 
         List<String> submitTaskNodeList = parsePostNodeList(parentNodeName);
 
         List<TaskInstance> taskInstances = new ArrayList<>();
         for(String taskNode : submitTaskNodeList){
+        	try {
+        		VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
+        	} catch (ParseException e) {
+                logger.error("parse {} exception", processInstance.getVarPool(), e);
+            }
+        	TaskNode taskNodeObject = dag.getNode(taskNode);
+        	VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
             taskInstances.add(createTaskInstance(processInstance, taskNode,
-                    dag.getNode(taskNode)));
+            		taskNodeObject));
         }
 
         // if previous node success , post node submit
@@ -973,6 +982,8 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if(task.getState() == ExecutionStatus.SUCCESS){
+                	processInstance.setVarPool(task.getVarPool());
+                    processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());
                     continue;
