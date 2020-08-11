@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -218,12 +219,11 @@ public class AccessTokenMapperTest {
      * @throws Exception
      */
     private AccessToken createAccessToken(Integer userId,String userName)throws Exception{
-        Random random = new Random();
         //insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserName(userName);
         accessToken.setUserId(userId);
-        accessToken.setToken(String.valueOf(random.nextLong()));
+        accessToken.setToken(String.valueOf(ThreadLocalRandom.current().nextLong()));
         accessToken.setCreateTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         accessToken.setExpireTime(DateUtils.getCurrentDate());
