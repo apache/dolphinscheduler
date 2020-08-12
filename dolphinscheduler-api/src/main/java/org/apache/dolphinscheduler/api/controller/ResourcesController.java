@@ -597,6 +597,7 @@ public class ResourcesController extends BaseController {
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
         String userName = loginUser.getUserName();
+        userName = userName.replaceAll("[\n|\r|\t]", "_");
         logger.info("query udf func list, user:{}, type:{}", userName, type);
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
