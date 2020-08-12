@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,33 +26,54 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.datasource.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.ClickHouseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DB2ServerDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
+import org.apache.dolphinscheduler.dao.datasource.HiveDataSource;
+import org.apache.dolphinscheduler.dao.datasource.MySQLDataSource;
+import org.apache.dolphinscheduler.dao.datasource.OracleDataSource;
+import org.apache.dolphinscheduler.dao.datasource.PostgreDataSource;
+import org.apache.dolphinscheduler.dao.datasource.SQLServerDataSource;
+import org.apache.dolphinscheduler.dao.datasource.SparkDataSource;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * datasource service
+ * datasource service.
  */
 @Service
-public class DataSourceService extends BaseService{
+public class DataSourceService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceService.class);
 
@@ -77,7 +97,7 @@ public class DataSourceService extends BaseService{
     private DataSourceUserMapper datasourceUserMapper;
 
     /**
-     * create data source
+     * create data source.
      *
      * @param loginUser login user
      * @param name data source name
@@ -126,9 +146,8 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
-
     /**
-     * updateProcessInstance datasource
+     * updateProcessInstance datasource.
      *
      * @param loginUser login user
      * @param name data source name
@@ -148,13 +167,13 @@ public class DataSourceService extends BaseService{
             return result;
         }
 
-        if(!hasPerm(loginUser, dataSource.getUserId())){
+        if (!hasPerm(loginUser, dataSource.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         //check name can use or not
-        if(!name.trim().equals(dataSource.getName()) && checkName(name)){
+        if (!name.trim().equals(dataSource.getName()) && checkName(name)) {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
@@ -196,9 +215,8 @@ public class DataSourceService extends BaseService{
         return false;
     }
 
-
     /**
-     * updateProcessInstance datasource
+     * updateProcessInstance datasource.
      * @param id datasource id
      * @return data source detail
      */
@@ -222,9 +240,9 @@ public class DataSourceService extends BaseService{
         BaseDataSource datasourceForm = DataSourceFactory.getDatasource(dataSource.getType(), parameter);
         DbConnectType  connectType = null;
         String hostSeperator = Constants.DOUBLE_SLASH;
-        if(DbType.ORACLE.equals(dataSource.getType())){
+        if (DbType.ORACLE.equals(dataSource.getType())) {
             connectType = ((OracleDataSource) datasourceForm).getConnectType();
-            if(DbConnectType.ORACLE_SID.equals(connectType)){
+            if (DbConnectType.ORACLE_SID.equals(connectType)) {
                 hostSeperator = Constants.AT_SIGN;
             }
         }
@@ -284,9 +302,8 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
-
     /**
-     * query datasource list by keyword
+     * query datasource list by keyword.
      *
      * @param loginUser login user
      * @param searchVal search value
@@ -301,7 +318,7 @@ public class DataSourceService extends BaseService{
 
         if (isAdmin(loginUser)) {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
-        }else{
+        } else {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
         }
 
@@ -317,7 +334,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * handle datasource connection password for safety
+     * handle datasource connection password for safety.
      * @param dataSourceList
      */
     private void handlePasswd(List<DataSource> dataSourceList) {
@@ -333,7 +350,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * query data resource list
+     * query data resource list.
      *
      * @param loginUser login user
      * @param type data source type
@@ -346,7 +363,7 @@ public class DataSourceService extends BaseService{
 
         if (isAdmin(loginUser)) {
             datasourceList = dataSourceMapper.listAllDataSourceByType(type);
-        }else{
+        } else {
             datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
         }
 
@@ -357,7 +374,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * verify datasource exists
+     * verify datasource exists.
      *
      * @param loginUser login user
      * @param name datasource name
@@ -377,7 +394,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * get connection
+     * get connection.
      *
      * @param dbType datasource type
      * @param parameter parameter
@@ -399,17 +416,17 @@ public class DataSourceService extends BaseService{
                 case HIVE:
                 case SPARK:
                     if (CommonUtils.getKerberosStartupState())  {
-                            System.setProperty(org.apache.dolphinscheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
+                        System.setProperty(org.apache.dolphinscheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
                                     getString(org.apache.dolphinscheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
-                            Configuration configuration = new Configuration();
-                            configuration.set(org.apache.dolphinscheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
-                            UserGroupInformation.setConfiguration(configuration);
-                            UserGroupInformation.loginUserFromKeytab(getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                        Configuration configuration = new Configuration();
+                        configuration.set(org.apache.dolphinscheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                        UserGroupInformation.setConfiguration(configuration);
+                        UserGroupInformation.loginUserFromKeytab(getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
                                     getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
                     }
-                    if (dbType == DbType.HIVE){
+                    if (dbType == DbType.HIVE) {
                         datasource = JSONUtils.parseObject(parameter, HiveDataSource.class);
-                    }else if (dbType == DbType.SPARK){
+                    } else if (dbType == DbType.SPARK) {
                         datasource = JSONUtils.parseObject(parameter, SparkDataSource.class);
                     }
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
@@ -434,7 +451,7 @@ public class DataSourceService extends BaseService{
                     break;
             }
 
-            if(datasource != null){
+            if (datasource != null) {
                 connection = DriverManager.getConnection(datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
             }
         } catch (Exception e) {
@@ -443,9 +460,8 @@ public class DataSourceService extends BaseService{
         return connection;
     }
 
-
     /**
-     * check connection
+     * check connection.
      *
      * @param type data source type
      * @param parameter data source parameters
@@ -465,9 +481,8 @@ public class DataSourceService extends BaseService{
         return isConnection;
     }
 
-
     /**
-     * test connection
+     * test connection.
      *
      * @param loginUser login user
      * @param id datasource id
@@ -479,7 +494,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * build paramters
+     * build paramters.
      *
      * @param name data source name
      * @param desc data source description
@@ -504,8 +519,8 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
 
-        if (CommonUtils.getKerberosStartupState() &&
-                (type == DbType.HIVE || type == DbType.SPARK)){
+        if (CommonUtils.getKerberosStartupState()
+                && (type == DbType.HIVE || type == DbType.SPARK)) {
             jdbcUrl += ";principal=" + principal;
         }
 
@@ -528,30 +543,27 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
-        if (CommonUtils.getKerberosStartupState() &&
-                (type == DbType.HIVE || type == DbType.SPARK)){
+        if (CommonUtils.getKerberosStartupState()
+                && (type == DbType.HIVE || type == DbType.SPARK)) {
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
-        if (other != null && !"".equals(other)) {
-            Map<String, String> map = JSONUtils.toMap(other);
-            if (map.size() > 0) {
-                StringBuilder otherSb = new StringBuilder();
-                for (Map.Entry<String, String> entry: map.entrySet()) {
-                    otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
-                }
-                if (!Constants.DB2.equals(type.name())) {
-                    otherSb.deleteCharAt(otherSb.length() - 1);
-                }
-                parameterMap.put(Constants.OTHER, otherSb);
-            }
 
+        Map<String, String> map = JSONUtils.toMap(other);
+        if (map != null) {
+            StringBuilder otherSb = new StringBuilder();
+            for (Map.Entry<String, String> entry: map.entrySet()) {
+                otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
+            }
+            if (!Constants.DB2.equals(type.name())) {
+                otherSb.deleteCharAt(otherSb.length() - 1);
+            }
+            parameterMap.put(Constants.OTHER, otherSb);
         }
 
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
         }
         return JSONUtils.toJsonString(parameterMap);
-
 
     }
 
@@ -585,7 +597,7 @@ public class DataSourceService extends BaseService{
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
             sb.append(host).append(":").append(port);
-        }else if (Constants.DB2.equals(type.name())) {
+        } else if (Constants.DB2.equals(type.name())) {
             sb.append(Constants.JDBC_DB2);
             sb.append(host).append(":").append(port);
         }
@@ -594,7 +606,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * delete datasource
+     * delete datasource.
      *
      * @param loginUser login user
      * @param datasourceId data source id
@@ -606,12 +618,12 @@ public class DataSourceService extends BaseService{
         try {
             //query datasource by id
             DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-            if(dataSource == null){
+            if (dataSource == null) {
                 logger.error("resource id {} not exist", datasourceId);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if(!hasPerm(loginUser, dataSource.getUserId())){
+            if (!hasPerm(loginUser, dataSource.getUserId())) {
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
@@ -626,7 +638,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * unauthorized datasource
+     * unauthorized datasource.
      *
      * @param loginUser login user
      * @param userId user id
@@ -665,9 +677,8 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
-
     /**
-     * authorized datasource
+     * authorized datasource.
      *
      * @param loginUser login user
      * @param userId user id
@@ -687,9 +698,8 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
-
     /**
-     * get host and port by address
+     * get host and port by address.
      *
      * @param address   address
      * @return sting array: [host,port]
@@ -699,7 +709,7 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * get host and port by address
+     * get host and port by address.
      *
      * @param address   address
      * @param separator separator
