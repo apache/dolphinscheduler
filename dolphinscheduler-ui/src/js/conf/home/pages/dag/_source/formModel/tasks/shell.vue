@@ -20,11 +20,7 @@
       <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
         <div class="from-mirror">
-          <textarea
-            id="code-shell-mirror"
-            name="code-shell-mirror"
-            style="opacity: 0">
-          </textarea>
+          <textarea id="code-shell-mirror" name="code-shell-mirror" style="opacity: 0"></textarea>
           <a class="ans-modal-box-max">
             <em class="ans-icon-max" @click="setEditorVal"></em>
           </a>
@@ -365,9 +361,11 @@
     },
     mounted () {
       // Added delay loading in script input box
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 350)
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this._handlerEditor()
+        }, 350)
+      })
     },
     destroyed () {
       if (editor) {
