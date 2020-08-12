@@ -243,7 +243,7 @@ public class AccessTokenMapperTest {
 
         int status = accessTokenMapper.insert(accessToken);
 
-        if (status < 0) {
+        if (status != 1) {
             Assert.fail("insert data error");
         }
         return accessToken;
