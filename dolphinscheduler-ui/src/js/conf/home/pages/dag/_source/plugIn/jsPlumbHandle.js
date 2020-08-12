@@ -688,12 +688,15 @@ JSP.prototype.saveStore = function () {
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
     console.log(info)
+    const rtTargetArr = (id) => {
+      let ids = $(`#${id}`).attr('data-targetarr')
+      return ids ? ids.split(',') : []
+    }
     let sourceId = info['sourceId']// 出
     let targetId = info['targetId']// 入
     console.log(sourceId,targetId)
-    let rtTargetarr = rtTargetarrArr(targetId)
-    let rtSoucearr = rtTargetarrArr(sourceId)
-    console.log(rtTargetarr,rtSoucearr)
+    let rtTargetArrs = rtTargetArr(targetId)
+    let rtSouceArrs = rtTargetArr(sourceId)
     /**
     * When connecting, connection is prohibited when the sourceId and target nodes are empty
     */
@@ -710,7 +713,7 @@ JSP.prototype.handleEvent = function () {
           if (arr[i] === targetId) {
             recursiveVal = targetId
           } else {
-            let targetArr = rtTargetarrArr(arr[i])
+            let targetArr = rtTargetArr(arr[i])
             recursiveTargetarr(targetArr, targetId)
           }
         }
@@ -718,13 +721,13 @@ JSP.prototype.handleEvent = function () {
     }
     
     // Connection to connected nodes is not allowed
-    if (_.findIndex(rtTargetarr, v => v === sourceId) !== -1) {
-      console.log(rtTargetarr,'not allowed')
+    if (_.findIndex(rtTargetArrs, v => v === sourceId) !== -1) {
+      console.log(rtTargetArrs,'not allowed')
       return false
     }
     
     // Recursive form to find if the target Targetarr has a sourceId
-    if (recursiveTargetarr(rtSoucearr, targetId)) {
+    if (recursiveTargetarr(rtSouceArrs, targetId)) {
       console.log('has a sourceId')
       return false
     }
