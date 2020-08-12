@@ -228,11 +228,11 @@ public class AccessTokenMapperTest {
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         accessToken.setExpireTime(DateUtils.getCurrentDate());
 
-       int status= accessTokenMapper.insert(accessToken);
+        int status = accessTokenMapper.insert(accessToken);
 
-       if( status < 0 ){
-           Assert.fail("insert data error");
-       }
+        if (status < 0) {
+            Assert.fail("insert data error");
+        }
         return accessToken;
     }
 
