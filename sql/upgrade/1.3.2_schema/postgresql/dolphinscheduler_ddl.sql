@@ -13,33 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.process;
-
-/**
- * resource info
- */
-public class ResourceInfo {
-  /**
-   * res the name of the resource that was uploaded
-   */
-  private int id;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  private String res;
-
-  public String getRes() {
-    return res;
-  }
-
-  public void setRes(String res) {
-    this.res = res;
-  }
-}
+*/

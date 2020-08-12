@@ -34,7 +34,7 @@ export default {
   'View log': '查看日志',
   'Enter this child node': '进入该子节点',
   'Node name': '节点名称',
-  'Please enter name(required)': '请输入名称(必填)',
+  'Please enter name (required)': '请输入名称(必填)',
   'Run flag': '运行标志',
   Normal: '正常',
   'Prohibition execution': '禁止执行',
@@ -333,6 +333,7 @@ export default {
   'Drag the file into the current upload window': '请将文件拖拽到当前上传窗口内！',
   'Drag area upload': '拖动区域上传',
   Upload: '上传',
+  'ReUpload File': '重新上传文件',
   'Please enter file name': '请输入文件名',
   'Please select the file to upload': '请选择要上传的文件',
   'Resources manage': '资源中心',
@@ -605,5 +606,6 @@ export default {
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
   'Current connection settings': '当前连线设置',
-  'Please save the DAG before formatting': '格式化前请先保存DAG'
+  'Please save the DAG before formatting': '格式化前请先保存DAG',
+  'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow': '此画布异常，无法进行节点连线，请保存或退出当前工作流'
 }

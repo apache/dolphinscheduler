@@ -36,7 +36,7 @@ import {
 } from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
 
-const JSP = function () {
+let JSP = function () {
   this.dag = {}
   this.selectedElement = {}
 
@@ -478,9 +478,9 @@ JSP.prototype.handleEventRemove = function () {
 JSP.prototype.removeNodes = function ($id) {
   // Delete node processing(data-targetarr)
   _.map(tasksAll(), v => {
-    const targetarr = v.targetarr.split(',')
+    let targetarr = v.targetarr.split(',')
     if (targetarr.length) {
-      const newArr = _.filter(targetarr, v1 => v1 !== $id)
+      let newArr = _.filter(targetarr, v1 => v1 !== $id)
       $(`#${v.id}`).attr('data-targetarr', newArr.toString())
     }
   })
@@ -496,8 +496,7 @@ JSP.prototype.removeNodes = function ($id) {
   _.map(this.JspInstance.getConnections(), v => {
     connects.push({
       endPointSourceId: v.sourceId,
-      endPointTargetId: v.targetId,
-      label: v._jsPlumb.overlays.label.canvas.innerText
+      endPointTargetId: v.targetId
     })
   })
   // Storage line dependence
@@ -512,8 +511,8 @@ JSP.prototype.removeConnect = function ($connect) {
     return
   }
   // Remove connections and remove node and node dependencies
-  const targetId = $connect.targetId
-  const sourceId = $connect.sourceId
+  let targetId = $connect.targetId
+  let sourceId = $connect.sourceId
   let targetarr = rtTargetarrArr(targetId)
   if (targetarr.length) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
@@ -688,37 +687,55 @@ JSP.prototype.saveStore = function () {
 
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
-    const sourceId = info.sourceId// 出
-    const targetId = info.targetId// 入
+    console.log(info)
+    const rtTargetArr = (id) => {
+      let ids = $(`#${id}`).attr('data-targetarr')
+      return ids ? ids.split(',') : []
+    }
+    let sourceId = info['sourceId']// 出
+    let targetId = info['targetId']// 入
+    console.log(sourceId,targetId)
+    let rtTargetArrs = rtTargetArr(targetId)
+    let rtSouceArrs = rtTargetArr(sourceId)
+    /**
+    * When connecting, connection is prohibited when the sourceId and target nodes are empty
+    */
+    if(!sourceId && !targetId) {
+      Vue.$message.warning(`${i18n.$t('This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow')}`)
+      return false
+    }
     /**
      * Recursive search for nodes
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (const i in arr) {
-        if (arr[i] === targetId) {
-          recursiveVal = targetId
-        } else {
-          recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
+        for (let i in arr) {
+          if (arr[i] === targetId) {
+            recursiveVal = targetId
+          } else {
+            let targetArr = rtTargetArr(arr[i])
+            recursiveTargetarr(targetArr, targetId)
+          }
         }
-      }
       return recursiveVal
     }
-
+    
     // Connection to connected nodes is not allowed
-    if (_.findIndex(rtTargetarrArr(targetId), v => v === sourceId) !== -1) {
+    if (_.findIndex(rtTargetArrs, v => v === sourceId) !== -1) {
+      console.log(rtTargetArrs,'not allowed')
       return false
     }
-
+    
     // Recursive form to find if the target Targetarr has a sourceId
-    if (recursiveTargetarr(rtTargetarrArr(sourceId), targetId)) {
+    if (recursiveTargetarr(rtSouceArrs, targetId)) {
+      console.log('has a sourceId')
       return false
     }
-
-    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber') === 2) {
+    if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && parseInt($(`#${sourceId}`).attr('data-nodenumber')) === 2) {
       return false
     } else {
-      $(`#${sourceId}`).attr('data-nodenumber', Number($(`#${sourceId}`).attr('data-nodenumber')) + 1)
+      console.log('data-nodenumber')
+      $(`#${sourceId}`).attr('data-nodenumber', parseInt($(`#${sourceId}`).attr('data-nodenumber')) + 1)
     }
 
     // Storage node dependency information

@@ -34,7 +34,6 @@ export default {
   'View log': 'View log',
   'Enter this child node': 'Enter this child node',
   'Node name': 'Node name',
-  'Please enter name(required)': 'Please enter name(required)',
   'Run flag': 'Run flag',
   Normal: 'Normal',
   'Prohibition execution': 'Prohibition execution',
@@ -336,6 +335,7 @@ export default {
   Delete: 'Delete',
   'Please enter keyword': 'Please enter keyword',
   'File Upload': 'File Upload',
+  'File ReUpload': 'File ReUpload',
   'Drag the file into the current upload window': 'Drag the file into the current upload window',
   'Drag area upload': 'Drag area upload',
   Upload: 'Upload',
@@ -600,5 +600,6 @@ export default {
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
-  'Please save the DAG before formatting': 'Please save the DAG before formatting'
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
+  'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow': 'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow'
 }
