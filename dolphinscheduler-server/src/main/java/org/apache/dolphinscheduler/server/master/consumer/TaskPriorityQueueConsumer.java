@@ -326,6 +326,10 @@ public class TaskPriorityQueueConsumer extends Thread{
             List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
             Map<UdfFunc,String> udfFuncMap = new HashMap<>();
             for(UdfFunc udfFunc : udfFuncList) {
+                Resource resource = processService.queryResourceById(udfFunc.getResourceId());
+                if (resource != null) {
+                    udfFunc.setResourceName(resource.getFullName());
+                }
                 String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
                 udfFuncMap.put(udfFunc,tenantCode);
             }

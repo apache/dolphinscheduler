@@ -1560,6 +1560,15 @@ public class ProcessService {
     }
 
     /**
+     * find resource by resource id
+     * @param resId resource id
+     * @return resource
+     */
+    public Resource queryResourceById(int resId){
+        return resourceMapper.selectById(resId);
+    }
+
+    /**
      * find schedule list by process define id.
      * @param ids ids
      * @return schedule list
