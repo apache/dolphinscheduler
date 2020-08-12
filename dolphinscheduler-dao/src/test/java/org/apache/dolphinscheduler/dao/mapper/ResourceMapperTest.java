@@ -78,7 +78,7 @@ public class ResourceMapperTest {
         resource.setType(ResourceType.FILE);
         resource.setUserId(111);
         int status = resourceMapper.insert(resource);
-        if( status < 0 ){
+        if (status != 1) {
             Assert.fail("insert data error");
         }
         return resource;
@@ -99,7 +99,7 @@ public class ResourceMapperTest {
         resource.setFullName(fullName);
         resource.setUserId(user.getId());
         int status = resourceMapper.insert(resource);
-        if( status < 0 ){
+        if (status != 1) {
             Assert.fail("insert data error");
         }
         return resource;
@@ -134,10 +134,12 @@ public class ResourceMapperTest {
         user.setCreateTime(new Date());
         user.setTenantId(1);
         user.setUpdateTime(new Date());
-        if (userMapper.insert(user) > 0) {
-            return user;
+        int status = userMapper.insert(user);
+
+        if (status != 1) {
+            Assert.fail("insert data error");
         }
-        throw new RuntimeException("insert data error");
+        return user;
     }
 
     /**
@@ -308,16 +310,28 @@ public class ResourceMapperTest {
         Tenant tenant = new Tenant();
         tenant.setTenantName("ut tenant ");
         tenant.setTenantCode("ut tenant code for resource");
-        tenantMapper.insert(tenant);
+        int tenantInsertStatus = tenantMapper.insert(tenant);
+
+        if (tenantInsertStatus != 1) {
+            Assert.fail("insert tenant data error");
+        }
 
         User user = new User();
         user.setTenantId(tenant.getId());
         user.setUserName("ut user");
-        userMapper.insert(user);
+        int userInsertStatus = userMapper.insert(user);
+
+        if (userInsertStatus != 1) {
+            Assert.fail("insert user data error");
+        }
+
 
         Resource resource = insertOne();
         resource.setUserId(user.getId());
-        resourceMapper.updateById(resource);
+        int userUpdateStatus = resourceMapper.updateById(resource);
+        if (userUpdateStatus != 1) {
+            Assert.fail("update user data error");
+        }
 
         String resource1 = resourceMapper.queryTenantCodeByResourceName(
                 resource.getFullName(), ResourceType.FILE.ordinal()
@@ -395,8 +409,8 @@ public class ResourceMapperTest {
         List<Resource> resourceList = new ArrayList<>();
         resourceList.add(resource);
         int result = resourceMapper.batchUpdateResource(resourceList);
-        if( result < 0 ){
-            Assert.fail("insert data error");
+        if (result != resourceList.size()) {
+            Assert.fail("batch update resource  data error");
         }
     }
 }
