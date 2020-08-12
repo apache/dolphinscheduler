@@ -152,7 +152,7 @@ public class WorkerRegistry {
             // trim and lower case is need
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
             workerZkPathBuilder.append(address);
-            workerZkPathBuilder.append(weight).append(SLASH);
+            workerZkPathBuilder.append(weight);
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
