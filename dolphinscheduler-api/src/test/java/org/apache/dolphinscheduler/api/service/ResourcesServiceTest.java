@@ -675,13 +675,25 @@ public class ResourcesServiceTest {
     public void testCatFile(){
 
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        //HDFS_NOT_STARTUP
+        Result result = resourcesService.readResource(1,1,10);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
 
         //SUCCESS
         try {
+            List<String> list = hadoopUtils.catFile(null,1,10) ;
+            Assert.assertEquals(0,list.size());
             Mockito.when(hadoopUtils.exists(null)).thenReturn(true);
             Mockito.when(hadoopUtils.catFile(null,1,10)).thenReturn(getContent());
+
+            list = hadoopUtils.catFile(null,1,10) ;
+            Assert.assertEquals("test",list.get(0));
         } catch (IOException e) {
             logger.error("hadoop error",e);
         }
+
+
+
     }
 }
