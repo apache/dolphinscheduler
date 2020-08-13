@@ -667,11 +667,9 @@ public class MasterExecThread implements Runnable {
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
             if(!dag.containsNode(depsNode)
+                    || skipTaskNodeList.containsKey(depsNode)
                     || forbiddenTaskList.containsKey(depsNode)){
                 continue;
-            }
-            if(skipTaskNodeList.containsKey(depsNode)){
-                return DependResult.FAILED;
             }
             // all the dependencies must be completed
             if(!completeTaskList.containsKey(depsNode)){
