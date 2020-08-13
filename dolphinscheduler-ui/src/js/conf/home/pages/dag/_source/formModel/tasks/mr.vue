@@ -216,10 +216,8 @@
           resourceIdArr = isResourceId.map(item=>{
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          let diffSet
+          diffSet = _.xorWith(this.resourceList, resourceIdArr, _.isEqual)
           let optionsCmp = []
           if(diffSet.length>0) {
             diffSet.forEach(item=>{
@@ -356,7 +354,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          if(o.params.mainJar.res) {
+          if(!o.params.mainJar.id) {
             this.marjarId(o.params.mainJar.res)
           } else if(o.params.mainJar.res=='') {
             this.mainJar = ''
