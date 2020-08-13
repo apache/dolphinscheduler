@@ -86,7 +86,7 @@ public class TenantService extends BaseService{
                          int queueId,
                          String desc) throws Exception {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
     result.put(Constants.STATUS, false);
     if (checkAdmin(loginUser, result)) {
       return result;
@@ -138,7 +138,7 @@ public class TenantService extends BaseService{
    */
   public Map<String,Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
     if (checkAdmin(loginUser, result)) {
       return result;
     }
@@ -169,7 +169,7 @@ public class TenantService extends BaseService{
    */
   public Map<String, Object>  updateTenant(User loginUser,int id,String tenantCode, String tenantName, int queueId, String desc) throws Exception {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
     result.put(Constants.STATUS, false);
 
     if (checkAdmin(loginUser, result)) {
@@ -235,7 +235,7 @@ public class TenantService extends BaseService{
    */
   @Transactional(rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     if (checkAdmin(loginUser, result)) {
       return result;
@@ -292,7 +292,7 @@ public class TenantService extends BaseService{
    */
   public Map<String, Object> queryTenantList(User loginUser) {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     List<Tenant> resourceList = tenantMapper.selectList(null);
     result.put(Constants.DATA_LIST, resourceList);
@@ -307,7 +307,7 @@ public class TenantService extends BaseService{
    * @return tenant list
    */
   public Map<String, Object> queryTenantList(String tenantCode) {
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
     if (CollectionUtils.isNotEmpty(resourceList)) {
