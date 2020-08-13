@@ -17,46 +17,62 @@
 
 package org.apache.dolphinscheduler.server.log;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class LoggerServerTest {
 
+    private LoggerServer loggerServer;
 
-    @Test
-    public void testRollViewLog(){
-        LoggerServer loggerServer = new LoggerServer();
-        loggerServer.start();
+    private LogClientService logClientService;
 
-        LogClientService logClientService = new LogClientService();
-        logClientService.rollViewLog("localhost", Constants.RPC_PORT,"/opt/demo.txt",0,1000);
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-
-        }
-
-        loggerServer.stop();
-        logClientService.close();
+    @Before
+    public void startServerAndClient() {
+        this.loggerServer = new LoggerServer();
+        this.loggerServer.start();
+        this.logClientService = new LogClientService();
     }
 
     @Test
-    public void testRemoveTaskLog(){
-        LoggerServer loggerServer = new LoggerServer();
-        loggerServer.start();
+    public void testRollViewLog() throws IOException {
+        String expectedTmpDemoString = "testRolloViewLog";
+        FileUtils.writeStringToFile(new File("/tmp/demo.txt"), expectedTmpDemoString, Charset.defaultCharset());
 
-        LogClientService logClientService = new LogClientService();
-        logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/opt/zhangsan");
+        String resultTmpDemoString = this.logClientService.rollViewLog(
+                "localhost", Constants.RPC_PORT,"/tmp/demo.txt", 0, 1000);
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
+        Assert.assertEquals(expectedTmpDemoString, resultTmpDemoString.replaceAll("[\r|\n|\t]", StringUtils.EMPTY));
 
-        }
+        FileUtils.deleteFile("/tmp/demo.txt");
+    }
 
-        loggerServer.stop();
-        logClientService.close();
+    @Test
+    public void testRemoveTaskLog() throws IOException {
+        String expectedTmpRemoveString = "testRemoveTaskLog";
+        FileUtils.writeStringToFile(new File("/tmp/remove.txt"), expectedTmpRemoveString, Charset.defaultCharset());
+
+        Boolean b = this.logClientService.removeTaskLog("localhost", Constants.RPC_PORT,"/tmp/remove.txt");
+
+        Assert.assertTrue(b);
+
+        String result = this.logClientService.viewLog("localhost", Constants.RPC_PORT,"/tmp/demo.txt");
+
+        Assert.assertEquals(StringUtils.EMPTY, result);
+    }
+
+    @After
+    public void stopServerAndClient() {
+        this.loggerServer.stop();
+        this.logClientService.close();
     }
 }

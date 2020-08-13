@@ -38,7 +38,7 @@ public class RoundRobinHostManager extends CommonHostManager {
      * set round robin
      */
     public RoundRobinHostManager(){
-        this.selector = new RoundRobinSelector<>();
+        this.selector = new RoundRobinSelector();
     }
 
     @Override

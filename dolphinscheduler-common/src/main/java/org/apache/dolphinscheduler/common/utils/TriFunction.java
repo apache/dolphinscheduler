@@ -14,32 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
-
-import org.apache.dolphinscheduler.api.utils.Result;
+package org.apache.dolphinscheduler.common.utils;
 
 /**
- * log service
+ * tri function function interface
  */
-public interface LoggerService {
+@FunctionalInterface
+public interface TriFunction<IN1, IN2, IN3, OUT1> {
 
-    /**
-     * view log
-     *
-     * @param taskInstId task instance id
-     * @param skipLineNum skip line number
-     * @param limit limit
-     * @return log string data
-     */
-    Result<String> queryLog(int taskInstId, int skipLineNum, int limit);
-
-
-    /**
-     * get log size
-     *
-     * @param taskInstId task instance id
-     * @return log byte array
-     */
-    byte[] getLogBytes(int taskInstId);
+    OUT1 apply(IN1 in1, IN2 in2, IN3 in3);
 
 }
