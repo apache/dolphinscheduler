@@ -17,13 +17,10 @@
 package org.apache.dolphinscheduler.api.service;
 
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
@@ -88,21 +85,36 @@ public interface ProcessDefinitionService {
      * @param processId   process definition id
      * @return process definition detail
      */
+
     Map<String, Object> queryProcessDefinitionById(User loginUser,
                                                    String projectName,
                                                    Integer processId);
 
     /**
-     * copy process definition
-     *
-     * @param loginUser   login user
-     * @param projectName project name
-     * @param processId   process definition id
-     * @return copy result code
+     * batch copy process definition
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @param processDefinitionIds processDefinitionIds
+     * @param targetProjectId targetProjectId
+     * @return
      */
-    Map<String, Object> copyProcessDefinition(User loginUser,
-                                             String projectName,
-                                             Integer processId) throws JsonProcessingException;
+    Map<String, Object> batchCopyProcessDefinition(User loginUser,
+                                                          String projectName,
+                                                          String processDefinitionIds,
+                                                          int targetProjectId);
+
+    /**
+     * batch move process definition
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @param processDefinitionIds processDefinitionIds
+     * @param targetProjectId targetProjectId
+     * @return
+     */
+    Map<String, Object> batchMoveProcessDefinition(User loginUser,
+                                                          String projectName,
+                                                          String processDefinitionIds,
+                                                          int targetProjectId);
 
     /**
      * update  process definition
@@ -187,7 +199,6 @@ public interface ProcessDefinitionService {
                                                 MultipartFile file,
                                                 String currentProjectName);
 
-
     /**
      * check the process definition node meets the specifications
      *
@@ -213,7 +224,6 @@ public interface ProcessDefinitionService {
      * @return task node list
      */
     Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList);
-
 
     /**
      * query process definition all by project id

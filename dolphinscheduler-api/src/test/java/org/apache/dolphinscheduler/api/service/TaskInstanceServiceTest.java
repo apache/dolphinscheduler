@@ -78,7 +78,7 @@ public class TaskInstanceServiceTest {
 
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
