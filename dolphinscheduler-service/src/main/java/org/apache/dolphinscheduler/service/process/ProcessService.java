@@ -478,10 +478,8 @@ public class ProcessService {
      */
     private Date getScheduleTime(Command command, Map<String, String> cmdParam) {
         Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null) {
-            if (cmdParam != null && cmdParam.containsKey(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-                scheduleTime = DateUtils.stringToDate(cmdParam.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE));
-            }
+        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
+            scheduleTime = DateUtils.stringToDate(cmdParam.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE));
         }
         return scheduleTime;
     }
