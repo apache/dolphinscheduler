@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -99,6 +99,13 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @return  UDF function list
      */
     List<UdfFunc> listAuthorizedUdfByResourceId(@Param("userId") int userId,@Param("resourceIds") int[] resourceIds);
+
+    /**
+     * batch update udf func
+     * @param udfFuncList  udf list
+     * @return update num
+     */
+    int batchUpdateUdfFunc(@Param("udfFuncList") List<UdfFunc> udfFuncList);
 
 
 }
