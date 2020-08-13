@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -55,7 +56,7 @@ public class ProcessDefinitionControllerTest{
     private ProcessDefinitionController processDefinitionController;
 
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private ProcessDefinitionServiceImpl processDefinitionService;
 
     protected User user;
 
@@ -342,9 +343,7 @@ public class ProcessDefinitionControllerTest{
         String processDefinitionIds = "1,2";
         String projectName = "test";
         HttpServletResponse response = new MockHttpServletResponse();
-        ProcessDefinitionService service = new ProcessDefinitionService();
-        ProcessDefinitionService spy = Mockito.spy(service);
-        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
+        Mockito.doNothing().when(this.processDefinitionService).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
         processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
     }
 

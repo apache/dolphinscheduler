@@ -38,7 +38,7 @@ public class RandomHostManager extends CommonHostManager {
      * set round robin
      */
     public RandomHostManager(){
-        this.selector = new RandomSelector<>();
+        this.selector = new RandomSelector();
     }
 
     @Override
