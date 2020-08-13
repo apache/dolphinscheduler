@@ -669,4 +669,19 @@ public class ResourcesServiceTest {
         contentList.add("test");
         return contentList;
     }
+
+
+    @Test
+    public void testCatFile(){
+
+        PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+
+        //SUCCESS
+        try {
+            Mockito.when(hadoopUtils.exists(null)).thenReturn(true);
+            Mockito.when(hadoopUtils.catFile(null,1,10)).thenReturn(getContent());
+        } catch (IOException e) {
+            logger.error("hadoop error",e);
+        }
+    }
 }

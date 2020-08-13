@@ -23,6 +23,11 @@ import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 @RunWith(PowerMockRunner.class)
@@ -79,6 +84,17 @@ public class FileUtilsTest {
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
+    }
+
+    @Test
+    public void testWriteContent2File() throws FileNotFoundException {
+        // file exists, fmt is invalid
+        String filePath = "test/testFile.txt" ;
+        String content = "正正正faffdasfasdfas";
+        FileUtils.writeContent2File(content, filePath);
+
+        String  fileContent = FileUtils.readFile2Str(new FileInputStream(new File(filePath)));
+        Assert.assertEquals(content, fileContent);
     }
 
 }
