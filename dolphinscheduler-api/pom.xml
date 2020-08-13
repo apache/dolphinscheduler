@@ -153,8 +153,8 @@
           <artifactId>servlet-api</artifactId>
         </exclusion>
         <exclusion>
-          <artifactId>curator-client</artifactId>
           <groupId>org.apache.curator</groupId>
+          <artifactId>curator-client</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
