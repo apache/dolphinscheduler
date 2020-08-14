@@ -118,8 +118,8 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
 Dag.prototype.backfill = function (arg) {
   if (arg) {
     let locationsValue = store.state.dag.locations
-    const locationsValue1 = store.state.dag.locations
-    const locationsValue2 = store.state.dag.locations
+    const locationsValue1 = _.cloneDeep(store.state.dag.locations)
+    const locationsValue2 = _.cloneDeep(store.state.dag.locations)
     const arr = []
     for (const i in locationsValue1) {
       const objs = {}

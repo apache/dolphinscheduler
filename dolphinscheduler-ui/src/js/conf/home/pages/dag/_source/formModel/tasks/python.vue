@@ -208,10 +208,8 @@
           resourceIdArr = isResourceId.map(item=>{
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          let diffSet
+          diffSet = _.xorWith(this.resourceList, resourceIdArr, _.isEqual)
           let optionsCmp = []
           if(diffSet.length>0) {
             diffSet.forEach(item=>{
