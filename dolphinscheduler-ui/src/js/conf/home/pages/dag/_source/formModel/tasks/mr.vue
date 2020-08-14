@@ -19,7 +19,7 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select v-model="programType" :disabled="isDetails" style="width: 110px;">
+        <x-select v-model="programType" @on-change="_onChange" :disabled="isDetails" style="width: 110px;">
           <x-option
                   v-for="city in programTypeList"
                   :key="city.code"
@@ -117,6 +117,8 @@
         // Main jar package (List)
         mainJarLists: [],
         mainJarList: [],
+        jarList: [],
+        pyList: [],
         // Resource(list)
         resourceList: [],
         // Cache ResourceList
@@ -145,6 +147,16 @@
     },
     mixins: [disabledState],
     methods: {
+      /**
+       * programType change
+       */
+      _onChange(o) {
+        if(o.value === 'PYTHON') {
+          this.mainJarLists = this.pyList
+        } else {
+          this.mainJarLists = this.jarList
+        }
+      },
       /**
        * getResourceId
        */
@@ -237,12 +249,13 @@
           if(optionsCmp.length>0) {
             this.allNoResources = optionsCmp
             optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+              return {id: item.id,name: item.name || item.res,fullName: item.res}
             })
             optionsCmp.forEach(item=>{
               item.isNew = true
             })
             noResources[0].children = optionsCmp
+            this.mainJarList = _.filter(this.mainJarList, o=> { return o.id!==-1 })
             this.mainJarList = this.mainJarList.concat(noResources)
           }
         }
@@ -343,13 +356,24 @@
       }
     },
     created () {
+        let o = this.backfillItem
         let item = this.store.state.dag.resourcesListS
         let items = this.store.state.dag.resourcesListJar
+        let pythonList = this.store.state.dag.resourcesListPy
         this.diGuiTree(item)
         this.diGuiTree(items)
+        this.diGuiTree(pythonList)
+
         this.mainJarList = item
-        this.mainJarLists = items
-        let o = this.backfillItem
+        this.jarList = items
+        this.pyList = pythonList
+
+        if(!_.isEmpty(o) && o.params.programType === 'PYTHON') {
+          this.mainJarLists = pythonList
+        } else {
+          this.mainJarLists = items
+        }
+        
 
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
