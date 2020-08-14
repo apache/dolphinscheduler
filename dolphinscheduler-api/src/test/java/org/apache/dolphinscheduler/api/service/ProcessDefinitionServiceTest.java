@@ -16,21 +16,45 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.entity.ContentType;
-import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,23 +62,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-
 @RunWith(MockitoJUnitRunner.Silent.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessDefinitionServiceTest {
 
     @InjectMocks
-    ProcessDefinitionService processDefinitionService;
+    ProcessDefinitionServiceImpl processDefinitionService;
 
     @Mock
     private DataSourceMapper dataSourceMapper;
@@ -70,8 +85,6 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private ScheduleMapper scheduleMapper;
-
-
 
     @Mock
     private ProcessService processService;
@@ -115,7 +128,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project not found
@@ -144,7 +157,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project not found
@@ -165,7 +178,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project check auth fail
@@ -194,13 +207,15 @@ public class ProcessDefinitionServiceTest {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
+        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(getProject(projectName));
+
         Project project = getProject(projectName);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //project check auth success, instance not exist
         putMsg(result, Status.SUCCESS, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
@@ -212,7 +227,7 @@ public class ProcessDefinitionServiceTest {
         //instance exit
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
 
-        Map<String, Object> createProcessResult = new HashMap<>(5);
+        Map<String, Object> createProcessResult = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.createProcessDefinition(
@@ -224,8 +239,51 @@ public class ProcessDefinitionServiceTest {
                 definition.getLocations(),
                 definition.getConnects())).thenReturn(createProcessResult);
 
-        Map<String, Object> successRes = processDefinitionService.copyProcessDefinition(loginUser,
-                "project_test1", 46);
+        Map<String, Object> successRes = processDefinitionService.batchCopyProcessDefinition(loginUser,"project_test1",
+                 "46",1);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testBatchMoveProcessDefinition()  throws Exception{
+        String projectName = "project_test1";
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+
+        String projectName2 = "project_test2";
+        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(getProject(projectName2));
+
+        int targetProjectId = 2;
+        Mockito.when(projectMapper.queryDetailById(targetProjectId)).thenReturn(getProjectById(targetProjectId));
+
+        Project project = getProject(projectName);
+        Project targetProject = getProjectById(targetProjectId);
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS, projectName);
+
+        Map<String, Object> result2 = new HashMap<>();
+        putMsg(result2, Status.SUCCESS, targetProject.getName());
+
+        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser,targetProject,targetProject.getName())).thenReturn(result2);
+
+        ProcessDefinition definition = getProcessDefinition();
+        definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
+        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
+        definition.setConnects("[]");
+        //instance exit
+        Mockito.when(processDefineMapper.updateById(definition)).thenReturn(46);
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
+
+        putMsg(result, Status.SUCCESS);
+
+
+        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(loginUser,"project_test1",
+                "46",2);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
@@ -241,7 +299,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.deleteProcessDefinitionById(loginUser, "project_test1", 6);
@@ -321,7 +379,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
@@ -364,7 +422,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         //project check auth fail
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
         Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(loginUser,
@@ -502,157 +560,6 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
     }
 
-    /**
-     * add datasource param and dependent when export process
-     * @throws JSONException
-     */
-    @Test
-    public void testAddTaskNodeSpecialParam() throws JSONException {
-
-        Mockito.when(dataSourceMapper.selectById(1)).thenReturn(getDataSource());
-        Mockito.when(processDefineMapper.queryByDefineId(2)).thenReturn(getProcessDefinition());
-
-        String corSqlDependentJson = processDefinitionService.addExportTaskNodeSpecialParam(sqlDependentJson);
-
-        JSONAssert.assertEquals(sqlDependentJson,corSqlDependentJson,false);
-
-    }
-
-    @Test
-    public void testExportProcessMetaDataStr() {
-        Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(getSchedulerList());
-        ProcessDefinition processDefinition = getProcessDefinition();
-        processDefinition.setProcessDefinitionJson(sqlDependentJson);
-
-        String exportProcessMetaDataStr = processDefinitionService.exportProcessMetaDataStr(46, processDefinition);
-        Assert.assertNotEquals(sqlDependentJson,exportProcessMetaDataStr);
-    }
-
-    @Test
-    public void testAddExportTaskNodeSpecialParam() throws JSONException {
-        String shellData = shellJson;
-
-        String resultStr = processDefinitionService.addExportTaskNodeSpecialParam(shellData);
-        JSONAssert.assertEquals(shellJson, resultStr, false);
-    }
-
-    @Test
-    public void testImportProcessSchedule() {
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-
-        String currentProjectName = "test";
-        String processDefinitionName = "test_process";
-        Integer processDefinitionId = 1;
-        Schedule schedule = getSchedule();
-
-        ProcessMeta processMeta = getProcessMeta();
-
-        int insertFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMeta,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlag);
-
-        ProcessMeta processMetaCron = new ProcessMeta();
-        processMetaCron.setScheduleCrontab(schedule.getCrontab());
-
-        int insertFlagCron = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlagCron);
-
-        WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setName("ds-test-workergroup");
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-        workerGroups.add(workerGroup);
-
-        processMetaCron.setScheduleWorkerGroupName("ds-test");
-        int insertFlagWorker = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, insertFlagWorker);
-
-        int workerNullFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
-                processDefinitionName, processDefinitionId);
-        Assert.assertEquals(0, workerNullFlag);
-
-
-    }
-
-    /**
-     * import sub process test
-     */
-    @Test
-    public void testImportSubProcess() {
-
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-
-        Project testProject = getProject("test");
-
-        //Recursive subprocess sub2 process in sub1 process and sub1process in top process
-        String topProcessJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-38634\",\"name\":\"shell1\"," +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}," +
-                "{\"type\":\"SUB_PROCESS\",\"id\":\"tasks-44207\",\"name\":\"shell-4\"," +
-                "\"params\":{\"processDefinitionId\":39},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"dependence\":{},\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[\"shell1\"]}],\"tenantId\":1,\"timeout\":0}";
-
-        String sub1ProcessJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-84090\"," +
-                "\"name\":\"shell-4\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-4\\\"\"}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false}," +
-                "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]},{\"type\":\"SUB_PROCESS\"," +
-                "\"id\":\"tasks-87364\",\"name\":\"shell-5\"," +
-                "\"params\":{\"processDefinitionId\":46},\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{}," +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-                "\"workerGroupId\":-1,\"preTasks\":[\"shell-4\"]}],\"tenantId\":1,\"timeout\":0}";
-
-        String sub2ProcessJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-52423\",\"name\":\"shell-5\"," +
-                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"shell-5\\\"\"},\"description\":\"\"," +
-                "\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
-
-
-        ObjectNode jsonObject = JSONUtils.parseObject(topProcessJson);
-        ArrayNode jsonArray = (ArrayNode) jsonObject.path("tasks");
-
-        String originSubJson = jsonArray.toString();
-
-        Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
-
-        ProcessDefinition shellDefinition1 = new ProcessDefinition();
-        shellDefinition1.setId(39);
-        shellDefinition1.setName("shell-4");
-        shellDefinition1.setProjectId(2);
-        shellDefinition1.setProcessDefinitionJson(sub1ProcessJson);
-
-        ProcessDefinition shellDefinition2 = new ProcessDefinition();
-        shellDefinition2.setId(46);
-        shellDefinition2.setName("shell-5");
-        shellDefinition2.setProjectId(2);
-        shellDefinition2.setProcessDefinitionJson(sub2ProcessJson);
-
-        Mockito.when(processDefineMapper.queryByDefineId(39)).thenReturn(shellDefinition1);
-        Mockito.when(processDefineMapper.queryByDefineId(46)).thenReturn(shellDefinition2);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-5")).thenReturn(null);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-4")).thenReturn(null);
-        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "testProject")).thenReturn(shellDefinition2);
-
-        processDefinitionService.importSubProcess(loginUser,testProject, jsonArray, subProcessIdMap);
-
-        String correctSubJson = jsonArray.toString();
-
-        Assert.assertEquals(originSubJson, correctSubJson);
-
-    }
-
     @Test
     public void testImportProcessDefinitionById() throws IOException {
 
@@ -694,7 +601,7 @@ public class ProcessDefinitionServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
 
         String currentProjectName = "testProject";
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, currentProjectName);
 
         ProcessDefinition shellDefinition2 = new ProcessDefinition();
@@ -731,41 +638,13 @@ public class ProcessDefinitionServiceTest {
 
     }
 
-    /**
-     * check import process metadata
-     * @param file file
-     * @param loginUser login user
-     * @param currentProjectName current project name
-     * @param processMetaJson process meta json
-     * @throws IOException IO exception
-     */
-    private void improssProcessCheckData(File file, User loginUser, String currentProjectName, String processMetaJson) throws IOException {
-        //check null
-        FileUtils.writeStringToFile(new File("/tmp/task.json"),processMetaJson);
-
-        File fileEmpty = new File("/tmp/task.json");
-
-        FileInputStream fileEmptyInputStream = new FileInputStream("/tmp/task.json");
-
-        MultipartFile multiFileEmpty = new MockMultipartFile(fileEmpty.getName(), fileEmpty.getName(),
-                ContentType.APPLICATION_OCTET_STREAM.toString(), fileEmptyInputStream);
-
-        Map<String, Object> resEmptyProcess = processDefinitionService.importProcessDefinition(loginUser, multiFileEmpty, currentProjectName);
-
-        Assert.assertEquals(Status.DATA_IS_NULL, resEmptyProcess.get(Constants.STATUS));
-
-        boolean deleteFlag = file.delete();
-
-        Assert.assertTrue(deleteFlag);
-    }
-
     @Test
     public void testUpdateProcessDefinition () {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         String projectName = "project_test1";
@@ -817,6 +696,19 @@ public class ProcessDefinitionServiceTest {
         Project project = new Project();
         project.setId(1);
         project.setName(projectName);
+        project.setUserId(1);
+        return  project;
+    }
+
+    /**
+     * get mock Project
+     * @param projectId projectId
+     * @return Project
+     */
+    private Project getProjectById(int projectId){
+        Project project = new Project();
+        project.setId(1);
+        project.setName("project_test2");
         project.setUserId(1);
         return  project;
     }

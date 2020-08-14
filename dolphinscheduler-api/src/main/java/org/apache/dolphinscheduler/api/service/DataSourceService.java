@@ -88,7 +88,7 @@ public class DataSourceService extends BaseService{
      */
     public Map<String, Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         // check name can use or not
         if (checkName(name)) {
             putMsg(result, Status.DATASOURCE_EXIST);
@@ -341,7 +341,7 @@ public class DataSourceService extends BaseService{
      * @return data source list page
      */
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList;
 
@@ -683,7 +683,7 @@ public class DataSourceService extends BaseService{
      * @return authorized result code
      */
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);

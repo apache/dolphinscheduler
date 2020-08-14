@@ -95,27 +95,65 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * copy process definition
+     * copy  process definition
      *
      * @param loginUser   login user
      * @param projectName project name
-     * @param processId   process definition id
+     * @param processDefinitionIds   process definition ids
+     * @param targetProjectId target project id
      * @return copy result code
      */
     @ApiOperation(value = "copyProcessDefinition", notes= "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
     })
     @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COPY_PROCESS_DEFINITION_ERROR)
+    @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
     public Result copyProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                        @RequestParam(value = "processId", required = true) int processId) throws JsonProcessingException {
-        logger.info("copy process definition, login user:{}, project name:{}, process definition id:{}",
-                loginUser.getUserName(), projectName, processId);
-        Map<String, Object> result = processDefinitionService.copyProcessDefinition(loginUser, projectName, processId);
-        return returnDataList(result);
+                                        @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
+                                        @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
+        logger.info("batch copy process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(projectName),
+                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
+
+        return returnDataList(
+                processDefinitionService.batchCopyProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
+    }
+
+    /**
+     * move process definition
+     *
+     * @param loginUser   login user
+     * @param projectName project name
+     * @param processDefinitionIds   process definition ids
+     * @param targetProjectId target project id
+     * @return move result code
+     */
+    @ApiOperation(value = "moveProcessDefinition", notes= "MOVE_PROCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
+    })
+    @PostMapping(value = "/move")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(BATCH_MOVE_PROCESS_DEFINITION_ERROR)
+    public Result moveProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                        @RequestParam(value = "processDefinitionIds", required = true) String processDefinitionIds,
+                                        @RequestParam(value = "targetProjectId",required = true) int targetProjectId)  {
+        logger.info("batch move process definition, login user:{}, project name:{}, process definition ids:{}，target project id:{}",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(projectName),
+                StringUtils.replaceNRTtoUnderline(processDefinitionIds),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(targetProjectId)));
+
+        return returnDataList(
+                processDefinitionService.batchMoveProcessDefinition(loginUser,projectName,processDefinitionIds,targetProjectId));
     }
 
     /**
@@ -365,7 +403,7 @@ public class ProcessDefinitionController extends BaseController {
     public Result getNodeListByDefinitionIdList(
             @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-            @RequestParam("processDefinitionIdList") String processDefinitionIdList) throws Exception {
+            @RequestParam("processDefinitionIdList") String processDefinitionIdList) {
 
         logger.info("query task node name list by definitionId list, login user:{}, project name:{}, id list: {}",
                 loginUser.getUserName(), projectName, processDefinitionIdList);
@@ -420,7 +458,7 @@ public class ProcessDefinitionController extends BaseController {
         logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
                 loginUser.getUserName(), projectName, processDefinitionIds);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (StringUtils.isNotEmpty(processDefinitionIds)) {
             String[] processDefinitionIdArray = processDefinitionIds.split(",");
