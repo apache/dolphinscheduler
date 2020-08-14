@@ -165,7 +165,7 @@
         }
         // noRes
         if (this.noRes.length>0) {
-          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          this.$message.warning(`${i18n.$t('Please delete all non-existing resources')}`)
           return false
         }
         // Process resourcelist
@@ -260,19 +260,20 @@
           }
           let noResources = [{
             id: -1,
-            name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            name: $t('No resources exist'),
+            fullName: '/'+$t('No resources exist'),
             children: []
           }]
           if(optionsCmp.length>0) {
             this.allNoResources = optionsCmp
             optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+              return {id: item.id,name: item.name || item.res,fullName: item.res}
             })
             optionsCmp.forEach(item=>{
               item.isNew = true
             })
             noResources[0].children = optionsCmp
+            this.options = _.filter(this.options, o=> { return o.id!==-1 })
             this.options = this.options.concat(noResources)
           }
         }

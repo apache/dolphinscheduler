@@ -666,7 +666,18 @@ JSP.prototype.saveStore = function () {
         y: v.y
       }
     })
-
+    let targetArrBool = false
+    _.forEach(locations, item => {
+      if(item.targetarr) {
+        targetArrBool = true
+        return false
+      }
+    })
+    if(connects.length && !targetArrBool) {
+      Vue.$message.warning(`${i18n.$t('The workflow canvas is abnormal and cannot be saved, please recreate')}`)
+      return false
+    }
+    // return false
     // Storage node
     store.commit('dag/setTasks', tasks)
     // Store coordinate information
@@ -697,13 +708,6 @@ JSP.prototype.handleEvent = function () {
     console.log(sourceId,targetId)
     let rtTargetArrs = rtTargetArr(targetId)
     let rtSouceArrs = rtTargetArr(sourceId)
-    /**
-    * When connecting, connection is prohibited when the sourceId and target nodes are empty
-    */
-    if(!sourceId && !targetId) {
-      Vue.$message.warning(`${i18n.$t('This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow')}`)
-      return false
-    }
     /**
      * Recursive search for nodes
      */
