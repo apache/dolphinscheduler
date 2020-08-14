@@ -591,8 +591,8 @@ export default {
   'Branch flow': '分支流转',
   'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Successful branch flow and failed branch flow are required': 'conditions节点成功和失败分支流转必填',
-  'Unauthorized or deleted resources': '未授权或已删除资源',
-  'Please delete all non-existent resources': '请删除所有未授权或已删除资源',
+  'No resources exist': '不存在资源',
+  'Please delete all non-existing resources': '请删除所有不存在资源',
   'The Worker group no longer exists, please select the correct Worker group!': '该Worker分组已经不存在，请选择正确的Worker分组！',
   'Please confirm whether the workflow has been saved before downloading': '下载前请确定工作流是否已保存',
   'User name length is between 3 and 39': '用户名长度在3～39之间',
@@ -607,5 +607,5 @@ export default {
   'Connection name': '连线名',
   'Current connection settings': '当前连线设置',
   'Please save the DAG before formatting': '格式化前请先保存DAG',
-  'This canvas is abnormal and the node connection cannot be made. Please save or exit the current workflow': '此画布异常，无法进行节点连线，请保存或退出当前工作流'
+  'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建'
 }
