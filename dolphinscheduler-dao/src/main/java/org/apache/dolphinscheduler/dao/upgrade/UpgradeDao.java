@@ -343,6 +343,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                     if (param != null) {
 
                         List<ResourceInfo> resourceList = JSONUtils.toList(param.getString("resourceList"), ResourceInfo.class);
+                        ResourceInfo mainJar = JSONUtils.parseObject(param.getString("mainJar"), ResourceInfo.class);
+                        if (mainJar != null && mainJar.getId() == 0) {
+                            String fullName = mainJar.getRes().startsWith("/") ? mainJar.getRes() : String.format("/%s",mainJar.getRes());
+                            if (resourcesMap.containsKey(fullName)) {
+                                mainJar.setId(resourcesMap.get(fullName));
+                                param.put("mainJar",JSONUtils.parseObject(JSONObject.toJSONString(mainJar)));
+                            }
+                        }
 
                         if (CollectionUtils.isNotEmpty(resourceList)) {
                             List<ResourceInfo> newResourceList = resourceList.stream().map(resInfo -> {

@@ -23,7 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * resource filter test
@@ -48,9 +50,11 @@ public class ResourceFilterTest {
         allList.add(resource5);
         allList.add(resource6);
         allList.add(resource7);
+        Set<String> suffixSet = new HashSet<>();
+        suffixSet.add(".jar");
+        suffixSet.add(".txt");
 
-
-        ResourceFilter resourceFilter = new ResourceFilter(".jar",allList);
+        ResourceFilter resourceFilter = new ResourceFilter(suffixSet,allList);
         List<Resource> resourceList = resourceFilter.filter();
         Assert.assertNotNull(resourceList);
         resourceList.stream().forEach(t-> logger.info(t.toString()));
