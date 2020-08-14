@@ -279,15 +279,19 @@ public class UdfFuncService extends BaseService{
     }
 
     /**
-     * query data resource by type
+     * query udf list
      *
      * @param loginUser login user
-     * @param type  resource type
-     * @return resource list
+     * @param type  udf type
+     * @return udf func list
      */
-    public Map<String, Object> queryResourceList(User loginUser, Integer type) {
+    public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>(5);
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(loginUser.getId(), type);
+        int userId = loginUser.getId();
+        if (isAdmin(loginUser)) {
+            userId = 0;
+        }
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(userId, type);
 
         result.put(Constants.DATA_LIST, udfFuncList);
         putMsg(result, Status.SUCCESS);

@@ -436,14 +436,38 @@ public class ResourcesService extends BaseService {
                 if (CollectionUtils.isNotEmpty(childrenResource)) {
                     String matcherFullName = Matcher.quoteReplacement(fullName);
                     List<Resource> childResourceList = new ArrayList<>();
-                    List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
+                    Integer[] childResIdArray = childrenResource.toArray(new Integer[childrenResource.size()]);
+                    List<Resource> resourceList = resourcesMapper.listResourceByIds(childResIdArray);
                     childResourceList = resourceList.stream().map(t -> {
                         t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                         t.setUpdateTime(now);
                         return t;
                     }).collect(Collectors.toList());
                     resourcesMapper.batchUpdateResource(childResourceList);
+
+                    if (ResourceType.UDF.equals(resource.getType())) {
+                        List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(childResIdArray);
+                        if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                            udfFuncs = udfFuncs.stream().map(t -> {
+                                t.setResourceName(t.getResourceName().replaceFirst(originFullName, matcherFullName));
+                                t.setUpdateTime(now);
+                                return t;
+                            }).collect(Collectors.toList());
+                            udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
+                        }
+                    }
                 }
+            } else if (ResourceType.UDF.equals(resource.getType())) {
+                List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new Integer[]{resourceId});
+                if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                    udfFuncs = udfFuncs.stream().map(t -> {
+                        t.setResourceName(fullName);
+                        t.setUpdateTime(now);
+                        return t;
+                    }).collect(Collectors.toList());
+                    udfFunctionMapper.batchUpdateUdfFunc(udfFuncs);
+                }
+
             }
 
             putMsg(result, Status.SUCCESS);

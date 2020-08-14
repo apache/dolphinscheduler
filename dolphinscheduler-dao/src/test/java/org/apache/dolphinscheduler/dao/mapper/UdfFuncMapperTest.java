@@ -33,6 +33,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -302,5 +303,17 @@ public class UdfFuncMapperTest {
         insertOneUDFUser(generalUser1,unauthorizdUdfFunc);
         authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
         Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
+    }
+
+    @Test
+    public void batchUpdateUdfFuncTest(){
+        //create general user
+        User generalUser1 = createGeneralUser("user1");
+        UdfFunc udfFunc = insertOne(generalUser1);
+        udfFunc.setResourceName("/updateTest");
+        List<UdfFunc> udfFuncList = new ArrayList<>();
+        udfFuncList.add(udfFunc);
+        Assert.assertTrue(udfFuncMapper.batchUpdateUdfFunc(udfFuncList)>0);
+
     }
 }
