@@ -267,12 +267,13 @@
           if(optionsCmp.length>0) {
             this.allNoResources = optionsCmp
             optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+              return {id: item.id,name: item.name || item.res,fullName: item.res}
             })
             optionsCmp.forEach(item=>{
               item.isNew = true
             })
             noResources[0].children = optionsCmp
+            this.options = _.filter(this.options, o=> { return o.id!==-1 })
             this.options = this.options.concat(noResources)
           }
         }
