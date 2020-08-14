@@ -66,9 +66,9 @@ jobs:
         run: cd ./e2e && mvn -B clean test
       - name: Collect logs
         if: failure()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: dslogs
-          path: /var/lib/docker/volumes/docker-swarm_dolphinscheduler-logs/_data
+          path: ${{ github.workspace }}/docker/docker-swarm/dolphinscheduler-logs
 
 
