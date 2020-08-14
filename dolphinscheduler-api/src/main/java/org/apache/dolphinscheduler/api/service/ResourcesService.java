@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -654,26 +655,33 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * query resource list
+     * query resource list by program type
      *
      * @param loginUser login user
      * @param type resource type
      * @return resource list
      */
-    public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
+    public Map<String, Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
 
         Map<String, Object> result = new HashMap<>(5);
+        String suffix = ".jar";
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
             userId = 0;
         }
-        Set<String> suffixSet = new HashSet<>();
-        suffixSet.add(".jar");
-        if (ResourceType.UDF.equals(type)) {
-            suffixSet.add(".py");
+        if (programType != null) {
+            switch (programType) {
+                case JAVA:
+                    break;
+                case SCALA:
+                    break;
+                case PYTHON:
+                    suffix = ".py";
+                    break;
+            }
         }
         List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        List<Resource> resources = new ResourceFilter(suffixSet,new ArrayList<>(allResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffix,new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);

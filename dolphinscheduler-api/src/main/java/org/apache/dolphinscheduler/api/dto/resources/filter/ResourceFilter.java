@@ -31,7 +31,7 @@ public class ResourceFilter implements IFilter {
     /**
      * resource suffix
      */
-    private Set<String> suffixs;
+    private Set<String> suffixs = new HashSet<>();
     /**
      * resource list
      */
