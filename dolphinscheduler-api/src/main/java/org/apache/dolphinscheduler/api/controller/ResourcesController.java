@@ -288,7 +288,9 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "programType",required = false) ProgramType programType
     ) {
         String programTypeName = programType == null ? "" : programType.name();
-        logger.info("query resource list, login user:{}, resource type:{}, program type:{}", loginUser.getUserName(),programTypeName);
+        String userName = loginUser.getUserName();
+        userName = userName.replaceAll("[\n|\r|\t]", "_");
+        logger.info("query resource list, login user:{}, resource type:{}, program type:{}", userName,programTypeName);
         Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
         return returnDataList(result);
     }
