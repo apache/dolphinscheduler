@@ -24,3 +24,4 @@ UPDATE t_ds_task_instance instance SET `worker_group`=IFNULL((SELECT name from t
 UPDATE t_ds_schedules schedule SET `worker_group`=IFNULL((SELECT name from t_ds_worker_group WHERE schedule.worker_group=CONCAT(id,'')),'default');
 UPDATE t_ds_command command SET `worker_group`=IFNULL((SELECT name from t_ds_worker_group WHERE command.worker_group=CONCAT(id,'')),'default');
 UPDATE t_ds_error_command command SET `worker_group`=IFNULL((SELECT name from t_ds_worker_group WHERE command.worker_group=CONCAT(id,'')),'default');
+UPDATE t_ds_user SET phone = '' WHERE phone = 'xx';
