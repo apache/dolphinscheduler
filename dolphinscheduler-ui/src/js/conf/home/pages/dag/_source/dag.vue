@@ -434,7 +434,6 @@
           this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
-
         // Global parameters (optional)
         this._udpTopFloorPop().then(() => {
           return this._save()

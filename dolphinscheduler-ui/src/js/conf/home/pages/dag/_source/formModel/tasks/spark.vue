@@ -362,8 +362,8 @@
           }
           let noResources = [{
             id: -1,
-            name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            name: $t('No resources exist'),
+            fullName: '/'+$t('No resources exist'),
             children: []
           }]
           if(optionsCmp.length>0) {
@@ -401,7 +401,7 @@
 
         // noRes
         if (this.noRes.length>0) {
-          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          this.$message.warning(`${i18n.$t('Please delete all non-existing resources')}`)
           return false
         }
 
