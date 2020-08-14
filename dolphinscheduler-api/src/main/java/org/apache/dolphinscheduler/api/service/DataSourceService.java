@@ -249,6 +249,7 @@ public class DataSourceService extends BaseService{
             case POSTGRESQL:
             case CLICKHOUSE:
             case ORACLE:
+            case PRESTO:
                 separator = "&";
                 break;
             default:
@@ -430,6 +431,10 @@ public class DataSourceService extends BaseService{
                     datasource = JSONUtils.parseObject(parameter, DB2ServerDataSource.class);
                     Class.forName(Constants.COM_DB2_JDBC_DRIVER);
                     break;
+                case PRESTO:
+                    datasource = JSONUtils.parseObject(parameter, PrestoDataSource.class);
+                    Class.forName(Constants.COM_PRESTO_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
@@ -513,7 +518,8 @@ public class DataSourceService extends BaseService{
         if (Constants.MYSQL.equals(type.name())
                 || Constants.POSTGRESQL.equals(type.name())
                 || Constants.CLICKHOUSE.equals(type.name())
-                || Constants.ORACLE.equals(type.name())) {
+                || Constants.ORACLE.equals(type.name())
+                || Constants.PRESTO.equals(type.name())) {
             separator = "&";
         } else if (Constants.HIVE.equals(type.name())
                 || Constants.SPARK.equals(type.name())
@@ -585,8 +591,11 @@ public class DataSourceService extends BaseService{
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
             sb.append(host).append(":").append(port);
-        }else if (Constants.DB2.equals(type.name())) {
+        } else if (Constants.DB2.equals(type.name())) {
             sb.append(Constants.JDBC_DB2);
+            sb.append(host).append(":").append(port);
+        } else if (Constants.PRESTO.equals(type.name())) {
+            sb.append(Constants.JDBC_PRESTO);
             sb.append(host).append(":").append(port);
         }
 
