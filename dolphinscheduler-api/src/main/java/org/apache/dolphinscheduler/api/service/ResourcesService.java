@@ -667,8 +667,13 @@ public class ResourcesService extends BaseService {
         if(isAdmin(loginUser)){
             userId = 0;
         }
+        Set<String> suffixSet = new HashSet<>();
+        suffixSet.add(".jar");
+        if (ResourceType.UDF.equals(type)) {
+            suffixSet.add(".py");
+        }
         List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
-        List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
+        List<Resource> resources = new ResourceFilter(suffixSet,new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
