@@ -374,16 +374,21 @@ export default {
   /**
    * get jar
    */
-  getResourcesListJar ({ state }) {
+  getResourcesListJar ({ state }, payload) {
     return new Promise((resolve, reject) => {
       if (state.resourcesListJar.length) {
         resolve()
         return
       }
       io.get('resources/list/jar', {
-        type: 'FILE'
+        type: 'FILE',
+        programType: payload
       }, res => {
-        state.resourcesListJar = res.data
+        if(payload) {
+          state.resourcesListPy = res.data
+        } else {
+          state.resourcesListJar = res.data
+        }
         resolve(res.data)
       }).catch(res => {
         reject(res)

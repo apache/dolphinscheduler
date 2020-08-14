@@ -109,6 +109,7 @@ export default {
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []
     state.resourcesListJar = (payload && payload.resourcesListJar) || []
+    state.resourcesListPy = (payload && payload.resourcesListPy) || []
     state.projectListS = (payload && payload.projectListS) || []
     state.isDetails = (payload && payload.isDetails) || false
     state.runFlag = (payload && payload.runFlag) || ''

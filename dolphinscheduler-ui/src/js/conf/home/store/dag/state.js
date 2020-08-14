@@ -55,6 +55,8 @@ export default {
   resourcesListS: [],
   // tasks resourcesListJar
   resourcesListJar: [],
+  // tasks resourcesListPy
+  resourcesListPy: [],
   // tasks datasource Type
   dsTypeListS: [
     {
