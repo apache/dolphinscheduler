@@ -69,7 +69,7 @@ export default {
   /**
    * Task status statistics
    */
-  getTaskCtatusCount ({ state }, payload) {
+  getTaskStatusCount ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get('projects/analysis/task-state-count', payload, res => {
         resolve(res)
