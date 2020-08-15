@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.commons.collections.BeanMap;
+import org.apache.commons.beanutils.BeanMap;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -88,11 +88,11 @@ public class ResourcesService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Result createDirectory(User loginUser,
-                                 String name,
-                                 String description,
-                                 ResourceType type,
-                                 int pid,
-                                 String currentDir) {
+                                  String name,
+                                  String description,
+                                  ResourceType type,
+                                  int pid,
+                                  String currentDir) {
         Result result = new Result();
         // if hdfs not startup
         if (!PropertyUtils.getResUploadStartupState()){
@@ -126,23 +126,16 @@ public class ResourcesService extends BaseService {
         Date now = new Date();
 
         Resource resource = new Resource(pid,name,fullName,true,description,name,loginUser.getId(),type,0,now,now);
-
-        try {
-            resourcesMapper.insert(resource);
-
-            putMsg(result, Status.SUCCESS);
-            Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<String, Object>();
-            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
-                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
-                    resultMap.put(entry.getKey().toString(), entry.getValue());
-                }
+        saveResource(resource);
+        putMsg(result, Status.SUCCESS);
+        Map<Object, Object> dataMap = new BeanMap(resource);
+        Map<String, Object> resultMap = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : dataMap.entrySet()) {
+            if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
             }
-            result.setData(resultMap);
-        } catch (Exception e) {
-            logger.error("resource already exists, can't recreate ", e);
-            throw new RuntimeException("resource already exists, can't recreate");
         }
+        result.setData(resultMap);
         //create directory in hdfs
         createDirecotry(loginUser,fullName,type,result);
         return result;
@@ -234,23 +227,16 @@ public class ResourcesService extends BaseService {
 
         Date now = new Date();
         Resource resource = new Resource(pid,name,fullName,false,desc,file.getOriginalFilename(),loginUser.getId(),type,file.getSize(),now,now);
-
-        try {
-            resourcesMapper.insert(resource);
-
-            putMsg(result, Status.SUCCESS);
-            Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<>();
-            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
-                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
-                    resultMap.put(entry.getKey().toString(), entry.getValue());
-                }
+        saveResource(resource);
+        putMsg(result, Status.SUCCESS);
+        Map<Object, Object> dataMap = new BeanMap(resource);
+        Map<String, Object> resultMap = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : dataMap.entrySet()) {
+            if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
             }
-            result.setData(resultMap);
-        } catch (Exception e) {
-            logger.error("resource already exists, can't recreate ", e);
-            throw new RuntimeException("resource already exists, can't recreate");
         }
+        result.setData(resultMap);
 
         // fail upload
         if (!upload(loginUser, fullName, file, type)) {
@@ -860,7 +846,7 @@ public class ResourcesService extends BaseService {
         // save data
         Date now = new Date();
         Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
-
+        //TODO confirm need to check the success status?
         resourcesMapper.insert(resource);
 
         putMsg(result, Status.SUCCESS);
@@ -1229,6 +1215,18 @@ public class ResourcesService extends BaseService {
         for(int chlidId:children){
             childList.add(chlidId);
             listAllChildren(chlidId,childList);
+        }
+    }
+
+    /**
+     * save resource ande status check sav
+     * @param resource resource
+     */
+    private void saveResource(Resource resource){
+        int saveResourceStatus = resourcesMapper.insert(resource);
+        if (saveResourceStatus != 1) {
+            logger.error("resource  maybe already exists, can't recreate ");
+            throw new RuntimeException("resource maybe already exists, can't recreate");
         }
     }
 
