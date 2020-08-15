@@ -16,22 +16,35 @@
  */
 <template>
   <div class="flink-model">
-    <m-list-box>
-      <div slot="text">{{$t('Program Type')}}</div>
-      <div slot="content">
-        <x-select
-                style="width: 130px;"
-                v-model="programType"
-                :disabled="isDetails">
-          <x-option
+    <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1">{{$t('Program Type')}}</span>
+        <span class="sp2">
+            <x-select
+              style="width: 180px;"
+              v-model="programType"
+              :disabled="isDetails">
+                <x-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+                </x-option>
+            </x-select>
+        </span>
+        <span class="sp1 sp3">{{$t('Queue')}}</span>
+        <span class="sp2">
+            <x-select  style="width: 200px;"  v-model="queue" :disabled="isDetails" >
+                <x-option
+                  v-for="city in queueList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.name">
+                </x-option>
+            </x-select>
+        </span>
       </div>
-    </m-list-box>
+    </div>
 
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
@@ -222,7 +235,8 @@
         programType: 'SCALA',
         // Program type(List)
         programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
-
+        queue: 'default',
+        queueList: [],
         flinkVersion:'<1.10',
         // Flink Versions(List)
         flinkVersionList: [{ code: '<1.10' }, { code: '>=1.10' }],
@@ -241,6 +255,19 @@
     },
     mixins: [disabledState],
     methods: {
+      _getQueueList () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/getQueueList').then(res => {
+            this.queueList = _.map(res, v => {
+              return {
+                code: v.queue,
+                name: v.queueName
+              }
+            })
+            resolve()
+          })
+        })
+      },
       /**
        * getResourceId
        */
@@ -466,7 +493,8 @@
           taskManagerMemory: this.taskManagerMemory,
           mainArgs: this.mainArgs,
           others: this.others,
-          programType: this.programType
+          programType: this.programType,
+          queue:this.queue
         }
       }
     },
@@ -477,6 +505,9 @@
         this.diGuiTree(items)
         this.mainJarList = item
         this.mainJarLists = items
+
+        this._getQueueList()
+
         let o = this.backfillItem
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
@@ -499,6 +530,7 @@
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'SCALA'
+          this.queue = o.params.queue || 'default'
 
           // backfill resourceList
           let backResource = o.params.resourceList || []

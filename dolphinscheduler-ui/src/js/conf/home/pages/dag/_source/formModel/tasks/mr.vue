@@ -16,19 +16,35 @@
  */
 <template>
   <div class="spark-model">
-    <m-list-box>
-      <div slot="text">{{$t('Program Type')}}</div>
-      <div slot="content">
-        <x-select v-model="programType" :disabled="isDetails" style="width: 110px;">
-          <x-option
+    <div class="list-box-4p">
+      <div class="clearfix list">
+        <span class="sp1">{{$t('Program Type')}}</span>
+        <span class="sp2">
+            <x-select
+              style="width: 180px;"
+              v-model="programType"
+              :disabled="isDetails">
+                <x-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+                </x-option>
+            </x-select>
+        </span>
+        <span class="sp1 sp3">{{$t('Queue')}}</span>
+        <span class="sp2">
+            <x-select  style="width: 200px;"  v-model="queue" :disabled="isDetails" >
+                <x-option
+                  v-for="city in queueList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.name">
+                </x-option>
+            </x-select>
+        </span>
       </div>
-    </m-list-box>
+    </div>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
@@ -131,6 +147,8 @@
         programType: 'JAVA',
         // Program type(List)
         programTypeList: [{ code: 'JAVA' }, { code: 'PYTHON' }],
+        queue: 'default',
+        queueList: [],
         normalizer(node) {
           return {
             label: node.name
@@ -145,6 +163,19 @@
     },
     mixins: [disabledState],
     methods: {
+      _getQueueList () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/getQueueList').then(res => {
+            this.queueList = _.map(res, v => {
+              return {
+                code: v.queue,
+                name: v.queueName
+              }
+            })
+            resolve()
+          })
+        })
+      },
       /**
        * getResourceId
        */
@@ -289,7 +320,7 @@
         })
         return true
       },
-    
+
     },
     watch: {
       /**
@@ -340,7 +371,8 @@
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
-          programType: this.programType
+          programType: this.programType,
+          queue:this.queue
         }
       }
     },
@@ -351,6 +383,18 @@
         this.diGuiTree(items)
         this.mainJarList = item
         this.mainJarLists = items
+
+        this._getQueueList().then(res => {
+          if (this.item) {
+            this.$nextTick(() => {
+              this.queueId = this.item.queueId
+            })
+            this.tenantCode = this.item.tenantCode
+            this.tenantName = this.item.tenantName
+            this.description = this.item.description
+          }
+        })
+
         let o = this.backfillItem
 
         // Non-null objects represent backfill
@@ -366,6 +410,7 @@
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'JAVA'
+          this.queue = o.params.queue || 'default'
 
           // backfill resourceList
           let resourceList = o.params.resourceList || []
