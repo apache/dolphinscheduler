@@ -94,7 +94,7 @@ public class AccessTokenServiceTest {
 
 
        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
-        Map<String, Object> result = accessTokenService.createToken(1,getDate(),"AccessTokenServiceTest");
+        Map<String, Object> result = accessTokenService.createToken(getLoginUser(), 1,getDate(),"AccessTokenServiceTest");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
@@ -102,7 +102,7 @@ public class AccessTokenServiceTest {
     @Test
     public  void testGenerateToken(){
 
-        Map<String, Object> result = accessTokenService.generateToken(Integer.MAX_VALUE,getDate());
+        Map<String, Object> result = accessTokenService.generateToken(getLoginUser(), Integer.MAX_VALUE,getDate());
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         String token = (String) result.get(Constants.DATA_LIST);
@@ -134,14 +134,22 @@ public class AccessTokenServiceTest {
     public  void testUpdateToken(){
 
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
-        Map<String, Object> result = accessTokenService.updateToken(1,Integer.MAX_VALUE,getDate(),"token");
+        Map<String, Object> result = accessTokenService.updateToken(getLoginUser(), 1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         // not exist
-        result = accessTokenService.updateToken(2,Integer.MAX_VALUE,getDate(),"token");
+        result = accessTokenService.updateToken(getLoginUser(), 2,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
 
+    }
+
+
+    private User getLoginUser(){
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
     }
 
     /**
