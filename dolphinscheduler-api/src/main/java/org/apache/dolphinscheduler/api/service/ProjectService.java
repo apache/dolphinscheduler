@@ -33,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
-
 import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
 
 /**
@@ -43,7 +41,7 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
  *HttpTask./
  **/
 @Service
-public class ProjectService extends BaseService{
+public class ProjectService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
@@ -66,7 +64,7 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Map<String, Object> descCheck = checkDesc(desc);
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
@@ -105,7 +103,7 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> queryById(Integer projectId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.selectById(projectId);
 
         if (project != null) {
@@ -126,7 +124,7 @@ public class ProjectService extends BaseService{
      * @return true if the login user have permission to see the project
      */
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (project == null) {
             putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
         } else if (!checkReadPermission(loginUser, project)) {
@@ -191,7 +189,7 @@ public class ProjectService extends BaseService{
      * @return delete result code
      */
     public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.selectById(projectId);
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
@@ -245,7 +243,7 @@ public class ProjectService extends BaseService{
      * @return update result code
      */
     public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         Map<String, Object> descCheck = checkDesc(desc);
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
@@ -284,7 +282,7 @@ public class ProjectService extends BaseService{
      * @return the projects which user have not permission to see
      */
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -341,6 +339,26 @@ public class ProjectService extends BaseService{
         }
 
         List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
+        result.put(Constants.DATA_LIST, projects);
+        putMsg(result,Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query authorized project
+     *
+     * @param loginUser login user
+     * @return projects which the user have permission to see, Except for items created by this user
+     */
+    public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
         putMsg(result,Status.SUCCESS);
 

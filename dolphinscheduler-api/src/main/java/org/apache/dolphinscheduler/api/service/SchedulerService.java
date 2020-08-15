@@ -452,7 +452,7 @@ public class SchedulerService extends BaseService {
      * @return schedule list
      */
     public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
@@ -534,7 +534,7 @@ public class SchedulerService extends BaseService {
      */
     public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -583,7 +583,7 @@ public class SchedulerService extends BaseService {
      * @return the next five fire time
      */
     public Map<String,Object> previewSchedule(User loginUser, String projectName, String schedule) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         CronExpression cronExpression;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();

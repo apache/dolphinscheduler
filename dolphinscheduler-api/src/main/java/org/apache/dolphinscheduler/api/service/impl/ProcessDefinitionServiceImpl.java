@@ -33,10 +33,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
@@ -94,7 +92,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -128,7 +125,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
-
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
@@ -328,41 +324,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.SUCCESS);
         }
         return result;
-    }
-
-    /**
-     * copy process definition
-     *
-     * @param loginUser   login user
-     * @param projectName project name
-     * @param processId   process definition id
-     * @return copy result code
-     */
-    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) throws JsonProcessingException {
-
-        Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return checkResult;
-        }
-
-        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
-        if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
-            return result;
-        } else {
-            return createProcessDefinition(
-                    loginUser,
-                    projectName,
-                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
-                    processDefinition.getProcessDefinitionJson(),
-                    processDefinition.getDescription(),
-                    processDefinition.getLocations(),
-                    processDefinition.getConnects());
-        }
     }
 
     /**
@@ -963,7 +924,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         return true;
     }
-
     /**
      * import process add special task param
      *
@@ -1010,7 +970,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param processDefinitionId   process definition id
      * @return insert schedule flag
      */
-    private int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta,
+    public int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta,
                                      String processDefinitionName, Integer processDefinitionId) {
         Date now = new Date();
         Schedule scheduleObj = new Schedule();
@@ -1487,6 +1447,249 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return processDefinitionName;
         }
         return recursionProcessDefinitionName(projectId, processDefinitionName, num + 1);
+    }
+
+    private Map<String, Object> copyProcessDefinition(User loginUser,
+                                                      Integer processId,
+                                                      Project targetProject) throws JsonProcessingException {
+
+        Map<String, Object> result = new HashMap<>();
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        } else {
+            return createProcessDefinition(
+                    loginUser,
+                    targetProject.getName(),
+                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
+                    processDefinition.getProcessDefinitionJson(),
+                    processDefinition.getDescription(),
+                    processDefinition.getLocations(),
+                    processDefinition.getConnects());
+
+        }
+    }
+
+    /**
+     * batch copy process definition
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @param processDefinitionIds processDefinitionIds
+     * @param targetProjectId targetProjectId
+     * @return
+     */
+    @Override
+    public Map<String, Object> batchCopyProcessDefinition(User loginUser,
+                                                          String projectName,
+                                                          String processDefinitionIds,
+                                                          int targetProjectId){
+        Map<String, Object> result = new HashMap<>();
+        List<String> failedProcessList = new ArrayList<>();
+
+        if (StringUtils.isEmpty(processDefinitionIds)) {
+            putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, processDefinitionIds);
+            return result;
+        }
+
+        //check src project auth
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
+        if (checkResult != null) {
+            return checkResult;
+        }
+
+        Project targetProject = projectMapper.queryDetailById(targetProjectId);
+        if(targetProject == null){
+            putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
+            return result;
+        }
+
+        if(!(targetProject.getName()).equals(projectName)){
+            Map<String, Object> checkTargetProjectResult = checkProjectAndAuth(loginUser, targetProject.getName());
+            if (checkTargetProjectResult != null) {
+                return checkTargetProjectResult;
+            }
+        }
+
+        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
+        doBatchCopyProcessDefinition(loginUser, targetProject, failedProcessList, processDefinitionIdList);
+
+        checkBatchOperateResult(projectName,targetProject.getName(),result,failedProcessList,true);
+
+        return result;
+    }
+
+    /**
+     * batch move process definition
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @param processDefinitionIds processDefinitionIds
+     * @param targetProjectId targetProjectId
+     * @return
+     */
+    @Override
+    public Map<String, Object> batchMoveProcessDefinition(User loginUser,
+                                                          String projectName,
+                                                          String processDefinitionIds,
+                                                          int targetProjectId) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> failedProcessList = new ArrayList<>();
+
+        //check src project auth
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, projectName);
+        if (checkResult != null) {
+            return checkResult;
+        }
+
+        if (StringUtils.isEmpty(processDefinitionIds)) {
+            putMsg(result, Status.PROCESS_DEFINITION_IDS_IS_EMPTY, processDefinitionIds);
+            return result;
+        }
+        
+        Project targetProject = projectMapper.queryDetailById(targetProjectId);
+        if(targetProject == null){
+            putMsg(result, Status.PROJECT_NOT_FOUNT, targetProjectId);
+            return result;
+        }
+
+        if(!(targetProject.getName()).equals(projectName)){
+            Map<String, Object> checkTargetProjectResult = checkProjectAndAuth(loginUser, targetProject.getName());
+            if (checkTargetProjectResult != null) {
+                return checkTargetProjectResult;
+            }
+        }
+
+        String[] processDefinitionIdList = processDefinitionIds.split(Constants.COMMA);
+        doBatchMoveProcessDefinition(targetProject, failedProcessList, processDefinitionIdList);
+
+        checkBatchOperateResult(projectName,targetProject.getName(),result,failedProcessList,false);
+
+        return result;
+    }
+
+    /**
+     * do batch move process definition
+     * @param targetProject targetProject
+     * @param failedProcessList failedProcessList
+     * @param processDefinitionIdList processDefinitionIdList
+     */
+    private void doBatchMoveProcessDefinition(Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
+        for(String processDefinitionId:processDefinitionIdList){
+            try {
+                Map<String, Object> moveProcessDefinitionResult =
+                        moveProcessDefinition(Integer.valueOf(processDefinitionId),targetProject);
+                if (!Status.SUCCESS.equals(moveProcessDefinitionResult.get(Constants.STATUS))) {
+                    setFailedProcessList(failedProcessList, processDefinitionId);
+                    logger.error((String) moveProcessDefinitionResult.get(Constants.MSG));
+                }
+            } catch (Exception e) {
+                setFailedProcessList(failedProcessList, processDefinitionId);
+            }
+        }
+    }
+
+    /**
+     * batch copy process definition
+     * @param loginUser loginUser
+     * @param targetProject targetProject
+     * @param failedProcessList failedProcessList
+     * @param processDefinitionIdList processDefinitionIdList
+     */
+    private void doBatchCopyProcessDefinition(User loginUser, Project targetProject, List<String> failedProcessList, String[] processDefinitionIdList) {
+        for(String processDefinitionId:processDefinitionIdList){
+            try {
+                Map<String, Object> copyProcessDefinitionResult =
+                        copyProcessDefinition(loginUser,Integer.valueOf(processDefinitionId),targetProject);
+                if (!Status.SUCCESS.equals(copyProcessDefinitionResult.get(Constants.STATUS))) {
+                    setFailedProcessList(failedProcessList, processDefinitionId);
+                    logger.error((String) copyProcessDefinitionResult.get(Constants.MSG));
+                }
+            } catch (Exception e) {
+                setFailedProcessList(failedProcessList, processDefinitionId);
+            }
+        }
+    }
+
+    /**
+     * set failed processList
+     * @param failedProcessList failedProcessList
+     * @param processDefinitionId processDefinitionId
+     */
+    private void setFailedProcessList(List<String> failedProcessList, String processDefinitionId) {
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(Integer.valueOf(processDefinitionId));
+        if(processDefinition != null){
+            failedProcessList.add(processDefinitionId+"["+processDefinition.getName()+"]");
+        }else{
+            failedProcessList.add(processDefinitionId+"[null]");
+        }
+    }
+
+    /**
+     * check project and auth
+     * @param loginUser loginUser
+     * @param projectName projectName
+     * @return
+     */
+    private Map<String, Object> checkProjectAndAuth(User loginUser, String projectName) {
+        Project project = projectMapper.queryByName(projectName);
+
+        //check user access for project
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+        return null;
+    }
+
+    /**
+     * move process definition
+     * @param processId processId
+     * @param targetProject targetProject
+     * @return move result code
+     */
+    private Map<String, Object> moveProcessDefinition(Integer processId,
+                                                      Project targetProject) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        } else {
+            processDefinition.setProjectId(targetProject.getId());
+            processDefinition.setUpdateTime(new Date());
+            if (processDefineMapper.updateById(processDefinition) > 0) {
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * check batch operate result
+     * @param srcProjectName srcProjectName
+     * @param targetProjectName targetProjectName
+     * @param result result
+     * @param failedProcessList failedProcessList
+     * @param isCopy isCopy
+     */
+    private void checkBatchOperateResult(String srcProjectName,String targetProjectName,
+                                         Map<String, Object> result, List<String> failedProcessList,boolean isCopy) {
+        if (!failedProcessList.isEmpty()) {
+            if(isCopy){
+                putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName,String.join(",", failedProcessList));
+            }else{
+                putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR, srcProjectName, targetProjectName,String.join(",", failedProcessList));
+            }
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
     }
 
 }
