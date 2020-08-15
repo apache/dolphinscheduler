@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.DDLException;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -846,7 +847,6 @@ public class ResourcesService extends BaseService {
         // save data
         Date now = new Date();
         Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
-        //TODO confirm need to check the success status?
         resourcesMapper.insert(resource);
 
         putMsg(result, Status.SUCCESS);
@@ -1219,14 +1219,14 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * save resource ande status check sav
+     * save resource and  check save status
      * @param resource resource
      */
     private void saveResource(Resource resource){
         int saveResourceStatus = resourcesMapper.insert(resource);
         if (saveResourceStatus != 1) {
             logger.error("resource  maybe already exists, can't recreate ");
-            throw new RuntimeException("resource maybe already exists, can't recreate");
+            throw new DDLException("resource maybe already exists, can't recreate");
         }
     }
 
