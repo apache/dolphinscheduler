@@ -74,7 +74,9 @@ public class MapReduceTask extends AbstractYarnTask {
             throw new RuntimeException("mapreduce task params is not valid");
         }
 
-        mapreduceParameters.setQueue(taskExecutionContext.getQueue());
+        if(StringUtils.isEmpty(mapreduceParameters.getQueue())) {
+            mapreduceParameters.setQueue(taskExecutionContext.getQueue());
+        }
         setMainJarName();
 
 

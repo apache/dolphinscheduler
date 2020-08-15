@@ -71,7 +71,9 @@ public class FlinkTask extends AbstractYarnTask {
     if (!flinkParameters.checkParameters()) {
       throw new RuntimeException("flink task params is not valid");
     }
-    flinkParameters.setQueue(taskExecutionContext.getQueue());
+    if(StringUtils.isEmpty(flinkParameters.getQueue())){
+      flinkParameters.setQueue(taskExecutionContext.getQueue());
+    }
     setMainJarName();
 
 

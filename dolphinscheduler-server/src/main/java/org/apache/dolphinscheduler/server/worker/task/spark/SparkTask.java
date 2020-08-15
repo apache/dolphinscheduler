@@ -76,8 +76,10 @@ public class SparkTask extends AbstractYarnTask {
     if (!sparkParameters.checkParameters()) {
       throw new RuntimeException("spark task params is not valid");
     }
-    sparkParameters.setQueue(taskExecutionContext.getQueue());
 
+    if(StringUtils.isEmpty(sparkParameters.getQueue())) {
+      sparkParameters.setQueue(taskExecutionContext.getQueue());
+    }
     setMainJarName();
 
     if (StringUtils.isNotEmpty(sparkParameters.getMainArgs())) {
