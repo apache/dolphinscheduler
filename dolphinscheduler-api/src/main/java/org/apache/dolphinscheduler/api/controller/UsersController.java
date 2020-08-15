@@ -161,7 +161,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "phone", required = false) String phone) throws Exception {
         logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
                 loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone, queue);
-        Map<String, Object> result = usersService.updateUser(id, userName, userPassword, email, tenantId, phone, queue);
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue);
         return returnDataList(result);
     }
 
