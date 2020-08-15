@@ -384,16 +384,7 @@
         this.mainJarList = item
         this.mainJarLists = items
 
-        this._getQueueList().then(res => {
-          if (this.item) {
-            this.$nextTick(() => {
-              this.queueId = this.item.queueId
-            })
-            this.tenantCode = this.item.tenantCode
-            this.tenantName = this.item.tenantName
-            this.description = this.item.description
-          }
-        })
+        this._getQueueList()
 
         let o = this.backfillItem
 

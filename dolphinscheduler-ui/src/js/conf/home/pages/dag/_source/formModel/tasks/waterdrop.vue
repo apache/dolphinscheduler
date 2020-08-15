@@ -29,14 +29,14 @@
         </span>
         <span class="sp1 sp3">{{$t('Queue')}}</span>
         <span class="sp4">
-          <x-input
-            :disabled="isDetails"
-            type="input"
-            v-model="queue"
-            :placeholder="$t('Please enter queue value')"
-            style="width: 60%;"
-            autocomplete="off">
-        </x-input>
+          <x-select  style="width: 200px;"  v-model="queue" :disabled="isDetails" >
+              <x-option
+                v-for="city in queueList"
+                :key="city.code"
+                :value="city.code"
+                :label="city.name">
+              </x-option>
+          </x-select>
         </span>
       </div>
     </div>
@@ -122,6 +122,7 @@
         deployMode: 'client',
         // Deployment master
         queue: 'default',
+        queueList: [],
         // Deployment master
         master: 'yarn',
         // Spark version(LIst)
@@ -148,6 +149,19 @@
       backfillItem: Object
     },
     methods: {
+      _getQueueList () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/getQueueList').then(res => {
+            this.queueList = _.map(res, v => {
+              return {
+                code: v.queue,
+                name: v.queueName
+              }
+            })
+            resolve()
+          })
+        })
+      },
       /**
        * return localParams
        */
@@ -199,7 +213,7 @@
         let deployMode = this.deployMode
         let master = this.master
         let masterUrl = this.masterUrl
-        
+
         if(this.deployMode == 'local'){
           master = 'local'
           masterUrl = ''
@@ -365,6 +379,7 @@
       this.diGuiTree(item)
       this.options = item
       let o = this.backfillItem
+      this._getQueueList()
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
