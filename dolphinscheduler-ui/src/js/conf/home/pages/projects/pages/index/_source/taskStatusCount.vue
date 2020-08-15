@@ -93,7 +93,7 @@
         const myChart = Chart.pie('#task-status-pie', this.taskStatusList, { title: '' })
         myChart.echart.setOption(pie)
 
-        // 首页不允许跳转
+        // Jump forbidden in index page
         if (this.searchParams.projectId) {
           myChart.echart.on('click', e => {
             this._goTask(e.data.name)
