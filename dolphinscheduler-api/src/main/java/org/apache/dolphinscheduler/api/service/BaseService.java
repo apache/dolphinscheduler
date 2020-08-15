@@ -95,6 +95,25 @@ public class BaseService {
     }
 
     /**
+     * check
+     *
+     * @param result result
+     * @param bool bool
+     * @param userNoOperationPerm status
+     * @return check result
+     */
+    protected boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
+        //only admin can operate
+        if (bool) {
+            result.put(Constants.STATUS, userNoOperationPerm);
+            result.put(Constants.MSG, userNoOperationPerm.getMsg());
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
      * get cookie info by name
      * @param request request
      * @param name 'sessionId'
