@@ -19,6 +19,7 @@ third-party-dependencies.txt
 *.iws
 *.tgz
 .*.swp
+.factorypath
 .vim
 .tmp
 **/node_modules
