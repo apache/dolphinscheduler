@@ -344,7 +344,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testBatchCopyProcessDefinition() throws Exception {
+    public void testBatchCopyProcessDefinition() {
 
         String projectName = "project_test1";
         Project project = getProject(projectName);
@@ -446,7 +446,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void deleteProcessDefinitionByIdTest() throws Exception {
+    public void deleteProcessDefinitionByIdTest() {
         String projectName = "project_test1";
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
 
@@ -660,7 +660,7 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
-    public void testGetTaskNodeListByDefinitionIdList() throws Exception {
+    public void testGetTaskNodeListByDefinitionIdList() {
         //process definition not exist
         String defineIdList = "46";
         Integer[] idArray = {46};
@@ -1005,7 +1005,7 @@ public class ProcessDefinitionServiceTest {
      */
     private Project getProjectById(int projectId) {
         Project project = new Project();
-        project.setId(1);
+        project.setId(projectId);
         project.setName("project_test2");
         project.setUserId(1);
         return project;
