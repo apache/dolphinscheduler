@@ -47,7 +47,7 @@ public class MRTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(MRTaskTest.class);
 
     @Test
-    public void testSparkTaskInitWithQueue() {
+    public void testMRTaskInitWithQueue() {
 
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
 
@@ -97,7 +97,7 @@ public class MRTaskTest {
     }
 
     @Test
-    public void testSparkTaskInitWithNoQueue() {
+    public void testMRTaskInitWithNoQueue() {
 
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\"}";
 

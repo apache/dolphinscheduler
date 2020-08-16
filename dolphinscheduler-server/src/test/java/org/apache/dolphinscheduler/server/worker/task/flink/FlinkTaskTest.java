@@ -46,7 +46,7 @@ public class FlinkTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(FlinkTaskTest.class);
 
     @Test
-    public void testSparkTaskInitWithQueue() {
+    public void testFlinkTaskInitWithQueue() {
 
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
 
@@ -96,7 +96,7 @@ public class FlinkTaskTest {
     }
 
     @Test
-    public void testSparkTaskInitWithNoQueue() {
+    public void testFlinkTaskInitWithNoQueue() {
 
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\"}";
 
