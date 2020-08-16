@@ -98,149 +98,149 @@ public class ProcessDefinitionServiceTest {
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
 
-    private static final String SHELL_JSON = "{\n" +
-            "    \"globalParams\": [\n" +
-            "        \n" +
-            "    ],\n" +
-            "    \"tasks\": [\n" +
-            "        {\n" +
-            "            \"type\": \"SHELL\",\n" +
-            "            \"id\": \"tasks-9527\",\n" +
-            "            \"name\": \"shell-1\",\n" +
-            "            \"params\": {\n" +
-            "                \"resourceList\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"localParams\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n" +
-            "            },\n" +
-            "            \"description\": \"\",\n" +
-            "            \"runFlag\": \"NORMAL\",\n" +
-            "            \"dependence\": {\n" +
-            "                \n" +
-            "            },\n" +
-            "            \"maxRetryTimes\": \"0\",\n" +
-            "            \"retryInterval\": \"1\",\n" +
-            "            \"timeout\": {\n" +
-            "                \"strategy\": \"\",\n" +
-            "                \"interval\": 1,\n" +
-            "                \"enable\": false\n" +
-            "            },\n" +
-            "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-            "            \"workerGroupId\": -1,\n" +
-            "            \"preTasks\": [\n" +
-            "                \n" +
-            "            ]\n" +
-            "        }\n" +
-            "    ],\n" +
-            "    \"tenantId\": 1,\n" +
-            "    \"timeout\": 0\n" +
-            "}";
+    private static final String SHELL_JSON = "{\n"
+            + "    \"globalParams\": [\n"
+            + "        \n"
+            + "    ],\n"
+            + "    \"tasks\": [\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9527\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \n"
+            + "            ]\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"tenantId\": 1,\n"
+            + "    \"timeout\": 0\n"
+            + "}";
 
-    private static final String CYCLE_SHELL_JSON = "{\n" +
-            "    \"globalParams\": [\n" +
-            "        \n" +
-            "    ],\n" +
-            "    \"tasks\": [\n" +
-            "        {\n" +
-            "            \"type\": \"SHELL\",\n" +
-            "            \"id\": \"tasks-9527\",\n" +
-            "            \"name\": \"shell-1\",\n" +
-            "            \"params\": {\n" +
-            "                \"resourceList\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"localParams\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n" +
-            "            },\n" +
-            "            \"description\": \"\",\n" +
-            "            \"runFlag\": \"NORMAL\",\n" +
-            "            \"dependence\": {\n" +
-            "                \n" +
-            "            },\n" +
-            "            \"maxRetryTimes\": \"0\",\n" +
-            "            \"retryInterval\": \"1\",\n" +
-            "            \"timeout\": {\n" +
-            "                \"strategy\": \"\",\n" +
-            "                \"interval\": 1,\n" +
-            "                \"enable\": false\n" +
-            "            },\n" +
-            "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-            "            \"workerGroupId\": -1,\n" +
-            "            \"preTasks\": [\n" +
-            "                \"tasks-9529\"\n" +
-            "            ]\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"type\": \"SHELL\",\n" +
-            "            \"id\": \"tasks-9528\",\n" +
-            "            \"name\": \"shell-1\",\n" +
-            "            \"params\": {\n" +
-            "                \"resourceList\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"localParams\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n" +
-            "            },\n" +
-            "            \"description\": \"\",\n" +
-            "            \"runFlag\": \"NORMAL\",\n" +
-            "            \"dependence\": {\n" +
-            "                \n" +
-            "            },\n" +
-            "            \"maxRetryTimes\": \"0\",\n" +
-            "            \"retryInterval\": \"1\",\n" +
-            "            \"timeout\": {\n" +
-            "                \"strategy\": \"\",\n" +
-            "                \"interval\": 1,\n" +
-            "                \"enable\": false\n" +
-            "            },\n" +
-            "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-            "            \"workerGroupId\": -1,\n" +
-            "            \"preTasks\": [\n" +
-            "                \"tasks-9527\"\n" +
-            "            ]\n" +
-            "        },\n" +
-            "        {\n" +
-            "            \"type\": \"SHELL\",\n" +
-            "            \"id\": \"tasks-9529\",\n" +
-            "            \"name\": \"shell-1\",\n" +
-            "            \"params\": {\n" +
-            "                \"resourceList\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"localParams\": [\n" +
-            "                    \n" +
-            "                ],\n" +
-            "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n" +
-            "            },\n" +
-            "            \"description\": \"\",\n" +
-            "            \"runFlag\": \"NORMAL\",\n" +
-            "            \"dependence\": {\n" +
-            "                \n" +
-            "            },\n" +
-            "            \"maxRetryTimes\": \"0\",\n" +
-            "            \"retryInterval\": \"1\",\n" +
-            "            \"timeout\": {\n" +
-            "                \"strategy\": \"\",\n" +
-            "                \"interval\": 1,\n" +
-            "                \"enable\": false\n" +
-            "            },\n" +
-            "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-            "            \"workerGroupId\": -1,\n" +
-            "            \"preTasks\": [\n" +
-            "                \"tasks-9528\"\n" +
-            "            ]\n" +
-            "        }\n" +
-            "    ],\n" +
-            "    \"tenantId\": 1,\n" +
-            "    \"timeout\": 0\n" +
-            "}";
+    private static final String CYCLE_SHELL_JSON = "{\n"
+            + "    \"globalParams\": [\n"
+            + "        \n"
+            + "    ],\n"
+            + "    \"tasks\": [\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9527\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9529\"\n"
+            + "            ]\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9528\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9527\"\n"
+            + "            ]\n"
+            + "        },\n"
+            + "        {\n"
+            + "            \"type\": \"SHELL\",\n"
+            + "            \"id\": \"tasks-9529\",\n"
+            + "            \"name\": \"shell-1\",\n"
+            + "            \"params\": {\n"
+            + "                \"resourceList\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"localParams\": [\n"
+            + "                    \n"
+            + "                ],\n"
+            + "                \"rawScript\": \"#!/bin/bash\\necho \\\"shell-1\\\"\"\n"
+            + "            },\n"
+            + "            \"description\": \"\",\n"
+            + "            \"runFlag\": \"NORMAL\",\n"
+            + "            \"dependence\": {\n"
+            + "                \n"
+            + "            },\n"
+            + "            \"maxRetryTimes\": \"0\",\n"
+            + "            \"retryInterval\": \"1\",\n"
+            + "            \"timeout\": {\n"
+            + "                \"strategy\": \"\",\n"
+            + "                \"interval\": 1,\n"
+            + "                \"enable\": false\n"
+            + "            },\n"
+            + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+            + "            \"workerGroupId\": -1,\n"
+            + "            \"preTasks\": [\n"
+            + "                \"tasks-9528\"\n"
+            + "            ]\n"
+            + "        }\n"
+            + "    ],\n"
+            + "    \"tenantId\": 1,\n"
+            + "    \"timeout\": 0\n"
+            + "}";
 
     @Test
     public void testQueryProcessDefinitionList() {
@@ -734,57 +734,57 @@ public class ProcessDefinitionServiceTest {
     @Test
     public void testImportProcessDefinitionById() throws IOException {
 
-        String processJson = "[\n" +
-                "    {\n" +
-                "        \"projectName\": \"testProject\",\n" +
-                "        \"processDefinitionName\": \"shell-4\",\n" +
-                "        \"processDefinitionJson\": \"{\\\"tenantId\\\":1,\\\"globalParams\\\":[],\\\"tasks\\\":[{\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"},\\\"maxRetryTimes\\\":\\\"0\\\",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\",\\\"dependence\\\":{},\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"},{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"],\\\"id\\\":\\\"tasks-87364\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\",\\\"params\\\":{\\\"processDefinitionId\\\":46},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\",\n" +
-                "        \"processDefinitionDescription\": \"\",\n" +
-                "        \"processDefinitionLocations\": \"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\",\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\":\\\"shell-5\\\",\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\",\n" +
-                "        \"processDefinitionConnects\": \"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\",\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"\n" +
-                "    }\n" +
-                "]";
+        String processJson = "[\n"
+                + "    {\n"
+                + "        \"projectName\": \"testProject\",\n"
+                + "        \"processDefinitionName\": \"shell-4\",\n"
+                + "        \"processDefinitionJson\": \"{\\\"tenantId\\\":1,\\\"globalParams\\\":[],\\\"tasks\\\":[{\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"},\\\"maxRetryTimes\\\":\\\"0\\\",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\",\\\"dependence\\\":{},\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"},{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\":\\\"3\\\",\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"],\\\"id\\\":\\\"tasks-87364\\\",\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\",\\\"params\\\":{\\\"processDefinitionId\\\":46},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\",\n"
+                + "        \"processDefinitionDescription\": \"\",\n"
+                + "        \"processDefinitionLocations\": \"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\",\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\":\\\"shell-5\\\",\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\",\n"
+                + "        \"processDefinitionConnects\": \"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\",\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"\n"
+                + "    }\n"
+                + "]";
 
-        String subProcessJson = "{\n" +
-                "    \"globalParams\": [\n" +
-                "        \n" +
-                "    ],\n" +
-                "    \"tasks\": [\n" +
-                "        {\n" +
-                "            \"type\": \"SHELL\",\n" +
-                "            \"id\": \"tasks-52423\",\n" +
-                "            \"name\": \"shell-5\",\n" +
-                "            \"params\": {\n" +
-                "                \"resourceList\": [\n" +
-                "                    \n" +
-                "                ],\n" +
-                "                \"localParams\": [\n" +
-                "                    \n" +
-                "                ],\n" +
-                "                \"rawScript\": \"echo \\\"shell-5\\\"\"\n" +
-                "            },\n" +
-                "            \"description\": \"\",\n" +
-                "            \"runFlag\": \"NORMAL\",\n" +
-                "            \"dependence\": {\n" +
-                "                \n" +
-                "            },\n" +
-                "            \"maxRetryTimes\": \"0\",\n" +
-                "            \"retryInterval\": \"1\",\n" +
-                "            \"timeout\": {\n" +
-                "                \"strategy\": \"\",\n" +
-                "                \"interval\": null,\n" +
-                "                \"enable\": false\n" +
-                "            },\n" +
-                "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-                "            \"workerGroupId\": \"3\",\n" +
-                "            \"preTasks\": [\n" +
-                "                \n" +
-                "            ]\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"tenantId\": 1,\n" +
-                "    \"timeout\": 0\n" +
-                "}";
+        String subProcessJson = "{\n"
+                + "    \"globalParams\": [\n"
+                + "        \n"
+                + "    ],\n"
+                + "    \"tasks\": [\n"
+                + "        {\n"
+                + "            \"type\": \"SHELL\",\n"
+                + "            \"id\": \"tasks-52423\",\n"
+                + "            \"name\": \"shell-5\",\n"
+                + "            \"params\": {\n"
+                + "                \"resourceList\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"localParams\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"rawScript\": \"echo \\\"shell-5\\\"\"\n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"interval\": null,\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": \"3\",\n"
+                + "            \"preTasks\": [\n"
+                + "                \n"
+                + "            ]\n"
+                + "        }\n"
+                + "    ],\n"
+                + "    \"tenantId\": 1,\n"
+                + "    \"timeout\": 0\n"
+                + "}";
 
         FileUtils.writeStringToFile(new File("/tmp/task.json"), processJson);
 
@@ -838,95 +838,95 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(processService.findProcessDefineById(1)).thenReturn(getProcessDefinition());
 
-        String sqlDependentJson = "{\n" +
-                "    \"globalParams\": [\n" +
-                "        \n" +
-                "    ],\n" +
-                "    \"tasks\": [\n" +
-                "        {\n" +
-                "            \"type\": \"SQL\",\n" +
-                "            \"id\": \"tasks-27297\",\n" +
-                "            \"name\": \"sql\",\n" +
-                "            \"params\": {\n" +
-                "                \"type\": \"MYSQL\",\n" +
-                "                \"datasource\": 1,\n" +
-                "                \"sql\": \"select * from test\",\n" +
-                "                \"udfs\": \"\",\n" +
-                "                \"sqlType\": \"1\",\n" +
-                "                \"title\": \"\",\n" +
-                "                \"receivers\": \"\",\n" +
-                "                \"receiversCc\": \"\",\n" +
-                "                \"showType\": \"TABLE\",\n" +
-                "                \"localParams\": [\n" +
-                "                    \n" +
-                "                ],\n" +
-                "                \"connParams\": \"\",\n" +
-                "                \"preStatements\": [\n" +
-                "                    \n" +
-                "                ],\n" +
-                "                \"postStatements\": [\n" +
-                "                    \n" +
-                "                ]\n" +
-                "            },\n" +
-                "            \"description\": \"\",\n" +
-                "            \"runFlag\": \"NORMAL\",\n" +
-                "            \"dependence\": {\n" +
-                "                \n" +
-                "            },\n" +
-                "            \"maxRetryTimes\": \"0\",\n" +
-                "            \"retryInterval\": \"1\",\n" +
-                "            \"timeout\": {\n" +
-                "                \"strategy\": \"\",\n" +
-                "                \"enable\": false\n" +
-                "            },\n" +
-                "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-                "            \"workerGroupId\": -1,\n" +
-                "            \"preTasks\": [\n" +
-                "                \"dependent\"\n" +
-                "            ]\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"type\": \"DEPENDENT\",\n" +
-                "            \"id\": \"tasks-33787\",\n" +
-                "            \"name\": \"dependent\",\n" +
-                "            \"params\": {\n" +
-                "                \n" +
-                "            },\n" +
-                "            \"description\": \"\",\n" +
-                "            \"runFlag\": \"NORMAL\",\n" +
-                "            \"dependence\": {\n" +
-                "                \"relation\": \"AND\",\n" +
-                "                \"dependTaskList\": [\n" +
-                "                    {\n" +
-                "                        \"relation\": \"AND\",\n" +
-                "                        \"dependItemList\": [\n" +
-                "                            {\n" +
-                "                                \"projectId\": 2,\n" +
-                "                                \"definitionId\": 46,\n" +
-                "                                \"depTasks\": \"ALL\",\n" +
-                "                                \"cycle\": \"day\",\n" +
-                "                                \"dateValue\": \"today\"\n" +
-                "                            }\n" +
-                "                        ]\n" +
-                "                    }\n" +
-                "                ]\n" +
-                "            },\n" +
-                "            \"maxRetryTimes\": \"0\",\n" +
-                "            \"retryInterval\": \"1\",\n" +
-                "            \"timeout\": {\n" +
-                "                \"strategy\": \"\",\n" +
-                "                \"enable\": false\n" +
-                "            },\n" +
-                "            \"taskInstancePriority\": \"MEDIUM\",\n" +
-                "            \"workerGroupId\": -1,\n" +
-                "            \"preTasks\": [\n" +
-                "                \n" +
-                "            ]\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"tenantId\": 1,\n" +
-                "    \"timeout\": 0\n" +
-                "}";
+        String sqlDependentJson = "{\n"
+                + "    \"globalParams\": [\n"
+                + "        \n"
+                + "    ],\n"
+                + "    \"tasks\": [\n"
+                + "        {\n"
+                + "            \"type\": \"SQL\",\n"
+                + "            \"id\": \"tasks-27297\",\n"
+                + "            \"name\": \"sql\",\n"
+                + "            \"params\": {\n"
+                + "                \"type\": \"MYSQL\",\n"
+                + "                \"datasource\": 1,\n"
+                + "                \"sql\": \"select * from test\",\n"
+                + "                \"udfs\": \"\",\n"
+                + "                \"sqlType\": \"1\",\n"
+                + "                \"title\": \"\",\n"
+                + "                \"receivers\": \"\",\n"
+                + "                \"receiversCc\": \"\",\n"
+                + "                \"showType\": \"TABLE\",\n"
+                + "                \"localParams\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"connParams\": \"\",\n"
+                + "                \"preStatements\": [\n"
+                + "                    \n"
+                + "                ],\n"
+                + "                \"postStatements\": [\n"
+                + "                    \n"
+                + "                ]\n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": -1,\n"
+                + "            \"preTasks\": [\n"
+                + "                \"dependent\"\n"
+                + "            ]\n"
+                + "        },\n"
+                + "        {\n"
+                + "            \"type\": \"DEPENDENT\",\n"
+                + "            \"id\": \"tasks-33787\",\n"
+                + "            \"name\": \"dependent\",\n"
+                + "            \"params\": {\n"
+                + "                \n"
+                + "            },\n"
+                + "            \"description\": \"\",\n"
+                + "            \"runFlag\": \"NORMAL\",\n"
+                + "            \"dependence\": {\n"
+                + "                \"relation\": \"AND\",\n"
+                + "                \"dependTaskList\": [\n"
+                + "                    {\n"
+                + "                        \"relation\": \"AND\",\n"
+                + "                        \"dependItemList\": [\n"
+                + "                            {\n"
+                + "                                \"projectId\": 2,\n"
+                + "                                \"definitionId\": 46,\n"
+                + "                                \"depTasks\": \"ALL\",\n"
+                + "                                \"cycle\": \"day\",\n"
+                + "                                \"dateValue\": \"today\"\n"
+                + "                            }\n"
+                + "                        ]\n"
+                + "                    }\n"
+                + "                ]\n"
+                + "            },\n"
+                + "            \"maxRetryTimes\": \"0\",\n"
+                + "            \"retryInterval\": \"1\",\n"
+                + "            \"timeout\": {\n"
+                + "                \"strategy\": \"\",\n"
+                + "                \"enable\": false\n"
+                + "            },\n"
+                + "            \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "            \"workerGroupId\": -1,\n"
+                + "            \"preTasks\": [\n"
+                + "                \n"
+                + "            ]\n"
+                + "        }\n"
+                + "    ],\n"
+                + "    \"tenantId\": 1,\n"
+                + "    \"timeout\": 0\n"
+                + "}";
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
                 sqlDependentJson, "", "", "");
 
