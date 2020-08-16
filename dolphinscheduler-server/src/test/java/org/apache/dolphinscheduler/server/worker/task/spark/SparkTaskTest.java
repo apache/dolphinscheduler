@@ -156,23 +156,23 @@ public class SparkTaskTest {
 
     @Test
     public void testSparkTaskInitWithQueue() {
-        String param = "{" +
-                "\"mainClass\":\"com.test.main\"," +
-                "\"mainJar\":{\"id\":1}," +
-                "\"deployMode\":\"cluster\"," +
-                "\"resourceList\":[]," +
-                "\"localParams\":[]," +
-                "\"driverCores\":1," +
-                "\"driverMemory\":\"512M\"," +
-                "\"numExecutors\":2," +
-                "\"executorMemory\":\"2G\"," +
-                "\"executorCores\":2," +
-                "\"mainArgs\":\"\"," +
-                "\"others\":\"\"," +
-                "\"programType\":\"SCALA\"," +
-                "\"sparkVersion\":\"SPARK2\"," +
-                "\"queue\":\"queueB\"" +
-                "}";
+        String param = new StringBuilder().append("{")
+                .append("\"mainClass\":\"com.test.main\",")
+                .append("\"mainJar\":{\"id\":1},")
+                .append("\"deployMode\":\"cluster\",")
+                .append("\"resourceList\":[],")
+                .append("\"localParams\":[],")
+                .append("\"driverCores\":1,")
+                .append("\"driverMemory\":\"512M\",")
+                .append("\"numExecutors\":2,")
+                .append("\"executorMemory\":\"2G\",")
+                .append("\"executorCores\":2,")
+                .append("\"mainArgs\":\"\",")
+                .append("\"others\":\"\",")
+                .append("\"programType\":\"SCALA\",")
+                .append("\"sparkVersion\":\"SPARK2\",")
+                .append("\"queue\":\"queueB\"")
+                .append("}").toString();
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
         PowerMockito.mockStatic(OSUtils.class);
@@ -219,22 +219,22 @@ public class SparkTaskTest {
 
     @Test
     public void testSparkTaskInitWithNoQueue() {
-        String param = "{" +
-                "\"mainClass\":\"com.test.main\"," +
-                "\"mainJar\":{\"id\":1}," +
-                "\"deployMode\":\"cluster\"," +
-                "\"resourceList\":[]," +
-                "\"localParams\":[]," +
-                "\"driverCores\":1," +
-                "\"driverMemory\":\"512M\"," +
-                "\"numExecutors\":2," +
-                "\"executorMemory\":\"2G\"," +
-                "\"executorCores\":2," +
-                "\"mainArgs\":\"\"," +
-                "\"others\":\"\"," +
-                "\"programType\":\"SCALA\"," +
-                "\"sparkVersion\":\"SPARK2\"" +
-                "}";
+        String param = new StringBuilder().append("{")
+                .append("\"mainClass\":\"com.test.main\",")
+                .append("\"mainJar\":{\"id\":1},")
+                .append("\"deployMode\":\"cluster\",")
+                .append("\"resourceList\":[],")
+                .append("\"localParams\":[],")
+                .append("\"driverCores\":1,")
+                .append("\"driverMemory\":\"512M\",")
+                .append("\"numExecutors\":2,")
+                .append("\"executorMemory\":\"2G\",")
+                .append("\"executorCores\":2,")
+                .append("\"mainArgs\":\"\",")
+                .append("\"others\":\"\",")
+                .append("\"programType\":\"SCALA\",")
+                .append("\"sparkVersion\":\"SPARK2\"")
+                .append("}").toString();
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
         PowerMockito.mockStatic(OSUtils.class);
