@@ -16,12 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.mr;
 
-import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -50,7 +49,7 @@ public class MRTaskTest {
     @Test
     public void testMRTaskInitWithQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
+        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"resourceList\":[],\"localParams\":[],\"mainArgs\":\"11\",\"others\":\"\",\"programType\":\"JAVA\",\"queue\":\"queueA\"}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -87,19 +86,18 @@ public class MRTaskTest {
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
-        FlinkTask flinkTask = new FlinkTask(taskExecutionContext, logger);
 
+        MapReduceTask mapReduceTask = new MapReduceTask(taskExecutionContext, logger);
 
-        flinkTask.init();
-        FlinkParameters flinkParameters = (FlinkParameters) flinkTask.getParameters();
-        Assert.assertEquals("queueA", flinkParameters.getQueue());
-
+        mapReduceTask.init();
+        MapreduceParameters mapreduceParameters = (MapreduceParameters) mapReduceTask.getParameters();
+        Assert.assertEquals("queueA", mapreduceParameters.getQueue());
     }
 
     @Test
     public void testMRTaskInitWithNoQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\"}";
+        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"resourceList\":[],\"localParams\":[],\"mainArgs\":\"11\",\"others\":\"\",\"programType\":\"JAVA\"}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -136,11 +134,11 @@ public class MRTaskTest {
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
-        FlinkTask flinkTask = new FlinkTask(taskExecutionContext, logger);
+        MapReduceTask mapReduceTask = new MapReduceTask(taskExecutionContext, logger);
 
-        flinkTask.init();
-        FlinkParameters flinkParameters = (FlinkParameters) flinkTask.getParameters();
-        Assert.assertEquals("testQueue", flinkParameters.getQueue());
+        mapReduceTask.init();
+        MapreduceParameters mapreduceParameters = (MapreduceParameters) mapReduceTask.getParameters();
+        Assert.assertEquals("testQueue", mapreduceParameters.getQueue());
 
     }
 
