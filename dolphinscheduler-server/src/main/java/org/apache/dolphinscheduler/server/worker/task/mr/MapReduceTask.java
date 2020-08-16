@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.mr;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -23,39 +24,41 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 /**
- * mapreduce task
+ * mapreduce task .
  */
 public class MapReduceTask extends AbstractYarnTask {
 
 
     /**
-     * mapreduce parameters
+     * mapreduce parameters.
      */
     private MapreduceParameters mapreduceParameters;
 
     /**
-     * taskExecutionContext
+     * taskExecutionContext.
      */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     /**
-     * constructor
+     * constructor.
+     *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger    logger
+     * @param logger logger
      */
     public MapReduceTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
@@ -74,11 +77,10 @@ public class MapReduceTask extends AbstractYarnTask {
             throw new RuntimeException("mapreduce task params is not valid");
         }
 
-        if(StringUtils.isEmpty(mapreduceParameters.getQueue())) {
+        if (StringUtils.isEmpty(mapreduceParameters.getQueue())) {
             mapreduceParameters.setQueue(taskExecutionContext.getQueue());
         }
         setMainJarName();
-
 
         // replace placeholder
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
@@ -87,18 +89,19 @@ public class MapReduceTask extends AbstractYarnTask {
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
 
-        if (paramsMap != null){
-            String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
+        if (paramsMap != null) {
+            String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(), ParamUtils.convert(paramsMap));
             mapreduceParameters.setMainArgs(args);
-            if(mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON){
-                String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),  ParamUtils.convert(paramsMap));
+            if (mapreduceParameters.getProgramType() != null && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
+                String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(), ParamUtils.convert(paramsMap));
                 mapreduceParameters.setOthers(others);
             }
         }
     }
 
     /**
-     * build command
+     * build command.
+     *
      * @return command
      * @throws Exception exception
      */
@@ -141,25 +144,26 @@ public class MapReduceTask extends AbstractYarnTask {
     }
 
     /**
-     * build parameters
+     * build parameters.
+     *
      * @param mapreduceParameters mapreduce parameters
      * @return parameter list
      */
-    private List<String> buildParameters(MapreduceParameters mapreduceParameters){
+    private List<String> buildParameters(MapreduceParameters mapreduceParameters) {
 
         List<String> result = new ArrayList<>();
 
         result.add(Constants.HADOOP);
 
         // main jar
-        if(mapreduceParameters.getMainJar()!= null){
+        if (mapreduceParameters.getMainJar() != null) {
             result.add(Constants.JAR);
             result.add(mapreduceParameters.getMainJar().getRes());
         }
 
         // main class
-        if(!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
-                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
+        if (!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
+                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())) {
             result.add(mapreduceParameters.getMainClass());
         }
 
@@ -172,13 +176,13 @@ public class MapReduceTask extends AbstractYarnTask {
             }
 
             result.add(mapreduceParameters.getOthers());
-        }else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
+        } else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
             result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
 
         }
 
         // command args
-        if(StringUtils.isNotEmpty(mapreduceParameters.getMainArgs())){
+        if (StringUtils.isNotEmpty(mapreduceParameters.getMainArgs())) {
             result.add(mapreduceParameters.getMainArgs());
         }
         return result;
