@@ -219,12 +219,15 @@
                       ^sun\.misc\.BASE64Decoder,
                       ^jdk\.internal\.jline\.internal\.Nullable"/>
         </module>
-      
+
         <module name="RedundantImport"/>
-      
+
         <module name="UnusedImports"/>
-      
+
         <module name="ImportOrder">
+            <property name="staticGroups" value="org.apache.dolphinscheduler,org.apache,java,javax,org,com"/>
+            <property name="separatedStaticGroups" value="true"/>
+
             <property name="groups" value="org.apache.dolphinscheduler,org.apache,java,javax,org,com"/>
             <property name="ordered" value="true"/>
             <property name="separated" value="true"/>
@@ -269,7 +272,9 @@
             <property name="severity" value="error"/>
         </module>
 
-        <module name="JavadocStyle"/>
+        <module name="JavadocStyle">
+            <property name="endOfSentenceFormat" value=""/>
+        </module>
 
         <module name="JavadocType">
             <property name="scope" value="protected"/>
