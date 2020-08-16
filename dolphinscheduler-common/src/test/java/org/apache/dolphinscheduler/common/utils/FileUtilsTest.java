@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+
 import org.apache.dolphinscheduler.common.Constants;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DateUtils.class)
@@ -89,7 +91,7 @@ public class FileUtilsTest {
     @Test
     public void testWriteContent2File() throws FileNotFoundException {
         // file exists, fmt is invalid
-        String filePath = "test/testFile.txt" ;
+        String filePath = "test/testFile.txt";
         String content = "正正正faffdasfasdfas";
         FileUtils.writeContent2File(content, filePath);
 
