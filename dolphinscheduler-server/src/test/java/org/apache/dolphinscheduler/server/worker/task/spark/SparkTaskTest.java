@@ -22,19 +22,34 @@ import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(OSUtils.class)
+@PowerMockIgnore({"javax.management.*","javax.net.ssl.*"})
 public class SparkTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SparkTaskTest.class);
@@ -138,4 +153,107 @@ public class SparkTaskTest {
         Assert.assertEquals(SPARK2_COMMAND, sparkArgs.split(" ")[0]);
 
     }
+
+
+    @Test
+    public void testSparkTaskInitWithQueue() {
+
+//        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":72},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
+
+        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\",\"queue\":\"queueB\"}" ;
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+
+        PowerMockito.mockStatic(OSUtils.class);
+        ProcessService processService = PowerMockito.mock(ProcessService.class);
+
+        Resource resource = PowerMockito.mock(Resource.class);
+        Mockito.when(resource.getFullName()).thenReturn("/");
+        Mockito.when(processService.getResourceById(1)).thenReturn(resource);
+
+
+        ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        PowerMockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        TaskProps props = new TaskProps();
+        props.setExecutePath("/tmp");
+        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+        props.setTaskInstanceId(1);
+        props.setTenantCode("1");
+        props.setEnvFile(".dolphinscheduler_env.sh");
+        props.setTaskStartTime(new Date());
+        props.setTaskTimeout(0);
+        props.setTaskParams(param);
+
+
+        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
+        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
+        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
+        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
+        Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
+        SparkTask sparkTask = new SparkTask(taskExecutionContext, logger);
+
+
+
+        sparkTask.init();
+        SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
+        Assert.assertEquals("queueB",sparkParameters.getQueue());
+
+    }
+
+    @Test
+    public void testSparkTaskInitWithNoQueue() {
+
+        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\"}" ;
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+
+        PowerMockito.mockStatic(OSUtils.class);
+        ProcessService processService = PowerMockito.mock(ProcessService.class);
+
+        Resource resource = PowerMockito.mock(Resource.class);
+        Mockito.when(resource.getFullName()).thenReturn("/");
+        Mockito.when(processService.getResourceById(1)).thenReturn(resource);
+
+
+        ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        PowerMockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        TaskProps props = new TaskProps();
+        props.setExecutePath("/tmp");
+        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+        props.setTaskInstanceId(1);
+        props.setTenantCode("1");
+        props.setEnvFile(".dolphinscheduler_env.sh");
+        props.setTaskStartTime(new Date());
+        props.setTaskTimeout(0);
+        props.setTaskParams(param);
+
+
+        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
+        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
+        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
+        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
+        Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
+        SparkTask sparkTask = new SparkTask(taskExecutionContext, logger);
+
+        sparkTask.init();
+        SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
+        Assert.assertEquals("testQueue",sparkParameters.getQueue());
+
+    }
+
+
+
 }
