@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.service;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -60,12 +60,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessInstanceServiceTest {
 
     @InjectMocks
@@ -75,7 +73,7 @@ public class ProcessInstanceServiceTest {
     ProjectMapper projectMapper;
 
     @Mock
-    ProjectService projectService;
+    ProjectServiceImpl projectService;
 
     @Mock
     ProcessService processService;
@@ -185,8 +183,6 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectName);
         Project project = getProject(projectName);
         ProcessInstance processInstance = getProcessInstance();
-        List<ProcessInstance> processInstanceList = new ArrayList<>();
-        processInstanceList.add(processInstance);
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
