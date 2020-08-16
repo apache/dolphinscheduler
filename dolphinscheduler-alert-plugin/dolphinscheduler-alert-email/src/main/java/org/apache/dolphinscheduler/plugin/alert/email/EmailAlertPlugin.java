@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * email alert plugin

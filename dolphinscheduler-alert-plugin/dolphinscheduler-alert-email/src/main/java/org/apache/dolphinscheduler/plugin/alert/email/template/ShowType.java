@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.plugin.alert.email.template;
+
 /**
  * show type for email
  */
@@ -31,7 +32,7 @@ public enum ShowType {
     TABLEATTACHMENT(3, "table attachment");
 
 
-    ShowType(int code, String descp){
+    ShowType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

@@ -16,19 +16,23 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static java.util.Objects.requireNonNull;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static java.util.Objects.requireNonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * the default html alert message template
@@ -39,30 +43,31 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
 
     @Override
-    public String getMessageFromTemplate(String content, ShowType showType,boolean showAll) {
+    public String getMessageFromTemplate(String content, ShowType showType, boolean showAll) {
 
-        switch (showType){
+        switch (showType) {
             case TABLE:
-                return getTableTypeMessage(content,showAll);
+                return getTableTypeMessage(content, showAll);
             case TEXT:
-                return getTextTypeMessage(content,showAll);
+                return getTextTypeMessage(content, showAll);
             default:
-                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate",showType));
+                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate", showType));
         }
     }
 
     /**
      * get alert message which type is TABLE
+     *
      * @param content message content
      * @param showAll weather to show all
      * @return alert message
      */
-    private String getTableTypeMessage(String content,boolean showAll){
+    private String getTableTypeMessage(String content, boolean showAll) {
 
-        if (StringUtils.isNotEmpty(content)){
+        if (StringUtils.isNotEmpty(content)) {
             List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
-            if(!showAll && mapItemsList.size() > EmailConstants.NUMBER_1000){
+            if (!showAll && mapItemsList.size() > EmailConstants.NUMBER_1000) {
                 mapItemsList = mapItemsList.subList(0, EmailConstants.NUMBER_1000);
             }
 
@@ -71,7 +76,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             boolean flag = true;
 
             String title = "";
-            for (LinkedHashMap mapItems : mapItemsList){
+            for (LinkedHashMap mapItems : mapItemsList) {
 
                 Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
 
@@ -79,7 +84,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
                 StringBuilder t = new StringBuilder(EmailConstants.TR);
                 StringBuilder cs = new StringBuilder(EmailConstants.TR);
-                while (iterator.hasNext()){
+                while (iterator.hasNext()) {
 
                     Map.Entry<String, Object> entry = iterator.next();
                     t.append(EmailConstants.TH).append(entry.getKey()).append(EmailConstants.TH_END);
@@ -88,14 +93,14 @@ public class DefaultHTMLTemplate implements AlertTemplate {
                 }
                 t.append(EmailConstants.TR_END);
                 cs.append(EmailConstants.TR_END);
-                if (flag){
+                if (flag) {
                     title = t.toString();
                 }
                 flag = false;
                 contents.append(cs);
             }
 
-            return getMessageFromHtmlTemplate(title,contents.toString());
+            return getMessageFromHtmlTemplate(title, contents.toString());
         }
 
         return content;
@@ -103,22 +108,23 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
     /**
      * get alert message which type is TEXT
+     *
      * @param content message content
      * @param showAll weather to show all
      * @return alert message
      */
-    private String getTextTypeMessage(String content,boolean showAll){
+    private String getTextTypeMessage(String content, boolean showAll) {
 
-        if (StringUtils.isNotEmpty(content)){
+        if (StringUtils.isNotEmpty(content)) {
             ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
-            for (JsonNode jsonNode : list){
+            for (JsonNode jsonNode : list) {
                 contents.append(EmailConstants.TR);
                 contents.append(EmailConstants.TD).append(jsonNode.toString()).append(EmailConstants.TD_END);
                 contents.append(EmailConstants.TR_END);
             }
 
-            return getMessageFromHtmlTemplate(null,contents.toString());
+            return getMessageFromHtmlTemplate(null, contents.toString());
 
         }
 
@@ -127,16 +133,17 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
     /**
      * get alert message from a html template
-     * @param title     message title
-     * @param content   message content
+     *
+     * @param title   message title
+     * @param content message content
      * @return alert message which use html template
      */
-    private String getMessageFromHtmlTemplate(String title,String content){
+    private String getMessageFromHtmlTemplate(String title, String content) {
 
         requireNonNull(content, "content must not null");
-        String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n",title);
+        String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n", title);
 
-        return EmailConstants.HTML_HEADER_PREFIX +htmlTableThead + content + EmailConstants.TABLE_BODY_HTML_TAIL;
+        return EmailConstants.HTML_HEADER_PREFIX + htmlTableThead + content + EmailConstants.TABLE_BODY_HTML_TAIL;
     }
 
 }

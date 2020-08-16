@@ -16,15 +16,13 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
-import io.airlift.resolver.ArtifactResolver;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
+import static com.google.common.base.Preconditions.checkState;
+
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonatype.aether.artifact.Artifact;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +35,14 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.aether.artifact.Artifact;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
+
+import io.airlift.resolver.ArtifactResolver;
 
 /**
  * Plugin Loader
@@ -52,7 +55,7 @@ public class DolphinPluginLoader {
     /**
      * All third-party jar packages used in the classes which in spi package need to be add
      */
-    private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String>builder()
+    private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String> builder()
             .add("org.apache.dolphinscheduler.spi.")
             .add("com.fasterxml.jackson.annotation.")
             .build();
@@ -67,8 +70,7 @@ public class DolphinPluginLoader {
         installedPluginsDir = config.getInstalledPluginsDir();
         if (config.getPlugins() == null) {
             this.configPlugins = ImmutableList.of();
-        }
-        else {
+        } else {
             this.configPlugins = ImmutableList.copyOf(config.getPlugins());
         }
 
@@ -77,8 +79,7 @@ public class DolphinPluginLoader {
     }
 
     public void loadPlugins()
-            throws Exception
-    {
+            throws Exception {
         for (File file : listPluginDirs(installedPluginsDir)) {
             if (file.isDirectory()) {
                 loadPlugin(file.getAbsolutePath());
@@ -91,8 +92,7 @@ public class DolphinPluginLoader {
     }
 
     private void loadPlugin(String plugin)
-            throws Exception
-    {
+            throws Exception {
         logger.info("-- Loading Alert plugin {} --", plugin);
         URLClassLoader pluginClassLoader = buildPluginClassLoader(plugin);
         try (ThreadContextClassLoader ignored = new ThreadContextClassLoader(pluginClassLoader)) {
@@ -101,22 +101,20 @@ public class DolphinPluginLoader {
         logger.info("-- Finished loading Alert plugin {} --", plugin);
     }
 
-    private void loadPlugin(URLClassLoader pluginClassLoader)
-    {
+    private void loadPlugin(URLClassLoader pluginClassLoader) {
         ServiceLoader<DolphinSchedulerPlugin> serviceLoader = ServiceLoader.load(DolphinSchedulerPlugin.class, pluginClassLoader);
         List<DolphinSchedulerPlugin> plugins = ImmutableList.copyOf(serviceLoader);
         checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
             logger.info("Installing {}", plugin.getClass().getName());
-            for(DolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
+            for (DolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
                 dolphinPluginManager.installPlugin(plugin);
             }
         }
     }
 
     private URLClassLoader buildPluginClassLoader(String plugin)
-            throws Exception
-    {
+            throws Exception {
         File file = new File(plugin);
 
         if (!file.isDirectory() && (file.getName().equals("pom.xml") || file.getName().endsWith(".pom"))) {
@@ -124,15 +122,13 @@ public class DolphinPluginLoader {
         }
         if (file.isDirectory()) {
             return buildPluginClassLoaderFromDirectory(file);
-        }
-        else {
+        } else {
             throw new IllegalArgumentException(format("plugin must be a pom file or directory {} .", plugin));
         }
     }
 
     private URLClassLoader buildPluginClassLoaderFromPom(File pomFile)
-            throws Exception
-    {
+            throws Exception {
         List<Artifact> artifacts = resolver.resolvePom(pomFile);
         URLClassLoader classLoader = createClassLoader(artifacts, pomFile.getPath());
 
@@ -146,8 +142,7 @@ public class DolphinPluginLoader {
     }
 
     private URLClassLoader buildPluginClassLoaderFromDirectory(File dir)
-            throws Exception
-    {
+            throws Exception {
         logger.info("Classpath for {}:", dir.getName());
         List<URL> urls = new ArrayList<>();
         for (File file : listPluginDirs(dir)) {
@@ -158,8 +153,7 @@ public class DolphinPluginLoader {
     }
 
     private URLClassLoader createClassLoader(List<Artifact> artifacts, String name)
-            throws IOException
-    {
+            throws IOException {
         logger.info("Classpath for {}:", name);
         List<URL> urls = new ArrayList<>();
         for (Artifact artifact : sortArtifacts(artifacts)) {
@@ -173,15 +167,13 @@ public class DolphinPluginLoader {
         return createClassLoader(urls);
     }
 
-    private URLClassLoader createClassLoader(List<URL> urls)
-    {
+    private URLClassLoader createClassLoader(List<URL> urls) {
         ClassLoader parent = getClass().getClassLoader();
         return new DolphinPluginClassLoader(urls, parent, DOLPHIN_SPI_PACKAGES);
     }
 
 
-    private static List<File> listPluginDirs(File installedPluginsDir)
-    {
+    private static List<File> listPluginDirs(File installedPluginsDir) {
         if (installedPluginsDir != null && installedPluginsDir.isDirectory()) {
             File[] files = installedPluginsDir.listFiles();
             if (files != null) {
@@ -192,8 +184,7 @@ public class DolphinPluginLoader {
         return ImmutableList.of();
     }
 
-    private static List<Artifact> sortArtifacts(List<Artifact> artifacts)
-    {
+    private static List<Artifact> sortArtifacts(List<Artifact> artifacts) {
         List<Artifact> list = new ArrayList<>(artifacts);
         Collections.sort(list, Ordering.natural().nullsLast().onResultOf(Artifact::getFile));
         return list;

@@ -16,9 +16,8 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import com.sun.mail.smtp.SMTPProvider;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
+import static java.util.Objects.requireNonNull;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
@@ -26,11 +25,10 @@ import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTempla
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.HtmlEmail;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +37,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.util.Objects.requireNonNull;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.mail.smtp.SMTPProvider;
 
 
 /**
@@ -65,11 +78,10 @@ public class MailSender {
     private String showType;
     private AlertTemplate alertTemplate;
 
-    public MailSender(Map<String, String> config)
-    {
+    public MailSender(Map<String, String> config) {
 
         String receiversConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS);
-        if(receiversConfig == null || "".equals(receiversConfig)) {
+        if (receiversConfig == null || "".equals(receiversConfig)) {
             throw new RuntimeException(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS + "must not be null");
         }
 
@@ -78,7 +90,7 @@ public class MailSender {
         String receiverCcsConfig = config.get(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERCCS);
 
         receiverCcs = new ArrayList<>();
-        if(receiverCcsConfig != null && !"".equals(receiverCcsConfig)) {
+        if (receiverCcsConfig != null && !"".equals(receiverCcsConfig)) {
             receiverCcs = Arrays.asList(receiverCcsConfig.split(","));
         }
 
@@ -121,6 +133,7 @@ public class MailSender {
 
     /**
      * send mail to receivers
+     *
      * @param title
      * @param content
      * @return
@@ -131,6 +144,7 @@ public class MailSender {
 
     /**
      * send mail to receivers
+     *
      * @param title
      * @param content
      * @return
@@ -141,6 +155,7 @@ public class MailSender {
 
     /**
      * send mail
+     *
      * @param title
      * @param content
      * @return
@@ -165,14 +180,14 @@ public class MailSender {
                 email.setMailSession(session);
                 email.setFrom(mailSender);
                 email.setCharset(Constants.UTF_8);
-                if (CollectionUtils.isNotEmpty(receivers)){
+                if (CollectionUtils.isNotEmpty(receivers)) {
                     // receivers mail
                     for (String receiver : receivers) {
                         email.addTo(receiver);
                     }
                 }
 
-                if (CollectionUtils.isNotEmpty(receiverCcs)){
+                if (CollectionUtils.isNotEmpty(receiverCcs)) {
                     //cc
                     for (String receiverCc : receiverCcs) {
                         email.addCc(receiverCc);
@@ -183,16 +198,16 @@ public class MailSender {
             } catch (Exception e) {
                 handleException(alertResult, e);
             }
-        }else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
+        } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content,false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
 
-                attachment(title,content,partContent);
+                attachment(title, content, partContent);
 
                 alertResult.setStatus("true");
                 return alertResult;
-            }catch (Exception e){
+            } catch (Exception e) {
                 handleException(alertResult, e);
                 return alertResult;
             }
@@ -203,40 +218,44 @@ public class MailSender {
 
     /**
      * html table content
+     *
      * @param content the content
      * @param showAll if show the whole content
      * @return the html table form
      */
-    private String htmlTable(String content, boolean showAll){
-        return alertTemplate.getMessageFromTemplate(content,ShowType.TABLE,showAll);
+    private String htmlTable(String content, boolean showAll) {
+        return alertTemplate.getMessageFromTemplate(content, ShowType.TABLE, showAll);
     }
 
     /**
      * html table content
+     *
      * @param content the content
      * @return the html table form
      */
-    private String htmlTable(String content){
-        return htmlTable(content,true);
+    private String htmlTable(String content) {
+        return htmlTable(content, true);
     }
 
     /**
      * html text content
+     *
      * @param content the content
      * @return text in html form
      */
-    private String htmlText(String content){
-        return alertTemplate.getMessageFromTemplate(content,ShowType.TEXT);
+    private String htmlText(String content) {
+        return alertTemplate.getMessageFromTemplate(content, ShowType.TEXT);
     }
 
     /**
      * send mail as Excel attachment
+     *
      * @param title
      * @param content
      * @param partContent
      * @throws Exception
      */
-    private void attachment(String title,String content,String partContent)throws Exception{
+    private void attachment(String title, String content, String partContent) throws Exception {
         MimeMessage msg = getMimeMessage();
 
         attachContent(title, content, partContent, msg);
@@ -244,6 +263,7 @@ public class MailSender {
 
     /**
      * get MimeMessage
+     *
      * @return
      * @throws MessagingException
      */
@@ -267,6 +287,7 @@ public class MailSender {
 
     /**
      * get session
+     *
      * @return the new Session
      */
     private Session getSession() {
@@ -294,6 +315,7 @@ public class MailSender {
 
     /**
      * attach content
+     *
      * @param title
      * @param content
      * @param partContent
@@ -301,12 +323,12 @@ public class MailSender {
      * @throws MessagingException
      * @throws IOException
      */
-    private void attachContent(String title, String content, String partContent,MimeMessage msg) throws MessagingException, IOException {
+    private void attachContent(String title, String content, String partContent, MimeMessage msg) throws MessagingException, IOException {
         /**
          * set receiverCc
          */
-        if(CollectionUtils.isNotEmpty(receiverCcs)){
-            for (String receiverCc : receiverCcs){
+        if (CollectionUtils.isNotEmpty(receiverCcs)) {
+            for (String receiverCc : receiverCcs) {
                 msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(receiverCc));
             }
         }
@@ -319,16 +341,16 @@ public class MailSender {
         part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         // make excel file
 
-        ExcelUtils.genExcelFile(content,title,xlsFilePath);
+        ExcelUtils.genExcelFile(content, title, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
+        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS, Constants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
@@ -341,6 +363,7 @@ public class MailSender {
 
     /**
      * the string object map
+     *
      * @param title
      * @param content
      * @param alertResult
@@ -375,16 +398,17 @@ public class MailSender {
 
     /**
      * file delete
+     *
      * @param file the file to delete
      */
-    public  void deleteFile(File file){
-        if(file.exists()){
-            if(file.delete()){
-                logger.info("delete success: {}",file.getAbsolutePath() + file.getName());
-            }else{
+    public void deleteFile(File file) {
+        if (file.exists()) {
+            if (file.delete()) {
+                logger.info("delete success: {}", file.getAbsolutePath() + file.getName());
+            } else {
                 logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
             }
-        }else{
+        } else {
             logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
@@ -392,6 +416,7 @@ public class MailSender {
 
     /**
      * handle exception
+     *
      * @param alertResult
      * @param e
      */

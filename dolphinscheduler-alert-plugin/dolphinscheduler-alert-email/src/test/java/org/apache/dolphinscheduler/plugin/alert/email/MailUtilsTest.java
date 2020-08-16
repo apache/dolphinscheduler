@@ -20,11 +20,17 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
 
 /**
  */
@@ -38,7 +44,7 @@ public class MailUtilsTest {
     MailSender mailSender;
 
     @BeforeClass
-    public void initEmailConfig(){
+    public void initEmailConfig() {
         emailConfig.put(MailParamsConstants.MAIL_PROTOCOL, "smtp");
         emailConfig.put(MailParamsConstants.MAIL_SMTP_HOST, "xxx.xxx.com");
         emailConfig.put(MailParamsConstants.MAIL_SMTP_PORT, "25");
@@ -58,7 +64,7 @@ public class MailUtilsTest {
     @Test
     public void testSendMails() {
 
-        String content ="[\"id:69\"," +
+        String content = "[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +
                 "\"Job name: Start workflow\"," +
                 "\"State: SUCCESS\"," +
@@ -74,25 +80,25 @@ public class MailUtilsTest {
                 content);
     }
 
-    public String list2String(){
+    public String list2String() {
 
         LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
-        map1.put("mysql service name","mysql200");
-        map1.put("mysql address","192.168.xx.xx");
-        map1.put("port","3306");
-        map1.put("no index of number","80");
-        map1.put("database client connections","190");
+        map1.put("mysql service name", "mysql200");
+        map1.put("mysql address", "192.168.xx.xx");
+        map1.put("port", "3306");
+        map1.put("no index of number", "80");
+        map1.put("database client connections", "190");
 
         LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-        map2.put("mysql service name","mysql210");
-        map2.put("mysql address","192.168.xx.xx");
-        map2.put("port","3306");
-        map2.put("no index of number","10");
-        map2.put("database client connections","90");
+        map2.put("mysql service name", "mysql210");
+        map2.put("mysql address", "192.168.xx.xx");
+        map2.put("port", "3306");
+        map2.put("no index of number", "10");
+        map2.put("database client connections", "90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
-        maps.add(0,map1);
-        maps.add(1,map2);
+        maps.add(0, map1);
+        maps.add(1, map2);
         String mapjson = JSONUtils.toJsonString(maps);
         logger.info(mapjson);
 
@@ -101,16 +107,16 @@ public class MailUtilsTest {
     }
 
     @Test
-    public void testSendTableMail(){
+    public void testSendTableMail() {
         String title = "Mysql Exception";
-        String content= list2String();
+        String content = list2String();
         emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails(title, content);
     }
 
     @Test
-    public void testAttachmentFile()throws Exception{
+    public void testAttachmentFile() throws Exception {
         String content = list2String();
         emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.ATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
@@ -118,7 +124,7 @@ public class MailUtilsTest {
     }
 
     @Test
-    public void testTableAttachmentFile()throws Exception{
+    public void testTableAttachmentFile() throws Exception {
         String content = list2String();
         emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLEATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);

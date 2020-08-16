@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.spi.alert;
 
 /**
  * alert channel interface .
+ *
  * @author gaojun
  */
 public interface AlertChannel {

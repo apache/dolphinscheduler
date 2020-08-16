@@ -19,19 +19,16 @@ package org.apache.dolphinscheduler.spi.classloader;
 import java.io.Closeable;
 
 public class ThreadContextClassLoader
-        implements Closeable
-{
+        implements Closeable {
     private final ClassLoader threadContextClassLoader;
 
-    public ThreadContextClassLoader(ClassLoader newThreadContextClassLoader)
-    {
+    public ThreadContextClassLoader(ClassLoader newThreadContextClassLoader) {
         this.threadContextClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(newThreadContextClassLoader);
     }
 
     @Override
-    public void close()
-    {
+    public void close() {
         Thread.currentThread().setContextClassLoader(threadContextClassLoader);
     }
 }

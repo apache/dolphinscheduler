@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.alert.runner;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
@@ -42,15 +41,18 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * AlertSender Tester.
@@ -87,22 +89,22 @@ public class AlertSenderTest {
         Alert alert1 = new Alert();
         alert1.setTitle("test alert");
         LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
-        map1.put("mysql service name","mysql200");
-        map1.put("mysql address","192.168.xx.xx");
-        map1.put("port","3306");
-        map1.put("no index of number","80");
-        map1.put("database client connections","190");
+        map1.put("mysql service name", "mysql200");
+        map1.put("mysql address", "192.168.xx.xx");
+        map1.put("port", "3306");
+        map1.put("no index of number", "80");
+        map1.put("database client connections", "190");
 
         LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-        map2.put("mysql service name","mysql210");
-        map2.put("mysql address","192.168.xx.xx");
-        map2.put("port","3306");
-        map2.put("no index of number","10");
-        map2.put("database client connections","90");
+        map2.put("mysql service name", "mysql210");
+        map2.put("mysql address", "192.168.xx.xx");
+        map2.put("port", "3306");
+        map2.put("no index of number", "10");
+        map2.put("database client connections", "90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
-        maps.add(0,map1);
-        maps.add(1,map2);
+        maps.add(0, map1);
+        maps.add(1, map2);
         String mapjson = JSONUtils.toJsonString(maps);
         alert1.setContent(mapjson);
         alert1.setLog("log log");
@@ -138,7 +140,7 @@ public class AlertSenderTest {
         alertPluginInstance.setInstanceName("test email alert");
 
         List<PluginDefine> pluginDefineList = pluginDao.getPluginDefineMapper().queryByNameAndType("email alert", "alert");
-        if(pluginDefineList == null || pluginDefineList.size() == 0) {
+        if (pluginDefineList == null || pluginDefineList.size() == 0) {
             throw new RuntimeException("no alert plugin be load");
         }
         PluginDefine pluginDefine = pluginDefineList.get(0);
@@ -161,7 +163,7 @@ public class AlertSenderTest {
 
     public String getEmailAlertParams() {
         List<PluginParams> paramsList = new ArrayList<>();
-        InputParam receivesParam = new InputParam("receivers","receivers");
+        InputParam receivesParam = new InputParam("receivers", "receivers");
         receivesParam.setValue("540957506@qq.com")
                 .addValidate(Validate.buildValidate().setRequired(true));
 

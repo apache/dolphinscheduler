@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.dolphinscheduler.common.Constants;
+
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,10 +31,6 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
 
 public class ExcelUtilsTest {
 
@@ -64,7 +65,7 @@ public class ExcelUtilsTest {
 
         //Define dest file path
         String xlsFilePath = rootPath + System.getProperty("file.separator");
-        logger.info("xlsFilePath: "+xlsFilePath);
+        logger.info("xlsFilePath: " + xlsFilePath);
 
         //Define correctContent
         String correctContent = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";

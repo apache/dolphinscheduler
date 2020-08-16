@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import static java.util.Objects.requireNonNull;
+
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-import static java.util.Objects.requireNonNull;
-
 @Component
-public class PluginDao extends AbstractBaseDao{
+public class PluginDao extends AbstractBaseDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -44,15 +45,17 @@ public class PluginDao extends AbstractBaseDao{
 
     /**
      * add pluginDefine
+     *
      * @param pluginDefine plugin define entiy
      * @return plugin define id
      */
-    public int addPluginDefine(PluginDefine pluginDefine){
+    public int addPluginDefine(PluginDefine pluginDefine) {
         return pluginDefineMapper.insert(pluginDefine);
     }
 
     /**
      * add or update plugin define
+     *
      * @param pluginDefine new pluginDefine
      */
     public void addOrUpdatePluginDefine(PluginDefine pluginDefine) {
@@ -61,11 +64,11 @@ public class PluginDao extends AbstractBaseDao{
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
-        if(pluginDefineList == null || pluginDefineList.size() == 0) {
+        if (pluginDefineList == null || pluginDefineList.size() == 0) {
             pluginDefineMapper.insert(pluginDefine);
         } else {
             PluginDefine currPluginDefine = pluginDefineList.get(0);
-            if(!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
+            if (!currPluginDefine.getPluginParams().equals(pluginDefine.getPluginParams())) {
                 currPluginDefine.setUpdateTime(pluginDefine.getUpdateTime());
                 currPluginDefine.setPluginParams(pluginDefine.getPluginParams());
                 pluginDefineMapper.updateById(currPluginDefine);
@@ -75,6 +78,7 @@ public class PluginDao extends AbstractBaseDao{
 
     /**
      * query plugin define by id
+     *
      * @param pluginDefineId plugin define id
      * @return PluginDefine
      */

@@ -27,14 +27,14 @@ public class StringUtils {
         return !isEmpty(cs);
     }
 
-    public static boolean isBlank(String s){
+    public static boolean isBlank(String s) {
         if (isEmpty(s)) {
             return true;
         }
         return s.trim().length() == 0;
     }
 
-    public static boolean isNotBlank(String s){
+    public static boolean isNotBlank(String s) {
         return !isBlank(s);
     }
 }

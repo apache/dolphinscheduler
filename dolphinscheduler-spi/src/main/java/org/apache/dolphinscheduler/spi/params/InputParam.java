@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 /**
- *Text param
+ * Text param
  */
 public class InputParam extends PluginParams {
 
@@ -32,7 +32,7 @@ public class InputParam extends PluginParams {
     }
 
     public InputParam setPlaceholder(String placeholder) {
-        if(this.getProps() == null) {
+        if (this.getProps() == null) {
             this.setProps(new ParamsProps());
         }
 

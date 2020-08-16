@@ -18,13 +18,14 @@
 package org.apache.dolphinscheduler.spi.params;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * radio
@@ -52,7 +53,7 @@ public class RadioParam extends PluginParams {
     }
 
     public RadioParam addParamsOptions(ParamsOptions paramsOptions) {
-        if(this.paramsOptionsList == null) {
+        if (this.paramsOptionsList == null) {
             this.paramsOptionsList = new ArrayList<>();
         }
 

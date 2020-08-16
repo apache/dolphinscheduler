@@ -13,12 +13,13 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.walkFileTree;
+
+import static com.google.common.io.ByteStreams.toByteArray;
 
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.objectweb.asm.ClassReader;
-import org.sonatype.aether.artifact.Artifact;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,24 +36,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.io.ByteStreams.toByteArray;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.walkFileTree;
+import org.objectweb.asm.ClassReader;
+import org.sonatype.aether.artifact.Artifact;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * The role of this class is to load the plugin class during development
  */
-final class DolphinPluginDiscovery
-{
+final class DolphinPluginDiscovery {
     private static final String JAVA_CLASS_FILE_SUFFIX = ".class";
     private static final String PLUGIN_SERVICES_FILE = "META-INF/services/" + DolphinSchedulerPlugin.class.getName();
 
-    private DolphinPluginDiscovery() {}
+    private DolphinPluginDiscovery() {
+    }
 
     public static Set<String> discoverPluginsFromArtifact(Artifact artifact, ClassLoader classLoader)
-            throws IOException
-    {
+            throws IOException {
         if (!artifact.getExtension().equals("dolphinscheduler-plugin")) {
             throw new RuntimeException("Unexpected extension for main artifact: " + artifact);
         }
@@ -75,8 +76,7 @@ final class DolphinPluginDiscovery
     }
 
     public static void writePluginServices(Iterable<String> plugins, File root)
-            throws IOException
-    {
+            throws IOException {
         Path path = root.toPath().resolve(PLUGIN_SERVICES_FILE);
         createDirectories(path.getParent());
         try (Writer out = new OutputStreamWriter(new FileOutputStream(path.toFile()), UTF_8)) {
@@ -87,14 +87,11 @@ final class DolphinPluginDiscovery
     }
 
     private static List<String> listClasses(Path base)
-            throws IOException
-    {
+            throws IOException {
         ImmutableList.Builder<String> list = ImmutableList.builder();
-        walkFileTree(base, new SimpleFileVisitor<Path>()
-        {
+        walkFileTree(base, new SimpleFileVisitor<Path>() {
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes)
-            {
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
                 if (file.getFileName().toString().endsWith(JAVA_CLASS_FILE_SUFFIX)) {
                     String name = file.subpath(base.getNameCount(), file.getNameCount()).toString();
                     list.add(javaName(name.substring(0, name.length() - JAVA_CLASS_FILE_SUFFIX.length())));
@@ -105,8 +102,7 @@ final class DolphinPluginDiscovery
         return list.build();
     }
 
-    private static List<String> classInterfaces(String name, ClassLoader classLoader)
-    {
+    private static List<String> classInterfaces(String name, ClassLoader classLoader) {
         ImmutableList.Builder<String> list = ImmutableList.builder();
         ClassReader reader = readClass(name, classLoader);
         for (String binaryName : reader.getInterfaces()) {
@@ -118,26 +114,22 @@ final class DolphinPluginDiscovery
         return list.build();
     }
 
-    private static ClassReader readClass(String name, ClassLoader classLoader)
-    {
+    private static ClassReader readClass(String name, ClassLoader classLoader) {
         try (InputStream in = classLoader.getResourceAsStream(binaryName(name) + JAVA_CLASS_FILE_SUFFIX)) {
             if (in == null) {
                 throw new RuntimeException("Failed to read class: " + name);
             }
             return new ClassReader(toByteArray(in));
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private static String binaryName(String javaName)
-    {
+    private static String binaryName(String javaName) {
         return javaName.replace('.', '/');
     }
 
-    private static String javaName(String binaryName)
-    {
+    private static String javaName(String binaryName) {
         return binaryName.replace('/', '.');
     }
 }

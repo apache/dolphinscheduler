@@ -16,14 +16,16 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * DolphinPluginLoader Tester.

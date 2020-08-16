@@ -13,8 +13,7 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,11 +23,11 @@ import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 class DolphinPluginClassLoader
-        extends URLClassLoader
-{
+        extends URLClassLoader {
     private static final ClassLoader PLATFORM_CLASS_LOADER = findPlatformClassLoader();
 
     private final ClassLoader spiClassLoader;
@@ -38,8 +37,7 @@ class DolphinPluginClassLoader
     public DolphinPluginClassLoader(
             List<URL> urls,
             ClassLoader spiClassLoader,
-            Iterable<String> spiPackages)
-    {
+            Iterable<String> spiPackages) {
         this(urls,
                 spiClassLoader,
                 spiPackages,
@@ -50,8 +48,7 @@ class DolphinPluginClassLoader
             List<URL> urls,
             ClassLoader spiClassLoader,
             Iterable<String> spiPackages,
-            Iterable<String> spiResources)
-    {
+            Iterable<String> spiResources) {
         // plugins should not have access to the system (application) class loader
         super(urls.toArray(new URL[urls.size()]), PLATFORM_CLASS_LOADER);
         this.spiClassLoader = requireNonNull(spiClassLoader, "spiClassLoader is null");
@@ -61,8 +58,7 @@ class DolphinPluginClassLoader
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve)
-            throws ClassNotFoundException
-    {
+            throws ClassNotFoundException {
         // grab the magic lock
         synchronized (getClassLoadingLock(name)) {
             // Check if class is in the loaded classes cache
@@ -81,8 +77,7 @@ class DolphinPluginClassLoader
         }
     }
 
-    private Class<?> resolveClass(Class<?> clazz, boolean resolve)
-    {
+    private Class<?> resolveClass(Class<?> clazz, boolean resolve) {
         if (resolve) {
             resolveClass(clazz);
         }
@@ -90,8 +85,7 @@ class DolphinPluginClassLoader
     }
 
     @Override
-    public URL getResource(String name)
-    {
+    public URL getResource(String name) {
         // If this is an SPI resource, only check SPI class loader
         if (isSpiResource(name)) {
             return spiClassLoader.getResource(name);
@@ -103,8 +97,7 @@ class DolphinPluginClassLoader
 
     @Override
     public Enumeration<URL> getResources(String name)
-            throws IOException
-    {
+            throws IOException {
         // If this is an SPI resource, use SPI resources
         if (isSpiClass(name)) {
             return spiClassLoader.getResources(name);
@@ -114,34 +107,28 @@ class DolphinPluginClassLoader
         return super.getResources(name);
     }
 
-    private boolean isSpiClass(String name)
-    {
+    private boolean isSpiClass(String name) {
         return spiPackages.stream().anyMatch(name::startsWith);
     }
 
-    private boolean isSpiResource(String name)
-    {
+    private boolean isSpiResource(String name) {
         return spiResources.stream().anyMatch(name::startsWith);
     }
 
-    private static String classNameToResource(String className)
-    {
+    private static String classNameToResource(String className) {
         return className.replace('.', '/');
     }
 
     @SuppressWarnings("JavaReflectionMemberAccess")
-    private static ClassLoader findPlatformClassLoader()
-    {
+    private static ClassLoader findPlatformClassLoader() {
         try {
             // use platform class loader on Java 9
             Method method = ClassLoader.class.getMethod("getPlatformClassLoader");
             return (ClassLoader) method.invoke(null);
-        }
-        catch (NoSuchMethodException ignored) {
+        } catch (NoSuchMethodException ignored) {
             // use null class loader on Java 8
             return null;
-        }
-        catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new AssertionError(e);
         }
     }

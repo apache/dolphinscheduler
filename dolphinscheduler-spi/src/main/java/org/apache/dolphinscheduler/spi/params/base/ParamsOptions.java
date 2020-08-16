@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * The options field in form-create`s json rule
  * Set radio, select, checkbox and other component option options
- *
  */
 public class ParamsOptions {
 

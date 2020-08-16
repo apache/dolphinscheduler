@@ -16,16 +16,14 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import java.io.File;
 import java.util.List;
 
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Dolphin Scheduler Plugin Manager Config
@@ -50,8 +48,7 @@ public class DolphinPluginManagerConfig {
     private String mavenLocalRepository = System.getProperty("user.home") + "/.m2/repository";
     private List<String> mavenRemoteRepository = ImmutableList.of("http://repo1.maven.org/maven2/");
 
-    public File getInstalledPluginsDir()
-    {
+    public File getInstalledPluginsDir() {
         return installedPluginsDir;
     }
 
@@ -61,21 +58,19 @@ public class DolphinPluginManagerConfig {
     public DolphinPluginManagerConfig setInstalledPluginsDir(String pluginDir) {
         requireNonNull(pluginDir, "pluginDir can not be null");
         File pluginDirFile = new File(pluginDir);
-        if(!pluginDirFile.exists()) {
+        if (!pluginDirFile.exists()) {
             throw new IllegalArgumentException(format("plugin dir not exists ! {}", pluginDirFile.getPath()));
         }
         this.installedPluginsDir = pluginDirFile;
         return this;
     }
 
-    public List<String> getPlugins()
-    {
+    public List<String> getPlugins() {
         return plugins;
     }
 
 
-    public DolphinPluginManagerConfig setPlugins(List<String> plugins)
-    {
+    public DolphinPluginManagerConfig setPlugins(List<String> plugins) {
         this.plugins = plugins;
         return this;
     }
@@ -86,46 +81,40 @@ public class DolphinPluginManagerConfig {
      * eg:
      * file: alert.properties
      * alert.plugin=\
-     *   ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
-     *   ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
+     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml, \
+     * ../dolphinscheduler-alert-plugin/dolphinscheduler-alert-wechat/pom.xml
+     *
      * @param plugins
      * @return
      */
-    public DolphinPluginManagerConfig setPlugins(String plugins)
-    {
+    public DolphinPluginManagerConfig setPlugins(String plugins) {
         if (plugins == null) {
             this.plugins = null;
-        }
-        else {
+        } else {
             this.plugins = ImmutableList.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(plugins));
         }
         return this;
     }
 
-    public String getMavenLocalRepository()
-    {
+    public String getMavenLocalRepository() {
         return mavenLocalRepository;
     }
 
-    public DolphinPluginManagerConfig setMavenLocalRepository(String mavenLocalRepository)
-    {
+    public DolphinPluginManagerConfig setMavenLocalRepository(String mavenLocalRepository) {
         this.mavenLocalRepository = mavenLocalRepository;
         return this;
     }
 
-    public List<String> getMavenRemoteRepository()
-    {
+    public List<String> getMavenRemoteRepository() {
         return mavenRemoteRepository;
     }
 
-    public DolphinPluginManagerConfig setMavenRemoteRepository(List<String> mavenRemoteRepository)
-    {
+    public DolphinPluginManagerConfig setMavenRemoteRepository(List<String> mavenRemoteRepository) {
         this.mavenRemoteRepository = mavenRemoteRepository;
         return this;
     }
 
-    public DolphinPluginManagerConfig setMavenRemoteRepository(String mavenRemoteRepository)
-    {
+    public DolphinPluginManagerConfig setMavenRemoteRepository(String mavenRemoteRepository) {
         this.mavenRemoteRepository = ImmutableList.copyOf(Splitter.on(',').omitEmptyStrings().trimResults().split(mavenRemoteRepository));
         return this;
     }

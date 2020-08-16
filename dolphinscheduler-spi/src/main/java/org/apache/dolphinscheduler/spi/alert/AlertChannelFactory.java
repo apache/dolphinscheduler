@@ -31,22 +31,22 @@ public interface AlertChannelFactory {
      * Must be UNIQUE .
      * This alert plugin name eg: email , message ...
      * Name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
-     * @return
-     *  this alert plugin name
+     *
+     * @return this alert plugin name
      */
     String getName();
 
     /**
      * Returns the configurable parameters that this plugin needs to display on the web ui
-     * @return
-     *  this alert plugin params
+     *
+     * @return this alert plugin params
      */
     List<PluginParams> getParams();
 
     /**
      * The parameters configured in the alert / xxx.properties file will be in the config map
-     * @return
-     *  AlertChannel
+     *
+     * @return AlertChannel
      */
     AlertChannel create();
 }

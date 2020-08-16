@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 public class EmailConstants {
 
 
-
     public static final String XLS_FILE_PATH = "xls.file.path";
 
     public static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";

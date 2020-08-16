@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.spi;
 
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-
 import static java.util.Collections.emptyList;
+
+import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 
 /**
  * Dolphinscheduler plugin interface
@@ -30,8 +30,7 @@ import static java.util.Collections.emptyList;
  */
 public interface DolphinSchedulerPlugin {
 
-    default Iterable<AlertChannelFactory> getAlertChannelFactorys()
-    {
+    default Iterable<AlertChannelFactory> getAlertChannelFactorys() {
         return emptyList();
     }
 }

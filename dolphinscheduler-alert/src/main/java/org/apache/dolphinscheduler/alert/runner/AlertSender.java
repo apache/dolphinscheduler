@@ -26,10 +26,11 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * alert sender
@@ -67,8 +68,8 @@ public class AlertSender {
                     .setLog(alert.getLog())
                     .setTitle(alert.getTitle());
 
-            for(AlertPluginInstance instance : alertInstanceList) {
-                if(alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
+            for (AlertPluginInstance instance : alertInstanceList) {
+                if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
                     logger.warn("No Alert Plugin configured. Can not send alert info. ");
                     return;
                 }
@@ -79,7 +80,7 @@ public class AlertSender {
                 alertInfo.setAlertData(alertData);
                 alertInfo.setAlertParams(instance.getPluginInstanceParams());
                 AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
-                AlertResult alertResult =alertChannel.process(alertInfo);
+                AlertResult alertResult = alertChannel.process(alertInfo);
 
                 if (alertResult == null) {
                     alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());

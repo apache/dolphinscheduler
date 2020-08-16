@@ -16,20 +16,24 @@
  */
 package org.apache.dolphinscheduler.alert.plugin;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
+import static com.google.common.base.Preconditions.checkState;
+
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * load the configured alert plugin and manager them
@@ -40,8 +44,7 @@ public class AlertPluginManager extends DolphinPluginManager {
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
     private final Map<String, AlertChannel> alertChannelMap = new ConcurrentHashMap<>();
 
-    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory)
-    {
+    public void addAlertChannelFactory(AlertChannelFactory alertChannelFactory) {
         requireNonNull(alertChannelFactory, "alertChannelFactory is null");
 
         if (alertChannelFactoryMap.putIfAbsent(alertChannelFactory.getName(), alertChannelFactory) != null) {
@@ -55,8 +58,7 @@ public class AlertPluginManager extends DolphinPluginManager {
         }
     }
 
-    protected void loadConfiguredAlertChannel(String name)
-    {
+    protected void loadConfiguredAlertChannel(String name) {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);

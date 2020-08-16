@@ -31,8 +31,8 @@ public class PluginParamsTransfer {
 
     /**
      * transfe plugin params to form-create json
-     * @param pluginParamsList
-     *   pluginParamsList
+     *
+     * @param pluginParamsList pluginParamsList
      * @return
      */
     public static String getParamsJson(List<PluginParams> pluginParamsList) {
@@ -41,6 +41,7 @@ public class PluginParamsTransfer {
 
     /**
      * transfe plugin params json string to PluginParams
+     *
      * @param paramsJson
      * @return
      */
@@ -50,13 +51,14 @@ public class PluginParamsTransfer {
 
     /**
      * get the name and value of the plugin params
+     *
      * @param paramsJson
      * @return
      */
     public static Map<String, String> getPluginParamsMap(String paramsJson) {
         List<PluginParams> pluginParams = JSONUtils.toList(paramsJson, PluginParams.class);
         Map<String, String> paramsMap = new HashMap<>();
-        for(PluginParams param : pluginParams) {
+        for (PluginParams param : pluginParams) {
             paramsMap.put(param.getName(), param.getValue().toString());
         }
 

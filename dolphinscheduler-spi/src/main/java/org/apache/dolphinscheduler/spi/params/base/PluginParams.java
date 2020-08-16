@@ -17,16 +17,12 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.dolphinscheduler.spi.params.InputParam;
-import org.apache.dolphinscheduler.spi.params.RadioParam;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PluginParams {
 
@@ -50,16 +46,16 @@ public class PluginParams {
     }
 
     public PluginParams(String name, FormType formType, String title) {
-        requireNonNull(name , "name is null");
-        requireNonNull(formType , "formType is null");
-        requireNonNull(title , "title is null");
+        requireNonNull(name, "name is null");
+        requireNonNull(formType, "formType is null");
+        requireNonNull(title, "title is null");
         this.name = name;
         this.formType = formType.getFormType();
         this.title = title;
     }
 
     public PluginParams addValidate(Validate validate) {
-        if(this.getValidateList() == null) {
+        if (this.getValidateList() == null) {
             this.validateList = new ArrayList<>();
         }
         this.getValidateList().add(validate);
