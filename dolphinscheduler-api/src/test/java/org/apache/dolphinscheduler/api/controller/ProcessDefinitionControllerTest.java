@@ -18,16 +18,18 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -47,7 +49,7 @@ import java.util.Map;
  * process definition controller test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
-public class ProcessDefinitionControllerTest{
+public class ProcessDefinitionControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
@@ -55,7 +57,7 @@ public class ProcessDefinitionControllerTest{
     private ProcessDefinitionController processDefinitionController;
 
     @Mock
-    private ProcessDefinitionService processDefinitionService;
+    private ProcessDefinitionServiceImpl processDefinitionService;
 
     protected User user;
 
@@ -78,7 +80,7 @@ public class ProcessDefinitionControllerTest{
         String name = "dag_test";
         String description = "desc test";
         String connects = "[]";
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",1);
 
@@ -102,7 +104,7 @@ public class ProcessDefinitionControllerTest{
     @Test
     public void testVerifyProcessDefinitionName() throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROCESS_INSTANCE_EXIST);
         String projectName = "test";
         String name = "dag_test";
@@ -124,7 +126,7 @@ public class ProcessDefinitionControllerTest{
         String description = "desc test";
         String connects = "[]";
         int id = 1;
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",1);
 
@@ -140,7 +142,7 @@ public class ProcessDefinitionControllerTest{
     public void testReleaseProcessDefinition() throws Exception {
         String projectName = "test";
         int id = 1;
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectName,id,ReleaseState.OFFLINE.ordinal())).thenReturn(result);
@@ -168,7 +170,7 @@ public class ProcessDefinitionControllerTest{
         processDefinition.setName(name);
         processDefinition.setProcessDefinitionJson(json);
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, processDefinition);
 
@@ -179,16 +181,33 @@ public class ProcessDefinitionControllerTest{
     }
 
     @Test
-    public void testCopyProcessDefinition() throws Exception {
+    public void testBatchCopyProcessDefinition() throws Exception {
 
         String projectName = "test";
-        int id = 1;
+        int targetProjectId = 2;
+        String id = "1";
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.copyProcessDefinition(user, projectName,id)).thenReturn(result);
-        Result response = processDefinitionController.copyProcessDefinition(user, projectName,id);
+        Mockito.when(processDefinitionService.batchCopyProcessDefinition(user,projectName,id,targetProjectId)).thenReturn(result);
+        Result response = processDefinitionController.copyProcessDefinition(user, projectName,id,targetProjectId);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
+    }
+
+    @Test
+    public void testBatchMoveProcessDefinition() throws Exception {
+
+        String projectName = "test";
+        int targetProjectId = 2;
+        String id = "1";
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.batchMoveProcessDefinition(user,projectName,id,targetProjectId)).thenReturn(result);
+        Result response = processDefinitionController.moveProcessDefinition(user, projectName,id,targetProjectId);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),response.getCode().intValue());
     }
@@ -200,7 +219,7 @@ public class ProcessDefinitionControllerTest{
         String projectName = "test";
         List<ProcessDefinition> resourceList =  getDefinitionList();
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resourceList);
 
@@ -255,7 +274,7 @@ public class ProcessDefinitionControllerTest{
         String projectName = "test";
         int id = 1;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.deleteProcessDefinitionById(user, projectName,id)).thenReturn(result);
@@ -269,7 +288,7 @@ public class ProcessDefinitionControllerTest{
         String projectName = "test";
         int id = 1;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.getTaskNodeListByDefinitionId(id)).thenReturn(result);
@@ -283,7 +302,7 @@ public class ProcessDefinitionControllerTest{
         String projectName = "test";
         String idList = "1,2,3";
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
         Mockito.when(processDefinitionService.getTaskNodeListByDefinitionIdList(idList)).thenReturn(result);
@@ -342,9 +361,7 @@ public class ProcessDefinitionControllerTest{
         String processDefinitionIds = "1,2";
         String projectName = "test";
         HttpServletResponse response = new MockHttpServletResponse();
-        ProcessDefinitionService service = new ProcessDefinitionService();
-        ProcessDefinitionService spy = Mockito.spy(service);
-        Mockito.doNothing().when(spy).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
+        Mockito.doNothing().when(this.processDefinitionService).batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
         processDefinitionController.batchExportProcessDefinitionByIds(user, projectName, processDefinitionIds, response);
     }
 

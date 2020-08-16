@@ -88,7 +88,7 @@ public class DataSourceService extends BaseService{
      */
     public Map<String, Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         // check name can use or not
         if (checkName(name)) {
             putMsg(result, Status.DATASOURCE_EXIST);
@@ -249,6 +249,7 @@ public class DataSourceService extends BaseService{
             case POSTGRESQL:
             case CLICKHOUSE:
             case ORACLE:
+            case PRESTO:
                 separator = "&";
                 break;
             default:
@@ -340,7 +341,7 @@ public class DataSourceService extends BaseService{
      * @return data source list page
      */
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList;
 
@@ -430,6 +431,10 @@ public class DataSourceService extends BaseService{
                     datasource = JSONUtils.parseObject(parameter, DB2ServerDataSource.class);
                     Class.forName(Constants.COM_DB2_JDBC_DRIVER);
                     break;
+                case PRESTO:
+                    datasource = JSONUtils.parseObject(parameter, PrestoDataSource.class);
+                    Class.forName(Constants.COM_PRESTO_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
@@ -513,7 +518,8 @@ public class DataSourceService extends BaseService{
         if (Constants.MYSQL.equals(type.name())
                 || Constants.POSTGRESQL.equals(type.name())
                 || Constants.CLICKHOUSE.equals(type.name())
-                || Constants.ORACLE.equals(type.name())) {
+                || Constants.ORACLE.equals(type.name())
+                || Constants.PRESTO.equals(type.name())) {
             separator = "&";
         } else if (Constants.HIVE.equals(type.name())
                 || Constants.SPARK.equals(type.name())
@@ -527,7 +533,7 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.DATABASE, database);
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
-        parameterMap.put(Constants.PASSWORD, password);
+        parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
         if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             parameterMap.put(Constants.PRINCIPAL,principal);
@@ -585,8 +591,11 @@ public class DataSourceService extends BaseService{
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
             sb.append(host).append(":").append(port);
-        }else if (Constants.DB2.equals(type.name())) {
+        } else if (Constants.DB2.equals(type.name())) {
             sb.append(Constants.JDBC_DB2);
+            sb.append(host).append(":").append(port);
+        } else if (Constants.PRESTO.equals(type.name())) {
+            sb.append(Constants.JDBC_PRESTO);
             sb.append(host).append(":").append(port);
         }
 
@@ -600,7 +609,7 @@ public class DataSourceService extends BaseService{
      * @param datasourceId data source id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result delete(User loginUser, int datasourceId) {
         Result result = new Result();
         try {
@@ -674,7 +683,7 @@ public class DataSourceService extends BaseService{
      * @return authorized result code
      */
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);

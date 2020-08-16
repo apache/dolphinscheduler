@@ -17,24 +17,25 @@
 package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.apache.dolphinscheduler.page.project.ProjectPage;
+import org.apache.dolphinscheduler.page.project.WorkflowDefinePage;
+import org.apache.dolphinscheduler.page.project.RunWorkflowPage;
 import org.testng.annotations.Test;
 
-public class TestCreateProject extends BaseTest {
-    private CreateProjectPage createProjectPage;
+public class TestRunWorkflow extends BaseTest {
+    private WorkflowDefinePage createWorkflowPage;
+    private ProjectPage projectPage;
+    private RunWorkflowPage runWorkflowPage;
 
-    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest")
-    public void testCreateProject() throws InterruptedException {
-        createProjectPage = new CreateProjectPage(driver);
-        // enter user manage page
-        System.out.println("jump to the projectManage page to create project ");
-        createProjectPage.jumpProjectManagePage();
-        //assert user manage page
-        System.out.println("start create project");
-        assert createProjectPage.createProject();
-        System.out.println("end create project");
+
+    @Test(groups={"functionTests","runWorkflow"},dependsOnGroups = { "login","workflow" },description = "TestRunWorkflow")
+    public void testRunWorkflow() throws InterruptedException {
+        runWorkflowPage = new RunWorkflowPage(driver);
+
+        projectPage = new ProjectPage(driver);
+        System.out.println("start run workflow");
+        assert runWorkflowPage.runWorkflow();
+        System.out.println("end run workflow");
         System.out.println("===================================");
     }
-
 }
-

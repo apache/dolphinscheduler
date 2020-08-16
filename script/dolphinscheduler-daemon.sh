@@ -46,7 +46,7 @@ export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
 export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
 
-export DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
+export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-"-server -Xmx16g -Xms1g -Xss512k -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=10m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"}
 export STOP_TIMEOUT=5
 
 if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
@@ -72,6 +72,10 @@ elif [ "$command" = "alert-server" ]; then
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
+elif [ "$command" = "zookeeper-server" ]; then
+  #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
+  LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
+  CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
