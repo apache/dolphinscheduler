@@ -16,23 +16,22 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.*;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * task instance
@@ -43,14 +42,13 @@ public class TaskInstance implements Serializable {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
      * task name
      */
     private String name;
-
 
 
     /**
@@ -85,21 +83,27 @@ public class TaskInstance implements Serializable {
     private ExecutionStatus state;
 
     /**
+     * task first submit time.
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date firstSubmitTime;
+
+    /**
      * task submit time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submitTime;
 
     /**
      * task start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * task end time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**
@@ -215,11 +219,14 @@ public class TaskInstance implements Serializable {
 
 
     @TableField(exist = false)
-    private Map<String,String> resources;
+    private Map<String, String> resources;
 
+    /**
+     * delay execution time.
+     */
+    private int delayTime;
 
-
-    public void init(String host,Date startTime,String executePath){
+    public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
@@ -298,6 +305,14 @@ public class TaskInstance implements Serializable {
         this.state = state;
     }
 
+    public Date getFirstSubmitTime() {
+        return firstSubmitTime;
+    }
+
+    public void setFirstSubmitTime(Date firstSubmitTime) {
+        this.firstSubmitTime = firstSubmitTime;
+    }
+
     public Date getSubmitTime() {
         return submitTime;
     }
@@ -362,7 +377,7 @@ public class TaskInstance implements Serializable {
         this.retryTimes = retryTimes;
     }
 
-    public Boolean isTaskSuccess(){
+    public Boolean isTaskSuccess() {
         return this.state == ExecutionStatus.SUCCESS;
     }
 
@@ -382,11 +397,8 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-
-
-    public String getDependency(){
-
-        if(this.dependency != null){
+    public String getDependency() {
+        if (this.dependency != null) {
             return this.dependency;
         }
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
@@ -401,6 +413,7 @@ public class TaskInstance implements Serializable {
     public void setFlag(Flag flag) {
         this.flag = flag;
     }
+
     public String getProcessInstanceName() {
         return processInstanceName;
     }
@@ -465,33 +478,33 @@ public class TaskInstance implements Serializable {
         this.resources = resources;
     }
 
-    public boolean isSubProcess(){
+    public boolean isSubProcess() {
         return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
     }
 
-    public boolean isDependTask(){
+    public boolean isDependTask() {
         return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
     }
 
-    public boolean isConditionsTask(){
+    public boolean isConditionsTask() {
         return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
     }
 
 
-
     /**
      * determine if you can try again
+     *
      * @return can try result
      */
     public boolean taskCanRetry() {
-        if(this.isSubProcess()){
+        if (this.isSubProcess()) {
             return false;
         }
-        if(this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE){
+        if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        }else {
+        } else {
             return (this.getState().typeIsFailure()
-                && this.getRetryTimes() < this.getMaxRetryTimes());
+                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
     }
 
@@ -531,40 +544,50 @@ public class TaskInstance implements Serializable {
         this.dependentResult = dependentResult;
     }
 
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
+
     @Override
     public String toString() {
-        return "TaskInstance{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", taskType='" + taskType + '\'' +
-                ", processDefinitionId=" + processDefinitionId +
-                ", processInstanceId=" + processInstanceId +
-                ", processInstanceName='" + processInstanceName + '\'' +
-                ", taskJson='" + taskJson + '\'' +
-                ", state=" + state +
-                ", submitTime=" + submitTime +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", host='" + host + '\'' +
-                ", executePath='" + executePath + '\'' +
-                ", logPath='" + logPath + '\'' +
-                ", retryTimes=" + retryTimes +
-                ", alertFlag=" + alertFlag +
-                ", processInstance=" + processInstance +
-                ", processDefine=" + processDefine +
-                ", pid=" + pid +
-                ", appLink='" + appLink + '\'' +
-                ", flag=" + flag +
-                ", dependency='" + dependency + '\'' +
-                ", duration=" + duration +
-                ", maxRetryTimes=" + maxRetryTimes +
-                ", retryInterval=" + retryInterval +
-                ", taskInstancePriority=" + taskInstancePriority +
-                ", processInstancePriority=" + processInstancePriority +
-                ", dependentResult='" + dependentResult + '\'' +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", executorId=" + executorId +
-                ", executorName='" + executorName + '\'' +
-                '}';
+        return "TaskInstance{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", taskType='" + taskType + '\''
+                + ", processDefinitionId=" + processDefinitionId
+                + ", processInstanceId=" + processInstanceId
+                + ", processInstanceName='" + processInstanceName + '\''
+                + ", taskJson='" + taskJson + '\''
+                + ", state=" + state
+                + ", firstSubmitTime=" + firstSubmitTime
+                + ", submitTime=" + submitTime
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", host='" + host + '\''
+                + ", executePath='" + executePath + '\''
+                + ", logPath='" + logPath + '\''
+                + ", retryTimes=" + retryTimes
+                + ", alertFlag=" + alertFlag
+                + ", processInstance=" + processInstance
+                + ", processDefine=" + processDefine
+                + ", pid=" + pid
+                + ", appLink='" + appLink + '\''
+                + ", flag=" + flag
+                + ", dependency='" + dependency + '\''
+                + ", duration=" + duration
+                + ", maxRetryTimes=" + maxRetryTimes
+                + ", retryInterval=" + retryInterval
+                + ", taskInstancePriority=" + taskInstancePriority
+                + ", processInstancePriority=" + processInstancePriority
+                + ", dependentResult='" + dependentResult + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", executorId=" + executorId
+                + ", executorName='" + executorName + '\''
+                + ", delayTime=" + delayTime
+                + '}';
     }
 }
