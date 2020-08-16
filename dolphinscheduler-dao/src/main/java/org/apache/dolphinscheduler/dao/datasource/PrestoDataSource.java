@@ -14,31 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.utils;
+package org.apache.dolphinscheduler.dao.datasource;
 
-public class StringUtils {
-    public static final String EMPTY = "";
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
-    public static boolean isEmpty(final CharSequence cs) {
-        return cs == null || cs.length() == 0;
-    }
+public class PrestoDataSource extends BaseDataSource {
 
-    public static boolean isNotEmpty(final CharSequence cs) {
-        return !isEmpty(cs);
-    }
+  /**
+   * @return driver class
+   */
+  @Override
+  public String driverClassSelector() {
+    return Constants.COM_PRESTO_JDBC_DRIVER;
+  }
 
-    public static boolean isBlank(String s){
-        if (isEmpty(s)) {
-            return true;
-        }
-        return s.trim().length() == 0;
-    }
-
-    public static boolean isNotBlank(String s){
-        return !isBlank(s);
-    }
-
-    public static String replaceNRTtoUnderline(String src){
-        return src.replaceAll("[\n|\r|\t]", "_");
-    }
+  /**
+   * @return db type
+   */
+  @Override
+  public DbType dbTypeSelector() {
+    return DbType.PRESTO;
+  }
 }
