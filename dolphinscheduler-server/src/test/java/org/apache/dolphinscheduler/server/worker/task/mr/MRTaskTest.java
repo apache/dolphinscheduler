@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.mr;
 
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
@@ -38,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
@@ -49,7 +49,16 @@ public class MRTaskTest {
     @Test
     public void testMRTaskInitWithQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"resourceList\":[],\"localParams\":[],\"mainArgs\":\"11\",\"others\":\"\",\"programType\":\"JAVA\",\"queue\":\"queueA\"}";
+        String param = "{"
+                + "\"mainClass\":\"com.test.main\","
+                + "\"mainJar\":{\"id\":1},"
+                + "\"resourceList\":[],"
+                + "\"localParams\":[],\""
+                + "mainArgs\":\"11\","
+                + "\"others\":\"\","
+                + "\"programType\":\"JAVA\""
+                + ",\"queue\":\"queueA\""
+                + "}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -59,7 +68,6 @@ public class MRTaskTest {
         Resource resource = PowerMockito.mock(Resource.class);
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
-
 
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -75,7 +83,6 @@ public class MRTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(param);
-
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
@@ -97,7 +104,15 @@ public class MRTaskTest {
     @Test
     public void testMRTaskInitWithNoQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"resourceList\":[],\"localParams\":[],\"mainArgs\":\"11\",\"others\":\"\",\"programType\":\"JAVA\"}";
+        String param = "{"
+                + "\"mainClass\":\"com.test.main\","
+                + "\"mainJar\":{\"id\":1},"
+                + "\"resourceList\":[],"
+                + "\"localParams\":[],"
+                + "\"mainArgs\":\"11\","
+                + "\"others\":\"\","
+                + "\"programType\":\"JAVA\""
+                + "}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -107,7 +122,6 @@ public class MRTaskTest {
         Resource resource = PowerMockito.mock(Resource.class);
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
-
 
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -123,7 +137,6 @@ public class MRTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(param);
-
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());

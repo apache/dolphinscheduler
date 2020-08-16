@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.spark;
 
 import org.apache.dolphinscheduler.common.enums.SparkVersion;
@@ -56,12 +57,12 @@ public class SparkTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(SparkTaskTest.class);
 
     /**
-     * spark1 command
+     * spark1 command .
      */
     private static final String SPARK1_COMMAND = "${SPARK_HOME1}/bin/spark-submit";
 
     /**
-     * spark2 command
+     * spark2 command .
      */
     private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
 
@@ -70,39 +71,39 @@ public class SparkTaskTest {
 
         TaskProps taskProps = new TaskProps();
 
-        String spark1Params = "{" +
-                "\"mainArgs\":\"\", " +
-                "\"driverMemory\":\"1G\", " +
-                "\"executorMemory\":\"2G\", " +
-                "\"programType\":\"SCALA\", " +
-                "\"mainClass\":\"basicetl.GlobalUserCar\", " +
-                "\"driverCores\":\"2\", " +
-                "\"deployMode\":\"cluster\", " +
-                "\"executorCores\":2, " +
-                "\"mainJar\":{\"res\":\"test-1.0-SNAPSHOT.jar\"}, " +
-                "\"sparkVersion\":\"SPARK1\", " +
-                "\"numExecutors\":\"10\", " +
-                "\"localParams\":[], " +
-                "\"others\":\"\", " +
-                "\"resourceList\":[]" +
-                "}";
+        String spark1Params = "{"
+                + "\"mainArgs\":\"\", "
+                + "\"driverMemory\":\"1G\", "
+                + "\"executorMemory\":\"2G\", "
+                + "\"programType\":\"SCALA\", "
+                + "\"mainClass\":\"basicetl.GlobalUserCar\", "
+                + "\"driverCores\":\"2\", "
+                + "\"deployMode\":\"cluster\", "
+                + "\"executorCores\":2, "
+                + "\"mainJar\":{\"res\":\"test-1.0-SNAPSHOT.jar\"}, "
+                + "\"sparkVersion\":\"SPARK1\", "
+                + "\"numExecutors\":\"10\", "
+                + "\"localParams\":[], "
+                + "\"others\":\"\", "
+                + "\"resourceList\":[]"
+                + "}";
 
-        String spark2Params = "{" +
-                "\"mainArgs\":\"\", " +
-                "\"driverMemory\":\"1G\", " +
-                "\"executorMemory\":\"2G\", " +
-                "\"programType\":\"SCALA\", " +
-                "\"mainClass\":\"basicetl.GlobalUserCar\", " +
-                "\"driverCores\":\"2\", " +
-                "\"deployMode\":\"cluster\", " +
-                "\"executorCores\":2, " +
-                "\"mainJar\":{\"res\":\"test-1.0-SNAPSHOT.jar\"}, " +
-                "\"sparkVersion\":\"SPARK2\", " +
-                "\"numExecutors\":\"10\", " +
-                "\"localParams\":[], " +
-                "\"others\":\"\", " +
-                "\"resourceList\":[]" +
-                "}";
+        String spark2Params = "{"
+                + "\"mainArgs\":\"\", "
+                + "\"driverMemory\":\"1G\", "
+                + "\"executorMemory\":\"2G\", "
+                + "\"programType\":\"SCALA\", "
+                + "\"mainClass\":\"basicetl.GlobalUserCar\", "
+                + "\"driverCores\":\"2\", "
+                + "\"deployMode\":\"cluster\", "
+                + "\"executorCores\":2, "
+                + "\"mainJar\":{\"res\":\"test-1.0-SNAPSHOT.jar\"}, "
+                + "\"sparkVersion\":\"SPARK2\", "
+                + "\"numExecutors\":\"10\", "
+                + "\"localParams\":[], "
+                + "\"others\":\"\", "
+                + "\"resourceList\":[]"
+                + "}";
 
         taskProps.setTaskParams(spark2Params);
 
@@ -183,7 +184,6 @@ public class SparkTaskTest {
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
 
-
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
@@ -199,7 +199,6 @@ public class SparkTaskTest {
         props.setTaskTimeout(0);
         props.setTaskParams(param);
 
-
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
@@ -210,7 +209,6 @@ public class SparkTaskTest {
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
         SparkTask sparkTask = new SparkTask(taskExecutionContext, logger);
-
 
         sparkTask.init();
         SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
@@ -244,7 +242,6 @@ public class SparkTaskTest {
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
 
-
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
@@ -259,7 +256,6 @@ public class SparkTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(param);
-
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());

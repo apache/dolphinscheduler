@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.flink;
 
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
@@ -38,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
 @PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
@@ -49,7 +49,22 @@ public class FlinkTaskTest {
     @Test
     public void testFlinkTaskInitWithQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
+        String param = "{"
+                        + "\"mainClass\":\"com.test.main\","
+                        + "\"mainJar\":{\"id\":1},"
+                        + "\"deployMode\":\"cluster\","
+                        + "\"resourceList\":[],"
+                        + "\"localParams\":[],"
+                        + "\"flinkVersion\":\"<1.10\","
+                        + "\"slot\":1,"
+                        + "\"taskManager\":\"2\","
+                        + "\"jobManagerMemory\":\"1G\","
+                        + "\"taskManagerMemory\":\"2G\","
+                        + "\"mainArgs\":\"\","
+                        + "\"others\":\"\","
+                        + "\"programType\":\"SCALA\","
+                        + "\"queue\":\"queueA\""
+                    + "}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -59,7 +74,6 @@ public class FlinkTaskTest {
         Resource resource = PowerMockito.mock(Resource.class);
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
-
 
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -75,7 +89,6 @@ public class FlinkTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(param);
-
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
@@ -88,7 +101,6 @@ public class FlinkTaskTest {
         Mockito.when(taskExecutionContext.getQueue()).thenReturn("testQueue");
         FlinkTask flinkTask = new FlinkTask(taskExecutionContext, logger);
 
-
         flinkTask.init();
         FlinkParameters flinkParameters = (FlinkParameters) flinkTask.getParameters();
         Assert.assertEquals("queueA", flinkParameters.getQueue());
@@ -98,7 +110,18 @@ public class FlinkTaskTest {
     @Test
     public void testFlinkTaskInitWithNoQueue() {
 
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\"}";
+        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},"
+                            + "\"deployMode\":\"cluster\","
+                            + "\"resourceList\":[],"
+                            + "\"localParams\":[],"
+                            + "\"flinkVersion\":\"<1.10\","
+                            + "\"slot\":1,\"taskManager\":\"2\","
+                            + "\"jobManagerMemory\":\"1G\","
+                            + "\"taskManagerMemory\":\"2G\","
+                            + "\"mainArgs\":\"\","
+                            + "\"others\":\"\","
+                            + "\"programType\":\"SCALA\""
+                         + "}";
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -108,7 +131,6 @@ public class FlinkTaskTest {
         Resource resource = PowerMockito.mock(Resource.class);
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
-
 
         ApplicationContext applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -124,7 +146,6 @@ public class FlinkTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(param);
-
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
