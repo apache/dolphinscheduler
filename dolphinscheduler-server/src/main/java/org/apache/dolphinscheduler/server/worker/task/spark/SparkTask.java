@@ -102,7 +102,7 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     /**
-     * create command
+     * create command .
      *
      * @return command
      */
