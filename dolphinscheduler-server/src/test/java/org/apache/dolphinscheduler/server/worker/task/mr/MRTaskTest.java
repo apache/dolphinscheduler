@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ import java.util.Date;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
-@PowerMockIgnore({"javax.management.*","javax.net.ssl.*"})
+@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
 public class MRTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MRTaskTest.class);
@@ -89,10 +90,9 @@ public class MRTaskTest {
         FlinkTask flinkTask = new FlinkTask(taskExecutionContext, logger);
 
 
-
         flinkTask.init();
         FlinkParameters flinkParameters = (FlinkParameters) flinkTask.getParameters();
-        Assert.assertEquals("queueA",flinkParameters.getQueue());
+        Assert.assertEquals("queueA", flinkParameters.getQueue());
 
     }
 
@@ -140,8 +140,8 @@ public class MRTaskTest {
 
         flinkTask.init();
         FlinkParameters flinkParameters = (FlinkParameters) flinkTask.getParameters();
-        Assert.assertEquals("testQueue",flinkParameters.getQueue());
+        Assert.assertEquals("testQueue", flinkParameters.getQueue());
 
     }
-    
+
 }

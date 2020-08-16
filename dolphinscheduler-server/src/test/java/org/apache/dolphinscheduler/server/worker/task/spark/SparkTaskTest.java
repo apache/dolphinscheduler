@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +49,7 @@ import java.util.Map;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
-@PowerMockIgnore({"javax.management.*","javax.net.ssl.*"})
+@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
 public class SparkTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SparkTaskTest.class);
@@ -155,7 +156,23 @@ public class SparkTaskTest {
 
     @Test
     public void testSparkTaskInitWithQueue() {
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\",\"queue\":\"queueB\"}" ;
+        String param = "{" +
+                "\"mainClass\":\"com.test.main\"," +
+                "\"mainJar\":{\"id\":1}," +
+                "\"deployMode\":\"cluster\"," +
+                "\"resourceList\":[]," +
+                "\"localParams\":[]," +
+                "\"driverCores\":1," +
+                "\"driverMemory\":\"512M\"," +
+                "\"numExecutors\":2," +
+                "\"executorMemory\":\"2G\"," +
+                "\"executorCores\":2," +
+                "\"mainArgs\":\"\"," +
+                "\"others\":\"\"," +
+                "\"programType\":\"SCALA\"," +
+                "\"sparkVersion\":\"SPARK2\"," +
+                "\"queue\":\"queueB\"" +
+                "}";
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
         PowerMockito.mockStatic(OSUtils.class);
@@ -194,16 +211,30 @@ public class SparkTaskTest {
         SparkTask sparkTask = new SparkTask(taskExecutionContext, logger);
 
 
-
         sparkTask.init();
         SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
-        Assert.assertEquals("queueB",sparkParameters.getQueue());
+        Assert.assertEquals("queueB", sparkParameters.getQueue());
 
     }
 
     @Test
     public void testSparkTaskInitWithNoQueue() {
-        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\"}" ;
+        String param = "{" +
+                "\"mainClass\":\"com.test.main\"," +
+                "\"mainJar\":{\"id\":1}," +
+                "\"deployMode\":\"cluster\"," +
+                "\"resourceList\":[]," +
+                "\"localParams\":[]," +
+                "\"driverCores\":1," +
+                "\"driverMemory\":\"512M\"," +
+                "\"numExecutors\":2," +
+                "\"executorMemory\":\"2G\"," +
+                "\"executorCores\":2," +
+                "\"mainArgs\":\"\"," +
+                "\"others\":\"\"," +
+                "\"programType\":\"SCALA\"," +
+                "\"sparkVersion\":\"SPARK2\"" +
+                "}";
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
         PowerMockito.mockStatic(OSUtils.class);
@@ -242,6 +273,6 @@ public class SparkTaskTest {
 
         sparkTask.init();
         SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
-        Assert.assertEquals("testQueue",sparkParameters.getQueue());
+        Assert.assertEquals("testQueue", sparkParameters.getQueue());
     }
 }
