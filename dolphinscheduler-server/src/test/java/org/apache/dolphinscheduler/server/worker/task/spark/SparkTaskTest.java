@@ -46,7 +46,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
 @PowerMockIgnore({"javax.management.*","javax.net.ssl.*"})
@@ -154,12 +153,8 @@ public class SparkTaskTest {
 
     }
 
-
     @Test
     public void testSparkTaskInitWithQueue() {
-
-//        String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":72},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"flinkVersion\":\"<1.10\",\"slot\":1,\"taskManager\":\"2\",\"jobManagerMemory\":\"1G\",\"taskManagerMemory\":\"2G\",\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"queue\":\"queueA\"}";
-
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\",\"queue\":\"queueB\"}" ;
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
@@ -208,14 +203,11 @@ public class SparkTaskTest {
 
     @Test
     public void testSparkTaskInitWithNoQueue() {
-
         String param = "{\"mainClass\":\"com.test.main\",\"mainJar\":{\"id\":1},\"deployMode\":\"cluster\",\"resourceList\":[],\"localParams\":[],\"driverCores\":1,\"driverMemory\":\"512M\",\"numExecutors\":2,\"executorMemory\":\"2G\",\"executorCores\":2,\"mainArgs\":\"\",\"others\":\"\",\"programType\":\"SCALA\",\"sparkVersion\":\"SPARK2\"}" ;
-
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
 
         PowerMockito.mockStatic(OSUtils.class);
         ProcessService processService = PowerMockito.mock(ProcessService.class);
-
         Resource resource = PowerMockito.mock(Resource.class);
         Mockito.when(resource.getFullName()).thenReturn("/");
         Mockito.when(processService.getResourceById(1)).thenReturn(resource);
@@ -251,9 +243,5 @@ public class SparkTaskTest {
         sparkTask.init();
         SparkParameters sparkParameters = (SparkParameters) sparkTask.getParameters();
         Assert.assertEquals("testQueue",sparkParameters.getQueue());
-
     }
-
-
-
 }
