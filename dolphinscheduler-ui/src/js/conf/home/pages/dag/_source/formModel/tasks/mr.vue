@@ -454,7 +454,7 @@
           font-size: 14px;
           color: #777;
           display: inline-block;
-          padding-top: 6px;
+          padding-top: 10px;
         }
         .sp2 {
           float: left;
