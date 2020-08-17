@@ -147,8 +147,8 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  ready to execute SQL and parameter entity Map
-     * @return
+     * ready to execute SQL and parameter entity Map
+     * @return SqlBinds
      */
     private SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer,Property> sqlParamsMap =  new HashMap<>();
@@ -250,7 +250,7 @@ public class SqlTask extends AbstractTask {
      * result process
      *
      * @param resultSet resultSet
-     * @throws Exception
+     * @throws Exception Exception
      */
     private void resultProcess(ResultSet resultSet) throws Exception{
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
@@ -293,7 +293,7 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * post psql
+     * post sql
      *
      * @param connection connection
      * @param postStatementsBinds postStatementsBinds
@@ -329,7 +329,7 @@ public class SqlTask extends AbstractTask {
      * create connection
      *
      * @return connection
-     * @throws Exception
+     * @throws Exception Exception
      */
     private Connection createConnection() throws Exception{
         // if hive , load connection params if exists
@@ -367,7 +367,7 @@ public class SqlTask extends AbstractTask {
             try {
                 resultSet.close();
             } catch (SQLException e) {
-
+                logger.error("close result set error : {}",e.getMessage(),e);
             }
         }
 
@@ -375,7 +375,7 @@ public class SqlTask extends AbstractTask {
             try {
                 pstmt.close();
             } catch (SQLException e) {
-
+                logger.error("close prepared statement error : {}",e.getMessage(),e);
             }
         }
 
@@ -383,17 +383,17 @@ public class SqlTask extends AbstractTask {
             try {
                 connection.close();
             } catch (SQLException e) {
-
+                logger.error("close connection error : {}",e.getMessage(),e);
             }
         }
     }
 
     /**
      * preparedStatement bind
-     * @param connection
-     * @param sqlBinds
-     * @return
-     * @throws Exception
+     * @param connection connection
+     * @param sqlBinds  sqlBinds
+     * @return PreparedStatement
+     * @throws Exception Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
         // is the timeout set

@@ -417,7 +417,12 @@ public class HadoopUtils implements Closeable {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
-        String responseContent = HttpUtils.get(applicationUrl);
+        String responseContent ;
+		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+			responseContent = KerberosHttpClient.get(applicationUrl);
+		} else {
+			responseContent = HttpUtils.get(applicationUrl);
+		}
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
             result = jsonObject.path("app").path("finalStatus").asText();
