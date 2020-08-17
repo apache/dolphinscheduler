@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.DDLException;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -1226,7 +1225,7 @@ public class ResourcesService extends BaseService {
         int saveResourceStatus = resourcesMapper.insert(resource);
         if (saveResourceStatus != 1) {
             logger.error("resource  maybe already exists, can't recreate ");
-            throw new DDLException("resource maybe already exists, can't recreate");
+            throw new ServiceException("resource maybe already exists, can't recreate");
         }
     }
 
