@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -59,7 +60,7 @@ public class DataAnalysisServiceTest {
     ProjectMapper projectMapper;
 
     @Mock
-    ProjectService projectService;
+    ProjectServiceImpl projectService;
 
     @Mock
     ProcessInstanceMapper processInstanceMapper;
