@@ -29,7 +29,7 @@
             <span>Token</span>
           </th>
           <th>
-            <span>{{$t('Failure time')}}</span>
+            <span>{{$t('Expiration time')}}</span>
           </th>
           <th>
             <span>{{$t('Create Time')}}</span>
