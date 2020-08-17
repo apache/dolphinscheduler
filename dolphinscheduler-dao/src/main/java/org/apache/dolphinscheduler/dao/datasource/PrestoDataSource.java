@@ -14,35 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.dao.datasource;
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RandomSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
+public class PrestoDataSource extends BaseDataSource {
 
-import java.util.Collection;
+  /**
+   * @return driver class
+   */
+  @Override
+  public String driverClassSelector() {
+    return Constants.COM_PRESTO_JDBC_DRIVER;
+  }
 
-
-/**
- *  round robin host manager
- */
-public class RandomHostManager extends CommonHostManager {
-
-    /**
-     * selector
-     */
-    private final Selector<Host> selector;
-
-    /**
-     * set round robin
-     */
-    public RandomHostManager(){
-        this.selector = new RandomSelector();
-    }
-
-    @Override
-    public Host select(Collection<Host> nodes) {
-        return selector.select(nodes);
-    }
+  /**
+   * @return db type
+   */
+  @Override
+  public DbType dbTypeSelector() {
+    return DbType.PRESTO;
+  }
 }

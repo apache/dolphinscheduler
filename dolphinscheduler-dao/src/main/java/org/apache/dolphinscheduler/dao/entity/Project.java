@@ -16,12 +16,12 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.Date;
 
 /**
  * project
@@ -32,7 +32,7 @@ public class Project {
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
@@ -44,7 +44,7 @@ public class Project {
     /**
      * user name
      */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private String userName;
 
     /**
@@ -70,19 +70,19 @@ public class Project {
     /**
      * permission
      */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int perm;
 
     /**
      * process define count
      */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int defCount;
 
     /**
      * process instance running count
      */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int instRunningCount;
 
     public int getDefCount() {
@@ -136,6 +136,7 @@ public class Project {
     public void setDescription(String description) {
         this.description = description;
     }
+
     public String getDescription() {
         return description;
     }
@@ -163,6 +164,7 @@ public class Project {
     public void setPerm(int perm) {
         this.perm = perm;
     }
+
     @Override
     public String toString() {
         return "Project{" +
@@ -175,7 +177,6 @@ public class Project {
                 ", updateTime=" + updateTime +
                 '}';
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -202,4 +203,88 @@ public class Project {
         return result;
     }
 
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private int id;
+        private int userId;
+        private String userName;
+        private String name;
+        private String description;
+        private Date createTime;
+        private Date updateTime;
+        private int perm;
+        private int defCount;
+        private int instRunningCount;
+
+        private Builder() {
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder userId(int userId) {
+            this.userId = userId;
+            return this;
+        }
+
+        public Builder userName(String userName) {
+            this.userName = userName;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder createTime(Date createTime) {
+            this.createTime = createTime;
+            return this;
+        }
+
+        public Builder updateTime(Date updateTime) {
+            this.updateTime = updateTime;
+            return this;
+        }
+
+        public Builder perm(int perm) {
+            this.perm = perm;
+            return this;
+        }
+
+        public Builder defCount(int defCount) {
+            this.defCount = defCount;
+            return this;
+        }
+
+        public Builder instRunningCount(int instRunningCount) {
+            this.instRunningCount = instRunningCount;
+            return this;
+        }
+
+        public Project build() {
+            Project project = new Project();
+            project.setId(id);
+            project.setUserId(userId);
+            project.setUserName(userName);
+            project.setName(name);
+            project.setDescription(description);
+            project.setCreateTime(createTime);
+            project.setUpdateTime(updateTime);
+            project.setPerm(perm);
+            project.setDefCount(defCount);
+            project.setInstRunningCount(instRunningCount);
+            return project;
+        }
+    }
 }
