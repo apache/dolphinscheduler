@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.avro.generic.GenericData;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -225,13 +224,13 @@ public class UsersServiceTest {
         String userPassword = "userTest0001";
         try {
             //user not exist
-            Map<String, Object> result = usersService.updateUser(0,userName,userPassword,"3443@qq.com",1,"13457864543","queue");
+            Map<String, Object> result = usersService.updateUser(getLoginUser(), 0,userName,userPassword,"3443@qq.com",1,"13457864543","queue");
             Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
             logger.info(result.toString());
 
             //success
             when(userMapper.selectById(1)).thenReturn(getUser());
-            result = usersService.updateUser(1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue");
+            result = usersService.updateUser(getLoginUser(), 1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -357,6 +356,12 @@ public class UsersServiceTest {
 
     }
 
+    private User getLoginUser(){
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
+    }
 
     @Test
     public void getUserInfo(){

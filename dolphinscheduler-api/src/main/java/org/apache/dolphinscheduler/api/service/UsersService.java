@@ -248,6 +248,8 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
+     *
+     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -258,7 +260,7 @@ public class UsersService extends BaseService {
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateUser(int userId,
+    public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
                                           String email,
@@ -268,13 +270,14 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
+        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
         User user = userMapper.selectById(userId);
-
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)){
@@ -812,24 +815,6 @@ public class UsersService extends BaseService {
         putMsg(result, Status.SUCCESS);
 
         return result;
-    }
-
-    /**
-     * check
-     *
-     * @param result result
-     * @param bool bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
     }
 
     /**
