@@ -87,7 +87,7 @@ public class ResourcesService extends BaseService {
      * @return create directory result
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public  Result createDirectory(User loginUser,
+    public Result createDirectory(User loginUser,
                                  String name,
                                  String description,
                                  ResourceType type,
@@ -161,7 +161,7 @@ public class ResourcesService extends BaseService {
      * @return create result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
-    public  Result createResource(User loginUser,
+    public Result createResource(User loginUser,
                                  String name,
                                  String desc,
                                  ResourceType type,
