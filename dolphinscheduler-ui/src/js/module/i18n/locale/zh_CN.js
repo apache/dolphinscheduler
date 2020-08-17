@@ -461,7 +461,7 @@ export default {
   'Edit token': '编辑令牌',
   'Please enter the IP address separated by commas': '请输入IP地址多个用英文逗号隔开',
   'Note: Multiple IP addresses have been comma separated': '注意：多个IP地址以英文逗号分割',
-  'Failure time': '失效时间',
+  'Expiration time': '失效时间',
   User: '用户',
   'Please enter token': '请输入令牌',
   'Generate token': '生成令牌',

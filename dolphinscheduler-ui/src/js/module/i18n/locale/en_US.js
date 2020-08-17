@@ -466,7 +466,7 @@ export default {
   'Edit token': 'Edit token',
   'Please enter the IP address separated by commas': 'Please enter the IP address separated by commas',
   'Note: Multiple IP addresses have been comma separated': 'Note: Multiple IP addresses have been comma separated',
-  'Failure time': 'Failure time',
+  'Expiration time': 'Expiration time',
   User: 'User',
   'Please enter token': 'Please enter token',
   'Generate token': 'Generate token',
