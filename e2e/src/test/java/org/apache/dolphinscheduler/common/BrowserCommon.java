@@ -242,9 +242,9 @@ public class BrowserCommon {
         actions.release();
     }
 
-    public void moveToDragElement(By targetLocator, int X, int Y) {
+    public void moveToDragElement(By targetLocator, int x, int y) {
         WebElement targetElement = locateElement(targetLocator);
-        actions.dragAndDropBy(targetElement, X, Y).perform();
+        actions.dragAndDropBy(targetElement, x, y).perform();
         actions.release();
     }
 
