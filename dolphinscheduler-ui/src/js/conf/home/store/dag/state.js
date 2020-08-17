@@ -96,6 +96,11 @@ export default {
       id: 7,
       code: 'DB2',
       disabled: false
+    },
+    {
+      id: 8,
+      code: 'PRESTO',
+      disabled: false
     }
   ],
   // Alarm interface

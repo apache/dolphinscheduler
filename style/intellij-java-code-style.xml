@@ -37,7 +37,23 @@
   </option>
   <option name="IMPORT_LAYOUT_TABLE">
     <value>
+      <package name="org.apache.dolphinscheduler" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="org.apache" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="java" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="javax" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="org" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="com" withSubpackages="true" static="true" />
+      <emptyLine />
       <package name="" withSubpackages="true" static="true" />
+      <emptyLine />
+      <package name="org.apache.dolphinscheduler" withSubpackages="true" static="false" />
+      <emptyLine />
+      <package name="org.apache" withSubpackages="true" static="false" />
       <emptyLine />
       <package name="java" withSubpackages="true" static="false" />
       <emptyLine />

@@ -54,7 +54,7 @@ public class ExecutorServiceTest {
     @Test
     public void putMsgWithParamsTest() {
 
-        Map<String,Object> map = new HashMap<>(5);
+        Map<String,Object> map = new HashMap<>();
         putMsgWithParams(map, Status.PROJECT_ALREADY_EXISTS);
 
         logger.info(map.toString());

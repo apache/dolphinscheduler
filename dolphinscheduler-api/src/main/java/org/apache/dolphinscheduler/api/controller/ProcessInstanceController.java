@@ -370,7 +370,7 @@ public class ProcessInstanceController extends BaseController {
         logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
                 loginUser.getUserName(), projectName, processInstanceIds);
         // task queue
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (StringUtils.isNotEmpty(processInstanceIds)) {
             String[] processInstanceIdArray = processInstanceIds.split(",");

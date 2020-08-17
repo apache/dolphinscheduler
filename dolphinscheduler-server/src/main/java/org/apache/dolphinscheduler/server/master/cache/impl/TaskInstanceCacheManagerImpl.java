@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
 
     /**
-     * taskInstance caceh
+     * taskInstance cache
      */
     private Map<Integer,TaskInstance> taskInstanceCache = new ConcurrentHashMap<>();
 
