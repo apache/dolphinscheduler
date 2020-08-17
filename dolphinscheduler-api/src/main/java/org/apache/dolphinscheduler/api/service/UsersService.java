@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -101,7 +102,7 @@ public class UsersService extends BaseService {
                                           String queue,
                                           int state) throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
@@ -229,7 +230,7 @@ public class UsersService extends BaseService {
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -269,7 +270,7 @@ public class UsersService extends BaseService {
                                           String phone,
                                           String queue,
                                           int state) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         User user = userMapper.selectById(userId);
@@ -392,7 +393,7 @@ public class UsersService extends BaseService {
      * @throws Exception exception when operate hdfs
      */
     public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
@@ -432,7 +433,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -482,7 +483,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -579,7 +580,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
@@ -626,7 +627,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -706,7 +707,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -727,7 +728,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryUserList(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -771,7 +772,7 @@ public class UsersService extends BaseService {
      */
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -807,7 +808,7 @@ public class UsersService extends BaseService {
      * @return authorized result code
      */
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -917,10 +918,11 @@ public class UsersService extends BaseService {
      * @param repeatPassword repeat password
      * @param email          email
      * @return register result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
@@ -934,10 +936,51 @@ public class UsersService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-
-        createUser(userName, userPassword, email, 1, "", "", 0);
+        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, user);
         return result;
     }
 
+    /**
+     * activate user, only system admin have permission, change user state code 0 to 1
+     *
+     * @param loginUser login user
+     * @return create result code
+     */
+    public Map<String, Object> activateUser(User loginUser, String userName) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        if (!CheckUtils.checkUserName(userName)){
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        User user = userMapper.queryByUserNameAccurately(userName);
+
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
+
+        if (user.getState() != Flag.NO.ordinal()) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        user.setState(Flag.YES.ordinal());
+        Date now = new Date();
+        user.setUpdateTime(now);
+        userMapper.updateById(user);
+        User responseUser = userMapper.queryByUserNameAccurately(userName);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, responseUser);
+        return result;
+    }
 }

@@ -91,3 +91,30 @@ jobs:
           mkdir -p ${LOG_DIR}
           docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml logs dolphinscheduler-postgresql > ${LOG_DIR}/db.txt
         continue-on-error: true
+
+  Checkstyle:
+    name: Check code style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - name: check code style
+        env:
+          WORKDIR: ./
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECKSTYLE_CONFIG: style/checkstyle.xml
+          REVIEWDOG_VERSION: v0.10.2
+        run: |
+          wget -O - -q https://github.com/checkstyle/checkstyle/releases/download/checkstyle-8.22/checkstyle-8.22-all.jar > /opt/checkstyle.jar
+          wget -O - -q https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s -- -b /opt ${REVIEWDOG_VERSION}
+          java -jar /opt/checkstyle.jar "${WORKDIR}" -c "${CHECKSTYLE_CONFIG}"  -f xml \
+               | /opt/reviewdog -f=checkstyle \
+                    -reporter="${INPUT_REPORTER:-github-pr-check}" \
+                    -filter-mode="${INPUT_FILTER_MODE:-added}" \
+                    -fail-on-error="${INPUT_FAIL_ON_ERROR:-false}"
