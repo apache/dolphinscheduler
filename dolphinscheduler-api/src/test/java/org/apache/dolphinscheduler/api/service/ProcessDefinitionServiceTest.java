@@ -404,10 +404,12 @@ public class ProcessDefinitionServiceTest {
     @Test
     public void testBatchMoveProcessDefinition() {
         String projectName = "project_test1";
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Project project1 = getProject(projectName);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project1);
 
         String projectName2 = "project_test2";
-        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(getProject(projectName2));
+        Project project2 = getProject(projectName2);
+        Mockito.when(projectMapper.queryByName(projectName2)).thenReturn(project2);
 
         int targetProjectId = 2;
         Mockito.when(projectMapper.queryDetailById(targetProjectId)).thenReturn(getProjectById(targetProjectId));
@@ -426,21 +428,21 @@ public class ProcessDefinitionServiceTest {
         putMsg(result2, Status.SUCCESS, targetProject.getName());
 
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, targetProject, targetProject.getName())).thenReturn(result2);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project2, projectName2)).thenReturn(result);
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
         definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
         definition.setConnects("[]");
-        //instance exit
+
+        // check target project result == null
         Mockito.when(processDefineMapper.updateById(definition)).thenReturn(46);
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
 
         putMsg(result, Status.SUCCESS);
 
-
-        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(loginUser, "project_test1",
-                "46", 2);
+        Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(
+                loginUser, "project_test1", "46", 2);
 
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
