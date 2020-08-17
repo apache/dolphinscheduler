@@ -677,7 +677,7 @@ JSP.prototype.saveStore = function () {
       Vue.$message.warning(`${i18n.$t('The workflow canvas is abnormal and cannot be saved, please recreate')}`)
       return false
     }
-    // return false
+    
     // Storage node
     store.commit('dag/setTasks', tasks)
     // Store coordinate information
