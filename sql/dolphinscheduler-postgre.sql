@@ -499,7 +499,8 @@ CREATE TABLE t_ds_resources (
   pid int,
   full_name varchar(64),
   is_directory int,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
 ) ;
 
 
