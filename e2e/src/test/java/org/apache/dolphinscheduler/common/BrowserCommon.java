@@ -71,10 +71,7 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        // show poll frequency timeout
-        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
-
-        wait = new WebDriverWait(driver, timeout, pollFrequency);
+        wait = new WebDriverWait(driver, timeout);
     }
 
     /**
@@ -87,10 +84,7 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        // show poll frequency timeout
-        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
-
-        wait = new WebDriverWait(driver, timeout, pollFrequency);
+        wait = new WebDriverWait(driver, timeout);
         this.jedis = jedis;
     }
 
@@ -104,10 +98,7 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        // show poll frequency timeout
-        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
-
-        wait = new WebDriverWait(driver, timeout, pollFrequency);
+        wait = new WebDriverWait(driver, timeout);
     }
 
 
