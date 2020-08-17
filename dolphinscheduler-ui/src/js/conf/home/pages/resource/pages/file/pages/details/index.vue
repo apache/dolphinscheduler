@@ -232,7 +232,7 @@
         position: absolute;
         right: 0;
         top: 0;
-        >i {
+        >em {
           font-size: 20px;
           color: #2d8cf0;
           cursor: pointer;

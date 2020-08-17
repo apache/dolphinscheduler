@@ -447,9 +447,12 @@
       }
     },
     mounted () {
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 200)
+      // Added delay loading in script input box
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this._handlerEditor()
+        }, 350)
+      })
     },
     destroyed () {
       /**
