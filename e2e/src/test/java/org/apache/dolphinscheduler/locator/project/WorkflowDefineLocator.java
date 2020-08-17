@@ -120,12 +120,22 @@ public class WorkflowDefineLocator {
     //click submit button
     public static final By CLICK_SUBMIT_BUTTON = By.xpath("//div[3]/div/button[2]/span");
 
+    //copy task
+    public static final By MOUSE_RIGHT_CLICK = By.xpath("//div[2]/div[2]/div/div/div/div/div[2]");
+    public static final By COPY_TASK = By.xpath("//a[3]/span");
+
+    //click line
+    public static final By CLICK_LINE = By.xpath("//a[@id='line']/button/i");
+
+    public static final By LINE_SOURCES_TASK = By.xpath("//div[@id='canvas']/div[1]/div[2]");
+
+    public static final By LINE_TARGET_TASK = By.xpath("//div[@id='canvas']/div[2]/div[2]");
 
     /**
      * save workflow
      */
     //click save workflow button
-    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//div[2]/div[1]/div[2]/button[2]");
+    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//div[2]/div[1]/div[2]/button");
 
     //input  workflow name
     public static final By INPUT_WORKFLOW_NAME = By.xpath("//input");

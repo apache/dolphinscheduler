@@ -23,7 +23,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import redis.clients.jedis.Jedis;
-import org.openqa.selenium.JavascriptExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -217,6 +217,7 @@ public class BrowserCommon {
      * @return actions
      */
     public Actions moveToElement(By locator) {
+
         return actions.moveToElement(locateElement(locator));
     }
 
@@ -239,6 +240,30 @@ public class BrowserCommon {
         actions.release();
     }
 
+    /**
+     * Right mouse click on the element
+     *
+     * @param locator By
+     * @return actions
+     */
+    public void mouseRightClickElement(By locator) {
+        WebElement mouseRightClickElement = locateElement(locator);
+        actions.contextClick(mouseRightClickElement).perform();
+    }
+
+    /**
+     * The mouse moves from a position to a specified positionØ
+     *
+     * @param source_locator BY
+     * @param target_locator BY
+     * @return actions
+     */
+    public void mouseMovePosition(By source_locator, By target_locator) throws InterruptedException {
+        WebElement sourceElement = locateElement(source_locator);
+        WebElement targetElement = locateElement(target_locator);
+        actions.dragAndDrop(sourceElement,targetElement).perform();
+        actions.click();
+    }
 
     /**
      * jump page
