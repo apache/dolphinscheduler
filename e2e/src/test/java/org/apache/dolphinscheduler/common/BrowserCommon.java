@@ -217,7 +217,6 @@ public class BrowserCommon {
      * @return actions
      */
     public Actions moveToElement(By locator) {
-
         return actions.moveToElement(locateElement(locator));
     }
 
