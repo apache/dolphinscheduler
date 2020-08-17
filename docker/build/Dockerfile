@@ -27,7 +27,7 @@ ENV DEBIAN_FRONTEND noninteractive
 #If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
 #RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
-    apk add dos2unix shadow bash openrc python python3 sudo vim wget iputils net-tools openssh-server py2-pip tini && \
+    apk --update add --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
     apk add --update procps && \
     openrc boot && \
     pip install kazoo
