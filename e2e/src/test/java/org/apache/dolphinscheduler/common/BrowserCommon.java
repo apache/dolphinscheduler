@@ -71,7 +71,10 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        wait = new WebDriverWait(driver, timeout);
+        // show poll frequency timeout
+        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
+
+        wait = new WebDriverWait(driver, timeout, pollFrequency);
     }
 
     /**
@@ -84,7 +87,10 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        wait = new WebDriverWait(driver, timeout);
+        // show poll frequency timeout
+        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
+
+        wait = new WebDriverWait(driver, timeout, pollFrequency);
         this.jedis = jedis;
     }
 
@@ -98,7 +104,10 @@ public class BrowserCommon {
         this.je = ((JavascriptExecutor) driver);
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
-        wait = new WebDriverWait(driver, timeout);
+        // show poll frequency timeout
+        long pollFrequency = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDrivePollFrequency"));
+
+        wait = new WebDriverWait(driver, timeout, pollFrequency);
     }
 
 
@@ -223,18 +232,18 @@ public class BrowserCommon {
     /**
      * mouse drag  element
      *
-     * @param source_locator BY
-     * @param target_locator BY
+     * @param sourceLocator BY
+     * @param targetLocator BY
      */
-    public void dragAndDrop(By source_locator, By target_locator) {
-        WebElement sourceElement = locateElement(source_locator);
-        WebElement targetElement = locateElement(target_locator);
+    public void dragAndDrop(By sourceLocator, By targetLocator) {
+        WebElement sourceElement = locateElement(sourceLocator);
+        WebElement targetElement = locateElement(targetLocator);
         actions.dragAndDrop(sourceElement, targetElement).perform();
         actions.release();
     }
 
-    public void moveToDragElement(By target_locator, int X, int Y) {
-        WebElement targetElement = locateElement(target_locator);
+    public void moveToDragElement(By targetLocator, int X, int Y) {
+        WebElement targetElement = locateElement(targetLocator);
         actions.dragAndDropBy(targetElement, X, Y).perform();
         actions.release();
     }
@@ -253,13 +262,13 @@ public class BrowserCommon {
     /**
      * The mouse moves from a position to a specified positionØ
      *
-     * @param source_locator BY
-     * @param target_locator BY
+     * @param sourceLocator BY
+     * @param targetLocator BY
      * @return actions
      */
-    public void mouseMovePosition(By source_locator, By target_locator) throws InterruptedException {
-        WebElement sourceElement = locateElement(source_locator);
-        WebElement targetElement = locateElement(target_locator);
+    public void mouseMovePosition(By sourceLocator, By targetLocator) throws InterruptedException {
+        WebElement sourceElement = locateElement(sourceLocator);
+        WebElement targetElement = locateElement(targetLocator);
         actions.dragAndDrop(sourceElement,targetElement).perform();
         actions.click();
     }
