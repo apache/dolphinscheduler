@@ -155,10 +155,10 @@ public class ZookeeperNodeManager implements InitializingBean {
 
         private String parseGroup(String path){
             String[] parts = path.split("\\/");
-            if(parts.length != 6){
+            if(parts.length < 6){
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
-            String group = parts[4];
+            String group = parts[parts.length - 2];
             return group;
         }
     }
