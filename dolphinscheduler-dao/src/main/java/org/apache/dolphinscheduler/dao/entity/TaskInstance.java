@@ -16,23 +16,22 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.*;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * task instance
@@ -382,16 +381,16 @@ public class TaskInstance implements Serializable {
         this.appLink = appLink;
     }
 
-
-
-    public String getDependency(){
-
-        if(this.dependency != null){
+    public String getDependency() {
+        if (this.dependency != null) {
             return this.dependency;
         }
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+        return taskNode == null ? null : taskNode.getDependence();
+    }
 
-        return taskNode.getDependence();
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     public Flag getFlag() {
@@ -493,10 +492,6 @@ public class TaskInstance implements Serializable {
             return (this.getState().typeIsFailure()
                 && this.getRetryTimes() < this.getMaxRetryTimes());
         }
-    }
-
-    public void setDependency(String dependency) {
-        this.dependency = dependency;
     }
 
     public Priority getTaskInstancePriority() {
