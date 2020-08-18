@@ -103,7 +103,10 @@ public class ResourcesService extends BaseService {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
-
+        result = verifyResourceName(fullName,type,loginUser);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
         if (pid != -1) {
             Resource parentResource = resourcesMapper.selectById(pid);
 
@@ -116,13 +119,6 @@ public class ResourcesService extends BaseService {
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
-        }
-
-
-        if (checkResourceExists(fullName, 0, type.ordinal())) {
-            logger.error("resource directory {} has exist, can't recreate", fullName);
-            putMsg(result, Status.RESOURCE_EXIST);
-            return result;
         }
 
         Date now = new Date();
