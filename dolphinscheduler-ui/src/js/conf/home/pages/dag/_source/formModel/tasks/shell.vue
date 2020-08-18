@@ -262,6 +262,7 @@
             id: -1,
             name: $t('No resources exist'),
             fullName: '/'+$t('No resources exist'),
+            isDisabled: true,
             children: []
           }]
           if(optionsCmp.length>0) {
