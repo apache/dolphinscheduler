@@ -103,7 +103,10 @@ public class ResourcesService extends BaseService {
             return result;
         }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
-
+        result = verifyResourceName(fullName,type,loginUser);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+            return result;
+        }
         if (pid != -1) {
             Resource parentResource = resourcesMapper.selectById(pid);
 

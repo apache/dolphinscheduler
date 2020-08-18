@@ -138,6 +138,10 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
 
         //PARENT_RESOURCE_NOT_EXIST
+        user.setId(1);
+        user.setTenantId(1);
+        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.selectById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.createDirectory(user,"directoryTest","directory test",ResourceType.FILE,1,"/");
