@@ -1305,7 +1305,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     ProcessInstance processInstance = processInstanceList.get(i);
                     TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), nodeName);
                     if (taskInstance == null) {
-                        treeViewDto.getInstances().add(new Instance(-1, "not running", "null"));
+                        treeViewDto.getInstances().add(new Instance(-1, "not running", null));
                     } else {
                         Date startTime = taskInstance.getStartTime() == null ? new Date() : taskInstance.getStartTime();
                         Date endTime = taskInstance.getEndTime() == null ? new Date() : taskInstance.getEndTime();
