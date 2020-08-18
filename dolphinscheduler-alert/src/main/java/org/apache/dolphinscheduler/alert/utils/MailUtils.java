@@ -213,6 +213,7 @@ public class MailUtils {
 
     /**
      * get session
+     *
      * @return the new Session
      */
     private static Session getSession() {
@@ -222,8 +223,8 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, MAIL_PROTOCOL);
         props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, STARTTLS_ENABLE);
-        if(SSL_ENABLE){
-            props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE,"true");
+        if (SSL_ENABLE) {
+            props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, "true");
             props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
         }
 
@@ -347,5 +348,5 @@ public class MailUtils {
         retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
-    
+
 }
