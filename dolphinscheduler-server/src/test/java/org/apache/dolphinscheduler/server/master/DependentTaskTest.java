@@ -292,7 +292,9 @@ public class DependentTaskTest {
     @Test
     public void testWaitAndCancel() throws Exception {
         // for the poor independence of UT, error on other place may causes the condition happens
-        if (!Stopper.isRunning()) return;
+        if (!Stopper.isRunning()) {
+            return;
+        }
 
         TaskNode taskNode = getDependantTaskNode();
         DependentTaskModel dependentTaskModel = new DependentTaskModel();
