@@ -115,11 +115,11 @@
             <x-poptip
                     :ref="'poptip-' + $index"
                     placement="bottom-end"
-                    width="90">
+                    width="190">
               <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
                 <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" :loading="spinnerLoading" @click="_delete(item,$index)">{{spinnerLoading ? 'Loading' : $t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -152,7 +152,8 @@
     name: 'file-manage-list',
     data () {
       return {
-        list: []
+        list: [],
+        spinnerLoading: false
       }
     },
     props: {
@@ -190,15 +191,18 @@
         this.$refs[`poptip-${i}`][0].doClose()
       },
       _delete (item, i) {
+        this.spinnerLoading = true
         this.deleteResource({
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
+          this.spinnerLoading = false
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
+          this.spinnerLoading = false
         })
       },
       _rename (item, i) {

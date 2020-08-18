@@ -32,8 +32,9 @@
               <tr v-for="(item,$index) in taskCtatusList" :key="$index">
                 <td><span>{{$index+1}}</span></td>
                 <td>
-                  <span>
-                    <a href="javascript:" @click="searchParams.projectId && _goTask(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a>
+                  <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
+                  <span v-else>
+                    <a href="javascript:" @click="searchParams.projectId && _goTask(item.key)">{{item.value}}</a>
                   </span>
                 </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
@@ -62,7 +63,8 @@
       return {
         isSpin: true,
         msg: '',
-        taskCtatusList: []
+        taskCtatusList: [],
+        currentName: ''
       }
     },
     props: {
@@ -120,6 +122,7 @@
     beforeCreate () {
     },
     created () {
+      this.currentName = this.$router.currentRoute.name
     },
     beforeMount () {
     },
@@ -139,7 +142,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .task-ctatus-count-model {
-
-  }
 </style>
