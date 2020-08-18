@@ -31,7 +31,10 @@
               </tr>
               <tr v-for="(item,$index) in processStateList" :key="$index">
                 <td><span>{{$index+1}}</span></td>
-                <td><span><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a></span></td>
+                <td>
+                  <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
+                  <span v-else><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)">{{item.value}}</a></span>
+                </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
               </tr>
             </table>
@@ -57,7 +60,8 @@
       return {
         isSpin: true,
         msg: '',
-        processStateList: []
+        processStateList: [],
+        currentName: ''
       }
     },
     props: {
@@ -113,6 +117,7 @@
     beforeCreate () {
     },
     created () {
+      this.currentName = this.$router.currentRoute.name
     },
     beforeMount () {
     },
@@ -132,7 +137,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .process-state-count-model {
-
-  }
 </style>
