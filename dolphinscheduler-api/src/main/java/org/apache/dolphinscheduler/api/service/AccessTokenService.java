@@ -120,9 +120,11 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> generateToken(User loginUser, int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>(5);
-        if(check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)){
+        if (!hasPerm(loginUser,userId)){
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+
         String token = EncryptionUtils.getMd5(userId + expireTime + String.valueOf(System.currentTimeMillis()));
         result.put(Constants.DATA_LIST, token);
         putMsg(result, Status.SUCCESS);
