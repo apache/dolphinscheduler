@@ -207,7 +207,7 @@
           this.customConfig = 0
           setTimeout(() => {
             this._handlerEditor()
-          }, 200)
+          }, 350)
         }
       },
       /**
@@ -431,11 +431,11 @@
       if(this.customConfig) {
         setTimeout(() => {
           this._handlerJsonEditor()
-        }, 200)
+        }, 350)
       } else {
         setTimeout(() => {
           this._handlerEditor()
-        }, 200)
+        }, 350)
       }
     },
     destroyed () {
