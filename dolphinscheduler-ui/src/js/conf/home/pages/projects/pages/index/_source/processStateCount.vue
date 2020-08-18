@@ -137,7 +137,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .process-state-count-model {
-
-  }
 </style>
