@@ -84,7 +84,9 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
-        if(check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)){
+
+        if (!hasPerm(loginUser,userId)){
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -140,10 +142,6 @@ public class AccessTokenService extends BaseService {
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
 
-        if(check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)){
-            return result;
-        }
-
         AccessToken accessToken = accessTokenMapper.selectById(id);
 
         if (accessToken == null) {
@@ -152,8 +150,7 @@ public class AccessTokenService extends BaseService {
             return result;
         }
 
-        if (loginUser.getId() != accessToken.getUserId() &&
-                loginUser.getUserType() != UserType.ADMIN_USER) {
+        if (!hasPerm(loginUser,accessToken.getUserId())){
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -176,9 +173,11 @@ public class AccessTokenService extends BaseService {
     public Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
 
-        if(check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)){
+        if (!hasPerm(loginUser,userId)){
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
             logger.error("access token not exist,  access token id {}", id);
