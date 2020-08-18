@@ -17,14 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,12 +38,19 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Sets;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.sift.SiftingAppender;
+
 @RunWith(MockitoJUnitRunner.Silent.class)
-@PrepareForTest(MasterTaskExecThread.class)
+@PrepareForTest({
+        MasterTaskExecThread.class,
+        MasterBaseTaskExecThread.class,
+})
 public class MasterTaskExecThreadTest {
 
     private MasterTaskExecThread masterTaskExecThread;
@@ -106,6 +118,44 @@ public class MasterTaskExecThreadTest {
         MasterTaskExecThread masterTaskExecThread = new MasterTaskExecThread(taskInstance);
         masterTaskExecThread.pauseTask();
         org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
+    }
+
+    @Test
+    public void testGetTaskLogPath() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(100);
+        taskInstance.setId(1000);
+
+        Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
+        Assert.assertNotNull(rootLogger);
+
+        MasterTaskExecThread taskExecThread = new MasterTaskExecThread(taskInstance);
+
+        // case 1
+        {
+            Assert.assertEquals("/", Constants.SINGLE_SLASH);
+            Assert.assertEquals("", taskExecThread.getTaskLogPath(taskInstance));
+        }
+
+        // case 2
+        {
+            SiftingAppender appender = PowerMockito.mock(SiftingAppender.class);
+            // it's a trick to mock logger.getAppend("TASKLOGFILE")
+            PowerMockito.when(appender.getName()).thenReturn("TASKLOGFILE");
+            rootLogger.addAppender(appender);
+
+            Path logBase = Paths.get("path").resolve("to").resolve("test");
+
+            TaskLogDiscriminator taskLogDiscriminator = PowerMockito.mock(TaskLogDiscriminator.class);
+            PowerMockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
+            PowerMockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
+
+            Path logPath = Paths.get(".").toAbsolutePath().getParent()
+                    .resolve(logBase)
+                    .resolve("1").resolve("100").resolve("1000.log");
+            Assert.assertEquals(logPath.toString(), taskExecThread.getTaskLogPath(taskInstance));
+        }
     }
 
     private TaskInstance getTaskInstance(){

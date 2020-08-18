@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -31,13 +30,17 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.spi.AppenderAttachable;
 
 
 /**
@@ -250,30 +253,27 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * get task log path
      * @return log path
      */
+    @SuppressWarnings("unchecked")
     public String getTaskLogPath(TaskInstance task) {
-        String logPath;
-        try{
-            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                    .getLogger("ROOT")
-                    .getAppender("TASKLOGFILE"))
-                    .getDiscriminator()).getLogBase();
-            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-                logPath =  baseLog + Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        task.getId() + ".log";
-            }else{
-                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                        baseLog +  Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        task.getId() + ".log";
+        try {
+            // Optional.map will be skipped if null
+            Path path = Optional.of(LoggerFactory.getILoggerFactory())
+                    .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
+                    .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
+                    .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
+                    .map(TaskLogDiscriminator::getLogBase)
+                    .map(e -> Paths.get(e)
+                            .toAbsolutePath()
+                            .resolve(String.valueOf(task.getProcessDefinitionId()))
+                            .resolve(String.valueOf(task.getProcessInstanceId()))
+                            .resolve(task.getId() + ".log"))
+                    .orElse(null);
+            if (path != null) {
+                return path.toString();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("logger", e);
-            logPath = "";
         }
-        return logPath;
+        return "";
     }
-
 }
