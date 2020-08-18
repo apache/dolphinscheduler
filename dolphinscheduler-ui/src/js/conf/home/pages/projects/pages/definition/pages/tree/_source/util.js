@@ -23,16 +23,16 @@ import { tasksState } from '@/conf/home/pages/dag/_source/config'
  */
 const rtInstancesTooltip = (data) => {
   let str = '<div style="text-align: left;word-break:break-all">'
-  str += `id : ${data.id}</br>`
-  str += `host : ${data.host}</br>`
-  str += `name : ${data.name}</br>`
-  str += `state : ${data.state ? tasksState[data.state].desc : '-'}（${data.state}）</br>`
+  str += `id : ${data.id ? data.id : '-'}</br>`
+  str += `host : ${data.host ? data.host : '-'}</br>`
+  str += `name : ${data.name ? data.name : '-'}</br>`
+  str += `state : ${data.state ? tasksState[data.state].desc : '-'}（${data.state ? data.state : '-'}）</br>`
   if (data.type) {
-    str += `type : ${data.type}</br>`
+    str += `type : ${data.type ? data.type : '-'}</br>`
   }
   str += `startTime : ${data.startTime ? formatDate(data.startTime) : '-'}</br>`
   str += `endTime : ${data.endTime ? formatDate(data.endTime) : '-'}</br>`
-  str += `duration : ${data.duration}</br>`
+  str += `duration : ${data.duration  ? data.duration : '-'}</br>`
   str += '</div>'
   return str
 }
