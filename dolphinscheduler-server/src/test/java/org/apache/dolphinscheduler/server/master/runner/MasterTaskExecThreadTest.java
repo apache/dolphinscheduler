@@ -72,14 +72,15 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testExistsValidWorkerGroup1(){
+    public void testExistsValidWorkerGroup1() {
 
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet());
         boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
         Assert.assertFalse(b);
     }
+
     @Test
-    public void testExistsValidWorkerGroup2(){
+    public void testExistsValidWorkerGroup2() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
         workerGorups.add("test2");
@@ -90,7 +91,7 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testExistsValidWorkerGroup3(){
+    public void testExistsValidWorkerGroup3() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
 
@@ -101,7 +102,7 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testPauseTask(){
+    public void testPauseTask() {
 
 
         ProcessService processService = Mockito.mock(ProcessService.class);
@@ -132,33 +133,27 @@ public class MasterTaskExecThreadTest {
 
         MasterTaskExecThread taskExecThread = new MasterTaskExecThread(taskInstance);
 
-        // case 1
-        {
-            Assert.assertEquals("/", Constants.SINGLE_SLASH);
-            Assert.assertEquals("", taskExecThread.getTaskLogPath(taskInstance));
-        }
+        Assert.assertEquals("/", Constants.SINGLE_SLASH);
+        Assert.assertEquals("", taskExecThread.getTaskLogPath(taskInstance));
 
-        // case 2
-        {
-            SiftingAppender appender = PowerMockito.mock(SiftingAppender.class);
-            // it's a trick to mock logger.getAppend("TASKLOGFILE")
-            PowerMockito.when(appender.getName()).thenReturn("TASKLOGFILE");
-            rootLogger.addAppender(appender);
+        SiftingAppender appender = PowerMockito.mock(SiftingAppender.class);
+        // it's a trick to mock logger.getAppend("TASKLOGFILE")
+        PowerMockito.when(appender.getName()).thenReturn("TASKLOGFILE");
+        rootLogger.addAppender(appender);
 
-            Path logBase = Paths.get("path").resolve("to").resolve("test");
+        Path logBase = Paths.get("path").resolve("to").resolve("test");
 
-            TaskLogDiscriminator taskLogDiscriminator = PowerMockito.mock(TaskLogDiscriminator.class);
-            PowerMockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
-            PowerMockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
+        TaskLogDiscriminator taskLogDiscriminator = PowerMockito.mock(TaskLogDiscriminator.class);
+        PowerMockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
+        PowerMockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
 
-            Path logPath = Paths.get(".").toAbsolutePath().getParent()
-                    .resolve(logBase)
-                    .resolve("1").resolve("100").resolve("1000.log");
-            Assert.assertEquals(logPath.toString(), taskExecThread.getTaskLogPath(taskInstance));
-        }
+        Path logPath = Paths.get(".").toAbsolutePath().getParent()
+                .resolve(logBase)
+                .resolve("1").resolve("100").resolve("1000.log");
+        Assert.assertEquals(logPath.toString(), taskExecThread.getTaskLogPath(taskInstance));
     }
 
-    private TaskInstance getTaskInstance(){
+    private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("SHELL");
         taskInstance.setId(252612);
