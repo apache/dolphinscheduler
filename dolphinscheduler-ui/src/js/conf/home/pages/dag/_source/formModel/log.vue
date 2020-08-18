@@ -304,6 +304,7 @@
             font-size: 12px;
             margin-left: 10px;
             em {
+              text-decoration: none !important;
               vertical-align: middle;
             }
           }
