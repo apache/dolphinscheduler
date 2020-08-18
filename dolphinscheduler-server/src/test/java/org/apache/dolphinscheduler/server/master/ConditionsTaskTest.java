@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -81,8 +80,7 @@ public class ConditionsTaskTest {
                 .thenReturn(processInstance);
     }
 
-    @Test
-    public void testCondition() throws Exception {
+    private TaskInstance testBasicInit(ExecutionStatus expectResult) {
         TaskInstance taskInstance = getTaskInstance(getTaskNode(), processInstance);
 
         // for MasterBaseTaskExecThread.submit
@@ -102,35 +100,31 @@ public class ConditionsTaskTest {
                 .updateTaskInstance(taskInstance))
                 .thenReturn(true);
 
-        // case 1
-        {
-            // for ConditionsTaskExecThread.waitTaskQuit
-            List<TaskInstance> conditions = Stream.of(
-                    getTaskInstanceForValidTaskList(1001, "1", ExecutionStatus.SUCCESS)
-            ).collect(Collectors.toList());
-            Mockito.when(processService
-                    .findValidTaskListByProcessId(processInstance.getId()))
-                    .thenReturn(conditions);
+        // for ConditionsTaskExecThread.waitTaskQuit
+        List<TaskInstance> conditions = Stream.of(
+                getTaskInstanceForValidTaskList(1001, "1", expectResult)
+        ).collect(Collectors.toList());
+        Mockito.when(processService
+                .findValidTaskListByProcessId(processInstance.getId()))
+                .thenReturn(conditions);
 
-            ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
-            taskExecThread.call();
-            Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
-        }
+        return taskInstance;
+    }
 
-        // case 2
-        {
-            // for ConditionsTaskExecThread.waitTaskQuit
-            List<TaskInstance> conditions = Stream.of(
-                    getTaskInstanceForValidTaskList(1001, "1", ExecutionStatus.FAILURE)
-            ).collect(Collectors.toList());
-            Mockito.when(processService
-                    .findValidTaskListByProcessId(processInstance.getId()))
-                    .thenReturn(conditions);
+    @Test
+    public void testBasicSuccess() throws Exception {
+        TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
+        ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
+        taskExecThread.call();
+        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecThread.getTaskInstance().getState());
+    }
 
-            ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
-            taskExecThread.call();
-            Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
-        }
+    @Test
+    public void testBasicFailure() throws Exception {
+        TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
+        ConditionsTaskExecThread taskExecThread = new ConditionsTaskExecThread(taskInstance);
+        taskExecThread.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
     }
 
     private TaskNode getTaskNode() {
