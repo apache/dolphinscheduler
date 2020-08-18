@@ -142,9 +142,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .task-ctatus-count-model {
-    .links {
-      cursor: Default;
-    }
-  }
 </style>
