@@ -707,6 +707,8 @@ CREATE TABLE `t_ds_task_instance` (
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `executor_id` int(11) DEFAULT NULL,
+  `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
+  `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,

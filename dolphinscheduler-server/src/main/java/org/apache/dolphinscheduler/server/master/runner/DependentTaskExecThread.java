@@ -64,6 +64,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     public DependentTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
+        taskInstance.setStartTime(new Date());
     }
 
 
