@@ -108,6 +108,7 @@ public class TaskResponseService {
                     TaskResponseEvent taskResponseEvent = eventQueue.take();
                     persist(taskResponseEvent);
                 } catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e){
                     logger.error("persist task error",e);
