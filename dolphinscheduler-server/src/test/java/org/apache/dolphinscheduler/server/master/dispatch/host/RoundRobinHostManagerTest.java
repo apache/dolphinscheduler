@@ -30,9 +30,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.when;
 
 
 /**
@@ -50,7 +49,7 @@ public class RoundRobinHostManagerTest {
 
     @Test
     public void testSelectWithEmptyResult() {
-        when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
+        Mockito.when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host emptyHost = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isEmpty(emptyHost.getAddress()));
@@ -58,7 +57,7 @@ public class RoundRobinHostManagerTest {
 
     @Test
     public void testSelectWithResult() {
-        when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22:100"));
+        Mockito.when(zookeeperNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22:100"));
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
         Assert.assertTrue(StringUtils.isNotEmpty(host.getAddress()));
