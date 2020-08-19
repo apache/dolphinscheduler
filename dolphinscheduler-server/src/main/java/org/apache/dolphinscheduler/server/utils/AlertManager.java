@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -53,7 +53,6 @@ public class AlertManager {
      */
     private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
-
     /**
      * command type convert chinese
      *
@@ -86,7 +85,6 @@ public class AlertManager {
                 return "unknown type";
         }
     }
-
 
     /**
      * get process instance content
@@ -222,7 +220,6 @@ public class AlertManager {
             return;
         }
         Alert alert = new Alert();
-
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
