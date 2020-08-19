@@ -172,7 +172,7 @@ public class AlertDao extends AbstractBaseDao {
         List<LinkedHashMap> taskTimeoutList = new ArrayList<>(1);
         LinkedHashMap<String, String> taskTimeoutMap = new LinkedHashMap();
         taskTimeoutMap.put("process instance id", String.valueOf(processInstanceId));
-        taskTimeoutMap.put("task name", processInstanceName);
+        taskTimeoutMap.put("process name", processInstanceName);
         taskTimeoutMap.put("task id", String.valueOf(taskId));
         taskTimeoutMap.put("task name", taskName);
         taskTimeoutMap.put("event", "timeout");
