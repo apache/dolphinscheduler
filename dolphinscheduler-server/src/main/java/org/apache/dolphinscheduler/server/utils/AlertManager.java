@@ -22,20 +22,21 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * alert manager
@@ -86,19 +87,6 @@ public class AlertManager {
         }
     }
 
-    /**
-     * process instance format
-     */
-    private static final String PROCESS_INSTANCE_FORMAT =
-            "\"id:%d\"," +
-            "\"name:%s\"," +
-            "\"job type: %s\"," +
-            "\"state: %s\"," +
-            "\"recovery:%s\"," +
-            "\"run time: %d\"," +
-            "\"start time: %s\"," +
-            "\"end time: %s\"," +
-            "\"host: %s\"" ;
 
     /**
      * get process instance content
@@ -110,20 +98,20 @@ public class AlertManager {
                                             List<TaskInstance> taskInstances){
 
         String res = "";
-        if(processInstance.getState().typeIsSuccess()){
-            res = String.format(PROCESS_INSTANCE_FORMAT,
-                    processInstance.getId(),
-                    processInstance.getName(),
-                    getCommandCnName(processInstance.getCommandType()),
-                    processInstance.getState().toString(),
-                    processInstance.getRecovery().toString(),
-                    processInstance.getRunTimes(),
-                    DateUtils.dateToString(processInstance.getStartTime()),
-                    DateUtils.dateToString(processInstance.getEndTime()),
-                    processInstance.getHost()
-
-            );
-            res = "[" + res + "]";
+        if(processInstance.getState().typeIsSuccess()) {
+            List<LinkedHashMap> successTaskList = new ArrayList<>(1);
+            LinkedHashMap<String, String> successTaskMap = new LinkedHashMap();
+            successTaskMap.put("id", String.valueOf(processInstance.getId()));
+            successTaskMap.put("name", processInstance.getName());
+            successTaskMap.put("job type", getCommandCnName(processInstance.getCommandType()));
+            successTaskMap.put("state", processInstance.getState().toString());
+            successTaskMap.put("recovery", processInstance.getRecovery().toString());
+            successTaskMap.put("run time", String.valueOf(processInstance.getRunTimes()));
+            successTaskMap.put("start time", DateUtils.dateToString(processInstance.getStartTime()));
+            successTaskMap.put("end time", DateUtils.dateToString(processInstance.getEndTime()));
+            successTaskMap.put("host", processInstance.getHost());
+            successTaskList.add(successTaskMap);
+            res = JSONUtils.toJsonString(successTaskList);
         }else if(processInstance.getState().typeIsFailure()){
 
             List<LinkedHashMap> failedTaskList = new ArrayList<>();
