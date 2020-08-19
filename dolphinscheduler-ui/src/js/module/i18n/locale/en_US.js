@@ -42,6 +42,8 @@ export default {
   Times: 'Times',
   'Failed retry interval': 'Failed retry interval',
   Minute: 'Minute',
+  'Delay execution time': 'Delay execution time',
+  'Delay execution': 'Delay execution',
   Cancel: 'Cancel',
   'Confirm add': 'Confirm add',
   'The newly created sub-Process has not yet been executed and cannot enter the sub-Process': 'The newly created sub-Process has not yet been executed and cannot enter the sub-Process',
