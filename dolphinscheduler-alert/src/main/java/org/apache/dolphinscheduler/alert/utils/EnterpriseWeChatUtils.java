@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.*;
-
 import org.apache.dolphinscheduler.plugin.model.AlertData;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,11 +30,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Enterprise WeChat utils
@@ -48,8 +55,8 @@ public class EnterpriseWeChatUtils {
 
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL == null ? null : ENTERPRISE_WE_CHAT_TOKEN_URL
-    .replaceAll("\\{corpId\\}", ENTERPRISE_WE_CHAT_CORP_ID)
-    .replaceAll("\\{secret\\}", ENTERPRISE_WE_CHAT_SECRET);
+            .replaceAll("\\{corpId\\}", ENTERPRISE_WE_CHAT_CORP_ID)
+            .replaceAll("\\{secret\\}", ENTERPRISE_WE_CHAT_SECRET);
 
     private static final String ENTERPRISE_WE_CHAT_PUSH_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
 
@@ -121,8 +128,8 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
         return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", toParty)
-        .replaceAll("\\{agentId\\}", agentId)
-        .replaceAll("\\{msg\\}", msg);
+                .replaceAll("\\{agentId\\}", agentId)
+                .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -136,8 +143,8 @@ public class EnterpriseWeChatUtils {
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
         return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", listParty)
-        .replaceAll("\\{agentId\\}", agentId)
-        .replaceAll("\\{msg\\}", msg);
+                .replaceAll("\\{agentId\\}", agentId)
+                .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -150,8 +157,8 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
         return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", toUser)
-        .replaceAll("\\{agentId\\}", agentId)
-        .replaceAll("\\{msg\\}", msg);
+                .replaceAll("\\{agentId\\}", agentId)
+                .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -165,8 +172,8 @@ public class EnterpriseWeChatUtils {
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
         return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", listUser)
-        .replaceAll("\\{agentId\\}", agentId)
-        .replaceAll("\\{msg\\}", msg);
+                .replaceAll("\\{agentId\\}", agentId)
+                .replaceAll("\\{msg\\}", msg);
     }
 
     /**
@@ -215,13 +222,13 @@ public class EnterpriseWeChatUtils {
 
         if (null != mapItemsList) {
             for (LinkedHashMap mapItems : mapItemsList) {
-                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
-                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
+                Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
                 StringBuilder t = new StringBuilder(String.format("`%s`%s", title, Constants.MARKDOWN_ENTER));
 
                 while (iterator.hasNext()) {
 
-                    Map.Entry<String, String> entry = iterator.next();
+                    Map.Entry<String, Object> entry = iterator.next();
                     t.append(Constants.MARKDOWN_QUOTE);
                     t.append(entry.getKey()).append(":").append(entry.getValue());
                     t.append(Constants.MARKDOWN_ENTER);
@@ -241,23 +248,24 @@ public class EnterpriseWeChatUtils {
      */
     public static String markdownText(String title, String content) {
         if (StringUtils.isNotEmpty(content)) {
-            List<String> list;
-            try {
-                list = JSONUtils.toList(content, String.class);
-            } catch (Exception e) {
-                logger.error("json format exception", e);
-                return null;
-            }
+            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+            if (null != mapItemsList) {
+                StringBuilder contents = new StringBuilder(100);
+                contents.append(String.format("`%s`%n", title));
+                for (LinkedHashMap mapItems : mapItemsList) {
 
-            StringBuilder contents = new StringBuilder(100);
-            contents.append(String.format("`%s`%n", title));
-            for (String str : list) {
-                contents.append(Constants.MARKDOWN_QUOTE);
-                contents.append(str);
-                contents.append(Constants.MARKDOWN_ENTER);
-            }
+                    Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
+                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, Object> entry = iterator.next();
+                        contents.append(Constants.MARKDOWN_QUOTE);
+                        contents.append(entry.getKey()).append(":").append(entry.getValue());
+                        contents.append(Constants.MARKDOWN_ENTER);
+                    }
 
-            return contents.toString();
+                }
+                return contents.toString();
+            }
 
         }
         return null;
@@ -278,4 +286,5 @@ public class EnterpriseWeChatUtils {
         return result;
 
     }
+
 }
