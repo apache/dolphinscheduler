@@ -20,18 +20,21 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ServerAlertContent {
 
     /**
      * server type :master or worker
      */
-    private final String type;
-
-    private final String host;
-
-    private final AlertEvent event;
-
-    private final AlertWarnLevel warningLevel;
+    @JsonProperty("type")
+    final String type;
+    @JsonProperty("host")
+    final String host;
+    @JsonProperty("event")
+    final AlertEvent event;
+    @JsonProperty("warningLevel")
+    final AlertWarnLevel warningLevel;
 
     private ServerAlertContent(Builder builder) {
         this.type = builder.type;
@@ -53,10 +56,6 @@ public class ServerAlertContent {
         private AlertEvent event;
 
         private AlertWarnLevel warningLevel;
-
-        public Builder() {
-
-        }
 
         public Builder type(String type) {
             this.type = type;

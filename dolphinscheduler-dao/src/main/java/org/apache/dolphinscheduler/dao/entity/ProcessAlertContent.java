@@ -129,10 +129,6 @@ public class ProcessAlertContent implements Serializable {
         private String taskHost;
         private String logPath;
 
-        public Builder() {
-
-        }
-
         public Builder processId(int processId) {
             this.processId = processId;
             return this;
