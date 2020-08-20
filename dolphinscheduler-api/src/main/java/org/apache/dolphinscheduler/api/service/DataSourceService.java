@@ -65,7 +65,6 @@ public class DataSourceService extends BaseService{
     public static final String PRINCIPAL = "principal";
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
-    public static final String PASSWORD = Constants.PASSWORD;
     public static final String OTHER = "other";
 
 
@@ -474,20 +473,21 @@ public class DataSourceService extends BaseService{
     /**
      * test connection
      *
-     * @param loginUser login user
      * @param id datasource id
      * @return connect result code
      */
-    public boolean connectionTest(User loginUser, int id) {
+    public boolean connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
-        return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
+        if(dataSource != null){
+            return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
+        }else {
+            return false;
+        }
     }
 
     /**
      * build paramters
      *
-     * @param name data source name
-     * @param desc data source description
      * @param type data source  type
      * @param host data source  host
      * @param port data source port
@@ -498,7 +498,7 @@ public class DataSourceService extends BaseService{
      * @param principal principal
      * @return datasource parameter
      */
-    public String buildParameter(String name, String desc, DbType type, String host,
+    public String buildParameter(DbType type, String host,
                                  String port, String database, String principal, String userName,
                                  String password, DbConnectType connectType, String other) {
 
