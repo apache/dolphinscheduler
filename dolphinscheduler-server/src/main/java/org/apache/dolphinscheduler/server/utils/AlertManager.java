@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -29,12 +29,13 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * alert manager
@@ -49,8 +50,7 @@ public class AlertManager {
     /**
      * alert dao
      */
-    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-
+    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
     /**
      * command type convert chinese
@@ -86,27 +86,14 @@ public class AlertManager {
     }
 
     /**
-     * process instance format
-     */
-    private static final String PROCESS_INSTANCE_FORMAT =
-            "\"id:%d\"," +
-            "\"name:%s\"," +
-            "\"job type: %s\"," +
-            "\"state: %s\"," +
-            "\"recovery:%s\"," +
-            "\"run time: %d\"," +
-            "\"start time: %s\"," +
-            "\"end time: %s\"," +
-            "\"host: %s\"" ;
-
-    /**
      * get process instance content
-     * @param processInstance   process instance
-     * @param taskInstances     task instance list
+     *
+     * @param processInstance process instance
+     * @param taskInstances task instance list
      * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
-                                            List<TaskInstance> taskInstances){
+                                            List<TaskInstance> taskInstances) {
 
         String res = "";
         if (processInstance.getState().typeIsSuccess()) {
@@ -154,11 +141,11 @@ public class AlertManager {
     /**
      * getting worker fault tolerant content
      *
-     * @param processInstance   process instance
+     * @param processInstance process instance
      * @param toleranceTaskList tolerance task list
      * @return worker tolerance content
      */
-    private String getWorkerToleranceContent(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
+    private String getWorkerToleranceContent(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
 
         List<ProcessAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
@@ -177,11 +164,11 @@ public class AlertManager {
     /**
      * send worker alert fault tolerance
      *
-     * @param processInstance   process instance
+     * @param processInstance process instance
      * @param toleranceTaskList tolerance task list
      */
-    public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
-        try{
+    public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
+        try {
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
             alert.setShowType(ShowType.TABLE);
@@ -189,13 +176,13 @@ public class AlertManager {
             alert.setContent(content);
             alert.setAlertType(AlertType.EMAIL);
             alert.setCreateTime(new Date());
-            alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1:processInstance.getWarningGroupId());
+            alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
             alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert.toString());
 
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
         }
 
@@ -203,40 +190,40 @@ public class AlertManager {
 
     /**
      * send process instance alert
-     * @param processInstance   process instance
-     * @param taskInstances     task instance list
+     *
+     * @param processInstance process instance
+     * @param taskInstances task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
-                                         List<TaskInstance> taskInstances){
+                                         List<TaskInstance> taskInstances) {
 
         boolean sendWarnning = false;
         WarningType warningType = processInstance.getWarningType();
-        switch (warningType){
+        switch (warningType) {
             case ALL:
-                if(processInstance.getState().typeIsFinished()){
+                if (processInstance.getState().typeIsFinished()) {
                     sendWarnning = true;
                 }
                 break;
             case SUCCESS:
-                if(processInstance.getState().typeIsSuccess()){
+                if (processInstance.getState().typeIsSuccess()) {
                     sendWarnning = true;
                 }
                 break;
             case FAILURE:
-                if(processInstance.getState().typeIsFailure()){
+                if (processInstance.getState().typeIsFailure()) {
                     sendWarnning = true;
                 }
                 break;
-                default:
+            default:
         }
-        if(!sendWarnning){
+        if (!sendWarnning) {
             return;
         }
         Alert alert = new Alert();
 
-
         String cmdName = getCommandCnName(processInstance.getCommandType());
-        String success = processInstance.getState().typeIsSuccess() ? "success" :"failed";
+        String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         alert.setShowType(showType);
@@ -255,7 +242,7 @@ public class AlertManager {
     /**
      * send process timeout alert
      *
-     * @param processInstance   process instance
+     * @param processInstance process instance
      * @param processDefinition process definition
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {

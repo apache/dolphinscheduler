@@ -98,7 +98,7 @@ public class ProcessAlertContent implements Serializable {
         this.taskEndTime = builder.taskEndTime;
         this.taskHost = builder.taskHost;
         this.logPath = builder.logPath;
-        this.retryTimes=builder.retryTimes;
+        this.retryTimes = builder.retryTimes;
 
     }
 
@@ -207,6 +207,7 @@ public class ProcessAlertContent implements Serializable {
             this.retryTimes = retryTimes;
             return this;
         }
+
         public Builder taskState(ExecutionStatus taskState) {
             this.taskState = taskState;
             return this;
