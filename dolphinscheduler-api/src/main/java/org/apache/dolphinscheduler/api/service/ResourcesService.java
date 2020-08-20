@@ -88,11 +88,11 @@ public class ResourcesService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Result createDirectory(User loginUser,
-                                  String name,
-                                  String description,
-                                  ResourceType type,
-                                  int pid,
-                                  String currentDir) {
+                                 String name,
+                                 String description,
+                                 ResourceType type,
+                                 int pid,
+                                 String currentDir) {
         Result result = new Result();
         // if hdfs not startup
         if (!PropertyUtils.getResUploadStartupState()){
