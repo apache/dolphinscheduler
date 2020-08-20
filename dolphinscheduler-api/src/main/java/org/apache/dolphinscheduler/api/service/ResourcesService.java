@@ -88,11 +88,11 @@ public class ResourcesService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Result createDirectory(User loginUser,
-                                 String name,
-                                 String description,
-                                 ResourceType type,
-                                 int pid,
-                                 String currentDir) {
+                                  String name,
+                                  String description,
+                                  ResourceType type,
+                                  int pid,
+                                  String currentDir) {
         Result result = new Result();
         // if hdfs not startup
         if (!PropertyUtils.getResUploadStartupState()){
@@ -117,21 +117,19 @@ public class ResourcesService extends BaseService {
         }
 
 
-
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
+            logger.error("resource directory {} has exist, can't recreate", fullName);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
+        }
 
         Date now = new Date();
 
         Resource resource = new Resource(pid,name,fullName,true,description,name,loginUser.getId(),type,0,now,now);
 
         try {
-            synchronized (this) {
-                if (checkResourceExists(fullName, 0, type.ordinal())) {
-                    logger.error("resource directory {} has exist, can't recreate", fullName);
-                    putMsg(result, Status.RESOURCE_EXIST);
-                    return result;
-                }
-                resourcesMapper.insert(resource);
-            }
+            resourcesMapper.insert(resource);
+
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<String, Object>();
