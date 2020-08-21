@@ -98,7 +98,7 @@ public class UserManagePage extends PageCommon {
     /**
      * edit admin user
      */
-    public boolean editAdminlUser() throws InterruptedException {
+    public boolean editAdminUser() throws InterruptedException {
         //edit admin user
         // click  user manage
         System.out.println("start edit admin user");

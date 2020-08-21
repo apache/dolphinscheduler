@@ -31,7 +31,7 @@ public class AlertManagePage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create alert
      *
      * @return Whether to enter the specified page after create tenant
      */

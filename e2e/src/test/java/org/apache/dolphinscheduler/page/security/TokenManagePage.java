@@ -29,7 +29,7 @@ public class TokenManagePage extends PageCommon {
     /**
      * create token
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createToken() throws InterruptedException {
         //create token
@@ -53,11 +53,10 @@ public class TokenManagePage extends PageCommon {
         return ifTitleContains(TokenManageData.TOKEN_MANAGE);
     }
 
-
     /**
      * edit token
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after edit tenant
      */
     public boolean editToken() throws InterruptedException {
         // edit token
