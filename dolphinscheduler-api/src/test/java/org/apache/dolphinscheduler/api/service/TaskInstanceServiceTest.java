@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -75,14 +76,10 @@ public class TaskInstanceServiceTest {
     TaskInstanceMapper taskInstanceMapper;
 
     @Mock
-    ProcessInstanceService processInstanceService;
-
-    @Mock
     UsersService usersService;
 
     @Test
     public void queryTaskListPaging() {
-
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>();
@@ -94,7 +91,6 @@ public class TaskInstanceServiceTest {
         Map<String, Object> proejctAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "",
                 "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
-
 
         //project
         putMsg(result, Status.SUCCESS, projectName);
@@ -133,6 +129,13 @@ public class TaskInstanceServiceTest {
         Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullRes.get(Constants.STATUS));
+
+        //start/end date null
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", null, null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.SUCCESS, executorNullDateRes.get(Constants.STATUS));
     }
 
     /**

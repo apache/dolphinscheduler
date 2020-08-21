@@ -17,8 +17,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,11 +30,19 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
-import java.util.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task instance service
@@ -79,10 +85,10 @@ public class TaskInstanceService extends BaseService {
      * @param pageSize page size
      * @return task list page
      */
-    public Map<String,Object> queryTaskListPaging(User loginUser, String projectName,
-                                                  Integer processInstanceId, String taskName, String executorName, String startDate,
-                                                  String endDate, String searchVal, ExecutionStatus stateType,String host,
-                                                  Integer pageNo, Integer pageSize) {
+    public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
+                                                   Integer processInstanceId, String taskName, String executorName, String startDate,
+                                                   String endDate, String searchVal, ExecutionStatus stateType, String host,
+                                                   Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
@@ -93,23 +99,17 @@ public class TaskInstanceService extends BaseService {
         }
 
         int[] statusArray = null;
-        if(stateType != null){
+        if (stateType != null) {
             statusArray = new int[]{stateType.ordinal()};
         }
 
         Date start = null;
         Date end = null;
-        try {
-            if(StringUtils.isNotEmpty(startDate)){
-                start = DateUtils.getScheduleDate(startDate);
-            }
-            if(StringUtils.isNotEmpty( endDate)){
-                end = DateUtils.getScheduleDate(endDate);
-            }
-        } catch (Exception e) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
-            return result;
+        if (StringUtils.isNotEmpty(startDate)) {
+            start = DateUtils.getScheduleDate(startDate);
+        }
+        if (StringUtils.isNotEmpty(endDate)) {
+            end = DateUtils.getScheduleDate(endDate);
         }
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
@@ -124,15 +124,15 @@ public class TaskInstanceService extends BaseService {
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
 
-        for(TaskInstance taskInstance : taskInstanceList){
+        for (TaskInstance taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(), taskInstance.getEndTime()));
             User executor = usersService.queryUser(taskInstance.getExecutorId());
             if (null != executor) {
                 taskInstance.setExecutorName(executor.getUserName());
             }
         }
-        pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
-        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));
+        pageInfo.setTotalCount((int) taskInstanceIPage.getTotal());
+        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
