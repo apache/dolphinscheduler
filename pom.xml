@@ -788,8 +788,8 @@
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/utils/KerberosHttpClientTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
-                        <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
+                        <include>**/common/utils/MoreSupplierUtilsTest.java</include>
                         <include>**/common/plugin/FilePluginManagerTest</include>
                         <include>**/common/plugin/PluginClassLoaderTest</include>
                         <include>**/common/enums/ExecutionStatusTest</include>

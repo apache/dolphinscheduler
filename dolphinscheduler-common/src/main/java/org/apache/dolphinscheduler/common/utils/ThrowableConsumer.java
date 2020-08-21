@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common;
+
+package org.apache.dolphinscheduler.common.utils;
 
 /**
- * server stop interface.
+ * throwable supplier to cover the situation of some supplier need to throw Exception
  */
-public interface IStoppable {
-  /**
-   * Stop this service.
-   * @param cause why stopping
-   */
-   void stop(String cause);
-
+@FunctionalInterface
+public interface ThrowableConsumer<T, X extends Throwable> {
+    void accept(T t) throws X;
 }

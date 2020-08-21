@@ -16,47 +16,52 @@
  */
 package org.apache.dolphinscheduler.dao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * dao factory
  */
 public class DaoFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(DaoFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(DaoFactory.class);
 
-  private static Map<String, AbstractBaseDao> daoMap = new ConcurrentHashMap<>();
+    private static final Map<String, AbstractBaseDao> daoMap = new ConcurrentHashMap<>();
 
-  private DaoFactory(){
+    private DaoFactory() {
 
-  }
-
-  /**
-   * get dao instance
-   * @param clazz clazz
-   * @param <T> T
-   * @return T object
-   */
-  @SuppressWarnings("unchecked")
-  public static <T extends AbstractBaseDao> T getDaoInstance(Class<T> clazz) {
-    String className = clazz.getName();
-    synchronized (daoMap) {
-      if (!daoMap.containsKey(className)) {
-        try {
-          T t = clazz.getConstructor().newInstance();
-          // init
-          t.init();
-          daoMap.put(className, t);
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
     }
 
-    return (T) daoMap.get(className);
-  }
+    /**
+     * get dao instance
+     *
+     * @param clazz clazz
+     * @param <T> T
+     * @return T object
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends AbstractBaseDao> T getDaoInstance(Class<T> clazz) {
+        String className = clazz.getName();
+
+        if (!daoMap.containsKey(className)) {
+            synchronized (daoMap) {
+                if (!daoMap.containsKey(className)) {
+                    try {
+                        T t = clazz.getConstructor().newInstance();
+                        // init
+                        t.init();
+                        daoMap.put(className, t);
+                        return t;
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
+            }
+        }
+
+        return (T) daoMap.get(className);
+    }
 }

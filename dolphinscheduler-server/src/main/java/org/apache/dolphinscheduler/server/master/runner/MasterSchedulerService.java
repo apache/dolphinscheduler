@@ -16,13 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -36,13 +29,22 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- *  master scheduler thread
+ * master scheduler thread
  */
 @Service
 public class MasterSchedulerService extends Thread {
@@ -73,10 +75,10 @@ public class MasterSchedulerService extends Thread {
     /**
      * alert manager
      */
-    private AlertManager alertManager = new AlertManager();
+    private AlertManager alertManager;
 
     /**
-     *  netty remoting client
+     * netty remoting client
      */
     private NettyRemotingClient nettyRemotingClient;
 
@@ -90,14 +92,15 @@ public class MasterSchedulerService extends Thread {
      * constructor of MasterSchedulerService
      */
     @PostConstruct
-    public void init(){
-        this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
+    public void init() {
+        this.masterExecService = (ThreadPoolExecutor) ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.alertManager = AlertManager.getInstance();
     }
 
     @Override
-    public synchronized void start(){
+    public synchronized void start() {
         super.setName("MasterSchedulerService");
         super.start();
     }
@@ -110,7 +113,7 @@ public class MasterSchedulerService extends Thread {
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
-        if(!terminated){
+        if (!terminated) {
             logger.warn("masterExecService shutdown without terminated, increase await time");
         }
         nettyRemotingClient.close();
@@ -123,11 +126,11 @@ public class MasterSchedulerService extends Thread {
     @Override
     public void run() {
         logger.info("master scheduler started");
-        while (Stopper.isRunning()){
+        while (Stopper.isRunning()) {
             InterProcessMutex mutex = null;
             try {
                 boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
-                if(!runCheckFlag) {
+                if (!runCheckFlag) {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
@@ -139,9 +142,9 @@ public class MasterSchedulerService extends Thread {
                     // make sure to scan and delete command  table in one transaction
                     Command command = processService.findOneCommand();
                     if (command != null) {
-                        logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
+                        logger.info("find one command: id: {}, type: {}", command.getId(), command.getCommandType());
 
-                        try{
+                        try {
 
                             ProcessInstance processInstance = processService.handleCommand(logger,
                                     getLocalAddress(),
@@ -156,24 +159,24 @@ public class MasterSchedulerService extends Thread {
                                                 , alertManager
                                                 , masterConfig));
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             logger.error("scan command error ", e);
                             processService.moveToErrorCommand(command, e.toString());
                         }
-                    } else{
+                    } else {
                         //indicate that no command ,sleep for 1s
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
-            } catch (Exception e){
-                logger.error("master scheduler thread error",e);
-            } finally{
+            } catch (Exception e) {
+                logger.error("master scheduler thread error", e);
+            } finally {
                 zkMasterClient.releaseMutex(mutex);
             }
         }
     }
 
-    private String getLocalAddress(){
+    private String getLocalAddress() {
         return NetUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 }

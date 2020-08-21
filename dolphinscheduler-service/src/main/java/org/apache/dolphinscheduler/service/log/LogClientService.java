@@ -41,8 +41,6 @@ public class LogClientService {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
-    private final NettyClientConfig clientConfig;
-
     private final NettyRemotingClient client;
 
     private volatile boolean isRunning;
@@ -56,8 +54,8 @@ public class LogClientService {
      * construct client
      */
     public LogClientService() {
-        this.clientConfig = new NettyClientConfig();
-        this.clientConfig.setWorkerThreads(4);
+        NettyClientConfig clientConfig = new NettyClientConfig();
+        clientConfig.setWorkerThreads(4);
         this.client = new NettyRemotingClient(clientConfig);
         this.isRunning = true;
     }

@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.MoreSupplierUtils;
+import org.apache.dolphinscheduler.common.utils.MoreSupplierUtils.LazyCloseableSupplier;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -34,14 +36,38 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * alert manager
  */
 public class AlertManager {
+
+    private static AlertManager instance;
+
+    private AlertManager() {
+    }
+
+    /**
+     * singleton mode
+     *
+     * @return singleton INSTANCE
+     */
+    public static AlertManager getInstance() {
+        if (Objects.isNull(instance)) {
+            synchronized (AlertManager.class) {
+                if (Objects.isNull(instance)) {
+                    instance = new AlertManager();
+                    return instance;
+                }
+            }
+        }
+        return instance;
+    }
 
     /**
      * logger of AlertManager
@@ -51,7 +77,8 @@ public class AlertManager {
     /**
      * alert dao
      */
-    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    private static final LazyCloseableSupplier<AlertDao> alertDaoSupplier =
+            MoreSupplierUtils.lazy(() -> DaoFactory.getDaoInstance(AlertDao.class));
 
     /**
      * command type convert chinese
@@ -99,7 +126,7 @@ public class AlertManager {
         String res = "";
         if (processInstance.getState().typeIsSuccess()) {
             List<LinkedHashMap> successTaskList = new ArrayList<>(1);
-            LinkedHashMap<String, String> successTaskMap = new LinkedHashMap();
+            LinkedHashMap<String, String> successTaskMap = new LinkedHashMap<>();
             successTaskMap.put("id", String.valueOf(processInstance.getId()));
             successTaskMap.put("name", processInstance.getName());
             successTaskMap.put("job type", getCommandCnName(processInstance.getCommandType()));
@@ -119,7 +146,7 @@ public class AlertManager {
                 if (task.getState().typeIsSuccess()) {
                     continue;
                 }
-                LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap();
+                LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap<>();
                 failedTaskMap.put("process instance id", String.valueOf(processInstance.getId()));
                 failedTaskMap.put("process instance name", processInstance.getName());
                 failedTaskMap.put("task id", String.valueOf(task.getId()));
@@ -150,7 +177,7 @@ public class AlertManager {
         List<LinkedHashMap<String, String>> toleranceTaskInstanceList = new ArrayList<>();
 
         for (TaskInstance taskInstance : toleranceTaskList) {
-            LinkedHashMap<String, String> toleranceWorkerContentMap = new LinkedHashMap();
+            LinkedHashMap<String, String> toleranceWorkerContentMap = new LinkedHashMap<>();
             toleranceWorkerContentMap.put("process name", processInstance.getName());
             toleranceWorkerContentMap.put("task name", taskInstance.getName());
             toleranceWorkerContentMap.put("host", taskInstance.getHost());
@@ -178,7 +205,7 @@ public class AlertManager {
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
             alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
             alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
-            alertDao.addAlert(alert);
+            alertDaoSupplier.get().addAlert(alert);
             logger.info("add alert to db , alert : {}", alert.toString());
 
         } catch (Exception e) {
@@ -234,7 +261,7 @@ public class AlertManager {
         alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
         alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
 
-        alertDao.addAlert(alert);
+        alertDaoSupplier.get().addAlert(alert);
         logger.info("add alert to db , alert: {}", alert.toString());
     }
 
@@ -245,6 +272,6 @@ public class AlertManager {
      * @param processDefinition process definition
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
-        alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+        alertDaoSupplier.get().sendProcessTimeoutAlert(processInstance, processDefinition);
     }
 }
