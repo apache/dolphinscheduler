@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,9 +108,15 @@ public class TaskInstanceService extends BaseService {
         Date end = null;
         if (StringUtils.isNotEmpty(startDate)) {
             start = DateUtils.getScheduleDate(startDate);
+            if (start == null) {
+                return generateInvalidParamRes(result, "startDate");
+            }
         }
         if (StringUtils.isNotEmpty(endDate)) {
             end = DateUtils.getScheduleDate(endDate);
+            if (end == null) {
+                return generateInvalidParamRes(result, "endDate");
+            }
         }
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
@@ -136,6 +143,18 @@ public class TaskInstanceService extends BaseService {
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /***
+     * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
+     * @param result exist result map
+     * @param params invalid params name
+     * @return update result map
+     */
+    private Map<String, Object> generateInvalidParamRes(Map<String, Object> result, String params) {
+        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), params));
         return result;
     }
 }

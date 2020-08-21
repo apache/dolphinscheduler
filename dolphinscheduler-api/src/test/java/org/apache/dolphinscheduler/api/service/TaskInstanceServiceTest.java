@@ -136,6 +136,16 @@ public class TaskInstanceServiceTest {
         Map<String, Object> executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
                 "", null, null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullDateRes.get(Constants.STATUS));
+
+        //start date error format
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", "error date", null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorStartDateRes.get(Constants.STATUS));
+        Map<String, Object> executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", null, "error date", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorEndDateRes.get(Constants.STATUS));
     }
 
     /**
