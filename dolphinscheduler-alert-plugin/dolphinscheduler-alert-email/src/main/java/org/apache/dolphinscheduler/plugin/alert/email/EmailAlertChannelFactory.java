@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.RadioParam;

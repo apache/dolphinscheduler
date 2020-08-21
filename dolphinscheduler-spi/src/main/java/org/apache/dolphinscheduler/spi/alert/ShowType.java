@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
+package org.apache.dolphinscheduler.spi.alert;
 
 /**
  * show type for email
+ * all alert plugin can use ShowType , so let it in spi package
  */
 public enum ShowType {
     /**
@@ -39,7 +38,6 @@ public enum ShowType {
         this.descp = descp;
     }
 
-    @EnumValue
     private final int code;
     private final String descp;
 

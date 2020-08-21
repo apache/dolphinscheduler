@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.dolphinscheduler.common.Constants;
-
 import java.io.File;
 
 import org.junit.After;
@@ -80,7 +78,7 @@ public class ExcelUtilsTest {
         ExcelUtils.genExcelFile(correctContent, title, xlsFilePath);
 
         //Test file exists
-        File xlsFile = new File(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
+        File xlsFile = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
         assertTrue(xlsFile.exists());
 
         //Expected RuntimeException
@@ -100,7 +98,7 @@ public class ExcelUtilsTest {
     @Test
     public void testGenExcelFileByCheckDir() {
         ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", "/tmp/xls");
-        File file = new File("/tmp/xls" + Constants.SINGLE_SLASH + "t" + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File("/tmp/xls" + EmailConstants.SINGLE_SLASH + "t" + EmailConstants.EXCEL_SUFFIX_XLS);
         file.delete();
     }
 }

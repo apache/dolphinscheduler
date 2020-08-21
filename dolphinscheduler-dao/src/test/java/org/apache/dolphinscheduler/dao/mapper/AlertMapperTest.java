@@ -18,10 +18,8 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +156,7 @@ public class AlertMapperTest {
      */
     private Alert createAlert(AlertStatus alertStatus){
         Alert alert = new Alert();
-        alert.setShowType(ShowType.TABLE);
+//        alert.setShowType(ShowType.TABLE);
         alert.setTitle("test alert");
         alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
         alert.setAlertType(AlertType.EMAIL);

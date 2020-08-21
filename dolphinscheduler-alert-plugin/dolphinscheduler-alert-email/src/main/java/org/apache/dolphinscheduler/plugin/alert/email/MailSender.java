@@ -18,14 +18,13 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static java.util.Objects.requireNonNull;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
-import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 
@@ -87,7 +86,7 @@ public class MailSender {
 
         receivers = Arrays.asList(receiversConfig.split(","));
 
-        String receiverCcsConfig = config.get(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERCCS);
+        String receiverCcsConfig = config.get(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS);
 
         receiverCcs = new ArrayList<>();
         if (receiverCcsConfig != null && !"".equals(receiverCcsConfig)) {
@@ -134,8 +133,8 @@ public class MailSender {
     /**
      * send mail to receivers
      *
-     * @param title
-     * @param content
+     * @param title   title
+     * @param content content
      * @return
      */
     public AlertResult sendMails(String title, String content) {
@@ -145,8 +144,8 @@ public class MailSender {
     /**
      * send mail to receivers
      *
-     * @param title
-     * @param content
+     * @param title   email title
+     * @param content email content
      * @return
      */
     public AlertResult sendMailsToReceiverOnly(String title, String content) {
@@ -156,8 +155,10 @@ public class MailSender {
     /**
      * send mail
      *
-     * @param title
-     * @param content
+     * @param receivers   receivers
+     * @param receiverCcs receiverCcs
+     * @param title       title
+     * @param content     content
      * @return
      */
     public AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
@@ -179,7 +180,7 @@ public class MailSender {
                 Session session = getSession();
                 email.setMailSession(session);
                 email.setFrom(mailSender);
-                email.setCharset(Constants.UTF_8);
+                email.setCharset(EmailConstants.UTF_8);
                 if (CollectionUtils.isNotEmpty(receivers)) {
                     // receivers mail
                     for (String receiver : receivers) {
@@ -201,7 +202,7 @@ public class MailSender {
         } else if (showType.equals(ShowType.ATTACHMENT.getDescp()) || showType.equals(ShowType.TABLEATTACHMENT.getDescp())) {
             try {
 
-                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + Constants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
+                String partContent = (showType.equals(ShowType.ATTACHMENT.getDescp()) ? "Please see the attachment " + title + EmailConstants.EXCEL_SUFFIX_XLS : htmlTable(content, false));
 
                 attachment(title, content, partContent);
 
@@ -341,7 +342,7 @@ public class MailSender {
         part1.setContent(partContent, EmailConstants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File(xlsFilePath + EmailConstants.SINGLE_SLASH + title + EmailConstants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -350,7 +351,7 @@ public class MailSender {
         ExcelUtils.genExcelFile(content, title, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS, Constants.UTF_8, "B"));
+        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLS, EmailConstants.UTF_8, "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);

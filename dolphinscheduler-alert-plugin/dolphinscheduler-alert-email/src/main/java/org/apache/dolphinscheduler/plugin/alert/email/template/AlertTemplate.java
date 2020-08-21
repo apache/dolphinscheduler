@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+
 /**
  * alert message template
  */

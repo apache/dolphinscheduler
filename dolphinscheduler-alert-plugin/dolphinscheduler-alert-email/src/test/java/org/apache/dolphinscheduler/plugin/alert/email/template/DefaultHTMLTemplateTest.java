@@ -18,8 +18,9 @@ package org.apache.dolphinscheduler.plugin.alert.email.template;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

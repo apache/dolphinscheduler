@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class EmailAlertChannel implements AlertChannel {
 
         AlertData alert = info.getAlertData();
         String alertParams = info.getAlertParams();
-        List<PluginParams> pluginParams = JSONUtils.toList(alertParams, PluginParams.class);
+        List<PluginParams> pluginParams = PluginParamsTransfer.transferJsonToParamsList(alertParams);
         Map<String, String> paramsMap = new HashMap<>();
         for (PluginParams param : pluginParams) {
             paramsMap.put(param.getName(), param.getValue().toString());

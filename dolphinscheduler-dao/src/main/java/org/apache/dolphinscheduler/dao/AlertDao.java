@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -129,9 +128,9 @@ public class AlertDao extends AbstractBaseDao {
         saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
     }
 
-    private void  saveTaskTimeoutAlert(Alert alert, String content, int alertgroupId,
+    private void saveTaskTimeoutAlert(Alert alert, String content, int alertgroupId,
                                     String receivers,  String receiversCc){
-        alert.setShowType(ShowType.TABLE);
+//        alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(alertgroupId);

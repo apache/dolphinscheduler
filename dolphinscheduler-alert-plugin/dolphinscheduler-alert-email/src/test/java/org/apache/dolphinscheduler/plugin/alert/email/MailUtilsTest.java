@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
-import org.apache.dolphinscheduler.plugin.alert.email.template.ShowType;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,25 +38,25 @@ import org.slf4j.LoggerFactory;
 public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
 
-    private Map<String, String> emailConfig = new HashMap<>();
+    private static Map<String, String> emailConfig = new HashMap<>();
 
-    private AlertTemplate alertTemplate;
+    private static AlertTemplate alertTemplate;
 
-    MailSender mailSender;
+    static MailSender mailSender;
 
     @BeforeClass
-    public void initEmailConfig() {
-        emailConfig.put(MailParamsConstants.MAIL_PROTOCOL, "smtp");
-        emailConfig.put(MailParamsConstants.MAIL_SMTP_HOST, "xxx.xxx.com");
-        emailConfig.put(MailParamsConstants.MAIL_SMTP_PORT, "25");
-        emailConfig.put(MailParamsConstants.MAIL_SENDER, "xxx1.xxx.com");
-        emailConfig.put(MailParamsConstants.MAIL_USER, "xxx2.xxx.com");
-        emailConfig.put(MailParamsConstants.MAIL_PASSWD, "111111");
-        emailConfig.put(MailParamsConstants.MAIL_SMTP_STARTTLS_ENABLE, "true");
-        emailConfig.put(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, "false");
-        emailConfig.put(MailParamsConstants.MAIL_SMTP_SSL_ENABLE, "false");
-        emailConfig.put(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERS, "347801120@qq.com");
-        emailConfig.put(MailParamsConstants.PLUGIN_DEFAULT_EMAIL_RECEIVERCCS, "347801120@qq.com");
+    public static void initEmailConfig() {
+        emailConfig.put(MailParamsConstants.NAME_MAIL_PROTOCOL, "smtp");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_HOST, "xxx.xxx.com");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_PORT, "25");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SENDER, "xxx1.xxx.com");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_USER, "xxx2.xxx.com");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_PASSWD, "111111");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE, "true");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_SSL_ENABLE, "false");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST, "false");
+        emailConfig.put(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS, "347801120@qq.com");
+        emailConfig.put(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS, "347801120@qq.com");
         emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         alertTemplate = new DefaultHTMLTemplate();
         mailSender = new MailSender(emailConfig);

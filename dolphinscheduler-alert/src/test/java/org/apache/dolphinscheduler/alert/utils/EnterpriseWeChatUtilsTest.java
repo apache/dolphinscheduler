@@ -17,11 +17,12 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -160,7 +161,7 @@ public class EnterpriseWeChatUtilsTest {
 
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-        alert.setShowType(ShowType.TEXT);
+//        alert.setShowType(ShowType.TEXT);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(4);
@@ -194,7 +195,7 @@ public class EnterpriseWeChatUtilsTest {
     private Alert createAlertForTable(){
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-        alert.setShowType(ShowType.TABLE);
+//        alert.setShowType(ShowType.TABLE.getDescp());
         String content= list2String();
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);

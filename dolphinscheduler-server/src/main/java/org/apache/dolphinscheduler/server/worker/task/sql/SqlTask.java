@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -448,17 +447,17 @@ public class SqlTask extends AbstractTask {
         }
 
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
-        if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
+//        if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
 //            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
 //                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
 //            if(!(boolean) mailResult.get(STATUS)){
 //                throw new RuntimeException("send mail failed!");
 //            }
             //TODO AlertServer should provide a grpc interface, which is called when other services need to send alerts
-        }else{
-            logger.error("showType: {} is not valid "  ,showTypeName);
-            throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));
-        }
+//        }else{
+//            logger.error("showType: {} is not valid "  ,showTypeName);
+//            throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));
+//        }
     }
 
     /**

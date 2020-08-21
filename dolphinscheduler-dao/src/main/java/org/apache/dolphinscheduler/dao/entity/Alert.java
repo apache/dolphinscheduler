@@ -16,17 +16,17 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("t_ds_alert")
 public class Alert {
@@ -45,7 +45,7 @@ public class Alert {
      */
     //TODO ShowType should be delete from Alert, Because showType is move to the plugin params
     @TableField(value = "show_type")
-    private ShowType showType;
+    private String showType;
     /**
      * content
      */
@@ -116,13 +116,13 @@ public class Alert {
         this.title = title;
     }
 
-    public ShowType getShowType() {
-        return showType;
-    }
-
-    public void setShowType(ShowType showType) {
-        this.showType = showType;
-    }
+//    public String getShowType() {
+//        return showType;
+//    }
+//
+//    public void setShowType(String showType) {
+//        this.showType = showType;
+//    }
 
     public String getContent() {
         return content;

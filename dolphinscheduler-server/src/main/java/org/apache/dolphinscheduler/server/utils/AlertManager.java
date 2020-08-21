@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -29,6 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,7 +184,7 @@ public class AlertManager {
         try{
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
-            alert.setShowType(ShowType.TABLE);
+//            alert.setShowType(ShowType.TABLE);
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
             alert.setAlertType(AlertType.EMAIL);
@@ -238,7 +239,7 @@ public class AlertManager {
         String success = processInstance.getState().typeIsSuccess() ? "success" :"failed";
         alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
-        alert.setShowType(showType);
+//        alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
