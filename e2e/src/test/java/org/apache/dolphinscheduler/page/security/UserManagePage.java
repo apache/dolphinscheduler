@@ -29,7 +29,7 @@ public class UserManagePage extends PageCommon {
     /**
      * create user
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createUser() throws InterruptedException {
         // click  user manage

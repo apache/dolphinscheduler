@@ -47,7 +47,7 @@ public class UserManageLocator {
 
     public static final By SELECT_ENABLE_STATE = By.xpath("//div[7]/div[2]/div/label[1]/span/input");
 
-    public static final By SUBMIT = By.xpath("//div[3]/button[3]/span");
+    public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
 
     /**
      * edit user
