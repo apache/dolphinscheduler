@@ -21,25 +21,70 @@ import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.PropsType;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Text param
+ * password param
  */
 public class PasswordParam extends PluginParams {
 
-    public PasswordParam(String name, String label) {
-        super(name, FormType.INPUT, label);
-        ParamsProps paramsProps = new ParamsProps();
-        paramsProps.setPropsType(PropsType.PASSWORD);
-        this.setProps(paramsProps);
+    private PasswordParam(Builder builder) {
+        super(builder);
     }
 
-    public PasswordParam setPlaceholder(String placeholder) {
-        if (this.getProps() == null) {
-            this.setProps(new ParamsProps());
+    public static Builder newBuilder(String name, String title) {
+        return new PasswordParam.Builder(name, title);
+    }
+
+    public static class Builder extends PluginParams.Builder {
+
+        public Builder(String name, String title) {
+            super(name, FormType.INPUT, title);
+            ParamsProps paramsProps = new ParamsProps();
+            paramsProps.setPropsType(PropsType.PASSWORD);
+            this.props = paramsProps;
         }
 
-        this.getProps().setPlaceholder(placeholder);
-        return this;
+
+        public Builder setPlaceholder(String placeholder) {
+            this.props.setPlaceholder(placeholder);
+            return this;
+        }
+
+        public Builder addValidate(Validate validate) {
+            if (this.validateList == null) {
+                this.validateList = new ArrayList<>();
+            }
+            this.validateList.add(validate);
+            return this;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setValue(Object value) {
+            this.value = value;
+            return this;
+        }
+
+        public Builder setValidateList(List<Validate> validateList) {
+            this.validateList = validateList;
+            return this;
+        }
+
+        @Override
+        public PasswordParam build() {
+            return new PasswordParam(this);
+        }
     }
 }

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.spi.params.base;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * this props field in form-create`s json rule
+ * the props field in form-create`s json rule
  */
 public class ParamsProps {
     private PropsType propsType;

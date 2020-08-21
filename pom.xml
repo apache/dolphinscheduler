@@ -666,6 +666,11 @@
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-maven-plugin</artifactId>
                 <extensions>true</extensions>
+                <!--<configuration>-->
+                    <!--<allowedProvidedDependencies>-->
+                        <!--<allowedProvidedDependency>org.apache.dolphinscheduler:dolphinscheduler-common</allowedProvidedDependency>-->
+                    <!--</allowedProvidedDependencies>-->
+                <!--</configuration>-->
             </plugin>
 
             <plugin>

@@ -19,111 +19,136 @@ package org.apache.dolphinscheduler.spi.params.base;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+/**
+ * plugin params
+ */
+@JsonDeserialize(builder = PluginParams.Builder.class)
 public class PluginParams {
 
     /**
      * param name
      */
-    private String name;
-
-    private ParamsProps props;
-
-    private String formType;
-
-    private String title;
-
-    private Object value;
-
-    private List<Validate> validateList;
-
-    public PluginParams() {
-
-    }
-
-    public PluginParams(String name, FormType formType, String title) {
-        requireNonNull(name, "name is null");
-        requireNonNull(formType, "formType is null");
-        requireNonNull(title, "title is null");
-        this.name = name;
-        this.formType = formType.getFormType();
-        this.title = title;
-    }
-
-    public PluginParams addValidate(Validate validate) {
-        if (this.getValidateList() == null) {
-            this.validateList = new ArrayList<>();
-        }
-        this.getValidateList().add(validate);
-        return this;
-    }
-
     @JsonProperty("field")
+    protected String name;
+
+    @JsonProperty("props")
+    protected ParamsProps props;
+
+    @JsonProperty("type")
+    protected String formType;
+
+    /**
+     * Name displayed on the page
+     */
+    @JsonProperty("title")
+    protected String title;
+
+    /**
+     * default value or value input by user in the page
+     */
+    @JsonProperty("value")
+    protected Object value;
+
+    @JsonProperty("validate")
+    protected List<Validate> validateList;
+
+    protected PluginParams(Builder builder) {
+
+        requireNonNull(builder, "builder is null");
+        requireNonNull(builder.name, "name is null");
+        requireNonNull(builder.formType, "formType is null");
+        requireNonNull(builder.title, "title is null");
+
+        this.name = builder.name;
+        this.formType = builder.formType.getFormType();
+        this.title = builder.title;
+        this.props = builder.props;
+        this.value = builder.value;
+        this.validateList = builder.validateList;
+
+    }
+
+    @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
+    public static class Builder {
+        //Must have
+        protected String name;
+
+        protected FormType formType;
+
+        protected String title;
+
+        //option params
+        protected ParamsProps props;
+
+        protected Object value;
+
+        protected List<Validate> validateList;
+
+        public Builder(String name,
+                       FormType formType,
+                       String title) {
+            requireNonNull(name, "name is null");
+            requireNonNull(formType, "formType is null");
+            requireNonNull(title, "title is null");
+            this.name = name;
+            this.formType = formType;
+            this.title = title;
+        }
+
+        //for json deserialize to POJO
+        @JsonCreator
+        public Builder(@JsonProperty("field") String name,
+                       @JsonProperty("type") FormType formType,
+                       @JsonProperty("title") String title,
+                       @JsonProperty("props") ParamsProps props,
+                       @JsonProperty("value") Object value,
+                       @JsonProperty("validate") List<Validate> validateList
+        ) {
+            requireNonNull(name, "name is null");
+            requireNonNull(formType, "formType is null");
+            requireNonNull(title, "title is null");
+            this.name = name;
+            this.formType = formType;
+            this.title = title;
+            this.props = props;
+            this.value = value;
+            this.validateList = validateList;
+        }
+
+        public PluginParams build() {
+            return new PluginParams(this);
+        }
+    }
+
     public String getName() {
         return name;
     }
 
-    @JsonProperty(value = "field")
-    public PluginParams setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    @JsonProperty("props")
     public ParamsProps getProps() {
         return props;
     }
 
-    @JsonProperty(value = "props")
-    public PluginParams setProps(ParamsProps props) {
-        this.props = props;
-        return this;
-    }
-
-    @JsonProperty("type")
     public String getFormType() {
         return formType;
     }
 
-    @JsonProperty(value = "type")
-    public PluginParams setFormType(String formType) {
-        this.formType = formType;
-        return this;
-    }
-
-    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
 
-    public PluginParams setTitle(String title) {
-        this.title = title;
-        return this;
-    }
-
-    @JsonProperty("value")
     public Object getValue() {
         return value;
     }
 
-    public PluginParams setValue(Object value) {
-        this.value = value;
-        return this;
-    }
-
-    @JsonProperty("validate")
     public List<Validate> getValidateList() {
         return validateList;
-    }
-
-    @JsonProperty(value = "validate")
-    public PluginParams setValidateList(List<Validate> validateList) {
-        this.validateList = validateList;
-        return this;
     }
 }
 

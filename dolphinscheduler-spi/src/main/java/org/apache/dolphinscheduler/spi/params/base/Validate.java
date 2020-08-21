@@ -18,82 +18,120 @@
 package org.apache.dolphinscheduler.spi.params.base;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
+/**
+ * form validate
+ */
+@JsonDeserialize(builder = Validate.Builder.class)
 public class Validate {
 
-    private boolean required = false;
+    @JsonProperty("required")
+    private boolean required;
 
+    @JsonProperty("message")
     private String message;
 
-    private String type = DataType.STRING.getDataType();
+    @JsonProperty("type")
+    private String type;
 
-    private String trigger = TriggerType.BLUR.getTriggerType();
+    @JsonProperty("trigger")
+    private String trigger;
 
+    @JsonProperty("min")
     private Double min;
 
+    @JsonProperty("max")
     private Double max;
 
-    public static Validate buildValidate() {
-        return new Validate();
+    private Validate() {
+
     }
 
-    @JsonProperty("required")
+    private Validate(Builder builder) {
+        this.required = builder.required;
+        this.message = builder.message;
+        this.type = builder.type;
+        this.trigger = builder.trigger;
+        this.min = builder.min;
+        this.max = builder.max;
+    }
+
+    public static Builder newBuilder() {
+        return new Validate.Builder();
+    }
+
+    @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
+    public static class Builder {
+        private boolean required = false;
+
+        private String message;
+
+        private String type = DataType.STRING.getDataType();
+
+        private String trigger = TriggerType.BLUR.getTriggerType();
+
+        private Double min;
+
+        private Double max;
+
+        public Builder setRequired(boolean required) {
+            this.required = required;
+            return this;
+        }
+
+        public Builder setMessage(String message) {
+            this.message = message;
+            return this;
+        }
+
+        public Builder setTrigger(String trigger) {
+            this.trigger = trigger;
+            return this;
+        }
+
+        public Builder setMin(Double min) {
+            this.min = min;
+            return this;
+        }
+
+        public Builder setMax(Double max) {
+            this.max = max;
+            return this;
+        }
+
+        public Builder setType(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Validate build() {
+            return new Validate(this);
+        }
+    }
+
     public boolean isRequired() {
         return required;
     }
 
-    public Validate setRequired(boolean required) {
-        this.required = required;
-        return this;
-    }
-
-    @JsonProperty("message")
     public String getMessage() {
         return message;
     }
 
-    public Validate setMessage(String message) {
-        this.message = message;
-        return this;
-    }
-
-    @JsonProperty("trigger")
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public Validate setTrigger(String trigger) {
-        this.trigger = trigger;
-        return this;
-    }
-
-    @JsonProperty("min")
-    public Double getMin() {
-        return min;
-    }
-
-    public Validate setMin(Double min) {
-        this.min = min;
-        return this;
-    }
-
-    @JsonProperty("max")
-    public Double getMax() {
-        return max;
-    }
-
-    public Validate setMax(Double max) {
-        this.max = max;
-        return this;
-    }
-
-    @JsonProperty("type")
     public String getType() {
         return type;
     }
 
-    public Validate setType(String type) {
-        this.type = type;
-        return this;
+    public String getTrigger() {
+        return trigger;
+    }
+
+    public Double getMin() {
+        return min;
+    }
+
+    public Double getMax() {
+        return max;
     }
 }

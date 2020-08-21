@@ -17,26 +17,78 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
-
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Text param
  */
 public class InputParam extends PluginParams {
 
-    public InputParam(String name, String label) {
-        super(name, FormType.INPUT, label);
+    private InputParam(Builder builder) {
+        super(builder);
     }
 
-    public InputParam setPlaceholder(String placeholder) {
-        if (this.getProps() == null) {
-            this.setProps(new ParamsProps());
+    public static Builder newBuilder(String name, String title) {
+        return new InputParam.Builder(name, title);
+    }
+
+    public static class Builder extends PluginParams.Builder {
+
+        public Builder(String name, String title) {
+            super(name, FormType.INPUT, title);
         }
 
-        this.getProps().setPlaceholder(placeholder);
-        return this;
+        public Builder setPlaceholder(String placeholder) {
+            if (this.props == null) {
+                this.setProps(new ParamsProps());
+            }
+
+            this.props.setPlaceholder(placeholder);
+            return this;
+        }
+
+        public Builder addValidate(Validate validate) {
+            if (this.validateList == null) {
+                this.validateList = new ArrayList<>();
+            }
+            this.validateList.add(validate);
+            return this;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setProps(ParamsProps props) {
+            this.props = props;
+            return this;
+        }
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setValue(Object value) {
+            this.value = value;
+            return this;
+        }
+
+        public Builder setValidateList(List<Validate> validateList) {
+            this.validateList = validateList;
+            return this;
+        }
+
+        @Override
+        public InputParam build() {
+            return new InputParam(this);
+        }
     }
 }

@@ -31,6 +31,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * PluginParamsTransfer Tester.
  */
@@ -50,59 +52,71 @@ public class PluginParamsTransferTest {
     @Test
     public void testGetParamsJson() throws Exception {
         List<PluginParams> paramsList = new ArrayList<>();
-        InputParam receivesParam = new InputParam("field1", "field1");
-        receivesParam.addValidate(Validate.buildValidate().setRequired(true));
+        InputParam receivesParam = InputParam.newBuilder("field1", "field1")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
-        InputParam receiveCcsParam = new InputParam("field2", "field2");
+        InputParam receiveCcsParam = new InputParam.Builder("field2", "field2").build();
 
-        InputParam mailSmtpHost = new InputParam("field3", "field3");
-        mailSmtpHost.addValidate(Validate.buildValidate()
-                .setRequired(true));
+        InputParam mailSmtpHost = new InputParam.Builder("field3", "field3")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
-        InputParam mailSmtpPort = new InputParam("field4", "field4");
-        mailSmtpPort.addValidate(Validate.buildValidate()
-                .setRequired(true)
-                .setType(DataType.NUMBER.getDataType()));
+        InputParam mailSmtpPort = new InputParam.Builder("field4", "field4")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .setType(DataType.NUMBER.getDataType())
+                        .build())
+                .build();
 
-        InputParam mailSender = new InputParam("field5", "field5");
-        mailSender.addValidate(Validate.buildValidate().setRequired(true));
+        InputParam mailSender = new InputParam.Builder("field5", "field5")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
-        RadioParam enableSmtpAuth = new RadioParam("field6", "field6");
-        enableSmtpAuth.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableSmtpAuth = new RadioParam.Builder("field6", "field6")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .setValue(true)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
+        InputParam mailUser = new InputParam.Builder("field7", "field7")
+                .setPlaceholder("if enable use authentication, you need input user")
+                .build();
 
-        InputParam mailUser = new InputParam("field7", "field7");
-        mailUser.setPlaceholder("if enable use authentication, you need input user");
+        PasswordParam mailPassword = new PasswordParam.Builder("field8", "field8")
+                .setPlaceholder("if enable use authentication, you need input password")
+                .build();
 
-        PasswordParam mailPassword = new PasswordParam("field8", "field8");
-        mailPassword.setPlaceholder("if enable use authentication, you need input password");
-
-        RadioParam enableTls = new RadioParam("field9", "field9");
-        enableTls.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableTls = new RadioParam.Builder("field9", "field9")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .setValue(false)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
-        RadioParam enableSsl = new RadioParam("field10", "field10");
-        enableSsl.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableSsl = new RadioParam.Builder("field10", "field10")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
                 .setValue(false)
-                .addValidate(Validate.buildValidate().setRequired(true));
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
-        InputParam sslTrust = new InputParam("field11", "field11");
-        sslTrust.setValue("*").addValidate(Validate.buildValidate().setRequired(true));
+        InputParam sslTrust = new InputParam.Builder("field11", "field11")
+                .setValue("*")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         List<ParamsOptions> emailShowTypeList = new ArrayList<>();
         emailShowTypeList.add(new ParamsOptions("table", "table", false));
         emailShowTypeList.add(new ParamsOptions("text", "text", false));
         emailShowTypeList.add(new ParamsOptions("attachment", "attachment", false));
         emailShowTypeList.add(new ParamsOptions("tableattachment", "tableattachment", false));
-        RadioParam showType = new RadioParam("showType", "showType", emailShowTypeList);
-        showType.setValue("table")
-                .addValidate(Validate.buildValidate().setRequired(true));
+        RadioParam showType = new RadioParam.Builder("showType", "showType")
+                .setParamsOptionsList(emailShowTypeList)
+                .setValue("table")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         paramsList.add(receivesParam);
         paramsList.add(receiveCcsParam);
@@ -128,9 +142,21 @@ public class PluginParamsTransferTest {
         String paramsJsonAssert = "[{\"field\":\"field1\",\"props\":null,\"type\":\"input\",\"title\":\"field1\",\"value\":\"v1\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},{\"field\":\"field2\",\"props\":null,\"type\":\"input\",\"title\":\"field2\",\"value\":\"v2\",\"validate\":null},{\"field\":\"field3\",\"props\":null,\"type\":\"input\",\"title\":\"field3\",\"value\":\"v3\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},{\"field\":\"field4\",\"props\":null,\"type\":\"input\",\"title\":\"field4\",\"value\":\"v4\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"number\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},{\"field\":\"field5\",\"props\":null,\"type\":\"input\",\"title\":\"field5\",\"value\":\"v5\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},{\"field\":\"field6\",\"props\":null,\"type\":\"radio\",\"title\":\"field6\",\"value\":true,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field7\",\"props\":{\"type\":null,\"placeholder\":\"if enable use authentication, you need input user\",\"rows\":0},\"type\":\"input\",\"title\":\"field7\",\"value\":\"v6\",\"validate\":null},{\"field\":\"field8\",\"props\":{\"type\":\"PASSWORD\",\"placeholder\":\"if enable use authentication, you need input password\",\"rows\":0},\"type\":\"input\",\"title\":\"field8\",\"value\":\"v7\",\"validate\":null},{\"field\":\"field9\",\"props\":null,\"type\":\"radio\",\"title\":\"field9\",\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field10\",\"props\":null,\"type\":\"radio\",\"title\":\"field10\",\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}],\"options\":[{\"label\":\"YES\",\"value\":true,\"disabled\":false},{\"label\":\"NO\",\"value\":false,\"disabled\":false}]},{\"field\":\"field11\",\"props\":null,\"type\":\"input\",\"title\":\"field11\",\"value\":\"*\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}]},{\"field\":\"showType\",\"props\":null,\"type\":\"radio\",\"title\":\"showType\",\"value\":\"table\",\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\",\"trigger\":\"blur\",\"min\":0.0,\"max\":0.0}],\"options\":[{\"label\":\"table\",\"value\":\"table\",\"disabled\":false},{\"label\":\"text\",\"value\":\"text\",\"disabled\":false},{\"label\":\"attachment\",\"value\":\"attachment\",\"disabled\":false},{\"label\":\"tableattachment\",\"value\":\"tableattachment\",\"disabled\":false}]}]";
         List<PluginParams> pluginParams = JSONUtils.toList(paramsJsonAssert, PluginParams.class);
         String[] results = new String[]{"v1", "v2", "v3", "v4", "v5", "true", "v6", "v7", "false", "false", "*", "table", "v1"};
+        Assert.assertEquals(12, pluginParams.size());
         for (int i = 0; i < pluginParams.size(); i++) {
             PluginParams param = pluginParams.get(i);
             Assert.assertEquals(param.getValue().toString(), results[i]);
         }
+    }
+
+    @Test
+    public void testAtest() {
+        Atest at = new Atest("a" , 1);
+        String s = JSONUtils.toJsonString(at);
+        System.out.println(s);
+
+        String stt = "{\"age\":1,\"name\":\"a\"}";
+        ObjectNode objectNode = JSONUtils.parseObject(stt);
+        System.out.println(objectNode);
     }
 }

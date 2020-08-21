@@ -153,7 +153,7 @@ public class AlertSenderTest {
 
         Alert alertResult = alertDao.getAlertMapper().selectById(alert1.getId());
         Assert.assertNotNull(alertResult);
-        Assert.assertEquals(alertResult.getAlertStatus(), AlertStatus.EXECUTION_SUCCESS);
+        Assert.assertEquals(alertResult.getAlertStatus(), AlertStatus.EXECUTION_FAILURE);
 
         alertDao.getAlertGroupMapper().deleteById(alertGroup.getId());
         alertDao.getAlertPluginInstanceMapper().deleteById(alertPluginInstance.getId());
@@ -163,67 +163,77 @@ public class AlertSenderTest {
 
     public String getEmailAlertParams() {
         List<PluginParams> paramsList = new ArrayList<>();
-        InputParam receivesParam = new InputParam("receivers", "receivers");
-        receivesParam.setValue("540957506@qq.com")
-                .addValidate(Validate.buildValidate().setRequired(true));
+        InputParam receivesParam = InputParam.newBuilder("receivers", "receivers")
+                .setValue("540957506@qq.com")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
 
-        InputParam mailSmtpHost = new InputParam("mailServerHost", "mail.smtp.host");
-        mailSmtpHost.addValidate(Validate.buildValidate()
-                .setRequired(true))
-                .setValue("smtp.exmail.qq.com");
+        InputParam mailSmtpHost = InputParam.newBuilder("mailServerHost", "mail.smtp.host")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue("smtp.exmail.qq.com")
+                .build();
 
-        InputParam mailSmtpPort = new InputParam("mailServerPort", "mail.smtp.port");
-        mailSmtpPort.addValidate(Validate.buildValidate()
-                .setRequired(true)
-                .setType(DataType.NUMBER.getDataType()))
-                .setValue(25);
+        InputParam mailSmtpPort = InputParam.newBuilder("mailServerPort", "mail.smtp.port")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .setType(DataType.NUMBER.getDataType())
+                        .build())
+                .setValue(25)
+                .build();
 
-        InputParam mailSender = new InputParam("mailSender", "mail.sender");
-        mailSender.addValidate(Validate.buildValidate().setRequired(true))
-                .setValue("easyscheduler@analysys.com.cn");
+        InputParam mailSender = InputParam.newBuilder("mailSender", "mail.sender")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue("easyscheduler@analysys.com.cn")
+                .build();
 
-        RadioParam enableSmtpAuth = new RadioParam("enableSmtpAuth",
-                "mail.smtp.auth");
-        enableSmtpAuth.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableSmtpAuth = RadioParam.newBuilder("enableSmtpAuth", "mail.smtp.auth")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .addValidate(Validate.buildValidate().setRequired(true))
-                .setValue(true);
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue(true)
+                .build();
 
 
-        InputParam mailUser = new InputParam("mailUser", "mail.user");
-        mailUser.setPlaceholder("if enable use authentication, you need input user");
-        mailUser.setValue("easyscheduler@analysys.com.cn");
+        InputParam mailUser = InputParam.newBuilder("mailUser", "mail.user")
+                .setPlaceholder("if enable use authentication, you need input user")
+                .setValue("easyscheduler@analysys.com.cn")
+                .build();
 
-        PasswordParam mailPassword = new PasswordParam("mailPasswd", "mail.passwd");
-        mailPassword.setPlaceholder("if enable use authentication, you need input password");
-        mailPassword.setValue("xxxxxxx");
+        PasswordParam mailPassword = PasswordParam.newBuilder("mailPasswd", "mail.passwd")
+                .setPlaceholder("if enable use authentication, you need input password")
+                .setValue("xxxxxxx")
+                .build();
 
-        RadioParam enableTls = new RadioParam("starttlsEnable", "mail.smtp.starttls.enable");
-        enableTls.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableTls = RadioParam.newBuilder("starttlsEnable", "mail.smtp.starttls.enable")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .addValidate(Validate.buildValidate().setRequired(true))
-                .setValue(true);
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue(true)
+                .build();
 
-        RadioParam enableSsl = new RadioParam("sslEnable", "mail.smtp.ssl.enable");
-        enableSsl.addParamsOptions(new ParamsOptions("YES", true, false))
+        RadioParam enableSsl = RadioParam.newBuilder("sslEnable", "mail.smtp.ssl.enable")
+                .addParamsOptions(new ParamsOptions("YES", true, false))
                 .addParamsOptions(new ParamsOptions("NO", false, false))
-                .addValidate(Validate.buildValidate().setRequired(true))
-                .setValue(false);
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue(false)
+                .build();
 
-        InputParam sslTrust = new InputParam("mailSmtpSslTrust", "mail.smtp.ssl.trust");
-        sslTrust.addValidate(Validate.buildValidate().setRequired(true))
-                .setValue("smtp.exmail.qq.com");
+        InputParam sslTrust = InputParam.newBuilder("mailSmtpSslTrust", "mail.smtp.ssl.trust")
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .setValue("smtp.exmail.qq.com")
+                .build();
 
         List<ParamsOptions> emailShowTypeList = new ArrayList<>();
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = new RadioParam("showType",
-                "showType", emailShowTypeList);
-        showType.setValue(ShowType.TABLE.getDescp())
-                .addValidate(Validate.buildValidate().setRequired(true));
+        RadioParam showType = RadioParam.newBuilder("showType","showType")
+                .setParamsOptionsList(emailShowTypeList)
+                .setValue(ShowType.TABLE.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
 
         paramsList.add(receivesParam);
         paramsList.add(mailSmtpHost);

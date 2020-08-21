@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum FormType {
 
     INPUT("input"),
@@ -29,6 +31,7 @@ public enum FormType {
         this.formType = formType;
     }
 
+    @JsonValue
     public String getFormType() {
         return this.formType;
     }
