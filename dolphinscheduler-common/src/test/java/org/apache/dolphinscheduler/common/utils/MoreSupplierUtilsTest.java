@@ -103,8 +103,8 @@ public class MoreSupplierUtilsTest {
     public void testLazyCloseableThrowable() throws IOException {
         final String expectedResult = "6";
 
-        ThrowableSupplier<CloseableTester, IOException> stringInitSupplier =
-                () -> new CloseableTester("6");
+        ThrowableSupplier<CloseableTester, IOException> stringInitSupplier = () ->
+                new CloseableTester("6");
 
         LazyCloseableThrowableSupplier<CloseableTester, IOException, RuntimeException> lazyCloseableThrowableSupplier =
                 MoreSupplierUtils.lazyCloseableThrowable(stringInitSupplier, CloseableTester::close);
