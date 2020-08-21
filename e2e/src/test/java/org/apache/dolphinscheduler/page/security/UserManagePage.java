@@ -34,6 +34,8 @@ public class UserManagePage extends PageCommon {
     public boolean createUser() throws InterruptedException {
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
+        //determine whether the create user button exists
+        ifTextExists(UserManageLocator.CLICK_CREATE_USER_BUTTON,UserManageData.CREATE_USER_BUTTON);
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
@@ -47,8 +49,8 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.SELECT_QUEUE);
         sendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EMAIL);
         sendInput(UserManageLocator.INPUT_PHONE, UserManageData.PHONE);
-        clickElement(UserManageLocator.SELECT_STOP_STATE);
-        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
+        clickButton(UserManageLocator.SELECT_STOP_STATE);
+        clickButton(UserManageLocator.SELECT_ENABLE_STATE);
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
@@ -64,7 +66,6 @@ public class UserManagePage extends PageCommon {
         //edit general user
         // click  user manage
         System.out.println("start edit general user");
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
@@ -101,7 +102,6 @@ public class UserManagePage extends PageCommon {
         //edit admin user
         // click  user manage
         System.out.println("start edit admin user");
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  edit user button
@@ -115,7 +115,6 @@ public class UserManagePage extends PageCommon {
         // click  button
         clickButton(UserManageLocator.SUBMIT);
         System.out.println("end edit admin user");
-        Thread.sleep(500);
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);
     }

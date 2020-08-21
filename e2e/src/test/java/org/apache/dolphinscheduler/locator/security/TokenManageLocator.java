@@ -30,6 +30,8 @@ public class TokenManageLocator {
 
     public static final By CLICK_SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 
+    public static final By EDIT_TOKEN_BUTTON = By.xpath("//table/tr[2]/td[7]/button");
+
     //edit token
     public static final By CLICK_EDIT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[7]/button/i");
 

@@ -43,11 +43,11 @@ public class UserManageLocator {
 
     public static final By INPUT_PHONE = By.xpath("//div[6]/div[2]/div/input");
 
-    public static final By SELECT_STOP_STATE = By.xpath("//div[7]/div[2]/div/label[2]/span/input");
+    public static final By SELECT_STOP_STATE = By.xpath("//div[7]/div[2]/div/label[2]/span[1]/input");
 
-    public static final By SELECT_ENABLE_STATE = By.xpath("//div[7]/div[2]/div/label[1]/span/input");
+    public static final By SELECT_ENABLE_STATE = By.xpath("//div[7]/div[2]/div/label[1]/span[1]/input");
 
-    public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
+    public static final By SUBMIT = By.xpath("//div[3]/button[3]/span");
 
     /**
      * edit user

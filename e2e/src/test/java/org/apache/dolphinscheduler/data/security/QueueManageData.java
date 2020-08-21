@@ -22,6 +22,8 @@ public class QueueManageData {
      */
     public static final String QUEUE_NAME = "selenium_queue_name";
 
+    public static final String CREATE_QUEUE = "创建队列";
+
     /**
      * Create Queue Value
      */

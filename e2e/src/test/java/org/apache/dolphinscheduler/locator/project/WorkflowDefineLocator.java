@@ -49,10 +49,10 @@ public class WorkflowDefineLocator {
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");
 
     //click stop run type
-    public static final By CLICK_STOP_RUN_TYPE = By.xpath("//label[2]/span/input");
+    public static final By CLICK_STOP_RUN_TYPE = By.xpath("//label[2]/span[1]/input");
 
     //click normal run type
-    public static final By CLICK_NORMAL_RUN_TYPE = By.xpath("//span/input");
+    public static final By CLICK_NORMAL_RUN_TYPE = By.xpath("//label[1]/span[1]/input");
 
     //input shell task description
     public static final By INPUT_SHELL_TASK_DESCRIPTION = By.xpath("//label/div/textarea");
