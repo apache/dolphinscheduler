@@ -28,57 +28,57 @@
             <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTenantManage"></class>
 
             <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestAlertManage"></class>
-            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestQueueManage"></class>
             <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestTokenManage"></class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testSecurity.TestUserManage">-->
-                <!--<methods>-->
-                    <!--<include name="testCreateUser" />-->
-                    <!--<include name="testEditUser" />-->
-                <!--</methods>-->
-            <!--</class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testSecurity.TestUserManage">
+                <methods>
+                    <include name="testCreateUser" />
+                    <include name="testEditUser" />
+                </methods>
+            </class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestProject">-->
-                <!--<methods>-->
-                    <!--<include name="createProject" />-->
-                <!--</methods>-->
-            <!--</class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestProject">
+                <methods>
+                    <include name="createProject" />
+                </methods>
+            </class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestWorkflowDefine">-->
-                <!--<methods>-->
-                    <!--<include name="testCreateWorkflow" />-->
-                    <!--<include name="testOnlineWorkflow" />-->
-                <!--</methods>-->
-            <!--</class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestWorkflowDefine">
+                <methods>
+                    <include name="testCreateWorkflow" />
+                    <include name="testOnlineWorkflow" />
+                </methods>
+            </class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestRunWorkflow"></class>
 
-            <!--&lt;!&ndash; <class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">-->
-                <!--<methods>-->
-                    <!--<include name="testCreateTiming" />-->
-                    <!--<include name="testEditTiming" />-->
-                    <!--<include name="testOnlineTiming" />-->
-                    <!--<include name="testOfflineTiming" />-->
-                    <!--<include name="testDeleteTiming" />-->
-                <!--</methods>-->
-            <!--</class> &ndash;&gt;-->
-            <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestProcessInstance">-->
-                <!--<methods>-->
-                    <!--<include name="testRerun" />-->
-                <!--</methods>-->
-            <!--</class>-->
+            <!-- <class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">
+                <methods>
+                    <include name="testCreateTiming" />
+                    <include name="testEditTiming" />
+                    <include name="testOnlineTiming" />
+                    <include name="testOfflineTiming" />
+                    <include name="testDeleteTiming" />
+                </methods>
+            </class> -->
+            <class name="org.apache.dolphinscheduler.testcase.testProject.TestProcessInstance">
+                <methods>
+                    <include name="testRerun" />
+                </methods>
+            </class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow">-->
-                <!--<methods>-->
-                    <!--<include name="testOfflineWorkflow" />-->
-                    <!--<include name="testDeleteWorkflow" />-->
-                <!--</methods>-->
-            <!--</class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteWorkflow">
+                <methods>
+                    <include name="testOfflineWorkflow" />
+                    <include name="testDeleteWorkflow" />
+                </methods>
+            </class>
 
-            <!--<class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteProject"></class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteProject"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteAlert"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteToken"></class>
-            <!--<class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>-->
+            <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteUser"></class>
             <class name="org.apache.dolphinscheduler.testcase.testDeleteData.TestDeleteTenant"></class>
         </classes>
     </test>
