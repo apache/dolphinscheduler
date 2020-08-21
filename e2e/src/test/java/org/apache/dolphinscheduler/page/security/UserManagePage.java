@@ -49,8 +49,8 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.SELECT_QUEUE);
         sendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EMAIL);
         sendInput(UserManageLocator.INPUT_PHONE, UserManageData.PHONE);
-        clickButton(UserManageLocator.SELECT_STOP_STATE);
-        clickButton(UserManageLocator.SELECT_ENABLE_STATE);
+        clickElement(UserManageLocator.SELECT_STOP_STATE);
+        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);

@@ -49,7 +49,7 @@ public class TenantManagePage extends PageCommon {
         clickElement(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
-        clickElement(TenantManageLocator.CREATE_TENANT_BUTTON);
+        clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
         // tenant data
         sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANT_CODE);
