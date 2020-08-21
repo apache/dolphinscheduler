@@ -64,7 +64,7 @@ public class TokenManagePage extends PageCommon {
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
 
         // determine the existence of the editing token
-        ifLocatorExists(TokenManageLocator.EDIT_TOKEN_BUTTON);
+        locateElement(TokenManageLocator.EDIT_TOKEN_BUTTON);
 
         // click  edit token button
         clickButton(TokenManageLocator.CLICK_EDIT_BUTTON);
