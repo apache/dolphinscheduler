@@ -311,7 +311,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            logger.error("tenant {} has exist, can't create again.", tenantCode);
             putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
