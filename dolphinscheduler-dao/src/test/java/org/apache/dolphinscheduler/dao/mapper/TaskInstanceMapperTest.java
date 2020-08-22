@@ -64,7 +64,7 @@ public class TaskInstanceMapperTest {
      */
     private TaskInstance insertOne(){
         //insertOne
-        return insertOne("us task", 1, ExecutionStatus.RUNNING_EXEUTION, TaskType.SHELL.toString());
+        return insertOne("us task", 1, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
     }
 
     /**

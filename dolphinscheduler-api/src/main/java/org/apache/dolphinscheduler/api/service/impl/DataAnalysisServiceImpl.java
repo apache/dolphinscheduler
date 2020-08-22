@@ -122,12 +122,17 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
      * @return process instance state count data
      */
     public Map<String, Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
-        return this.countStateByProject(
+        Map<String, Object> tmpResult =  this.countStateByProject(
                 loginUser,
                 projectId,
                 startDate,
                 endDate,
                 (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
+        // process state count needs to remove state of forced success
+        if (tmpResult.get(Constants.STATUS).equals(Status.SUCCESS)) {
+            ((TaskCountDto)tmpResult.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
+        }
+        return tmpResult;
     }
 
     private Map<String, Object> countStateByProject(User loginUser, int projectId, String startDate, String endDate
@@ -154,8 +159,6 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-            // process state count needs to remove state of forced success
-            taskCountResult.removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
         }
