@@ -161,7 +161,6 @@ public class UsersServiceTest {
     @Test
     public void testQueryUserList() {
 
-
         User user = new User();
 
         //no operate
@@ -179,7 +178,6 @@ public class UsersServiceTest {
 
     @Test
     public void testQueryUserListPage() {
-
 
         User user = new User();
         IPage<User> page = new Page<>(1, 10);
@@ -249,7 +247,6 @@ public class UsersServiceTest {
             Assert.fail();
         }
 
-
     }
 
     @Test
@@ -296,7 +293,6 @@ public class UsersServiceTest {
 
     }
 
-
     @Test
     public void testGrantUDFFunction() {
 
@@ -338,7 +334,6 @@ public class UsersServiceTest {
 
     }
 
-
     @Test
     public void getUserInfo() {
 
@@ -364,7 +359,6 @@ public class UsersServiceTest {
         //check userName
         Assert.assertEquals("userTest0001", tempUser.getUserName());
     }
-
 
     @Test
     public void testQueryAllGeneralUsers() {
@@ -414,7 +408,6 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
-
 
     @Test
     public void testAuthorizedUser() {
@@ -469,10 +462,9 @@ public class UsersServiceTest {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
-            Assert.assertTrue(false);
+            Assert.fail();
         }
     }
-
 
     @Test
     public void testActivateUser() {
@@ -522,7 +514,6 @@ public class UsersServiceTest {
         return user;
     }
 
-
     /**
      * get user
      */
@@ -534,7 +525,6 @@ public class UsersServiceTest {
         user.setUserPassword("userTest0001");
         return user;
     }
-
 
     private List<User> getUserList() {
         List<User> userList = new ArrayList<>();
