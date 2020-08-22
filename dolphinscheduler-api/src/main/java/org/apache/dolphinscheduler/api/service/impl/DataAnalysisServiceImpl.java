@@ -17,6 +17,9 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 
+import java.text.MessageFormat;
+import java.util.*;
+
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
@@ -30,27 +33,9 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TriFunction;
-import org.apache.dolphinscheduler.dao.entity.CommandCount;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
-import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -207,11 +192,9 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
         Date end = null;
 
         if (startDate != null && endDate != null) {
-            try {
-                start = DateUtils.getScheduleDate(startDate);
-                end = DateUtils.getScheduleDate(endDate);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+            start = DateUtils.getScheduleDate(startDate);
+            end = DateUtils.getScheduleDate(endDate);
+            if (start == null || end == null) {
                 putErrorRequestParamsMsg(result);
                 return result;
             }
