@@ -60,6 +60,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      */
     public ConditionsTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
+        taskInstance.setStartTime(new Date());
     }
 
     @Override
