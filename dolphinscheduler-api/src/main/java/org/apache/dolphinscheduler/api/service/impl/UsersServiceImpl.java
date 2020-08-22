@@ -539,7 +539,6 @@ public class UsersServiceImpl extends BaseService implements UsersService {
             }
         }
 
-
         //get the authorized resource id list by user id
         List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
         //if resource type is UDF,need check whether it is bound by UDF functon
@@ -754,7 +753,6 @@ public class UsersServiceImpl extends BaseService implements UsersService {
         return result;
     }
 
-
     /**
      * query user list
      *
@@ -796,7 +794,6 @@ public class UsersServiceImpl extends BaseService implements UsersService {
         return result;
     }
 
-
     /**
      * unauthorized user
      *
@@ -832,7 +829,6 @@ public class UsersServiceImpl extends BaseService implements UsersService {
 
         return result;
     }
-
 
     /**
      * authorized user
