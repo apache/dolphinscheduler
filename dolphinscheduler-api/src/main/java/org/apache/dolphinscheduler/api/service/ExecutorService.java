@@ -99,7 +99,7 @@ public class ExecutorService extends BaseService{
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
@@ -177,7 +177,7 @@ public class ExecutorService extends BaseService{
      * @return check result code
      */
     public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId){
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (processDefinition == null) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,processDefineId);
@@ -202,7 +202,7 @@ public class ExecutorService extends BaseService{
      * @return execute result code
      */
     public Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = checkResultAndAuth(loginUser, projectName, project);
@@ -302,7 +302,7 @@ public class ExecutorService extends BaseService{
      */
     private Map<String, Object> checkExecuteType(ProcessInstance processInstance, ExecuteType executeType) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         ExecutionStatus executionStatus = processInstance.getState();
         boolean checkResult = false;
         switch (executeType) {
@@ -348,7 +348,7 @@ public class ExecutorService extends BaseService{
      * @return update result
      */
     private Map<String, Object> updateProcessInstancePrepare(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
@@ -374,7 +374,7 @@ public class ExecutorService extends BaseService{
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Command command = new Command();
         command.setCommandType(commandType);
         command.setProcessDefinitionId(processDefinitionId);

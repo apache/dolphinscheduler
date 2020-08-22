@@ -250,4 +250,14 @@ public class PropertyUtils {
         }
         return matchedProperties;
     }
+
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    public static void setValue(String key, String value) {
+        properties.setProperty(key,value);
+    }
+
 }

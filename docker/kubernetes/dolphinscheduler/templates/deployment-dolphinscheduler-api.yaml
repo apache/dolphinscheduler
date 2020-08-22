@@ -162,6 +162,12 @@ spec:
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperQuorum }}
               {{- end }}
+            - name: ZOOKEEPER_ROOT
+              {{- if .Values.zookeeper.enabled }}
+              value: "/dolphinscheduler"
+              {{- else }}
+              value: {{ .Values.externalZookeeper.zookeeperRoot }}
+              {{- end }}
             - name: RESOURCE_STORAGE_TYPE
               valueFrom:
                 configMapKeyRef:

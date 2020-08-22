@@ -71,7 +71,12 @@ public abstract class CommonHostManager implements HostManager {
             return host;
         }
         List<Host> candidateHosts = new ArrayList<>(nodes.size());
-        nodes.stream().forEach(node -> candidateHosts.add(Host.of(node)));
+        nodes.forEach(node -> {
+            Host nodeHost=Host.of(node);
+            nodeHost.setWorkGroup(context.getWorkerGroup());
+            candidateHosts.add(nodeHost);
+        });
+
 
         return select(candidateHosts);
     }

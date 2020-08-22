@@ -21,7 +21,7 @@ import org.openqa.selenium.By;
 public class ProcessInstanceLocator {
     // jump Process Instance page
     //click Process Instance name
-    public static final By CLICK_PROCESS_INSTANCE_NAME = By.xpath("//div[3]/div/ul/li[2]");
+    public static final By CLICK_PROCESS_INSTANCE_NAME = By.xpath("//div[4]/div/ul/li[2]");
 
     // click rerun button
     public static final By CLICK_RERUN_BUTTON = By.xpath("//tr[2]/td[14]/div[1]/button[2]");

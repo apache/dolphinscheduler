@@ -53,6 +53,25 @@ public class ProcessInstanceMapperTest {
 
 
     /**
+     * insert process instance with specified start time and end time,set state to SUCCESS
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    private ProcessInstance insertOne(Date startTime, Date endTime) {
+        ProcessInstance processInstance = new ProcessInstance();
+        Date start = startTime;
+        Date end = endTime;
+        processInstance.setStartTime(start);
+        processInstance.setEndTime(end);
+        processInstance.setState(ExecutionStatus.SUCCESS);
+
+        processInstanceMapper.insert(processInstance);
+        return processInstance;
+    }
+
+    /**
      * insert
      * @return ProcessInstance
      */
@@ -113,7 +132,7 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 = processInstanceMapper.queryDetailById(processInstance.getId());
-        Assert.assertNotEquals(processInstance1, 50);
+        Assert.assertNotNull(processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
@@ -124,11 +143,11 @@ public class ProcessInstanceMapperTest {
     public void testQueryByHostAndStates() {
         ProcessInstance processInstance = insertOne();
         processInstance.setHost("192.168.2.155");
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByHostAndStatus(null, stateArray);
@@ -145,7 +164,7 @@ public class ProcessInstanceMapperTest {
 
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -155,7 +174,7 @@ public class ProcessInstanceMapperTest {
 
         ProcessInstance processInstance = insertOne();
         processInstance.setProcessDefinitionId(processDefinition.getId());
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setIsSubProcess(Flag.NO);
         processInstance.setStartTime(new Date());
 
@@ -188,12 +207,12 @@ public class ProcessInstanceMapperTest {
     public void testSetFailoverByHostAndStateArray() {
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUCCESS.ordinal()};
 
         ProcessInstance processInstance = insertOne();
 
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setHost("192.168.2.220");
         processInstanceMapper.updateById(processInstance);
         String host = processInstance.getHost();
@@ -214,9 +233,9 @@ public class ProcessInstanceMapperTest {
 
         ProcessInstance processInstance = insertOne();
 
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
-        processInstanceMapper.updateProcessInstanceByState(ExecutionStatus.RUNNING_EXEUTION, ExecutionStatus.SUCCESS);
+        processInstanceMapper.updateProcessInstanceByState(ExecutionStatus.RUNNING_EXECUTION, ExecutionStatus.SUCCESS);
 
         ProcessInstance processInstance1 = processInstanceMapper.selectById(processInstance.getId());
 
@@ -294,11 +313,11 @@ public class ProcessInstanceMapperTest {
     @Test
     public void testQueryLastRunningProcess() {
         ProcessInstance processInstance = insertOne();
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstanceMapper.updateById(processInstance);
 
         int[] stateArray = new int[]{
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+                ExecutionStatus.RUNNING_EXECUTION.ordinal(),
                 ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
 
         ProcessInstance processInstance1 = processInstanceMapper.queryLastRunningProcess(processInstance.getProcessDefinitionId(), null, null , stateArray);
@@ -327,6 +346,52 @@ public class ProcessInstanceMapperTest {
         Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());
+
+    }
+
+
+    /**
+     * test whether it is in descending order by running duration
+     *
+     * @param processInstances
+     * @return
+     */
+    private boolean isSortedByDuration(List<ProcessInstance> processInstances) {
+        for (int i = 1; i < processInstances.size(); i++) {
+            long d1 = processInstances.get(i).getEndTime().getTime() - processInstances.get(i).getStartTime().getTime();
+            long d2 = processInstances.get(i - 1).getEndTime().getTime() - processInstances.get(i - 1).getStartTime().getTime();
+            if (d1 > d2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * test query top n process instance order by running duration
+     */
+    @Test
+    public void testQueryTopNProcessInstance() {
+        Date startTime1 = new Date(2019, 7, 9, 10, 9, 9);
+        Date endTime1 = new Date(2019, 7, 9, 10, 9, 14);
+        Date startTime2 = new Date(2020, 7, 9, 10, 9, 9);
+        Date endTime2 = new Date(2020, 7, 9, 10, 9, 30);
+        Date startTime3 = new Date(2020, 6, 9, 10, 9, 9);
+        Date endTime3 = new Date(2020, 7, 9, 10, 9, 30);
+        ProcessInstance processInstance1 = insertOne(startTime1, endTime1);
+        ProcessInstance processInstance2 = insertOne(startTime2, endTime2);
+        ProcessInstance processInstance3 = insertOne(startTime3, endTime3);
+        Date start = new Date(2020, 1, 1, 1, 1, 1);
+        Date end = new Date(2021, 1, 1, 1, 1, 1);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(2, start, end,ExecutionStatus.SUCCESS);
+        Assert.assertEquals(2, processInstances.size());
+        Assert.assertTrue(isSortedByDuration(processInstances));
+        for (ProcessInstance processInstance : processInstances) {
+            Assert.assertTrue(processInstance.getState().typeIsSuccess());
+        }
+        processInstanceMapper.deleteById(processInstance1.getId());
+        processInstanceMapper.deleteById(processInstance2.getId());
+        processInstanceMapper.deleteById(processInstance3.getId());
 
     }
 }

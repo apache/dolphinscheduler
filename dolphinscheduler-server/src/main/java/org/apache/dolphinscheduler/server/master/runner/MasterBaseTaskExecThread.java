@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -30,11 +30,14 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 
 
 /**
@@ -171,9 +174,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
                 return true;
             }
-            // task cannot submit when running
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task, but task [%s] state already be running. ", taskInstance.getName()));
+            // task cannot be submitted because its execution state is RUNNING or DELAY.
+            if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
+                    || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION) {
+                logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
                 return true;
             }
             logger.info("task ready to submit: {}", taskInstance);
@@ -271,6 +275,5 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
         return logPath;
     }
-
 
 }

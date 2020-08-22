@@ -55,7 +55,7 @@ public class AlertGroupService extends BaseService{
      */
     public HashMap<String, Object> queryAlertgroup() {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
         List<AlertGroup> alertGroups = alertGroupMapper.queryAllGroupList();
         result.put(Constants.DATA_LIST, alertGroups);
         putMsg(result, Status.SUCCESS);
@@ -74,7 +74,7 @@ public class AlertGroupService extends BaseService{
      */
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -101,7 +101,7 @@ public class AlertGroupService extends BaseService{
      * @return create result code
      */
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, AlertType groupType, String desc) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (checkAdmin(loginUser, result)){
             return result;
@@ -138,7 +138,7 @@ public class AlertGroupService extends BaseService{
      * @return update result code
      */
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, AlertType groupType, String desc) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (checkAdmin(loginUser, result)){
             return result;
@@ -177,9 +177,9 @@ public class AlertGroupService extends BaseService{
      * @param id alert group id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -209,7 +209,7 @@ public class AlertGroupService extends BaseService{
      * @return grant result code
      */
     public Map<String, Object> grantUser(User loginUser, int alertgroupId, String userIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate

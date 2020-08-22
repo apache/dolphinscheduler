@@ -16,29 +16,27 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 /**
  * process instance controller test
  */
 public class ProcessInstanceControllerTest extends AbstractControllerTest {
-    private static Logger logger = LoggerFactory.getLogger(ProcessInstanceControllerTest.class);
 
     @Test
     public void testQueryProcessInstanceList() throws Exception {
@@ -52,30 +50,30 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/list-paging","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/list-paging", "cxc_1113")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1203"))
+                .param("processInstanceId", "1203"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -90,110 +88,108 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("syncDefine", "false");
         paramsMap.add("locations", locations);
         paramsMap.add("connects", "[]");
-//        paramsMap.add("flag", "2");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update", "cxc_1113")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryProcessInstanceById() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-by-id","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-by-id", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1203"))
+                .param("processInstanceId", "1203"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
-
 
 
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-sub-process","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-sub-process", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("taskId","1203"))
+                .param("taskId", "1203"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryParentInstanceBySubId() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-parent-process","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-parent-process", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("subId","1204"))
+                .param("subId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(), result.getCode().intValue());
     }
 
 
     @Test
     public void testViewVariables() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/view-variables","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/view-variables", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1204"))
+                .param("processInstanceId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/delete","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/delete", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1204"))
+                .param("processInstanceId", "1204"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testBatchDeleteProcessInstanceByIds() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/batch-delete","cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/batch-delete", "cxc_1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceIds","1205，1206"))
+                .param("processInstanceIds", "1205，1206"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), result.getCode().intValue());
     }
 }

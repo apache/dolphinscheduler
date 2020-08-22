@@ -38,7 +38,7 @@
                 type="text"
                 v-model="name"
                 :disabled="isDetails"
-                :placeholder="$t('Please enter name(required)')"
+                :placeholder="$t('Please enter name (required)')"
                 maxlength="100"
                 @on-blur="_verifName()"
                 autocomplete="off">
@@ -109,6 +109,20 @@
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
+
+        <!-- Delay execution time -->
+        <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS' && taskType !== 'CONDITIONS' && taskType !== 'DEPENDENT'">
+          <div class="text-box">
+            <span>{{$t('Delay execution time')}}</span>
+          </div>
+          <div class="cont-box">
+            <m-select-input v-model="delayTime" :list="[0,1,5,10]">
+            </m-select-input>
+            <span>({{$t('Minute')}})</span>
+          </div>
+        </div>
+
+        <!-- Branch flow -->
         <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
@@ -127,7 +141,6 @@
             </x-select>
           </div>
         </div>
-
         <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
@@ -162,6 +175,14 @@
           ref="SHELL"
           :backfill-item="backfillItem">
         </m-shell>
+        <!-- waterdrop node -->
+        <m-waterdrop
+          v-if="taskType === 'WATERDROP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="WATERDROP"
+          :backfill-item="backfillItem">
+        </m-waterdrop>
         <!-- sub_process node -->
         <m-sub-process
           v-if="taskType === 'SUB_PROCESS'"
@@ -274,6 +295,7 @@
   import mSql from './tasks/sql'
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
+  import mWaterdrop from './tasks/waterdrop'
   import mSpark from './tasks/spark'
   import mFlink from './tasks/flink'
   import mPython from './tasks/python'
@@ -330,6 +352,8 @@
         maxRetryTimes: '0',
         // Failure retry interval
         retryInterval: '1',
+        // Delay execution time
+        delayTime: '0',
         // Task timeout alarm
         timeout: {},
         // Task priority
@@ -457,6 +481,7 @@
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
@@ -535,6 +560,7 @@
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
@@ -625,6 +651,7 @@
         this.description = o.description
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
+        this.delayTime = o.delayTime
         if(o.conditionResult) {
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
@@ -690,6 +717,7 @@
           dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,
           retryInterval: this.retryInterval,
+          delayTime: this.delayTime,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
@@ -701,6 +729,7 @@
     components: {
       mMr,
       mShell,
+      mWaterdrop,
       mSubProcess,
       mProcedure,
       mSql,
