@@ -101,13 +101,13 @@ const setSvgColor = (e, color) => {
   // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
-      $(v).attr('fill', '#2d8cf0').attr('stroke', '#2d8cf0').attr('stroke-width', 2)
+      $(v).attr('stroke', '#2d8cf0').attr('stroke-width', 2)
     })
   })
 
   // Add color to the selection
   _.map($(e.canvas)[0].childNodes, (v, i) => {
-    $(v).attr('fill', color).attr('stroke', color)
+    $(v).attr('stroke', '#ccc')
     if ($(v).attr('class')) {
       $(v).attr('stroke-width', 2)
     }
