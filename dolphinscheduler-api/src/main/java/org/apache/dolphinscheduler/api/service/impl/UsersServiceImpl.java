@@ -784,8 +784,6 @@ public class UsersServiceImpl extends BaseService implements UsersService {
         Result result = new Result();
         User user = userMapper.queryByUserNameAccurately(userName);
         if (user != null) {
-            logger.error("user {} has exist, can't create again.", userName);
-
             putMsg(result, Status.USER_NAME_EXIST);
         } else {
             putMsg(result, Status.SUCCESS);
