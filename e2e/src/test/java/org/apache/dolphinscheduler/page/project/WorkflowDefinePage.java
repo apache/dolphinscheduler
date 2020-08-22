@@ -131,6 +131,11 @@ public class WorkflowDefinePage extends PageCommon {
         System.out.println("move to Dag Element ");
         moveToDragElement(WorkflowDefineLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
+        System.out.println("copy task");
+        mouseRightClickElement(WorkflowDefineLocator.MOUSE_RIGHT_CLICK);
+        clickButton(WorkflowDefineLocator.COPY_TASK);
+        clickButton(WorkflowDefineLocator.CLICK_LINE);
+        mouseMovePosition(WorkflowDefineLocator.LINE_SOURCES_TASK,WorkflowDefineLocator.LINE_TARGET_TASK);
         return ifTitleContains(WorkflowDefineData.CREATE_WORKFLOW_TITLE);
     }
 

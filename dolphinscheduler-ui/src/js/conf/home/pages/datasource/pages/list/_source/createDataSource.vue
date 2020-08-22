@@ -227,6 +227,10 @@
           {
             value: 'DB2',
             label: 'DB2'
+          },
+          {
+            value: 'PRESTO',
+            label: 'PRESTO'
           }
         ]
       }
@@ -432,6 +436,9 @@
             break
           case 'DB2':
             defaultPort = '50000'
+            break
+          case 'PRESTO':
+            defaultPort = '8080'
             break
           default:
             break

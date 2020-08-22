@@ -174,10 +174,16 @@ public enum Status {
     DELETE_WORKER_GROUP_BY_ID_FAIL(10145,"delete worker group by id fail, for there are {0} process instances in executing using it", "删除Worker分组失败，有[{0}]个运行中的工作流实例正在使用"),
     QUERY_WORKER_GROUP_FAIL(10146,"query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147,"delete worker group fail ", "删除worker分组失败"),
-    COPY_PROCESS_DEFINITION_ERROR(10148,"copy process definition error", "复制工作流错误"),
-    USER_DISABLED(10149,"The current user is disabled", "当前用户已停用"),
-    FORCE_TASK_SUCCESS_ERROR(10150, "force task success error", "强制成功任务实例错误"),
-    TASK_INSTANCE_STATE_OPETATION_ERROR(10151, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
+    USER_DISABLED(10148,"The current user is disabled", "当前用户已停用"),
+    COPY_PROCESS_DEFINITION_ERROR(10149,"copy process definition from {0} to {1} error : {2}", "从{0}复制工作流到{1}错误 : {2}"),
+    MOVE_PROCESS_DEFINITION_ERROR(10150,"move process definition from {0} to {1} error : {2}", "从{0}移动工作流到{1}错误 : {2}"),
+    QUERY_USER_CREATED_PROJECT_ERROR(10151,"query user created project error error", "查询用户创建的项目错误"),
+    PROCESS_DEFINITION_IDS_IS_EMPTY(10152,"process definition ids is empty", "工作流IDS不能为空"),
+    BATCH_COPY_PROCESS_DEFINITION_ERROR(10153,"batch copy process definition error", "复制工作流错误"),
+    BATCH_MOVE_PROCESS_DEFINITION_ERROR(10154,"batch move process definition error", "移动工作流错误"),
+    QUERY_WORKFLOW_LINEAGE_ERROR(10155,"query workflow lineage error", "查询血缘失败"),
+    FORCE_TASK_SUCCESS_ERROR(10156, "force task success error", "强制成功任务实例错误"),
+    TASK_INSTANCE_STATE_OPETATION_ERROR(10157, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -252,7 +258,8 @@ public enum Status {
 
 
     COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error", "查询各状态任务实例数错误"),
-
+    NEGTIVE_SIZE_NUMBER_ERROR(80002,"query size number error","查询size错误"),
+    START_TIME_BIGGER_THAN_END_TIME_ERROR(80003,"start time bigger than end time error","开始时间在结束时间之后错误"),
     QUEUE_COUNT_ERROR(90001,"queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error", "获取kerberos启动状态错误"),

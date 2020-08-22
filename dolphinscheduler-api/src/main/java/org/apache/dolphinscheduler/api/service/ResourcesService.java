@@ -86,7 +86,7 @@ public class ResourcesService extends BaseService {
      * @param currentDir current directory
      * @return create directory result
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result createDirectory(User loginUser,
                                  String name,
                                  String description,
@@ -160,7 +160,7 @@ public class ResourcesService extends BaseService {
      * @param currentDir current directory
      * @return create result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result createResource(User loginUser,
                                  String name,
                                  String desc,
@@ -288,7 +288,7 @@ public class ResourcesService extends BaseService {
      * @param type          resource type
      * @return  update result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result updateResource(User loginUser,
                                  int resourceId,
                                  String name,
@@ -402,7 +402,7 @@ public class ResourcesService extends BaseService {
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<>(5);
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -447,7 +447,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
         Page<Resource> page = new Page(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -548,7 +548,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
@@ -571,7 +571,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
             userId = 0;
@@ -827,7 +827,7 @@ public class ResourcesService extends BaseService {
      * @param content content
      * @return create result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory) {
         Result result = new Result();
         // if resource upload startup
@@ -889,7 +889,7 @@ public class ResourcesService extends BaseService {
      * @param content content
      * @return update result cod
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 
@@ -1094,7 +1094,7 @@ public class ResourcesService extends BaseService {
      * @return unauthorized result code
      */
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (checkAdmin(loginUser, result)) {
             return result;
@@ -1146,7 +1146,7 @@ public class ResourcesService extends BaseService {
      * @return authorized result
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)){
             return result;
         }
