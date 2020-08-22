@@ -17,12 +17,16 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,6 +35,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +47,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class TaskInstanceControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(TaskInstanceControllerTest.class);
+
+    @MockBean
+    private TaskInstanceService taskInstanceService;
 
     @Test
     public void testQueryTaskListPaging() throws Exception {
@@ -72,6 +80,11 @@ public class TaskInstanceControllerTest extends AbstractControllerTest{
     public void forceSingleTaskSuccess() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskInstanceId","104");
+
+        Map<String, Object> mockResult = new HashMap<>(5);
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.MSG, Status.SUCCESS.getMsg());
+        when(taskInstanceService.forceSingleTaskSuccess(any(User.class), anyString(), anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success","test")
                 .header(SESSION_ID, sessionId)
