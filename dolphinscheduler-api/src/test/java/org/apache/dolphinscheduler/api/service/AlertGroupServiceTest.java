@@ -76,7 +76,7 @@ public class AlertGroupServiceTest {
 
 
     @Test
-    public  void testQueryAlertgroup(){
+    public  void testQueryAlertGroup(){
 
         Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
         HashMap<String, Object> result= alertGroupService.queryAlertgroup();

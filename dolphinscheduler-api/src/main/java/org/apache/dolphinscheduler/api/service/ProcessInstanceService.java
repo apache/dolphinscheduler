@@ -16,8 +16,28 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
+import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
+import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -31,14 +51,26 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,22 +78,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * process instance service
  */
 @Service
-public class ProcessInstanceService extends BaseDAGService {
+public class ProcessInstanceService extends BaseService {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceService.class);
@@ -99,6 +123,53 @@ public class ProcessInstanceService extends BaseDAGService {
     UsersService usersService;
 
     /**
+     * return top n SUCCESS process instance order by running time which started between startTime and endTime
+     * @param loginUser
+     * @param projectName
+     * @param size
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime) {
+        Map<String, Object> result = new HashMap<>();
+
+        Project project = projectMapper.queryByName(projectName);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        if (0 > size) {
+            putMsg(result, Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
+            return result;
+        }
+        if (Objects.isNull(startTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.START_TIME);
+            return result;
+        }
+        Date start = DateUtils.stringToDate(startTime);
+        if (Objects.isNull(endTime)) {
+            putMsg(result, Status.DATA_IS_NULL, Constants.END_TIME);
+            return result;
+        }
+        Date end = DateUtils.stringToDate(endTime);
+        if(start == null || end == null) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
+            return result;
+        }
+        if (start.getTime() > end.getTime()) {
+            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
+            return result;
+        }
+
+        List<ProcessInstance> processInstances = processInstanceMapper.queryTopNProcessInstance(size, start, end, ExecutionStatus.SUCCESS);
+        result.put(DATA_LIST, processInstances);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+    /**
      * query process instance by id
      *
      * @param loginUser login user
@@ -107,7 +178,7 @@ public class ProcessInstanceService extends BaseDAGService {
      * @return process instance detail
      */
     public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -120,7 +191,7 @@ public class ProcessInstanceService extends BaseDAGService {
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
-        result.put(Constants.DATA_LIST, processInstance);
+        result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -146,7 +217,7 @@ public class ProcessInstanceService extends BaseDAGService {
                                                         String searchVal, String executorName,ExecutionStatus stateType, String host,
                                                         Integer pageNo, Integer pageSize) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -195,7 +266,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
         pageInfo.setLists(processInstances);
-        result.put(Constants.DATA_LIST, pageInfo);
+        result.put(DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -226,7 +297,7 @@ public class ProcessInstanceService extends BaseDAGService {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
-        result.put(Constants.DATA_LIST, resultMap);
+        result.put(DATA_LIST, resultMap);
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -315,7 +386,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("subProcessInstanceId", subWorkflowInstance.getId());
-        result.put(Constants.DATA_LIST, dataMap);
+        result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -454,7 +525,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("parentWorkflowInstance", parentWorkflowInstance.getId());
-        result.put(Constants.DATA_LIST, dataMap);
+        result.put(DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -466,10 +537,10 @@ public class ProcessInstanceService extends BaseDAGService {
      * @param processInstanceId process instance id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -509,7 +580,7 @@ public class ProcessInstanceService extends BaseDAGService {
      * @return variables data
      */
     public Map<String, Object> viewVariables(Integer processInstanceId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
 
@@ -571,7 +642,7 @@ public class ProcessInstanceService extends BaseDAGService {
         resultMap.put(GLOBAL_PARAMS, globalParams);
         resultMap.put(LOCAL_PARAMS, localUserDefParams);
 
-        result.put(Constants.DATA_LIST, resultMap);
+        result.put(DATA_LIST, resultMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -621,9 +692,28 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         ganttDto.setTasks(taskList);
 
-        result.put(Constants.DATA_LIST, ganttDto);
+        result.put(DATA_LIST, ganttDto);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * process instance to DAG
+     *
+     * @param processInstance input process instance
+     * @return process instance dag.
+     */
+    private static DAG<String, TaskNode, TaskNodeRelation> processInstance2DAG(ProcessInstance processInstance) {
+
+        String processDefinitionJson = processInstance.getProcessInstanceJson();
+
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+
+        List<TaskNode> taskNodeList = processData.getTasks();
+
+        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
+
+        return DagHelper.buildDagGraph(processDag);
     }
 
 }

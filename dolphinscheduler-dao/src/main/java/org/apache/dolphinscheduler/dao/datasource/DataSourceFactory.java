@@ -54,6 +54,8 @@ public class DataSourceFactory {
           return JSONUtils.parseObject(parameter, SQLServerDataSource.class);
         case DB2:
           return JSONUtils.parseObject(parameter, DB2ServerDataSource.class);
+        case PRESTO:
+          return JSONUtils.parseObject(parameter, PrestoDataSource.class);
         default:
           return null;
       }
@@ -93,6 +95,9 @@ public class DataSourceFactory {
         break;
       case DB2:
         Class.forName(Constants.COM_DB2_JDBC_DRIVER);
+        break;
+      case PRESTO:
+        Class.forName(Constants.COM_PRESTO_JDBC_DRIVER);
         break;
       default:
         logger.error("not support sql type: {},can't load class", dbType);

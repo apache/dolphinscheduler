@@ -132,7 +132,7 @@
                         :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
                         @click="_stop(item,$index)"
                         :icon="item.state === 'STOP' ? 'ans-icon-pause-solid' : 'ans-icon-stop'"
-                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
+                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
                         size="xsmall"
@@ -140,7 +140,7 @@
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
                         :icon="item.state === 'PAUSE' ? 'ans-icon-pause-solid' : 'ans-icon-pause'"
-                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
+                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
                       placement="top-end"

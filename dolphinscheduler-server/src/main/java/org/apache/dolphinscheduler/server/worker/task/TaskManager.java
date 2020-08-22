@@ -50,6 +50,8 @@ public class TaskManager {
     switch (EnumUtils.getEnum(TaskType.class,taskExecutionContext.getTaskType())) {
         case SHELL:
         return new ShellTask(taskExecutionContext, logger);
+      case WATERDROP:
+        return new ShellTask(taskExecutionContext, logger);
       case PROCEDURE:
         return new ProcedureTask(taskExecutionContext, logger);
       case SQL:

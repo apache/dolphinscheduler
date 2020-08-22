@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.server.registry.DependencyConfig;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -35,7 +36,8 @@ import java.util.Date;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, TaskResponseService.class})
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, TaskResponseService.class,
+        CuratorZookeeperClient.class})
 public class TaskResponseServiceTest {
 
     @Autowired
@@ -43,7 +45,7 @@ public class TaskResponseServiceTest {
 
     @Test
     public void testAdd(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXEUTION, new Date(),
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
                 "", "", "", 1);
         taskResponseService.addResponse(taskResponseEvent);
         Assert.assertTrue(taskResponseService.getEventQueue().size() == 1);
@@ -57,7 +59,7 @@ public class TaskResponseServiceTest {
 
     @Test
     public void testStop(){
-        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXEUTION, new Date(),
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
                 "", "", "", 1);
         taskResponseService.addResponse(taskResponseEvent);
         taskResponseService.stop();

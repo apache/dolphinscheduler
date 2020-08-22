@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +133,7 @@ public abstract class BaseDataSource {
         case MYSQL:
         case ORACLE:
         case POSTGRESQL:
+        case PRESTO:
           separator = "?";
           break;
         case DB2:
@@ -182,8 +184,12 @@ public abstract class BaseDataSource {
     this.user = user;
   }
 
+  /**
+   * password need decode
+   * @return
+   */
   public String getPassword() {
-    return password;
+    return CommonUtils.decodePassword(password);
   }
 
   public void setPassword(String password) {

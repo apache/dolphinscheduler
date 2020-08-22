@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
-
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
 
 import java.util.HashMap;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
 /**
  * running status for workflow and task nodes
- *
  */
 public enum ExecutionStatus {
 
@@ -41,10 +40,11 @@ public enum ExecutionStatus {
      * 9 kill
      * 10 waiting thread
      * 11 waiting depend node complete
-     * 12 forced success
+     * 12 delay execution
+     * 13 forced success
      */
     SUBMITTED_SUCCESS(0, "submit success"),
-    RUNNING_EXEUTION(1, "running"),
+    RUNNING_EXECUTION(1, "running"),
     READY_PAUSE(2, "ready pause"),
     PAUSE(3, "pause"),
     READY_STOP(4, "ready stop"),
@@ -55,9 +55,10 @@ public enum ExecutionStatus {
     KILL(9, "kill"),
     WAITTING_THREAD(10, "waiting thread"),
     WAITTING_DEPEND(11, "waiting depend node complete"),
-    FORCED_SUCCESS(12, "forced success");
+    DELAY_EXECUTION(12, "delay execution")，
+    FORCED_SUCCESS(13, "forced success");
 
-    ExecutionStatus(int code, String descp){
+    ExecutionStatus(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -66,19 +67,19 @@ public enum ExecutionStatus {
     private final int code;
     private final String descp;
 
-    private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP=new HashMap<>();
+    private static HashMap<Integer, ExecutionStatus> EXECUTION_STATUS_MAP = new HashMap<>();
 
     static {
-       for (ExecutionStatus executionStatus:ExecutionStatus.values()){
-           EXECUTION_STATUS_MAP.put(executionStatus.code,executionStatus);
-       }
+        for (ExecutionStatus executionStatus : ExecutionStatus.values()) {
+            EXECUTION_STATUS_MAP.put(executionStatus.code, executionStatus);
+        }
     }
 
  /**
   * status is success
   * @return status
   */
-   public boolean typeIsSuccess(){
+   public boolean typeIsSuccess() {
      return this == SUCCESS || this == FORCED_SUCCESS;
    }
 
@@ -86,7 +87,7 @@ public enum ExecutionStatus {
   * status is failure
   * @return status
   */
-   public boolean typeIsFailure(){
+   public boolean typeIsFailure() {
      return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
    }
 
@@ -94,7 +95,7 @@ public enum ExecutionStatus {
   * status is finished
   * @return status
   */
-   public boolean typeIsFinished(){
+   public boolean typeIsFinished() {
 
        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
                || typeIsStop();
@@ -102,41 +103,47 @@ public enum ExecutionStatus {
 
     /**
      * status is waiting thread
+     *
      * @return status
      */
-   public boolean typeIsWaitingThread(){
-       return this == WAITTING_THREAD;
-   }
+    public boolean typeIsWaitingThread() {
+        return this == WAITTING_THREAD;
+    }
 
     /**
      * status is pause
+     *
      * @return status
      */
-   public boolean typeIsPause(){
-       return this == PAUSE;
-   }
+    public boolean typeIsPause() {
+        return this == PAUSE;
+    }
+
     /**
      * status is pause
+     *
      * @return status
      */
-    public boolean typeIsStop(){
+    public boolean typeIsStop() {
         return this == STOP;
     }
 
     /**
      * status is running
+     *
      * @return status
      */
-   public boolean typeIsRunning(){
-       return this == RUNNING_EXEUTION || this == WAITTING_DEPEND;
-   }
+    public boolean typeIsRunning() {
+        return this == RUNNING_EXECUTION || this == WAITTING_DEPEND || this == DELAY_EXECUTION;
+    }
 
     /**
      * status is cancel
+     *
      * @return status
      */
-    public boolean typeIsCancel(){
-        return this == KILL || this == STOP ;
+    public boolean typeIsCancel() {
+        return this == KILL || this == STOP;
     }
 
     public int getCode() {
@@ -147,10 +154,10 @@ public enum ExecutionStatus {
         return descp;
     }
 
-    public static ExecutionStatus of(int status){
-       if(EXECUTION_STATUS_MAP.containsKey(status)){
-           return EXECUTION_STATUS_MAP.get(status);
-       }
+    public static ExecutionStatus of(int status) {
+        if (EXECUTION_STATUS_MAP.containsKey(status)) {
+            return EXECUTION_STATUS_MAP.get(status);
+        }
         throw new IllegalArgumentException("invalid status : " + status);
     }
 }

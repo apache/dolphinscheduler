@@ -17,6 +17,9 @@
 package org.apache.dolphinscheduler.server.registry;
 
 
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -24,6 +27,7 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -33,16 +37,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Map;
-import java.util.Set;
-
 /**
  * zookeeper node manager test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
-        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class})
+        ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, CuratorZookeeperClient.class})
 public class ZookeeperNodeManagerTest {
 
     @Autowired
@@ -75,6 +76,7 @@ public class ZookeeperNodeManagerTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(masterNodes));
         Assert.assertEquals(1, masterNodes.size());
         Assert.assertEquals(NetUtils.getHost() + ":" + masterConfig.getListenPort(), masterNodes.iterator().next());
+        workerRegistry.unRegistry();
     }
 
     @Test
@@ -88,6 +90,7 @@ public class ZookeeperNodeManagerTest {
         Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
         Assert.assertEquals(1, workerGroupNodes.size());
         Assert.assertEquals("default".trim(), workerGroupNodes.keySet().iterator().next());
+        workerRegistry.unRegistry();
     }
 
     @Test
@@ -103,5 +106,6 @@ public class ZookeeperNodeManagerTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(workerNodes));
         Assert.assertEquals(1, workerNodes.size());
         Assert.assertEquals(NetUtils.getHost() + ":" + workerConfig.getListenPort(), workerNodes.iterator().next());
+        workerRegistry.unRegistry();
     }
 }

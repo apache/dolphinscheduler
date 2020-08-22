@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -95,9 +94,8 @@ public class SchedulerService extends BaseService {
      * @param receiversCc receivers cc
      * @param workerGroup worker group
      * @return create result code
-     * @throws IOException ioexception
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName,
                                               Integer processDefineId,
                                               String schedule,
@@ -107,7 +105,7 @@ public class SchedulerService extends BaseService {
                                               String receivers,
                                               String receiversCc,
                                               Priority processInstancePriority,
-                                              String workerGroup) throws IOException {
+                                              String workerGroup) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -192,9 +190,8 @@ public class SchedulerService extends BaseService {
      * @param receivers receivers
      * @param scheduleStatus schedule status
      * @return update result code
-     * @throws IOException ioexception
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> updateSchedule(User loginUser,
                                               String projectName,
                                               Integer id,
@@ -206,7 +203,7 @@ public class SchedulerService extends BaseService {
                                               String receiversCc,
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
-                                              String workerGroup) throws IOException {
+                                              String workerGroup) {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -296,7 +293,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleStatus  schedule status
      * @return publish result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> setScheduleState(User loginUser,
                                                 String projectName,
                                                 Integer id,
@@ -455,7 +452,7 @@ public class SchedulerService extends BaseService {
      * @return schedule list
      */
     public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
@@ -537,7 +534,7 @@ public class SchedulerService extends BaseService {
      */
     public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -586,7 +583,7 @@ public class SchedulerService extends BaseService {
      * @return the next five fire time
      */
     public Map<String,Object> previewSchedule(User loginUser, String projectName, String schedule) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         CronExpression cronExpression;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();

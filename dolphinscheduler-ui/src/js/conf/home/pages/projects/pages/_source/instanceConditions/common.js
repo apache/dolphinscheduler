@@ -28,7 +28,7 @@ const stateType = [
     code: 'SUBMITTED_SUCCESS',
     label: `${i18n.$t('Submitted successfully')}`
   }, {
-    code: 'RUNNING_EXEUTION',
+    code: 'RUNNING_EXECUTION',
     label: `${i18n.$t('Running')}`
   }, {
     code: 'READY_PAUSE',
@@ -60,6 +60,9 @@ const stateType = [
   }, {
     code: 'WAITTING_DEPEND',
     label: `${i18n.$t('Waiting for dependency to complete')}`
+  }, {
+    code: 'DELAY_EXECUTION',
+    label: `${i18n.$t('Delay execution')}`
   }
 ]
 

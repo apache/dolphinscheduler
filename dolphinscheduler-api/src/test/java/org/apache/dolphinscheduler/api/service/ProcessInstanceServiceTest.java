@@ -16,16 +16,43 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DependResult;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,22 +60,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.ParseException;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessInstanceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceServiceTest.class);
 
     @InjectMocks
     ProcessInstanceService processInstanceService;
@@ -57,7 +73,7 @@ public class ProcessInstanceServiceTest {
     ProjectMapper projectMapper;
 
     @Mock
-    ProjectService projectService;
+    ProjectServiceImpl projectService;
 
     @Mock
     ProcessService processService;
@@ -78,9 +94,7 @@ public class ProcessInstanceServiceTest {
     TaskInstanceMapper taskInstanceMapper;
 
     @Mock
-    LoggerService loggerService;
-
-
+    LoggerServiceImpl loggerService;
 
     @Mock
     UsersService usersService;
@@ -96,7 +110,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryProcessInstanceList() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -148,10 +162,42 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testQueryProcessInstanceById() {
+    public void testQueryTopNLongestRunningProcessInstance() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+        int size = 10;
+        String startTime = "2020-01-01 00:00:00";
+        String endTime = "2020-08-02 00:00:00";
+        Date start = DateUtils.getScheduleDate(startTime);
+        Date end = DateUtils.getScheduleDate(endTime);
+
+        //project auth fail
+        when(projectMapper.queryByName(projectName)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
+        Map<String, Object> proejctAuthFailRes = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        ProcessInstance processInstance = getProcessInstance();
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
+        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
+        when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
+        Map<String, Object> successRes = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testQueryProcessInstanceById() {
+        String projectName = "project_test1";
+        User loginUser = getAdminUser();
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -189,7 +235,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryTaskListByProcessId() throws IOException {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -238,7 +284,7 @@ public class ProcessInstanceServiceTest {
     public void testQuerySubProcessInstanceByTaskId() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -284,7 +330,7 @@ public class ProcessInstanceServiceTest {
     public void testUpdateProcessInstance() throws ParseException {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -307,7 +353,7 @@ public class ProcessInstanceServiceTest {
 
         //process instance not finish
         when(processService.findProcessInstanceDetailById(1)).thenReturn(processInstance);
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         Map<String, Object> processInstanceNotFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstanceNotFinishRes.get(Constants.STATUS));
@@ -340,7 +386,7 @@ public class ProcessInstanceServiceTest {
     public void testQueryParentInstanceBySubId() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -381,7 +427,7 @@ public class ProcessInstanceServiceTest {
     public void testDeleteProcessInstanceById() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
@@ -414,7 +460,7 @@ public class ProcessInstanceServiceTest {
         ProcessInstance processInstance = getProcessInstance();
         processInstance.setProcessInstanceJson(shellJson);
         TaskInstance taskInstance = getTaskInstance();
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         when(taskInstanceMapper.queryByInstanceIdAndName(Mockito.anyInt(), Mockito.any())).thenReturn(taskInstance);

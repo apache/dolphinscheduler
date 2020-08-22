@@ -83,7 +83,7 @@ public class TaskInstanceService extends BaseService {
                                                   Integer processInstanceId, String taskName, String executorName, String startDate,
                                                   String endDate, String searchVal, ExecutionStatus stateType,String host,
                                                   Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);

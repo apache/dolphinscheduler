@@ -210,3 +210,4 @@ xmlenc-0.52.jar
 xz-1.0.jar
 zookeeper-3.4.14.jar
 guava-retrying-2.0.0.jar
+presto-jdbc-0.238.1.jar

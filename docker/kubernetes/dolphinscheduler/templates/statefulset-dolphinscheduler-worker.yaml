@@ -162,6 +162,11 @@ spec:
                 configMapKeyRef:
                   name: {{ include "dolphinscheduler.fullname" . }}-worker
                   key: WORKER_GROUP
+            - name: WORKER_WEUGHT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "dolphinscheduler.fullname" . }}-worker
+                  key: WORKER_WEIGHT
             - name: DOLPHINSCHEDULER_DATA_BASEDIR_PATH
               valueFrom:
                 configMapKeyRef:
@@ -224,6 +229,12 @@ spec:
               value: "{{ template "dolphinscheduler.zookeeper.quorum" . }}"
               {{- else }}
               value: {{ .Values.externalZookeeper.zookeeperQuorum }}
+              {{- end }}
+            - name: ZOOKEEPER_ROOT
+              {{- if .Values.zookeeper.enabled }}
+              value: "/dolphinscheduler"
+              {{- else }}
+              value: {{ .Values.externalZookeeper.zookeeperRoot }}
               {{- end }}
             - name: RESOURCE_STORAGE_TYPE
               valueFrom:

@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,6 +48,7 @@ public class MySQLDataSourceTest {
         Assert.assertEquals("test_pwd?", dataSource.getPassword());
     }
 
+
     @Test
     public void testFilterOther(){
         MySQLDataSource dataSource = new MySQLDataSource();
@@ -61,4 +64,36 @@ public class MySQLDataSourceTest {
         other = dataSource.filterOther("serverTimezone=Asia/Shanghai&autoDeserialize=true&characterEncoding=utf8");
         Assert.assertEquals("serverTimezone=Asia/Shanghai&characterEncoding=utf8", other);
     }
+
+    @Test
+    public void testGetPasswordWithDecodePassword(){
+        MySQLDataSource dataSource = new MySQLDataSource();
+        String password= "";
+        dataSource.setPassword(password);
+        Assert.assertEquals("", dataSource.getPassword());
+        password= "IUAjJCVeJipNVEl6TkRVMg==";
+        dataSource.setPassword(password);
+        Assert.assertNotNull(dataSource.getPassword());
+        Assert.assertNotNull(dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"true");
+        Assert.assertEquals("123456", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        Assert.assertEquals("123456", dataSource.getPassword());
+        Assert.assertEquals("123456", dataSource.getPassword());
+        Assert.assertEquals("123456", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        PropertyUtils.setValue(Constants.DATASOURCE_ENCRYPTION_ENABLE,"false");
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+
+        dataSource.setPassword(password);
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+        Assert.assertEquals("IUAjJCVeJipNVEl6TkRVMg==", dataSource.getPassword());
+
+    }
+
 }
