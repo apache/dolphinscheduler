@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.*;
+
+import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -27,19 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +41,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 @RunWith(PowerMockRunner.class)
 public class DataAnalysisServiceTest {
@@ -169,6 +165,58 @@ public class DataAnalysisServiceTest {
         result = dataAnalysisService.countCommandState(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
+    }
+
+    @Test
+    public void testCountQueueState() {
+        // when project check fail then return nothing
+        Map<String, Object> result1 = dataAnalysisService.countCommandState(user, 2, null, null);
+        Assert.assertTrue(result1.isEmpty());
+
+        // when all date in illegal format then return error message
+        String startDate2 = "illegalDateString";
+        String endDate2 = "illegalDateString";
+        Map<String, Object> result2 = dataAnalysisService.countCommandState(user, 0, startDate2, endDate2);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result2.get(Constants.STATUS));
+
+        // when one of date in illegal format then return error message
+        String startDate3 = "2020-08-22 09:23:10";
+        String endDate3 = "illegalDateString";
+        Map<String, Object> result3 = dataAnalysisService.countCommandState(user, 0, startDate3, endDate3);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result3.get(Constants.STATUS));
+
+        // when one of date in illegal format then return error message
+        String startDate4 = "illegalDateString";
+        String endDate4 = "2020-08-22 09:23:10";
+        Map<String, Object> result4 = dataAnalysisService.countCommandState(user, 0, startDate4, endDate4);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result4.get(Constants.STATUS));
+
+        // when no command found then return all count are 0
+        Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.emptyList());
+        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());
+        Map<String, Object> result5 = dataAnalysisService.countCommandState(user, 0, null, null);
+        assertThat(result5.get(Constants.STATUS)).isEqualTo(Status.SUCCESS);
+        assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("errorCount").allMatch(count -> count.equals(0));
+        assertThat(result5.get(Constants.DATA_LIST)).asList().extracting("normalCount").allMatch(count -> count.equals(0));
+
+        // when command found then return combination result
+        CommandCount normalCommandCount = new CommandCount();
+        normalCommandCount.setCommandType(CommandType.START_PROCESS);
+        normalCommandCount.setCount(10);
+        CommandCount errorCommandCount = new CommandCount();
+        errorCommandCount.setCommandType(CommandType.START_PROCESS);
+        errorCommandCount.setCount(5);
+        Mockito.when(commandMapper.countCommandState(anyInt(), any(), any(), any())).thenReturn(Collections.singletonList(normalCommandCount));
+        Mockito.when(errorCommandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.singletonList(errorCommandCount));
+
+        Map<String, Object> result6 = dataAnalysisService.countCommandState(user, 0, null, null);
+
+        assertThat(result6.get(Constants.STATUS)).isEqualTo(Status.SUCCESS);
+        CommandStateCount commandStateCount = new CommandStateCount();
+        commandStateCount.setCommandState(CommandType.START_PROCESS);
+        commandStateCount.setNormalCount(10);
+        commandStateCount.setErrorCount(5);
+        assertThat(result6.get(Constants.DATA_LIST)).asList().containsOnlyOnce(commandStateCount);
     }
 
     /**
