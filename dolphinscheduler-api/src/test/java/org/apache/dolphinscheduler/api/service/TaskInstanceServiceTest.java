@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -48,8 +49,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -57,7 +56,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
-    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceTest.class);
 
     @InjectMocks
     private TaskInstanceService taskInstanceService;
@@ -78,7 +76,7 @@ public class TaskInstanceServiceTest {
     ProcessInstanceService processInstanceService;
 
     @Mock
-    UsersService usersService;
+    UsersServiceImpl usersService;
 
     @Test
     public void queryTaskListPaging() {
