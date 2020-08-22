@@ -14,12 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
@@ -36,6 +32,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,7 +74,6 @@ public class TenantServiceTest {
     private static final String tenantCode = "TenantServiceTest";
 
     private static final String tenantName = "TenantServiceTest";
-
 
     @Test
     public void testCreateTenant() {
@@ -258,6 +259,5 @@ public class TenantServiceTest {
         processDefinitions.add(processDefinition);
         return processDefinitions;
     }
-
 
 }

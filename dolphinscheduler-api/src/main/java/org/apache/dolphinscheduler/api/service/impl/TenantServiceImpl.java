@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -40,6 +35,12 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,10 +83,10 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
-            String tenantCode,
-            String tenantName,
-            int queueId,
-            String desc) throws Exception {
+                                            String tenantCode,
+                                            String tenantName,
+                                            int queueId,
+                                            String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -166,7 +167,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @throws Exception exception
      */
     public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
-            String desc) throws Exception {
+                                            String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);

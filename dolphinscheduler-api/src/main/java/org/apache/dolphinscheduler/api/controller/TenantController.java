@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.controller;
 
+package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
@@ -24,8 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAG
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_CODE_ERROR;
 
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -33,6 +31,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,10 +70,10 @@ public class TenantController extends BaseController {
     /**
      * create tenant
      *
-     * @param loginUser   login user
-     * @param tenantCode  tenant code
-     * @param tenantName  tenant name
-     * @param queueId     queue id
+     * @param loginUser login user
+     * @param tenantCode tenant code
+     * @param tenantName tenant name
+     * @param queueId queue id
      * @param description description
      * @return create result code
      */
@@ -104,8 +105,8 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return tenant list page
      */
     @ApiOperation(value = "queryTenantlistPaging", notes = "QUERY_TENANT_LIST_PAGING_NOTES")
@@ -153,11 +154,11 @@ public class TenantController extends BaseController {
     /**
      * udpate tenant
      *
-     * @param loginUser   login user
-     * @param id          tennat id
-     * @param tenantCode  tennat code
-     * @param tenantName  tennat name
-     * @param queueId     queue id
+     * @param loginUser login user
+     * @param id tennat id
+     * @param tenantCode tennat code
+     * @param tenantName tennat name
+     * @param queueId queue id
      * @param description description
      * @return update result code
      */
@@ -189,7 +190,7 @@ public class TenantController extends BaseController {
      * delete tenant by id
      *
      * @param loginUser login user
-     * @param id        tenant id
+     * @param id tenant id
      * @return delete result code
      */
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
@@ -207,11 +208,10 @@ public class TenantController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * verify tenant code
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
@@ -228,6 +228,5 @@ public class TenantController extends BaseController {
                 loginUser.getUserName(), tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
     }
-
 
 }
