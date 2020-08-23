@@ -14,30 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import javafx.concurrent.Task;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.internal.junit.ExceptionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -60,15 +65,17 @@ public class TaskInstanceMapperTest {
 
     /**
      * insert
+     *
      * @return TaskInstance
      */
-    private TaskInstance insertOne(){
+    private TaskInstance insertOne() {
         //insertOne
         return insertOne("us task", 1, ExecutionStatus.RUNNING_EXECUTION, TaskType.SHELL.toString());
     }
 
     /**
      * construct a task instance and then insert
+     *
      * @param taskName
      * @param processInstanceId
      * @param state
@@ -96,7 +103,7 @@ public class TaskInstanceMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         TaskInstance taskInstance = insertOne();
         //update
@@ -109,7 +116,7 @@ public class TaskInstanceMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         TaskInstance taskInstance = insertOne();
         int delete = taskInstanceMapper.deleteById(taskInstance.getId());
         Assert.assertEquals(1, delete);
@@ -136,8 +143,8 @@ public class TaskInstanceMapperTest {
         task.setProcessInstanceId(110);
         taskInstanceMapper.updateById(task);
         List<Integer> taskInstances = taskInstanceMapper.queryTaskByProcessIdAndState(
-                task.getProcessInstanceId(),
-                ExecutionStatus.RUNNING_EXECUTION.ordinal()
+            task.getProcessInstanceId(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -156,19 +163,19 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task2);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.findValidTaskListByProcessId(
-                task.getProcessInstanceId(),
-                Flag.YES
+            task.getProcessInstanceId(),
+            Flag.YES
         );
 
         task2.setFlag(Flag.NO);
         taskInstanceMapper.updateById(task2);
         List<TaskInstance> taskInstances1 = taskInstanceMapper.findValidTaskListByProcessId(task.getProcessInstanceId(),
-                Flag.NO);
+            Flag.NO);
 
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
-        Assert.assertNotEquals(taskInstances1.size(), 0 );
+        Assert.assertNotEquals(taskInstances1.size(), 0);
     }
 
     /**
@@ -181,7 +188,7 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.queryByHostAndStatus(
-                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()}
+            task.getHost(), new int[] {ExecutionStatus.RUNNING_EXECUTION.ordinal()}
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -197,9 +204,9 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         int setResult = taskInstanceMapper.setFailoverByHostAndStateArray(
-                task.getHost(),
-                new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()},
-                ExecutionStatus.NEED_FAULT_TOLERANCE
+            task.getHost(),
+            new int[] {ExecutionStatus.RUNNING_EXECUTION.ordinal()},
+            ExecutionStatus.NEED_FAULT_TOLERANCE
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(setResult, 0);
@@ -215,8 +222,8 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndName(
-                task.getProcessInstanceId(),
-                task.getName()
+            task.getProcessInstanceId(),
+            task.getName()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstance, null);
@@ -236,12 +243,12 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         int countTask = taskInstanceMapper.countTask(
-                new Integer[0],
-                new int[0]
+            new Integer[0],
+            new int[0]
         );
         int countTask2 = taskInstanceMapper.countTask(
-                new Integer[]{definition.getProjectId()},
-                new int[]{task.getId()}
+            new Integer[] {definition.getProjectId()},
+            new int[] {task.getId()}
         );
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
@@ -266,8 +273,8 @@ public class TaskInstanceMapperTest {
 
 
         List<ExecuteStatusCount> count = taskInstanceMapper.countTaskInstanceStateByUser(
-                null, null,
-                new Integer[]{definition.getProjectId()}
+            null, null,
+            new Integer[] {definition.getProjectId()}
         );
 
         processDefinitionMapper.deleteById(definition.getId());
@@ -298,17 +305,17 @@ public class TaskInstanceMapperTest {
         task.setProcessInstanceId(processInstance.getId());
         taskInstanceMapper.updateById(task);
 
-        Page<TaskInstance> page = new Page(1,3);
+        Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page,
-                definition.getProjectId(),
-                task.getProcessInstanceId(),
-                "",
-                "",
-                0,
-                new int[0],
-                "",
-                null,null
+            page,
+            definition.getProjectId(),
+            task.getProcessInstanceId(),
+            "",
+            "",
+            0,
+            new int[0],
+            "",
+            null, null
         );
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
@@ -328,8 +335,8 @@ public class TaskInstanceMapperTest {
 
         // test query result
         List<Integer> resultArray = taskInstanceMapper.queryTaskByPIdAndStatusAndType(66,
-                new int[]{ExecutionStatus.FAILURE.ordinal(), ExecutionStatus.KILL.ordinal(), ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()},
-                TaskType.SUB_PROCESS.toString());
+            new int[] {ExecutionStatus.FAILURE.ordinal(), ExecutionStatus.KILL.ordinal(), ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()},
+            TaskType.SUB_PROCESS.toString());
         Assert.assertEquals(3, resultArray.size());
 
         // delete
@@ -340,7 +347,7 @@ public class TaskInstanceMapperTest {
 
     @Test
     public void testQueryTaskBySubProcessTaskIdAndStatusAndType() {
-        TaskInstance parentTask = insertOne("parent-task",66, ExecutionStatus.FAILURE, TaskType.SUB_PROCESS.toString());
+        TaskInstance parentTask = insertOne("parent-task", 66, ExecutionStatus.FAILURE, TaskType.SUB_PROCESS.toString());
 
         ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
         processInstanceMap.setParentProcessInstanceId(66);
@@ -353,8 +360,8 @@ public class TaskInstanceMapperTest {
 
         // test query result
         List<Integer> resultList = taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(parentTask.getId(),
-                new int[]{ExecutionStatus.FORCED_SUCCESS.ordinal()},
-                null);
+            new int[] {ExecutionStatus.FORCED_SUCCESS.ordinal()},
+            null);
 
         Assert.assertEquals(1, resultList.size());
         Assert.assertEquals(subTask2.getId(), resultList.get(0).intValue());
