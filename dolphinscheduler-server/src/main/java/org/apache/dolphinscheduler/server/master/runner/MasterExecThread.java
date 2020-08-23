@@ -684,37 +684,38 @@ public class MasterExecThread implements Runnable {
      * determine whether the dependencies of the task node are complete
      * @return DependResult
      */
+    @SuppressWarnings("checkstyle:WhitespaceAround")
     private DependResult isTaskDepsComplete(String taskName) {
 
         Collection<String> startNodes = dag.getBeginNode();
         // if vertex,returns true directly
-        if(startNodes.contains(taskName)){
+        if (startNodes.contains(taskName)) {
             return DependResult.SUCCESS;
         }
 
         TaskNode taskNode = dag.getNode(taskName);
         List<String> depNameList = taskNode.getDepList();
-        for(String depsNode : depNameList ){
-            if(!dag.containsNode(depsNode)
-                    || forbiddenTaskList.containsKey(depsNode)
-                    || skipTaskNodeList.containsKey(depsNode)){
+        for (String depsNode : depNameList) {
+            if (!dag.containsNode(depsNode)
+                || forbiddenTaskList.containsKey(depsNode)
+                || skipTaskNodeList.containsKey(depsNode)) {
                 continue;
             }
             // all the dependencies must be fully completed
-            if(!completeTaskList.containsKey(depsNode)){
+            if (!completeTaskList.containsKey(depsNode)) {
                 return DependResult.WAITING;
             }
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
 
-            if(depTaskState.typeIsPause() || depTaskState.typeIsCancel()){
+            if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
                 return DependResult.WAITING;
             }
 
             // ignore task state if current task is condition
-            if(taskNode.isConditionsTask()){
+            if (taskNode.isConditionsTask()) {
                 continue;
             }
-            if(!dependTaskSuccess(depsNode, taskName)){
+            if (!dependTaskSuccess(depsNode, taskName)) {
                 return DependResult.FAILED;
             }
         }
@@ -730,18 +731,18 @@ public class MasterExecThread implements Runnable {
      * @param nextNodeName
      * @return
      */
-    private boolean dependTaskSuccess(String dependNodeName, String nextNodeName){
+    private boolean dependTaskSuccess(String dependNodeName, String nextNodeName) {
         TaskNode tmpNode = dag.getNode(dependNodeName);
 
-        if(tmpNode.isConditionsTask()){
+        if (tmpNode.isConditionsTask()) {
             //condition task need check the branch to run
             List<String> nextTaskList = parseConditionTask(dependNodeName);
-            if(!nextTaskList.contains(nextNodeName)){
+            if (!nextTaskList.contains(nextNodeName)) {
                 return false;
             }
-        }else {
+        } else {
             ExecutionStatus depTaskState = completeTaskList.get(dependNodeName).getState();
-            if(depTaskState.typeIsFailure()){
+            if (depTaskState.typeIsFailure()) {
                 return false;
             }
         }
@@ -1062,17 +1063,17 @@ public class MasterExecThread implements Runnable {
             // failure priority is higher than pause
             // if a task fails, other suspended tasks need to be reset kill
             // check if there exists forced success nodes in errorTaskList
-            if(errorTaskList.size() > 0){
-                for(Map.Entry<String, TaskInstance> entry: completeTaskList.entrySet()) {
+            if (errorTaskList.size() > 0) {
+                for (Map.Entry<String, TaskInstance> entry : completeTaskList.entrySet()) {
                     TaskInstance completeTask = entry.getValue();
-                    if(completeTask.getState()== ExecutionStatus.PAUSE){
+                    if (completeTask.getState() == ExecutionStatus.PAUSE) {
                         completeTask.setState(ExecutionStatus.KILL);
                         completeTaskList.put(entry.getKey(), completeTask);
                         processService.updateTaskInstance(completeTask);
                     }
                 }
 
-                for(Map.Entry<String, TaskInstance> entry: errorTaskList.entrySet()) {
+                for (Map.Entry<String, TaskInstance> entry : errorTaskList.entrySet()) {
                     TaskInstance errorTask = entry.getValue();
                     TaskInstance currentTask = processService.findTaskInstanceById(errorTask.getId());
                     if (currentTask == null) {
@@ -1089,7 +1090,7 @@ public class MasterExecThread implements Runnable {
                     }
                 }
             }
-            if(canSubmitTaskToQueue()){
+            if (canSubmitTaskToQueue()) {
                 submitStandByTask();
             }
             try {

@@ -75,31 +75,34 @@ public enum ExecutionStatus {
         }
     }
 
- /**
-  * status is success
-  * @return status
-  */
-   public boolean typeIsSuccess() {
-     return this == SUCCESS || this == FORCED_SUCCESS;
-   }
+    /**
+     * status is success
+     *
+     * @return status
+     */
+    public boolean typeIsSuccess() {
+        return this == SUCCESS || this == FORCED_SUCCESS;
+    }
 
- /**
-  * status is failure
-  * @return status
-  */
-   public boolean typeIsFailure() {
-     return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
-   }
+    /**
+     * status is failure
+     *
+     * @return status
+     */
+    public boolean typeIsFailure() {
+        return this == FAILURE || this == NEED_FAULT_TOLERANCE || this == KILL;
+    }
 
- /**
-  * status is finished
-  * @return status
-  */
-   public boolean typeIsFinished() {
+    /**
+     * status is finished
+     *
+     * @return status
+     */
+    public boolean typeIsFinished() {
 
-       return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-               || typeIsStop();
-   }
+        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
+            || typeIsStop();
+    }
 
     /**
      * status is waiting thread
