@@ -123,7 +123,7 @@ public class TaskCountDto {
 
     // remove the specified state
     public void removeStateFromCountList(ExecutionStatus status) {
-        for(TaskStateCount count : this.taskCountDtos) {
+        for (TaskStateCount count : this.taskCountDtos) {
             if (count.getTaskStateType().equals(status)) {
                 this.taskCountDtos.remove(count);
                 break;
@@ -131,7 +131,7 @@ public class TaskCountDto {
         }
     }
 
-    public List<TaskStateCount> getTaskCountDtos(){
+    public List<TaskStateCount> getTaskCountDtos() {
         return taskCountDtos;
     }
 
