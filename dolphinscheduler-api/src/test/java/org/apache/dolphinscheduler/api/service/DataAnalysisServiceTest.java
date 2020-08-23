@@ -119,6 +119,11 @@ public class DataAnalysisServiceTest {
         result = dataAnalysisService.countTaskStateByProject(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
+        // when date in illegal format then return error message
+        String startDate2 = "illegalDateString";
+        String endDate2 = "illegalDateString";
+        Map<String, Object> result2 = dataAnalysisService.countTaskStateByProject(user, 0, startDate2, endDate2);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result2.get(Constants.STATUS));
     }
 
     @Test
