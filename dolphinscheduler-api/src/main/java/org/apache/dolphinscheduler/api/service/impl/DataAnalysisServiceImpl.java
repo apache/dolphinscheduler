@@ -122,16 +122,17 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             return result;
         }
 
-        Date start;
-        Date end;
-        try {
+        Date start = null;
+        Date end = null;
+        if (startDate != null && endDate != null) {
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            putErrorRequestParamsMsg(result);
-            return result;
+            if (start == null || end == null) {
+                putErrorRequestParamsMsg(result);
+                return result;
+            }
         }
+
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectIdArray);
