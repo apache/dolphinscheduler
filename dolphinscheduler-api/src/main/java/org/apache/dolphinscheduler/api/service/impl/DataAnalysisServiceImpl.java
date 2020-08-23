@@ -129,7 +129,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
                 endDate,
                 (start, end, projectIds) -> this.processInstanceMapper.countInstanceStateByUser(start, end, projectIds));
         // process state count needs to remove state of forced success
-        if (tmpResult.get(Constants.STATUS).equals(Status.SUCCESS)) {
+        if (tmpResult.containsKey(Constants.STATUS) && tmpResult.get(Constants.STATUS).equals(Status.SUCCESS)) {
             ((TaskCountDto)tmpResult.get(Constants.DATA_LIST)).removeStateFromCountList(ExecutionStatus.FORCED_SUCCESS);
         }
         return tmpResult;
