@@ -29,7 +29,7 @@ public class NettyUtilTest {
 
     @Test
     public void testUserEpoll() {
-        System.setProperty("netty.epoll.enable","false");
+        System.setProperty("netty.epoll.enable", "false");
         Assert.assertFalse(NettyUtils.useEpoll());
     }
 
