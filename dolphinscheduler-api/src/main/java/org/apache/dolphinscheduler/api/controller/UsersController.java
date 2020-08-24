@@ -472,7 +472,7 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+            @ApiImplicitParam(name = "userNames", value = "USER_NAMES", type = "String"),
     })
     @PostMapping("/batch/activate")
     @ResponseStatus(HttpStatus.OK)
@@ -480,9 +480,7 @@ public class UsersController extends BaseController {
     public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestBody List<String> userNames) {
         List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
-        String loginUserName = ParameterUtils.handleEscapes(loginUser.getUserName());
-        logger.info("login user {}, activate user, userNames: {}",
-                loginUserName, formatUserNames);
+        logger.info(" activate userNames: {}", formatUserNames);
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
