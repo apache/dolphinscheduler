@@ -23,8 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * @author jiangli
- * @date 2020-08-24 13:31
+ * NettyUtilTest
  */
 public class NettyUtilTest {
 
