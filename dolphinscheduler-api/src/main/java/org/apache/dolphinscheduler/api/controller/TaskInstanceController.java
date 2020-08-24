@@ -136,7 +136,7 @@ public class TaskInstanceController extends BaseController {
                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                          @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
         logger.info("force task success, login user: {}, project:{}, task instance id:{}",
-                loginUser.getUserName(), projectName, taskInstanceId);
+                loginUser.getUserName(), projectName.replaceAll("[\n|\r|\t]", "_"), taskInstanceId);
         Map<String, Object> result = taskInstanceService.forceSingleTaskSuccess(loginUser, projectName, taskInstanceId);
         return returnDataList(result);
     }
