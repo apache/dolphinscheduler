@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.classloader.ThreadContextClassLoader;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
@@ -87,7 +88,7 @@ public class AlertPluginManager extends DolphinPluginManager {
             this.addAlertChannelFactory(alertChannelFactory);
             List<PluginParams> params = alertChannelFactory.getParams();
             String nameEn = alertChannelFactory.getName();
-            String paramsJson = PluginParamsTransfer.getParamsJson(params);
+            String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
             PluginDefine pluginDefine = new PluginDefine(nameEn, "alert", paramsJson);
             pluginDao.addOrUpdatePluginDefine(pluginDefine);

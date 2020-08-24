@@ -20,7 +20,6 @@ import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
-import org.apache.dolphinscheduler.alert.plugin.PluginParamsTransfer;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -35,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
@@ -247,7 +247,7 @@ public class AlertSenderTest {
         paramsList.add(sslTrust);
         paramsList.add(showType);
 
-        return PluginParamsTransfer.getParamsJson(paramsList);
+        return PluginParamsTransfer.transferParamsToJson(paramsList);
     }
 
 
