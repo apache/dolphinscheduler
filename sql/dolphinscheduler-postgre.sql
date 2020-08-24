@@ -316,6 +316,30 @@ CREATE TABLE t_ds_process_definition (
 create index process_definition_index on t_ds_process_definition (project_id,id);
 
 --
+-- Table structure for table t_ds_process_definition_version
+--
+
+DROP TABLE IF EXISTS t_ds_process_definition_version;
+CREATE TABLE t_ds_process_definition_version (
+  id int NOT NULL  ,
+  process_definition_id int NOT NULL  ,
+  version int DEFAULT NULL ,
+  process_definition_json text ,
+  description text ,
+  global_params text ,
+  locations text ,
+  connects text ,
+  receivers text ,
+  receivers_cc text ,
+  create_time timestamp DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  resource_ids varchar(64),
+  PRIMARY KEY (id)
+) ;
+
+create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
+
+--
 -- Table structure for table t_ds_process_instance
 --
 
@@ -693,6 +717,9 @@ ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource
 DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_id_sequence;
 ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definition_version_id_sequence;
+CREATE SEQUENCE  t_ds_process_definition_version_id_sequence;
+ALTER TABLE t_ds_process_definition_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_version_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
