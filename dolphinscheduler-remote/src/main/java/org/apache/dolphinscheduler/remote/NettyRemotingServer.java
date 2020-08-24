@@ -22,6 +22,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -32,6 +34,8 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.handler.NettyServerHandler;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.remote.utils.NettyUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +70,12 @@ public class NettyRemotingServer {
     /**
      * boss group
      */
-    private final NioEventLoopGroup bossGroup;
+    private final EventLoopGroup bossGroup;
 
     /**
      *  worker group
      */
-    private final NioEventLoopGroup workGroup;
+    private final EventLoopGroup workGroup;
 
     /**
      *  server config
@@ -95,24 +99,43 @@ public class NettyRemotingServer {
      */
     public NettyRemotingServer(final NettyServerConfig serverConfig){
         this.serverConfig = serverConfig;
+        if(NettyUtils.useEpoll()){
+            this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
 
-        this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
-            private AtomicInteger threadIndex = new AtomicInteger(0);
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
 
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
-            }
-        });
+            this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
 
-        this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-            private AtomicInteger threadIndex = new AtomicInteger(0);
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+        }else {
+            this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
 
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
-            }
-        });
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+
+            this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+        }
     }
 
     /**

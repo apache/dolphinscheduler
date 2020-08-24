@@ -14,42 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.utils;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
+import io.netty.channel.epoll.Epoll;
 
 /**
- *  constant
+ * NettyUtils
  */
-public class Constants {
-
-    public static final String COMMA = ",";
-
-    public static final String SLASH = "/";
-
-    /**
-     *  charset
-     */
-    public static final Charset UTF8 = StandardCharsets.UTF_8;
-
-    /**
-     *  cpus
-     */
-    public static final int CPUS = Runtime.getRuntime().availableProcessors();
+public class NettyUtils {
 
 
-    public static final String LOCAL_ADDRESS = IPUtils.getFirstNoLoopbackIP4Address();
+    public static boolean useEpoll() {
+        String osName = Constants.OS_NAME;
+        if(!osName.toLowerCase().contains("linux")){
+            return false;
+        }
+        if(!Epoll.isAvailable()){
+            return false;
+        }
+        String enableNetty=Constants.NETTY_EPOLL_ENABLE;
+        return Boolean.parseBoolean(enableNetty);
+    }
 
-    /**
-     * netty epoll enable switch
-     */
-    public static final String NETTY_EPOLL_ENABLE = System.getProperty("netty.epoll.enable");
-
-    /**
-     * OS Name
-     */
-    public static final String OS_NAME = System.getProperty("os.name");
 
 }

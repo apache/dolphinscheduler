@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.remote;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -38,6 +39,8 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.CallerThreadExecutePolicy;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.remote.utils.NettyUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +79,7 @@ public class NettyRemotingClient {
     /**
      *  worker group
      */
-    private final NioEventLoopGroup workerGroup;
+    private final EventLoopGroup workerGroup;
 
     /**
      *  client config
@@ -109,14 +112,25 @@ public class NettyRemotingClient {
      */
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
-        this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
-            private AtomicInteger threadIndex = new AtomicInteger(0);
+        if(NettyUtils.useEpoll()){
+            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
 
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-            }
-        });
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+        }else {
+            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
+                }
+            });
+        }
         this.callbackExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.MINUTES,
                 new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
                 new CallerThreadExecutePolicy());
