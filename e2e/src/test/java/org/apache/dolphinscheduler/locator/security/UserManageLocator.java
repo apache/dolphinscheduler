@@ -60,7 +60,7 @@ public class UserManageLocator {
     /**
      * delete user
      */
-    public static final By DELETE_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[11]/span[2]/button");
+    public static final By DELETE_USER_BUTTON = By.xpath("//table/tr[3]/td[11]/span[2]/button");
 
-    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//div[2]/div/button[2]/span");
+    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//tr[3]/td[11]/span[2]/div/div[2]/div/button[2]/span");
 }
