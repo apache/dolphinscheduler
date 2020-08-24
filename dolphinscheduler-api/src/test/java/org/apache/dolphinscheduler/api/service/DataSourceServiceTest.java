@@ -55,7 +55,6 @@ public class DataSourceServiceTest {
     @Mock
     private DataSourceUserMapper datasourceUserMapper;
 
-//    @Test
     public void createDataSourceTest() {
         User loginUser = getAdminUser();
 
@@ -94,7 +93,6 @@ public class DataSourceServiceTest {
         Assert.assertEquals(Status.SUCCESS, success.get(Constants.STATUS));
     }
 
-//    @Test
     public void updateDataSourceTest() {
         User loginUser = getAdminUser();
 
