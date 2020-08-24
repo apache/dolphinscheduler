@@ -1014,7 +1014,7 @@ public class UsersService extends BaseService {
                 Map<String, String> failedBody = new HashMap<>();
                 failedBody.put("userName", userName);
                 Status status = (Status) tmpResult.get(Constants.STATUS);
-                String errorMessage= MessageFormat.format(status.getMsg(), userName);
+                String errorMessage = MessageFormat.format(status.getMsg(), userName);
                 failedBody.put("msg", errorMessage);
                 failedInfo.add(failedBody);
             } else {

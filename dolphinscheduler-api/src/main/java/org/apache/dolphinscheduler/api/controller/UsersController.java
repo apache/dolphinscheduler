@@ -17,6 +17,10 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -24,10 +28,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -470,7 +470,7 @@ public class UsersController extends BaseController {
      *
      * @param  userNames       user names
      */
-    @ApiOperation(value="batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
+    @ApiOperation(value = "batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
     })
@@ -479,9 +479,9 @@ public class UsersController extends BaseController {
     @ApiException(UPDATE_USER_ERROR)
     public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestBody List<String> userNames) {
+        List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         logger.info("login user {}, activate user, userNames: {}",
                 loginUser.getUserName(), userNames);
-        List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
