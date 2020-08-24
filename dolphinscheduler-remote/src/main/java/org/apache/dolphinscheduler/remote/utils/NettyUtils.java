@@ -26,7 +26,6 @@ public class NettyUtils {
 
 
     private NettyUtils() {
-        throw new IllegalStateException("Utility class");
     }
 
     public static boolean useEpoll() {
