@@ -253,7 +253,14 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountQueueState() {
+        // when project check fail then return nothing
+        Map<String, Object> result1 = dataAnalysisService.countQueueState(user, 2);
+        Assert.assertTrue(result1.isEmpty());
 
+        // when project check success when return all count are 0
+        Map<String, Object> result2 = dataAnalysisService.countQueueState(user, 1);
+        assertThat(result2.get(Constants.DATA_LIST)).extracting("taskQueue", "taskKill")
+                .allMatch(count -> count.equals(0));
     }
 
     /**
