@@ -472,6 +472,12 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionId);
             return result;
         }
+        // check process instances is already running
+        List<ProcessInstance> processInstances =  processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, Constants.NOT_TERMINATED_STATES);
+        if(CollectionUtils.isNotEmpty(processInstances)){
+            putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_ID_FAIL,processInstances.size());
+            return result;
+        }
 
         // get the timing according to the process definition
         List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);

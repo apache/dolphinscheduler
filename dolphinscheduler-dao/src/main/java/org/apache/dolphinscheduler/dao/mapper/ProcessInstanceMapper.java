@@ -205,5 +205,15 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                    @Param("startTime") Date startTime,
                                                    @Param("endTime") Date endTime,
                                                    @Param("status")ExecutionStatus status);
+    /**
+     * query process instance by processDefinitionId and stateArray
+     * @param processDefinitionId processDefinitionId
+     * @param states states array
+     * @return process instance list
+     */
+    List<ProcessInstance> queryByProcessDefineIdAndStatus(
+            @Param("processDefinitionId") int processDefinitionId,
+            @Param("states") int[] states);
+
 
 }
