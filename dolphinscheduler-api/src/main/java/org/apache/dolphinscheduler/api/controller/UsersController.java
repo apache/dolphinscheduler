@@ -480,8 +480,9 @@ public class UsersController extends BaseController {
     public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestBody List<String> userNames) {
         List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
+        String loginUserName = ParameterUtils.handleEscapes(loginUser.getUserName());
         logger.info("login user {}, activate user, userNames: {}",
-                loginUser.getUserName(), formatUserNames);
+                loginUserName, formatUserNames);
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
