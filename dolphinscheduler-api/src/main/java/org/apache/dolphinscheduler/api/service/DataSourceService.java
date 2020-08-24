@@ -305,10 +305,10 @@ public class DataSourceService extends BaseService {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
         }
 
-        List<DataSource> dataSources = dataSourceList.getRecords();
+        List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
-        pageInfo.setTotalCount((int) (dataSourceList.getTotal()));
+        pageInfo.setTotalCount((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setLists(dataSources);
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -360,11 +360,10 @@ public class DataSourceService extends BaseService {
     /**
      * verify datasource exists
      *
-     * @param loginUser login user
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
-    public Result verifyDataSourceName(User loginUser, String name) {
+    public Result verifyDataSourceName(String name) {
         Result result = new Result();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && dataSourceList.size() > 0) {

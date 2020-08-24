@@ -361,7 +361,7 @@ public class DataSourceController extends BaseController {
         logger.info("login user {}, verfiy datasource name: {}",
                 loginUser.getUserName(), name);
 
-        return dataSourceService.verifyDataSourceName(loginUser, name);
+        return dataSourceService.verifyDataSourceName(name);
     }
 
 
