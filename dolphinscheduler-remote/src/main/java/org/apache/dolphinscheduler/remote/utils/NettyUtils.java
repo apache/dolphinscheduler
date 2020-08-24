@@ -27,13 +27,13 @@ public class NettyUtils {
 
     public static boolean useEpoll() {
         String osName = Constants.OS_NAME;
-        if(!osName.toLowerCase().contains("linux")){
+        if (!osName.toLowerCase().contains("linux")) {
             return false;
         }
-        if(!Epoll.isAvailable()){
+        if (!Epoll.isAvailable()) {
             return false;
         }
-        String enableNetty=Constants.NETTY_EPOLL_ENABLE;
+        String enableNetty = Constants.NETTY_EPOLL_ENABLE;
         return Boolean.parseBoolean(enableNetty);
     }
 
