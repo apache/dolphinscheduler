@@ -201,10 +201,6 @@ public class DataAnalysisServiceTest {
         result = dataAnalysisService.countCommandState(user, 1, startDate, endDate);
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-    }
-
-    @Test
-    public void testCountQueueState() {
         // when project check fail then return nothing
         Map<String, Object> result1 = dataAnalysisService.countCommandState(user, 2, null, null);
         Assert.assertTrue(result1.isEmpty());
@@ -253,6 +249,11 @@ public class DataAnalysisServiceTest {
         commandStateCount.setNormalCount(10);
         commandStateCount.setErrorCount(5);
         assertThat(result6.get(Constants.DATA_LIST)).asList().containsOnlyOnce(commandStateCount);
+    }
+
+    @Test
+    public void testCountQueueState() {
+
     }
 
     /**
