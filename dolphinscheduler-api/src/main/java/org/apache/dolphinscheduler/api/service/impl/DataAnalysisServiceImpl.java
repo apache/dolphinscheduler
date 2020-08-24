@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
@@ -295,58 +294,9 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             return result;
         }
 
-        // TODO tasksQueueList and tasksKillList is never updated.
-        List<String> tasksQueueList = new ArrayList<>();
-        List<String> tasksKillList = new ArrayList<>();
-
         Map<String, Integer> dataMap = new HashMap<>();
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            dataMap.put("taskQueue", tasksQueueList.size());
-            dataMap.put("taskKill", tasksKillList.size());
-
-            result.put(Constants.DATA_LIST, dataMap);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-
-        int[] tasksQueueIds = new int[tasksQueueList.size()];
-        int[] tasksKillIds = new int[tasksKillList.size()];
-
-        int i = 0;
-        for (String taskQueueStr : tasksQueueList) {
-            if (StringUtils.isNotEmpty(taskQueueStr)) {
-                String[] splits = taskQueueStr.split("_");
-                if (splits.length >= 4) {
-                    tasksQueueIds[i++] = Integer.parseInt(splits[3]);
-                }
-            }
-        }
-
-        i = 0;
-        for (String taskKillStr : tasksKillList) {
-            if (StringUtils.isNotEmpty(taskKillStr)) {
-                String[] splits = taskKillStr.split("-");
-                if (splits.length == 2) {
-                    tasksKillIds[i++] = Integer.parseInt(splits[1]);
-                }
-            }
-        }
-        Integer taskQueueCount = 0;
-        Integer taskKillCount = 0;
-
-        Integer[] projectIds = getProjectIdsArrays(loginUser, projectId);
-        if (tasksQueueIds.length != 0) {
-            taskQueueCount = taskInstanceMapper.countTask(
-                    projectIds,
-                    tasksQueueIds);
-        }
-
-        if (tasksKillIds.length != 0) {
-            taskKillCount = taskInstanceMapper.countTask(projectIds, tasksKillIds);
-        }
-
-        dataMap.put("taskQueue", taskQueueCount);
-        dataMap.put("taskKill", taskKillCount);
+        dataMap.put("taskQueue", 0);
+        dataMap.put("taskKill", 0);
 
         result.put(Constants.DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
