@@ -1180,34 +1180,32 @@ public class MasterExecThread implements Runnable {
     /**
      * handling the list of tasks to be submitted
      */
-    private void submitStandByTask(){
-        for(Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
+    private void submitStandByTask() {
+        for (Map.Entry<String, TaskInstance> entry : readyToSubmitTaskList.entrySet()) {
             TaskInstance task = entry.getValue();
             // stop tasks which is retrying if forced success happens
             if (task.taskCanRetry()) {
                 TaskInstance tmpTask = processService.findTaskInstanceById(task.getId());
-                if (tmpTask != null) {
-                    if (tmpTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
-                        task.setState(tmpTask.getState());
-                        logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
-                        removeTaskFromStandbyList(task);
-                        completeTaskList.put(task.getName(), task);
-                        submitPostNode(task.getName());
-                        continue;
-                    }
+                if (tmpTask != null && tmpTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                    task.setState(tmpTask.getState());
+                    logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
+                    removeTaskFromStandbyList(task);
+                    completeTaskList.put(task.getName(), task);
+                    submitPostNode(task.getName());
+                    continue;
                 }
             }
             DependResult dependResult = getDependResultForTask(task);
-            if(DependResult.SUCCESS == dependResult){
-                if(retryTaskIntervalOverTime(task)){
+            if (DependResult.SUCCESS == dependResult) {
+                if (retryTaskIntervalOverTime(task)) {
                     submitTaskExec(task);
                     removeTaskFromStandbyList(task);
                 }
-            }else if(DependResult.FAILED == dependResult){
+            } else if (DependResult.FAILED == dependResult) {
                 // if the dependency fails, the current node is not submitted and the state changes to failure.
                 dependFailedTask.put(entry.getKey(), task);
                 removeTaskFromStandbyList(task);
-                logger.info("task {},id:{} depend result : {}",task.getName(), task.getId(), dependResult);
+                logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
             }
         }
     }
