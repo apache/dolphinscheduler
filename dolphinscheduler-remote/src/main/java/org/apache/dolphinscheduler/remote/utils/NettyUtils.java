@@ -25,6 +25,10 @@ import io.netty.channel.epoll.Epoll;
 public class NettyUtils {
 
 
+    private NettyUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean useEpoll() {
         String osName = Constants.OS_NAME;
         if (!osName.toLowerCase().contains("linux")) {
