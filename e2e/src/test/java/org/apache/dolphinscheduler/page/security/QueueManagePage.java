@@ -57,7 +57,7 @@ public class QueueManagePage extends PageCommon {
         clickButton(QueueManageLocator.SUBMIT_QUEUE);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(QueueManageData.QUEUE_MANAGE);
+        return ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, QueueManageData.QUEUE_NAME);
     }
 
 
@@ -68,22 +68,21 @@ public class QueueManagePage extends PageCommon {
      */
     public boolean editQueue() throws InterruptedException {
         // click queue manage
-        Thread.sleep(1000);
         clickElement(QueueManageLocator.CLICK_QUEUE_MANAGE);
-        Thread.sleep(1000);
+
+        ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, QueueManageData.QUEUE_NAME);
 
         // click  edit queue button
         clickButton(QueueManageLocator.CLICK_EDIT_QUEUE);
-        Thread.sleep(1000);
 
         // input queue data
-        sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.EDIT_QUEUE_NAME);
-        sendInput(QueueManageLocator.INPUT_QUEUE_VALUE, QueueManageData.EDIT_QUEUE_VALUE);
+        clearSendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.EDIT_QUEUE_NAME);
+        clearSendInput(QueueManageLocator.INPUT_QUEUE_VALUE, QueueManageData.EDIT_QUEUE_VALUE);
 
         // click  button
         clickButton(QueueManageLocator.SUBMIT_QUEUE);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(QueueManageData.QUEUE_MANAGE);
+        return ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, QueueManageData.EDIT_QUEUE_NAME);
     }
 }
