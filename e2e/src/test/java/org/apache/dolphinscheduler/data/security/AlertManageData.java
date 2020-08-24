@@ -17,18 +17,14 @@
 package org.apache.dolphinscheduler.data.security;
 
 public class AlertManageData {
-    /**
-     * Alert Name
-     */
+    //Alert Name
     public static final String ALERT_NAME = "selenium_alert_Name";
-    /**
-     * Alert Type
-     */
+    public static final String CREATE_ALERT =  "创建告警组";
+
+    // Alert Type
     public static final String ALERT_TYPE = "邮件";
 
-    /**
-     * Alert Description
-     */
+    //Alert Description
     public static final String DESCRIPTION = "create alert test";
 
     public static final String ALERT_MANAGE = "告警组管理 - DolphinScheduler";

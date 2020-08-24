@@ -31,22 +31,21 @@ public class AlertManagePage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create alert
      *
      * @return Whether to enter the specified page after create tenant
      */
     public boolean createAlert() throws InterruptedException {
         // click  alert manage
-        Thread.sleep(500);
         System.out.println("start click alert manage button");
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
-        Thread.sleep(500);
+
+        //determine whether the create alert button exists
+        ifTextExists(AlertManageLocator.CLICK_CREATE_ALERT,AlertManageData.CREATE_ALERT);
 
         // click  create alert button
         System.out.println("start click create alert  button");
         clickElement(AlertManageLocator.CLICK_CREATE_ALERT);
-        Thread.sleep(500);
-
         // input alert data
         System.out.println("start input  alert ");
         sendInput(AlertManageLocator.INPUT_ALERT_NAME, AlertManageData.ALERT_NAME);
@@ -61,15 +60,17 @@ public class AlertManagePage extends PageCommon {
         clickButton(AlertManageLocator.SUBMIT_ALERT);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(AlertManageData.ALERT_MANAGE);
+        return ifTextExists(AlertManageLocator.ALERT_NAME, AlertManageData.ALERT_NAME);
     }
 
     public boolean deleteAlert() throws InterruptedException {
 
-        // click  user manage
+        // click  alert manage
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
 
-        // click  delete user button
+        ifTextExists(AlertManageLocator.ALERT_NAME, AlertManageData.ALERT_NAME);
+
+        // click  delete alert button
         clickButton(AlertManageLocator.DELETE_ALERT_BUTTON);
 
         // click confirm delete button

@@ -20,6 +20,9 @@ public class WorkflowDefineData {
     /**
      * create workflow data
      */
+
+    public static final String workflow_define = "工作流定义";
+
     //input shell task name
     public static final String SHELL_TASK_NAME = "shell_task_selenium_1";
 
@@ -74,4 +77,13 @@ public class WorkflowDefineData {
 
     //input to add workflow  global parameters value
     public static final String INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES = "selenium_global_parameters_value_2";
+
+    /**
+     * workflowDefine list
+     */
+    public static final String WORKFLOW_ONLINE_STATE = "上线";
+
+    public static final String WORKFLOW_OFFLINE_STATE = "下线";
+
+
 }
