@@ -29,12 +29,14 @@ public class NettyUtilTest {
 
     @Test
     public void testUseEpoll1() {
+        System.setProperty("netty.epoll.enable", "false");
         Assert.assertFalse(NettyUtils.useEpoll());
     }
 
     @Test
     public void testUseEpoll2() {
         System.setProperty("netty.epoll.enable", "true");
+        // only available on linux
         Assert.assertTrue(NettyUtils.useEpoll());
 
     }

@@ -803,7 +803,8 @@
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <!--<include>**/remote/NettyRemotingClientTest.java</include>-->
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/remote/NettyUtilTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
