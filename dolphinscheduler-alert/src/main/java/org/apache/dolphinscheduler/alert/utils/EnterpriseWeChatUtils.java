@@ -48,25 +48,17 @@ import org.slf4j.LoggerFactory;
 public class EnterpriseWeChatUtils {
 
     public static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatUtils.class);
-
+    public static final String ENTERPRISE_WE_CHAT_AGENT_ID = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID);
+    public static final String ENTERPRISE_WE_CHAT_USERS = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS);
     private static final String ENTERPRISE_WE_CHAT_CORP_ID = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_CORP_ID);
-
     private static final String ENTERPRISE_WE_CHAT_SECRET = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_SECRET);
-
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
     private static final String ENTERPRISE_WE_CHAT_TOKEN_URL_REPLACE = ENTERPRISE_WE_CHAT_TOKEN_URL == null ? null : ENTERPRISE_WE_CHAT_TOKEN_URL
             .replaceAll("\\{corpId}", ENTERPRISE_WE_CHAT_CORP_ID)
             .replaceAll("\\{secret}", ENTERPRISE_WE_CHAT_SECRET);
-
     private static final String ENTERPRISE_WE_CHAT_PUSH_URL = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
-
     private static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_TEAM_SEND_MSG);
-
     private static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
-
-    public static final String ENTERPRISE_WE_CHAT_AGENT_ID = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID);
-
-    public static final String ENTERPRISE_WE_CHAT_USERS = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS);
 
     /**
      * get Enterprise WeChat is enable
@@ -123,13 +115,13 @@ public class EnterpriseWeChatUtils {
      *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg     the msg
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", toParty)
-                .replaceAll("\\{agentId\\}", agentId)
-                .replaceAll("\\{msg\\}", msg);
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty}", toParty)
+                .replaceAll("\\{agentId}", agentId)
+                .replaceAll("\\{msg}", msg);
     }
 
     /**
@@ -137,56 +129,56 @@ public class EnterpriseWeChatUtils {
      *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg     the msg
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
-        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty\\}", listParty)
-                .replaceAll("\\{agentId\\}", agentId)
-                .replaceAll("\\{msg\\}", msg);
+        return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty", listParty)
+                .replaceAll("\\{agentId}", agentId)
+                .replaceAll("\\{msg}", msg);
     }
 
     /**
      * make team single user message
      *
-     * @param toUser  the toUser
+     * @param toUser the toUser
      * @param agentId the agentId
-     * @param msg     the msg
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", toUser)
-                .replaceAll("\\{agentId\\}", agentId)
-                .replaceAll("\\{msg\\}", msg);
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser}", toUser)
+                .replaceAll("\\{agentId}", agentId)
+                .replaceAll("\\{msg}", msg);
     }
 
     /**
      * make team multi user message
      *
-     * @param toUser  the toUser
+     * @param toUser the toUser
      * @param agentId the agentId
-     * @param msg     the msg
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
-        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser\\}", listUser)
-                .replaceAll("\\{agentId\\}", agentId)
-                .replaceAll("\\{msg\\}", msg);
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser}", listUser)
+                .replaceAll("\\{agentId}", agentId)
+                .replaceAll("\\{msg}", msg);
     }
 
     /**
      * send Enterprise WeChat
      *
      * @param charset the charset
-     * @param data    the data
-     * @param token   the token
+     * @param data the data
+     * @param token the token
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException the IOException
      */
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
-        String enterpriseWeChatPushUrlReplace = ENTERPRISE_WE_CHAT_PUSH_URL.replaceAll("\\{token\\}", token);
+        String enterpriseWeChatPushUrlReplace = ENTERPRISE_WE_CHAT_PUSH_URL.replaceAll("\\{token}", token);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
@@ -212,7 +204,7 @@ public class EnterpriseWeChatUtils {
     /**
      * convert table to markdown style
      *
-     * @param title   the title
+     * @param title the title
      * @param content the content
      * @return markdown table content
      */
@@ -242,7 +234,7 @@ public class EnterpriseWeChatUtils {
     /**
      * convert text to markdown style
      *
-     * @param title   the title
+     * @param title the title
      * @param content the content
      * @return markdown text
      */
@@ -286,5 +278,6 @@ public class EnterpriseWeChatUtils {
         return result;
 
     }
+
 
 }
