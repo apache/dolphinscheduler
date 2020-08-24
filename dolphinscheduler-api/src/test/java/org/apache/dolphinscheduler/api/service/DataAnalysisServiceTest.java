@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.api.service;
 import java.util.*;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
+import org.apache.dolphinscheduler.api.dto.TaskStateCount;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
@@ -122,8 +124,37 @@ public class DataAnalysisServiceTest {
         // when date in illegal format then return error message
         String startDate2 = "illegalDateString";
         String endDate2 = "illegalDateString";
-        Map<String, Object> result2 = dataAnalysisService.countTaskStateByProject(user, 0, startDate2, endDate2);
-        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result2.get(Constants.STATUS));
+        result = dataAnalysisService.countTaskStateByProject(user, 0, startDate2, endDate2);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+
+        // when counting general user's task status then return user's task status count
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(processService.getProjectIdListHavePerm(anyInt()))
+                .thenReturn(Collections.singletonList(123));
+        ExecuteStatusCount executeStatusCount = new ExecuteStatusCount();
+        executeStatusCount.setExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        executeStatusCount.setCount(10);
+        Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any()))
+                .thenReturn(Collections.singletonList(executeStatusCount));
+        result = dataAnalysisService.countTaskStateByProject(user, 0, null, null);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList()
+                .hasSameSizeAs(ExecutionStatus.values());
+        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").first().isEqualTo(10);
+        TaskStateCount taskStateCount = new TaskStateCount(ExecutionStatus.RUNNING_EXECUTION, 10);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList().containsOnlyOnce(taskStateCount);
+
+        // when general user doesn't have any task then return all count are 0
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(processService.getProjectIdListHavePerm(anyInt()))
+                .thenReturn(new ArrayList<>());
+        Mockito.when(taskInstanceMapper.countTaskInstanceStateByUser(any(), any(), any()))
+                .thenReturn(Collections.emptyList());
+        result = dataAnalysisService.countTaskStateByProject(user, 0, null, null);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("totalCount").first().isEqualTo(0);
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList()
+                .hasSameSizeAs(ExecutionStatus.values());
+        assertThat(result.get(Constants.DATA_LIST)).extracting("taskCountDtos").first().asList()
+                .extracting("count").allMatch(count -> count.equals(0));
     }
 
     @Test
