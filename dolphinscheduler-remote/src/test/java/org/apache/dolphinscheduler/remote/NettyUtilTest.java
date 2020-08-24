@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import io.netty.channel.epoll.Epoll;
-
-import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
 import org.junit.Assert;
@@ -36,16 +33,4 @@ public class NettyUtilTest {
         Assert.assertFalse(NettyUtils.useEpoll());
     }
 
-    @Test
-    public void testUseEpoll2() {
-
-        System.setProperty("netty.epoll.enable", "true");
-        // only available on linux
-        if (Constants.OS_NAME.toLowerCase().contains("linux")&& Epoll.isAvailable()) {
-            Assert.assertTrue(NettyUtils.useEpoll());
-        } else {
-            Assert.assertFalse(NettyUtils.useEpoll());
-        }
-
-    }
 }
