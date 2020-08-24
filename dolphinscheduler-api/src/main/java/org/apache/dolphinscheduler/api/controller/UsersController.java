@@ -481,7 +481,7 @@ public class UsersController extends BaseController {
                                        @RequestBody List<String> userNames) {
         List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
         logger.info("login user {}, activate user, userNames: {}",
-                loginUser.getUserName(), userNames);
+                loginUser.getUserName(), formatUserNames);
         Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
