@@ -790,7 +790,7 @@ public class ProcessService {
         List<Integer> forcedSuccessList = this.findTaskIdInSubProcessByStatusAndType(taskInstanceId,
                 new ExecutionStatus[]{ExecutionStatus.FORCED_SUCCESS},
                 null);
-        if (forcedSuccessList != null && forcedSuccessList.size() > 0) {
+        if (forcedSuccessList != null && !forcedSuccessList.isEmpty()) {
             return true;
         }
 
