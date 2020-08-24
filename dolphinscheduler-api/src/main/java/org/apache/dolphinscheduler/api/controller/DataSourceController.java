@@ -100,7 +100,7 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
-        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
         return returnDataList(result);
     }
@@ -155,7 +155,7 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
         return returnDataList(dataSource);
     }
@@ -280,7 +280,7 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "other") String other) {
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Boolean isConnection = dataSourceService.checkConnection(type, parameter);
         Result result = new Result();
 
@@ -310,7 +310,7 @@ public class DataSourceController extends BaseController {
                                  @RequestParam("id") int id) {
         logger.info("connection test, login user:{}, id:{}", loginUser.getUserName(), id);
 
-        Boolean isConnection = dataSourceService.connectionTest(loginUser, id);
+        Boolean isConnection = dataSourceService.connectionTest(id);
         Result result = new Result();
 
         if (isConnection) {
@@ -361,7 +361,7 @@ public class DataSourceController extends BaseController {
         logger.info("login user {}, verfiy datasource name: {}",
                 loginUser.getUserName(), name);
 
-        return dataSourceService.verifyDataSourceName(loginUser, name);
+        return dataSourceService.verifyDataSourceName(name);
     }
 
 
