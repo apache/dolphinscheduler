@@ -65,10 +65,12 @@ public class AlertManagePage extends PageCommon {
 
     public boolean deleteAlert() throws InterruptedException {
 
-        // click  user manage
+        // click  alert manage
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
 
-        // click  delete user button
+        ifTextExists(AlertManageLocator.ALERT_NAME, AlertManageData.ALERT_NAME);
+
+        // click  delete alert button
         clickButton(AlertManageLocator.DELETE_ALERT_BUTTON);
 
         // click confirm delete button

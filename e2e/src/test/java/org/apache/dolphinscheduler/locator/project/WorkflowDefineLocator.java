@@ -182,23 +182,24 @@ public class WorkflowDefineLocator {
     /**
      * online workflow
      */
+    public static final By WORKFLOW_STATE = By.xpath("//table/tr[2]/td[4]/span");
+
+
     // click online workflow button
-    public static final By CLICK_ONLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
+    public static final By CLICK_ONLINE_WORKFLOW_BUTTON = By.xpath("//button[@title['data-original-title']='上线']");
 
     /**
      * offline workflow
      */
     // click offline workflow button
-    public static final By CLICK_OFFLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
-
+    public static final By CLICK_OFFLINE_WORKFLOW_BUTTON = By.xpath("//button[@title['data-original-title']='下线']");
 
     /**
      * delete workflow
      */
     //click delete workflow button
-    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[10]/span/button");
+    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//table/tr[2]/td[10]/span/button");
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
-    
 }

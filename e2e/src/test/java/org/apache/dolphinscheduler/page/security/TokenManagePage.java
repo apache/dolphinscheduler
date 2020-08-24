@@ -60,7 +60,7 @@ public class TokenManagePage extends PageCommon {
      */
     public boolean editToken() throws InterruptedException {
         // edit token
-        clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
+        ifTextExists(TokenManageLocator.TOKEN, "1");
 
         // determine the existence of the editing token
         locateElement(TokenManageLocator.EDIT_TOKEN_BUTTON);
