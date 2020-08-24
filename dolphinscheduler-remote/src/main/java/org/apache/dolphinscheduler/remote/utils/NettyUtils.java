@@ -24,7 +24,6 @@ import io.netty.channel.epoll.Epoll;
  */
 public class NettyUtils {
 
-
     private NettyUtils() {
     }
 
@@ -36,9 +35,8 @@ public class NettyUtils {
         if (!Epoll.isAvailable()) {
             return false;
         }
-        String enableNetty = Constants.NETTY_EPOLL_ENABLE;
-        return Boolean.parseBoolean(enableNetty);
+        String enableNettyEpoll = Constants.NETTY_EPOLL_ENABLE;
+        return Boolean.parseBoolean(enableNettyEpoll);
     }
-
 
 }
