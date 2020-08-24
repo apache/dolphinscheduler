@@ -28,6 +28,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -297,6 +300,24 @@ public class UsersControllerTest extends AbstractControllerTest{
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+    }
+
+    @Test
+    public void testBatchActivateUser() throws Exception {
+        List<String> userNames = new ArrayList<>();
+        userNames.add("user_sky_cxl");
+        userNames.add("19990323");
+        userNames.add("test_sky_post_11");
+        String jsonUserNames = JSONUtils.toJsonString(userNames);
+        MvcResult mvcResult = mockMvc.perform(post("/users/batch/activate")
+                .header(SESSION_ID, sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonUserNames))
+                .andExpect(status().isOk())
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

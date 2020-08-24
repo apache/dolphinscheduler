@@ -528,6 +528,41 @@ public class UsersServiceTest {
         }
     }
 
+    @Test
+    public void testBatchActivateUser() {
+        User user = new User();
+        user.setUserType(UserType.GENERAL_USER);
+        List<String> userNames = new ArrayList<>();
+        userNames.add("userTest0001");
+        userNames.add("userTest0002");
+        userNames.add("userTest0003~");
+        userNames.add("userTest0004");
+
+        try {
+            //not admin
+            Map<String, Object> result = usersService.batchActivateUser(user, userNames);
+            Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
+            //batch activate user names
+            user.setUserType(UserType.ADMIN_USER);
+            when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
+            when(userMapper.queryByUserNameAccurately("userTest0002")).thenReturn(getDisabledUser());
+            result = usersService.batchActivateUser(user, userNames);
+            Map<String, Object> responseData = (Map<String, Object>) result.get(Constants.DATA_LIST);
+            Map<String, Object> successData = (Map<String, Object>) responseData.get("success");
+            int totalSuccess = (Integer) successData.get("sum");
+
+            Map<String, Object> failedData = (Map<String, Object>) responseData.get("failed");
+            int totalFailed = (Integer) failedData.get("sum");
+
+            Assert.assertEquals(1, totalSuccess);
+            Assert.assertEquals(3, totalFailed);
+            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
+    }
+
     /**
      * get disabled user
      * @return
