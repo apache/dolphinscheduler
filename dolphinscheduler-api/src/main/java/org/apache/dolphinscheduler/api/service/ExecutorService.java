@@ -635,7 +635,7 @@ public class ExecutorService extends BaseService{
      */
     private boolean checkValidForcedSuccessTask(int processInstanceId) {
         List<Integer> forcedSuccessList = processService.findTaskIdByInstanceState(processInstanceId, ExecutionStatus.FORCED_SUCCESS);
-        if (forcedSuccessList != null && forcedSuccessList.size() > 0) {
+        if (forcedSuccessList != null && !forcedSuccessList.isEmpty()) {
             return true;
         }
 
