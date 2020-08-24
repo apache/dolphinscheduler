@@ -100,7 +100,18 @@ const setSvgColor = (e, color) => {
   // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
-      $(v).attr('stroke', '#2d8cf0').attr('stroke-width', 2)
+      if($(v).attr('fill') ==='#ccc') {
+        $(v).attr('fill', '#2d8cf0')
+      }
+      if($(v).attr('fill') ==='#4caf50') {
+        $(v).attr('fill','#4caf50').attr('stroke', '#4caf50').attr('stroke-width', 2)
+        $(v).prev().attr('stroke', '#4caf50').attr('stroke-width', 2)
+      } else if($(v).attr('fill') ==='#252d39') {
+        $(v).attr('stroke', '#252d39').attr('stroke-width', 2)
+        $(v).prev().attr('stroke', '#252d39').attr('stroke-width', 2)
+      } else {
+        $(v).attr('stroke', '#2d8cf0').attr('stroke-width', 2)
+      }
     })
   })
 
