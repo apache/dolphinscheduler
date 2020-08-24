@@ -107,6 +107,9 @@ const setSvgColor = (e, color) => {
 
   // Add color to the selection
   _.map($(e.canvas)[0].childNodes, (v, i) => {
+    if($(v).attr('fill') ==='#2d8cf0') {
+      $(v).attr('fill', '#ccc')
+    }
     $(v).attr('stroke', '#ccc')
     if ($(v).attr('class')) {
       $(v).attr('stroke-width', 2)
