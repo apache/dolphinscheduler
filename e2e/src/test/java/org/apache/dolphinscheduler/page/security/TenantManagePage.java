@@ -46,7 +46,7 @@ public class TenantManagePage extends PageCommon {
      * @return Whether to enter the specified page after create tenant
      */
     public boolean createTenant() throws InterruptedException {
-        clickButton(TenantManageLocator.TENANT_MANAGE);
+        clickElement(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
@@ -61,11 +61,11 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TenantManageData.TENANT_MANAGE);
+        return ifTextExists(TenantManageLocator.TENANT_CODE_FIRST, TenantManageData.TENANT_CODE);
     }
 
     public boolean deleteTenant() throws InterruptedException {
-        clickButton(TenantManageLocator.TENANT_MANAGE);
+        clickElement(TenantManageLocator.TENANT_MANAGE);
 
         // click delete button
         clickButton(TenantManageLocator.DELETE_TENANT_BUTTON);

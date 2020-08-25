@@ -424,6 +424,33 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_process_definition_version
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_version`;
+CREATE TABLE `t_ds_process_definition_version` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+  `version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `process_definition_json` longtext COMMENT 'process definition json content',
+  `description` text,
+  `global_params` text COMMENT 'global parameters',
+  `locations` text COMMENT 'Node location information',
+  `connects` text COMMENT 'Node connection information',
+  `receivers` text COMMENT 'receivers',
+  `receivers_cc` text COMMENT 'cc',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_id_and_version` (`process_definition_id`,`version`) USING BTREE,
+  KEY `process_definition_index` (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_process_definition
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_instance`;

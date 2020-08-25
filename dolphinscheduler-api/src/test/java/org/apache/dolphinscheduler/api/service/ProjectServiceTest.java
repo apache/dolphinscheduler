@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -35,9 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,7 +51,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
-
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceTest.class);
 
@@ -72,17 +70,6 @@ public class ProjectServiceTest {
     private String projectName = "ProjectServiceTest";
 
     private String userName = "ProjectServiceTest";
-
-    @Before
-    public void setUp() {
-
-    }
-
-
-    @After
-    public void after() {
-
-    }
 
     @Test
     public void testCreateProject() {
@@ -104,7 +91,6 @@ public class ProjectServiceTest {
         result = projectService.createProject(loginUser, "test", "test");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
 
     }
 
@@ -147,6 +133,21 @@ public class ProjectServiceTest {
         result = projectService.checkProjectAndAuth(loginUser, project, projectName);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Map<String, Object> result2 = new HashMap<>();
+
+        result2 = projectService.checkProjectAndAuth(loginUser, null, projectName);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, result2.get(Constants.STATUS));
+
+        Project project1 = getProject();
+        // USER_NO_OPERATION_PROJECT_PERM
+        project1.setUserId(2);
+        result2 = projectService.checkProjectAndAuth(loginUser, project1, projectName);
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result2.get(Constants.STATUS));
+
+        //success
+        project1.setUserId(1);
+        projectService.checkProjectAndAuth(loginUser, project1, projectName);
 
     }
 
@@ -224,7 +225,6 @@ public class ProjectServiceTest {
         result = projectService.deleteProject(loginUser, 1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
 
     }
 
@@ -322,7 +322,6 @@ public class ProjectServiceTest {
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
-
     private Project getProject() {
         Project project = new Project();
         project.setId(1);
@@ -336,7 +335,6 @@ public class ProjectServiceTest {
         list.add(getProject());
         return list;
     }
-
 
     /**
      * create admin user
@@ -369,13 +367,11 @@ public class ProjectServiceTest {
         return list;
     }
 
-
     private String getDesc() {
-        return "projectUserMapper.deleteProjectRelation(projectId,userId)projectUserMappe" +
-                ".deleteProjectRelation(projectId,userId)projectUserMappe" +
-                "r.deleteProjectRelation(projectId,userId)projectUserMapper" +
-                ".deleteProjectRelation(projectId,userId)projectUserMapper.deleteProjectRelation(projectId,userId)";
+        return "projectUserMapper.deleteProjectRelation(projectId,userId)projectUserMappe"
+                + ".deleteProjectRelation(projectId,userId)projectUserMappe"
+                + "r.deleteProjectRelation(projectId,userId)projectUserMapper"
+                + ".deleteProjectRelation(projectId,userId)projectUserMapper.deleteProjectRelation(projectId,userId)";
     }
-
 
 }

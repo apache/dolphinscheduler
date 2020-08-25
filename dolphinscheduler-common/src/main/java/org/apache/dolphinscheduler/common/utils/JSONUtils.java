@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.*;
-
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 /**
  * json utils
@@ -48,6 +48,7 @@ public class JSONUtils {
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .setTimeZone(TimeZone.getDefault())
             ;
 
