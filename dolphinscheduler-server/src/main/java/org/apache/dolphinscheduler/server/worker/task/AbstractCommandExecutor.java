@@ -312,14 +312,8 @@ public abstract class AbstractCommandExecutor {
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
-        String cmdStr;
-
-        try {
-            cmdStr = ProcessUtils.buildCommandStr(commands);
-            logger.info("task run command:\n{}", cmdStr);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+        String cmdStr = ProcessUtils.buildCommandStr(commands);
+        logger.info("task run command:\n{}", cmdStr);
     }
 
     /**
