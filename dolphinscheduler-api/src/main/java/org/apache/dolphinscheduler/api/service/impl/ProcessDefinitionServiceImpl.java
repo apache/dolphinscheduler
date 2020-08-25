@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -56,6 +57,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -124,6 +126,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -202,7 +207,16 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefine.setCreateTime(now);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
+
+        // save the new process definition
         processDefineMapper.insert(processDefine);
+
+        // add process definition version
+        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefine);
+
+        processDefine.setVersion(version);
+
+        processDefineMapper.updateVersionByProcessDefinitionId(processDefine.getId(), version);
 
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
@@ -239,7 +253,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return sb.toString();
     }
 
-
     /**
      * query process definition list
      *
@@ -264,7 +277,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         return result;
     }
-
 
     /**
      * query process definition list paging
@@ -310,7 +322,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return process definition detail
      */
     public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
-
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -398,9 +409,14 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefine.setGlobalParamList(globalParamsList);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
+
+        // add process definition version
+        long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefine);
+        processDefine.setVersion(version);
+
         if (processDefineMapper.updateById(processDefine) > 0) {
             putMsg(result, Status.SUCCESS);
-
+            result.put(Constants.DATA_LIST, processDefineMapper.queryByDefineId(id));
         } else {
             putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
@@ -1058,7 +1074,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
     }
 
-
     /**
      * check the process definition node meets the specifications
      *
@@ -1127,7 +1142,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
-
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
@@ -1184,7 +1198,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
 
     }
-
 
     /**
      * query process definition all by project id
@@ -1277,7 +1290,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 TaskNode taskNode = dag.getNode(nodeName);
                 treeViewDto.setType(taskNode.getType());
 
-
                 //set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
@@ -1334,7 +1346,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-
     /**
      * Generate the DAG Graph based on the process definition id
      *
@@ -1359,7 +1370,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         return new DAG<>();
     }
-
 
     /**
      * whether the graph has a ring
@@ -1522,6 +1532,66 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         checkBatchOperateResult(projectName, targetProject.getName(), result, failedProcessList, false);
 
+        return result;
+    }
+
+    /**
+     * switch the defined process definition verison
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param version the version user want to switch
+     * @return switch process definition version result code
+     */
+    @Override
+    public Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
+            , int processDefinitionId, long version) {
+
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(projectName);
+        // check project auth
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+        if (Objects.isNull(processDefinition)) {
+            putMsg(result
+                    , Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_ERROR
+                    , processDefinitionId);
+            return result;
+        }
+
+        ProcessDefinitionVersion processDefinitionVersion = processDefinitionVersionService
+                .queryByProcessDefinitionIdAndVersion(processDefinitionId, version);
+        if (Objects.isNull(processDefinitionVersion)) {
+            putMsg(result
+                    , Status.SWITCH_PROCESS_DEFINITION_VERSION_NOT_EXIST_PROCESS_DEFINITION_VERSION_ERROR
+                    , processDefinitionId
+                    , version);
+            return result;
+        }
+
+        processDefinition.setVersion(processDefinitionVersion.getVersion());
+        processDefinition.setProcessDefinitionJson(processDefinitionVersion.getProcessDefinitionJson());
+        processDefinition.setDescription(processDefinitionVersion.getDescription());
+        processDefinition.setLocations(processDefinitionVersion.getLocations());
+        processDefinition.setConnects(processDefinitionVersion.getConnects());
+        processDefinition.setTimeout(processDefinitionVersion.getTimeout());
+        processDefinition.setGlobalParams(processDefinitionVersion.getGlobalParams());
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setReceivers(processDefinitionVersion.getReceivers());
+        processDefinition.setReceiversCc(processDefinitionVersion.getReceiversCc());
+        processDefinition.setResourceIds(processDefinitionVersion.getResourceIds());
+
+        if (processDefineMapper.updateById(processDefinition) > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR);
+        }
         return result;
     }
 
