@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
@@ -97,6 +98,9 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    private ProcessDefinitionVersionService processDefinitionVersionService;
 
     private static final String SHELL_JSON = "{\n"
             + "    \"globalParams\": [\n"
@@ -390,7 +394,11 @@ public class ProcessDefinitionServiceTest {
         // instance exit
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
-        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
+        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\","
+                + "\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234"
+                + "\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\","
+                + "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
         definition.setConnects("[]");
 
         Mockito.when(processDefineMapper.selectById(46)).thenReturn(definition);
@@ -432,7 +440,11 @@ public class ProcessDefinitionServiceTest {
 
         ProcessDefinition definition = getProcessDefinition();
         definition.setLocations("{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}");
-        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
+        definition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\""
+                + ",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234"
+                + "\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\","
+                + "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},"
+                + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}");
         definition.setConnects("[]");
 
         // check target project result == null
@@ -568,14 +580,14 @@ public class ProcessDefinitionServiceTest {
 
         //FIXME has function exit code 1 when exception
         //process definition offline
-//        List<Schedule> schedules = new ArrayList<>();
-//        Schedule schedule = getSchedule();
-//        schedules.add(schedule);
-//        Mockito.when(scheduleMapper.selectAllByProcessDefineArray(new int[]{46})).thenReturn(schedules);
-//        Mockito.when(scheduleMapper.updateById(schedule)).thenReturn(1);
-//        Map<String, Object> offlineRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
-//                46, ReleaseState.OFFLINE.getCode());
-//        Assert.assertEquals(Status.SUCCESS, offlineRes.get(Constants.STATUS));
+        //        List<Schedule> schedules = new ArrayList<>();
+        //        Schedule schedule = getSchedule();
+        //        schedules.add(schedule);
+        //        Mockito.when(scheduleMapper.selectAllByProcessDefineArray(new int[]{46})).thenReturn(schedules);
+        //        Mockito.when(scheduleMapper.updateById(schedule)).thenReturn(1);
+        //        Map<String, Object> offlineRes = processDefinitionService.releaseProcessDefinition(loginUser, "project_test1",
+        //                46, ReleaseState.OFFLINE.getCode());
+        //        Assert.assertEquals(Status.SUCCESS, offlineRes.get(Constants.STATUS));
     }
 
     @Test
@@ -850,9 +862,12 @@ public class ProcessDefinitionServiceTest {
         String projectName = "project_test1";
         Project project = getProject(projectName);
 
+        ProcessDefinition processDefinition = getProcessDefinition();
+
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(processService.findProcessDefineById(1)).thenReturn(getProcessDefinition());
+        Mockito.when(processService.findProcessDefineById(1)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1L);
 
         String sqlDependentJson = "{\n"
                 + "    \"globalParams\": [\n"
