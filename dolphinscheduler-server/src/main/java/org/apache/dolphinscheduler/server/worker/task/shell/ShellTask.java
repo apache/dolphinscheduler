@@ -156,12 +156,11 @@ public class ShellTask extends AbstractTask {
     logger.info("raw script : {}", shellParameters.getRawScript());
     logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
-    Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
-    FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
     if (OSUtils.isWindows()) {
       Files.createFile(path);
     } else {
+      Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
+      FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
       Files.createFile(path, attr);
     }
 
