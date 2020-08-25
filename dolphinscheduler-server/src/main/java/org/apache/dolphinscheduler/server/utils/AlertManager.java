@@ -21,18 +21,17 @@ import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -98,39 +97,40 @@ public class AlertManager {
 
         String res = "";
         if (processInstance.getState().typeIsSuccess()) {
-            List<LinkedHashMap> successTaskList = new ArrayList<>(1);
-            LinkedHashMap<String, String> successTaskMap = new LinkedHashMap();
-            successTaskMap.put("id", String.valueOf(processInstance.getId()));
-            successTaskMap.put("name", processInstance.getName());
-            successTaskMap.put("job type", getCommandCnName(processInstance.getCommandType()));
-            successTaskMap.put("state", processInstance.getState().toString());
-            successTaskMap.put("recovery", processInstance.getRecovery().toString());
-            successTaskMap.put("run time", String.valueOf(processInstance.getRunTimes()));
-            successTaskMap.put("start time", DateUtils.dateToString(processInstance.getStartTime()));
-            successTaskMap.put("end time", DateUtils.dateToString(processInstance.getEndTime()));
-            successTaskMap.put("host", processInstance.getHost());
-            successTaskList.add(successTaskMap);
+            List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
+            ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .processId(processInstance.getId())
+                    .processName(processInstance.getName())
+                    .processType(processInstance.getCommandType())
+                    .processState(processInstance.getState())
+                    .recovery(processInstance.getRecovery())
+                    .runTimes(processInstance.getRunTimes())
+                    .processStartTime(processInstance.getStartTime())
+                    .processEndTime(processInstance.getEndTime())
+                    .processHost(processInstance.getHost())
+                    .build();
+            successTaskList.add(processAlertContent);
             res = JSONUtils.toJsonString(successTaskList);
         } else if (processInstance.getState().typeIsFailure()) {
 
-            List<LinkedHashMap> failedTaskList = new ArrayList<>();
-
+            List<ProcessAlertContent> failedTaskList = new ArrayList<>();
             for (TaskInstance task : taskInstances) {
                 if (task.getState().typeIsSuccess()) {
                     continue;
                 }
-                LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap();
-                failedTaskMap.put("process instance id", String.valueOf(processInstance.getId()));
-                failedTaskMap.put("process instance name", processInstance.getName());
-                failedTaskMap.put("task id", String.valueOf(task.getId()));
-                failedTaskMap.put("task name", task.getName());
-                failedTaskMap.put("task type", task.getTaskType());
-                failedTaskMap.put("task state", task.getState().toString());
-                failedTaskMap.put("task start time", DateUtils.dateToString(task.getStartTime()));
-                failedTaskMap.put("task end time", DateUtils.dateToString(task.getEndTime()));
-                failedTaskMap.put("host", task.getHost());
-                failedTaskMap.put("log path", task.getLogPath());
-                failedTaskList.add(failedTaskMap);
+                ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                        .processId(processInstance.getId())
+                        .processName(processInstance.getName())
+                        .taskId(task.getId())
+                        .taskName(task.getName())
+                        .taskType(task.getTaskType())
+                        .taskState(task.getState())
+                        .taskStartTime(task.getStartTime())
+                        .taskEndTime(task.getEndTime())
+                        .taskHost(task.getHost())
+                        .logPath(task.getLogPath())
+                        .build();
+                failedTaskList.add(processAlertContent);
             }
             res = JSONUtils.toJsonString(failedTaskList);
         }
@@ -147,15 +147,16 @@ public class AlertManager {
      */
     private String getWorkerToleranceContent(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
 
-        List<LinkedHashMap<String, String>> toleranceTaskInstanceList = new ArrayList<>();
+        List<ProcessAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
         for (TaskInstance taskInstance : toleranceTaskList) {
-            LinkedHashMap<String, String> toleranceWorkerContentMap = new LinkedHashMap();
-            toleranceWorkerContentMap.put("process name", processInstance.getName());
-            toleranceWorkerContentMap.put("task name", taskInstance.getName());
-            toleranceWorkerContentMap.put("host", taskInstance.getHost());
-            toleranceWorkerContentMap.put("task retry times", String.valueOf(taskInstance.getRetryTimes()));
-            toleranceTaskInstanceList.add(toleranceWorkerContentMap);
+            ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .processName(processInstance.getName())
+                    .taskName(taskInstance.getName())
+                    .taskHost(taskInstance.getHost())
+                    .retryTimes(taskInstance.getRetryTimes())
+                    .build();
+            toleranceTaskInstanceList.add(processAlertContent);
         }
         return JSONUtils.toJsonString(toleranceTaskInstanceList);
     }

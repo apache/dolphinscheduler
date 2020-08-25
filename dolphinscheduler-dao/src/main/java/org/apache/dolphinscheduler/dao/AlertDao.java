@@ -17,22 +17,25 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.AlertWarnLevel;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -103,14 +106,12 @@ public class AlertDao extends AbstractBaseDao {
      */
     public void sendServerStopedAlert(int alertgroupId, String host, String serverType) {
         Alert alert = new Alert();
-        List<LinkedHashMap> serverStopList = new ArrayList<>(1);
-        LinkedHashMap<String, String> serverStopedMap = new LinkedHashMap();
-        serverStopedMap.put("type", serverType);
-        serverStopedMap.put("host", host);
-        serverStopedMap.put("event", "server down");
-        serverStopedMap.put("warning level", "serious");
-        serverStopList.add(serverStopedMap);
-        String content = JSONUtils.toJsonString(serverStopList);
+        List<ServerAlertContent> serverAlertContents = new ArrayList<>(1);
+        ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
+                type(serverType).host(host).event(AlertEvent.SERVER_DOWN).warningLevel(AlertWarnLevel.SERIOUS).
+                build();
+        serverAlertContents.add(serverStopAlertContent);
+        String content = JSONUtils.toJsonString(serverAlertContents);
         alert.setTitle("Fault tolerance warning");
         saveTaskTimeoutAlert(alert, content, alertgroupId, null, null);
     }
@@ -126,14 +127,15 @@ public class AlertDao extends AbstractBaseDao {
         String receivers = processDefinition.getReceivers();
         String receiversCc = processDefinition.getReceiversCc();
         Alert alert = new Alert();
-        List<LinkedHashMap> processTimeoutList = new ArrayList<>(1);
-        LinkedHashMap<String, String> processTimeoutMap = new LinkedHashMap();
-        processTimeoutMap.put("id", String.valueOf(processInstance.getId()));
-        processTimeoutMap.put("name", processInstance.getName());
-        processTimeoutMap.put("event", "timeout");
-        processTimeoutMap.put("warnLevel", "middle");
-        processTimeoutList.add(processTimeoutMap);
-        String content = JSONUtils.toJsonString(processTimeoutList);
+        List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
+        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .event(AlertEvent.TIME_OUT)
+                .warningLevel(AlertWarnLevel.MIDDLE)
+                .build();
+        processAlertContentList.add(processAlertContent);
+        String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Process Timeout Warn");
         saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
     }
@@ -169,16 +171,17 @@ public class AlertDao extends AbstractBaseDao {
     public void sendTaskTimeoutAlert(int alertgroupId, String receivers, String receiversCc, int processInstanceId,
                                      String processInstanceName, int taskId, String taskName) {
         Alert alert = new Alert();
-        List<LinkedHashMap> taskTimeoutList = new ArrayList<>(1);
-        LinkedHashMap<String, String> taskTimeoutMap = new LinkedHashMap();
-        taskTimeoutMap.put("process instance id", String.valueOf(processInstanceId));
-        taskTimeoutMap.put("process name", processInstanceName);
-        taskTimeoutMap.put("task id", String.valueOf(taskId));
-        taskTimeoutMap.put("task name", taskName);
-        taskTimeoutMap.put("event", "timeout");
-        taskTimeoutMap.put("warnLevel", "middle");
-        taskTimeoutList.add(taskTimeoutMap);
-        String content = JSONUtils.toJsonString(taskTimeoutList);
+        List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
+        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                .processId(processInstanceId)
+                .processName(processInstanceName)
+                .taskId(taskId)
+                .taskName(taskName)
+                .event(AlertEvent.TIME_OUT)
+                .warningLevel(AlertWarnLevel.MIDDLE)
+                .build();
+        processAlertContentList.add(processAlertContent);
+        String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
         saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
     }
@@ -210,4 +213,5 @@ public class AlertDao extends AbstractBaseDao {
     public AlertMapper getAlertMapper() {
         return alertMapper;
     }
+
 }
