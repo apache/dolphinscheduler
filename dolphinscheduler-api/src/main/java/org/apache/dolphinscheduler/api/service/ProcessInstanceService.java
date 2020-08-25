@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
+package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.common.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
@@ -24,19 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
@@ -72,6 +59,21 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +111,9 @@ public class ProcessInstanceService extends BaseService {
     ProcessDefinitionService processDefinitionService;
 
     @Autowired
+    ProcessDefinitionVersionService processDefinitionVersionService;
+
+    @Autowired
     ExecutorService execService;
 
     @Autowired
@@ -118,18 +123,11 @@ public class ProcessInstanceService extends BaseService {
     LoggerService loggerService;
 
 
-
     @Autowired
     UsersService usersService;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime
-     * @param loginUser
-     * @param projectName
-     * @param size
-     * @param startTime
-     * @param endTime
-     * @return
      */
     public Map<String, Object> queryTopNLongestRunningProcessInstance(User loginUser, String projectName, int size, String startTime, String endTime) {
         Map<String, Object> result = new HashMap<>();
@@ -155,7 +153,7 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
         Date end = DateUtils.stringToDate(endTime);
-        if(start == null || end == null) {
+        if (start == null || end == null) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
             return result;
         }
@@ -169,6 +167,7 @@ public class ProcessInstanceService extends BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
     /**
      * query process instance by id
      *
@@ -214,7 +213,7 @@ public class ProcessInstanceService extends BaseService {
      */
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
                                                         String startDate, String endDate,
-                                                        String searchVal, String executorName,ExecutionStatus stateType, String host,
+                                                        String searchVal, String executorName, ExecutionStatus stateType, String host,
                                                         Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>();
@@ -246,18 +245,18 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
 
-        Page<ProcessInstance> page = new Page(pageNo, pageSize);
+        Page<ProcessInstance> page = new Page<>(pageNo, pageSize);
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                project.getId(), processDefineId, searchVal, executorId,statusArray, host, start, end);
+                        project.getId(), processDefineId, searchVal, executorId, statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
-        for(ProcessInstance processInstance: processInstances){
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+        for (ProcessInstance processInstance : processInstances) {
+            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
             User executor = usersService.queryUser(processInstance.getExecutorId());
             if (null != executor) {
                 processInstance.setExecutorName(executor.getUserName());
@@ -270,8 +269,6 @@ public class ProcessInstanceService extends BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
-
 
     /**
      * query task list by process instance id
@@ -305,14 +302,13 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * add dependent result for dependent task
-     * @param taskInstanceList
      */
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
-        for(TaskInstance taskInstance: taskInstanceList){
-            if(taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())){
+        for (TaskInstance taskInstance : taskInstanceList) {
+            if (taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())) {
                 Result logResult = loggerService.queryLog(
                         taskInstance.getId(), 0, 4098);
-                if(logResult.getCode() == Status.SUCCESS.ordinal()){
+                if (logResult.getCode() == Status.SUCCESS.ordinal()) {
                     String log = (String) logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
                     taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
@@ -321,24 +317,24 @@ public class ProcessInstanceService extends BaseService {
         }
     }
 
-    public Map<String,DependResult> parseLogForDependentResult(String log) throws IOException {
+    public Map<String, DependResult> parseLogForDependentResult(String log) throws IOException {
         Map<String, DependResult> resultMap = new HashMap<>();
-        if(StringUtils.isEmpty(log)){
+        if (StringUtils.isEmpty(log)) {
             return resultMap;
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(log.getBytes(
-            StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         String line;
         while ((line = br.readLine()) != null) {
-            if(line.contains(DEPENDENT_SPLIT)){
+            if (line.contains(DEPENDENT_SPLIT)) {
                 String[] tmpStringArray = line.split(":\\|\\|");
-                if(tmpStringArray.length != 2){
+                if (tmpStringArray.length != 2) {
                     continue;
                 }
                 String dependResultString = tmpStringArray[1];
                 String[] dependStringArray = dependResultString.split(",");
-                if(dependStringArray.length != 2){
+                if (dependStringArray.length != 2) {
                     continue;
                 }
                 String key = dependStringArray[0].trim();
@@ -348,7 +344,6 @@ public class ProcessInstanceService extends BaseService {
         }
         return resultMap;
     }
-
 
     /**
      * query sub process instance detail info by task id
@@ -462,7 +457,7 @@ public class ProcessInstanceService extends BaseService {
             processInstance.setTimeout(timeout);
             Tenant tenant = processService.getTenantForProcess(processData.getTenantId(),
                     processDefinition.getUserId());
-            if(tenant != null){
+            if (tenant != null) {
                 processInstance.setTenantCode(tenant.getTenantCode());
             }
             processInstance.setProcessInstanceJson(processInstanceJson);
@@ -477,6 +472,11 @@ public class ProcessInstanceService extends BaseService {
             processDefinition.setLocations(locations);
             processDefinition.setConnects(connects);
             processDefinition.setTimeout(timeout);
+            processDefinition.setUpdateTime(new Date());
+
+            // add process definition version
+            long version = processDefinitionVersionService.addProcessDefinitionVersion(processDefinition);
+            processDefinition.setVersion(version);
             updateDefine = processDefineMapper.updateById(processDefinition);
         }
         if (update > 0 && updateDefine > 0) {
@@ -484,7 +484,6 @@ public class ProcessInstanceService extends BaseService {
         } else {
             putMsg(result, Status.UPDATE_PROCESS_INSTANCE_ERROR);
         }
-
 
         return result;
 
@@ -532,6 +531,7 @@ public class ProcessInstanceService extends BaseService {
 
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
+     *
      * @param loginUser login user
      * @param projectName project name
      * @param processInstanceId process instance id
@@ -554,12 +554,9 @@ public class ProcessInstanceService extends BaseService {
             return result;
         }
 
-
-
         processService.removeTaskLogFile(processInstanceId);
         // delete database cascade
         int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
-
 
         processService.deleteAllSubWorkProcessByParentId(processInstanceId);
         processService.deleteWorkProcessMapByParentId(processInstanceId);
@@ -592,7 +589,6 @@ public class ProcessInstanceService extends BaseService {
                 .getBusinessTime(processInstance.getCmdTypeIfComplement(),
                         processInstance.getScheduleTime());
 
-
         String workflowInstanceJson = processInstance.getProcessInstanceJson();
 
         ProcessData workflowData = JSONUtils.parseObject(workflowInstanceJson, ProcessData.class);
@@ -603,9 +599,8 @@ public class ProcessInstanceService extends BaseService {
         List<Property> globalParams = new ArrayList<>();
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-                globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
-
 
         List<TaskNode> taskNodeList = workflowData.getTasks();
 
@@ -618,7 +613,7 @@ public class ProcessInstanceService extends BaseService {
         }
 
         // local params
-        Map<String, Map<String,Object>> localUserDefParams = new HashMap<>();
+        Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
             String parameter = taskNode.getParams();
             Map<String, String> map = JSONUtils.toMap(parameter);
@@ -627,9 +622,9 @@ public class ProcessInstanceService extends BaseService {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
-                Map<String,Object> localParamsMap = new HashMap<>();
-                localParamsMap.put("taskType",taskNode.getType());
-                localParamsMap.put("localParamsList",localParamsList);
+                Map<String, Object> localParamsMap = new HashMap<>();
+                localParamsMap.put("taskType", taskNode.getType());
+                localParamsMap.put("localParamsList", localParamsList);
                 if (CollectionUtils.isNotEmpty(localParamsList)) {
                     localUserDefParams.put(taskNode.getName(), localParamsMap);
                 }
