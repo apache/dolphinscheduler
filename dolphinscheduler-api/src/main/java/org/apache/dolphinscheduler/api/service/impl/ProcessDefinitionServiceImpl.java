@@ -239,7 +239,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return sb.toString();
     }
 
-
     /**
      * query process definition list
      *
@@ -264,7 +263,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         return result;
     }
-
 
     /**
      * query process definition list paging
@@ -310,7 +308,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return process definition detail
      */
     public Map<String, Object> queryProcessDefinitionById(User loginUser, String projectName, Integer processId) {
-
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -474,7 +471,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
         // check process instances is already running
         List<ProcessInstance> processInstances =  processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, Constants.NOT_TERMINATED_STATES);
-        if(CollectionUtils.isNotEmpty(processInstances)){
+        if (CollectionUtils.isNotEmpty(processInstances)) {
             putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_ID_FAIL,processInstances.size());
             return result;
         }
@@ -1064,7 +1061,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
     }
 
-
     /**
      * check the process definition node meets the specifications
      *
@@ -1133,7 +1129,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return result;
         }
 
-
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
@@ -1190,7 +1185,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
 
     }
-
 
     /**
      * query process definition all by project id
@@ -1283,7 +1277,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 TaskNode taskNode = dag.getNode(nodeName);
                 treeViewDto.setType(taskNode.getType());
 
-
                 //set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
@@ -1340,7 +1333,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         return result;
     }
 
-
     /**
      * Generate the DAG Graph based on the process definition id
      *
@@ -1365,7 +1357,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         return new DAG<>();
     }
-
 
     /**
      * whether the graph has a ring
