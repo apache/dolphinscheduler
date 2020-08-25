@@ -14,16 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.project;
 
-public class ProjectData {
+package org.apache.dolphinscheduler.remote;
 
-    public static final String CREATE_PROJECT_BUTTON = "创建项目";
+import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project_1";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+import org.junit.Assert;
+import org.junit.Test;
+
+/**
+ * NettyUtilTest
+ */
+public class NettyUtilTest {
+
+    @Test
+    public void testUserEpoll() {
+        System.setProperty("netty.epoll.enable", "false");
+        Assert.assertFalse(NettyUtils.useEpoll());
+    }
+
 }
