@@ -174,7 +174,7 @@ public class TaskInstanceService extends BaseService {
 
         // check whether the task instance state type is failure
         if (!task.getState().typeIsFailure()) {
-            putMsg(result, Status.TASK_INSTANCE_STATE_OPETATION_ERROR, taskInstanceId, task.getState().toString());
+            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
 

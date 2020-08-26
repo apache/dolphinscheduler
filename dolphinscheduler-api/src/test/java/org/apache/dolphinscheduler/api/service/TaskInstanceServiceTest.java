@@ -237,7 +237,7 @@ public class TaskInstanceServiceTest {
         task.setState(ExecutionStatus.SUCCESS);
         when(taskInstanceMapper.selectById(1)).thenReturn(task);
         Map<String, Object> taskStateErrorRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
-        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPETATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
+        Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
 
         // test success
         task.setState(ExecutionStatus.FAILURE);
