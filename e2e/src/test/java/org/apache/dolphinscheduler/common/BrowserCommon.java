@@ -444,4 +444,8 @@ public class BrowserCommon {
     public boolean ifTextExists(By locator, String text) {
         return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
     }
+
+    public void flushPage() {
+        driver.navigate().refresh();
+    }
 }
