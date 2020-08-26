@@ -194,7 +194,7 @@ public enum Status {
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     FORCE_TASK_SUCCESS_ERROR(10162, "force task success error", "强制成功任务实例错误"),
-    TASK_INSTANCE_STATE_OPETATION_ERROR(10163, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
+    TASK_INSTANCE_STATE_OPERATION_ERROR(10163, "the status of task instance {0} is {1},Cannot perform force success operation", "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
 
 
 
