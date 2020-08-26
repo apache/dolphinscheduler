@@ -637,5 +637,6 @@ export default {
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
   'Current connection settings': '当前连线设置',
-  'Please save the DAG before formatting': '格式化前请先保存DAG'
+  'Please save the DAG before formatting': '格式化前请先保存DAG',
+  'Batch copy': '批量复制'
 }
