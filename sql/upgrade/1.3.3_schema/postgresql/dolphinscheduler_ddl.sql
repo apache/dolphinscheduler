@@ -50,3 +50,33 @@ d//
 delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_delay_time();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_delay_time();
+
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
+delimiter d//
+CREATE OR REPLACE FUNCTION ct_dolphin_T_t_ds_process_definition_version() RETURNS void AS $$
+BEGIN
+CREATE TABLE t_ds_process_definition_version (
+                                                 id int NOT NULL  ,
+                                                 process_definition_id int NOT NULL  ,
+                                                 version int DEFAULT NULL ,
+                                                 process_definition_json text ,
+                                                 description text ,
+                                                 global_params text ,
+                                                 locations text ,
+                                                 connects text ,
+                                                 receivers text ,
+                                                 receivers_cc text ,
+                                                 create_time timestamp DEFAULT NULL ,
+                                                 timeout int DEFAULT '0' ,
+                                                 resource_ids varchar(64),
+                                                 PRIMARY KEY (id)
+) ;
+create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT ct_dolphin_T_t_ds_process_definition_version();
+DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_process_definition_version();
