@@ -637,5 +637,6 @@ export default {
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
-  'Please save the DAG before formatting': 'Please save the DAG before formatting'
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
+  'Batch copy': 'Batch copy'
 }
