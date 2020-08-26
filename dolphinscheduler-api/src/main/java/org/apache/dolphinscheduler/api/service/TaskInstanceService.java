@@ -188,6 +188,9 @@ public class TaskInstanceService extends BaseService {
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
+        return result;
+    }
+
     /***
      * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
      * @param result exist result map
