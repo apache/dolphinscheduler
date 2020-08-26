@@ -14,42 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.remote.utils;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+package org.apache.dolphinscheduler.common.enums;
 
+public enum AlertWarnLevel {
 
-/**
- *  constant
- */
-public class Constants {
-
-    public static final String COMMA = ",";
-
-    public static final String SLASH = "/";
-
-    /**
-     *  charset
-     */
-    public static final Charset UTF8 = StandardCharsets.UTF_8;
-
-    /**
-     *  cpus
-     */
-    public static final int CPUS = Runtime.getRuntime().availableProcessors();
-
-
-    public static final String LOCAL_ADDRESS = IPUtils.getFirstNoLoopbackIP4Address();
-
-    /**
-     * netty epoll enable switch
-     */
-    public static final String NETTY_EPOLL_ENABLE = System.getProperty("netty.epoll.enable");
-
-    /**
-     * OS Name
-     */
-    public static final String OS_NAME = System.getProperty("os.name");
-
+    MIDDLE,SERIOUS
 }
