@@ -30,6 +30,9 @@ public class TimingData {
 
     public static final String EDIT_Cc = "test.edit123qwe@qq.com";
 
-    public static final String WORKFLOW_TITLE = "工作流定义 - DolphinScheduler";
+    public static final String TIMING_OFFLINE_STATE = "下线";
+
+    public static final String TIMING_ONLINE_STATE = "上线";
+
     public static final String TIMING_TITLE = "定时任务列表 - DolphinScheduler";
 }
