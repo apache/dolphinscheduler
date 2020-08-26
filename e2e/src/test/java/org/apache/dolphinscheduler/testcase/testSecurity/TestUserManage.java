@@ -39,7 +39,7 @@ public class TestUserManage extends BaseTest {
         //edit user
         System.out.println("start edit  user");
         assert userManagePage.editGeneralUser();
-        assert userManagePage.editAdminlUser();
+        assert userManagePage.editAdminUser();
 
         System.out.println("end edit user");
         System.out.println("===================================");

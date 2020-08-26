@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -88,6 +89,9 @@ public class ProcessInstanceServiceTest {
     ProcessDefinitionService processDefinitionService;
 
     @Mock
+    ProcessDefinitionVersionService processDefinitionVersionService;
+
+    @Mock
     ExecutorService execService;
 
     @Mock
@@ -99,12 +103,11 @@ public class ProcessInstanceServiceTest {
     @Mock
     UsersService usersService;
 
-    private String shellJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\"," +
-            "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
-            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-            "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
-
+    private String shellJson = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-9527\",\"name\":\"shell-1\","
+            + "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"},"
+            + "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\","
+            + "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\","
+            + "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
     @Test
     public void testQueryProcessInstanceList() {
@@ -265,19 +268,16 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
-
     @Test
-    public void testParseLogForDependentResult() {
-        String logString = "[INFO] 2019-03-19 17:11:08.475 org.apache.dolphinscheduler.server.worker.log.TaskLogger:[172] - [taskAppId=TASK_223_10739_452334] dependent item complete :|| 223-ALL-day-last1Day,SUCCESS\n" +
-                "[INFO] 2019-03-19 17:11:08.476 org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread:[172] - task : 223_10739_452334 exit status code : 0\n" +
-                "[root@node2 current]# ";
-        try {
-            Map<String, DependResult> resultMap =
-                    processInstanceService.parseLogForDependentResult(logString);
-            Assert.assertEquals(1, resultMap.size());
-        } catch (IOException e) {
-
-        }
+    public void testParseLogForDependentResult() throws IOException {
+        String logString = "[INFO] 2019-03-19 17:11:08.475 org.apache.dolphinscheduler.server.worker.log.TaskLogger:[172]"
+                + " - [taskAppId=TASK_223_10739_452334] dependent item complete :|| 223-ALL-day-last1Day,SUCCESS\n"
+                + "[INFO] 2019-03-19 17:11:08.476 org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread:[172]"
+                + " - task : 223_10739_452334 exit status code : 0\n"
+                + "[root@node2 current]# ";
+        Map<String, DependResult> resultMap =
+                processInstanceService.parseLogForDependentResult(logString);
+        Assert.assertEquals(1, resultMap.size());
     }
 
     @Test
@@ -371,6 +371,7 @@ public class ProcessInstanceServiceTest {
         when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
         when(processService.updateProcessInstance(processInstance)).thenReturn(1);
         when(processDefinitionService.checkProcessNodeList(Mockito.any(), eq(shellJson))).thenReturn(result);
+        when(processDefinitionVersionService.addProcessDefinitionVersion(processDefinition)).thenReturn(1L);
         Map<String, Object> processInstanceFinishRes = processInstanceService.updateProcessInstance(loginUser, projectName, 1,
                 shellJson, "2020-02-21 00:00:00", true, Flag.YES, "", "");
         Assert.assertEquals(Status.UPDATE_PROCESS_INSTANCE_ERROR, processInstanceFinishRes.get(Constants.STATUS));
@@ -401,6 +402,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Map<String, Object> processInstanceNullRes = processInstanceService.queryParentInstanceBySubId(loginUser, projectName, 1);
         Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
 
@@ -558,6 +560,5 @@ public class ProcessInstanceServiceTest {
             result.put(Constants.MSG, status.getMsg());
         }
     }
-
 
 }

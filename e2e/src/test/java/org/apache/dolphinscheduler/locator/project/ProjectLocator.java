@@ -34,6 +34,9 @@ public class ProjectLocator {
     //submit button
     public static final By SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 
+    // project name
+    public static final By LIST_PROJECT_NAME = By.xpath("//table/tr[2]/td[2]/span/a");
+
     //delete project button
     public static final By DELETE_PROJECT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[9]/span/button");
 
