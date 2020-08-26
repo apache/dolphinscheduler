@@ -60,7 +60,7 @@ jobs:
           sudo apt-get install -f -y
           googleVersion=`google-chrome -version | awk '{print $3}'`
           echo ${googleVersion}
-          wget -N https://chromedriver.storage.googleapis.com/${{googleVersion}}/chromedriver_linux64.zip
+          wget -N https://chromedriver.storage.googleapis.com/${googleVersion}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
           sudo mv -f chromedriver /usr/local/share/chromedriver
           sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
