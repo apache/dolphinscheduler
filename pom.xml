@@ -730,6 +730,7 @@
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
+                        <include>**/api/service/ProcessDefinitionVersionServiceTest.java</include>
                         <include>**/api/service/ProcessInstanceServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
@@ -803,7 +804,8 @@
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <!--<include>**/remote/NettyRemotingClientTest.java</include>-->
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/remote/NettyUtilTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
@@ -818,7 +820,7 @@
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
-                        <!--<include>**/server/master/register/MasterRegistryTest.java</include>-->
+                        <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
@@ -853,6 +855,7 @@
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessDefinitionVersionMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
                         <include>**/dao/mapper/ProjectMapperTest.java</include>
