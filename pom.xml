@@ -997,6 +997,7 @@
                         <exclude>**/*.eslintrc</exclude>
                         <exclude>**/.mvn/jvm.config</exclude>
                         <exclude>**/.mvn/wrapper/**</exclude>
+                        <exclude>**/*.iml</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
