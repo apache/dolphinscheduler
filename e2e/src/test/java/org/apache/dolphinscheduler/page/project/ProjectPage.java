@@ -32,7 +32,6 @@ public class ProjectPage extends PageCommon {
      */
     public boolean jumpProjectManagePage() throws InterruptedException {
         clickTopElement(ProjectLocator.PROJECT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSAND);
         return ifTitleContains(ProjectData.PROJECT_TITLE);
     }
 
@@ -42,7 +41,7 @@ public class ProjectPage extends PageCommon {
      * @return Whether to enter the specified page after create project
      */
     public boolean createProject() throws InterruptedException {
-        Thread.sleep(500);
+        ifTextExists(ProjectLocator.CREATE_PROJECT_BUTTON,ProjectData.CREATE_PROJECT_BUTTON);
         clickElement(ProjectLocator.CREATE_PROJECT_BUTTON);
 
         // input create project data
@@ -53,7 +52,7 @@ public class ProjectPage extends PageCommon {
         clickButton(ProjectLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(ProjectData.PROJECT_TITLE);
+        return ifTextExists(ProjectLocator.LIST_PROJECT_NAME,ProjectData.PROJECT_NAME);
     }
 
     /**

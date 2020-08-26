@@ -59,7 +59,7 @@
 //
 //    public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 //
-//    public static final String SSL_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_ENABLE);
+//    public static final Boolean SSL_ENABLE = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 //
 //    public static final String SSL_TRUST = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
 //
@@ -213,6 +213,7 @@
 //
 //    /**
 //     * get session
+//     *
 //     * @return the new Session
 //     */
 //    private static Session getSession() {
@@ -222,8 +223,10 @@
 //        props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
 //        props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, MAIL_PROTOCOL);
 //        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, STARTTLS_ENABLE);
-//        props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, SSL_ENABLE);
-//        props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
+//        if (SSL_ENABLE) {
+//            props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, "true");
+//            props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
+//        }
 //
 //        Authenticator auth = new Authenticator() {
 //            @Override
