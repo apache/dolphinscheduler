@@ -63,10 +63,6 @@ public class DependentTaskTest {
                 .findValidTaskListByProcessId(11))
                 .thenReturn(getTaskInstances());
 
-        Mockito.when(processService
-                .findTaskInstanceById(252612))
-                .thenReturn(getTaskInstance());
-
         Mockito.when(processService.findProcessInstanceById(10111))
                 .thenReturn(getProcessInstance());
 
@@ -88,6 +84,11 @@ public class DependentTaskTest {
 
         Mockito.when(processService.submitTask(taskInstance))
                 .thenReturn(taskInstance);
+
+        Mockito.when(processService
+                .findTaskInstanceById(252612))
+                .thenReturn(getTaskInstance());
+
         DependentTaskExecThread dependentTask =
                 new DependentTaskExecThread(taskInstance);
 
@@ -117,6 +118,10 @@ public class DependentTaskTest {
         taskInstance.setDependency(dependString);
         Mockito.when(processService.submitTask(taskInstance))
                 .thenReturn(taskInstance);
+
+        Mockito.when(processService
+                .findTaskInstanceById(252612))
+                .thenReturn(getTaskInstance());
         DependentTaskExecThread dependentTask =
                 new DependentTaskExecThread(taskInstance);
 
