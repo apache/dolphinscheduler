@@ -585,7 +585,7 @@
                 <plugin>
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-maven-plugin</artifactId>
-                    <version>1.0.0-SNAPSHOT</version>
+                    <version>1.0.0</version>
                     <extensions>true</extensions>
                 </plugin>
 
