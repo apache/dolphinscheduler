@@ -14,15 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.SUCCESS;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
+import org.apache.dolphinscheduler.api.utils.DBUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
@@ -30,16 +40,26 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * data source controller
@@ -58,16 +78,16 @@ public class DataSourceController extends BaseController {
      * create data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param note      data source description
-     * @param type      data source type
-     * @param host      host
-     * @param port      port
-     * @param database  data base
+     * @param name data source name
+     * @param note data source description
+     * @param type data source type
+     * @param host host
+     * @param port port
+     * @param database data base
      * @param principal principal
-     * @param userName  user name
-     * @param password  password
-     * @param other     other arguments
+     * @param userName user name
+     * @param password password
+     * @param other other arguments
      * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
@@ -110,17 +130,17 @@ public class DataSourceController extends BaseController {
      * updateProcessInstance data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param note      description
-     * @param type      data source type
-     * @param other     other arguments
-     * @param id        data source di
-     * @param host      host
-     * @param port      port
-     * @param database  database
+     * @param name data source name
+     * @param note description
+     * @param type data source type
+     * @param other other arguments
+     * @param id data source di
+     * @param host host
+     * @param port port
+     * @param database database
      * @param principal principal
-     * @param userName  user name
-     * @param password  password
+     * @param userName user name
+     * @param password password
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
@@ -164,7 +184,7 @@ public class DataSourceController extends BaseController {
      * query data source detail
      *
      * @param loginUser login user
-     * @param id        datasource id
+     * @param id datasource id
      * @return data source detail
      */
     @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
@@ -187,7 +207,7 @@ public class DataSourceController extends BaseController {
      * query datasouce by type
      *
      * @param loginUser login user
-     * @param type      data source type
+     * @param type data source type
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
@@ -208,8 +228,8 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
@@ -238,16 +258,16 @@ public class DataSourceController extends BaseController {
      * connect datasource
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param note      data soruce description
-     * @param type      data source type
-     * @param other     other parameters
-     * @param host      host
-     * @param port      port
-     * @param database  data base
+     * @param name data source name
+     * @param note data soruce description
+     * @param type data source type
+     * @param other other parameters
+     * @param host host
+     * @param port port
+     * @param database data base
      * @param principal principal
-     * @param userName  user name
-     * @param password  password
+     * @param userName user name
+     * @param password password
      * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
@@ -281,7 +301,7 @@ public class DataSourceController extends BaseController {
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
-        Boolean isConnection = dataSourceService.checkConnection(type, parameter);
+        Boolean isConnection = DBUtils.checkConnection(type, parameter);
         Result result = new Result();
 
         if (isConnection) {
@@ -296,7 +316,7 @@ public class DataSourceController extends BaseController {
      * connection test
      *
      * @param loginUser login user
-     * @param id        data source id
+     * @param id data source id
      * @return connect result code
      */
     @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
@@ -325,7 +345,7 @@ public class DataSourceController extends BaseController {
      * delete datasource by id
      *
      * @param loginUser login user
-     * @param id        datasource id
+     * @param id datasource id
      * @return delete result
      */
     @ApiOperation(value = "delete", notes = "DELETE_DATA_SOURCE_NOTES")
@@ -345,7 +365,7 @@ public class DataSourceController extends BaseController {
      * verify datasource name
      *
      * @param loginUser login user
-     * @param name      data source name
+     * @param name data source name
      * @return true if data source name not exists.otherwise return false
      */
     @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
@@ -369,7 +389,7 @@ public class DataSourceController extends BaseController {
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return unauthed data source result code
      */
     @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
@@ -392,7 +412,7 @@ public class DataSourceController extends BaseController {
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return authorized result code
      */
     @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
