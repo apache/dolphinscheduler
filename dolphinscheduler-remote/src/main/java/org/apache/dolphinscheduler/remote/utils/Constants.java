@@ -42,4 +42,14 @@ public class Constants {
 
     public static final String LOCAL_ADDRESS = IPUtils.getFirstNoLoopbackIP4Address();
 
+    /**
+     * netty epoll enable switch
+     */
+    public static final String NETTY_EPOLL_ENABLE = System.getProperty("netty.epoll.enable");
+
+    /**
+     * OS Name
+     */
+    public static final String OS_NAME = System.getProperty("os.name");
+
 }
