@@ -790,7 +790,8 @@
                 props: {
                   processDefinition: {
                     id: self.urlParam.id,
-                    version: self.$store.state.dag.version
+                    version: self.$store.state.dag.version,
+                    state: self.releaseState
                   },
                   processDefinitionVersions: processDefinitionVersions,
                   total: total,

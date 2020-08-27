@@ -67,8 +67,12 @@
               width="90">
               <p>{{$t('Confirm Switch To This Version?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeSwitchVersion($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_mVersionSwitchProcessDefinitionVersion(item)">{{$t('Confirm')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeSwitchVersion($index)">
+                  {{$t('Cancel')}}
+                </x-button>
+                <x-button type="primary" size="xsmall" shape="circle"
+                          @click="_mVersionSwitchProcessDefinitionVersion(item)">{{$t('Confirm')}}
+                </x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -76,7 +80,7 @@
                   type="primary"
                   shape="circle"
                   size="xsmall"
-                  :disabled="item.version === processDefinition.version"
+                  :disabled="item.version === processDefinition.version || 'ONLINE' === processDefinition.state"
                   data-toggle="tooltip"
                   :title="$t('Switch To This Version')">
                 </x-button>
@@ -88,8 +92,11 @@
               width="90">
               <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_mVersionDeleteProcessDefinitionVersion(item,$index)">{{$t('Confirm')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}
+                </x-button>
+                <x-button type="primary" size="xsmall" shape="circle"
+                          @click="_mVersionDeleteProcessDefinitionVersion(item,$index)">{{$t('Confirm')}}
+                </x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -97,7 +104,7 @@
                   type="error"
                   shape="circle"
                   size="xsmall"
-                  :disabled="item.version === processDefinition.version"
+                  :disabled="item.version === processDefinition.version || 'ONLINE' === processDefinition.state"
                   data-toggle="tooltip"
                   :title="$t('delete')">
                 </x-button>
@@ -114,8 +121,9 @@
 
     <div v-if="processDefinitionVersions.length > 0">
       <div class="bottom-box">
-        <x-button type="text" @click="_close()"> {{$t('Cancel')}} </x-button>
-        <x-page :current="pageNo" :total="total" @on-change="_mVersionGetProcessDefinitionVersionsPage" small><!----></x-page>
+        <x-button type="text" @click="_close()"> {{$t('Cancel')}}</x-button>
+        <x-page :current="pageNo" :total="total" @on-change="_mVersionGetProcessDefinitionVersionsPage" small>
+          <!----></x-page>
       </div>
     </div>
 
@@ -211,8 +219,10 @@
         })
       }
     },
-    created () {},
-    mounted () {},
+    created () {
+    },
+    mounted () {
+    },
     components: { mNoData }
   }
 </script>
@@ -221,10 +231,12 @@
   .container {
     width: 500px;
     position: relative;
+
     .title-box {
       height: 61px;
       border-bottom: 1px solid #DCDEDC;
       position: relative;
+
       .name {
         position: absolute;
         left: 24px;
@@ -232,6 +244,7 @@
         font-size: 16px;
       }
     }
+
     .bottom-box {
       position: absolute;
       bottom: 0;
@@ -242,10 +255,12 @@
       line-height: 60px;
       border-top: 1px solid #DCDEDC;
       background: #fff;
+
       .ans-page {
         display: inline-block;
       }
     }
+
     .table-box {
       overflow-y: scroll;
       height: calc(100vh - 61px);
