@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -149,10 +150,12 @@ public class NettyRemotingServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
                 .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
                 .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
                 .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
 
                     @Override

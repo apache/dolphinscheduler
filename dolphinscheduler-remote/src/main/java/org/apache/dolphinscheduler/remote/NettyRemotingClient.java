@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -160,6 +161,7 @@ public class NettyRemotingClient {
             .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
             .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
             .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
+            .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
             .handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
