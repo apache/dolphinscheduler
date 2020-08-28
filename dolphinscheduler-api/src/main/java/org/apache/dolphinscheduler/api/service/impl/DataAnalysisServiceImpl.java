@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.service.impl;
 
-
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
@@ -50,9 +49,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +59,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DataAnalysisServiceImpl extends BaseService implements DataAnalysisService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -139,14 +135,15 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
         Date start = null;
         Date end = null;
-        if (startDate != null && endDate != null) {
+        if (StringUtils.isNotEmpty(startDate) && StringUtils.isNotEmpty(endDate)) {
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
-            if (start == null || end == null) {
+            if (Objects.isNull(start) || Objects.isNull(end)) {
                 putErrorRequestParamsMsg(result);
                 return result;
             }
         }
+
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<ExecuteStatusCount> processInstanceStateCounts =
                 instanceStateCounter.apply(start, end, projectIdArray);
@@ -205,11 +202,10 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
          */
         Date start = null;
         Date end = null;
-
-        if (startDate != null && endDate != null) {
+        if (StringUtils.isNotEmpty(startDate) && StringUtils.isNotEmpty(endDate)) {
             start = DateUtils.getScheduleDate(startDate);
             end = DateUtils.getScheduleDate(endDate);
-            if (start == null || end == null) {
+            if (Objects.isNull(start) || Objects.isNull(end)) {
                 putErrorRequestParamsMsg(result);
                 return result;
             }
