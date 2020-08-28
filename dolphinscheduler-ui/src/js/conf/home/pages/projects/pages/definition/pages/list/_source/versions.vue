@@ -195,18 +195,14 @@
        * Close the switch version layer
        */
       _closeSwitchVersion (i) {
-        if (i > 0) {
-          this.$refs[`poptip-switch-version-${i}`][0].doClose()
-        }
+        this.$refs[`poptip-switch-version-${i}`][0].doClose()
       },
 
       /**
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
 
       /**
