@@ -1369,11 +1369,11 @@ public class ProcessService {
      * @return task instance id list
      */
     public List<Integer> findTaskIdByInstanceStatusAndType(int processInstanceId, ExecutionStatus[] states, TaskType taskType) {
-        int[] stateArray = new int[states.length];
+        int[] statesArray = new int[states.length];
         for (int i = 0; i < states.length; i++) {
-            stateArray[i] = states[i].ordinal();
+            statesArray[i] = states[i].ordinal();
         }
-        return taskInstanceMapper.queryTaskByPIdAndStatusAndType(processInstanceId, stateArray, taskType.toString());
+        return taskInstanceMapper.queryTaskByPIdAndStatusAndType(processInstanceId, statesArray, taskType.toString());
     }
 
     /**
@@ -1385,14 +1385,14 @@ public class ProcessService {
      * @return task instance id list
      */
     public List<Integer> findTaskIdInSubProcessByStatusAndType(int taskId, ExecutionStatus[] states, TaskType taskType) {
-        int[] stateArray = new int[states.length];
+        int[] statesArray = new int[states.length];
         for (int i = 0; i < states.length; i++) {
-            stateArray[i] = states[i].ordinal();
+            statesArray[i] = states[i].ordinal();
         }
         if (taskType == null) {
-            return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, stateArray, null);
+            return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, statesArray, null);
         }
-        return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, stateArray, taskType.toString());
+        return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, statesArray, taskType.toString());
     }
 
     /**
