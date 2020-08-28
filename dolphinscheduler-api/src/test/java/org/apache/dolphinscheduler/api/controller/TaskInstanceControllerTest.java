@@ -81,7 +81,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void forceSingleTaskSuccess() throws Exception {
+    public void testForceSingleTaskSuccess() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskInstanceId","104");
 
