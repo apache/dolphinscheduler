@@ -26,12 +26,12 @@
         <caption><!-- placeHolder --></caption>
         <tr>
           <th scope="col">
-            <span>#</span>
+            <span></span>
           </th>
           <th scope="col" style="min-width: 40px">
-            <span>Version</span>
+            <span>{{$t('Version')}}</span>
           </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
+          <th scope="col" style="min-width: 30px">
             <span>{{$t('Description')}}</span>
           </th>
           <th scope="col" style="min-width: 50px">
@@ -43,7 +43,7 @@
         </tr>
         <tr v-for="(item, $index) in processDefinitionVersions" :key="item.id">
           <td>
-            <span>-</span>
+            <span></span>
           </td>
           <td>
             <span v-if="item.version">
@@ -64,7 +64,7 @@
             <x-poptip
               :ref="'poptip-switch-version-' + $index"
               placement="top-end"
-              width="90">
+              width="260">
               <p>{{$t('Confirm Switch To This Version?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
                 <x-button type="text" size="xsmall" shape="circle" @click="_closeSwitchVersion($index)">
