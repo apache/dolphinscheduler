@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -135,8 +136,10 @@ public class TaskInstanceController extends BaseController {
     public Result forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                          @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
+        String userNameReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String projectNameReplace = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("force task success, login user: {}, project:{}, task instance id:{}",
-                loginUser.getUserName(), projectName, taskInstanceId);
+                userNameReplace, projectNameReplace, taskInstanceId);
         Map<String, Object> result = taskInstanceService.forceSingleTaskSuccess(loginUser, projectName, taskInstanceId);
         return returnDataList(result);
     }
