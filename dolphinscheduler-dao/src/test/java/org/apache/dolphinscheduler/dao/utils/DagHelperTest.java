@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.dao.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * dag helper test
@@ -79,6 +82,7 @@ public class DagHelperTest {
     /**
      * 1->2->3->5
      * 4->3
+     * 3->6
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
      */
@@ -120,6 +124,14 @@ public class DagHelperTest {
         node5.setDepList(dep5);
         taskNodeList.add(node5);
 
+        TaskNode node6 = new TaskNode();
+        node6.setId("6");
+        node6.setName("6");
+        List<String> dep6 = new ArrayList<>();
+        dep6.add("3");
+        node6.setDepList(dep6);
+        taskNodeList.add(node6);
+
         List<String> startNodes = new ArrayList<>();
         List<String> recoveryNodes  = new ArrayList<>();
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
@@ -148,4 +160,28 @@ public class DagHelperTest {
         Assert.assertNotNull(dag);
     }
 
+    @Test
+    public void testGetStartVertex() throws JsonProcessingException {
+        // let 1->2->3->5, 3->5, 4->3
+        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
+
+        // test when completeList is null
+        Assert.assertEquals(2, DagHelper.getStartVertex(null, dag, null).size());
+        Assert.assertEquals(1, DagHelper.getStartVertex("1", dag, null).size());
+
+        // test when 3 is CONDITIONS and 1,2,3,4 all completed
+        Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
+        completeTaskList.putIfAbsent("1", new TaskInstance());
+        completeTaskList.putIfAbsent("2", new TaskInstance());
+        completeTaskList.putIfAbsent("4", new TaskInstance());
+        TaskInstance task3 = new TaskInstance();
+        task3.setState(ExecutionStatus.SUCCESS);
+        completeTaskList.putIfAbsent("3", task3);
+
+        dag.getNode("3").setConditionResult("{\"successNode\":[\"5\"],\"failedNode\":[\"6\"]}");
+        dag.getNode("3").setType(TaskType.CONDITIONS.toString());
+
+        Assert.assertEquals(1, DagHelper.getStartVertex(null, dag, completeTaskList).size());
+        Assert.assertEquals(true, DagHelper.getStartVertex(null, dag, completeTaskList).contains("5"));
+    }
 }
