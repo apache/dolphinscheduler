@@ -181,7 +181,17 @@ public class DagHelperTest {
         dag.getNode("3").setConditionResult("{\"successNode\":[\"5\"],\"failedNode\":[\"6\"]}");
         dag.getNode("3").setType(TaskType.CONDITIONS.toString());
 
+        // test success branch
         Assert.assertEquals(1, DagHelper.getStartVertex(null, dag, completeTaskList).size());
         Assert.assertEquals(true, DagHelper.getStartVertex(null, dag, completeTaskList).contains("5"));
+
+        // test failure branch
+        task3.setState(ExecutionStatus.FAILURE);
+        Assert.assertEquals(1, DagHelper.getStartVertex(null, dag, completeTaskList).size());
+        Assert.assertEquals(true, DagHelper.getStartVertex(null, dag, completeTaskList).contains("6"));
+
+        // test state error
+        task3.setState(ExecutionStatus.PAUSE);
+        Assert.assertEquals(0, DagHelper.getStartVertex(null, dag, completeTaskList).size());
     }
 }
