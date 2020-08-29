@@ -405,7 +405,7 @@ public class MasterExecThread implements Runnable {
             if(task.isTaskComplete()){
                 completeTaskList.put(task.getName(), task);
             }
-            if(task.getState().typeIsFailure() && !task.taskCanRetry()){
+            if (task.getState().typeIsFailure() && !task.taskCanRetry() && !task.isConditionsTask()) {
                 errorTaskList.put(task.getName(), task);
             }
         }
