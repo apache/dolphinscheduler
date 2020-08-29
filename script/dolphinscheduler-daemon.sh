@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop) <command> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <command> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -121,6 +121,16 @@ case $startStop in
         echo no $command to stop
       fi
       ;;
+
+  (status)
+    # more details about the status can be added later
+    serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
+    state="STOP"
+    if [[ $serverCount -gt 0 ]];then
+      state="RUNNING"
+    fi
+    echo "$command  $state"
+    ;;
 
   (*)
     echo $usage
