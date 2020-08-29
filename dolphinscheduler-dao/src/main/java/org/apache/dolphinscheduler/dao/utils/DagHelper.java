@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -278,13 +279,7 @@ public class DagHelper {
         if (StringUtils.isNotEmpty(parentNodeName)) {
             TaskNode task = dag.getNode(parentNodeName);
             if (task.isConditionsTask() && completeTaskList.containsKey(parentNodeName)) {
-                ConditionsParameters conditionsParameters = JSONUtils.parseObject(task.getConditionResult(), ConditionsParameters.class);
-                TaskInstance taskInstance = completeTaskList.get(parentNodeName);
-                if (taskInstance.getState().typeIsSuccess()) {
-                    startVertexs = conditionsParameters.getSuccessNode();
-                } else if (taskInstance.getState().typeIsFailure()) {
-                    startVertexs = conditionsParameters.getFailedNode();
-                }
+                startVertexs = parseConditionTask(parentNodeName, task, completeTaskList);
             }
             else {
                 startVertexs = dag.getSubsequentNodes(parentNodeName);
@@ -293,7 +288,7 @@ public class DagHelper {
             startVertexs = dag.getBeginNode();
         }
 
-        List<String> tmpStartVertexs = new ArrayList<>();
+        Set<String> tmpStartVertexs = new HashSet<>();
         if (startVertexs != null) {
             tmpStartVertexs.addAll(startVertexs);
         }
@@ -315,6 +310,20 @@ public class DagHelper {
             tmpStartVertexs.remove(start);
         }
         return tmpStartVertexs;
+    }
+
+    /**
+     * parse condition post nodes
+     */
+    private static Collection<String> parseConditionTask(String parentNodeName, TaskNode task, Map<String, TaskInstance> completeTaskList) {
+        ConditionsParameters conditionsParameters = JSONUtils.parseObject(task.getConditionResult(), ConditionsParameters.class);
+        TaskInstance taskInstance = completeTaskList.get(parentNodeName);
+        if (taskInstance.getState().typeIsSuccess()) {
+            return conditionsParameters.getSuccessNode();
+        } else if (taskInstance.getState().typeIsFailure()) {
+            return conditionsParameters.getFailedNode();
+        }
+        return null;
     }
 
     /**

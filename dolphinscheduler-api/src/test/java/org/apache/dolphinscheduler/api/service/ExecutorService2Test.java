@@ -265,7 +265,7 @@ public class ExecutorService2Test {
             .thenReturn(true);
 
         Map<String, Object> result = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
-        Assert.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(processService, times(1)).createCommand(any(Command.class));
     }
 
