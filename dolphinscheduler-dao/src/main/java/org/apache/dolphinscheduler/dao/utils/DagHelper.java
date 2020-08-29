@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -323,7 +324,7 @@ public class DagHelper {
         } else if (taskInstance.getState().typeIsFailure()) {
             return conditionsParameters.getFailedNode();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
