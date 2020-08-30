@@ -1,0 +1,134 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.servers-wrapper {
+  padding: 16px;
+  .gauge-model {
+    width: 100%;
+    height: 360px;
+    overflow: hidden;
+    margin:  0 auto;
+    .gauge-echart {
+      width: 350px;
+      margin:  auto;
+      margin-bottom: -80px;
+    }
+    .text-1 {
+      width: 100%;
+      margin: 0 auto;
+      font-size: 32px;
+      text-align: center;
+    }
+  }
+  .text-num-model {
+    &.text {
+      width: 100%;
+      height: 380px;
+      overflow: hidden;
+      border: 1px solid #E8E8E8;
+      margin:  0 auto;
+      margin-bottom: 16px;
+      >.title {
+        height: 36px;
+        line-height: 36px;
+        background: #F9F9F9;
+        border-bottom: 1px solid #E8E8E8;
+        padding-left: 10px;
+        span {
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space:  nowrap;
+          display: block;
+        }
+      }
+    }
+    .value-p {
+      height: 276px;
+      line-height: 276px;
+      text-align: center;
+      >strong {
+        font-size: 100px;
+        color: #333;
+      }
+    }
+    .text-1 {
+      width: 100%;
+      margin: 0 auto;
+      font-size: 32px;
+      text-align: center;
+    }
+  }
+  &.mysql-model {
+    .text-num-model {
+      height: 250px;
+      .text-1 {
+        font-size: 18px;
+      }
+      .value-p {
+        height: 150px;
+        line-height: 150px;
+        >b {
+          font-size: 72px;
+        }
+        >.state {
+          >em {
+            font-size: 50px;
+          }
+          .success {
+            color: #33cc00;
+          }
+          .error {
+            color: #ff0000;
+          }
+        }
+      }
+    }
+  }
+  .row-box {
+    width: 100%;
+    height: 380px;
+    overflow: hidden;
+    border: 1px solid #E8E8E8;
+    margin:  0 auto;
+    margin-bottom: 16px;
+    .row-title {
+      height: 36px;
+      line-height: 36px;
+      background: #F9F9F9;
+      border-bottom: 1px solid #E8E8E8;
+      position: relative;
+      span {
+        font-size: 12px;
+        color: #444;
+        &.sp {
+          margin-right: 6px;
+        }
+      }
+      .left {
+        position: absolute;
+        left: 10px;
+        top: 0;
+      }
+      .right {
+        position: absolute;
+        right: 10px;
+        top: 0;
+      }
+    }
+  }
+}
+

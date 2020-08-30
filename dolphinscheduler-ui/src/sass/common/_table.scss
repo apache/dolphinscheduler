@@ -1,0 +1,173 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ .ansfont {
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ .as {
+  display: inline-block;
+  font-size: 14px;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ .as-spin {
+    -webkit-animation: as-spin 2s infinite linear;
+    animation: as-spin 2s infinite linear;
+  }
+  @-webkit-keyframes as-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+    }
+  }
+  @keyframes as-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+    }
+  }
+.table-box {
+  border-top: 1px solid #ecf3ff;
+  .ans-checkbox-wrapper-disabled {
+    .ans-checkbox-inner {
+      background-color: #ccc;
+    }
+  }
+  .ans-checkbox {
+    .ans-checkbox-inner {
+      border: 1px solid #ccc;
+    }
+  }
+  .ans-checkbox-checked {
+    .ans-checkbox-inner {
+      border: 1px solid #1489e2;
+    }
+  }
+  .ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space:  nowrap;
+    display: block;
+  }
+  button {
+    .iconfont {
+      font-size: 16px;
+    }
+    .ans-icon {
+      font-size: 14px;
+    }
+  }
+  table {
+    width: 100%;
+    &.fixed {
+      table-layout: fixed;
+    }
+    tr {
+      height: 40px;
+      box-sizing: border-box;
+      background: #fff;
+      color: #333;
+      font-size: 12px;
+      border-bottom: 1px solid #ecf3ff;
+      &:hover {
+        background: #ddecff;
+      }
+      th,td{
+        &:nth-child(1) {
+          width: 50px;
+          text-align: center;
+        }
+      }
+      th {
+        &:nth-child(1) {
+          width: 60px;
+          text-align: center;
+        }
+        >span {
+          font-size: 12px;
+          color: #555;
+        }
+      }
+      td {
+        >span {
+          font-size: 12px;
+          color: #666;
+        }
+        &:nth-child(1) {
+          span {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+  .links {
+    color: #2d8cf0;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.table-small-model {
+  padding: 0 10px;
+  table {
+    width: 100%;
+    tr{
+      background: #fff;
+      th,td {
+        padding-left: 8px;
+      }
+      th {
+        height: 36px;
+        line-height: 38px;
+        font-size: 12px;
+        font-weight: bold;
+        color: #333;
+        border-bottom: 2px solid #ECEDEC;
+      }
+      td {
+        height: 32px;
+        line-height: 32px;
+        border-bottom: 1px solid #ECEDEC;
+        span {
+          font-size: 12px;
+          color: #333;
+        }
+        .links {
+          color:#2d8cf0;
+        }
+      }
+      &:hover {
+        td {
+          background: #ddecff;
+        }
+      }
+    }
+  }
+}

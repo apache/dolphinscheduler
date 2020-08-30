@@ -1,0 +1,43 @@
+{
+  "name": "testjest",
+  "description": "jest",
+  "version": "1.0.0",
+  "author": "xiangcaibiao",
+  "private": true,
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+    "vue": "^2.4.4"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "vue"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "transform": {
+      "^.+\\.js$": "<rootDir>/_test_/node_modules/babel-jest",
+      ".*\\.(vue)$": "<rootDir>/_test_/node_modules/vue-jest"
+    },
+    "snapshotSerializers": [
+      "<rootDir>/_test_/node_modules/jest-serializer-vue"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,vue}",
+      "!**/node_modules/**"
+    ],
+    "rootDir": "../"
+  },
+  "devDependencies": {
+    "@vue/test-utils": "^1.0.0-beta.30",
+    "babel-jest": "^24.9.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^24.9.0",
+    "jest-serializer-vue": "^2.0.2",
+    "vue-jest": "^3.0.5"
+  }
+}

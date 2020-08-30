@@ -1,0 +1,359 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import "scrollbar";
+@import "table";
+
+.ans-input {
+  textarea,input {
+    font-weight: 400;
+  }
+}
+.ans-radio {
+  .ans-radio-inner {
+    border: 1px solid #B3B3B3;
+  }
+}
+.ans-poptip {
+  min-width: 158px;
+}
+
+.ans-checkbox-wrapper .checkbox-label,
+.ans-radio-wrapper {
+  font-weight: normal;
+}
+
+a:focus {
+  text-decoration: none !important;
+}
+
+a:hover{
+  color:#0097e0;
+  text-decoration: none !important;
+}
+
+.CodeMirror-hints {
+  z-index: 999 !important;
+}
+
+.cm-s-mdn-like .CodeMirror-gutters {
+  border-left:0 !important;
+}
+
+.cm-s-mdn-like .CodeMirror-linenumber {
+  padding-left: 0;
+}
+
+body{
+  background: #EDEEED;
+  .home-main {
+    min-height: calc(100vh - 100px);
+    background: #fff;
+    margin: 20px;
+    border-radius: 3px;
+    >.content-title {
+      height: 48px;
+      background: #f8fbfe;
+      border-radius: 3px 3px 0 0;
+      span {
+        font-size: 22px;
+        padding-left: 18px;
+        padding-top: 10px;
+        display: inline-block;
+        color: #2A455B;
+      }
+    }
+    >.conditions-box {
+      //background: #f8fbfe;
+    }
+    .conditions-model {
+      height: 50px;
+      position: relative;
+      .left {
+        position: absolute;
+        left: 12px;
+        top: 13px;
+      }
+      .right {
+        position: absolute;
+        right: 8px;
+        top: 13px;
+        .from-box {
+          .list {
+            float: right;
+            margin-right: 4px;
+          }
+        }
+      }
+    }
+  }
+  .main-layout-model {
+    &.dag-screen {
+      .m-bottom {
+        z-index: 2;
+      }
+      .index-model {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: -20px;
+        left: -20px;
+        .dag-model {
+          height: 100% !important;
+        }
+      }
+    }
+  }
+  font-family:13px/1.5 PingFangSC-Light,Helvetica Neue,Helvetica,Microsoft Yahei,Arial,Hiragino Sans GB,tahoma,SimSun,sans-serif;
+	-webkit-backface-visibility:hidden;
+	-webkit-tap-highlight-color:transparent;
+	-webkit-text-size-adjust:none;
+	-webkit-touch-callout:none;
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale
+}
+
+// icon disabled state
+.iconfont.icon-disabled {
+  color: #999 !important;
+}
+
+.main-layout-box {
+  padding-left: 200px;
+  &.no {
+    padding-left: 0;
+  }
+}
+
+.tooltip-cont-model {
+  width: 200px;
+  height: 300px;
+  background: #fff;
+  border-radius: 3px;
+  margin-left: -4px;
+  margin-top: -4px;
+}
+
+.global-loading {
+  background: #fff;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  .svg-box {
+    width: 100px;
+    height: 66px;
+    position: absolute;
+    left:50%;
+    top: 50%;
+    margin-left: -50px;
+    margin-top: -100px;
+    text-align: center;
+    .sp1 {
+      display: block;
+      font-size: 14px;
+      color: #999;
+      padding-top: 4px;
+    }
+  }
+}
+
+
+.page-box {
+  text-align: right;
+  padding: 20px;
+  .ans-page {
+    display: inline-block;
+  }
+}
+
+
+button[disabled='disabled'] {
+  color: #bbbec4 !important;
+  background-color: #f7f7f7 !important;
+  border-color: #dddee1 !important;
+}
+
+.ans-icon-spinner.loading {
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-animation: fa-spin .6s infinite linear;
+  animation: fa-spin .6s infinite linear;
+}
+
+.fa-spin {
+  font-size: 16px;
+}
+
+.CodeMirror {
+  border: 1px solid #DDDDDD !important;
+  border-radius: 3px;
+}
+
+
+
+
+article,aside,blockquote,body,button,code,dd,details,div,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul {
+	margin:0;
+	padding:0
+}
+h1,h2,h3,p {
+	font-style:normal
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0
+}
+button,input,select,textarea {
+	font-family:inherit;
+	font-size:inherit
+}
+ol,ul {
+	list-style:none
+}
+img {
+	border:0
+}
+input::-ms-clear,input::-ms-reveal {
+	display:none
+}
+a,body {
+	color:#333
+}
+:focus {
+	outline:0
+}
+*,:after,:before {
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box
+}
+[hidden],[v-cloak] {
+	display:none
+}
+body::-webkit-scrollbar {
+	width:4px;
+	height:4px
+}
+body::-webkit-scrollbar-track {
+	background:hsla(0,0%,100%,0);
+	border-radius:2x;
+	margin:4px 0
+}
+body::-webkit-scrollbar-thumb {
+	background:hsla(0,0%,100%,0);
+	border-radius:2px;
+	-webkit-transition:background .2s ease-in-out;
+	transition:background .2s ease-in-out
+}
+[class*=scrollbar]:hover::-webkit-scrollbar-thumb {
+	background:#70bdf7
+}
+.clearfix,.outer {
+	zoom:1
+}
+.clearfix:after,.outer:after {
+	clear:both;
+	content:" ";
+	display:block;
+	width:0;
+	height:0;
+	visibility:hidden
+}
+.f-show {
+	display:block
+}
+.f-hide {
+	display:none
+}
+.f-pr {
+	position:relative
+}
+.f-fl {
+	float:left
+}
+.f-fr {
+	float:right
+}
+.float-left {
+	float:left
+}
+.float-right {
+	float:right
+}
+.f-no-select {
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	-o-user-select:none;
+	user-select:none
+}
+.f-word-break {
+	white-space:normal;
+	word-wrap:break-word;
+	word-break:break-all
+}
+.f-text-ellipis {
+	overflow:hidden;
+	word-wrap:normal;
+	white-space:nowrap;
+	text-overflow:ellipsis
+}
+.f-link {
+	display:inline-block;
+	text-decoration:none;
+	width:100%;
+	height:100%
+}
+.f-wide {
+	margin:0 auto
+}
+.f-pre,.f-wide {
+	text-align:left
+}
+.f-pre {
+	overflow:hidden;
+	white-space:pre-wrap;
+	word-wrap:break-word;
+	word-break:break-all
+}
+.f-cursor-p {
+	cursor:pointer
+}
+.f-text-overflow {
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis
+}
+.f-f12 {
+	font-size:12px
+}
+.f-f14 {
+	font-size:14px
+}
+.f-f16 {
+	font-size:16px
+}
+.f-f18 {
+	font-size:18px
+}
+
+
+
+
+
