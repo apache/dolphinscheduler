@@ -142,6 +142,7 @@ public class WorkerRegistry {
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
         String weight = getWorkerWeight();
+        String startTime = getStartTime();
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);
@@ -153,6 +154,7 @@ public class WorkerRegistry {
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
             workerZkPathBuilder.append(address);
             workerZkPathBuilder.append(weight);
+            workerZkPathBuilder.append(startTime);
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
@@ -170,5 +172,12 @@ public class WorkerRegistry {
      */
     private String getWorkerWeight() {
         return ":" + workerConfig.getWeight();
+    }
+
+    /**
+     * get startTime
+     */
+    private String getStartTime(){
+        return ":"+System.currentTimeMillis();
     }
 }

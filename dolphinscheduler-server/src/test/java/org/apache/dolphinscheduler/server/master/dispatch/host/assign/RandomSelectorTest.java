@@ -39,14 +39,14 @@ public class RandomSelectorTest {
     @Test
     public void testSelect1(){
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.2",80,20)));
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100,System.currentTimeMillis()),new Host("192.168.1.2",80,20,System.currentTimeMillis())));
         Assert.assertNotNull(result);
     }
 
     @Test
     public void testSelect(){
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.1",80,20)));
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100,System.currentTimeMillis()),new Host("192.168.1.1",80,20,System.currentTimeMillis())));
         Assert.assertNotNull(result);
 
     }

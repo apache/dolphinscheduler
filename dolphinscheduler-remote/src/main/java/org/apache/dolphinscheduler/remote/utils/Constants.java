@@ -52,4 +52,9 @@ public class Constants {
      */
     public static final String OS_NAME = System.getProperty("os.name");
 
+    /**
+     * warm up time
+     */
+    public static final int WARM_UP_TIME = 10 * 60 * 1000;
+
 }
