@@ -29,7 +29,6 @@ shift
 command=$1
 shift
 
-echo "Begin $startStop $command......"
 
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
@@ -126,10 +125,14 @@ case $startStop in
     # more details about the status can be added later
     serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
     state="STOP"
+    #  font color - red
+    state="[ \033[1;31m $state \033[0m ]"
     if [[ $serverCount -gt 0 ]];then
       state="RUNNING"
+      # font color - green
+      state="[ \033[1;32m $state \033[0m ]"
     fi
-    echo "$command  $state"
+    echo -e "$command  $state"
     ;;
 
   (*)
@@ -138,5 +141,3 @@ case $startStop in
     ;;
 
 esac
-
-echo "End $startStop $command."

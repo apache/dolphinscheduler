@@ -28,7 +28,6 @@ echo -e "2.master server node config hosts:[ \033[1;32m ${masters} \033[0m ]"
 echo -e "3.worker server node config hosts:[ \033[1;32m ${workers} \033[0m ]"
 echo -e "4.alert server node config hosts:[ \033[1;32m ${alertServer} \033[0m ]"
 echo -e "5.api server node config hosts:[ \033[1;32m ${apiServers} \033[0m ]"
-echo -e '\n'
 
 # all server check state
 echo -e '\n'
@@ -47,11 +46,13 @@ do
   workersGroupMap+=([$worker]=$groupName)
 done
 
+StateRunning="Running"
 # 1.master server check state
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
-  echo "$master  `ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status master-server;"`"
+  masterState=`ssh -p $sshPort $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status master-server;"`
+  echo "$master  $masterState"
 done
 
 # 2.worker server and logger-server check state
@@ -75,8 +76,3 @@ do
   apiState=`ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh status api-server;"`
   echo "$apiServer  $apiState"
 done
-
-# 5.
-echo -e '\n'
-echo -e "1.master server config hosts:[ \033[1;32m ${masters} \033[0m ],running:[ \033[1;32m ${masters} \033[0m ],stop:[ \033[1;32m ${masters} \033[0m ]"
-
