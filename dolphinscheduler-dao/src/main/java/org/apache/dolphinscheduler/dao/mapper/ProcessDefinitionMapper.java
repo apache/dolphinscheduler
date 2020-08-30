@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * process definition mapper interface
@@ -34,6 +37,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * query process definition by name
+     *
      * @param projectId projectId
      * @param name name
      * @return process definition
@@ -43,6 +47,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * query process definition by id
+     *
      * @param processDefineId processDefineId
      * @return process definition
      */
@@ -50,6 +55,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * process definition page
+     *
      * @param page page
      * @param searchVal searchVal
      * @param userId userId
@@ -65,6 +71,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * query all process definition list
+     *
      * @param projectId projectId
      * @return process definition list
      */
@@ -72,6 +79,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * query process definition by ids
+     *
      * @param ids ids
      * @return process definition list
      */
@@ -79,6 +87,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * query process definition by tenant
+     *
      * @param tenantId tenantId
      * @return process definition list
      */
@@ -86,6 +95,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * count process definition group by user
+     *
      * @param userId userId
      * @param projectIds projectIds
      * @param isAdmin isAdmin
@@ -98,6 +108,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * list all resource ids
+     *
      * @return resource ids list
      */
     @MapKey("id")
@@ -105,8 +116,17 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
      * list all resource ids by user id
+     *
      * @return resource ids list
      */
     @MapKey("id")
     List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
+
+    /**
+     * update process definition version by process definitionId
+     *
+     * @param processDefinitionId process definition id
+     * @param version version
+     */
+    void updateVersionByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId, @Param("version") long version);
 }

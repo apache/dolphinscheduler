@@ -108,6 +108,7 @@ public class TaskResponseService {
                     TaskResponseEvent taskResponseEvent = eventQueue.take();
                     persist(taskResponseEvent);
                 } catch (InterruptedException e){
+                    Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e){
                     logger.error("persist task error",e);
@@ -134,12 +135,11 @@ public class TaskResponseService {
                         taskResponseEvent.getTaskInstanceId());
                 break;
             case RESULT:
-            	processService.changeTaskState(taskResponseEvent.getState(),
+                processService.changeTaskState(taskResponseEvent.getState(),
                         taskResponseEvent.getEndTime(),
                         taskResponseEvent.getProcessId(),
                         taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getTaskInstanceId(),
-                        taskResponseEvent.getVarPool());
+                        taskResponseEvent.getTaskInstanceId());
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);

@@ -79,11 +79,6 @@ public class TaskResponseEvent {
      */
     private Event event;
 
-    /**
-     * varPool
-     */
-    private String varPool;
-    
     public static TaskResponseEvent newAck(ExecutionStatus state, Date startTime, String workerAddress, String executePath, String logPath, int taskInstanceId){
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
@@ -96,7 +91,7 @@ public class TaskResponseEvent {
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId, String varPool){
+    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId){
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setEndTime(endTime);
@@ -104,18 +99,9 @@ public class TaskResponseEvent {
         event.setAppIds(appIds);
         event.setTaskInstanceId(taskInstanceId);
         event.setEvent(Event.RESULT);
-        event.setVarPool(varPool);
         return event;
     }
 
-    public String getVarPool() {
-    	return varPool;
-    }
-    
-    public void setVarPool(String varPool) {
-    	this.varPool = varPool;
-    }
-    
     public int getTaskInstanceId() {
         return taskInstanceId;
     }

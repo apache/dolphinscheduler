@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,7 +103,7 @@ public class UsersService extends BaseService {
                                           String queue,
                                           int state) throws Exception {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
@@ -230,7 +231,7 @@ public class UsersService extends BaseService {
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -270,7 +271,7 @@ public class UsersService extends BaseService {
                                           String phone,
                                           String queue,
                                           int state) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         User user = userMapper.selectById(userId);
@@ -393,7 +394,7 @@ public class UsersService extends BaseService {
      * @throws Exception exception when operate hdfs
      */
     public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
@@ -433,7 +434,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -483,7 +484,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -580,7 +581,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
@@ -627,7 +628,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -707,7 +708,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -728,7 +729,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryUserList(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -772,7 +773,7 @@ public class UsersService extends BaseService {
      */
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -808,7 +809,7 @@ public class UsersService extends BaseService {
      * @return authorized result code
      */
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -946,6 +947,7 @@ public class UsersService extends BaseService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
+     * @param userName  user name
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {
@@ -981,6 +983,54 @@ public class UsersService extends BaseService {
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);
+        return result;
+    }
+
+    /**
+     * activate user, only system admin have permission, change users state code 0 to 1
+     *
+     * @param loginUser login user
+     * @param userNames user name
+     * @return create result code
+     */
+    public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        int totalSuccess = 0;
+        List<String> successUserNames = new ArrayList<>();
+        Map<String, Object> successRes = new HashMap<>();
+        int totalFailed = 0;
+        List<Map<String, String>> failedInfo = new ArrayList<>();
+        Map<String, Object> failedRes = new HashMap<>();
+        for (String userName : userNames) {
+            Map<String, Object> tmpResult = activateUser(loginUser, userName);
+            if (tmpResult.get(Constants.STATUS) != Status.SUCCESS) {
+                totalFailed++;
+                Map<String, String> failedBody = new HashMap<>();
+                failedBody.put("userName", userName);
+                Status status = (Status) tmpResult.get(Constants.STATUS);
+                String errorMessage = MessageFormat.format(status.getMsg(), userName);
+                failedBody.put("msg", errorMessage);
+                failedInfo.add(failedBody);
+            } else {
+                totalSuccess++;
+                successUserNames.add(userName);
+            }
+        }
+        successRes.put("sum", totalSuccess);
+        successRes.put("userName", successUserNames);
+        failedRes.put("sum", totalFailed);
+        failedRes.put("info", failedInfo);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", successRes);
+        res.put("failed", failedRes);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, res);
         return result;
     }
 }

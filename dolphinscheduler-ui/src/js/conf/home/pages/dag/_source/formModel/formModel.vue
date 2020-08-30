@@ -109,6 +109,20 @@
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
+
+        <!-- Delay execution time -->
+        <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS' && taskType !== 'CONDITIONS' && taskType !== 'DEPENDENT'">
+          <div class="text-box">
+            <span>{{$t('Delay execution time')}}</span>
+          </div>
+          <div class="cont-box">
+            <m-select-input v-model="delayTime" :list="[0,1,5,10]">
+            </m-select-input>
+            <span>({{$t('Minute')}})</span>
+          </div>
+        </div>
+
+        <!-- Branch flow -->
         <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
@@ -127,7 +141,6 @@
             </x-select>
           </div>
         </div>
-
         <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
           <div class="text-box">
             <span>{{$t('State')}}</span>
@@ -339,6 +352,8 @@
         maxRetryTimes: '0',
         // Failure retry interval
         retryInterval: '1',
+        // Delay execution time
+        delayTime: '0',
         // Task timeout alarm
         timeout: {},
         // Task priority
@@ -466,6 +481,7 @@
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
@@ -544,6 +560,7 @@
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
@@ -634,6 +651,7 @@
         this.description = o.description
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
+        this.delayTime = o.delayTime
         if(o.conditionResult) {
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
@@ -699,6 +717,7 @@
           dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,
           retryInterval: this.retryInterval,
+          delayTime: this.delayTime,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,

@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -60,7 +59,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -498,9 +496,6 @@ public class MasterExecThread implements Runnable {
             // task instance whether alert
             taskInstance.setAlertFlag(Flag.NO);
 
-            // task instance start time
-            taskInstance.setStartTime(new Date());
-
             // task instance flag
             taskInstance.setFlag(Flag.YES);
 
@@ -529,6 +524,8 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setWorkerGroup(taskWorkerGroup);
             }
 
+            // delay execution time
+            taskInstance.setDelayTime(taskNode.getDelayTime());
         }
         return taskInstance;
     }
@@ -654,22 +651,14 @@ public class MasterExecThread implements Runnable {
      * submit post node
      * @param parentNodeName parent node name
      */
-    private Map<String,Object> propToValue = new ConcurrentHashMap<String, Object>();
     private void submitPostNode(String parentNodeName){
 
         List<String> submitTaskNodeList = parsePostNodeList(parentNodeName);
 
         List<TaskInstance> taskInstances = new ArrayList<>();
         for(String taskNode : submitTaskNodeList){
-            try {
-                VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
-            } catch (ParseException e) {
-                logger.error("parse {} exception", processInstance.getVarPool(), e);
-            }
-            TaskNode taskNodeObject = dag.getNode(taskNode);
-            VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
             taskInstances.add(createTaskInstance(processInstance, taskNode,
-                    taskNodeObject));
+                    dag.getNode(taskNode)));
         }
 
         // if previous node success , post node submit
@@ -755,9 +744,10 @@ public class MasterExecThread implements Runnable {
      * @return ExecutionStatus
      */
     private ExecutionStatus runningState(ExecutionStatus state){
-        if(state == ExecutionStatus.READY_STOP ||
-                state == ExecutionStatus.READY_PAUSE ||
-                state == ExecutionStatus.WAITTING_THREAD){
+        if (state == ExecutionStatus.READY_STOP
+                || state == ExecutionStatus.READY_PAUSE
+                || state == ExecutionStatus.WAITTING_THREAD
+                || state == ExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
         }else{
@@ -1009,8 +999,6 @@ public class MasterExecThread implements Runnable {
                         task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if(task.getState() == ExecutionStatus.SUCCESS){
-                    processInstance.setVarPool(task.getVarPool());
-                    processService.updateProcessInstance(processInstance);
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());
                     continue;

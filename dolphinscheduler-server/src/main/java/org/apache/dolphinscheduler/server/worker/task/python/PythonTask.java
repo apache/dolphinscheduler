@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -93,7 +92,6 @@ public class PythonTask extends AbstractTask {
       setExitStatusCode(commandExecuteResult.getExitStatusCode());
       setAppIds(commandExecuteResult.getAppIds());
       setProcessId(commandExecuteResult.getProcessId());
-      setVarPool(pythonCommandExecutor.getVarPool());
     }
     catch (Exception e) {
       logger.error("python task failure", e);
@@ -122,11 +120,6 @@ public class PythonTask extends AbstractTask {
             pythonParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
-    try {
-    	rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
-	}catch (StringIndexOutOfBoundsException e) {
-		// TODO: handle exception
-	}
     if (paramsMap != null){
       rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }
