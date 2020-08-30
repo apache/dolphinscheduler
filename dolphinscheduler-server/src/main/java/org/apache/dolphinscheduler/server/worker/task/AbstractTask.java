@@ -46,7 +46,11 @@ import java.util.Map;
  * executive task
  */
 public abstract class AbstractTask {
-
+    
+    /**
+     * varPool string
+     */
+    protected String varPool;
     /**
      * taskExecutionContext
      **/
@@ -121,6 +125,14 @@ public abstract class AbstractTask {
         logger.info(" -> {}", String.join("\n\t", logs));
     }
 
+    public void setVarPool(String varPool) {
+      this.varPool = varPool;
+    }
+    
+    public String getVarPool() {
+      return varPool;
+    }
+    
     /**
      * get exit status code
      * @return  exit status code

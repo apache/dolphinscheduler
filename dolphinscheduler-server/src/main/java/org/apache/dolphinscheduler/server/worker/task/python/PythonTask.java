@@ -92,6 +92,7 @@ public class PythonTask extends AbstractTask {
       setExitStatusCode(commandExecuteResult.getExitStatusCode());
       setAppIds(commandExecuteResult.getAppIds());
       setProcessId(commandExecuteResult.getProcessId());
+      setVarPool(pythonCommandExecutor.getVarPool());
     }
     catch (Exception e) {
       logger.error("python task failure", e);
@@ -120,6 +121,13 @@ public class PythonTask extends AbstractTask {
             pythonParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
+    
+    try {
+        rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
+    }catch (StringIndexOutOfBoundsException e) {
+      // TODO: handle exception
+    }
+    
     if (paramsMap != null){
       rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }

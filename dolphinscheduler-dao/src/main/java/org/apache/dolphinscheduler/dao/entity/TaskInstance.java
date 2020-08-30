@@ -212,6 +212,12 @@ public class TaskInstance implements Serializable {
     private int executorId;
 
     /**
+     * varPool string
+     */
+    private String varPool;
+
+    
+    /**
      * executor name
      */
     @TableField(exist = false)
@@ -226,10 +232,19 @@ public class TaskInstance implements Serializable {
      */
     private int delayTime;
 
+    
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
+    }
+
+    public String getVarPool() {
+      return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+      this.varPool = varPool;
     }
 
 

@@ -66,6 +66,7 @@ public abstract class AbstractCommandExecutor {
      */
     protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
+    protected StringBuilder varPool = new StringBuilder();
     /**
      *  process
      */
@@ -234,6 +235,9 @@ public abstract class AbstractCommandExecutor {
         return result;
     }
 
+    public String getVarPool() {
+      return varPool.toString();
+    }
 
     /**
      * cancel application
@@ -347,8 +351,13 @@ public abstract class AbstractCommandExecutor {
                     long lastFlushTime = System.currentTimeMillis();
 
                     while ((line = inReader.readLine()) != null) {
-                        logBuffer.add(line);
-                        lastFlushTime = flush(lastFlushTime);
+                        if(line.startsWith("${setValue(")) {
+                          varPool.append(line.substring("${setValue(".length(), line.length()-2));
+                          varPool.append("$guyinyou$");
+                        }else {
+                            logBuffer.add(line);
+                            lastFlushTime = flush(lastFlushTime);
+                        }
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);
