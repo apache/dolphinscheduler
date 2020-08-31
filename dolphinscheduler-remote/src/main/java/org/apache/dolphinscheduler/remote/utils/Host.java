@@ -69,6 +69,7 @@ public class Host implements Serializable {
         this.port = port;
         this.address = ip + ":" + port;
         this.weight = getWarmUpWeight(weight, startTime);
+        this.startTime = startTime;
     }
 
     public Host(String ip, int port, int weight, long startTime, String workGroup) {
@@ -77,6 +78,7 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
         this.weight = getWarmUpWeight(weight, startTime);
         this.workGroup = workGroup;
+        this.startTime = startTime;
     }
 
     public String getAddress() {
