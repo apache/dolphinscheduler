@@ -48,6 +48,8 @@ public class LowerWeightRoundRobinTest {
         Assert.assertEquals("192.158.2.2", result.getHost().getIp());
         result = roundRobin.select(sources);
         Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.2", result.getHost().getIp());
     }
 
     @Test
