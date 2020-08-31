@@ -190,6 +190,9 @@ public class Host implements Serializable {
             + '}';
     }
 
+    /**
+     * warm up
+     */
     private int getWarmUpWeight(int weight, long startTime) {
         long uptime = System.currentTimeMillis() - startTime;
         //If the warm-up is not over, reduce the weight
