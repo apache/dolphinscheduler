@@ -52,7 +52,7 @@
             </span>
             <span v-else>-</span>
           </td>
-          <td>
+          <td style="word-break:break-all;">
             <span v-if="item.description">{{item.description}}</span>
             <span v-else>-</span>
           </td>
