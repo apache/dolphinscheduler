@@ -194,7 +194,7 @@ public class Host implements Serializable {
         long uptime = System.currentTimeMillis() - startTime;
         //If the warm-up is not over, reduce the weight
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
-            return (int) (weight * (uptime / Constants.WARM_UP_TIME));
+            return (int) (weight * ((float) uptime / Constants.WARM_UP_TIME));
         }
         return weight;
     }

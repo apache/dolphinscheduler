@@ -56,6 +56,6 @@ public class Constants {
     /**
      * warm up time
      */
-    public static final double WARM_UP_TIME = 10 * 60 * 1000;
+    public static final long WARM_UP_TIME = 10 * 60 * 1000;
 
 }
