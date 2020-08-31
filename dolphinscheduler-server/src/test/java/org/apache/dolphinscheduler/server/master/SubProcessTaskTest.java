@@ -35,9 +35,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@RunWith(PowerMockRunner.class)
 public class SubProcessTaskTest {
 
     /**
@@ -59,6 +61,9 @@ public class SubProcessTaskTest {
         Mockito.when(applicationContext.getBean(MasterConfig.class)).thenReturn(config);
         config.setMasterTaskCommitRetryTimes(3);
         config.setMasterTaskCommitInterval(1000);
+
+        PowerMockito.mockStatic(Stopper.class);
+        PowerMockito.when(Stopper.isRunning()).thenReturn(true);
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
@@ -96,9 +101,6 @@ public class SubProcessTaskTest {
 
     @Test
     public void testBasicSuccess() throws Exception {
-        if (!Stopper.isRunning()) {
-            return;
-        }
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.SUCCESS);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
         taskExecThread.call();
@@ -107,9 +109,6 @@ public class SubProcessTaskTest {
 
     @Test
     public void testBasicFailure() throws Exception {
-        if (!Stopper.isRunning()) {
-            return;
-        }
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
         taskExecThread.call();
