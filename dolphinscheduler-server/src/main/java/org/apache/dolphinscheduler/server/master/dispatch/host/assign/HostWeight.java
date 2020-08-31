@@ -76,7 +76,7 @@ public class HostWeight {
 
     private int getWarmUpWeight(Host host, int weight) {
         long startTime = host.getStartTime();
-        double uptime = System.currentTimeMillis() - startTime;
+        long uptime = System.currentTimeMillis() - startTime;
         //If the warm-up is not over, add the weight
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
             return (int) ((weight * Constants.WARM_UP_TIME) / uptime);
