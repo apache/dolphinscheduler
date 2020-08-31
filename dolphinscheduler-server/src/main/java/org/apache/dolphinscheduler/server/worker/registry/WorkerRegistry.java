@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SLASH;
+
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -44,8 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 
 /**
@@ -147,7 +148,6 @@ public class WorkerRegistry {
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
         String weight = getWorkerWeight();
         String workerStartTime = Constants.COLON + System.currentTimeMillis();
-        ;
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);

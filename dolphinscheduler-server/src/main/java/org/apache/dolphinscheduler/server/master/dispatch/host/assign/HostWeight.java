@@ -70,7 +70,7 @@ public class HostWeight {
 
     private int getWeight(double cpu, double memory, double loadAverage, Host host) {
         int calculateWeight = (int) (cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
-        return getWarmUpWeight(host, weight);
+        return getWarmUpWeight(host, calculateWeight);
 
     }
 
