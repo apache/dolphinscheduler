@@ -183,11 +183,10 @@ public class Host implements Serializable {
 
     @Override
     public String toString() {
-        return "Host{" +
-            "address='" + address + '\'' +
-            '}';
+        return "Host{"
+            + "address='" + address + '\''
+            + '}';
     }
-
 
     private int getWarmUpWeight(int weight, long startTime) {
         long uptime = System.currentTimeMillis() - startTime;

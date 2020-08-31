@@ -29,6 +29,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -145,7 +146,8 @@ public class WorkerRegistry {
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
         String weight = getWorkerWeight();
-        String startTime = getStartTime();
+        String workerStartTime = Constants.COLON + System.currentTimeMillis();
+        ;
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);
@@ -157,7 +159,7 @@ public class WorkerRegistry {
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
             workerZkPathBuilder.append(address);
             workerZkPathBuilder.append(weight);
-            workerZkPathBuilder.append(startTime);
+            workerZkPathBuilder.append(workerStartTime);
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
@@ -167,20 +169,14 @@ public class WorkerRegistry {
      * get local address
      */
     private String getLocalAddress() {
-        return NetUtils.getHost() + ":" + workerConfig.getListenPort();
+        return NetUtils.getHost() + Constants.COLON + workerConfig.getListenPort();
     }
 
     /**
      * get Worker Weight
      */
     private String getWorkerWeight() {
-        return ":" + workerConfig.getWeight();
+        return Constants.COLON + workerConfig.getWeight();
     }
 
-    /**
-     * get startTime
-     */
-    private String getStartTime() {
-        return ":" + System.currentTimeMillis();
-    }
 }
