@@ -31,5 +31,13 @@ public class HostTest {
     public void testHostWarmUp() {
         Host host = Host.of(("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 5 * 1000)));
         Assert.assertEquals(50, host.getWeight());
+        host = Host.of(("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 10 * 1000)));
+        Assert.assertEquals(100, host.getWeight());
+    }
+
+    @Test
+    public void testHost() {
+        Host host = Host.of("192.158.2.2:22");
+        Assert.assertEquals(22, host.getPort());
     }
 }
