@@ -389,9 +389,10 @@ public class ResourcesService extends BaseService {
                 String matcherFullName = Matcher.quoteReplacement(fullName);
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
-                childResourceList = resourceList.stream().peek(t -> {
+                childResourceList = resourceList.stream().map(t -> {
                     t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                     t.setUpdateTime(now);
+                    return t;
                 }).collect(Collectors.toList());
                 resourcesMapper.batchUpdateResource(childResourceList);
             }
