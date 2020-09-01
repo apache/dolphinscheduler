@@ -1,4 +1,4 @@
-                                 Apache License
+                               Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -384,7 +384,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     xercesImpl 2.9.1: https://mvnrepository.com/artifact/xerces/xercesImpl/2.9.1, Apache 2.0
     xml-apis 1.4.01: https://mvnrepository.com/artifact/xml-apis/xml-apis/1.4.01, Apache 2.0 and W3C
     zookeeper 3.4.14: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.4.14, Apache 2.0
-    resolver 1.5 https://github.com/airlift/resolver, Apache 2.0
     presto-jdbc 0.238.1 https://mvnrepository.com/artifact/com.facebook.presto/presto-jdbc/0.238.1
 
 
@@ -395,7 +394,7 @@ BSD licenses
 The following components are provided under a BSD license. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    asm 6.2.1: https://asm.ow2.io/license.html, BSD-3-Clause
+    asm 3.1: https://github.com/jdf/javalin/tree/master/lib/asm-3.1, BSD
     javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
     jline 0.9.94: https://github.com/jline/jline3, BSD
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
