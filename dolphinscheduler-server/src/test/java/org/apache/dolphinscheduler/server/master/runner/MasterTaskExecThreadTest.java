@@ -132,16 +132,16 @@ public class MasterTaskExecThreadTest {
         Assert.assertEquals("/", Constants.SINGLE_SLASH);
         Assert.assertEquals("", taskExecThread.getTaskLogPath(taskInstance));
 
-        SiftingAppender appender = PowerMockito.mock(SiftingAppender.class);
+        SiftingAppender appender = Mockito.mock(SiftingAppender.class);
         // it's a trick to mock logger.getAppend("TASKLOGFILE")
-        PowerMockito.when(appender.getName()).thenReturn("TASKLOGFILE");
+        Mockito.when(appender.getName()).thenReturn("TASKLOGFILE");
         rootLogger.addAppender(appender);
 
         Path logBase = Paths.get("path").resolve("to").resolve("test");
 
-        TaskLogDiscriminator taskLogDiscriminator = PowerMockito.mock(TaskLogDiscriminator.class);
-        PowerMockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
-        PowerMockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
+        TaskLogDiscriminator taskLogDiscriminator = Mockito.mock(TaskLogDiscriminator.class);
+        Mockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
+        Mockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
 
         Path logPath = Paths.get(".").toAbsolutePath().getParent()
                 .resolve(logBase)
