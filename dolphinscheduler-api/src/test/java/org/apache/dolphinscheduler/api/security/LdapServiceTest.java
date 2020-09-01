@@ -14,30 +14,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-@TestPropertySource(properties = {
-        "security.authentication.type=PASSWORD",
-})
-public class SecurityConfigTest {
-
+@TestPropertySource(
+        properties = {
+                "security.authentication.type=LDAP",
+                "security.authentication.ldap.user.admin=read-only-admin",
+                "ldap.urls=ldap://ldap.forumsys.com:389/",
+                "ldap.base.dn=dc=example,dc=com",
+                "ldap.username=cn=read-only-admin,dc=example,dc=com",
+                "ldap.password=password",
+                "ldap.user.identity.attribute=uid",
+                "ldap.user.email.attribute=mail",
+        })
+public class LdapServiceTest {
     @Autowired
-    private SecurityConfig securityConfig;
+    private AutowireCapableBeanFactory beanFactory;
+    private LdapService ldapService;
+
+    @Before
+    public void setUp() {
+        ldapService = new LdapService();
+        beanFactory.autowireBean(ldapService);
+    }
 
     @Test
-    public void testAuthenticator() {
-        Authenticator authenticator = securityConfig.authenticator();
-        Assert.assertNotNull(authenticator);
+    public void ldapLogin() {
+        String email = ldapService.ldapLogin("tesla", "password");
+        Assert.assertEquals(email, "tesla@ldap.forumsys.com");
+
+        String email2 = ldapService.ldapLogin("tesla", "error password");
+        Assert.assertNull(email2);
     }
 }

@@ -17,23 +17,29 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.api.ApiApplicationServer;
 
-/**
- * authentication type
- */
-public enum AuthenticationType {
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
-    PASSWORD(0, "verify via user name and password"),
-    LDAP(1, "verify via LDAP server"),
-    ;
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApiApplicationServer.class)
+@TestPropertySource(properties = {
+        "security.authentication.type=LDAP",
+})
+public class SecurityConfigLDAPTest {
 
-    AuthenticationType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
+    @Autowired
+    private SecurityConfig securityConfig;
+
+    @Test
+    public void testAuthenticator() {
+        Authenticator authenticator = securityConfig.authenticator();
+        Assert.assertNotNull(authenticator);
     }
-
-    @EnumValue
-    private final int code;
-    private final String desc;
 }

@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -45,56 +46,63 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-public class PasswordAuthenticatorTest {
-    private static Logger logger = LoggerFactory.getLogger(PasswordAuthenticatorTest.class);
+public class LdapAuthenticatorTest {
+    private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
 
     @Autowired
     private AutowireCapableBeanFactory beanFactory;
+    @MockBean
+    private LdapService ldapService;
     @MockBean
     private SessionService sessionService;
     @MockBean
     private UsersService usersService;
 
-    private PasswordAuthenticator authenticator;
+    private LdapAuthenticator authenticator;
 
+    //test param
     private User mockUser;
     private Session mockSession;
 
+    private String ldapUid = "test";
+    private String ldapUserPwd = "password";
+    private String ldapEmail = "test@example.com";
+    private String ip = "127.0.0.1";
+    private UserType userType = UserType.GENERAL_USER;
+
     @Before
-    public void setUp() throws Exception {
-        authenticator = new PasswordAuthenticator();
+    public void setUp() {
+        authenticator = new LdapAuthenticator();
         beanFactory.autowireBean(authenticator);
 
         mockUser = new User();
-        mockUser.setUserName("test");
-        mockUser.setEmail("test@test.com");
-        mockUser.setUserPassword("test");
         mockUser.setId(1);
-        mockUser.setState(1);
+        mockUser.setUserName(ldapUid);
+        mockUser.setEmail(ldapEmail);
+        mockUser.setUserType(userType);
 
         mockSession = new Session();
         mockSession.setId(UUID.randomUUID().toString());
-        mockSession.setIp("127.0.0.1");
+        mockSession.setIp(ip);
         mockSession.setUserId(1);
         mockSession.setLastLoginTime(new Date());
+
     }
 
     @Test
     public void testAuthenticate() {
-        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
-        when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
-        Result result = authenticator.authenticate("test", "test", "127.0.0.1");
+        when(usersService.createUser(userType, ldapUid, ldapEmail)).thenReturn(mockUser);
+        when(usersService.getUserByUserName(ldapUid)).thenReturn(mockUser);
+        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
+
+        when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
+
+        Result result = authenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
-
-        mockUser.setState(0);
-        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
-        when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
-        Result result1 = authenticator.authenticate("test", "test", "127.0.0.1");
-        Assert.assertEquals(Status.USER_DISABLED.getCode(), (int) result1.getCode());
-        logger.info(result1.toString());
     }
 
     @Test
