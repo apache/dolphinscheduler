@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -34,31 +34,38 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
-public class PasswordAuthenticator implements Authenticator {
-    private static final Logger logger = LoggerFactory.getLogger(PasswordAuthenticator.class);
-
+@Configuration
+public class LdapAuthenticator implements Authenticator {
+    private static final Logger logger = LoggerFactory.getLogger(LdapAuthenticator.class);
     @Autowired
     private UsersService userService;
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    LdapService ldapService;
+
+    @Value("${security.authentication.ldap.user.admin}")
+    private String adminUserId;
 
     @Override
-    public Result<Map<String, String>> authenticate(String username, String password, String extra) {
+    public Result<Map<String, String>> authenticate(String userId, String password, String extra) {
         Result<Map<String, String>> result = new Result<>();
-        // verify username and password
-        User user = userService.queryUser(username, password);
-        if (user == null) {
+        User user;
+        String ldapEmail = ldapService.ldapLogin(userId, password);
+        if (ldapEmail == null) {
             result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
             result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
             return result;
-        }
-
-        // check user state
-        if (user.getState() == Flag.NO.ordinal()) {
-            result.setCode(Status.USER_DISABLED.getCode());
-            result.setMsg(Status.USER_DISABLED.getMsg());
-            return result;
+        } else {
+            //check if user exist
+            user = userService.getUserByUserName(userId);
+            if (user == null) {
+                UserType userType = adminUserId.equalsIgnoreCase(userId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+                user = userService.createUser(userType, userId, ldapEmail);
+            }
         }
 
         // create session
@@ -85,4 +92,5 @@ public class PasswordAuthenticator implements Authenticator {
         //get user object from session
         return userService.queryUser(session.getUserId());
     }
+
 }
