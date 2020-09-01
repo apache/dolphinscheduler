@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,21 +59,20 @@ public class MasterCommandTest {
         cmd.setCommandParam("{\"ProcessInstanceId\":325}");
         cmd.setProcessDefinitionId(63);
 
-        commandMapper.insert(cmd);
-
+        int result = commandMapper.insert(cmd);
+        Assert.assertEquals(1, result);
     }
 
     @Test
     public void recoverSuspendCommand() {
-
         Command cmd = new Command();
         cmd.setProcessDefinitionId(44);
         cmd.setCommandParam("{\"ProcessInstanceId\":290}");
         cmd.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
 
-        commandMapper.insert(cmd);
+        int result = commandMapper.insert(cmd);
+        Assert.assertEquals(1, result);
     }
-
 
     @Test
     public void startNewProcessCommand() {
@@ -84,7 +84,8 @@ public class MasterCommandTest {
         cmd.setWarningGroupId(4);
         cmd.setExecutorId(19);
 
-        commandMapper.insert(cmd);
+        int result = commandMapper.insert(cmd);
+        Assert.assertEquals(1, result);
     }
 
     @Test
@@ -94,7 +95,8 @@ public class MasterCommandTest {
         cmd.setCommandParam("{\"ProcessInstanceId\":816}");
         cmd.setProcessDefinitionId(15);
 
-        commandMapper.insert(cmd);
+        int result = commandMapper.insert(cmd);
+        Assert.assertEquals(1, result);
     }
 
     @Test
@@ -105,15 +107,13 @@ public class MasterCommandTest {
         cmd.setWarningType(WarningType.ALL);
         cmd.setProcessDefinitionId(72);
         cmd.setExecutorId(10);
-        commandMapper.insert(cmd);
+        int result = commandMapper.insert(cmd);
+        Assert.assertEquals(1, result);
     }
-
 
     @Test
     public void testDagHelper() {
-
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(19);
-
         try {
             ProcessDag processDag = DagHelper.generateFlowDag(processDefinition.getProcessDefinitionJson(),
                     new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
@@ -128,8 +128,6 @@ public class MasterCommandTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-
 
 }
