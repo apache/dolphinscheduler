@@ -62,7 +62,7 @@ public class DolphinPluginLoader {
 
     private final File installedPluginsDir;
     private final List<String> configPlugins;
-    private final ArtifactResolver resolver;
+    private ArtifactResolver resolver = null;
     private final List<DolphinPluginManager> dolphinPluginManagerList;
 
 
