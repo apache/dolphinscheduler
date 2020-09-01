@@ -28,6 +28,9 @@ public class Constants {
      */
     public static final String ALERT_PROPERTIES_PATH = "/alert.properties";
 
+    /** default alert plugin dir **/
+    public static final String ALERT_PLUGIN_PATH = "./lib/plugin/alert";
+
     public static final String DATA_SOURCE_PROPERTIES_PATH = "/dao/data_source.properties";
 
     public static final String SINGLE_SLASH = "/";

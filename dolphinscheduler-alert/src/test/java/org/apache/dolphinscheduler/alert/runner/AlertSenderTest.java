@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -119,7 +120,7 @@ public class AlertSenderTest {
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         alertPluginManagerConfig.setPlugins("../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
-            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR).trim());
+            alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
 
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
