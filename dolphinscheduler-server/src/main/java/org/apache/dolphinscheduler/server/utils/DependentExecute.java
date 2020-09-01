@@ -200,8 +200,8 @@ public class DependentExecute {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ?
-                lastManualProcess : lastSchedulerProcess;
+        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime()))
+                ? lastManualProcess : lastSchedulerProcess;
     }
 
     /**

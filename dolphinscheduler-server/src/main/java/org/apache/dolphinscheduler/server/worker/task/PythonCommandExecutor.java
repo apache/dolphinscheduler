@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -157,7 +158,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
                 }
             }
             String result = sb.toString();
-            if (org.apache.commons.lang.StringUtils.isEmpty(result)) {
+            if (StringUtils.isEmpty(result)) {
                 return null;
             }
             String[] arrs = result.split(Constants.EQUAL_SIGN);

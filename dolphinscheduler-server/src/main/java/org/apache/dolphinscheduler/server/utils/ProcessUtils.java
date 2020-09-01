@@ -186,9 +186,10 @@ public class ProcessUtils {
     /**
      * escape verification.
      */
-    private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
-
-            {' ', '\t', '<', '>'}, {' ', '\t'}};
+    private static final char[][] ESCAPE_VERIFICATION = {
+            {' ', '\t', '<', '>', '&', '|', '^'},
+            {' ', '\t', '<', '>'}, {' ', '\t'}
+    };
 
     /**
      * create command line.

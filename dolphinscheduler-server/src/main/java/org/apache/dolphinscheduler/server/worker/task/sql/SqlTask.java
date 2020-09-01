@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMA;
@@ -51,8 +52,6 @@ import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -72,6 +71,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -180,7 +180,6 @@ public class SqlTask extends AbstractTask {
         StringBuilder sqlBuilder = new StringBuilder();
 
         // find process instance by task id
-
 
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
@@ -296,9 +295,11 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         logger.debug("execute sql : {}", result);
 
-        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
-                        sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
-                JSONUtils.toJsonString(resultJSONArray));
+        sendAttachment(
+                StringUtils.isNotEmpty(sqlParameters.getTitle())
+                        ? sqlParameters.getTitle() : taskExecutionContext.getTaskName() + " query result sets",
+                JSONUtils.toJsonString(resultJSONArray)
+        );
     }
 
     /**

@@ -37,11 +37,9 @@ public class CommandExecuteResult {
      */
     private Integer processId;
 
-
     public CommandExecuteResult() {
         this.exitStatusCode = 0;
     }
-
 
     public Integer getExitStatusCode() {
         return exitStatusCode;

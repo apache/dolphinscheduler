@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -223,7 +224,6 @@ public class TaskProps {
         this.envFile = envFile;
     }
 
-
     public String getTaskName() {
         return taskName;
     }
@@ -247,7 +247,6 @@ public class TaskProps {
     public void setQueue(String queue) {
         this.queue = queue;
     }
-
 
     public String getTaskAppId() {
         return taskAppId;
