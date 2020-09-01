@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -34,7 +34,6 @@ import org.mockito.Mockito;
  * for test use only
  */
 public class ExecutionContextTestUtils {
-
 
     public static ExecutionContext getExecutionContext(int port) {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);

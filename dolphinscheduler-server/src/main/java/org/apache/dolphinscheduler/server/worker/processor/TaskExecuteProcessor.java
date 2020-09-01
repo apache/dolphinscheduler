@@ -165,16 +165,16 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 .getAppender("TASKLOGFILE"))
                 .getDiscriminator()).getLogBase();
         if (baseLog.startsWith(Constants.SINGLE_SLASH)) {
-            return baseLog + Constants.SINGLE_SLASH +
-                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH +
-                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH +
-                    taskExecutionContext.getTaskInstanceId() + ".log";
+            return baseLog + Constants.SINGLE_SLASH
+                    + taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH
+                    + taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH
+                    + taskExecutionContext.getTaskInstanceId() + ".log";
         }
-        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                baseLog + Constants.SINGLE_SLASH +
-                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH +
-                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH +
-                taskExecutionContext.getTaskInstanceId() + ".log";
+        return System.getProperty("user.dir") + Constants.SINGLE_SLASH
+                + baseLog + Constants.SINGLE_SLASH
+                + taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH
+                + taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH
+                + taskExecutionContext.getTaskInstanceId() + ".log";
     }
 
     /**

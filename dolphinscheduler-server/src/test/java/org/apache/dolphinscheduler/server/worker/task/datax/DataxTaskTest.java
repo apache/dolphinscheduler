@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.datax;
 
+package org.apache.dolphinscheduler.server.worker.task.datax;
 
 import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
 

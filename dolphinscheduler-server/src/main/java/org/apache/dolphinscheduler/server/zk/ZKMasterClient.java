@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -32,7 +33,6 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
@@ -80,7 +80,6 @@ public class ZKMasterClient extends AbstractZKClient {
             while (!checkZKNodeExists(NetUtils.getHost(), ZKNodeType.MASTER)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
-
 
             // self tolerant
             if (getActiveMasterNum() == 1) {
@@ -166,6 +165,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 break;
             case WORKER:
                 failoverWorker(serverHost, true);
+                break;
             default:
                 break;
         }

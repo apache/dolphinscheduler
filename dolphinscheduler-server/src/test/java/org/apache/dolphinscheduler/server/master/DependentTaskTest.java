@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -50,7 +51,6 @@ public class DependentTaskTest {
     private ProcessService processService;
     private ApplicationContext applicationContext;
 
-
     private MasterConfig config;
 
     @Before
@@ -66,7 +66,6 @@ public class DependentTaskTest {
                         dateInterval.getEndTime()))
                 .thenReturn(findLastProcessInterval());
 
-
         Mockito.when(processService
                 .getTaskNodeListByDefinitionId(4))
                 .thenReturn(getTaskNodes());
@@ -77,7 +76,6 @@ public class DependentTaskTest {
         Mockito.when(processService
                 .findTaskInstanceById(252612))
                 .thenReturn(getTaskInstance());
-
 
         Mockito.when(processService.findProcessInstanceById(10111))
                 .thenReturn(getProcessInstance());
@@ -180,7 +178,6 @@ public class DependentTaskTest {
 
         return processInstance;
     }
-
 
     private List<TaskNode> getTaskNodes() {
         List<TaskNode> list = new ArrayList<>();

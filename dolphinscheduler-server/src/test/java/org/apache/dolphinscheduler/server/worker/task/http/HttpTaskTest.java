@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.http;
 
 import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
@@ -49,7 +50,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
@@ -159,7 +159,6 @@ public class HttpTaskTest {
         String body = null;
 
         try {
-
             CloseableHttpResponse response = httpTask.sendRequest(client);
             statusCode = String.valueOf(httpTask.getStatusCode(response));
             body = httpTask.getResponseBody(response);
@@ -170,7 +169,6 @@ public class HttpTaskTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ;
     }
 
     @Test

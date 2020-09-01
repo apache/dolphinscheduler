@@ -51,9 +51,8 @@ public class MasterCommandTest {
 
     private ProcessDefinitionMapper processDefinitionMapper;
 
-
     @Test
-    public void StartFromFailedCommand() {
+    public void startFromFailedCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":325}");
@@ -64,7 +63,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void RecoverSuspendCommand() {
+    public void recoverSuspendCommand() {
 
         Command cmd = new Command();
         cmd.setProcessDefinitionId(44);
@@ -89,7 +88,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void ToleranceCommand() {
+    public void toleranceCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":816}");

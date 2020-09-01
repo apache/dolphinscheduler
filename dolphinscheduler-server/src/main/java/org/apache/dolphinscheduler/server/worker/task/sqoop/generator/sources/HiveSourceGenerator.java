@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceHiveParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
-
-import org.apache.commons.lang.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +49,8 @@ public class HiveSourceGenerator implements ISourceGenerator {
                     sb.append(" --hcatalog-table ").append(sourceHiveParameter.getHiveTable());
                 }
 
-                if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey()) &&
-                        StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
+                if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())
+                        && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
                     sb.append(" --hcatalog-partition-keys ").append(sourceHiveParameter.getHivePartitionKey())
                             .append(" --hcatalog-partition-values ").append(sourceHiveParameter.getHivePartitionValue());
                 }

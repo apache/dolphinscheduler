@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -161,7 +162,6 @@ public class TaskCallbackServiceTest {
     @Test
     public void testPause() {
         Assert.assertEquals(5000, taskCallbackService.pause(3));
-        ;
     }
 
     @Test

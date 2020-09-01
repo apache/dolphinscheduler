@@ -60,12 +60,10 @@ public class TaskCallbackService {
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
-
     /**
      * netty remoting client
      */
     private final NettyRemotingClient nettyRemotingClient;
-
 
     public TaskCallbackService() {
         final NettyClientConfig clientConfig = new NettyClientConfig();
@@ -132,11 +130,9 @@ public class TaskCallbackService {
         throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
 
-
     public int pause(int ntries) {
         return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
     }
-
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId) {
         NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel, opaque);

@@ -69,7 +69,6 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
-
     public TaskKillProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
