@@ -49,7 +49,6 @@ public class ResourceFilterTest {
         allList.add(resource6);
         allList.add(resource7);
 
-
         ResourceFilter resourceFilter = new ResourceFilter(".jar",allList);
         List<Resource> resourceList = resourceFilter.filter();
         Assert.assertNotNull(resourceList);
