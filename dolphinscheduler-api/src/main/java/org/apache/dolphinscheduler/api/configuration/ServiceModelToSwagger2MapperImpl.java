@@ -221,9 +221,6 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
             return null;
         }
         ApiInfo info = resourceListing.getInfo();
-        if (info == null) {
-            return null;
-        }
         return info;
     }
 

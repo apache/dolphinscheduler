@@ -54,7 +54,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -78,7 +77,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -281,7 +279,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -303,7 +300,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -324,7 +320,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -344,7 +339,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -365,7 +359,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -386,7 +379,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -406,7 +398,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -427,7 +418,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -446,7 +436,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
-        ObjectNode object = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());

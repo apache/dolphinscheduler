@@ -272,10 +272,7 @@ public class ResourcesService extends BaseService {
     private boolean checkResourceExists(String fullName, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        if (resources != null && resources.size() > 0) {
-            return true;
-        }
-        return false;
+        return resources != null && resources.size() > 0;
     }
 
 
@@ -392,10 +389,9 @@ public class ResourcesService extends BaseService {
                 String matcherFullName = Matcher.quoteReplacement(fullName);
                 List<Resource> childResourceList = new ArrayList<>();
                 List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
-                childResourceList = resourceList.stream().map(t -> {
+                childResourceList = resourceList.stream().peek(t -> {
                     t.setFullName(t.getFullName().replaceFirst(originFullName, matcherFullName));
                     t.setUpdateTime(now);
-                    return t;
                 }).collect(Collectors.toList());
                 resourcesMapper.batchUpdateResource(childResourceList);
             }
