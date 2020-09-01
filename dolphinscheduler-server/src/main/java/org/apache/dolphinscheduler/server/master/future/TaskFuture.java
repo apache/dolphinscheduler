@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskFuture {
 
-    private final static ConcurrentHashMap<Long, TaskFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+    private static final ConcurrentHashMap<Long, TaskFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
 
     /**
      * request unique identification

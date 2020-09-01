@@ -134,7 +134,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      * depend result for depend item
      */
     private DependResult getDependResultForItem(DependentItem item) {
-
         DependResult dependResult = DependResult.SUCCESS;
         if (!completeTaskList.containsKey(item.getDepTasks())) {
             logger.info("depend item: {} have not completed yet.", item.getDepTasks());
@@ -150,6 +149,5 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
                 Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
         return dependResult;
     }
-
 
 }

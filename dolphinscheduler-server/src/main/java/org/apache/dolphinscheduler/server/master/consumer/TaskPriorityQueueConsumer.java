@@ -408,8 +408,8 @@ public class TaskPriorityQueueConsumer extends Thread {
                 Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
 
-                    oldVersionResources.forEach(
-                            (t) -> resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
+                    oldVersionResources.forEach((t) ->
+                            resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
                     );
                 }
 
@@ -421,8 +421,8 @@ public class TaskPriorityQueueConsumer extends Thread {
                     Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(
-                            (t) -> resourceMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
+                    resources.forEach((t) ->
+                            resourceMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
                     );
                 }
             }
