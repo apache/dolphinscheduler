@@ -46,8 +46,8 @@ public class HiveTargetGenerator implements ITargetGenerator {
 
                 result.append(" --hive-import ");
 
-                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase()) &&
-                        StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase())
+                        && StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
                     result.append(" --hive-table ")
                             .append(targetHiveParameter.getHiveDatabase())
                             .append(".")
@@ -70,12 +70,10 @@ public class HiveTargetGenerator implements ITargetGenerator {
                     result.append(" --hive-delims-replacement ").append(targetHiveParameter.getReplaceDelimiter());
                 }
 
-                if (StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionKey()) &&
-                        StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())) {
-                    result.append(" --hive-partition-key ")
-                            .append(targetHiveParameter.getHivePartitionKey())
-                            .append(" --hive-partition-value ")
-                            .append(targetHiveParameter.getHivePartitionValue());
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionKey())
+                        && StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())) {
+                    result.append(" --hive-partition-key ").append(targetHiveParameter.getHivePartitionKey())
+                            .append(" --hive-partition-value ").append(targetHiveParameter.getHivePartitionValue());
                 }
 
             }
