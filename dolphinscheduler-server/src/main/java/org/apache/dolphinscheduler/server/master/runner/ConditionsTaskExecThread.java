@@ -23,17 +23,18 @@ import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.LoggerFactory;
 
 public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -60,7 +61,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      */
     public ConditionsTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
-        taskInstance.setStartTime(new Date());
     }
 
     @Override
