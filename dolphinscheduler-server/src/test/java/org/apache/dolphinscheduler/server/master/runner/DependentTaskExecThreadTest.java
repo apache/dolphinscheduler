@@ -107,6 +107,12 @@ public class DependentTaskExecThreadTest {
                 .thenReturn(null).thenReturn(processInstance);
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
+
+        PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
+                .thenReturn(processInstance);
+        taskInstance.setTaskJson(taskInstance.getTaskJson().replaceAll("true", "false"));
+        execThread.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
     }
 
     private TaskInstance initTaskInstance() {

@@ -75,6 +75,21 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     private Date dependentDate;
 
     /**
+     * wait pre-process start timeout setting
+     */
+    private TaskTimeoutParameter waitDependentStartTimeout = null;
+
+    /**
+     * whether to check pre-process start
+     */
+    private boolean checkStartTimeout = false;
+
+    /**
+     * polling interval
+     */
+    private int loopInterval = Constants.SLEEP_TIME_MILLIS;
+
+    /**
      * constructor of MasterBaseTaskExecThread
      *
      * @param taskInstance    task instance
@@ -96,6 +111,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
             Thread.currentThread().setName(threadLoggerInfoName);
             initTaskParameters();
+            initTimeoutParameters();
             initDependParameters();
             waitTaskQuit();
             updateTaskState();
@@ -151,34 +167,13 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                     this.taskInstance.getState());
             return true;
         }
-        String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        TaskTimeoutParameter waitDependentStartTimeout = null;
-        boolean checkStartTimeout = false;
-        if (Objects.nonNull(taskNode)) {
-            waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
-            checkStartTimeout = Objects.nonNull(waitDependentStartTimeout) && waitDependentStartTimeout.getEnable();
-        }
-        int loopInterval = checkStartTimeout ? waitDependentStartTimeout.getCheckInterval() * 60000 : Constants.SLEEP_TIME_MILLIS;
         while (Stopper.isRunning()) {
             try {
                 if (!shouldContinueWait()) {
                     break;
                 }
-                if (checkStartTimeout) {
-                    if (allDependentProcessStart()) {
-                        logger.info("all dependent process instances already exist, start checking their status of execution");
-                        checkStartTimeout = false;
-                        loopInterval = Constants.SLEEP_TIME_MILLIS;
-                    } else {
-                        long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), waitDependentStartTimeout.getInterval() * 60L);
-                        if (remainTime < 0) {
-                            logger.warn("waiting for the dependent processes to start timing out({} minute(s)), stop current task",
-                                    waitDependentStartTimeout.getInterval());
-                            break;
-                        }
-                        logger.info("there are processes that have not started yet, wait {} minute(s).", waitDependentStartTimeout.getCheckInterval());
-                    }
+                if (checkStartTimeout && isTimeoutForWaitingDependentProcessStart()) {
+                    break;
                 } else if (allDependentTaskFinish()) {
                     break;
                 }
@@ -268,6 +263,28 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
+     * Is the waiting time out?
+     * @return
+     */
+    private boolean isTimeoutForWaitingDependentProcessStart() {
+        if (allDependentProcessStart()) {
+            logger.info("all dependent process instances already exist, start checking their status of execution");
+            checkStartTimeout = false;
+            loopInterval = Constants.SLEEP_TIME_MILLIS;
+            return false;
+        } else {
+            long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), waitDependentStartTimeout.getInterval() * 60L);
+            if (remainTime < 0) {
+                logger.warn("waiting for the dependent processes to start timing out({} minute(s)), stop current task",
+                        waitDependentStartTimeout.getInterval());
+                return true;
+            }
+            logger.info("there are processes that have not started yet, wait {} minute(s).", waitDependentStartTimeout.getCheckInterval());
+        }
+        return false;
+    }
+
+    /**
      * judge whether all dependent processes have started.
      * @return whether all dependent processes have started
      */
@@ -283,5 +300,18 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             }
         }
         return start;
+    }
+
+    /**
+     * init timeout parameters.
+     */
+    private void initTimeoutParameters() {
+        String taskJson = taskInstance.getTaskJson();
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+        if (Objects.nonNull(taskNode)) {
+            waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
+            checkStartTimeout = Objects.nonNull(waitDependentStartTimeout) && waitDependentStartTimeout.getEnable();
+            loopInterval = checkStartTimeout ? waitDependentStartTimeout.getCheckInterval() * 60000 : Constants.SLEEP_TIME_MILLIS;
+        }
     }
 }
