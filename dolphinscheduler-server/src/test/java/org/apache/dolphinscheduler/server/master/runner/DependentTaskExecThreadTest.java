@@ -83,8 +83,6 @@ public class DependentTaskExecThreadTest {
                 .thenReturn(processInstance);
         PowerMockito.when(processService.submitTask(taskInstance))
                 .thenReturn(taskInstance);
-        PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
-                .thenReturn(processInstance);
 
         execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
         PowerMockito.when(execThread, "submit")
@@ -100,6 +98,16 @@ public class DependentTaskExecThreadTest {
 
     @Test
     public void testWaitDependentProcessesStartTimeout() throws Exception {
+        PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
+                .thenReturn(processInstance);
+        execThread.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
+    }
+
+    @Test
+    public void testWaitDependentProcessesStartTimeout2() throws Exception {
+        PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
+                .thenReturn(null).thenReturn(processInstance);
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
     }
@@ -110,12 +118,13 @@ public class DependentTaskExecThreadTest {
         taskInstance.setId(252612);
         taskInstance.setName("ABC");
         taskInstance.setProcessInstanceId(10111);
+        // Note that the interval here is a negative number, and the task will directly time out.
         taskInstance.setTaskJson("{\"type\":\"DEPENDENT\",\"id\":\"tasks-4455\",\"name\":\"d_node\",\"params\":{},"
                 + "\"description\":\"d_node\",\"runFlag\":\"NORMAL\",\"conditionResult\":{"
                 + "\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{"
                 + "\"relation\":\"AND\",\"dependItemList\":[{\"projectId\":1,\"definitionId\":15,\"depTasks\":\"py_1\",\"cycle\":\"day\",\"dateValue\":\"today\"}]}"
                 + "]},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"FAILED\",\"interval\":30,\"enable\":true},"
-                + "\"waitStartTimeout\":{\"strategy\":\"\",\"interval\":5,\"enable\":true,\"checkInterval\":1},"
+                + "\"waitStartTimeout\":{\"strategy\":\"\",\"interval\":-5,\"enable\":true,\"checkInterval\":1},"
                 + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[]}");
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

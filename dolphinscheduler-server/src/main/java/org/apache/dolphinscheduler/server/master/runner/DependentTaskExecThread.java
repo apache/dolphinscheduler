@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -153,29 +152,12 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         }
         String taskJson = taskInstance.getTaskJson();
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        TaskTimeoutParameter waitDependentStartTimeout = null;
-        TaskTimeoutParameter waitDependentFinishTimeout = null;
-        boolean checkStartTimeout = false;
-        boolean checkFinishTimeout = false;
-        if (Objects.nonNull(taskNode)) {
-            waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
-            waitDependentFinishTimeout = taskNode.getTaskTimeoutParameter();
-            checkStartTimeout = Objects.nonNull(waitDependentStartTimeout) && waitDependentStartTimeout.getEnable();
-            checkFinishTimeout = Objects.nonNull(waitDependentFinishTimeout) && waitDependentFinishTimeout.getEnable();
-        }
-        int loopInterval = checkStartTimeout ? waitDependentStartTimeout.getCheckInterval() * Constants.SEC_2_MINUTES_TIME_UNIT
-                * Constants.SLEEP_TIME_MILLIS : Constants.SLEEP_TIME_MILLIS;
+        TaskTimeoutParameter waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
+        boolean checkStartTimeout = waitDependentStartTimeout.getEnable();
+        int loopInterval = checkStartTimeout ? waitDependentStartTimeout.getCheckInterval() * 60000 : Constants.SLEEP_TIME_MILLIS;
         while (Stopper.isRunning()) {
             try {
-                if (this.processInstance == null) {
-                    logger.error("process instance not exists , master task exec thread exit");
-                    return true;
-                }
-                if (this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
-                    cancelTaskInstance();
-                    break;
-                }
-                if (taskInstance.getState().typeIsFinished()) {
+                if (!shouldContinueWait()) {
                     break;
                 }
                 if (checkStartTimeout) {
@@ -183,11 +165,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                         logger.info("all dependent process instances already exist, start checking their status of execution");
                         checkStartTimeout = false;
                         loopInterval = Constants.SLEEP_TIME_MILLIS;
-                        // extend the next timeout period
-                        if (checkFinishTimeout) {
-                            long usedTimeMinuets = Math.round((System.currentTimeMillis() - taskInstance.getStartTime().getTime()) / 60000.0);
-                            waitDependentFinishTimeout.setInterval((int) (usedTimeMinuets + waitDependentFinishTimeout.getInterval()));
-                        }
                     } else {
                         long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), waitDependentStartTimeout.getInterval() * 60L);
                         if (remainTime < 0) {
@@ -213,6 +190,22 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             }
         }
         return true;
+    }
+
+    /**
+     * determine whether polling should continue.
+     * @return should continue wait
+     */
+    private boolean shouldContinueWait() {
+        if (this.processInstance == null) {
+            logger.error("process instance not exists, master task exec thread exit");
+            return false;
+        }
+        if (this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
+            cancelTaskInstance();
+            return false;
+        }
+        return !taskInstance.getState().typeIsFinished();
     }
 
     /**

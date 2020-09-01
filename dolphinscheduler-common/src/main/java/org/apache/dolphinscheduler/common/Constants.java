@@ -513,11 +513,6 @@ public final class Constants {
     public static final int SLEEP_TIME_MILLIS = 1000;
 
     /**
-     * polling interval
-     */
-    public static final int DEFAULT_POLLING_INTERVAL_MINUTES = 1;
-
-    /**
      * heartbeat for zk info length
      */
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
