@@ -79,6 +79,46 @@ export default {
       })
     })
   },
+
+  /**
+   * get process definition versions pagination info
+   */
+  getProcessDefinitionVersionsPage ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/versions`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * switch process definition version
+   */
+  switchProcessDefinitionVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/version/switch`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * delete process definition version
+   */
+  deleteProcessDefinitionVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/version/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
   /**
    * Update process instance status
    */
@@ -126,6 +166,8 @@ export default {
         state.connects = JSON.parse(res.data.connects)
         // locations
         state.locations = JSON.parse(res.data.locations)
+        // version
+        state.version = res.data.version
         // Process definition
         const processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
         // tasks info
@@ -154,8 +196,38 @@ export default {
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/process/copy`, {
-        processId: payload.processId
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
       }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get process definition DAG diagram details
+   */
+  moveProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/process/move`, {
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get all the items created by the logged in user
+   */
+  getAllItems ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/login-user-created-project`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

@@ -135,6 +135,7 @@ export default {
   'Child Node': 'Child Node',
   'Please select a sub-Process': 'Please select a sub-Process',
   Edit: 'Edit',
+  'Switch To This Version': 'Switch To This Version',
   'Datasource Name': 'Datasource Name',
   'Please enter datasource name': 'Please enter datasource name',
   IP: 'IP',
@@ -159,8 +160,11 @@ export default {
   'Create Time': 'Create Time',
   'Update Time': 'Update Time',
   Operation: 'Operation',
+  'Current Version': 'Current Version',
   'Click to view': 'Click to view',
   'Delete?': 'Delete?',
+  'Switch Version Successfully': 'Switch Version Successfully',
+  'Confirm Switch To This Version?': 'Confirm Switch To This Version?',
   Confirm: 'Confirm',
   'Task status statistics': 'Task Status Statistics',
   Number: 'Number',
@@ -288,6 +292,7 @@ export default {
   Rename: 'Rename',
   Download: 'Download',
   Export: 'Export',
+  'Version Info': 'Version Info',
   Submit: 'Submit',
   'Edit UDF Function': 'Edit UDF Function',
   type: 'type',
@@ -632,5 +637,9 @@ export default {
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
-  'Please save the DAG before formatting': 'Please save the DAG before formatting'
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
+  'Batch copy': 'Batch copy',
+  'Related items': 'Related items',
+  'Project name is required': 'Project name is required',
+  'Batch move': 'Batch move'
 }

@@ -138,6 +138,7 @@ export default {
   'Child Node': '子节点',
   'Please select a sub-Process': '请选择子工作流',
   Edit: '编辑',
+  'Switch To This Version': '切换到该版本',
   'Datasource Name': '数据源名称',
   'Please enter datasource name': '请输入数据源名称',
   IP: 'IP主机名',
@@ -162,8 +163,11 @@ export default {
   'Create Time': '创建时间',
   'Update Time': '更新时间',
   Operation: '操作',
+  'Current Version': '当前版本',
   'Click to view': '点击查看',
   'Delete?': '确定删除吗?',
+  'Switch Version Successfully': '切换版本成功',
+  'Confirm Switch To This Version?': '确定切换到该版本吗?',
   Confirm: '确定',
   'Task status statistics': '任务状态统计',
   Number: '数量',
@@ -289,6 +293,7 @@ export default {
   Rename: '重命名',
   Download: '下载',
   Export: '导出',
+  'Version Info': '版本信息',
   Submit: '提交',
   'Edit UDF Function': '编辑UDF函数',
   type: '类型',
@@ -632,5 +637,9 @@ export default {
   'Directory detail': '查看目录详情',
   'Connection name': '连线名',
   'Current connection settings': '当前连线设置',
-  'Please save the DAG before formatting': '格式化前请先保存DAG'
+  'Please save the DAG before formatting': '格式化前请先保存DAG',
+  'Batch copy': '批量复制',
+  'Related items': '关联项目',
+  'Project name is required': '项目名称必填',
+  'Batch move': '批量移动'
 }
