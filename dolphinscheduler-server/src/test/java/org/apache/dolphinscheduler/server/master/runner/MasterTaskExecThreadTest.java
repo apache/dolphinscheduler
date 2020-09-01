@@ -17,16 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,13 +34,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.google.common.collect.Sets;
-
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.sift.SiftingAppender;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @PrepareForTest(MasterTaskExecThread.class)
