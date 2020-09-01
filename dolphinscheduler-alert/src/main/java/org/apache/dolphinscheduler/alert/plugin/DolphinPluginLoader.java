@@ -75,7 +75,9 @@ public class DolphinPluginLoader {
         }
 
         this.dolphinPluginManagerList = requireNonNull(dolphinPluginManagerList, "dolphinPluginManagerList is null");
-        this.resolver = new ArtifactResolver(config.getMavenLocalRepository(), config.getMavenRemoteRepository());
+        if(configPlugins != null && configPlugins.size() > 0) {
+            this.resolver = new ArtifactResolver(config.getMavenLocalRepository(), config.getMavenRemoteRepository());
+        }
     }
 
     public void loadPlugins()
