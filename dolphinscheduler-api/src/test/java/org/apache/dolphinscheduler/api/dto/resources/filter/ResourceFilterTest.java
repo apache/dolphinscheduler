@@ -53,6 +53,6 @@ public class ResourceFilterTest {
         ResourceFilter resourceFilter = new ResourceFilter(".jar",allList);
         List<Resource> resourceList = resourceFilter.filter();
         Assert.assertNotNull(resourceList);
-        resourceList.stream().forEach(t-> logger.info(t.toString()));
+        resourceList.forEach(t -> logger.info(t.toString()));
     }
 }
