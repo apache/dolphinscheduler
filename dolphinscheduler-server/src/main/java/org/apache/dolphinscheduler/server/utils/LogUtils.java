@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
@@ -28,7 +27,6 @@ import java.util.Optional;
 
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.spi.AppenderAttachable;
