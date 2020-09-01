@@ -265,16 +265,16 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     .getAppender("TASKLOGFILE"))
                     .getDiscriminator()).getLogBase();
             if (baseLog.startsWith(Constants.SINGLE_SLASH)) {
-                logPath = baseLog + Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH +
-                        task.getId() + ".log";
+                logPath = baseLog + Constants.SINGLE_SLASH
+                        + task.getProcessDefinitionId() + Constants.SINGLE_SLASH
+                        + task.getProcessInstanceId() + Constants.SINGLE_SLASH
+                        + task.getId() + ".log";
             } else {
-                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                        baseLog + Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH +
-                        task.getId() + ".log";
+                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH
+                        + baseLog + Constants.SINGLE_SLASH
+                        + task.getProcessDefinitionId() + Constants.SINGLE_SLASH
+                        + task.getProcessInstanceId() + Constants.SINGLE_SLASH
+                        + task.getId() + ".log";
             }
         } catch (Exception e) {
             logger.error("logger", e);

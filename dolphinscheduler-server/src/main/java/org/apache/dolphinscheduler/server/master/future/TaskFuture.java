@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.future;
 
+package org.apache.dolphinscheduler.server.master.future;
 
 import org.apache.dolphinscheduler.remote.command.Command;
 
@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskFuture {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
-
     private final static ConcurrentHashMap<Long, TaskFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
 
     /**
      * request unique identification
@@ -165,14 +165,14 @@ public class TaskFuture {
 
     @Override
     public String toString() {
-        return "TaskFuture{" +
-                "opaque=" + opaque +
-                ", timeoutMillis=" + timeoutMillis +
-                ", latch=" + latch +
-                ", beginTimestamp=" + beginTimestamp +
-                ", responseCommand=" + responseCommandReference.get() +
-                ", sendOk=" + sendOk +
-                ", cause=" + causeReference.get() +
-                '}';
+        return "TaskFuture{"
+                + "opaque=" + opaque
+                + ", timeoutMillis=" + timeoutMillis
+                + ", latch=" + latch
+                + ", beginTimestamp=" + beginTimestamp
+                + ", responseCommand=" + responseCommandReference.get()
+                + ", sendOk=" + sendOk
+                + ", cause=" + causeReference.get()
+                + '}';
     }
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
@@ -193,7 +194,6 @@ public class MasterExecThread implements Runnable {
         this.alertManager = alertManager;
     }
 
-
     @Override
     public void run() {
 
@@ -341,7 +341,6 @@ public class MasterExecThread implements Runnable {
         }
     }
 
-
     /**
      * prepare process parameter
      *
@@ -356,7 +355,6 @@ public class MasterExecThread implements Runnable {
         logger.info("prepare process :{} end", processInstance.getId());
     }
 
-
     /**
      * process end handle
      */
@@ -369,7 +367,6 @@ public class MasterExecThread implements Runnable {
         List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         alertManager.sendAlertProcessInstance(processInstance, taskInstances);
     }
-
 
     /**
      * generate process dag
@@ -536,7 +533,6 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-
     /**
      * if all of the task dependence are skip, skip it too.
      */
@@ -569,7 +565,6 @@ public class MasterExecThread implements Runnable {
             setTaskNodeSkip(postSkipList);
         }
     }
-
 
     /**
      * parse condition task find the branch process
@@ -722,7 +717,6 @@ public class MasterExecThread implements Runnable {
         return DependResult.SUCCESS;
     }
 
-
     /**
      * query task instance by complete state
      *
@@ -822,7 +816,6 @@ public class MasterExecThread implements Runnable {
             return ExecutionStatus.SUCCESS;
         }
     }
-
 
     /**
      * generate the latest process instance status by the tasks state
@@ -1096,7 +1089,6 @@ public class MasterExecThread implements Runnable {
         return OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
     }
 
-
     /**
      * close the on going tasks
      */
@@ -1134,9 +1126,9 @@ public class MasterExecThread implements Runnable {
         if (taskInstance.getState() != ExecutionStatus.FAILURE) {
             return true;
         }
-        if (taskInstance.getId() == 0 ||
-                taskInstance.getMaxRetryTimes() == 0 ||
-                taskInstance.getRetryInterval() == 0) {
+        if (taskInstance.getId() == 0
+                || taskInstance.getMaxRetryTimes() == 0
+                || taskInstance.getRetryInterval() == 0) {
             return true;
         }
         Date now = new Date();

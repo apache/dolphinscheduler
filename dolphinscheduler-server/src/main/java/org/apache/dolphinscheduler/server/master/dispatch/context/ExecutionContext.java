@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.dispatch.context;
 
+package org.apache.dolphinscheduler.server.master.dispatch.context;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
@@ -48,7 +48,6 @@ public class ExecutionContext {
      */
     private String workerGroup;
 
-
     public ExecutionContext(Command command, ExecutorType executorType) {
         this(command, executorType, DEFAULT_WORKER_GROUP);
     }
@@ -70,7 +69,6 @@ public class ExecutionContext {
     public void setWorkerGroup(String workerGroup) {
         this.workerGroup = workerGroup;
     }
-
 
     public String getWorkerGroup() {
         return this.workerGroup;

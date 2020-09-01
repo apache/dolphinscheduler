@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -37,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.LoggerFactory;
 
 public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
-
 
     /**
      * dependent parameters
@@ -108,9 +108,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
         logger.info("the conditions task depend result : {}", conditionResult);
     }
 
-    /**
-     *
-     */
     private void updateTaskState() {
         ExecutionStatus status;
         if (this.cancel) {
@@ -132,7 +129,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
         this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(), DependentParameters.class);
     }
-
 
     /**
      * depend result for depend item
