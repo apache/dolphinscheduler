@@ -101,11 +101,8 @@ public class DependentTaskExecThreadTest {
         PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
                 .thenReturn(processInstance);
         execThread.call();
-        Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
-    }
+        Assert.assertEquals(ExecutionStatus.FAILURE, execThread.getTaskInstance().getState());
 
-    @Test
-    public void testWaitDependentProcessesStartTimeout2() throws Exception {
         PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
                 .thenReturn(null).thenReturn(processInstance);
         execThread.call();

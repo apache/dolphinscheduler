@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -152,8 +153,12 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         }
         String taskJson = taskInstance.getTaskJson();
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
-        TaskTimeoutParameter waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
-        boolean checkStartTimeout = waitDependentStartTimeout.getEnable();
+        TaskTimeoutParameter waitDependentStartTimeout = null;
+        boolean checkStartTimeout = false;
+        if (Objects.nonNull(taskNode)) {
+            waitDependentStartTimeout = taskNode.getTaskTimeoutParameterForDependentNode();
+            checkStartTimeout = Objects.nonNull(waitDependentStartTimeout) && waitDependentStartTimeout.getEnable();
+        }
         int loopInterval = checkStartTimeout ? waitDependentStartTimeout.getCheckInterval() * 60000 : Constants.SLEEP_TIME_MILLIS;
         while (Stopper.isRunning()) {
             try {
