@@ -117,38 +117,6 @@ public class MasterTaskExecThreadTest {
         org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
     }
 
-    @Test
-    public void testGetTaskLogPath() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setProcessDefinitionId(1);
-        taskInstance.setProcessInstanceId(100);
-        taskInstance.setId(1000);
-
-        Logger rootLogger = (Logger) LoggerFactory.getILoggerFactory().getLogger("ROOT");
-        Assert.assertNotNull(rootLogger);
-
-        MasterTaskExecThread taskExecThread = new MasterTaskExecThread(taskInstance);
-
-        Assert.assertEquals("/", Constants.SINGLE_SLASH);
-        Assert.assertEquals("", taskExecThread.getTaskLogPath(taskInstance));
-
-        SiftingAppender appender = Mockito.mock(SiftingAppender.class);
-        // it's a trick to mock logger.getAppend("TASKLOGFILE")
-        Mockito.when(appender.getName()).thenReturn("TASKLOGFILE");
-        rootLogger.addAppender(appender);
-
-        Path logBase = Paths.get("path").resolve("to").resolve("test");
-
-        TaskLogDiscriminator taskLogDiscriminator = Mockito.mock(TaskLogDiscriminator.class);
-        Mockito.when(taskLogDiscriminator.getLogBase()).thenReturn(logBase.toString());
-        Mockito.when(appender.getDiscriminator()).thenReturn(taskLogDiscriminator);
-
-        Path logPath = Paths.get(".").toAbsolutePath().getParent()
-                .resolve(logBase)
-                .resolve("1").resolve("100").resolve("1000.log");
-        Assert.assertEquals(logPath.toString(), taskExecThread.getTaskLogPath(taskInstance));
-    }
-
     private TaskInstance getTaskInstance(){
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("SHELL");
