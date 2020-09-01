@@ -48,35 +48,33 @@ public class SqoopJobGenerator {
      */
     private CommonGenerator commonGenerator;
 
-    public SqoopJobGenerator(){
+    public SqoopJobGenerator() {
         commonGenerator = new CommonGenerator();
     }
 
-    private void createSqoopJobGenerator(String sourceType,String targetType){
+    private void createSqoopJobGenerator(String sourceType, String targetType) {
         sourceGenerator = createSourceGenerator(sourceType);
         targetGenerator = createTargetGenerator(targetType);
     }
 
     /**
      * get the final sqoop scripts
-     * @param sqoopParameters
-     * @return
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext){
+    public String generateSqoopJob(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
         String sqoopScripts = "";
 
         if (SqoopJobType.TEMPLATE.getDescp().equals(sqoopParameters.getJobType())) {
-            createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
-            if(sourceGenerator == null || targetGenerator == null){
+            createSqoopJobGenerator(sqoopParameters.getSourceType(), sqoopParameters.getTargetType());
+            if (sourceGenerator == null || targetGenerator == null) {
                 throw new RuntimeException("sqoop task source type or target type is null");
             }
 
-            sqoopScripts =  commonGenerator.generate(sqoopParameters)
-                    + sourceGenerator.generate(sqoopParameters,taskExecutionContext)
-                    + targetGenerator.generate(sqoopParameters,taskExecutionContext);
+            sqoopScripts = commonGenerator.generate(sqoopParameters)
+                    + sourceGenerator.generate(sqoopParameters, taskExecutionContext)
+                    + targetGenerator.generate(sqoopParameters, taskExecutionContext);
         } else if (SqoopJobType.CUSTOM.getDescp().equals(sqoopParameters.getJobType())) {
-            sqoopScripts =  sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
+            sqoopScripts = sqoopParameters.getCustomShell().replaceAll("\\r\\n", "\n");
         }
 
         return sqoopScripts;
@@ -84,11 +82,9 @@ public class SqoopJobGenerator {
 
     /**
      * get the source generator
-     * @param sourceType
-     * @return
      */
-    private ISourceGenerator createSourceGenerator(String sourceType){
-        switch (sourceType){
+    private ISourceGenerator createSourceGenerator(String sourceType) {
+        switch (sourceType) {
             case MYSQL:
                 return new MysqlSourceGenerator();
             case HIVE:
@@ -102,11 +98,9 @@ public class SqoopJobGenerator {
 
     /**
      * get the target generator
-     * @param targetType
-     * @return
      */
-    private ITargetGenerator createTargetGenerator(String targetType){
-        switch (targetType){
+    private ITargetGenerator createTargetGenerator(String targetType) {
+        switch (targetType) {
             case MYSQL:
                 return new MysqlTargetGenerator();
             case HIVE:

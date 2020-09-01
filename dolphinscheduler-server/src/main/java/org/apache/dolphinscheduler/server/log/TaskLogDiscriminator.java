@@ -16,10 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.log;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.sift.AbstractDiscriminator;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.sift.AbstractDiscriminator;
 
 /**
  * Task Log Discriminator
@@ -38,7 +39,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
     /**
      * logger name should be like:
-     *     Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
+     * Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
      */
     @Override
     public String getDiscriminatingValue(ILoggingEvent event) {
@@ -47,7 +48,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
         String prefix = LoggerUtils.TASK_LOGGER_INFO_PREFIX + "-";
         if (loggerName.startsWith(prefix)) {
             return loggerName.substring(prefix.length(),
-                    loggerName.length() - 1).replace("-","/");
+                    loggerName.length() - 1).replace("-", "/");
         } else {
             return "unknown_task";
         }

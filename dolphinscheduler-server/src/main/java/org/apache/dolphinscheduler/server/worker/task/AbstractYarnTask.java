@@ -21,75 +21,79 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.slf4j.Logger;
 
 /**
- *  abstract yarn task
+ * abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTask {
-  /**
-   *  process task
-   */
-  private ShellCommandExecutor shellCommandExecutor;
+    /**
+     * process task
+     */
+    private ShellCommandExecutor shellCommandExecutor;
 
-  /**
-   *  process database access
-   */
-  protected ProcessService processService;
+    /**
+     * process database access
+     */
+    protected ProcessService processService;
 
-  /**
-   * Abstract Yarn Task
-   * @param taskExecutionContext taskExecutionContext
-   * @param logger    logger
-   */
-  public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
-    super(taskExecutionContext, logger);
-    this.processService = SpringApplicationContext.getBean(ProcessService.class);
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
-  }
-
-  @Override
-  public void handle() throws Exception {
-    try {
-      // SHELL task exit code
-      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
-      setExitStatusCode(commandExecuteResult.getExitStatusCode());
-      setAppIds(commandExecuteResult.getAppIds());
-      setProcessId(commandExecuteResult.getProcessId());
-    } catch (Exception e) {
-      logger.error("yarn process failure", e);
-      exitStatusCode = -1;
-      throw e;
+    /**
+     * Abstract Yarn Task
+     *
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
+     */
+    public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,
+                logger);
     }
-  }
 
-  /**
-   * cancel application
-   * @param status status
-   * @throws Exception exception
-   */
-  @Override
-  public void cancelApplication(boolean status) throws Exception {
-    cancel = true;
-    // cancel process
-    shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
-    if (status && taskInstance != null){
-      ProcessUtils.killYarnJob(taskExecutionContext);
+    @Override
+    public void handle() throws Exception {
+        try {
+            // SHELL task exit code
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
+        } catch (Exception e) {
+            logger.error("yarn process failure", e);
+            exitStatusCode = -1;
+            throw e;
+        }
     }
-  }
 
-  /**
-   * create command
-   * @return String
-   * @throws Exception exception
-   */
-  protected abstract String buildCommand() throws Exception;
+    /**
+     * cancel application
+     *
+     * @param status status
+     * @throws Exception exception
+     */
+    @Override
+    public void cancelApplication(boolean status) throws Exception {
+        cancel = true;
+        // cancel process
+        shellCommandExecutor.cancelApplication();
+        TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+        if (status && taskInstance != null) {
+            ProcessUtils.killYarnJob(taskExecutionContext);
+        }
+    }
 
-  /**
-   * set main jar name
-   */
-  protected abstract void setMainJarName();
+    /**
+     * create command
+     *
+     * @return String
+     * @throws Exception exception
+     */
+    protected abstract String buildCommand() throws Exception;
+
+    /**
+     * set main jar name
+     */
+    protected abstract void setMainJarName();
 }

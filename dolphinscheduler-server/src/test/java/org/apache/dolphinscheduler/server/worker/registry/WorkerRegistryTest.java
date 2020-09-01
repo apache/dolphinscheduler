@@ -19,18 +19,20 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executor;
-
-import org.apache.curator.framework.imps.CuratorFrameworkImpl;
-import org.apache.curator.framework.listen.Listenable;
-import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+
+import org.apache.curator.framework.imps.CuratorFrameworkImpl;
+import org.apache.curator.framework.listen.Listenable;
+import org.apache.curator.framework.state.ConnectionStateListener;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executor;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

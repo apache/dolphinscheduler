@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.entity;
 import java.io.Serializable;
 
 /**
- *  master/worker task transport
+ * master/worker task transport
  */
-public class SqoopTaskExecutionContext implements Serializable{
+public class SqoopTaskExecutionContext implements Serializable {
 
     /**
      * dataSourceId

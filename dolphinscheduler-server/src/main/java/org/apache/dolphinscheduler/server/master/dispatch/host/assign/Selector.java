@@ -22,12 +22,14 @@ import java.util.Collection;
 
 /**
  * selector
+ *
  * @param <T> T
  */
 public interface Selector<T> {
 
     /**
      * select
+     *
      * @param source source
      * @return T
      */

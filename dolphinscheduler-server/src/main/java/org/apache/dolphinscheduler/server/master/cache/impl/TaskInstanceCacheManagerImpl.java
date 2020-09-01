@@ -23,14 +23,15 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
- *  taskInstance state manager
+ * taskInstance state manager
  */
 @Component
 public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
@@ -38,7 +39,7 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     /**
      * taskInstance cache
      */
-    private Map<Integer,TaskInstance> taskInstanceCache = new ConcurrentHashMap<>();
+    private Map<Integer, TaskInstance> taskInstanceCache = new ConcurrentHashMap<>();
 
     /**
      * process service
@@ -56,9 +57,9 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public TaskInstance getByTaskInstanceId(Integer taskInstanceId) {
         TaskInstance taskInstance = taskInstanceCache.get(taskInstanceId);
-        if (taskInstance == null){
+        if (taskInstance == null) {
             taskInstance = processService.findTaskInstanceById(taskInstanceId);
-            taskInstanceCache.put(taskInstanceId,taskInstance);
+            taskInstanceCache.put(taskInstanceId, taskInstance);
         }
         return taskInstance;
     }
@@ -110,6 +111,7 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     @Override

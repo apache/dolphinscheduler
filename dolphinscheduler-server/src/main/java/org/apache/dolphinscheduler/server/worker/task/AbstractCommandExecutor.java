@@ -67,22 +67,22 @@ public abstract class AbstractCommandExecutor {
     protected static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
-     *  process
+     * process
      */
     private Process process;
 
     /**
-     *  log handler
+     * log handler
      */
     protected Consumer<List<String>> logHandler;
 
     /**
-     *  logger
+     * logger
      */
     protected Logger logger;
 
     /**
-     *  log list
+     * log list
      */
     protected final List<String> logBuffer;
 
@@ -97,8 +97,8 @@ public abstract class AbstractCommandExecutor {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   TaskExecutionContext taskExecutionContext ,
-                                   Logger logger){
+                                   TaskExecutionContext taskExecutionContext,
+                                   Logger logger) {
         this.logHandler = logHandler;
         this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
@@ -167,7 +167,7 @@ public abstract class AbstractCommandExecutor {
      * @return CommandExecuteResult
      * @throws Exception if error throws Exception
      */
-    public CommandExecuteResult run(String execCommand) throws Exception{
+    public CommandExecuteResult run(String execCommand) throws Exception {
 
         CommandExecuteResult result = new CommandExecuteResult();
 
@@ -221,7 +221,7 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(process.exitValue());
 
             // if yarn task , yarn state is final state
-            if (process.exitValue() == 0){
+            if (process.exitValue() == 0) {
                 result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }
         } else {
@@ -237,6 +237,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * cancel application
+     *
      * @throws Exception exception
      */
     public void cancelApplication() throws Exception {
@@ -267,6 +268,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * soft kill
+     *
      * @param processId process id
      * @return process is alive
      * @throws InterruptedException interrupted exception
@@ -291,6 +293,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * hard kill
+     *
      * @param processId process id
      */
     private void hardKill(int processId) {
@@ -309,6 +312,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * print command
+     *
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
@@ -330,12 +334,13 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * get the standard output of the process
+     *
      * @param process process
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable(){
+        parseProcessOutputExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 BufferedReader inReader = null;
@@ -351,7 +356,7 @@ public abstract class AbstractCommandExecutor {
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                 } finally {
                     clear();
                     close(inReader);
@@ -371,22 +376,22 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
-                while(Stopper.isRunning()){
+                while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
                             applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
                     }
 
-                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
                         break;
                     }
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
             result = false;
         }
         return result;
@@ -422,14 +427,15 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * convert file to list
+     *
      * @param filename file name
      * @return line list
      */
     private List<String> convertFile2List(String filename) {
         List lineList = new ArrayList<String>(100);
-        File file=new File(filename);
+        File file = new File(filename);
 
-        if (!file.exists()){
+        if (!file.exists()) {
             return lineList;
         }
 
@@ -441,13 +447,13 @@ public abstract class AbstractCommandExecutor {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
+            logger.error(String.format("read file: %s failed : ", filename), e);
         } finally {
-            if(br != null){
+            if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -457,6 +463,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * find app id
+     *
      * @param line line
      * @return appid
      */
@@ -513,7 +520,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * when log buffer siz or flush time reach condition , then flush
      *
-     * @param lastFlushTime  last flush time
+     * @param lastFlushTime last flush time
      * @return last flush time
      */
     private long flush(long lastFlushTime) {
@@ -550,7 +557,10 @@ public abstract class AbstractCommandExecutor {
     protected List<String> commandOptions() {
         return Collections.emptyList();
     }
+
     protected abstract String buildCommandFilePath();
+
     protected abstract String commandInterpreter();
+
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }

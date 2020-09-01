@@ -29,17 +29,18 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- *  master test
+ * master test
  */
 @Ignore
 public class MasterCommandTest {
@@ -52,7 +53,7 @@ public class MasterCommandTest {
 
 
     @Test
-    public void StartFromFailedCommand(){
+    public void StartFromFailedCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":325}");
@@ -63,7 +64,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void RecoverSuspendCommand(){
+    public void RecoverSuspendCommand() {
 
         Command cmd = new Command();
         cmd.setProcessDefinitionId(44);
@@ -74,10 +75,8 @@ public class MasterCommandTest {
     }
 
 
-
-
     @Test
-    public void startNewProcessCommand(){
+    public void startNewProcessCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_PROCESS);
         cmd.setProcessDefinitionId(167);
@@ -90,7 +89,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void ToleranceCommand(){
+    public void ToleranceCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setCommandParam("{\"ProcessInstanceId\":816}");
@@ -100,7 +99,7 @@ public class MasterCommandTest {
     }
 
     @Test
-    public void insertCommand(){
+    public void insertCommand() {
         Command cmd = new Command();
         cmd.setCommandType(CommandType.START_PROCESS);
         cmd.setFailureStrategy(FailureStrategy.CONTINUE);
@@ -112,7 +111,7 @@ public class MasterCommandTest {
 
 
     @Test
-    public void testDagHelper(){
+    public void testDagHelper() {
 
         ProcessDefinition processDefinition = processDefinitionMapper.selectById(19);
 
@@ -120,7 +119,7 @@ public class MasterCommandTest {
             ProcessDag processDag = DagHelper.generateFlowDag(processDefinition.getProcessDefinitionJson(),
                     new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
 
-            DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+            DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
             Collection<String> start = DagHelper.getStartVertex("1", dag, null);
 
             System.out.println(start.toString());
@@ -132,8 +131,6 @@ public class MasterCommandTest {
         }
 
     }
-
-
 
 
 }

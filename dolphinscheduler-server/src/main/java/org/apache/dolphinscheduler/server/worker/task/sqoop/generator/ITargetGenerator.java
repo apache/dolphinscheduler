@@ -26,9 +26,10 @@ public interface ITargetGenerator {
 
     /**
      * generate the target script
+     *
      * @param sqoopParameters sqoopParameters
      * @param taskExecutionContext taskExecutionContext
      * @return target script
      */
-    String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext);
+    String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext);
 }

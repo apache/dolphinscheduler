@@ -22,17 +22,18 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
- *  round robin host manager
+ * round robin host manager
  */
 public abstract class CommonHostManager implements HostManager {
 
@@ -46,18 +47,19 @@ public abstract class CommonHostManager implements HostManager {
 
     /**
      * select host
+     *
      * @param context context
      * @return host
      */
     @Override
-    public Host select(ExecutionContext context){
+    public Host select(ExecutionContext context) {
         Host host = new Host();
         Collection<String> nodes = null;
         /**
          * executor type
          */
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
                 nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;
@@ -67,12 +69,12 @@ public abstract class CommonHostManager implements HostManager {
                 throw new IllegalArgumentException("invalid executorType : " + executorType);
 
         }
-        if(CollectionUtils.isEmpty(nodes)){
+        if (CollectionUtils.isEmpty(nodes)) {
             return host;
         }
         List<Host> candidateHosts = new ArrayList<>(nodes.size());
         nodes.forEach(node -> {
-            Host nodeHost=Host.of(node);
+            Host nodeHost = Host.of(node);
             nodeHost.setWorkGroup(context.getWorkerGroup());
             candidateHosts.add(nodeHost);
         });

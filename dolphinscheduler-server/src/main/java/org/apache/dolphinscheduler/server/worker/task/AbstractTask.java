@@ -17,7 +17,10 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
@@ -30,17 +33,17 @@ import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 /**
  * executive task
@@ -53,13 +56,13 @@ public abstract class AbstractTask {
     TaskExecutionContext taskExecutionContext;
 
     /**
-     *  log record
+     * log record
      */
     protected Logger logger;
 
 
     /**
-     *  SHELL process pid
+     * SHELL process pid
      */
     protected int processId;
 
@@ -75,14 +78,15 @@ public abstract class AbstractTask {
     protected volatile boolean cancel = false;
 
     /**
-     *  exit code
+     * exit code
      */
     protected volatile int exitStatusCode = -1;
 
     /**
      * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
-     * @param logger    logger
+     * @param logger logger
      */
     protected AbstractTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         this.taskExecutionContext = taskExecutionContext;
@@ -91,6 +95,7 @@ public abstract class AbstractTask {
 
     /**
      * init task
+     *
      * @throws Exception exception
      */
     public void init() throws Exception {
@@ -98,6 +103,7 @@ public abstract class AbstractTask {
 
     /**
      * task handle
+     *
      * @throws Exception exception
      */
     public abstract void handle() throws Exception;
@@ -105,6 +111,7 @@ public abstract class AbstractTask {
 
     /**
      * cancel application
+     *
      * @param status status
      * @throws Exception exception
      */
@@ -114,6 +121,7 @@ public abstract class AbstractTask {
 
     /**
      * log handle
+     *
      * @param logs log list
      */
     public void logHandle(List<String> logs) {
@@ -123,7 +131,8 @@ public abstract class AbstractTask {
 
     /**
      * get exit status code
-     * @return  exit status code
+     *
+     * @return exit status code
      */
     public int getExitStatusCode() {
         return exitStatusCode;
@@ -151,20 +160,20 @@ public abstract class AbstractTask {
 
     /**
      * get task parameters
+     *
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
 
 
-
     /**
      * result processing
      */
-    public void after(){
-        if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
+    public void after() {
+        if (getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
             // task recor flat : if true , start up qianfan
             if (TaskRecordDao.getTaskRecordFlag()
-                    && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())){
+                    && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())) {
                 AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskExecutionContext.getTaskParams(), getCurTaskParamsClass());
 
                 // replace placeholder
@@ -174,37 +183,36 @@ public abstract class AbstractTask {
                         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                         taskExecutionContext.getScheduleTime());
                 if (paramsMap != null && !paramsMap.isEmpty()
-                        && paramsMap.containsKey("v_proc_date")){
+                        && paramsMap.containsKey("v_proc_date")) {
                     String vProcDate = paramsMap.get("v_proc_date").getValue();
-                    if (!StringUtils.isEmpty(vProcDate)){
+                    if (!StringUtils.isEmpty(vProcDate)) {
                         TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskExecutionContext.getTaskName(), vProcDate);
-                        logger.info("task record status : {}",taskRecordState);
-                        if (taskRecordState == TaskRecordStatus.FAILURE){
+                        logger.info("task record status : {}", taskRecordState);
+                        if (taskRecordState == TaskRecordStatus.FAILURE) {
                             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
                         }
                     }
                 }
             }
 
-        }else if (getExitStatusCode() == Constants.EXIT_CODE_KILL){
+        } else if (getExitStatusCode() == Constants.EXIT_CODE_KILL) {
             setExitStatusCode(Constants.EXIT_CODE_KILL);
-        }else {
+        } else {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
         }
     }
 
 
-
-
     /**
      * get current task parameter class
+     *
      * @return Task Params Class
      */
-    private Class getCurTaskParamsClass(){
+    private Class getCurTaskParamsClass() {
         Class paramsClass = null;
         // get task type
         TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
-        switch (taskType){
+        switch (taskType) {
             case SHELL:
                 paramsClass = ShellParameters.class;
                 break;
@@ -244,11 +252,12 @@ public abstract class AbstractTask {
 
     /**
      * get exit status according to exitCode
+     *
      * @return exit status
      */
-    public ExecutionStatus getExitStatus(){
+    public ExecutionStatus getExitStatus() {
         ExecutionStatus status;
-        switch (getExitStatusCode()){
+        switch (getExitStatusCode()) {
             case Constants.EXIT_CODE_SUCCESS:
                 status = ExecutionStatus.SUCCESS;
                 break;

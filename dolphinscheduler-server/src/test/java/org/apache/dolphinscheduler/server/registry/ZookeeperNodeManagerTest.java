@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.registry;
 
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -30,6 +27,10 @@ import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * zookeeper node manager test
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, MasterRegistry.class,WorkerRegistry.class,
+@ContextConfiguration(classes = {DependencyConfig.class, SpringZKServer.class, MasterRegistry.class, WorkerRegistry.class,
         ZookeeperRegistryCenter.class, MasterConfig.class, WorkerConfig.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, CuratorZookeeperClient.class})
 public class ZookeeperNodeManagerTest {
@@ -65,7 +66,7 @@ public class ZookeeperNodeManagerTest {
     private MasterConfig masterConfig;
 
     @Test
-    public void testGetMasterNodes(){
+    public void testGetMasterNodes() {
         masterRegistry.registry();
         try {
             //let the zookeeperNodeManager catch the registry event
@@ -80,7 +81,7 @@ public class ZookeeperNodeManagerTest {
     }
 
     @Test
-    public void testGetWorkerGroupNodes(){
+    public void testGetWorkerGroupNodes() {
         workerRegistry.registry();
         try {
             //let the zookeeperNodeManager catch the registry event
@@ -94,7 +95,7 @@ public class ZookeeperNodeManagerTest {
     }
 
     @Test
-    public void testGetWorkerGroupNodesWithParam(){
+    public void testGetWorkerGroupNodesWithParam() {
         workerRegistry.registry();
         try {
             //let the zookeeperNodeManager catch the registry event

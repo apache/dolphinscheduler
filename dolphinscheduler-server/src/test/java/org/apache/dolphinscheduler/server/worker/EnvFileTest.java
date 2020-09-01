@@ -17,62 +17,61 @@
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class EnvFileTest {
 
-    private static  final Logger logger = LoggerFactory.getLogger(EnvFileTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnvFileTest.class);
 
     @Test
     public void test() {
-        String path = System.getProperty("user.dir")+"/script/env/dolphinscheduler_env.sh";
+        String path = System.getProperty("user.dir") + "/script/env/dolphinscheduler_env.sh";
         String pythonHome = getPythonHome(path);
         logger.info(pythonHome);
     }
 
     /**
-     *  get python home
-     * @param path
-     * @return
+     * get python home
      */
-    private static String getPythonHome(String path){
+    private static String getPythonHome(String path) {
         BufferedReader br = null;
         String line = null;
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            while ((line = br.readLine()) != null){
-                if (line.contains("PYTHON_HOME")){
+            while ((line = br.readLine()) != null) {
+                if (line.contains("PYTHON_HOME")) {
                     sb.append(line);
                     break;
                 }
             }
             String result = sb.toString();
-            if (StringUtils.isEmpty(result)){
+            if (StringUtils.isEmpty(result)) {
                 return null;
             }
             String[] arrs = result.split("=");
-            if (arrs.length == 2){
+            if (arrs.length == 2) {
                 return arrs[1];
             }
 
-        }catch (IOException e){
-            logger.error("read file failed",e);
-        }finally {
+        } catch (IOException e) {
+            logger.error("read file failed", e);
+        } finally {
             try {
-                if (br != null){
+                if (br != null) {
                     br.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
             }
         }
         return null;

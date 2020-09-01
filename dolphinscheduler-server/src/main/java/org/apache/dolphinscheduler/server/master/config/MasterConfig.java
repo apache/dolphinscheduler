@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.config;
 
 import org.apache.dolphinscheduler.common.Constants;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -112,7 +113,7 @@ public class MasterConfig {
     }
 
     public double getMasterMaxCpuloadAvg() {
-        if (masterMaxCpuloadAvg == -1){
+        if (masterMaxCpuloadAvg == -1) {
             return Constants.DEFAULT_MASTER_CPU_LOAD;
         }
         return masterMaxCpuloadAvg;

@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 
 /**
- *  abstract executor manager
+ * abstract executor manager
  */
-public abstract class AbstractExecutorManager<T> implements ExecutorManager<T>{
+public abstract class AbstractExecutorManager<T> implements ExecutorManager<T> {
 
     /**
      * before execute , add time monitor ， timeout
@@ -37,6 +37,7 @@ public abstract class AbstractExecutorManager<T> implements ExecutorManager<T>{
 
     /**
      * after execute , add dispatch monitor
+     *
      * @param context context
      * @throws ExecuteException if error throws ExecuteException
      */

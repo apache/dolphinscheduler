@@ -16,22 +16,24 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.QueryType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mysql source generator
@@ -41,18 +43,18 @@ public class MysqlSourceGenerator implements ISourceGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
         StringBuilder result = new StringBuilder();
         try {
             SourceMysqlParameter sourceMysqlParameter
-                    = JSONUtils.parseObject(sqoopParameters.getSourceParams(),SourceMysqlParameter.class);
+                    = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
 
             SqoopTaskExecutionContext sqoopTaskExecutionContext = taskExecutionContext.getSqoopTaskExecutionContext();
 
-            if(sourceMysqlParameter != null){
+            if (sourceMysqlParameter != null) {
                 BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.of(sqoopTaskExecutionContext.getSourcetype()),
                         sqoopTaskExecutionContext.getSourceConnectionParams());
-                if(baseDataSource != null){
+                if (baseDataSource != null) {
                     result.append(" --connect ")
                             .append(baseDataSource.getJdbcUrl())
                             .append(" --username ")
@@ -60,57 +62,57 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                             .append(" --password ")
                             .append(baseDataSource.getPassword());
 
-                    if(sourceMysqlParameter.getSrcQueryType() == QueryType.FORM.ordinal()){
-                        if(StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())){
+                    if (sourceMysqlParameter.getSrcQueryType() == QueryType.FORM.ordinal()) {
+                        if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
                             result.append(" --table ").append(sourceMysqlParameter.getSrcTable());
                         }
 
-                        if(StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())){
+                        if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
                             result.append(" --columns ").append(sourceMysqlParameter.getSrcColumns());
                         }
 
-                    }else if(sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()
-                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())){
+                    } else if (sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()
+                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
                         String srcQuery = sourceMysqlParameter.getSrcQuerySql();
-                        if(srcQuery.toLowerCase().contains("where")){
-                            srcQuery += " AND "+"$CONDITIONS";
-                        }else{
+                        if (srcQuery.toLowerCase().contains("where")) {
+                            srcQuery += " AND " + "$CONDITIONS";
+                        } else {
                             srcQuery += " WHERE $CONDITIONS";
                         }
                         result.append(" --query \'").append(srcQuery).append("\'");
 
                     }
 
-                    List<Property>  mapColumnHive = sourceMysqlParameter.getMapColumnHive();
+                    List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
 
-                    if(mapColumnHive != null && !mapColumnHive.isEmpty()){
+                    if (mapColumnHive != null && !mapColumnHive.isEmpty()) {
                         StringBuilder columnMap = new StringBuilder();
-                        for(Property item:mapColumnHive){
+                        for (Property item : mapColumnHive) {
                             columnMap.append(item.getProp()).append("=").append(item.getValue()).append(",");
                         }
 
-                        if(StringUtils.isNotEmpty(columnMap.toString())){
+                        if (StringUtils.isNotEmpty(columnMap.toString())) {
                             result.append(" --map-column-hive ")
-                                    .append(columnMap.substring(0,columnMap.length() - 1));
+                                    .append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
 
-                    List<Property>  mapColumnJava = sourceMysqlParameter.getMapColumnJava();
+                    List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
-                    if(mapColumnJava != null && !mapColumnJava.isEmpty()){
+                    if (mapColumnJava != null && !mapColumnJava.isEmpty()) {
                         StringBuilder columnMap = new StringBuilder();
-                        for(Property item:mapColumnJava){
+                        for (Property item : mapColumnJava) {
                             columnMap.append(item.getProp()).append("=").append(item.getValue()).append(",");
                         }
 
-                        if(StringUtils.isNotEmpty(columnMap.toString())){
+                        if (StringUtils.isNotEmpty(columnMap.toString())) {
                             result.append(" --map-column-java ")
-                                    .append(columnMap.substring(0,columnMap.length() - 1));
+                                    .append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 

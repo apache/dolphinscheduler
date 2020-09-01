@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -26,13 +28,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,11 +41,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
- *  round robin host manager
+ * round robin host manager
  */
 public class LowerWeightHostManager extends CommonHostManager {
 
@@ -82,30 +88,31 @@ public class LowerWeightHostManager extends CommonHostManager {
     private ScheduledExecutorService executorService;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         this.selector = new LowerWeightRoundRobin();
         this.workerHostWeightsMap = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
         this.executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("LowerWeightHostManagerExecutor"));
-        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(),0, 5, TimeUnit.SECONDS);
+        this.executorService.scheduleWithFixedDelay(new RefreshResourceTask(), 0, 5, TimeUnit.SECONDS);
         this.roundRobinHostManager = new RoundRobinHostManager();
         this.roundRobinHostManager.setZookeeperNodeManager(getZookeeperNodeManager());
     }
 
     @PreDestroy
-    public void close(){
+    public void close() {
         this.executorService.shutdownNow();
     }
 
     /**
      * select host
+     *
      * @param context context
      * @return host
      */
     @Override
-    public Host select(ExecutionContext context){
+    public Host select(ExecutionContext context) {
         Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
-        if(CollectionUtils.isNotEmpty(workerHostWeights)){
+        if (CollectionUtils.isNotEmpty(workerHostWeights)) {
             return selector.select(workerHostWeights).getHost();
         }
         return new Host();
@@ -116,7 +123,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         throw new UnsupportedOperationException("not support");
     }
 
-    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights){
+    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
         lock.lock();
         try {
             workerHostWeightsMap.clear();
@@ -126,7 +133,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    private Set<HostWeight> getWorkerHostWeights(String workerGroup){
+    private Set<HostWeight> getWorkerHostWeights(String workerGroup) {
         lock.lock();
         try {
             return workerHostWeightsMap.get(workerGroup);
@@ -135,7 +142,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    class RefreshResourceTask implements Runnable{
+    class RefreshResourceTask implements Runnable {
 
         @Override
         public void run() {
@@ -143,21 +150,21 @@ public class LowerWeightHostManager extends CommonHostManager {
                 Map<String, Set<String>> workerGroupNodes = zookeeperNodeManager.getWorkerGroupNodes();
                 Set<Map.Entry<String, Set<String>>> entries = workerGroupNodes.entrySet();
                 Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-                for(Map.Entry<String, Set<String>> entry : entries){
+                for (Map.Entry<String, Set<String>> entry : entries) {
                     String workerGroup = entry.getKey();
                     Set<String> nodes = entry.getValue();
                     String workerGroupPath = registryCenter.getWorkerGroupPath(workerGroup);
                     Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
-                    for(String node : nodes){
+                    for (String node : nodes) {
                         String heartbeat = registryCenter.getZookeeperCachedOperator().get(workerGroupPath + "/" + node);
-                        if(StringUtils.isNotEmpty(heartbeat)
-                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
+                        if (StringUtils.isNotEmpty(heartbeat)
+                                && heartbeat.split(COMMA).length == Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH) {
                             String[] parts = heartbeat.split(COMMA);
 
                             int status = Integer.parseInt(parts[8]);
-                            if (status == Constants.ABNORMAL_NODE_STATUS){
+                            if (status == Constants.ABNORMAL_NODE_STATUS) {
                                 logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}",
-                                        Double.parseDouble(parts[3]) , Double.parseDouble(parts[2]));
+                                        Double.parseDouble(parts[3]), Double.parseDouble(parts[2]));
                                 continue;
                             }
 
@@ -171,7 +178,7 @@ public class LowerWeightHostManager extends CommonHostManager {
                     workerHostWeights.put(workerGroup, hostWeights);
                 }
                 syncWorkerHostWeight(workerHostWeights);
-            } catch (Throwable ex){
+            } catch (Throwable ex) {
                 logger.error("RefreshResourceTask error", ex);
             }
         }

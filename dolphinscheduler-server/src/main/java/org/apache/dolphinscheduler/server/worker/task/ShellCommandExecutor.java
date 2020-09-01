@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.slf4j.Logger;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +28,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.slf4j.Logger;
 
 /**
  * shell command executor
@@ -46,6 +48,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * constructor
+     *
      * @param logHandler logHandler
      * @param taskExecutionContext taskExecutionContext
      * @param logger logger
@@ -53,7 +56,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
                                 TaskExecutionContext taskExecutionContext,
                                 Logger logger) {
-        super(logHandler,taskExecutionContext,logger);
+        super(logHandler, taskExecutionContext, logger);
     }
 
 
@@ -68,6 +71,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * get command type
+     *
      * @return command type
      */
     @Override
@@ -78,9 +82,10 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * create command file if not exists
-     * @param execCommand   exec command
-     * @param commandFile   command file
-     * @throws IOException  io exception
+     *
+     * @param execCommand exec command
+     * @param commandFile command file
+     * @throws IOException io exception
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {

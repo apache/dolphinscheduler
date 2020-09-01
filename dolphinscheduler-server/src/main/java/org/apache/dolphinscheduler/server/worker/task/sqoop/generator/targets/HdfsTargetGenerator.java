@@ -16,12 +16,14 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHdfsParameter;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
+
+import org.apache.commons.lang.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,41 +35,41 @@ public class HdfsTargetGenerator implements ITargetGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
         StringBuilder result = new StringBuilder();
-        try{
+        try {
             TargetHdfsParameter targetHdfsParameter =
-                    JSONUtils.parseObject(sqoopParameters.getTargetParams(),TargetHdfsParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHdfsParameter.class);
 
-            if(targetHdfsParameter != null){
+            if (targetHdfsParameter != null) {
 
-                if(StringUtils.isNotEmpty(targetHdfsParameter.getTargetPath())){
+                if (StringUtils.isNotEmpty(targetHdfsParameter.getTargetPath())) {
                     result.append(" --target-dir ").append(targetHdfsParameter.getTargetPath());
                 }
 
-                if(StringUtils.isNotEmpty(targetHdfsParameter.getCompressionCodec())){
+                if (StringUtils.isNotEmpty(targetHdfsParameter.getCompressionCodec())) {
                     result.append(" --compression-codec ").append(targetHdfsParameter.getCompressionCodec());
                 }
 
-                if(StringUtils.isNotEmpty(targetHdfsParameter.getFileType())){
+                if (StringUtils.isNotEmpty(targetHdfsParameter.getFileType())) {
                     result.append(" ").append(targetHdfsParameter.getFileType());
                 }
 
-                if(targetHdfsParameter.isDeleteTargetDir()){
+                if (targetHdfsParameter.isDeleteTargetDir()) {
                     result.append(" --delete-target-dir");
                 }
 
-                if(StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())){
+                if (StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())) {
                     result.append(" --fields-terminated-by '").append(targetHdfsParameter.getFieldsTerminated()).append("'");
                 }
 
-                if(StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())){
+                if (StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())) {
                     result.append(" --lines-terminated-by '").append(targetHdfsParameter.getLinesTerminated()).append("'");
                 }
 
                 result.append(" --null-non-string 'NULL' --null-string 'NULL'");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 

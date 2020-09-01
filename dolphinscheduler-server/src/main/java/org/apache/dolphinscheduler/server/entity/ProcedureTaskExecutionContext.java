@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.entity;
 import java.io.Serializable;
 
 /**
- *  master/worker task transport
+ * master/worker task transport
  */
-public class ProcedureTaskExecutionContext implements Serializable{
+public class ProcedureTaskExecutionContext implements Serializable {
 
     /**
      * connectionParams

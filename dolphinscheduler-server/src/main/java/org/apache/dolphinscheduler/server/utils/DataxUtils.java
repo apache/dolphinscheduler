@@ -95,7 +95,7 @@ public class DataxUtils {
         }
 
         String[] toColumns = new String[columns.length];
-        for (int i = 0; i < columns.length; i++ ) {
+        for (int i = 0; i < columns.length; i++) {
             toColumns[i] = doConvertKeywordsColumn(dbType, columns[i]);
         }
 

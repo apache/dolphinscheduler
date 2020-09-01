@@ -21,17 +21,19 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.PriorityOrdered;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.PriorityOrdered;
+import org.springframework.stereotype.Service;
 
 
 /**
@@ -61,7 +63,7 @@ public class SpringZKServer implements PriorityOrdered {
         }
     }
 
-    public static boolean isStarted(){
+    public static boolean isStarted() {
         return isStarted.get();
     }
 
@@ -97,7 +99,7 @@ public class SpringZKServer implements PriorityOrdered {
     /**
      * Starts a local Zk instance
      *
-     * @param port        The port to listen on
+     * @param port The port to listen on
      * @param dataDirPath The path for the Zk data directory
      */
     private void startLocalZkServer(final int port, final String dataDirPath) {
@@ -130,7 +132,7 @@ public class SpringZKServer implements PriorityOrdered {
 
         CuratorFramework zkClient = CuratorFrameworkFactory.builder()
                 .connectString(DEFAULT_ZK_STR)
-                .retryPolicy(new ExponentialBackoffRetry(10,100))
+                .retryPolicy(new ExponentialBackoffRetry(10, 100))
                 .sessionTimeoutMs(1000 * 30)
                 .connectionTimeoutMs(1000 * 30)
                 .build();
@@ -151,7 +153,7 @@ public class SpringZKServer implements PriorityOrdered {
             logger.info("zk server stopped");
 
         } catch (Exception e) {
-            logger.error("Failed to stop ZK ",e);
+            logger.error("Failed to stop ZK ", e);
         }
     }
 

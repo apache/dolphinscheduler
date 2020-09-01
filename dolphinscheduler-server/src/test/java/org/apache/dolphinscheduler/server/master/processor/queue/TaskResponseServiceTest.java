@@ -25,6 +25,9 @@ import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,10 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Date;
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
+@ContextConfiguration(classes = {DependencyConfig.class, SpringZKServer.class, TaskResponseService.class, ZookeeperRegistryCenter.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, ZookeeperNodeManager.class, TaskResponseService.class,
         CuratorZookeeperClient.class})
 public class TaskResponseServiceTest {
@@ -44,7 +45,7 @@ public class TaskResponseServiceTest {
     private TaskResponseService taskResponseService;
 
     @Test
-    public void testAdd(){
+    public void testAdd() {
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
                 "", "", "", 1);
         taskResponseService.addResponse(taskResponseEvent);
@@ -58,7 +59,7 @@ public class TaskResponseServiceTest {
     }
 
     @Test
-    public void testStop(){
+    public void testStop() {
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
                 "", "", "", 1);
         taskResponseService.addResponse(taskResponseEvent);

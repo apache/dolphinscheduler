@@ -26,7 +26,7 @@ import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
 /**
- *  task log filter
+ * task log filter
  */
 public class TaskLogFilter extends Filter<ILoggingEvent> {
 
@@ -41,6 +41,7 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */

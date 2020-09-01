@@ -19,13 +19,14 @@ package org.apache.dolphinscheduler.server.worker.cache.impl;
 
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.stereotype.Service;
+
 /**
- *  TaskExecutionContextCache
+ * TaskExecutionContextCache
  */
 @Service
 public class TaskExecutionContextCacheManagerImpl implements TaskExecutionContextCacheManager {
@@ -34,7 +35,7 @@ public class TaskExecutionContextCacheManagerImpl implements TaskExecutionContex
     /**
      * taskInstance cache
      */
-    private Map<Integer,TaskExecutionContext> taskExecutionContextCache = new ConcurrentHashMap<>();
+    private Map<Integer, TaskExecutionContext> taskExecutionContextCache = new ConcurrentHashMap<>();
 
     /**
      * get taskInstance by taskInstance id
@@ -54,11 +55,12 @@ public class TaskExecutionContextCacheManagerImpl implements TaskExecutionContex
      */
     @Override
     public void cacheTaskExecutionContext(TaskExecutionContext taskExecutionContext) {
-        taskExecutionContextCache.put(taskExecutionContext.getTaskInstanceId(),taskExecutionContext);
+        taskExecutionContextCache.put(taskExecutionContext.getTaskInstanceId(), taskExecutionContext);
     }
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     @Override

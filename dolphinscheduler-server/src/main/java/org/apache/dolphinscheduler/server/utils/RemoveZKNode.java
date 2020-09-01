@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,7 @@ public class RemoveZKNode implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (args.length != ARGS_LENGTH){
+        if (args.length != ARGS_LENGTH) {
             logger.error("Usage: <node>");
             return;
         }

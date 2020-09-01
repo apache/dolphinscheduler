@@ -24,18 +24,19 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
- *  alert manager test
+ * alert manager test
  */
 @Ignore
 public class AlertManagerTest {
@@ -57,7 +58,7 @@ public class AlertManagerTest {
      * send worker alert fault tolerance
      */
     @Test
-    public void sendWarnningWorkerleranceFaultTest(){
+    public void sendWarnningWorkerleranceFaultTest() {
         // process instance
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 
@@ -82,7 +83,7 @@ public class AlertManagerTest {
      * send worker alert fault tolerance
      */
     @Test
-    public void sendWarnningOfProcessInstanceTest(){
+    public void sendWarnningOfProcessInstanceTest() {
         // process instance
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 

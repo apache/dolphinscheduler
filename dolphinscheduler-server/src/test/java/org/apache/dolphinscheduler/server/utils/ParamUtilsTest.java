@@ -17,23 +17,24 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test ParamUtils
@@ -51,7 +52,6 @@ public class ParamUtilsTest {
 
     /**
      * Init params
-     * @throws Exception
      */
     @Before
     public void setUp() throws Exception {
@@ -85,7 +85,7 @@ public class ParamUtilsTest {
         String expected1 = "{\"local_param\":{\"prop\":\"local_param\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"20191229\"}}";
         //Define expected date , the month is 0-base
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019,11,30);
+        calendar.set(2019, 11, 30);
         Date date = calendar.getTime();
 
         //Invoke convert

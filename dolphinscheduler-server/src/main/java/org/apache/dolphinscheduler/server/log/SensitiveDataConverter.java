@@ -17,14 +17,15 @@
 package org.apache.dolphinscheduler.server.log;
 
 
-import ch.qos.logback.classic.pattern.MessageConverter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import ch.qos.logback.classic.pattern.MessageConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
  * sensitive data log converter

@@ -20,15 +20,16 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
-import org.slf4j.Logger;
 
 import java.util.Map;
-import org.apache.dolphinscheduler.common.utils.*;
+
+import org.slf4j.Logger;
 
 /**
  * sqoop task extends the shell task
@@ -42,8 +43,8 @@ public class SqoopTask extends AbstractYarnTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
-    public SqoopTask(TaskExecutionContext taskExecutionContext, Logger logger){
-        super(taskExecutionContext,logger);
+    public SqoopTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
         this.taskExecutionContext = taskExecutionContext;
     }
 
@@ -51,7 +52,7 @@ public class SqoopTask extends AbstractYarnTask {
     public void init() throws Exception {
         logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
         sqoopParameters =
-                JSONUtils.parseObject(taskExecutionContext.getTaskParams(),SqoopParameters.class);
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
         if (!sqoopParameters.checkParameters()) {
             throw new RuntimeException("sqoop task params is not valid");
         }
@@ -62,7 +63,7 @@ public class SqoopTask extends AbstractYarnTask {
     protected String buildCommand() throws Exception {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters,taskExecutionContext);
+        String script = generator.generateSqoopJob(sqoopParameters, taskExecutionContext);
 
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
                 taskExecutionContext.getDefinedParams(),
@@ -70,8 +71,8 @@ public class SqoopTask extends AbstractYarnTask {
                 CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                 taskExecutionContext.getScheduleTime());
 
-        if(paramsMap != null){
-            String resultScripts = ParameterUtils.convertParameterPlaceholders(script,  ParamUtils.convert(paramsMap));
+        if (paramsMap != null) {
+            String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
             logger.info("sqoop script: {}", resultScripts);
             return resultScripts;
         }

@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import java.util.Date;
-
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -44,6 +42,9 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +59,7 @@ import io.netty.channel.Channel;
  * test task call back service
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={
+@ContextConfiguration(classes = {
         TaskCallbackServiceTestConfig.class,
         SpringZKServer.class,
         SpringApplicationContext.class,
@@ -95,10 +96,9 @@ public class TaskCallbackServiceTest {
 
     /**
      * send ack test
-     * @throws Exception
      */
     @Test
-    public void testSendAck() throws Exception{
+    public void testSendAck() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -122,10 +122,9 @@ public class TaskCallbackServiceTest {
 
     /**
      * send result test
-     * @throws Exception
      */
     @Test
-    public void testSendResult() throws Exception{
+    public void testSendResult() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -136,7 +135,7 @@ public class TaskCallbackServiceTest {
         NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(clientConfig);
         Channel channel = nettyRemotingClient.getChannel(Host.of("localhost:30000"));
         taskCallbackService.addRemoteChannel(1, new NettyRemoteChannel(channel, 1));
-        TaskExecuteResponseCommand responseCommand  = new TaskExecuteResponseCommand();
+        TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand();
         responseCommand.setTaskInstanceId(1);
         responseCommand.setEndTime(new Date());
 
@@ -153,19 +152,20 @@ public class TaskCallbackServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSendAckWithIllegalArgumentException(){
+    public void testSendAckWithIllegalArgumentException() {
         TaskExecuteAckCommand ackCommand = Mockito.mock(TaskExecuteAckCommand.class);
         taskCallbackService.sendAck(1, ackCommand.convert2Command());
         Stopper.stop();
     }
 
     @Test
-    public void testPause(){
-        Assert.assertEquals(5000, taskCallbackService.pause(3));;
+    public void testPause() {
+        Assert.assertEquals(5000, taskCallbackService.pause(3));
+        ;
     }
 
     @Test
-    public void testSendAck1(){
+    public void testSendAck1() {
         masterRegistry.registry();
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
@@ -195,7 +195,7 @@ public class TaskCallbackServiceTest {
     }
 
     @Test
-    public void testTaskExecuteProcessor() throws Exception{
+    public void testTaskExecuteProcessor() throws Exception {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -207,11 +207,11 @@ public class TaskCallbackServiceTest {
 
         TaskExecuteRequestCommand taskExecuteRequestCommand = new TaskExecuteRequestCommand();
 
-        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+        nettyRemotingClient.send(new Host("localhost", 30000), taskExecuteRequestCommand.convert2Command());
 
         taskExecuteRequestCommand.setTaskExecutionContext(JSONUtils.toJsonString(new TaskExecutionContext()));
 
-        nettyRemotingClient.send(new Host("localhost",30000),taskExecuteRequestCommand.convert2Command());
+        nettyRemotingClient.send(new Host("localhost", 30000), taskExecuteRequestCommand.convert2Command());
 
         Thread.sleep(5000);
 

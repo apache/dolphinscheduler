@@ -22,32 +22,33 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  logger server
+ * logger server
  */
 public class LoggerServer {
 
-    private static  final Logger logger = LoggerFactory.getLogger(LoggerServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoggerServer.class);
 
     /**
-     *  netty server
+     * netty server
      */
     private final NettyRemotingServer server;
 
     /**
-     *  netty server config
+     * netty server config
      */
     private final NettyServerConfig serverConfig;
 
     /**
-     *  loggger request processor
+     * loggger request processor
      */
     private final LoggerRequestProcessor requestProcessor;
 
-    public LoggerServer(){
+    public LoggerServer() {
         this.serverConfig = new NettyServerConfig();
         this.serverConfig.setListenPort(Constants.RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
@@ -60,9 +61,10 @@ public class LoggerServer {
 
     /**
      * main launches the server from the command line.
+     *
      * @param args arguments
      */
-    public static void main(String[] args)  {
+    public static void main(String[] args) {
         final LoggerServer server = new LoggerServer();
         server.start();
     }
@@ -70,9 +72,9 @@ public class LoggerServer {
     /**
      * server start
      */
-    public void start()  {
+    public void start() {
         this.server.start();
-        logger.info("logger server started, listening on port : {}" , Constants.RPC_PORT);
+        logger.info("logger server started, listening on port : {}", Constants.RPC_PORT);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {

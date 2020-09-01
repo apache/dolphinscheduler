@@ -19,17 +19,18 @@ package org.apache.dolphinscheduler.server.registry;
 
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 /**
- *  zookeeper register center
+ * zookeeper register center
  */
 @Service
 public class ZookeeperRegistryCenter implements InitializingBean {
@@ -41,7 +42,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     @Autowired
-    private  ZookeeperConfig zookeeperConfig;
+    private ZookeeperConfig zookeeperConfig;
 
     /**
      * nodes namespace
@@ -99,6 +100,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get master path
+     *
      * @return master path
      */
     public String getMasterPath() {
@@ -107,6 +109,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker path
+     *
      * @return worker path
      */
     public String getWorkerPath() {
@@ -114,7 +117,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     }
 
     /**
-     *  get master nodes directly
+     * get master nodes directly
+     *
      * @return master nodes
      */
     public Set<String> getMasterNodesDirectly() {
@@ -123,7 +127,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     }
 
     /**
-     *  get worker nodes directly
+     * get worker nodes directly
+     *
      * @return master nodes
      */
     public Set<String> getWorkerNodesDirectly() {
@@ -133,6 +138,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group directly
+     *
      * @return worker group nodes
      */
     public Set<String> getWorkerGroupDirectly() {
@@ -142,8 +148,6 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group nodes
-     * @param workerGroup
-     * @return
      */
     public Set<String> getWorkerGroupNodesDirectly(String workerGroup) {
         List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
@@ -152,6 +156,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * whether worker path
+     *
      * @param path path
      * @return result
      */
@@ -161,6 +166,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * whether master path
+     *
      * @param path path
      * @return result
      */
@@ -170,6 +176,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group path
+     *
      * @param workerGroup workerGroup
      * @return worker group path
      */
@@ -179,6 +186,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get children nodes
+     *
      * @param key key
      * @return children nodes
      */
@@ -188,6 +196,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get zookeeperCachedOperator
+     *
      * @return zookeeperCachedOperator
      */
     public ZookeeperCachedOperator getZookeeperCachedOperator() {

@@ -28,7 +28,7 @@ public class CommandExecuteResult {
     private Integer exitStatusCode;
 
     /**
-     *  appIds
+     * appIds
      */
     private String appIds;
 
@@ -38,7 +38,7 @@ public class CommandExecuteResult {
     private Integer processId;
 
 
-    public CommandExecuteResult(){
+    public CommandExecuteResult() {
         this.exitStatusCode = 0;
     }
 

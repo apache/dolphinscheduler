@@ -25,7 +25,7 @@ import java.util.Collection;
 
 
 /**
- *  round robin host manager
+ * round robin host manager
  */
 public class RoundRobinHostManager extends CommonHostManager {
 
@@ -37,7 +37,7 @@ public class RoundRobinHostManager extends CommonHostManager {
     /**
      * set round robin
      */
-    public RoundRobinHostManager(){
+    public RoundRobinHostManager() {
         this.selector = new RoundRobinSelector();
     }
 

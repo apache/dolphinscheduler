@@ -17,21 +17,23 @@
 package org.apache.dolphinscheduler.server.log;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.IThrowableProxy;
-import ch.qos.logback.classic.spi.LoggerContextVO;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
+
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.LoggerContextVO;
 
 public class SensitiveDataConverterTest {
 
@@ -53,6 +55,7 @@ public class SensitiveDataConverterTest {
             "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
             "\"user\":\"view\"," +
             "\"password\":\"******\"}";
+
     @Test
     public void convert() {
         SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
@@ -173,7 +176,6 @@ public class SensitiveDataConverterTest {
 
         return sb.toString();
     }
-
 
 
 }

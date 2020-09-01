@@ -57,7 +57,7 @@ import com.github.rholder.retry.RetryException;
 
 
 /**
- *  task scheduler thread
+ * task scheduler thread
  */
 public class TaskExecuteThread implements Runnable {
 
@@ -67,17 +67,17 @@ public class TaskExecuteThread implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteThread.class);
 
     /**
-     *  task instance
+     * task instance
      */
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     *  abstract task
+     * abstract task
      */
     private AbstractTask task;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private TaskCallbackService taskCallbackService;
 
@@ -92,7 +92,8 @@ public class TaskExecuteThread implements Runnable {
     private Logger taskLogger;
 
     /**
-     *  constructor
+     * constructor
+     *
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
@@ -177,10 +178,9 @@ public class TaskExecuteThread implements Runnable {
 
     /**
      * get global paras map
-     * @return
      */
     private Map<String, String> getGlobalParamsMap() {
-        Map<String,String> globalParamsMap = new HashMap<>(16);
+        Map<String, String> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
@@ -193,17 +193,17 @@ public class TaskExecuteThread implements Runnable {
 
     /**
      * set task timeout
+     *
      * @param taskExecutionContext TaskExecutionContext
-     * @param taskNode
      */
     private void setTaskTimeout(TaskExecutionContext taskExecutionContext, TaskNode taskNode) {
         // the default timeout is the maximum value of the integer
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         TaskTimeoutParameter taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
-        if (taskTimeoutParameter.getEnable()){
+        if (taskTimeoutParameter.getEnable()) {
             // get timeout strategy
             taskExecutionContext.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy().getCode());
-            switch (taskTimeoutParameter.getStrategy()){
+            switch (taskTimeoutParameter.getStrategy()) {
                 case WARN:
                     break;
                 case FAILED:
@@ -226,14 +226,14 @@ public class TaskExecuteThread implements Runnable {
 
 
     /**
-     *  kill task
+     * kill task
      */
-    public void kill(){
-        if (task != null){
+    public void kill() {
+        if (task != null) {
             try {
                 task.cancelApplication(true);
-            }catch (Exception e){
-                logger.error(e.getMessage(),e);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
     }
@@ -241,21 +241,17 @@ public class TaskExecuteThread implements Runnable {
 
     /**
      * download resource file
-     *
-     * @param execLocalPath
-     * @param projectRes
-     * @param logger
      */
     private void downloadResource(String execLocalPath,
-                                  Map<String,String> projectRes,
+                                  Map<String, String> projectRes,
                                   Logger logger) throws Exception {
-        if (MapUtils.isEmpty(projectRes)){
+        if (MapUtils.isEmpty(projectRes)) {
             return;
         }
 
         Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
 
-        for (Map.Entry<String,String> resource : resEntries) {
+        for (Map.Entry<String, String> resource : resEntries) {
             String fullName = resource.getKey();
             String tenantCode = resource.getValue();
             File resFile = new File(execLocalPath, fullName);
@@ -266,8 +262,8 @@ public class TaskExecuteThread implements Runnable {
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
-                }catch (Exception e){
-                    logger.error(e.getMessage(),e);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage());
                 }
             } else {
@@ -288,8 +284,8 @@ public class TaskExecuteThread implements Runnable {
                 Thread.sleep(remainTime * Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 logger.error("delay task execution failure, the task will be executed directly. process instance id:{}, task instance id:{}",
-                            taskExecutionContext.getProcessInstanceId(),
-                            taskExecutionContext.getTaskInstanceId());
+                        taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId());
             }
         }
     }

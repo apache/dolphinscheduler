@@ -19,23 +19,24 @@ package org.apache.dolphinscheduler.server.worker.shell;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Date;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.dolphinscheduler.common.utils.*;
-
-import java.util.Date;
 
 /**
- *  python shell command executor test
+ * python shell command executor test
  */
 @Ignore
 public class ShellCommandExecutorTest {
@@ -45,7 +46,7 @@ public class ShellCommandExecutorTest {
     private ProcessService processService = null;
 
     @Before
-    public void before(){
+    public void before() {
         processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
@@ -61,7 +62,6 @@ public class ShellCommandExecutorTest {
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
         taskProps.setTaskInstanceId(7657);
-
 
 
         TaskInstance taskInstance = processService.findTaskInstanceById(7657);
@@ -91,11 +91,11 @@ public class ShellCommandExecutorTest {
         task.handle();
         ExecutionStatus status = ExecutionStatus.SUCCESS;
 
-        if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
+        if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS) {
             status = ExecutionStatus.SUCCESS;
-        }else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL){
+        } else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL) {
             status = ExecutionStatus.KILL;
-        }else {
+        } else {
             status = ExecutionStatus.FAILURE;
         }
 

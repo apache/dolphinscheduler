@@ -32,12 +32,13 @@ public class MasterLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
+        if (event.getThreadName().startsWith("Master-")) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;

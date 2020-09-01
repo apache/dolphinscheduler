@@ -17,14 +17,14 @@
 package org.apache.dolphinscheduler.server.master.dispatch.context;
 
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-
 /**
- *  execution context
+ * execution context
  */
 public class ExecutionContext {
 
@@ -34,17 +34,17 @@ public class ExecutionContext {
     private Host host;
 
     /**
-     *  command
+     * command
      */
     private final Command command;
 
     /**
-     *  executor type : worker or client
+     * executor type : worker or client
      */
     private final ExecutorType executorType;
 
     /**
-     *  worker group
+     * worker group
      */
     private String workerGroup;
 
@@ -72,7 +72,7 @@ public class ExecutionContext {
     }
 
 
-    public String getWorkerGroup(){
+    public String getWorkerGroup() {
         return this.workerGroup;
     }
 

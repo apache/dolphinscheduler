@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,7 @@ public class HostManagerConfig {
         String hostSelector = masterConfig.getHostSelector();
         HostSelector selector = HostSelector.of(hostSelector);
         HostManager hostManager;
-        switch (selector){
+        switch (selector) {
             case RANDOM:
                 hostManager = new RandomHostManager();
                 break;

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.entity;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
 /**
- *  task priority info
+ * task priority info
  */
 public class TaskPriority {
 
@@ -50,11 +50,12 @@ public class TaskPriority {
     private String groupName;
 
     /**
-     *   ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${groupName}
+     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${groupName}
      */
     private String taskPriorityInfo;
 
-    public TaskPriority(){}
+    public TaskPriority() {
+    }
 
     public TaskPriority(int processInstancePriority,
                         int processInstanceId,
@@ -130,7 +131,7 @@ public class TaskPriority {
      * @param taskPriorityInfo taskPriorityInfo
      * @return TaskPriority
      */
-    public static TaskPriority of(String taskPriorityInfo){
+    public static TaskPriority of(String taskPriorityInfo) {
         String[] parts = taskPriorityInfo.split(UNDERLINE);
 
         if (parts.length != 5) {

@@ -22,7 +22,7 @@ import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
 /**
- *  worker log filter
+ * worker log filter
  */
 public class WorkerLogFilter extends Filter<ILoggingEvent> {
     /**
@@ -32,17 +32,19 @@ public class WorkerLogFilter extends Filter<ILoggingEvent> {
 
     /**
      * Accept or reject based on thread name
+     *
      * @param event event
      * @return FilterReply
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Worker-")){
+        if (event.getThreadName().startsWith("Worker-")) {
             return FilterReply.ACCEPT;
         }
 
         return FilterReply.DENY;
     }
+
     public void setLevel(String level) {
         this.level = Level.toLevel(level);
     }

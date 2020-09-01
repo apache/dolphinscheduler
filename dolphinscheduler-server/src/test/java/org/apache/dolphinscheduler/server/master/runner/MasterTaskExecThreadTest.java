@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,14 +61,15 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testExistsValidWorkerGroup1(){
+    public void testExistsValidWorkerGroup1() {
 
         Mockito.when(zookeeperRegistryCenter.getWorkerGroupDirectly()).thenReturn(Sets.newHashSet());
         boolean b = masterTaskExecThread.existsValidWorkerGroup("default");
         Assert.assertFalse(b);
     }
+
     @Test
-    public void testExistsValidWorkerGroup2(){
+    public void testExistsValidWorkerGroup2() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
         workerGorups.add("test2");
@@ -78,7 +80,7 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testExistsValidWorkerGroup3(){
+    public void testExistsValidWorkerGroup3() {
         Set<String> workerGorups = new HashSet<>();
         workerGorups.add("test1");
 
@@ -89,7 +91,7 @@ public class MasterTaskExecThreadTest {
     }
 
     @Test
-    public void testPauseTask(){
+    public void testPauseTask() {
 
 
         ProcessService processService = Mockito.mock(ProcessService.class);
@@ -108,7 +110,7 @@ public class MasterTaskExecThreadTest {
         org.junit.Assert.assertEquals(ExecutionStatus.PAUSE, taskInstance.getState());
     }
 
-    private TaskInstance getTaskInstance(){
+    private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("SHELL");
         taskInstance.setId(252612);

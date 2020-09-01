@@ -16,10 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.http;
 
-import static org.apache.dolphinscheduler.common.enums.CommandType.*;
-
-import java.io.IOException;
-import java.util.Date;
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
 
 import org.apache.dolphinscheduler.common.enums.HttpCheckCondition;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
@@ -32,9 +29,14 @@ import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.io.IOException;
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,10 +53,9 @@ import org.springframework.context.ApplicationContext;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
-@PowerMockIgnore({"javax.management.*","javax.net.ssl.*"})
+@PowerMockIgnore({"javax.management.*", "javax.net.ssl.*"})
 public class HttpTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(HttpTaskTest.class);
-
 
 
     private HttpTask httpTask;
@@ -120,28 +121,28 @@ public class HttpTaskTest {
 
 
     @Test
-    public void testGenerator(){
+    public void testGenerator() {
         String paramJson = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://github.com/\"," +
                 "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
         HttpParameters httpParameters = JSONUtils.parseObject(paramJson, HttpParameters.class);
 
 
-        Assert.assertEquals(10000,httpParameters.getConnectTimeout() );
-        Assert.assertEquals(10000,httpParameters.getSocketTimeout());
-        Assert.assertEquals("https://github.com/",httpParameters.getUrl());
-        Assert.assertEquals(HttpMethod.GET,httpParameters.getHttpMethod());
-        Assert.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT,httpParameters.getHttpCheckCondition());
-        Assert.assertEquals("",httpParameters.getCondition());
+        Assert.assertEquals(10000, httpParameters.getConnectTimeout());
+        Assert.assertEquals(10000, httpParameters.getSocketTimeout());
+        Assert.assertEquals("https://github.com/", httpParameters.getUrl());
+        Assert.assertEquals(HttpMethod.GET, httpParameters.getHttpMethod());
+        Assert.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
+        Assert.assertEquals("", httpParameters.getCondition());
 
     }
 
     @Test
-    public void testHandle(){
-        boolean flag = true ;
+    public void testHandle() {
+        boolean flag = true;
         try {
             httpTask.handle();
         } catch (Exception e) {
-            flag = false ;
+            flag = false;
             e.printStackTrace();
         }
 
@@ -150,7 +151,7 @@ public class HttpTaskTest {
     }
 
     @Test
-    public void testSendRequest(){
+    public void testSendRequest() {
 
         CloseableHttpClient client = httpTask.createHttpClient();
 
@@ -159,44 +160,45 @@ public class HttpTaskTest {
 
         try {
 
-            CloseableHttpResponse response = httpTask.sendRequest(client) ;
+            CloseableHttpResponse response = httpTask.sendRequest(client);
             statusCode = String.valueOf(httpTask.getStatusCode(response));
             body = httpTask.getResponseBody(response);
             int exitStatusCode = httpTask.validResponse(body, statusCode);
 
-            Assert.assertNotEquals(-1,exitStatusCode);
+            Assert.assertNotEquals(-1, exitStatusCode);
 
         } catch (IOException e) {
             e.printStackTrace();
-        };
+        }
+        ;
     }
 
     @Test
-    public void testValidResponse(){
+    public void testValidResponse() {
         String body = "body";
-        String statusCode = "200" ;
+        String statusCode = "200";
 
-        int exitStatusCode = httpTask.validResponse(body,statusCode);
-        Assert.assertNotEquals(-1,exitStatusCode);
+        int exitStatusCode = httpTask.validResponse(body, statusCode);
+        Assert.assertNotEquals(-1, exitStatusCode);
 
     }
 
     @Test
-    public void testAppendMessage(){
+    public void testAppendMessage() {
         httpTask.appendMessage("message");
 
-        Assert.assertEquals("message",httpTask.getOutput());
+        Assert.assertEquals("message", httpTask.getOutput());
     }
 
     @Test
-    public void testCreateHttpClient(){
+    public void testCreateHttpClient() {
         Assert.assertNotNull(httpTask.createHttpClient());
     }
 
     @Test
-    public void testCreateRequestBuilder(){
-        RequestBuilder  requestBuilder = httpTask.createRequestBuilder();
-        Assert.assertEquals(RequestBuilder.get().getMethod(),requestBuilder.getMethod());
+    public void testCreateRequestBuilder() {
+        RequestBuilder requestBuilder = httpTask.createRequestBuilder();
+        Assert.assertEquals(RequestBuilder.get().getMethod(), requestBuilder.getMethod());
     }
 
     private ProcessInstance getProcessInstance() {

@@ -56,28 +56,28 @@ import ch.qos.logback.classic.sift.SiftingAppender;
 import io.netty.channel.Channel;
 
 /**
- *  worker request processor
+ * worker request processor
  */
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
     /**
-     *  thread executor service
+     * thread executor service
      */
     private final ExecutorService workerExecService;
 
     /**
-     *  worker config
+     * worker config
      */
     private final WorkerConfig workerConfig;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private final TaskCallbackService taskCallbackService;
 
-    public TaskExecuteProcessor(){
+    public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
@@ -93,7 +93,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", taskRequestCommand);
 
-        if(taskRequestCommand == null){
+        if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
             return;
         }
@@ -101,7 +101,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
 
-        if(taskExecutionContext == null){
+        if (taskExecutionContext == null) {
             logger.error("task execution context is null");
             return;
         }
@@ -144,7 +144,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         try {
             RetryerUtils.retryCall(() -> {
-                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(),ackCommand);
+                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
                 return Boolean.TRUE;
             });
             // submit task
@@ -156,6 +156,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * get task log path
+     *
      * @return log path
      */
     private String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
@@ -163,21 +164,22 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 .getLogger("ROOT")
                 .getAppender("TASKLOGFILE"))
                 .getDiscriminator()).getLogBase();
-        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+        if (baseLog.startsWith(Constants.SINGLE_SLASH)) {
             return baseLog + Constants.SINGLE_SLASH +
-                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH +
+                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH +
                     taskExecutionContext.getTaskInstanceId() + ".log";
         }
         return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                baseLog +  Constants.SINGLE_SLASH +
-                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
-                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                baseLog + Constants.SINGLE_SLASH +
+                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH +
+                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH +
                 taskExecutionContext.getTaskInstanceId() + ".log";
     }
 
     /**
      * build ack command
+     *
      * @param taskExecutionContext taskExecutionContext
      * @return TaskExecuteAckCommand
      */
@@ -188,9 +190,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
+        if (taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())) {
             ackCommand.setExecutePath(null);
-        }else{
+        } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
@@ -199,10 +201,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * get execute local path
+     *
      * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
-    private String getExecLocalPath(TaskExecutionContext taskExecutionContext){
+    private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),

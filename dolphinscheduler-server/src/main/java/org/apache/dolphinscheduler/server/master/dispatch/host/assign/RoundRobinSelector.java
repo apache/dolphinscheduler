@@ -17,13 +17,16 @@
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.stereotype.Service;
 
 /**
  * Smooth Weight Round Robin

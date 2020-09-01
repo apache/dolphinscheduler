@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import com.google.common.collect.Sets;
-
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -32,6 +30,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.google.common.collect.Sets;
 
 
 /**

@@ -17,12 +17,13 @@
 package org.apache.dolphinscheduler.server.monitor;
 
 import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * zk monitor server impl
@@ -39,22 +40,23 @@ public class ZKMonitorImpl extends AbstractMonitor {
 
     /**
      * get active nodes map by path
+     *
      * @param path path
      * @return active nodes map
      */
     @Override
-    protected Map<String,String> getActiveNodesByPath(String path) {
+    protected Map<String, String> getActiveNodesByPath(String path) {
 
-        Map<String,String> maps = new HashMap<>();
+        Map<String, String> maps = new HashMap<>();
 
         List<String> childrenList = zookeeperOperator.getChildrenKeys(path);
 
-        if (childrenList == null){
+        if (childrenList == null) {
             return maps;
         }
 
-        for (String child : childrenList){
-            maps.put(child.split("_")[0],child);
+        for (String child : childrenList) {
+            maps.put(child.split("_")[0], child);
         }
 
         return maps;

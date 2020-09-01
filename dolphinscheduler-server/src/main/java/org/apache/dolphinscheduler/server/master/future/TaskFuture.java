@@ -18,8 +18,6 @@ package org.apache.dolphinscheduler.server.master.future;
 
 
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,22 +28,25 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- *  task fulture
+ * task fulture
  */
 public class TaskFuture {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
 
-    private final static ConcurrentHashMap<Long,TaskFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+    private final static ConcurrentHashMap<Long, TaskFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
     /**
-     *  request unique identification
+     * request unique identification
      */
     private final long opaque;
 
     /**
-     *  timeout
+     * timeout
      */
     private final long timeoutMillis;
 
@@ -54,13 +55,13 @@ public class TaskFuture {
     private final long beginTimestamp = System.currentTimeMillis();
 
     /**
-     *  response command
+     * response command
      */
-    private  AtomicReference<Command> responseCommandReference = new AtomicReference<>();
+    private AtomicReference<Command> responseCommandReference = new AtomicReference<>();
 
     private volatile boolean sendOk = true;
 
-    private  AtomicReference<Throwable> causeReference;
+    private AtomicReference<Throwable> causeReference;
 
     public TaskFuture(long opaque, long timeoutMillis) {
         this.opaque = opaque;
@@ -70,6 +71,7 @@ public class TaskFuture {
 
     /**
      * wait for response
+     *
      * @return command
      * @throws InterruptedException if error throws InterruptedException
      */
@@ -79,7 +81,7 @@ public class TaskFuture {
     }
 
     /**
-     *  put response
+     * put response
      *
      * @param responseCommand responseCommand
      */
@@ -90,7 +92,8 @@ public class TaskFuture {
     }
 
     /**
-     *  whether timeout
+     * whether timeout
+     *
      * @return timeout
      */
     public boolean isTimeout() {
@@ -98,9 +101,9 @@ public class TaskFuture {
         return diff > this.timeoutMillis;
     }
 
-    public static void notify(final Command responseCommand){
+    public static void notify(final Command responseCommand) {
         TaskFuture taskFuture = FUTURE_TABLE.remove(responseCommand.getOpaque());
-        if(taskFuture != null){
+        if (taskFuture != null) {
             taskFuture.putResponse(responseCommand);
         }
     }
@@ -146,7 +149,7 @@ public class TaskFuture {
     /**
      * scan future table
      */
-    public static void scanFutureTable(){
+    public static void scanFutureTable() {
         final List<TaskFuture> futureList = new LinkedList<>();
         Iterator<Map.Entry<Long, TaskFuture>> it = FUTURE_TABLE.entrySet().iterator();
         while (it.hasNext()) {

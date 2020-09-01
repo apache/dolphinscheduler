@@ -21,10 +21,11 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,7 +37,7 @@ public class CommonGenerator {
 
     public String generate(SqoopParameters sqoopParameters) {
         StringBuilder result = new StringBuilder();
-        try{
+        try {
             result.append("sqoop ")
                     .append(sqoopParameters.getModelType());
 
@@ -71,11 +72,11 @@ public class CommonGenerator {
                 }
             }
 
-            if(sqoopParameters.getConcurrency() >0){
+            if (sqoopParameters.getConcurrency() > 0) {
                 result.append(" -m ")
                         .append(sqoopParameters.getConcurrency());
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 

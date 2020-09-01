@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
- *  task instance state manager
+ * task instance state manager
  */
 public interface TaskInstanceCacheManager {
 
@@ -58,6 +58,7 @@ public interface TaskInstanceCacheManager {
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     void removeByTaskInstanceId(Integer taskInstanceId);

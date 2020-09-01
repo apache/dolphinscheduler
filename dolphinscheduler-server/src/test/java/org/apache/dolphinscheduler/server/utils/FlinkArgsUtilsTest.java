@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Test FlinkArgsUtils
@@ -95,32 +96,32 @@ public class FlinkArgsUtilsTest {
         assertEquals("yarn-cluster", result.get(1));
 
         assertEquals("-ys", result.get(2));
-        assertSame(Integer.valueOf(result.get(3)),slot);
+        assertSame(Integer.valueOf(result.get(3)), slot);
 
-        assertEquals("-ynm",result.get(4));
-        assertEquals(result.get(5),appName);
+        assertEquals("-ynm", result.get(4));
+        assertEquals(result.get(5), appName);
 
         assertEquals("-yn", result.get(6));
-        assertSame(Integer.valueOf(result.get(7)),taskManager);
+        assertSame(Integer.valueOf(result.get(7)), taskManager);
 
         assertEquals("-yjm", result.get(8));
-        assertEquals(result.get(9),jobManagerMemory);
+        assertEquals(result.get(9), jobManagerMemory);
 
         assertEquals("-ytm", result.get(10));
-        assertEquals(result.get(11),taskManagerMemory);
+        assertEquals(result.get(11), taskManagerMemory);
 
         assertEquals("-d", result.get(12));
 
         assertEquals("-c", result.get(13));
-        assertEquals(result.get(14),mainClass);
+        assertEquals(result.get(14), mainClass);
 
-        assertEquals(result.get(15),mainJar.getRes());
-        assertEquals(result.get(16),mainArgs);
+        assertEquals(result.get(15), mainJar.getRes());
+        assertEquals(result.get(16), mainArgs);
 
         assertEquals("--qu", result.get(17));
-        assertEquals(result.get(18),queue);
+        assertEquals(result.get(18), queue);
 
-        assertEquals(result.get(19),others);
+        assertEquals(result.get(19), others);
 
         //Others param without --qu
         FlinkParameters param1 = new FlinkParameters();

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -29,8 +28,8 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -39,26 +38,29 @@ import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.channel.Channel;
+
 /**
- *  task kill processor
+ * task kill processor
  */
 public class TaskKillProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
     /**
-     *  worker config
+     * worker config
      */
     private final WorkerConfig workerConfig;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private final TaskCallbackService taskCallbackService;
 
@@ -68,7 +70,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
 
-    public TaskKillProcessor(){
+    public TaskKillProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
@@ -91,24 +93,24 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand,result);
+        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand, result);
         taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
         taskExecutionContextCacheManager.removeByTaskInstanceId(taskKillResponseCommand.getTaskInstanceId());
     }
 
     /**
-     *  do kill
-     * @param killCommand
+     * do kill
+     *
      * @return kill result
      */
-    private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand){
+    private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
         List<String> appIds = Collections.EMPTY_LIST;
         try {
             TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
 
             Integer processId = taskExecutionContext.getProcessId();
 
-            if (processId == null || processId.equals(0)){
+            if (processId == null || processId.equals(0)) {
                 logger.error("process kill failed, process id :{}, task id:{}", processId, killCommand.getTaskInstanceId());
                 return Pair.of(false, appIds);
             }
@@ -135,7 +137,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * build TaskKillResponseCommand
      *
-     * @param killCommand  kill command
+     * @param killCommand kill command
      * @param result exe result
      * @return build TaskKillResponseCommand
      */
@@ -145,7 +147,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         taskKillResponseCommand.setStatus(result.getLeft() ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
         taskKillResponseCommand.setAppIds(result.getRight());
         TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
-        if(taskExecutionContext != null){
+        if (taskExecutionContext != null) {
             taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             taskKillResponseCommand.setHost(taskExecutionContext.getHost());
             taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
@@ -154,7 +156,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     }
 
     /**
-     *  kill yarn job
+     * kill yarn job
      *
      * @param host host
      * @param logPath logPath
@@ -166,8 +168,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         LogClientService logClient = null;
         try {
             logClient = new LogClientService();
-            logger.info("view log host : {},logPath : {}", host,logPath);
-            String log  = logClient.viewLog(host, Constants.RPC_PORT, logPath);
+            logger.info("view log host : {},logPath : {}", host, logPath);
+            String log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
 
             if (StringUtils.isNotEmpty(log)) {
                 List<String> appIds = LoggerUtils.getAppIds(log, logger);
@@ -181,9 +183,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 }
             }
         } catch (Exception e) {
-            logger.error("kill yarn job error",e);
+            logger.error("kill yarn job error", e);
         } finally {
-            if(logClient != null){
+            if (logClient != null) {
                 logClient.close();
             }
         }

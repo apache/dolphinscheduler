@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
-import java.util.Date;
-
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -42,6 +40,9 @@ import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
+
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +54,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class, CuratorZookeeperClient.class,
+@ContextConfiguration(classes = {DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class, CuratorZookeeperClient.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
         ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class,
         CuratorZookeeperClient.class})
@@ -73,7 +74,7 @@ public class TaskPriorityQueueConsumerTest {
     private ExecutorDispatcher dispatcher;
 
     @Before
-    public void init(){
+    public void init() {
 
         Tenant tenant = new Tenant();
         tenant.setId(1);
@@ -84,7 +85,7 @@ public class TaskPriorityQueueConsumerTest {
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
 
-        Mockito.doReturn(tenant).when(processService).getTenantForProcess(1,2);
+        Mockito.doReturn(tenant).when(processService).getTenantForProcess(1, 2);
 
         Mockito.doReturn("default").when(processService).queryUserQueueByProcessInstanceId(1);
     }
@@ -186,7 +187,6 @@ public class TaskPriorityQueueConsumerTest {
         taskPriorityQueue.put("2_1_2_1_default");
 
 
-
         DataSource dataSource = new DataSource();
         dataSource.setId(80);
         dataSource.setName("datax");
@@ -240,7 +240,7 @@ public class TaskPriorityQueueConsumerTest {
 
 
     @Test
-    public void testTaskInstanceIsFinalState(){
+    public void testTaskInstanceIsFinalState() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setTaskType("SHELL");
@@ -262,7 +262,6 @@ public class TaskPriorityQueueConsumerTest {
     public void close() {
         Stopper.stop();
     }
-
 
 
 }

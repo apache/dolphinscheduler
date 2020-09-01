@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import java.util.Collection;
 
 /**
- *  AbstractSelector
+ * AbstractSelector
  */
-public  abstract class AbstractSelector<T> implements Selector<T>{
+public abstract class AbstractSelector<T> implements Selector<T> {
     @Override
     public T select(Collection<T> source) {
 
@@ -35,11 +35,11 @@ public  abstract class AbstractSelector<T> implements Selector<T>{
          * if only one , return directly
          */
         if (source.size() == 1) {
-            return (T)source.toArray()[0];
+            return (T) source.toArray()[0];
         }
         return doSelect(source);
     }
 
-    protected abstract T  doSelect(Collection<T> source);
+    protected abstract T doSelect(Collection<T> source);
 
 }

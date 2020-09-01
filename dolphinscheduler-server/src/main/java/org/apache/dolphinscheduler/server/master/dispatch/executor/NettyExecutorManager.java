@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import com.github.rholder.retry.RetryException;
 import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -31,20 +30,26 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
+import com.github.rholder.retry.RetryException;
 
 /**
- *  netty executor manager
+ * netty executor manager
  */
 @Service
-public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
+public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
@@ -62,13 +67,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     /**
      * constructor
      */
-    public NettyExecutorManager(){
+    public NettyExecutorManager() {
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     @PostConstruct
-    public void init(){
+    public void init() {
         /**
          * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
          * register EXECUTE_TASK_ACK command type TaskAckProcessor
@@ -80,6 +85,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
 
     /**
      * execute logic
+     *
      * @param context context
      * @return result
      * @throws ExecuteException if error throws ExecuteException
@@ -103,7 +109,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         // remove start host address and add it to head
         allNodes.remove(startHostAddress);
         allNodes.addFirst(startHostAddress);
- 
+
         boolean success = false;
         for (String address : allNodes) {
             try {
@@ -119,7 +125,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         if (!success) {
             throw new ExecuteException("fail after try all nodes");
         }
-        
+
         return success;
     }
 
@@ -130,7 +136,8 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     }
 
     /**
-     *  execute logic
+     * execute logic
+     *
      * @param host host
      * @param command command
      * @throws ExecuteException if error throws ExecuteException
@@ -147,17 +154,18 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
     }
 
     /**
-     *  get all nodes
+     * get all nodes
+     *
      * @param context context
      * @return nodes
      */
-    private Set<String> getAllNodes(ExecutionContext context){
+    private Set<String> getAllNodes(ExecutionContext context) {
         Set<String> nodes = Collections.EMPTY_SET;
         /**
          * executor type
          */
         ExecutorType executorType = context.getExecutorType();
-        switch (executorType){
+        switch (executorType) {
             case WORKER:
                 nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;

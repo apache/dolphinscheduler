@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 /**
  * Test SparkArgsUtils
@@ -87,42 +88,42 @@ public class SparkArgsUtilsTest {
         }
 
         //Expected values and order
-        assertEquals(result.size(),20);
+        assertEquals(result.size(), 20);
 
-        assertEquals(result.get(0),"--master");
-        assertEquals(result.get(1),"yarn");
+        assertEquals(result.get(0), "--master");
+        assertEquals(result.get(1), "yarn");
 
-        assertEquals(result.get(2),"--deploy-mode");
-        assertEquals(result.get(3),mode);
+        assertEquals(result.get(2), "--deploy-mode");
+        assertEquals(result.get(3), mode);
 
-        assertEquals(result.get(4),"--class");
-        assertEquals(result.get(5),mainClass);
+        assertEquals(result.get(4), "--class");
+        assertEquals(result.get(5), mainClass);
 
-        assertEquals(result.get(6),"--driver-cores");
-        assertSame(Integer.valueOf(result.get(7)),driverCores);
+        assertEquals(result.get(6), "--driver-cores");
+        assertSame(Integer.valueOf(result.get(7)), driverCores);
 
-        assertEquals(result.get(8),"--driver-memory");
-        assertEquals(result.get(9),driverMemory);
+        assertEquals(result.get(8), "--driver-memory");
+        assertEquals(result.get(9), driverMemory);
 
-        assertEquals(result.get(10),"--num-executors");
-        assertSame(Integer.valueOf(result.get(11)),numExecutors);
+        assertEquals(result.get(10), "--num-executors");
+        assertSame(Integer.valueOf(result.get(11)), numExecutors);
 
-        assertEquals(result.get(12),"--executor-cores");
-        assertSame(Integer.valueOf(result.get(13)),executorCores);
+        assertEquals(result.get(12), "--executor-cores");
+        assertSame(Integer.valueOf(result.get(13)), executorCores);
 
-        assertEquals(result.get(14),"--executor-memory");
-        assertEquals(result.get(15),executorMemory);
+        assertEquals(result.get(14), "--executor-memory");
+        assertEquals(result.get(15), executorMemory);
 
-        assertEquals(result.get(16),"--queue");
-        assertEquals(result.get(17),queue);
-        assertEquals(result.get(18),mainJar.getRes());
-        assertEquals(result.get(19),mainArgs);
+        assertEquals(result.get(16), "--queue");
+        assertEquals(result.get(17), queue);
+        assertEquals(result.get(18), mainJar.getRes());
+        assertEquals(result.get(19), mainArgs);
 
         //Others param without --queue
         SparkParameters param1 = new SparkParameters();
         param1.setOthers("--files xxx/hive-site.xml");
         param1.setQueue(queue);
         result = SparkArgsUtils.buildArgs(param1);
-        assertEquals(result.size(),7);
+        assertEquals(result.size(), 7);
     }
 }

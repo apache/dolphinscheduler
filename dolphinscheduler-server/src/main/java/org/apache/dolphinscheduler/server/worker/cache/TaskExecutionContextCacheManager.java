@@ -21,7 +21,7 @@ package org.apache.dolphinscheduler.server.worker.cache;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
- *  TaskExecutionContextCacheManager
+ * TaskExecutionContextCacheManager
  */
 public interface TaskExecutionContextCacheManager {
 
@@ -42,6 +42,7 @@ public interface TaskExecutionContextCacheManager {
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     void removeByTaskInstanceId(Integer taskInstanceId);

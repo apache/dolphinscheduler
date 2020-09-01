@@ -26,7 +26,14 @@ import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.junit.*;
+
+import java.util.Date;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -36,10 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Date;
-
 /**
- *  shell task test
+ * shell task test
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
@@ -106,7 +111,8 @@ public class ShellTaskTest {
     }
 
     @After
-    public void after() {}
+    public void after() {
+    }
 
     /**
      * Method: ShellTask()

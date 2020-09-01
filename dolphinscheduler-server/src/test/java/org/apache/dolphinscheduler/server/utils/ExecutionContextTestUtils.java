@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+
 import org.mockito.Mockito;
 
 /**
@@ -35,7 +36,7 @@ import org.mockito.Mockito;
 public class ExecutionContextTestUtils {
 
 
-    public static ExecutionContext getExecutionContext(int port){
+    public static ExecutionContext getExecutionContext(int port) {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
         ProcessInstance processInstance = new ProcessInstance();

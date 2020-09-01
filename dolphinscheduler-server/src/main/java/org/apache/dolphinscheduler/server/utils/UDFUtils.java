@@ -16,39 +16,43 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.commons.collections.MapUtils;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.slf4j.Logger;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static org.apache.dolphinscheduler.common.utils.CollectionUtils.isNotEmpty;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+
+import org.apache.commons.collections.MapUtils;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+
 /**
- *  udf utils
+ * udf utils
  */
 public class UDFUtils {
 
     /**
-     *  create function format
+     * create function format
      */
     private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
     /**
      * create function list
-     * @param udfFuncTenantCodeMap  key is udf function,value is tenant code
-     * @param logger                logger
+     *
+     * @param udfFuncTenantCodeMap key is udf function,value is tenant code
+     * @param logger logger
      * @return create function list
      */
-    public static List<String> createFuncs(Map<UdfFunc,String> udfFuncTenantCodeMap, Logger logger){
+    public static List<String> createFuncs(Map<UdfFunc, String> udfFuncTenantCodeMap, Logger logger) {
 
-        if (MapUtils.isEmpty(udfFuncTenantCodeMap)){
+        if (MapUtils.isEmpty(udfFuncTenantCodeMap)) {
             logger.info("can't find udf function resource");
             return null;
         }
@@ -65,14 +69,15 @@ public class UDFUtils {
 
     /**
      * build jar sql
-     * @param sqls                  sql list
-     * @param udfFuncTenantCodeMap  key is udf function,value is tenant code
+     *
+     * @param sqls sql list
+     * @param udfFuncTenantCodeMap key is udf function,value is tenant code
      */
-    private static void buildJarSql(List<String> sqls, Map<UdfFunc,String> udfFuncTenantCodeMap) {
+    private static void buildJarSql(List<String> sqls, Map<UdfFunc, String> udfFuncTenantCodeMap) {
         String defaultFS = HadoopUtils.getInstance().getConfiguration().get(Constants.FS_DEFAULTFS);
 
-        Set<Map.Entry<UdfFunc,String>> entries = udfFuncTenantCodeMap.entrySet();
-        for (Map.Entry<UdfFunc,String> entry:entries){
+        Set<Map.Entry<UdfFunc, String>> entries = udfFuncTenantCodeMap.entrySet();
+        for (Map.Entry<UdfFunc, String> entry : entries) {
             String uploadPath = HadoopUtils.getHdfsUdfDir(entry.getValue());
             if (!uploadPath.startsWith("hdfs:")) {
                 uploadPath = defaultFS + uploadPath;
@@ -84,8 +89,9 @@ public class UDFUtils {
 
     /**
      * build temp function sql
-     * @param sqls      sql list
-     * @param udfFuncs  udf function list
+     *
+     * @param sqls sql list
+     * @param udfFuncs udf function list
      */
     private static void buildTempFuncSql(List<String> sqls, List<UdfFunc> udfFuncs) {
         if (isNotEmpty(udfFuncs)) {
