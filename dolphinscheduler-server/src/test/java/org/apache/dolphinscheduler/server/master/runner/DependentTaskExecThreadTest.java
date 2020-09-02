@@ -99,6 +99,7 @@ public class DependentTaskExecThreadTest {
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.getTaskInstance().getState());
     }
+
     @Test
     public void testWaitDependentProcessesStartTimeout_2() throws Exception {
         TaskInstance taskInstance = getTaskInstance();
