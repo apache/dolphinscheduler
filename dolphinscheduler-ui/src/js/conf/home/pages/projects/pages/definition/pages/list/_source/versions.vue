@@ -25,10 +25,7 @@
       <table class="fixed">
         <caption><!-- placeHolder --></caption>
         <tr>
-          <th scope="col">
-            <span></span>
-          </th>
-          <th scope="col" style="min-width: 40px">
+          <th scope="col" style="min-width: 40px;text-align: left">
             <span>{{$t('Version')}}</span>
           </th>
           <th scope="col" style="min-width: 30px">
@@ -42,9 +39,6 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in processDefinitionVersions" :key="item.id">
-          <td>
-            <span></span>
-          </td>
           <td>
             <span v-if="item.version">
               <span v-if="item.version === processDefinition.version" style="color: green"><strong>{{item.version}} {{$t('Current Version')}}</strong></span>
