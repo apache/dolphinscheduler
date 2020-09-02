@@ -168,20 +168,15 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             return true;
         }
         while (Stopper.isRunning()) {
-            try{
-                if(this.processInstance == null){
-                    logger.error("process instance not exists , master task exec thread exit");
-                    return true;
-                }
-                if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
-                    cancelTaskInstance();
+            try {
+                if (!shouldContinueWait()) {
                     break;
                 }
                 if (checkStartTimeout) {
                     if (isTimeoutForWaitingDependentProcessStart()) {
                         break;
                     }
-                } else if (allDependentTaskFinish() || taskInstance.getState().typeIsFinished()) {
+                } else if (allDependentTaskFinish()) {
                     break;
                 }
                 // update process task
@@ -197,6 +192,18 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             }
         }
         return true;
+    }
+
+    private boolean shouldContinueWait() {
+        if (this.processInstance == null) {
+            logger.error("process instance not exists , master task exec thread exit");
+            return false;
+        }
+        if (this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
+            cancelTaskInstance();
+            return false;
+        }
+        return !taskInstance.getState().typeIsFinished();
     }
 
     /**
