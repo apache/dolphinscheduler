@@ -443,7 +443,7 @@ public class HadoopUtils implements Closeable {
            		 result = jsonObject.path("job").path("state").asText();
 		}
 		else{
-		    return return ExecutionStatus.FAILURE;
+		    return ExecutionStatus.FAILURE;
 		}
         }
 
