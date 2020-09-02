@@ -33,6 +33,9 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 
 public class LogUtils {
 
+    private LogUtils() {
+    }
+
     /**
      * get task log path
      */
