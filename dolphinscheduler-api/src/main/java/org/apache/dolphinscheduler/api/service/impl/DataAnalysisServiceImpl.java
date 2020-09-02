@@ -44,12 +44,13 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,10 +84,6 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
 
     @Autowired
     private ProcessService processService;
-
-    private static final String COMMAND_STATE = "commandState";
-
-    private static final String ERROR_COMMAND_STATE = "errorCommandState";
 
     /**
      * statistical task instance status data
@@ -211,66 +208,23 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             }
         }
 
-
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
-        // count command state
-        List<CommandCount> commandStateCounts =
-                commandMapper.countCommandState(
-                        loginUser.getId(),
-                        start,
-                        end,
-                        projectIdArray);
+        // count normal command state
+        Map<CommandType, Integer> normalCountCommandCounts = commandMapper.countCommandState(loginUser.getId(), start, end, projectIdArray)
+                .stream()
+                .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
-        List<CommandCount> errorCommandStateCounts =
-                errorCommandMapper.countCommandState(
-                        start, end, projectIdArray);
+        Map<CommandType, Integer> errorCommandCounts = errorCommandMapper.countCommandState(start, end, projectIdArray)
+                .stream()
+                .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
-        // enumMap
-        Map<CommandType, Map<String, Integer>> dataMap = new EnumMap<>(CommandType.class);
-
-        Map<String, Integer> commonCommand = new HashMap<>();
-        commonCommand.put(COMMAND_STATE, 0);
-        commonCommand.put(ERROR_COMMAND_STATE, 0);
-
-
-        // init data map
-        /**
-         * START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
-         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
-         */
-        dataMap.put(CommandType.START_PROCESS, commonCommand);
-        dataMap.put(CommandType.START_CURRENT_TASK_PROCESS, commonCommand);
-        dataMap.put(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS, commonCommand);
-        dataMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, commonCommand);
-        dataMap.put(CommandType.START_FAILURE_TASK_PROCESS, commonCommand);
-        dataMap.put(CommandType.COMPLEMENT_DATA, commonCommand);
-        dataMap.put(CommandType.SCHEDULER, commonCommand);
-        dataMap.put(CommandType.REPEAT_RUNNING, commonCommand);
-        dataMap.put(CommandType.PAUSE, commonCommand);
-        dataMap.put(CommandType.STOP, commonCommand);
-        dataMap.put(CommandType.RECOVER_WAITTING_THREAD, commonCommand);
-
-        // put command state
-        for (CommandCount executeStatusCount : commandStateCounts) {
-            Map<String, Integer> commandStateCountsMap = new HashMap<>(dataMap.get(executeStatusCount.getCommandType()));
-            commandStateCountsMap.put(COMMAND_STATE, executeStatusCount.getCount());
-            dataMap.put(executeStatusCount.getCommandType(), commandStateCountsMap);
-        }
-
-        // put error command state
-        for (CommandCount errorExecutionStatus : errorCommandStateCounts) {
-            Map<String, Integer> errorCommandStateCountsMap = new HashMap<>(dataMap.get(errorExecutionStatus.getCommandType()));
-            errorCommandStateCountsMap.put(ERROR_COMMAND_STATE, errorExecutionStatus.getCount());
-            dataMap.put(errorExecutionStatus.getCommandType(), errorCommandStateCountsMap);
-        }
-
-        List<CommandStateCount> list = new ArrayList<>();
-        for (Map.Entry<CommandType, Map<String, Integer>> next : dataMap.entrySet()) {
-            CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get(ERROR_COMMAND_STATE),
-                    next.getValue().get(COMMAND_STATE), next.getKey());
-            list.add(commandStateCount);
-        }
+        List<CommandStateCount> list = Arrays.stream(CommandType.values())
+                .map(commandType -> new CommandStateCount(
+                        errorCommandCounts.getOrDefault(commandType, 0),
+                        normalCountCommandCounts.getOrDefault(commandType, 0),
+                        commandType)
+                ).collect(Collectors.toList());
 
         result.put(Constants.DATA_LIST, list);
         putMsg(result, Status.SUCCESS);
