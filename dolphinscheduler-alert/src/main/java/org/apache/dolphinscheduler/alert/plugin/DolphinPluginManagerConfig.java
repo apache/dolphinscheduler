@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.plugin;
 
 import static java.lang.String.format;
@@ -68,7 +69,6 @@ public class DolphinPluginManagerConfig {
     public List<String> getPlugins() {
         return plugins;
     }
-
 
     public DolphinPluginManagerConfig setPlugins(List<String> plugins) {
         this.plugins = plugins;

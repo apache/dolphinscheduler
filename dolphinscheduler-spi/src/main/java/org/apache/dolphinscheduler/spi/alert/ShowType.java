@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.spi.alert;
 
 /**
@@ -32,8 +33,7 @@ public enum ShowType {
     ATTACHMENT(2, "attachment"),
     TABLEATTACHMENT(3, "table attachment");
 
-
-    ShowType(int code, String descp){
+    ShowType(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

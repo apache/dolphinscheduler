@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.spi.utils;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
@@ -46,7 +47,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-
 /**
  * json utils
  */
@@ -65,7 +65,6 @@ public class JSONUtils {
 
     private JSONUtils() {
     }
-
 
     public static ArrayNode createArrayNode() {
         return objectMapper.createArrayNode();
@@ -148,7 +147,6 @@ public class JSONUtils {
         return Collections.emptyList();
     }
 
-
     /**
      * check json object valid
      *
@@ -171,7 +169,6 @@ public class JSONUtils {
         return false;
     }
 
-
     /**
      * Method for finding a JSON Object field with specified name in this
      * node or its child nodes, and returning value it has.
@@ -190,7 +187,6 @@ public class JSONUtils {
 
         return node.toString();
     }
-
 
     /**
      * json to map
@@ -270,7 +266,6 @@ public class JSONUtils {
         }
     }
 
-
     /**
      * json serializer
      */
@@ -280,7 +275,6 @@ public class JSONUtils {
         public void serialize(String value, JsonGenerator gen, SerializerProvider provider) throws IOException {
             gen.writeRawValue(value);
         }
-
     }
 
     /**
@@ -297,6 +291,5 @@ public class JSONUtils {
                 return node.toString();
             }
         }
-
     }
 }

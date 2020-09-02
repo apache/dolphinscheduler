@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.plugin;
 
 import static java.lang.String.format;
@@ -55,7 +56,7 @@ public class DolphinPluginLoader {
     /**
      * All third-party jar packages used in the classes which in spi package need to be add
      */
-    private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String> builder()
+    private static final ImmutableList<String> DOLPHIN_SPI_PACKAGES = ImmutableList.<String>builder()
             .add("org.apache.dolphinscheduler.spi.")
             .add("com.fasterxml.jackson.")
             .build();
@@ -64,7 +65,6 @@ public class DolphinPluginLoader {
     private final List<String> configPlugins;
     private ArtifactResolver resolver = null;
     private final List<DolphinPluginManager> dolphinPluginManagerList;
-
 
     public DolphinPluginLoader(DolphinPluginManagerConfig config, List<DolphinPluginManager> dolphinPluginManagerList) {
         installedPluginsDir = config.getInstalledPluginsDir();
@@ -75,7 +75,7 @@ public class DolphinPluginLoader {
         }
 
         this.dolphinPluginManagerList = requireNonNull(dolphinPluginManagerList, "dolphinPluginManagerList is null");
-        if(configPlugins != null && configPlugins.size() > 0) {
+        if (configPlugins != null && configPlugins.size() > 0) {
             this.resolver = new ArtifactResolver(config.getMavenLocalRepository(), config.getMavenRemoteRepository());
         }
     }
@@ -173,7 +173,6 @@ public class DolphinPluginLoader {
         ClassLoader parent = getClass().getClassLoader();
         return new DolphinPluginClassLoader(urls, parent, DOLPHIN_SPI_PACKAGES);
     }
-
 
     private static List<File> listPluginDirs(File installedPluginsDir) {
         if (installedPluginsDir != null && installedPluginsDir.isDirectory()) {

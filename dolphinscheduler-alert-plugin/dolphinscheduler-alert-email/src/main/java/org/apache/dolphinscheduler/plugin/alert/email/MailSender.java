@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import static java.util.Objects.requireNonNull;
@@ -53,7 +54,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.mail.smtp.SMTPProvider;
-
 
 /**
  * mail utils
@@ -414,7 +414,6 @@ public class MailSender {
             logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
-
 
     /**
      * handle exception

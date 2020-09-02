@@ -48,7 +48,6 @@ public class PasswordParam extends PluginParams {
             this.props = paramsProps;
         }
 
-
         public Builder setPlaceholder(String placeholder) {
             this.props.setPlaceholder(placeholder);
             return this;

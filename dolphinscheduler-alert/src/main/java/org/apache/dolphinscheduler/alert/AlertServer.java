@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
@@ -29,10 +29,13 @@ import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 
 /**
  * alert of start
@@ -60,15 +63,17 @@ public class AlertServer {
 
     public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 
-    public AlertServer() {
+    private static class AlertServerHolder {
+        private static final AlertServer INSTANCE = new AlertServer();
+    }
+
+    public static final AlertServer getInstance() {
+        return AlertServerHolder.INSTANCE;
 
     }
 
-    public synchronized static AlertServer getInstance() {
-        if (null == instance) {
-            instance = new AlertServer();
-        }
-        return instance;
+    private AlertServer() {
+
     }
 
     private void initPlugin() {
@@ -108,7 +113,6 @@ public class AlertServer {
             alertSender.run();
         }
     }
-
 
     public static void main(String[] args) {
         System.out.println(System.getProperty("user.dir"));
