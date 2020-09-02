@@ -20,8 +20,13 @@ package org.apache.dolphinscheduler.alert.utils;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -142,7 +147,12 @@ public class EnterpriseWeChatUtilsTest {
         AlertData alertData = new AlertData();
         AlertInfo alertInfo = new AlertInfo();
         //TODO:
-        alertInfo.setAlertParams(null);
+        List<PluginParams> paramsList = new ArrayList<>();
+        RadioParam showType = new RadioParam.Builder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
+                .setValue("table")
+                .build();
+        paramsList.add(showType);
+        alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
 //                .setShowType(alertForText.getShowType().getDescp())
