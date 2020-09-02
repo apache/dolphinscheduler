@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
@@ -116,13 +117,13 @@ public class Alert {
         this.title = title;
     }
 
-//    public String getShowType() {
-//        return showType;
-//    }
-//
-//    public void setShowType(String showType) {
-//        this.showType = showType;
-//    }
+    //    public String getShowType() {
+    //        return showType;
+    //    }
+    //
+    //    public void setShowType(String showType) {
+    //        this.showType = showType;
+    //    }
 
     public String getContent() {
         return content;
@@ -272,20 +273,37 @@ public class Alert {
 
     @Override
     public String toString() {
-        return "Alert{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", showType=" + showType +
-                ", content='" + content + '\'' +
-                ", alertType=" + alertType +
-                ", alertStatus=" + alertStatus +
-                ", log='" + log + '\'' +
-                ", alertGroupId=" + alertGroupId +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", info=" + info +
-                '}';
+        return "Alert{"
+                + "id="
+                + id
+                + ", title='"
+                + title + '\''
+                + ", showType="
+                + showType
+                + ", content='"
+                + content
+                + '\''
+                + ", alertType="
+                + alertType
+                + ", alertStatus="
+                + alertStatus
+                + ", log='"
+                + log
+                + '\''
+                + ", alertGroupId="
+                + alertGroupId
+                + ", receivers='"
+                + receivers
+                + '\''
+                + ", receiversCc='"
+                + receiversCc
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateTime="
+                + updateTime
+                + ", info="
+                + info
+                + '}';
     }
 }

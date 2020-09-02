@@ -150,9 +150,8 @@ public class AlertDao extends AbstractBaseDao {
         saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
     }
 
-    private void saveTaskTimeoutAlert(Alert alert, String content, int alertgroupId,
-                                      String receivers, String receiversCc) {
-//        alert.setShowType(ShowType.TABLE);
+    private void saveTaskTimeoutAlert(Alert alert, String content, int alertgroupId, String receivers, String receiversCc) {
+        //alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(alertgroupId);

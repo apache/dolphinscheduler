@@ -171,7 +171,7 @@ public class AlertManager {
         try {
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
-//            alert.setShowType(ShowType.TABLE);
+            //alert.setShowType(ShowType.TABLE);
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
             alert.setAlertType(AlertType.EMAIL);
@@ -226,7 +226,7 @@ public class AlertManager {
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
-//        alert.setShowType(showType);
+        //alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);

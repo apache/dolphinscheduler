@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
@@ -65,16 +66,16 @@ public class MailUtilsTest {
     @Test
     public void testSendMails() {
 
-        String content = "[\"id:69\"," +
-                "\"name:UserBehavior-0--1193959466\"," +
-                "\"Job name: Start workflow\"," +
-                "\"State: SUCCESS\"," +
-                "\"Recovery:NO\"," +
-                "\"Run time: 1\"," +
-                "\"Start time: 2018-08-06 10:31:34.0\"," +
-                "\"End time: 2018-08-06 10:31:49.0\"," +
-                "\"Host: 192.168.xx.xx\"," +
-                "\"Notify group :4\"]";
+        String content = "[\"id:69\","
+                + "\"name:UserBehavior-0--1193959466\","
+                + "\"Job name: Start workflow\","
+                + "\"State: SUCCESS\","
+                + "\"Recovery:NO\","
+                + "\"Run time: 1\","
+                + "\"Start time: 2018-08-06 10:31:34.0\","
+                + "\"End time: 2018-08-06 10:31:49.0\","
+                + "\"Host: 192.168.xx.xx\","
+                + "\"Notify group :4\"]";
 
         mailSender.sendMails(
                 "Mysql Exception",

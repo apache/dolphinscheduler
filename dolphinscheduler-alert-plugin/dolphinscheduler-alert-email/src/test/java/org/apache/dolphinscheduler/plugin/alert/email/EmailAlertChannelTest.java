@@ -91,7 +91,6 @@ public class EmailAlertChannelTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
-
         InputParam mailSmtpHost = InputParam.newBuilder("mailServerHost", "mail.smtp.host")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue("smtp.126.com")
@@ -116,7 +115,6 @@ public class EmailAlertChannelTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue(false)
                 .build();
-
 
         InputParam mailUser = InputParam.newBuilder("mailUser", "mail.user")
                 .setPlaceholder("if enable use authentication, you need input user")
@@ -172,5 +170,4 @@ public class EmailAlertChannelTest {
 
         return JSONUtils.toJsonString(paramsList);
     }
-
-} 
+}

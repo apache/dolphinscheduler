@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
@@ -25,8 +26,9 @@ import org.junit.Test;
 import java.util.List;
 
 public class AlertDaoTest {
+
     @Test
-    public void testAlertDao(){
+    public void testAlertDao() {
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
@@ -37,7 +39,6 @@ public class AlertDaoTest {
         alert.setAlertGroupId(1);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alertDao.addAlert(alert);
-
 
         List<Alert> alerts = alertDao.listWaitExecutionAlert();
         Assert.assertNotNull(alerts);
