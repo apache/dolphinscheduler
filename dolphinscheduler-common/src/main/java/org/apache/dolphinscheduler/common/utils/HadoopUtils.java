@@ -408,7 +408,7 @@ public class HadoopUtils implements Closeable {
      * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
      */
-    public ExecutionStatus getApplicationStatus(String applicationId) throws Exception {
+        public ExecutionStatus getApplicationStatus(String applicationId) throws Exception {
         if (StringUtils.isEmpty(applicationId)) {
             return null;
         }
@@ -417,25 +417,33 @@ public class HadoopUtils implements Closeable {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
-        String responseContent ;
-		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-			responseContent = KerberosHttpClient.get(applicationUrl);
-		} else {
-			responseContent = HttpUtils.get(applicationUrl);
-		}
+        String responseContent;
+        if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+            responseContent = KerberosHttpClient.get(applicationUrl);
+        } else {
+            responseContent = HttpUtils.get(applicationUrl);
+        }
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            if (!jsonObject.has("app")) {
+                 return ExecutionStatus.FAILURE;
+            }
             result = jsonObject.path("app").path("finalStatus").asText();
+
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = HttpUtils.get(jobHistoryUrl);
-            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            if (!jsonObject.has("job")){
-                return ExecutionStatus.FAILURE;
+            if (null != responseContent) {
+                ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+                if (!jsonObject.has("job")) {
+                    return ExecutionStatus.FAILURE;
+                }
+                result = jsonObject.path("job").path("state").asText();
+            } else {
+                 return ExecutionStatus.FAILURE;
             }
-            result = jsonObject.path("job").path("state").asText();
         }
 
         switch (result) {
