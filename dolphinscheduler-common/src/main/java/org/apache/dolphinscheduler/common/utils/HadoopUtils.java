@@ -425,17 +425,26 @@ public class HadoopUtils implements Closeable {
 		}
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            result = jsonObject.path("app").path("finalStatus").asText();
+	    if(!jsonObject.has("app")){
+		    return return ExecutionStatus.FAILURE;
+	    }
+		result = jsonObject.path("app").path("finalStatus").asText();
+      
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = HttpUtils.get(jobHistoryUrl);
-            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            if (!jsonObject.has("job")){
-                return ExecutionStatus.FAILURE;
-            }
-            result = jsonObject.path("job").path("state").asText();
+		if(null != responseContent){
+		   ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            		if (!jsonObject.has("job")){
+                     		return ExecutionStatus.FAILURE;
+            		}
+           		 result = jsonObject.path("job").path("state").asText();
+		}
+		else{
+		    return return ExecutionStatus.FAILURE;
+		}
         }
 
         switch (result) {
