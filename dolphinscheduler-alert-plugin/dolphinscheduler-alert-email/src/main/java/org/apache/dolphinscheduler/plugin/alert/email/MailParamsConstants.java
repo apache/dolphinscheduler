@@ -57,5 +57,4 @@ public class MailParamsConstants {
     public static final String MAIL_SMTP_SSL_TRUST = "mail.smtp.ssl.trust";
     public static final String NAME_MAIL_SMTP_SSL_TRUST = "mailSmtpSslTrust";
 
-    public static final String SHOW_TYPE = "showType";
 }

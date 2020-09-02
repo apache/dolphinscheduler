@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.spi.params;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * plugin params pojo and json transfer tool
@@ -33,5 +35,19 @@ public class PluginParamsTransfer {
 
     public static List<PluginParams> transferJsonToParamsList(String str) {
         return JSONUtils.toList(str, PluginParams.class);
+    }
+
+    /**
+     * return the plugin params map
+     * @param paramsJsonStr
+     * @return
+     */
+    public static Map<String, String> getPluginParamsMap(String paramsJsonStr) {
+        List<PluginParams> pluginParams = transferJsonToParamsList(paramsJsonStr);
+        Map<String, String> paramsMap = new HashMap<>();
+        for (PluginParams param : pluginParams) {
+            paramsMap.put(param.getName(), param.getValue().toString());
+        }
+        return paramsMap;
     }
 }

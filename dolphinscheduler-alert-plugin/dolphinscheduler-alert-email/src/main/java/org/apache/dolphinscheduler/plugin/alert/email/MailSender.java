@@ -20,6 +20,7 @@ import static java.util.Objects.requireNonNull;
 
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -119,8 +120,8 @@ public class MailSender {
         sslTrust = config.get(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST);
         requireNonNull(sslTrust, MailParamsConstants.MAIL_SMTP_SSL_TRUST + " must not null");
 
-        showType = config.get(MailParamsConstants.SHOW_TYPE);
-        requireNonNull(showType, MailParamsConstants.SHOW_TYPE + " must not null");
+        showType = config.get(AlertConstants.SHOW_TYPE);
+        requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
 
         xlsFilePath = config.get(EmailConstants.XLS_FILE_PATH);
         if (StringUtils.isBlank(xlsFilePath)) {

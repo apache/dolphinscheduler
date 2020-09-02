@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -274,7 +276,8 @@ public class EnterpriseWeChatUtils {
      */
     public static String markdownByAlert(AlertInfo alertInfo) {
         String result = "";
-        String showType = alertInfo.getAlertParams();
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertInfo.getAlertParams());
+        String showType = paramsMap.get(AlertConstants.SHOW_TYPE);
         if (showType.equals(ShowType.TABLE.getDescp())) {
             result = markdownTable(alertInfo.getAlertData().getTitle(), alertInfo.getAlertData().getContent());
         } else if (showType.equals(ShowType.TEXT.getDescp())) {

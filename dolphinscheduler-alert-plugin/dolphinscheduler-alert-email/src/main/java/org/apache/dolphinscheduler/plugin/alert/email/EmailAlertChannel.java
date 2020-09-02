@@ -42,13 +42,8 @@ public class EmailAlertChannel implements AlertChannel {
 
         AlertData alert = info.getAlertData();
         String alertParams = info.getAlertParams();
-        List<PluginParams> pluginParams = PluginParamsTransfer.transferJsonToParamsList(alertParams);
-        Map<String, String> paramsMap = new HashMap<>();
-        for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), param.getValue().toString());
-        }
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
         MailSender mailSender = new MailSender(paramsMap);
-
         AlertResult alertResult = mailSender.sendMails(alert.getTitle(), alert.getContent());
 
         //send flag

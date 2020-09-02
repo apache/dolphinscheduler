@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.plugin.alert.email;
 
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
@@ -57,7 +58,7 @@ public class MailUtilsTest {
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_SSL_TRUST, "false");
         emailConfig.put(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS, "347801120@qq.com");
         emailConfig.put(MailParamsConstants.NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS, "347801120@qq.com");
-        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
+        emailConfig.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         alertTemplate = new DefaultHTMLTemplate();
         mailSender = new MailSender(emailConfig);
     }
@@ -111,7 +112,7 @@ public class MailUtilsTest {
     public void testSendTableMail() {
         String title = "Mysql Exception";
         String content = list2String();
-        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
+        emailConfig.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails(title, content);
     }
@@ -119,7 +120,7 @@ public class MailUtilsTest {
     @Test
     public void testAttachmentFile() throws Exception {
         String content = list2String();
-        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.ATTACHMENT.getDescp());
+        emailConfig.put(AlertConstants.SHOW_TYPE, ShowType.ATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails("gaojing", content);
     }
@@ -127,7 +128,7 @@ public class MailUtilsTest {
     @Test
     public void testTableAttachmentFile() throws Exception {
         String content = list2String();
-        emailConfig.put(MailParamsConstants.SHOW_TYPE, ShowType.TABLEATTACHMENT.getDescp());
+        emailConfig.put(AlertConstants.SHOW_TYPE, ShowType.TABLEATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails("gaojing", content);
     }
