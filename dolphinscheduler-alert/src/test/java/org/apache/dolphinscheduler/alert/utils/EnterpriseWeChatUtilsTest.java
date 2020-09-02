@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -132,7 +133,12 @@ public class EnterpriseWeChatUtilsTest {
         AlertData alertData = new AlertData();
         AlertInfo alertInfo = new AlertInfo();
         //TODO:
-        alertInfo.setAlertParams(null);
+        List<PluginParams> paramsList = new ArrayList<>();
+        RadioParam showType = new RadioParam.Builder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
+                .setValue(ShowType.TEXT)
+                .build();
+        paramsList.add(showType);
+        alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
 //                .setShowType(alertForText.getShowType().getDescp())
@@ -149,7 +155,7 @@ public class EnterpriseWeChatUtilsTest {
         //TODO:
         List<PluginParams> paramsList = new ArrayList<>();
         RadioParam showType = new RadioParam.Builder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
-                .setValue("table")
+                .setValue(ShowType.TABLE)
                 .build();
         paramsList.add(showType);
         alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
