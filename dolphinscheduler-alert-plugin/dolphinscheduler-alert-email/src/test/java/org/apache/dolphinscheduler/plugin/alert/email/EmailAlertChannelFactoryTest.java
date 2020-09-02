@@ -49,7 +49,6 @@ public class EmailAlertChannelFactoryTest {
      */
     @Test
     public void testGetName() throws Exception {
-//TODO: Test goes here... 
     }
 
     /**
@@ -72,6 +71,4 @@ public class EmailAlertChannelFactoryTest {
         AlertChannel alertChannel = emailAlertChannelFactory.create();
         Assert.assertNotNull(alertChannel);
     }
-
-
-} 
+}
