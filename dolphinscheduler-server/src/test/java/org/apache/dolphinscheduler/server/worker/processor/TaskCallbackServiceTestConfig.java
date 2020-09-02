@@ -123,4 +123,19 @@ public class TaskCallbackServiceTestConfig {
         return Mockito.mock(ProjectMapper.class);
     }
 
+    @Bean
+    public AlertPluginInstanceMapper alertPluginInstanceMapper() {
+        return Mockito.mock(AlertPluginInstanceMapper.class);
+    }
+
+    @Bean
+    public AlertGroupMapper alertGroupMapper() {
+        return Mockito.mock(AlertGroupMapper.class);
+    }
+
+    @Bean
+    public PluginDefineMapper pluginDefineMapper() {
+        return Mockito.mock(PluginDefineMapper.class);
+    }
+
 }
