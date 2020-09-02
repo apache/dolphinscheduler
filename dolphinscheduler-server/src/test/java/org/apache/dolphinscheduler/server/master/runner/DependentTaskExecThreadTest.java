@@ -46,11 +46,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 @PrepareForTest({DependentTaskExecThread.class, SpringApplicationContext.class, ProcessService.class})
 public class DependentTaskExecThreadTest {
 
-    private TaskInstance taskInstance;
-
     private ProcessInstance processInstance;
-
-    private DependentTaskExecThread execThread;
 
     private ProcessService processService;
 
@@ -58,7 +54,6 @@ public class DependentTaskExecThreadTest {
 
     @Before
     public void init() throws Exception {
-        initTaskInstance();
         masterConfig = new MasterConfig();
         masterConfig.setMasterTaskCommitRetryTimes(1);
         masterConfig.setMasterTaskCommitInterval(100);
@@ -73,22 +68,13 @@ public class DependentTaskExecThreadTest {
 
         PowerMockito.when(processInstance.getState()).thenReturn(ExecutionStatus.FAILURE);
 
-        PowerMockito.when(processService.updateTaskInstance(taskInstance))
+        PowerMockito.when(processService.updateTaskInstance(Mockito.any(TaskInstance.class)))
                 .thenReturn(true);
-        PowerMockito.when(processService.saveTaskInstance(taskInstance))
+        PowerMockito.when(processService.saveTaskInstance(Mockito.any(TaskInstance.class)))
                 .thenReturn(true);
-        PowerMockito.when(processService.findTaskInstanceById(Mockito.anyInt()))
-                .thenReturn(taskInstance);
         PowerMockito.when(processService.findProcessInstanceById(Mockito.anyInt()))
                 .thenReturn(processInstance);
-        PowerMockito.when(processService.submitTask(taskInstance))
-                .thenReturn(taskInstance);
 
-        execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
-        PowerMockito.when(execThread, "submit")
-                .thenReturn(taskInstance);
-        PowerMockito.when(execThread, "allDependentTaskFinish")
-                .thenReturn(true);
         JoranConfigurator configurator = new JoranConfigurator();
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         configurator.setContext(lc);
@@ -97,37 +83,89 @@ public class DependentTaskExecThreadTest {
     }
 
     @Test
-    public void testWaitDependentProcessesStartTimeout() throws Exception {
+    public void testWaitDependentProcessesStartTimeout_1() throws Exception {
+        TaskInstance taskInstance = getTaskInstance();
+        DependentTaskExecThread execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
+        PowerMockito.when(execThread, "allDependentTaskFinish")
+                .thenReturn(true);
+        PowerMockito.when(processService.findTaskInstanceById(Mockito.anyInt()))
+                .thenReturn(taskInstance);
+        PowerMockito.when(processService.submitTask(Mockito.any(TaskInstance.class)))
+                .thenReturn(taskInstance);
         PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
                 .thenReturn(processInstance);
+
+        // Wait dependent process successful.
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.getTaskInstance().getState());
-
+    }
+    @Test
+    public void testWaitDependentProcessesStartTimeout_2() throws Exception {
+        TaskInstance taskInstance = getTaskInstance();
+        DependentTaskExecThread execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
+        PowerMockito.when(execThread, "allDependentTaskFinish")
+                .thenReturn(true);
+        PowerMockito.when(processService.findTaskInstanceById(Mockito.anyInt()))
+                .thenReturn(taskInstance);
+        PowerMockito.when(processService.submitTask(Mockito.any(TaskInstance.class)))
+                .thenReturn(taskInstance);
         PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
                 .thenReturn(null).thenReturn(processInstance);
+
+        // Note that the interval here is a negative number, and the task will directly time out.
+        taskInstance.setTaskJson(taskInstance.getTaskJson().replaceAll("\"interval\":5", "\"interval\":-1"));
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
+    }
 
+    @Test
+    public void testWaitDependentProcessesStartTimeout_3() throws Exception {
+        TaskInstance taskInstance = getTaskInstance();
+        DependentTaskExecThread execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
+        PowerMockito.when(execThread, "allDependentTaskFinish")
+                .thenReturn(true);
+        PowerMockito.when(processService.findTaskInstanceById(Mockito.anyInt()))
+                .thenReturn(taskInstance);
+        PowerMockito.when(processService.submitTask(Mockito.any(TaskInstance.class)))
+                .thenReturn(taskInstance);
         PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
                 .thenReturn(processInstance);
+
+        // Don't check timeout.
         taskInstance.setTaskJson(taskInstance.getTaskJson().replaceAll("true", "false"));
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
     }
 
-    private TaskInstance initTaskInstance() {
-        taskInstance = new TaskInstance();
+    @Test
+    public void testWaitDependentProcessesStartTimeout_4() throws Exception {
+        TaskInstance taskInstance = getTaskInstance();
+        DependentTaskExecThread execThread = PowerMockito.spy(new DependentTaskExecThread(taskInstance));
+        PowerMockito.when(execThread, "allDependentTaskFinish")
+                .thenReturn(false).thenReturn(true);
+        PowerMockito.when(processService.findTaskInstanceById(Mockito.anyInt()))
+                .thenReturn(taskInstance);
+        PowerMockito.when(processService.submitTask(Mockito.any(TaskInstance.class)))
+                .thenReturn(taskInstance);
+        PowerMockito.when(processService.findLastRunningProcess(Mockito.anyInt(), Mockito.any(Date.class), Mockito.any(Date.class)))
+                .thenReturn(processInstance);
+
+        execThread.call();
+        Assert.assertEquals(ExecutionStatus.FAILURE, execThread.getTaskInstance().getState());
+    }
+
+    private TaskInstance getTaskInstance() {
+        TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("DEPENDENT");
         taskInstance.setId(252612);
         taskInstance.setName("ABC");
         taskInstance.setProcessInstanceId(10111);
-        // Note that the interval here is a negative number, and the task will directly time out.
         taskInstance.setTaskJson("{\"type\":\"DEPENDENT\",\"id\":\"tasks-4455\",\"name\":\"d_node\",\"params\":{},"
                 + "\"description\":\"d_node\",\"runFlag\":\"NORMAL\",\"conditionResult\":{"
                 + "\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{"
                 + "\"relation\":\"AND\",\"dependItemList\":[{\"projectId\":1,\"definitionId\":15,\"depTasks\":\"py_1\",\"cycle\":\"day\",\"dateValue\":\"today\"}]}"
                 + "]},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"FAILED\",\"interval\":30,\"enable\":true},"
-                + "\"waitStartTimeout\":{\"strategy\":\"\",\"interval\":-5,\"enable\":true,\"checkInterval\":1},"
+                + "\"waitStartTimeout\":{\"strategy\":\"\",\"interval\":5,\"enable\":true,\"checkInterval\":1},"
                 + "\"taskInstancePriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"preTasks\":[]}");
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

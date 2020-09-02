@@ -168,13 +168,20 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             return true;
         }
         while (Stopper.isRunning()) {
-            try {
-                if (!shouldContinueWait()) {
+            try{
+                if(this.processInstance == null){
+                    logger.error("process instance not exists , master task exec thread exit");
+                    return true;
+                }
+                if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
+                    cancelTaskInstance();
                     break;
                 }
-                if (checkStartTimeout && isTimeoutForWaitingDependentProcessStart()) {
-                    break;
-                } else if (allDependentTaskFinish()) {
+                if (checkStartTimeout) {
+                    if (isTimeoutForWaitingDependentProcessStart()) {
+                        break;
+                    }
+                } else if (allDependentTaskFinish() || taskInstance.getState().typeIsFinished()) {
                     break;
                 }
                 // update process task
@@ -190,22 +197,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             }
         }
         return true;
-    }
-
-    /**
-     * determine whether polling should continue.
-     * @return should continue wait
-     */
-    private boolean shouldContinueWait() {
-        if (this.processInstance == null) {
-            logger.error("process instance not exists, master task exec thread exit");
-            return false;
-        }
-        if (this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
-            cancelTaskInstance();
-            return false;
-        }
-        return !taskInstance.getState().typeIsFinished();
     }
 
     /**
@@ -264,7 +255,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * Is the waiting time out?
-     * @return
+     * @return whether timeout
      */
     private boolean isTimeoutForWaitingDependentProcessStart() {
         if (allDependentProcessStart()) {
