@@ -262,7 +262,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             logger.info("all dependent process instances already exist, start checking their status of execution");
             checkStartTimeout = false;
             loopInterval = Constants.SLEEP_TIME_MILLIS;
-            return false;
         } else {
             long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), waitDependentStartTimeout.getInterval() * 60L);
             if (remainTime < 0) {
