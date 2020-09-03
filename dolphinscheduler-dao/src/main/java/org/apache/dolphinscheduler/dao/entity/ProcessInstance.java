@@ -215,6 +215,11 @@ public class ProcessInstance {
     private int tenantId;
 
     /**
+     * varPool string
+     */
+    private String varPool;
+    
+    /**
      * receivers for api
      */
     @TableField(exist = false)
@@ -241,6 +246,14 @@ public class ProcessInstance {
                 System.currentTimeMillis();
     }
 
+    public String getVarPool() {
+      return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+      this.varPool = varPool;
+    }
+    
     public ProcessDefinition getProcessDefinition() {
         return processDefinition;
     }
