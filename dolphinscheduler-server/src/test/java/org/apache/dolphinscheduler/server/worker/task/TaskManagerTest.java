@@ -98,6 +98,6 @@ public class TaskManagerTest {
         taskExecutionContext.setTaskType(null);
         Assert.assertNull(TaskManager.newTask(taskExecutionContext,taskLogger));
         taskExecutionContext.setTaskType("XXX");
-       Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+        Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
     }
 }
