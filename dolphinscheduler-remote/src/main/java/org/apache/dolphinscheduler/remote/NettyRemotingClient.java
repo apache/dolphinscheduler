@@ -155,11 +155,11 @@ public class NettyRemotingClient {
 
         this.bootstrap
             .group(this.workerGroup)
-            .channel(NioSocketChannel.class)
             .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
             .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
             .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
             .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
+            .channel(NettyUtils.getSocketChannelClass())
             .handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
