@@ -242,7 +242,7 @@ public class ProjectController extends BaseController {
         logger.info("login user {}, query authorized project by user id: {}.",
                 StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
                 StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
-        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
+        Map<String, Object> result = projectService.queryProjectListByUserId(loginUser);
         return returnDataList(result);
     }
 

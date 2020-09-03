@@ -120,4 +120,11 @@ public interface ProjectService {
      */
     Map<String, Object> queryAllProjectList();
 
+    /**
+     * query project list by user id
+     * @param loginUser
+     * @return
+     */
+    Map<String, Object> queryProjectListByUserId(User loginUser);
+
 }
