@@ -198,11 +198,17 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
          * statistics based on task status execution, failure, completion, wait, total
          */
         Date start = null;
-        Date end = null;
-        if (StringUtils.isNotEmpty(startDate) && StringUtils.isNotEmpty(endDate)) {
+        if (StringUtils.isNotEmpty(startDate)) {
             start = DateUtils.getScheduleDate(startDate);
+            if (Objects.isNull(start)) {
+                putErrorRequestParamsMsg(result);
+                return result;
+            }
+        }
+        Date end = null;
+        if (StringUtils.isNotEmpty(endDate)) {
             end = DateUtils.getScheduleDate(endDate);
-            if (Objects.isNull(start) || Objects.isNull(end)) {
+            if (Objects.isNull(end)) {
                 putErrorRequestParamsMsg(result);
                 return result;
             }
