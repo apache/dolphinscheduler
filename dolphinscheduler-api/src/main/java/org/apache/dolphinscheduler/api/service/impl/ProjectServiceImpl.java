@@ -368,13 +368,7 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
             return result;
         }
 
-        List<Project> projects = null;
-        if(loginUser.getUserType() == UserType.ADMIN_USER){
-            projects = projectMapper.selectList(null);
-        }else{
-            projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-        }
-
+        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
         result.put(Constants.DATA_LIST, projects);
         putMsg(result, Status.SUCCESS);
 
