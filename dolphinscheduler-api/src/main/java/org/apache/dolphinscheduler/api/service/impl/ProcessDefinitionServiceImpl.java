@@ -1321,14 +1321,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 if (CollectionUtils.isNotEmpty(postNodeList)) {
                     for (String nextNodeName : postNodeList) {
                         List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeName);
-                        if (CollectionUtils.isNotEmpty(treeViewDtoList)) {
-                            treeViewDtoList.add(treeViewDto);
-                            waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
-                        } else {
+                        if (CollectionUtils.isEmpty(treeViewDtoList)) {
                             treeViewDtoList = new ArrayList<>();
-                            treeViewDtoList.add(treeViewDto);
-                            waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
                         }
+                        treeViewDtoList.add(treeViewDto);
+                        waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
                     }
                 }
                 runningNodeMap.remove(nodeName);
@@ -1690,16 +1687,16 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
             return result;
-        } else {
-            processDefinition.setProjectId(targetProject.getId());
-            processDefinition.setUpdateTime(new Date());
-            if (processDefineMapper.updateById(processDefinition) > 0) {
-                putMsg(result, Status.SUCCESS);
-            } else {
-                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            }
-            return result;
         }
+
+        processDefinition.setProjectId(targetProject.getId());
+        processDefinition.setUpdateTime(new Date());
+        if (processDefineMapper.updateById(processDefinition) > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+        }
+        return result;
     }
 
     /**
