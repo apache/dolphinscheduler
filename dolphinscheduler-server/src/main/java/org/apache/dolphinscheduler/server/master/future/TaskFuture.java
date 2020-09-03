@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- *  task fulture
+ *  task future
  */
 public class TaskFuture {
 
