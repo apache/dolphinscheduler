@@ -27,7 +27,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
@@ -155,7 +154,7 @@ public class NettyRemotingClient {
 
         this.bootstrap
             .group(this.workerGroup)
-            .channel(NioSocketChannel.class)
+            .channel(NettyUtils.getSocketChannelClass())
             .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
             .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
             .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
