@@ -72,7 +72,7 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
-            <treeselect style="width:535px;float:left;" v-model="resourceId" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
+            <treeselect style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
             <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
@@ -81,7 +81,7 @@
         <m-list-box-f v-if="isUpdate">
           <template slot="name"><strong>*</strong>{{$t('UDF resources directory')}}</template>
           <template slot="content">
-            <treeselect style="width:535px;float:left;" v-model="pid" @select="selTree" :options="udfResourceDirList" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
+            <treeselect style="width:535px;float:left;" v-model="pid" maxHeight="200" @select="selTree" :options="udfResourceDirList" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
           </template>

@@ -35,8 +35,8 @@
               <span>{{$t('Task status statistics')}}</span>
             </div>
             <div class="row">
-              <m-task-ctatus-count :search-params="searchParams">
-              </m-task-ctatus-count>
+              <m-task-status-count :search-params="searchParams">
+              </m-task-status-count>
             </div>
           </div>
           <div class="col-md-6">
@@ -68,7 +68,7 @@
   import dayjs from 'dayjs'
   import mDefineUserCount from './_source/defineUserCount'
   import mCommandStateCount from './_source/commandStateCount'
-  import mTaskCtatusCount from './_source/taskCtatusCount'
+  import mTaskStatusCount from './_source/taskStatusCount'
   import mProcessStateCount from './_source/processStateCount'
   import mQueueCount from './_source/queueCount'
   import localStore from '@/module/util/localStorage'
@@ -105,7 +105,7 @@
       mListConstruction,
       mDefineUserCount,
       mCommandStateCount,
-      mTaskCtatusCount,
+      mTaskStatusCount,
       mProcessStateCount,
       mQueueCount
     }

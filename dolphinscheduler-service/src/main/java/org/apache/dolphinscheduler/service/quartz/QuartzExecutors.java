@@ -62,19 +62,19 @@ public class QuartzExecutors {
   private static Scheduler scheduler;
 
   /**
-   * instance of QuartzExecutors
-   */
-  private static volatile QuartzExecutors INSTANCE = null;
-
-  /**
    * load conf
    */
   private static Configuration conf;
+
+  private static final class Holder {
+    private static final QuartzExecutors instance = new QuartzExecutors();
+  }
 
 
   private QuartzExecutors() {
     try {
       conf = new PropertiesConfiguration(QUARTZ_PROPERTIES_PATH);
+      init();
     }catch (ConfigurationException e){
       logger.warn("not loaded quartz configuration file, will used default value",e);
     }
@@ -85,18 +85,7 @@ public class QuartzExecutors {
    * @return instance of Quartz Executors
    */
   public static QuartzExecutors getInstance() {
-    if (INSTANCE == null) {
-      synchronized (QuartzExecutors.class) {
-        // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
-        if (INSTANCE == null) {
-          QuartzExecutors quartzExecutors = new QuartzExecutors();
-          //finish QuartzExecutors init
-          quartzExecutors.init();
-          INSTANCE = quartzExecutors;
-        }
-      }
-    }
-    return INSTANCE;
+   return Holder.instance;
   }
 
 

@@ -35,9 +35,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Map;
-
 import static org.apache.dolphinscheduler.api.enums.Status.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -460,6 +462,26 @@ public class UsersController extends BaseController {
         logger.info("login user {}, activate user, userName: {}",
                 loginUser.getUserName(), userName);
         Map<String, Object> result = usersService.activateUser(loginUser, userName);
+        return returnDataList(result);
+    }
+
+    /**
+     * user batch activate
+     *
+     * @param  userNames       user names
+     */
+    @ApiOperation(value = "batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userNames", value = "USER_NAMES", type = "String"),
+    })
+    @PostMapping("/batch/activate")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_USER_ERROR)
+    public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestBody List<String> userNames) {
+        List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
+        logger.info(" activate userNames: {}", formatUserNames);
+        Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
         return returnDataList(result);
     }
 }

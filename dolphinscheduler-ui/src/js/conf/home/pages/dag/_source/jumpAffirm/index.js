@@ -72,7 +72,7 @@ Affirm.paramVerification = (name) => {
     }
   } else {
     // View history direct jump
-    flag = name === 'projects-instance-details' ? true : !dagStore.isEditDag
+    flag = name === 'projects-instance-details' ? true : (dagStore.isSwitchVersion || !dagStore.isEditDag)
   }
   return flag
 }

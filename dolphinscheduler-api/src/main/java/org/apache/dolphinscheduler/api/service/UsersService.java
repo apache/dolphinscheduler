@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -946,6 +947,7 @@ public class UsersService extends BaseService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
+     * @param userName  user name
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {
@@ -981,6 +983,54 @@ public class UsersService extends BaseService {
         User responseUser = userMapper.queryByUserNameAccurately(userName);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);
+        return result;
+    }
+
+    /**
+     * activate user, only system admin have permission, change users state code 0 to 1
+     *
+     * @param loginUser login user
+     * @param userNames user name
+     * @return create result code
+     */
+    public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        int totalSuccess = 0;
+        List<String> successUserNames = new ArrayList<>();
+        Map<String, Object> successRes = new HashMap<>();
+        int totalFailed = 0;
+        List<Map<String, String>> failedInfo = new ArrayList<>();
+        Map<String, Object> failedRes = new HashMap<>();
+        for (String userName : userNames) {
+            Map<String, Object> tmpResult = activateUser(loginUser, userName);
+            if (tmpResult.get(Constants.STATUS) != Status.SUCCESS) {
+                totalFailed++;
+                Map<String, String> failedBody = new HashMap<>();
+                failedBody.put("userName", userName);
+                Status status = (Status) tmpResult.get(Constants.STATUS);
+                String errorMessage = MessageFormat.format(status.getMsg(), userName);
+                failedBody.put("msg", errorMessage);
+                failedInfo.add(failedBody);
+            } else {
+                totalSuccess++;
+                successUserNames.add(userName);
+            }
+        }
+        successRes.put("sum", totalSuccess);
+        successRes.put("userName", successUserNames);
+        failedRes.put("sum", totalFailed);
+        failedRes.put("info", failedInfo);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", successRes);
+        res.put("failed", failedRes);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, res);
         return result;
     }
 }
