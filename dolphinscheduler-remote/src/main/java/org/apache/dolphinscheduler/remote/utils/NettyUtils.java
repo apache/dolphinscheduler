@@ -42,8 +42,8 @@ public class NettyUtils {
             return false;
         }
         String enableNettyEpoll = Constants.NETTY_EPOLL_ENABLE;
-            return Boolean.parseBoolean(enableNettyEpoll);
-        }
+        return Boolean.parseBoolean(enableNettyEpoll);
+    }
 
     public static Class<? extends ServerSocketChannel> getServerSocketChannelClass() {
         if (useEpoll()) {
