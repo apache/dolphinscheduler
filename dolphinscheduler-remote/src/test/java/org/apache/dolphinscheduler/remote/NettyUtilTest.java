@@ -35,8 +35,9 @@ public class NettyUtilTest {
     public void testUserEpoll() {
         if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
             Assert.assertTrue(NettyUtils.useEpoll());
+        } else {
+            Assert.assertFalse(NettyUtils.useEpoll());
         }
-        Assert.assertFalse(NettyUtils.useEpoll());
     }
 
 }
