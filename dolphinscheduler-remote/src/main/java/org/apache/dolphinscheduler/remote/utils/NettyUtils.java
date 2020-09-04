@@ -33,9 +33,6 @@ public class NettyUtils {
     private NettyUtils() {
     }
 
-    /**
-     * linux platform default value is true
-     */
     public static boolean useEpoll() {
         String osName = Constants.OS_NAME;
         if (!osName.toLowerCase().contains("linux")) {
@@ -45,11 +42,8 @@ public class NettyUtils {
             return false;
         }
         String enableNettyEpoll = Constants.NETTY_EPOLL_ENABLE;
-        if (null != enableNettyEpoll) {
             return Boolean.parseBoolean(enableNettyEpoll);
         }
-        return true;
-    }
 
     public static Class<? extends ServerSocketChannel> getServerSocketChannelClass() {
         if (useEpoll()) {
