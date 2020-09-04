@@ -385,9 +385,9 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
         Map<String, Object> result = new HashMap<>();
 
         List<Project> projects = null;
-        if(loginUser.getUserType() == UserType.ADMIN_USER){
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
             projects = projectMapper.selectList(null);
-        }else{
+        } else {
             projects = projectMapper.queryProjectListByUserId(loginUser.getId());
         }
 
