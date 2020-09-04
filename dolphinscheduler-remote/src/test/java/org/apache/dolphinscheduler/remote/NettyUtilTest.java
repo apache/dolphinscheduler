@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import io.netty.channel.epoll.Epoll;
-
 import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
 
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import io.netty.channel.epoll.Epoll;
 
 /**
  * NettyUtilTest
