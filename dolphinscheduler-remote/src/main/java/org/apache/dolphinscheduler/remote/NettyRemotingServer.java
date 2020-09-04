@@ -17,16 +17,6 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.epoll.EpollEventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
-
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -36,14 +26,24 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 
 /**
  * remoting netty server
@@ -152,10 +152,10 @@ public class NettyRemotingServer {
                 .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
                 .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
                 .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
-                .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                .childHandler(new ChannelInitializer<SocketChannel>() {
 
                     @Override
-                    protected void initChannel(NioSocketChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch) throws Exception {
                         initNettyChannel(ch);
                     }
                 });
@@ -181,9 +181,8 @@ public class NettyRemotingServer {
      * init netty channel
      *
      * @param ch socket channel
-     * @throws Exception
      */
-    private void initNettyChannel(NioSocketChannel ch) throws Exception {
+    private void initNettyChannel(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast("encoder", encoder);
         pipeline.addLast("decoder", new NettyDecoder());
