@@ -234,15 +234,32 @@ public class ProjectController extends BaseController {
      * @return projects which the user create
      */
     @ApiOperation(value = "queryProjectCreatedByUser", notes = "QUERY_USER_CREATED_PROJECT_NOTES")
-
     @GetMapping(value = "/login-user-created-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query authorized project by user id: {}.",
+        logger.info("login user {}, query user created project by user id: {}.",
                 StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
                 StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
-        Map<String, Object> result = projectService.queryProjectListByUserId(loginUser);
+        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
+        return returnDataList(result);
+    }
+
+    /**
+     * query user created project
+     *
+     * @param loginUser login user
+     * @return projects which the user create
+     */
+    @ApiOperation(value = "queryProjectCreatedAndAuthorizedByUser", notes = "QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_NOTES")
+    @GetMapping(value = "/created-and-authorized-project")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
+    public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("login user {}, query authorized and user created project by user id: {}.",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
+        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return returnDataList(result);
     }
 

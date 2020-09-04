@@ -121,10 +121,10 @@ public interface ProjectService {
     Map<String, Object> queryAllProjectList();
 
     /**
-     * query project list by user id
+     * query authorized and user create project list by user id
      * @param loginUser
      * @return
      */
-    Map<String, Object> queryProjectListByUserId(User loginUser);
+    Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser);
 
 }
