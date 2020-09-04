@@ -33,7 +33,7 @@ public class NettyUtilTest {
 
     @Test
     public void testUserEpoll() {
-        if (!OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
+        if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
             Assert.assertTrue(NettyUtils.useEpoll());
         }
         Assert.assertFalse(NettyUtils.useEpoll());
