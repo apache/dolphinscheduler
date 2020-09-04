@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 
@@ -39,8 +38,6 @@ public class LogUtilsTest {
 
     @Test
     public void testGetTaskLogPath() {
-        Assert.assertEquals("/", Constants.SINGLE_SLASH);
-
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setProcessDefinitionId(1);
         taskInstance.setProcessInstanceId(100);
