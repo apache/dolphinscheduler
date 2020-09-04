@@ -31,6 +31,7 @@ import io.netty.channel.epoll.Epoll;
  */
 public class NettyUtilTest {
 
+
     @Test
     public void testUserEpoll() {
         if (OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
