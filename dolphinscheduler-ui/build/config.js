@@ -207,7 +207,7 @@ const baseConfig = {
       'jquery':'jquery/dist/jquery.min.js',
       'jquery-ui': 'jquery-ui'
     },
-    extensions: ['.js', 'json', '.vue', '.scss']
+    extensions: ['*', '.js', 'json', '.vue', '.scss']
   },
   plugins: [
     new VueLoaderPlugin(),
