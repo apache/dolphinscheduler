@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.remote;
 
 import io.netty.channel.epoll.Epoll;
 
-import org.apache.dolphinscheduler.remote.utils.Constants;
+import static org.apache.dolphinscheduler.remote.utils.Constants.OS_NAME;
+
 import org.apache.dolphinscheduler.remote.utils.NettyUtils;
 
 import org.junit.Assert;
@@ -32,8 +33,7 @@ public class NettyUtilTest {
 
     @Test
     public void testUserEpoll() {
-        String osName = Constants.OS_NAME;
-        if (!osName.toLowerCase().contains("linux") && Epoll.isAvailable()) {
+        if (!OS_NAME.toLowerCase().contains("linux") && Epoll.isAvailable()) {
             Assert.assertTrue(NettyUtils.useEpoll());
         }
         Assert.assertFalse(NettyUtils.useEpoll());
