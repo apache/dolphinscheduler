@@ -25,6 +25,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
@@ -152,10 +153,10 @@ public class NettyRemotingServer {
                 .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
                 .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
                 .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
-                .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                .childHandler(new ChannelInitializer<SocketChannel>() {
 
                     @Override
-                    protected void initChannel(NioSocketChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch) throws Exception {
                         initNettyChannel(ch);
                     }
                 });
@@ -183,7 +184,7 @@ public class NettyRemotingServer {
      * @param ch socket channel
      * @throws Exception
      */
-    private void initNettyChannel(NioSocketChannel ch) throws Exception {
+    private void initNettyChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast("encoder", encoder);
         pipeline.addLast("decoder", new NettyDecoder());
