@@ -25,7 +25,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
@@ -146,7 +145,7 @@ public class NettyRemotingServer {
         if (isStarted.compareAndSet(false, true)) {
             this.serverBootstrap
                 .group(this.bossGroup, this.workGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(NettyUtils.getServerSocketChannelClass())
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
                 .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
