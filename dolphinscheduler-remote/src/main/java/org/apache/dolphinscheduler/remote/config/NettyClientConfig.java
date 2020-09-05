@@ -52,7 +52,7 @@ public class NettyClientConfig {
     /**
      * connect timeout millis
      */
-    private int connectTimeoutMillis = 3;
+    private int connectTimeoutMillis = 3000;
 
     public int getWorkerThreads() {
         return workerThreads;
