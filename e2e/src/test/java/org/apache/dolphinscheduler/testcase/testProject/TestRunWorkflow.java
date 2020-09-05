@@ -17,14 +17,14 @@
 package org.apache.dolphinscheduler.testcase.testProject;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.project.CreateProjectPage;
-import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
+import org.apache.dolphinscheduler.page.project.ProjectPage;
+import org.apache.dolphinscheduler.page.project.WorkflowDefinePage;
 import org.apache.dolphinscheduler.page.project.RunWorkflowPage;
 import org.testng.annotations.Test;
 
 public class TestRunWorkflow extends BaseTest {
-    private CreateWorkflowPage createWorkflowPage;
-    private CreateProjectPage createProjectPage;
+    private WorkflowDefinePage createWorkflowPage;
+    private ProjectPage projectPage;
     private RunWorkflowPage runWorkflowPage;
 
 
@@ -32,7 +32,7 @@ public class TestRunWorkflow extends BaseTest {
     public void testRunWorkflow() throws InterruptedException {
         runWorkflowPage = new RunWorkflowPage(driver);
 
-        createProjectPage = new CreateProjectPage(driver);
+        projectPage = new ProjectPage(driver);
         System.out.println("start run workflow");
         assert runWorkflowPage.runWorkflow();
         System.out.println("end run workflow");

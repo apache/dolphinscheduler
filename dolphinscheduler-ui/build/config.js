@@ -116,7 +116,6 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     minify: minifierConfig
   })
 })
-
 const baseConfig = {
   entry: jsEntry,
   output: {
@@ -208,7 +207,7 @@ const baseConfig = {
       'jquery':'jquery/dist/jquery.min.js',
       'jquery-ui': 'jquery-ui'
     },
-    extensions: ['.js', 'json', '.vue', '.scss']
+    extensions: ['*', '.js', 'json', '.vue', '.scss']
   },
   plugins: [
     new VueLoaderPlugin(),

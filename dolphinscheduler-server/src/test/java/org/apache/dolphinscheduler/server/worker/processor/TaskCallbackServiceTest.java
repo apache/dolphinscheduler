@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import io.netty.channel.Channel;
+import java.util.Date;
+
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -50,8 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-import java.util.Date;
+import io.netty.channel.Channel;
 
 /**
  * test task call back service
@@ -73,7 +74,8 @@ import java.util.Date;
         TaskResponseService.class,
         TaskAckProcessor.class,
         TaskResponseProcessor.class,
-        TaskExecuteProcessor.class})
+        TaskExecuteProcessor.class,
+        CuratorZookeeperClient.class})
 public class TaskCallbackServiceTest {
 
     @Autowired
@@ -189,6 +191,7 @@ public class TaskCallbackServiceTest {
 
         nettyRemotingServer.close();
         nettyRemotingClient.close();
+        masterRegistry.unRegistry();
     }
 
     @Test

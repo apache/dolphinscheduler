@@ -29,10 +29,9 @@ image:
   repository: "dolphinscheduler"
   tag: "latest"
   pullPolicy: "IfNotPresent"
+  pullSecrets: []
 
-imagePullSecrets: []
-
-# If not exists external postgresql, by default, Dolphinscheduler's database will use it.
+# If not exists external database, by default, Dolphinscheduler's database will use it.
 postgresql:
   enabled: true
   postgresqlUsername: "root"
@@ -43,21 +42,24 @@ postgresql:
     size: "20Gi"
     storageClass: "-"
 
-# If exists external postgresql, and set postgresql.enable value to false.
-# If postgresql.enable is false, Dolphinscheduler's database will use it.
+# If exists external database, and set postgresql.enable value to false.
+# external database will be used, otherwise Dolphinscheduler's database will be used.
 externalDatabase:
+  type: "postgresql"
+  driver: "org.postgresql.Driver"
   host: "localhost"
   port: "5432"
   username: "root"
   password: "root"
   database: "dolphinscheduler"
+  # multi params should join with & char
+  params: "characterEncoding=utf8"
 
 # If not exists external zookeeper, by default, Dolphinscheduler's zookeeper will use it.
 zookeeper:
   enabled: true
   taskQueue: "zookeeper"
-  config:
-    ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
+  config: null
   service:
     port: "2181"
   persistence:
@@ -70,6 +72,18 @@ zookeeper:
 externalZookeeper:
   taskQueue: "zookeeper"
   zookeeperQuorum: "127.0.0.1:2181"
+  zookeeperRoot: "/dolphinscheduler"
+
+common:
+  configmap:
+    DOLPHINSCHEDULER_ENV_PATH: "/tmp/dolphinscheduler/env"
+    DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler/files"
+    RESOURCE_STORAGE_TYPE: "NONE"
+    RESOURCE_UPLOAD_PATH: "/ds"
+    FS_DEFAULT_FS: "s3a://xxxx"
+    FS_S3A_ENDPOINT: "s3.xxx.amazonaws.com"
+    FS_S3A_ACCESS_KEY: "xxxxxxx"
+    FS_S3A_SECRET_KEY: "xxxxxxx"
 
 master:
   podManagementPolicy: "Parallel"
@@ -85,6 +99,18 @@ master:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  # The jvm options for java instance startup
+  jvmOptions: ""
+  resources: {}
+  # limits:
+  #   memory: "18Gi"
+  #   cpu: "4"
+  # requests:
+  #   memory: "2Gi"
+  #   cpu: "500m"
+  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
+  # Clients such as tools and libraries can retrieve this metadata.
+  annotations: {}
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   configmap:
@@ -137,6 +163,18 @@ worker:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  # The jvm options for java instance startup
+  jvmOptions: ""
+  resources: {}
+  # limits:
+  #   memory: "18Gi"
+  #   cpu: "4"
+  # requests:
+  #   memory: "2Gi"
+  #   cpu: "500m"
+  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
+  # Clients such as tools and libraries can retrieve this metadata.
+  annotations: {}
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -163,6 +201,7 @@ worker:
     WORKER_RESERVED_MEMORY: "0.1"
     WORKER_LISTEN_PORT: "1234"
     WORKER_GROUP: "default"
+    WORKER_WEIGHT: "100"
     DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
     DOLPHINSCHEDULER_ENV:
     - "export HADOOP_HOME=/opt/soft/hadoop"
@@ -213,9 +252,22 @@ alert:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  # The jvm options for java instance startup
+  jvmOptions: ""
+  resources: {}
+  # limits:
+  #   memory: "4Gi"
+  #   cpu: "1"
+  # requests:
+  #   memory: "2Gi"
+  #   cpu: "500m"
+  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
+  # Clients such as tools and libraries can retrieve this metadata.
+  annotations: {}
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   configmap:
+    ALERT_PLUGIN_DIR: "/opt/dolphinscheduler/alert/plugin"
     XLS_FILE_PATH: "/tmp/xls"
     MAIL_SERVER_HOST: ""
     MAIL_SERVER_PORT: ""
@@ -275,6 +327,18 @@ api:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  # The jvm options for java instance startup
+  jvmOptions: ""
+  resources: {}
+  # limits:
+  #   memory: "4Gi"
+  #   cpu: "2"
+  # requests:
+  #   memory: "2Gi"
+  #   cpu: "500m"
+  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
+  # Clients such as tools and libraries can retrieve this metadata.
+  annotations: {}
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:
@@ -322,6 +386,16 @@ frontend:
   # If specified, the pod's scheduling constraints.
   # More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
   affinity: {}
+  resources: {}
+  # limits:
+  #     memory: "256Mi"
+  #     cpu: "1"
+  #   requests:
+  #     memory: "256Mi"
+  #     cpu: "500m"
+  # You can use annotations to attach arbitrary non-identifying metadata to objects. 
+  # Clients such as tools and libraries can retrieve this metadata.
+  annotations: {}
   ## Periodic probe of container liveness. Container will be restarted if the probe fails. Cannot be updated.
   ## More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
   livenessProbe:

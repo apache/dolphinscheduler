@@ -22,7 +22,6 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Process Pid')}}: {{item.id}}</span>
               <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
             </div>
             <div class="right">
@@ -96,6 +95,7 @@
       this.getMasterData().then(res => {
         this.masterList = _.map(res, (v, i) => {
           return _.assign(v, {
+            id: v.host + "_" + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })
