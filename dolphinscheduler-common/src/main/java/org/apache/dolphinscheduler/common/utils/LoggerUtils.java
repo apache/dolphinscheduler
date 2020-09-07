@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
+
+import org.apache.dolphinscheduler.common.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +25,16 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.slf4j.Logger;
 
 /**
- *  logger utils
+ * logger utils
  */
 public class LoggerUtils {
+
+    private LoggerUtils() {
+        throw new UnsupportedOperationException("Construct LoggerUtils");
+    }
 
     /**
      * rules for extracting application ID
@@ -53,29 +59,29 @@ public class LoggerUtils {
     /**
      * build job id
      *
-     * @param affix         Task Logger's prefix
-     * @param processDefId  process define id
+     * @param affix Task Logger's prefix
+     * @param processDefId process define id
      * @param processInstId process instance id
-     * @param taskId        task id
+     * @param taskId task id
      * @return task id format
      */
     public static String buildTaskId(String affix,
-                                  int processDefId,
-                                  int processInstId,
-                                  int taskId){
+                                     int processDefId,
+                                     int processInstId,
+                                     int taskId) {
         // - [taskAppId=TASK_79_4084_15210]
-        return String.format(" - %s%s-%s-%s-%s]",TASK_APPID_LOG_FORMAT,affix,
+        return String.format(" - %s%s-%s-%s-%s]", TASK_APPID_LOG_FORMAT, affix,
                 processDefId,
                 processInstId,
                 taskId);
     }
 
-
     /**
      * processing log
      * get yarn application id list
-     * @param log       log content
-     * @param logger    logger
+     *
+     * @param log log content
+     * @param logger logger
      * @return app id list
      */
     public static List<String> getAppIds(String log, Logger logger) {
@@ -87,7 +93,7 @@ public class LoggerUtils {
         // analyse logs to get all submit yarn application id
         while (matcher.find()) {
             String appId = matcher.group();
-            if(!appIds.contains(appId)){
+            if (!appIds.contains(appId)) {
                 logger.info("find app id: {}", appId);
                 appIds.add(appId);
             }

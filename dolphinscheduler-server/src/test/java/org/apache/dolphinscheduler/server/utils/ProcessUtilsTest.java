@@ -40,11 +40,8 @@ public class ProcessUtilsTest {
     public void testBuildCommandStr() {
         List<String> commands = new ArrayList<>();
         commands.add("sudo");
-        try {
-            Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
+        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
+
     }
 
 }

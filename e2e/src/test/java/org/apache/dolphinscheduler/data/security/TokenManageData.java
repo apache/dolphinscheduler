@@ -18,7 +18,11 @@ package org.apache.dolphinscheduler.data.security;
 
 public class TokenManageData {
     public static final String TOKEN_MANAGE = "令牌管理 - DolphinScheduler";
+    public static final String CREATE_TOKEN = "创建令牌";
+
     public static final String DATE = "2038-06-10 00:00:00";
+    public static final String NAME = "admin";
+
 
 
 }

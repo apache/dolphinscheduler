@@ -18,7 +18,9 @@ package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
+import org.apache.dolphinscheduler.data.project.ProjectData;
 import org.apache.dolphinscheduler.data.project.WorkflowDefineData;
+import org.apache.dolphinscheduler.locator.project.ProjectLocator;
 import org.apache.dolphinscheduler.locator.project.WorkflowDefineLocator;
 import org.openqa.selenium.WebDriver;
 
@@ -32,9 +34,12 @@ public class WorkflowDefinePage extends PageCommon {
      */
 
     public boolean jumpWorkflowPage() throws InterruptedException {
+        ifTextExists(ProjectLocator.LIST_PROJECT_NAME, ProjectData.PROJECT_NAME);
+
         // click project name
         clickElement(WorkflowDefineLocator.CLICK_PROJECT_NAME);
-        Thread.sleep(TestConstant.ONE_THOUSAND);
+
+        ifTextExists(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE,WorkflowDefineData.workflow_define);
 
         System.out.println("Click on workflow define to jump to workflow define page");
         // click workflow define
@@ -126,11 +131,15 @@ public class WorkflowDefinePage extends PageCommon {
 
         //click submit button
         clickElement(WorkflowDefineLocator.CLICK_SUBMIT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSAND);
         System.out.println("Task node set up successfully");
         System.out.println("move to Dag Element ");
         moveToDragElement(WorkflowDefineLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
+        System.out.println("copy task");
+        mouseRightClickElement(WorkflowDefineLocator.MOUSE_RIGHT_CLICK);
+        clickButton(WorkflowDefineLocator.COPY_TASK);
+        clickButton(WorkflowDefineLocator.CLICK_LINE);
+        mouseMovePosition(WorkflowDefineLocator.LINE_SOURCES_TASK,WorkflowDefineLocator.LINE_TARGET_TASK);
         return ifTitleContains(WorkflowDefineData.CREATE_WORKFLOW_TITLE);
     }
 
@@ -180,7 +189,6 @@ public class WorkflowDefinePage extends PageCommon {
 
         //delete workflow  global parameters value
         clickElement(WorkflowDefineLocator.CLICK_DELETE_WORKFLOW_GLOBAL_PARAMETERS);
-        Thread.sleep(TestConstant.ONE_THOUSAND);
 
         //click add button
         System.out.println("submit workflow");
@@ -192,6 +200,9 @@ public class WorkflowDefinePage extends PageCommon {
     public boolean onlineWorkflow() throws InterruptedException {
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
+        // Determine whether the workflow status is offline
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_OFFLINE_STATE);
+
         // click online button
         System.out.println("Click online workflow button");
         clickButton(WorkflowDefineLocator.CLICK_ONLINE_WORKFLOW_BUTTON);
@@ -202,9 +213,11 @@ public class WorkflowDefinePage extends PageCommon {
     public boolean offlineWorkflow() throws InterruptedException {
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
+        // Determine whether the workflow status is online
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_ONLINE_STATE);
+
         // click offline button
         System.out.println("offline workflow");
-        Thread.sleep(500);
         clickButton(WorkflowDefineLocator.CLICK_OFFLINE_WORKFLOW_BUTTON);
 
         return ifTitleContains(WorkflowDefineData.WORKFLOW_TITLE);
@@ -213,8 +226,11 @@ public class WorkflowDefinePage extends PageCommon {
 
     public boolean deleteWorkflow() throws InterruptedException {
         //click  delete workflow
-        Thread.sleep(500);
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
+
+        // Determine whether the workflow status is offline
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_OFFLINE_STATE);
+
         clickButton(WorkflowDefineLocator.DELETE_WORKFLOW_BOTTOM);
 
         //click confirm delete project

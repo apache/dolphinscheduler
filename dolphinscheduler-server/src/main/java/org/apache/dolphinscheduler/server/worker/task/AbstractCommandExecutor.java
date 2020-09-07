@@ -16,12 +16,14 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinNT;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -32,9 +34,12 @@ import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -47,8 +52,10 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
+import org.slf4j.Logger;
+
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
 
 /**
  * abstract command executor
@@ -305,14 +312,8 @@ public abstract class AbstractCommandExecutor {
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
-        String cmdStr;
-
-        try {
-            cmdStr = ProcessUtils.buildCommandStr(commands);
-            logger.info("task run command:\n{}", cmdStr);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+        String cmdStr = ProcessUtils.buildCommandStr(commands);
+        logger.info("task run command:\n{}", cmdStr);
     }
 
     /**
@@ -474,8 +475,7 @@ public abstract class AbstractCommandExecutor {
      * @return remain time
      */
     private long getRemaintime() {
-        long usedTime = (System.currentTimeMillis() - taskExecutionContext.getStartTime().getTime()) / 1000;
-        long remainTime = taskExecutionContext.getTaskTimeout() - usedTime;
+        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getStartTime(), taskExecutionContext.getTaskTimeout());
 
         if (remainTime < 0) {
             throw new RuntimeException("task execution time out");

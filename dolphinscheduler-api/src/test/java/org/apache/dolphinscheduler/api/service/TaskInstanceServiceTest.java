@@ -16,9 +16,13 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -30,6 +34,14 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,11 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.text.MessageFormat;
-import java.util.*;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -59,7 +67,7 @@ public class TaskInstanceServiceTest {
     ProjectMapper projectMapper;
 
     @Mock
-    ProjectService projectService;
+    ProjectServiceImpl projectService;
 
     @Mock
     ProcessService processService;
@@ -68,26 +76,21 @@ public class TaskInstanceServiceTest {
     TaskInstanceMapper taskInstanceMapper;
 
     @Mock
-    ProcessInstanceService processInstanceService;
-
-    @Mock
     UsersService usersService;
 
     @Test
-    public void queryTaskListPaging(){
-
+    public void queryTaskListPaging() {
         String projectName = "project_test1";
         User loginUser = getAdminUser();
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
         when(projectMapper.queryByName(projectName)).thenReturn(null);
-        when(projectService.checkProjectAndAuth(loginUser,null,projectName)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
         Map<String, Object> proejctAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "",
                 "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
-
 
         //project
         putMsg(result, Status.SUCCESS, projectName);
@@ -101,7 +104,7 @@ public class TaskInstanceServiceTest {
         taskInstanceList.add(taskInstance);
         pageReturn.setRecords(taskInstanceList);
         when(projectMapper.queryByName(Mockito.anyString())).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
@@ -126,10 +129,28 @@ public class TaskInstanceServiceTest {
         Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullRes.get(Constants.STATUS));
+
+        //start/end date null
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", null, null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.SUCCESS, executorNullDateRes.get(Constants.STATUS));
+
+        //start date error format
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", "error date", null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorStartDateRes.get(Constants.STATUS));
+        Map<String, Object> executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+                "", null, "error date", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorEndDateRes.get(Constants.STATUS));
     }
 
     /**
      * get Mock Admin User
+     *
      * @return admin user
      */
     private User getAdminUser() {
@@ -142,19 +163,21 @@ public class TaskInstanceServiceTest {
 
     /**
      * get mock Project
+     *
      * @param projectName projectName
      * @return Project
      */
-    private Project getProject(String projectName){
+    private Project getProject(String projectName) {
         Project project = new Project();
         project.setId(1);
         project.setName(projectName);
         project.setUserId(1);
-        return  project;
+        return project;
     }
 
     /**
      * get Mock process instance
+     *
      * @return process instance
      */
     private ProcessInstance getProcessInstance() {
@@ -169,6 +192,7 @@ public class TaskInstanceServiceTest {
 
     /**
      * get Mock task instance
+     *
      * @return task instance
      */
     private TaskInstance getTaskInstance() {

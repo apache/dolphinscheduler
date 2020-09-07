@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.SLASH;
-
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -44,9 +41,11 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Sets;
 
+import static org.apache.dolphinscheduler.common.Constants.*;
+
 
 /**
- *  worker registry
+ * worker registry
  */
 @Service
 public class WorkerRegistry {
@@ -54,13 +53,13 @@ public class WorkerRegistry {
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistry.class);
 
     /**
-     *  zookeeper registry center
+     * zookeeper registry center
      */
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
-     *  worker config
+     * worker config
      */
     @Autowired
     private WorkerConfig workerConfig;
@@ -86,7 +85,7 @@ public class WorkerRegistry {
     }
 
     /**
-     *  registry
+     * registry
      */
     public void registry() {
         String address = NetUtils.getHost();
@@ -122,7 +121,7 @@ public class WorkerRegistry {
     }
 
     /**
-     *  remove registry info
+     * remove registry info
      */
     public void unRegistry() {
         String address = getLocalAddress();
@@ -135,13 +134,14 @@ public class WorkerRegistry {
     }
 
     /**
-     *  get worker path
+     * get worker path
      */
     private Set<String> getWorkerZkPaths() {
         Set<String> workerZkPaths = Sets.newHashSet();
 
         String address = getLocalAddress();
         String workerZkPathPrefix = this.zookeeperRegistryCenter.getWorkerPath();
+        String weight = getWorkerWeight();
 
         for (String workGroup : this.workerGroups) {
             StringBuilder workerZkPathBuilder = new StringBuilder(100);
@@ -152,15 +152,23 @@ public class WorkerRegistry {
             // trim and lower case is need
             workerZkPathBuilder.append(workGroup.trim().toLowerCase()).append(SLASH);
             workerZkPathBuilder.append(address);
+            workerZkPathBuilder.append(weight);
             workerZkPaths.add(workerZkPathBuilder.toString());
         }
         return workerZkPaths;
     }
 
     /**
-     *  get local address
+     * get local address
      */
     private String getLocalAddress() {
         return NetUtils.getHost() + ":" + workerConfig.getListenPort();
+    }
+
+    /**
+     * get Worker Weight
+     */
+    private String getWorkerWeight() {
+        return ":" + workerConfig.getWeight();
     }
 }
