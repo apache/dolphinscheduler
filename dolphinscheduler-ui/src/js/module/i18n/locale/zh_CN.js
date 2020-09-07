@@ -641,5 +641,6 @@ export default {
   'Batch copy': '批量复制',
   'Related items': '关联项目',
   'Project name is required': '项目名称必填',
-  'Batch move': '批量移动'
+  'Batch move': '批量移动',
+  Version: '版本'
 }
