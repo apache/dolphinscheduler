@@ -16,6 +16,9 @@
  */
 <template>
   <div class="list-model">
+    <div>
+      <form-create v-model="fApi" :rule="rule" :option="option"></form-create>
+    </div>
     <div class="table-box">
       <table>
         <tr>
@@ -97,7 +100,53 @@
     name: 'user-list',
     data () {
       return {
-        list: []
+        list: [],
+        fApi: {},
+        rule: [
+          {
+            type: "input", // 生成组件的名称(就是表单的名称：如input，radio，checkbox，select，slider等)
+            field: "userName", // 表单组件的字段名称(就是表单的name属性，注：该必须唯一),自定义组件可以不配置
+            className: "user-name-dom", // 设置组件的class属性
+            title: "用户名称：", // 组件的名称, 选填
+            value: "", // 表单组件的字段值(就是表单的value值),自定义组件可以不用设置
+            props: {
+              placeholder: "请输入用户名称！",
+              disabled: false,
+              readonly: false,
+              clearable: true // 是否显示清空按钮
+            },
+            validate: [
+              {
+                trigger: "blur",
+                required: true,
+                message: "用户名称不能为空！"
+              }
+            ],
+            col: {
+              md: { span: 12 }
+            }
+          }
+        ],
+        option: {
+          // 显示重置表单按扭
+          resetBtn: true,
+  
+          // 表单提交按扭事件
+          onSubmit: formData => {
+            alert(JSON.stringify(formData));
+  
+            console.log("获取表单中的数据：", formData);
+  
+            //按钮进入提交状态
+            //   this.fApi.btn.loading();
+  
+            //重置按钮禁用
+            //   this.fApi.resetBtn.disabled();
+  
+            //按钮进入可点击状态
+            //   this.fApi.btn.finish();
+          }
+        }
       }
     },
     props: {

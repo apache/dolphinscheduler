@@ -29,9 +29,13 @@ import ans from 'ans-ui/lib/ans-ui.min'
 import 'sass/conf/login/index.scss'
 import 'bootstrap/dist/js/bootstrap.min.js'
 
+import formCreate, {maker} from '@form-create/element-ui'
+
 Vue.use(ElementUI)
 
 Vue.use(ans)
+
+Vue.use(formCreate)
 
 Vue.config.devtools = true
 Vue.config.productionTip = true

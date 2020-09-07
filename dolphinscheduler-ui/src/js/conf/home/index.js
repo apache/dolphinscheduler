@@ -38,6 +38,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
 
+import formCreate, {maker} from '@form-create/element-ui'
+
 // Component internationalization
 const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
 
@@ -45,6 +47,8 @@ Vue.use(ElementUI)
 
 // Vue.use(ans)
 Vue.use(ans, useOpt)
+
+Vue.use(formCreate)
 
 sync(store, router)
 
