@@ -35,7 +35,7 @@ Vue.use(ElementUI)
 
 Vue.use(ans)
 
-Vue.use(formCreate)
+Vue.use(formCreate, {maker})
 
 Vue.config.devtools = true
 Vue.config.productionTip = true

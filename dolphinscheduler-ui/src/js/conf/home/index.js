@@ -48,7 +48,7 @@ Vue.use(ElementUI)
 // Vue.use(ans)
 Vue.use(ans, useOpt)
 
-Vue.use(formCreate)
+Vue.use(formCreate, {maker})
 
 sync(store, router)
 
