@@ -64,6 +64,12 @@ export default {
     state.tenantId = payload
   },
   /**
+   * set isParallel
+   */
+  setIsParallel (state, payload) {
+    state.isParallel = payload
+  },
+  /**
    * set global params
    */
   setGlobalParams (state, payload) {
@@ -105,6 +111,7 @@ export default {
     state.name = (payload && payload.name) || ''
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
+    state.isParallel = (payload && payload.isParallel) || 1
     state.tenantId = (payload && payload.tenantId) || -1
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []

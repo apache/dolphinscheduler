@@ -503,6 +503,7 @@ export default {
   'Statistics manage': '统计管理',
   statistics: '统计',
   'select tenant': '选择租户',
+  'select run type': '选择执行方式',
   'Please enter Principal': '请输入Principal',
   'The start time must not be the same as the end': '开始时间和结束时间不能相同',
   'Startup parameter': '启动参数',

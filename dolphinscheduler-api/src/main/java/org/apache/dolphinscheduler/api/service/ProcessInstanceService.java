@@ -118,6 +118,7 @@ public class ProcessInstanceService extends BaseDAGService {
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
+        processInstance.setIsParallel(processDefinition.getIsParallel());
         result.put(Constants.DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
@@ -179,7 +180,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                project.getId(), processDefineId, searchVal, executorId,statusArray, host, start, end);
+                        project.getId(), processDefineId, searchVal, executorId,statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
@@ -255,7 +256,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(log.getBytes(
-            StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         String line;
         while ((line = br.readLine()) != null) {
             if(line.contains(DEPENDENT_SPLIT)){

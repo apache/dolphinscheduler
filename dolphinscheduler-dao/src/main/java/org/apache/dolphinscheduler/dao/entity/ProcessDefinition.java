@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
  */
 @TableName("t_ds_process_definition")
 public class ProcessDefinition {
+
+    private int isParallel;
+
     /**
      * id
      */
@@ -379,10 +382,19 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public int getIsParallel() {
+        return isParallel;
+    }
+
+    public void setIsParallel(int isParallel) {
+        this.isParallel = isParallel;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
-                "id=" + id +
+                "isParallel=" + isParallel +
+                ", id=" + id +
                 ", name='" + name + '\'' +
                 ", version=" + version +
                 ", releaseState=" + releaseState +
@@ -409,5 +421,4 @@ public class ProcessDefinition {
                 ", resourceIds='" + resourceIds + '\'' +
                 '}';
     }
-
 }

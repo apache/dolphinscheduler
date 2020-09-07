@@ -19,18 +19,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select command.* from t_ds_command command
-        join t_ds_process_definition definition on command.process_definition_id = definition.id
-        where definition.release_state = 1 AND definition.flag = 1
-        order by command.update_time asc
-        limit 1
+        select * from
+        (select command.* from t_ds_command command,
+        t_ds_process_definition definition
+        where command.process_definition_id = definition.id and definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=1
+        union
+        select command.* from t_ds_command command,
+        t_ds_process_definition definition,(select process_definition_id,state from t_ds_process_instance instance,
+        (select max(id) as max_id from t_ds_process_instance group by process_definition_id) instance_maxid
+        where instance.id=instance_maxid.max_id and instance.state in(5,6,7,9)) instance_new
+        where command.process_definition_id = definition.id and definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=0
+        AND instance_new.process_definition_id=definition.id
+		union
+		select command.* from t_ds_command command,
+        t_ds_process_definition definition
+		where definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=0 and command.process_definition_id = definition.id
+		and definition.id not in (select distinct(process_definition_id) from  t_ds_process_instance)
+		) command_new order by command_new.update_time asc limit 1
     </select>
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
         select cmd.command_type as command_type, count(1) as count
         from t_ds_command cmd, t_ds_process_definition process
         where cmd.process_definition_id = process.id
         <if test="projectIdArray != null and projectIdArray.length != 0">
-            and process.project_id in 
+            and process.project_id in
             <foreach collection="projectIdArray" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>

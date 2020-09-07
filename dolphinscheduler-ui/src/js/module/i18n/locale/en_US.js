@@ -507,6 +507,7 @@ export default {
   'Statistics manage': 'Statistics Manage',
   statistics: 'Statistics',
   'select tenant': 'select tenant',
+  'select run type': 'select run type',
   'Please enter Principal': 'Please enter Principal',
   'The start time must not be the same as the end': 'The start time must not be the same as the end',
   'Startup parameter': 'Startup parameter',

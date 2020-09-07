@@ -41,6 +41,19 @@ public class ProcessData {
 
   private int tenantId;
 
+  /**
+   * 0:serial,1:parallel
+   */
+  private int isParallel;
+
+
+  public int getIsParallel() {
+    return isParallel;
+  }
+
+  public void setIsParallel(int isParallel) {
+    this.isParallel = isParallel;
+  }
 
   public ProcessData() {
   }
@@ -68,7 +81,7 @@ public class ProcessData {
     ProcessData that = (ProcessData) o;
 
     return CollectionUtils.equalLists(tasks, that.tasks) &&
-        CollectionUtils.equalLists(globalParams, that.globalParams);
+            CollectionUtils.equalLists(globalParams, that.globalParams);
   }
 
   public List<TaskNode> getTasks() {
@@ -110,6 +123,7 @@ public class ProcessData {
             ", globalParams=" + globalParams +
             ", timeout=" + timeout +
             ", tenantId=" + tenantId +
+            ", isParallel=" + isParallel +
             '}';
   }
 }

@@ -141,6 +141,7 @@ export default {
         state.timeout = processDefinitionJson.timeout
 
         state.tenantId = processDefinitionJson.tenantId
+        state.isParallel = processDefinitionJson.isParallel
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -192,7 +193,7 @@ export default {
         state.globalParams = processInstanceJson.globalParams
         // timeout
         state.timeout = processInstanceJson.timeout
-
+        state.isParallel = processDefinitionJson.isParallel
         state.tenantId = processInstanceJson.tenantId
 
         // startup parameters
@@ -214,6 +215,7 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
@@ -238,6 +240,7 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
@@ -264,6 +267,7 @@ export default {
         globalParams: state.globalParams,
         tasks: state.tasks,
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {

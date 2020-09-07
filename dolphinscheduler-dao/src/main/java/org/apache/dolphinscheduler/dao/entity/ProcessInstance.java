@@ -215,6 +215,9 @@ public class ProcessInstance {
     @TableField(exist = false)
     private String receivers;
 
+    @TableField(exist = false)
+    private int isParallel;
+
     /**
      * receivers cc for api
      */
@@ -576,6 +579,14 @@ public class ProcessInstance {
         this.receiversCc = receiversCc;
     }
 
+    public int getIsParallel() {
+        return isParallel;
+    }
+
+    public void setIsParallel(int isParallel) {
+        this.isParallel = isParallel;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{" +
@@ -601,6 +612,7 @@ public class ProcessInstance {
                 ", globalParams='" + globalParams + '\'' +
                 ", processInstanceJson='" + processInstanceJson + '\'' +
                 ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 ", tenantCode='" + tenantCode + '\'' +
                 ", queue='" + queue + '\'' +
                 ", isSubProcess=" + isSubProcess +
@@ -614,6 +626,7 @@ public class ProcessInstance {
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
                 ", receivers='" + receivers + '\'' +
+                ", isParallel=" + isParallel +
                 ", receiversCc='" + receiversCc + '\'' +
                 '}';
     }

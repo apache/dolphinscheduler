@@ -35,6 +35,8 @@ export default {
   timeout: 0,
   // tenant id
   tenantId: -1,
+  //isParallel 0:serial,1:parallel
+  isParallel:1,
   // Node location information
   locations: {},
   // Node-to-node connection

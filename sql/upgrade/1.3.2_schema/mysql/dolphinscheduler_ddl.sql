@@ -14,3 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+alter table t_ds_process_definition add is_parallel tinyint default '1' comment '0:serial,1:parallel';
