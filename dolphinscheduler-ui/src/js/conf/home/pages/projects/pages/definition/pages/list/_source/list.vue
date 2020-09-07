@@ -117,6 +117,7 @@
             </x-poptip>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="ans-icon-node"><!--{{$t('树形图')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="ans-icon-download"><!--{{$t('导出')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Version Info')" @click="_version(item)" :disabled="item.releaseState === 'ONLINE'" icon="ans-icon-dependence"><!--{{$t('版本信息')}}--></x-button>
 
           </td>
         </tr>
@@ -138,6 +139,8 @@
     </x-poptip>
     <template v-if="strSelectIds !== ''">
       <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
+      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
+      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
     </template>
 
   </div>
@@ -146,8 +149,10 @@
   import _ from 'lodash'
   import mStart from './start'
   import mTiming from './timing'
+  import mRelatedItems from './relatedItems'
   import { mapActions } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
+  import mVersions from './versions'
 
   export default {
     name: 'definition-list',
@@ -164,7 +169,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition','copyProcess']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
@@ -315,8 +320,27 @@
        */
       _copyProcess (item) {
         this.copyProcess({
-          processId: item.id
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
         }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      /**
+       * move
+       */
+      _moveProcess (item) {
+        this.moveProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
           this.$message.success(res.msg)
           $('body').find('.tooltip.fade.top.in').remove()
           this._onUpdate()
@@ -329,6 +353,125 @@
         this.exportDefinition({
           processDefinitionIds: item.id,
           fileName: item.name
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      _version (item) {
+        let self = this
+        this.getProcessDefinitionVersionsPage({
+          pageNo: 1,
+          pageSize: 10,
+          processDefinitionId: item.id
+        }).then(res => {
+          let processDefinitionVersions = res.data.lists
+          let total = res.data.totalCount
+          let pageSize = res.data.pageSize
+          let pageNo = res.data.currentPage
+          if (this.versionsModel) {
+            this.versionsModel.remove()
+          }
+          this.versionsModel = this.$drawer({
+            direction: 'right',
+            closable: true,
+            showMask: true,
+            escClose: true,
+            render (h) {
+              return h(mVersions, {
+                on: {
+                  /**
+                   * switch version in process definition version list
+                   *
+                   * @param version the version user want to change
+                   * @param processDefinitionId the process definition id
+                   * @param fromThis fromThis
+                   */
+                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+                    self.switchProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success($t('Switch Version Successfully'))
+                      setTimeout(() => {
+                        fromThis.$destroy()
+                        self.versionsModel.remove()
+                      }, 0)
+                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * Paging event of process definition versions
+                   *
+                   * @param pageNo page number
+                   * @param pageSize page size
+                   * @param processDefinitionId the process definition id of page version
+                   * @param fromThis fromThis
+                   */
+                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+                    self.getProcessDefinitionVersionsPage({
+                      pageNo: pageNo,
+                      pageSize: pageSize,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      fromThis.processDefinitionVersions = res.data.lists
+                      fromThis.total = res.data.totalCount
+                      fromThis.pageSize = res.data.pageSize
+                      fromThis.pageNo = res.data.currentPage
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * delete one version of process definition
+                   *
+                   * @param version the version need to delete
+                   * @param processDefinitionId the process definition id user want to delete
+                   * @param fromThis fromThis
+                   */
+                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+                    self.deleteProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success(res.msg || '')
+                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
+                        pageNo: 1,
+                        pageSize: 10,
+                        processDefinitionId: processDefinitionId,
+                        fromThis: fromThis
+                      })
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * remove this drawer
+                   *
+                   * @param fromThis
+                   */
+                  close ({ fromThis }) {
+                    setTimeout(() => {
+                      fromThis.$destroy()
+                      self.versionsModel.remove()
+                    }, 0)
+                  }
+                },
+                props: {
+                  processDefinition: item,
+                  processDefinitionVersions: processDefinitionVersions,
+                  total: total,
+                  pageNo: pageNo,
+                  pageSize: pageSize
+                }
+              })
+            }
+          })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -348,7 +491,64 @@
           this.$message.error(e.msg)
         })
       },
-
+      /**
+       * Batch Copy
+       */
+      _batchCopy () {
+          let self = this
+          let modal = this.$modal.dialog({
+            closable: false,
+            showMask: true,
+            escClose: true,
+            className: 'v-modal-custom',
+            transitionName: 'opacityp',
+            render (h) {
+              return h(mRelatedItems, {
+                on: {
+                  onBatchCopy (item) {
+                    self._copyProcess({id: self.strSelectIds,projectId: item})
+                    modal.remove()
+                  },
+                  close () {
+                    modal.remove()
+                  }
+                },
+                props: {
+                  tmp: false
+                }
+              })
+            }
+          })
+      },
+      /**
+       * _batchMove
+       */
+      _batchMove() {
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'v-modal-custom',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mRelatedItems, {
+              on: {
+                onBatchMove (item) {
+                  self._moveProcess({id: self.strSelectIds,projectId: item})
+                  modal.remove()
+                },
+                close () {
+                  modal.remove()
+                }
+              },
+              props: {
+                tmp: true
+              }
+            })
+          }
+        })
+      },
       /**
        * Edit state
        */
@@ -423,6 +623,6 @@
     },
     mounted () {
     },
-    components: { }
+    components: { mVersions }
   }
 </script>
