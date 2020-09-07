@@ -236,7 +236,7 @@ public abstract class AbstractCommandExecutor {
     }
 
     public String getVarPool() {
-      return varPool.toString();
+        return varPool.toString();
     }
     
     /**
@@ -351,13 +351,13 @@ public abstract class AbstractCommandExecutor {
                     long lastFlushTime = System.currentTimeMillis();
 
                     while ((line = inReader.readLine()) != null) {
-                      if(line.startsWith("${setValue(")) {
-                        varPool.append(line.substring("${setValue(".length(), line.length()-2));
-                        varPool.append("$guyinyou$");
-                      }else {
-                          logBuffer.add(line);
-                          lastFlushTime = flush(lastFlushTime);
-                      }
+                        if (line.startsWith("${setValue(")) {
+                            varPool.append(line.substring("${setValue(".length(), line.length()-2));
+                            varPool.append("$guyinyou$");
+                        } else {
+                            logBuffer.add(line);
+                            lastFlushTime = flush(lastFlushTime);
+                        }
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(),e);
