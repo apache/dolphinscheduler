@@ -278,12 +278,11 @@ public class DagHelper {
         }
         Collection<String> startVertexs = null;
         if (StringUtils.isNotEmpty(parentNodeName)) {
+            startVertexs = dag.getSubsequentNodes(parentNodeName);
+            // if task is CONDITION node
             TaskNode task = dag.getNode(parentNodeName);
             if (task.isConditionsTask() && completeTaskList.containsKey(parentNodeName)) {
                 startVertexs = parseConditionTask(parentNodeName, task, completeTaskList);
-            }
-            else {
-                startVertexs = dag.getSubsequentNodes(parentNodeName);
             }
         } else {
             startVertexs = dag.getBeginNode();

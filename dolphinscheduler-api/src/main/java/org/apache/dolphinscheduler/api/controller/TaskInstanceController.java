@@ -133,7 +133,7 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    public Result forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                          @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
         String userNameReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
