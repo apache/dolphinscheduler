@@ -18,7 +18,9 @@ package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.data.project.RunWorkflowData;
+import org.apache.dolphinscheduler.data.project.WorkflowDefineData;
 import org.apache.dolphinscheduler.locator.project.RunWorkflowLocator;
+import org.apache.dolphinscheduler.locator.project.WorkflowDefineLocator;
 import org.openqa.selenium.WebDriver;
 
 public class RunWorkflowPage extends PageCommon {
@@ -27,17 +29,17 @@ public class RunWorkflowPage extends PageCommon {
     }
 
     public boolean runWorkflow() throws InterruptedException {
+        // Determine whether the workflow status is online
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, WorkflowDefineData.WORKFLOW_ONLINE_STATE);
+
         // click run workflow button
         System.out.println("Click run workflow button");
-        Thread.sleep(1000);
         clickButton(RunWorkflowLocator.CLICK_RUN_WORKFLOW_BUTTON);
-        Thread.sleep(1000);
 
         clickElement(RunWorkflowLocator.SELECT_FAILURE_STRATEGY_END);
         clickElement(RunWorkflowLocator.SELECT_FAILURE_STRATEGY_CONTINUE);
         clickElement(RunWorkflowLocator.CLICK_NOTICE_STRATEGY);
         clickElement(RunWorkflowLocator.SELECT_NOTICE_STRATEGY);
-        Thread.sleep(500);
         clickElement(RunWorkflowLocator.CLICK_PROCESS_PRIORITY);
         clickElement(RunWorkflowLocator.SELECT_PROCESS_PRIORITY_HIGHEST);
         clickElement(RunWorkflowLocator.CLICK_WORKER_GROUP);

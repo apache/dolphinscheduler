@@ -103,7 +103,7 @@
           </x-button>
           <x-button
             type="primary"
-            v-tooltip.light="$t('Close')" 
+            v-tooltip.light="$t('Close')"
             icon="ans-icon-off"
             size="xsmall"
             data-container="body"
@@ -121,6 +121,17 @@
                   icon="ans-icon-save"
                   >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
+          </x-button>
+          <x-button
+                  style="vertical-align: middle;"
+                  type="primary"
+                  size="xsmall"
+                  v-if="this.type !== 'instance' && this.urlParam.id !== null"
+                  :loading="spinnerLoading"
+                  @click="_version"
+                  icon="ans-icon-dependence"
+                  >
+            {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
           </x-button>
         </div>
       </div>
@@ -147,6 +158,7 @@
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
   import { mapActions, mapState, mapMutations } from 'vuex'
+  import mVersions from '../../projects/pages/definition/pages/list/_source/versions'
 
   let eventModel
 
@@ -176,7 +188,7 @@
       releaseState: String
     },
     methods: {
-      ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
+      ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState', 'switchProcessDefinitionVersion', 'getProcessDefinitionVersionsPage', 'deleteProcessDefinitionVersion']),
       ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
 
       // DAG automatic layout
@@ -196,7 +208,6 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
@@ -370,6 +381,12 @@
                 this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
                   this.$message.success(res.msg)
                   this.spinnerLoading = false
+                  // Jump process definition
+                  if (this.type === 'instance') {
+                    this.$router.push({ path: `/projects/instance/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                  } else {
+                    this.$router.push({ path: `/projects/definition/list/${this.urlParam.id}?_t=${new Date().getTime()}` })
+                  }
                   resolve()
                 }).catch(e => {
                   this.$message.error(e.msg || '')
@@ -657,6 +674,136 @@
         if(eventModel && this.taskId == $id){
           eventModel.remove()
         }
+      },
+
+      /**
+       * query the process definition pagination version
+       */
+      _version (item) {
+        let self = this
+        this.getProcessDefinitionVersionsPage({
+          pageNo: 1,
+          pageSize: 10,
+          processDefinitionId: this.urlParam.id
+        }).then(res => {
+          let processDefinitionVersions = res.data.lists
+          let total = res.data.totalCount
+          let pageSize = res.data.pageSize
+          let pageNo = res.data.currentPage
+          if (this.versionsModel) {
+            this.versionsModel.remove()
+          }
+          this.versionsModel = this.$drawer({
+            direction: 'right',
+            closable: true,
+            showMask: true,
+            escClose: true,
+            render (h) {
+              return h(mVersions, {
+                on: {
+                  /**
+                   * switch version in process definition version list
+                   *
+                   * @param version the version user want to change
+                   * @param processDefinitionId the process definition id
+                   * @param fromThis fromThis
+                   */
+                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+
+                    self.$store.state.dag.isSwitchVersion = true
+
+                    self.switchProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success($t('Switch Version Successfully'))
+                      setTimeout(() => {
+                        fromThis.$destroy()
+                        self.versionsModel.remove()
+                      }, 0)
+                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}?_t=${new Date().getTime()}` })
+                    }).catch(e => {
+                      self.$store.state.dag.isSwitchVersion = false
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * Paging event of process definition versions
+                   *
+                   * @param pageNo page number
+                   * @param pageSize page size
+                   * @param processDefinitionId the process definition id of page version
+                   * @param fromThis fromThis
+                   */
+                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+                    self.getProcessDefinitionVersionsPage({
+                      pageNo: pageNo,
+                      pageSize: pageSize,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      fromThis.processDefinitionVersions = res.data.lists
+                      fromThis.total = res.data.totalCount
+                      fromThis.pageSize = res.data.pageSize
+                      fromThis.pageNo = res.data.currentPage
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * delete one version of process definition
+                   *
+                   * @param version the version need to delete
+                   * @param processDefinitionId the process definition id user want to delete
+                   * @param fromThis fromThis
+                   */
+                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+                    self.deleteProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success(res.msg || '')
+                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
+                        pageNo: 1,
+                        pageSize: 10,
+                        processDefinitionId: processDefinitionId,
+                        fromThis: fromThis
+                      })
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * remove this drawer
+                   *
+                   * @param fromThis
+                   */
+                  close ({ fromThis }) {
+                    setTimeout(() => {
+                      fromThis.$destroy()
+                      self.versionsModel.remove()
+                    }, 0)
+                  }
+                },
+                props: {
+                  processDefinition: {
+                    id: self.urlParam.id,
+                    version: self.$store.state.dag.version,
+                    state: self.releaseState
+                  },
+                  processDefinitionVersions: processDefinitionVersions,
+                  total: total,
+                  pageNo: pageNo,
+                  pageSize: pageSize
+                }
+              })
+            }
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
@@ -685,7 +832,6 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}, 
           ConnectionOverlays: [
             [
               'Arrow',
