@@ -26,6 +26,8 @@ public class QueueManageLocator {
     public static final By INPUT_QUEUE_VALUE = By.xpath("//div[2]/div[2]/div/input");
     public static final By SUBMIT_QUEUE = By.xpath("//button[2]/span");
 
+    public static final By LIST_QUEUE_NAME = By.xpath("//table/tr[2]/td[2]/span");
+
     //edit queue locator
     public static final By CLICK_EDIT_QUEUE = By.xpath("//td[6]/button/i");
 }

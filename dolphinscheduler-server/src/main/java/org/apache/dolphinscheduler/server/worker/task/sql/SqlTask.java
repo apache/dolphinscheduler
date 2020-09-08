@@ -262,7 +262,7 @@ public class SqlTask extends AbstractTask {
         while (rowCount < LIMIT && resultSet.next()) {
             ObjectNode mapOfColValues = JSONUtils.createObjectNode();
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.set(md.getColumnName(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
+                mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
             }
             resultJSONArray.add(mapOfColValues);
             rowCount++;

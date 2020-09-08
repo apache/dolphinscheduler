@@ -14,8 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_CODE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -24,20 +31,26 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 
 /**
@@ -57,10 +70,10 @@ public class TenantController extends BaseController {
     /**
      * create tenant
      *
-     * @param loginUser   login user
-     * @param tenantCode  tenant code
-     * @param tenantName  tenant name
-     * @param queueId     queue id
+     * @param loginUser login user
+     * @param tenantCode tenant code
+     * @param tenantName tenant name
+     * @param queueId queue id
      * @param description description
      * @return create result code
      */
@@ -92,8 +105,8 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return tenant list page
      */
     @ApiOperation(value = "queryTenantlistPaging", notes = "QUERY_TENANT_LIST_PAGING_NOTES")
@@ -141,11 +154,11 @@ public class TenantController extends BaseController {
     /**
      * udpate tenant
      *
-     * @param loginUser   login user
-     * @param id          tennat id
-     * @param tenantCode  tennat code
-     * @param tenantName  tennat name
-     * @param queueId     queue id
+     * @param loginUser login user
+     * @param id tennat id
+     * @param tenantCode tennat code
+     * @param tenantName tennat name
+     * @param queueId queue id
      * @param description description
      * @return update result code
      */
@@ -177,7 +190,7 @@ public class TenantController extends BaseController {
      * delete tenant by id
      *
      * @param loginUser login user
-     * @param id        tenant id
+     * @param id tenant id
      * @return delete result code
      */
     @ApiOperation(value = "deleteTenantById", notes = "DELETE_TENANT_NOTES")
@@ -195,11 +208,10 @@ public class TenantController extends BaseController {
         return returnDataList(result);
     }
 
-
     /**
      * verify tenant code
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
@@ -211,12 +223,10 @@ public class TenantController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_TENANT_CODE_ERROR)
     public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "tenantCode") String tenantCode
-    ) {
+                                   @RequestParam(value = "tenantCode") String tenantCode) {
         logger.info("login user {}, verfiy tenant code: {}",
                 loginUser.getUserName(), tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
     }
-
 
 }

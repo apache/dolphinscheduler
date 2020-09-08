@@ -55,3 +55,7 @@ do
   echo "$apiServer worker server is stopping"
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh stop api-server;"
 done
+
+# query server status
+echo "query server status"
+cd $installPath/; sh bin/status-all.sh
