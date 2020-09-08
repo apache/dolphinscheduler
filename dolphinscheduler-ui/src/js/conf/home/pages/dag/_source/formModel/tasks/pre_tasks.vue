@@ -74,12 +74,8 @@
         let keys = Object.keys(cacheTasks)
         for (let i = 0; i < keys.length; i++) {
           let key = keys[i]
-          if (!cacheTasks[key].id || !cacheTasks[key].name) {
-            // 删掉undefined的数据
-            delete cacheTasks[key]
-          }
-          else if (currentTaskId && cacheTasks[key].id === currentTaskId) {
-            // 去掉当前task，自己不能当作自己的preTask
+          if ((!cacheTasks[key].id || !cacheTasks[key].name) || (currentTaskId && cacheTasks[key].id === currentTaskId)) {
+            // 删掉undefined的数据 或 去掉当前task，自己不能当作自己的preTask
             delete cacheTasks[key]
           }
         }
