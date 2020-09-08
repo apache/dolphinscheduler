@@ -82,7 +82,7 @@
           </div>
         </template>
         <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" @click="ok()">{{$t('Add')}}</x-button>
+        <x-button type="primary" shape="circle" :disabled="isDetails" @click="ok()">{{$t('Add')}}</x-button>
       </div>
     </div>
   </div>
