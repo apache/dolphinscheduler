@@ -86,7 +86,7 @@ public class ExcelUtilsTest {
         expectedException.expectMessage("itemsList is null");
 
         //Invoke genExcelFile with incorrectContent, will cause RuntimeException
-        //ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
+        ExcelUtils.genExcelFile(incorrectContent1, title, xlsFilePath);
 
     }
 
