@@ -18,6 +18,8 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -36,11 +38,17 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
 
+import formCreate, {maker} from '@form-create/element-ui'
+
 // Component internationalization
 const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
 
+Vue.use(ElementUI)
+
 // Vue.use(ans)
 Vue.use(ans, useOpt)
+
+Vue.use(formCreate, {maker})
 
 sync(store, router)
 
