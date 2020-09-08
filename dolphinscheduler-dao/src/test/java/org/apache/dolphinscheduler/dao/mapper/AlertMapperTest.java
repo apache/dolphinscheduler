@@ -162,7 +162,7 @@ public class AlertMapperTest {
      */
     private Alert createAlert(AlertStatus alertStatus) {
         Alert alert = new Alert();
-//        alert.setShowType(ShowType.TABLE);
+        //alert.setShowType(ShowType.TABLE);
         alert.setTitle("test alert");
         alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
         alert.setAlertType(AlertType.EMAIL);
