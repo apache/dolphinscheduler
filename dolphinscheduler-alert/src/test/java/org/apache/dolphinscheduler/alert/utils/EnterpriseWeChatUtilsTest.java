@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.Validate;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -53,6 +52,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * enterprise.wechat.agent.id
  * enterprise.wechat.users
  */
+
 @PrepareForTest(PropertyUtils.class)
 @RunWith(PowerMockRunner.class)
 public class EnterpriseWeChatUtilsTest {
@@ -141,7 +141,7 @@ public class EnterpriseWeChatUtilsTest {
         alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-//                .setShowType(alertForText.getShowType().getDescp())
+                //.setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
         String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
@@ -161,7 +161,7 @@ public class EnterpriseWeChatUtilsTest {
         alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
         alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-//                .setShowType(alertForText.getShowType().getDescp())
+                //.setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
         String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
@@ -190,7 +190,7 @@ public class EnterpriseWeChatUtilsTest {
 
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-//        alert.setShowType(ShowType.TEXT);
+        //alert.setShowType(ShowType.TEXT);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(4);
@@ -224,7 +224,7 @@ public class EnterpriseWeChatUtilsTest {
     private Alert createAlertForTable() {
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-//        alert.setShowType(ShowType.TABLE.getDescp());
+        //alert.setShowType(ShowType.TABLE.getDescp());
         String content = list2String();
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);

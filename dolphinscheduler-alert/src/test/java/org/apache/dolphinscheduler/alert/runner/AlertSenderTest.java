@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.runner;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
@@ -62,7 +63,6 @@ public class AlertSenderTest {
 
     AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
     PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
-
 
     @Before
     public void before() throws Exception {
@@ -163,12 +163,12 @@ public class AlertSenderTest {
     }
 
     public String getEmailAlertParams() {
+
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam receivesParam = InputParam.newBuilder("receivers", "receivers")
                 .setValue("540957506@qq.com")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
-
 
         InputParam mailSmtpHost = InputParam.newBuilder("mailServerHost", "mail.smtp.host")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
@@ -194,7 +194,6 @@ public class AlertSenderTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue(true)
                 .build();
-
 
         InputParam mailUser = InputParam.newBuilder("mailUser", "mail.user")
                 .setPlaceholder("if enable use authentication, you need input user")
@@ -230,7 +229,7 @@ public class AlertSenderTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = RadioParam.newBuilder("showType","showType")
+        RadioParam showType = RadioParam.newBuilder("showType", "showType")
                 .setParamsOptionsList(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
@@ -250,6 +249,5 @@ public class AlertSenderTest {
 
         return PluginParamsTransfer.transferParamsToJson(paramsList);
     }
-
 
 } 
