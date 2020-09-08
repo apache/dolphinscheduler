@@ -684,7 +684,6 @@ public class MasterExecThread implements Runnable {
      * determine whether the dependencies of the task node are complete
      * @return DependResult
      */
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     private DependResult isTaskDepsComplete(String taskName) {
 
         Collection<String> startNodes = dag.getBeginNode();
