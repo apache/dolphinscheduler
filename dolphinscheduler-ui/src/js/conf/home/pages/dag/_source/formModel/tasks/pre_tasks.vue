@@ -52,7 +52,7 @@
     },
     data () {
       return {
-        preTasksSelectorId: '_preTasksSelectorId',    // 通过改变元素id来使子元素刷新
+        preTasksSelectorId: '_preTasksSelectorId',    // Refresh target vue-component by changing id
         preTasks: [],
         preTasksOld: [],
       }
@@ -61,13 +61,12 @@
       this.preTasks = this.backfillItem['preTasks'] || this.preTasks
       this.preTasksOld = this.preTasks
     
-      // 通过改变元素id来使子元素刷新
+      // Refresh target vue-component by changing id
       this.$nextTick(() => {
         this.preTasksSelectorId = 'preTasksSelectorId'
       })
     },
     computed: {
-      // 下拉菜单的选项
       preTaskList: function () {
         let currentTaskId = this.backfillItem['id'] || this.id
         let cacheTasks = Object.assign({}, this.store.state.dag.tasks)
@@ -75,27 +74,27 @@
         for (let i = 0; i < keys.length; i++) {
           let key = keys[i]
           if ((!cacheTasks[key].id || !cacheTasks[key].name) || (currentTaskId && cacheTasks[key].id === currentTaskId)) {
-            // 删掉undefined的数据 或 去掉当前task，自己不能当作自己的preTask
+            // Clean undefined and current task data
             delete cacheTasks[key]
           }
         }
 
         return cacheTasks
       },
-      // 等待添加连线的preTasks
+      // preTaskIds used to create new connection
       preTasksToAdd: function () {
         let toAddTasks = this.preTasks.filter(taskId => {
           return (this.preTasksOld.indexOf(taskId) === -1)
         })
         return toAddTasks
       },
-      // 等待删除连线的preTasks
+      // preTaskIds used to delete connection
       preTasksToDelete: function () {
         return this.preTasksOld.filter(taskId => this.preTasks.indexOf(taskId) === -1)
       },
     },
     methods: {
-      // 供上层formModal点击提交按钮时调用的方法，会触发事件提交数据给上层
+      // Pass data to parent-level to process dag
       _verification () {
         this.$emit('on-pre-tasks', {
           preTasks: this.preTasks,
