@@ -98,7 +98,3 @@ sh ${workDir}/script/remove-zk-node.sh $zkRoot
 # 6.startup
 echo "6.startup"
 sh ${workDir}/script/start-all.sh
-
-# 7.query status
-echo "7.query status"
-sh ${workDir}/script/status-all.sh

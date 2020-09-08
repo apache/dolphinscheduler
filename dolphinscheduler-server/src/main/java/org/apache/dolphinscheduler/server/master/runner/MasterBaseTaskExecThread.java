@@ -14,17 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -35,10 +34,6 @@ import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.sift.SiftingAppender;
-
 
 /**
  * master task exec base class
@@ -85,11 +80,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * taskUpdateQueue
      */
     private TaskPriorityQueue taskUpdateQueue;
+
     /**
      * constructor of MasterBaseTaskExecThread
-     * @param taskInstance      task instance
+     *
+     * @param taskInstance task instance
      */
-    public MasterBaseTaskExecThread(TaskInstance taskInstance){
+    public MasterBaseTaskExecThread(TaskInstance taskInstance) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
         this.cancel = false;
@@ -100,24 +97,26 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * get task instance
+     *
      * @return TaskInstance
      */
-    public TaskInstance getTaskInstance(){
+    public TaskInstance getTaskInstance() {
         return this.taskInstance;
     }
 
     /**
      * kill master base task exec thread
      */
-    public void kill(){
+    public void kill() {
         this.cancel = true;
     }
 
     /**
      * submit master base task exec thread
+     *
      * @return TaskInstance
      */
-    protected TaskInstance submit(){
+    protected TaskInstance submit() {
         Integer commitRetryTimes = masterConfig.getMasterTaskCommitRetryTimes();
         Integer commitRetryInterval = masterConfig.getMasterTaskCommitInterval();
 
@@ -156,14 +155,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
 
-
     /**
      * dispatcht task
+     *
      * @param taskInstance taskInstance
      * @return whether submit task success
      */
     public Boolean dispatchTask(TaskInstance taskInstance) {
-
         try{
             if(taskInstance.isConditionsTask()
                     || taskInstance.isDependTask()
@@ -202,7 +200,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
 
     /**
-     *  buildTaskPriorityInfo
+     * buildTaskPriorityInfo
      *
      * @param processInstancePriority processInstancePriority
      * @param processInstanceId processInstanceId
@@ -215,7 +213,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                                          int processInstanceId,
                                          int taskInstancePriority,
                                          int taskInstanceId,
-                                         String workerGroup){
+                                         String workerGroup) {
         return processInstancePriority +
                 UNDERLINE +
                 processInstanceId +
@@ -229,14 +227,16 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     /**
      * submit wait complete
+     *
      * @return true
      */
-    protected Boolean submitWaitComplete(){
+    protected Boolean submitWaitComplete() {
         return true;
     }
 
     /**
      * call
+     *
      * @return boolean
      * @throws Exception exception
      */
@@ -244,36 +244,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     public Boolean call() throws Exception {
         this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
-    }
-
-    /**
-     * get task log path
-     * @return log path
-     */
-    public String getTaskLogPath(TaskInstance task) {
-        String logPath;
-        try{
-            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                    .getLogger("ROOT")
-                    .getAppender("TASKLOGFILE"))
-                    .getDiscriminator()).getLogBase();
-            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-                logPath =  baseLog + Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        task.getId() + ".log";
-            }else{
-                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                        baseLog +  Constants.SINGLE_SLASH +
-                        task.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        task.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        task.getId() + ".log";
-            }
-        }catch (Exception e){
-            logger.error("logger", e);
-            logPath = "";
-        }
-        return logPath;
     }
 
 }
