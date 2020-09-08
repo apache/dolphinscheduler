@@ -89,21 +89,22 @@ public class NetUtils {
         }
         InetAddress localAddress = null;
         NetworkInterface networkInterface = findNetworkInterface();
-        Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
-        while (addresses.hasMoreElements()) {
-            Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
-            if (addressOp.isPresent()) {
-                try {
-                    if (addressOp.get().isReachable(100)) {
-                        LOCAL_ADDRESS = addressOp.get();
-                        return LOCAL_ADDRESS;
+        if (networkInterface != null) {
+            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            while (addresses.hasMoreElements()) {
+                Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
+                if (addressOp.isPresent()) {
+                    try {
+                        if (addressOp.get().isReachable(100)) {
+                            LOCAL_ADDRESS = addressOp.get();
+                            return LOCAL_ADDRESS;
+                        }
+                    } catch (IOException e) {
+                        logger.warn("test address id reachable io exception", e);
                     }
-                } catch (IOException e) {
-                    logger.warn("test address id reachable io exception", e);
                 }
             }
         }
-
         try {
             localAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
