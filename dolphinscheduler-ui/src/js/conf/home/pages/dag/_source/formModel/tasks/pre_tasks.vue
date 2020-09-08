@@ -52,7 +52,7 @@
     },
     data () {
       return {
-        preTasksSelectorId: '_preTasksSelectorId',    // Refresh target vue-component by changing id
+        preTasksSelectorId: '_preTasksSelectorId',  // Refresh target vue-component by changing id
         preTasks: [],
         preTasksOld: [],
       }
