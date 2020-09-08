@@ -190,7 +190,7 @@ public class NetUtils {
         if (null != result) {
             return result;
         }
-        return validNetworkInterfaces.get(0);
+        return findIntranetAddress(validNetworkInterfaces);
     }
 
     /**
@@ -226,5 +226,33 @@ public class NetUtils {
     private static boolean isSpecifyNetworkInterface(NetworkInterface networkInterface) {
         String preferredNetworkInterface = System.getProperty(DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE);
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
+    }
+
+    /**
+     * Get the Intranet IP
+     *
+     * @return If no {@link NetworkInterface} is available , return <code>null</code>
+     */
+    public static NetworkInterface findIntranetAddress(List<NetworkInterface> validNetworkInterfaces) {
+
+        if (validNetworkInterfaces.size() == 0) {
+            return null;
+        }
+        NetworkInterface networkInterface = null;
+        for (NetworkInterface ni : validNetworkInterfaces) {
+            Enumeration<InetAddress> address = ni.getInetAddresses();
+            while (address.hasMoreElements()) {
+                InetAddress ip = address.nextElement();
+                if (ip.isSiteLocalAddress()
+                        && !ip.isLoopbackAddress()
+                        && !ip.getHostAddress().contains(":")) {
+                    networkInterface = ni;
+                }
+            }
+        }
+        if (networkInterface == null) {
+            return validNetworkInterfaces.get(0);
+        }
+        return networkInterface;
     }
 }
