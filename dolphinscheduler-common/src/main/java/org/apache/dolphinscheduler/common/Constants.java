@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -28,7 +27,7 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     private Constants() {
-        throw new UnsupportedOperationException("Construct Constants");
+        throw new IllegalStateException("Constants class");
     }
 
     /**
@@ -139,7 +138,7 @@ public final class Constants {
     /**
      * python home
      */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
+    public static final String PYTHON_HOME="PYTHON_HOME";
 
     /**
      * resource.view.suffixs
@@ -365,6 +364,7 @@ public final class Constants {
      * worker reserved memory
      */
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
+
 
 
     /**
@@ -752,7 +752,7 @@ public final class Constants {
 
 
     /**
-     * preview schedule execute count
+     *  preview schedule execute count
      */
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 
@@ -832,7 +832,6 @@ public final class Constants {
     public static final int[] NOT_TERMINATED_STATES = new int[]{
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal(),
             ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
@@ -853,17 +852,18 @@ public final class Constants {
     /**
      * data total
      */
-    public static final String COUNT = "count";
+    public  static final String COUNT = "count";
 
     /**
      * page size
      */
-    public static final String PAGE_SIZE = "pageSize";
+    public  static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
      */
-    public static final String PAGE_NUMBER = "pageNo";
+    public  static final String PAGE_NUMBER = "pageNo";
+
 
 
     /**
@@ -898,7 +898,7 @@ public final class Constants {
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
-    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+    public static final String COM_PRESTO_JDBC_DRIVER = "io.prestosql.jdbc.PrestoDriver";
 
     /**
      * database type
@@ -966,11 +966,11 @@ public final class Constants {
     /**
      * authorize writable perm
      */
-    public static final int AUTHORIZE_WRITABLE_PERM = 7;
+    public static final int AUTHORIZE_WRITABLE_PERM=7;
     /**
      * authorize readable perm
      */
-    public static final int AUTHORIZE_READABLE_PERM = 4;
+    public static final int AUTHORIZE_READABLE_PERM=4;
 
 
     /**

@@ -223,46 +223,22 @@ public class BrowserCommon {
     /**
      * mouse drag  element
      *
-     * @param sourceLocator BY
-     * @param targetLocator BY
+     * @param source_locator BY
+     * @param target_locator BY
      */
-    public void dragAndDrop(By sourceLocator, By targetLocator) {
-        WebElement sourceElement = locateElement(sourceLocator);
-        WebElement targetElement = locateElement(targetLocator);
+    public void dragAndDrop(By source_locator, By target_locator) {
+        WebElement sourceElement = locateElement(source_locator);
+        WebElement targetElement = locateElement(target_locator);
         actions.dragAndDrop(sourceElement, targetElement).perform();
         actions.release();
     }
 
-    public void moveToDragElement(By targetLocator, int x, int y) {
-        WebElement targetElement = locateElement(targetLocator);
-        actions.dragAndDropBy(targetElement, x, y).perform();
+    public void moveToDragElement(By target_locator, int X, int Y) {
+        WebElement targetElement = locateElement(target_locator);
+        actions.dragAndDropBy(targetElement, X, Y).perform();
         actions.release();
     }
 
-    /**
-     * Right mouse click on the element
-     *
-     * @param locator By
-     * @return actions
-     */
-    public void mouseRightClickElement(By locator) {
-        WebElement mouseRightClickElement = locateElement(locator);
-        actions.contextClick(mouseRightClickElement).perform();
-    }
-
-    /**
-     * The mouse moves from a position to a specified positionØ
-     *
-     * @param sourceLocator BY
-     * @param targetLocator BY
-     * @return actions
-     */
-    public void mouseMovePosition(By sourceLocator, By targetLocator) throws InterruptedException {
-        WebElement sourceElement = locateElement(sourceLocator);
-        WebElement targetElement = locateElement(targetLocator);
-        actions.dragAndDrop(sourceElement,targetElement).perform();
-        actions.click();
-    }
 
     /**
      * jump page
@@ -443,9 +419,5 @@ public class BrowserCommon {
      */
     public boolean ifTextExists(By locator, String text) {
         return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
-    }
-
-    public void flushPage() {
-        driver.navigate().refresh();
     }
 }

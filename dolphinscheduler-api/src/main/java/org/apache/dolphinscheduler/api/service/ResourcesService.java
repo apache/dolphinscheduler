@@ -277,7 +277,10 @@ public class ResourcesService extends BaseService {
     private boolean checkResourceExists(String fullName, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && resources.size() > 0;
+        if (resources != null && resources.size() > 0) {
+            return true;
+        }
+        return false;
     }
 
 

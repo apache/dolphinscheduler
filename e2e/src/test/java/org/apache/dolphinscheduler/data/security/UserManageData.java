@@ -31,9 +31,6 @@ public class UserManageData  {
 
     public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
 
-    public static final String CREATE_USER_BUTTON = "创建用户";
-
-
     /**
      * edit user
      */

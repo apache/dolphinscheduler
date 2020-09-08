@@ -95,7 +95,6 @@
       this.getMasterData().then(res => {
         this.masterList = _.map(res, (v, i) => {
           return _.assign(v, {
-            id: v.host + "_" + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })

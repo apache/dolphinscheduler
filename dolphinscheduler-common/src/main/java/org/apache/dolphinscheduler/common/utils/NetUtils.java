@@ -14,36 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.common.utils;
-
-import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE;
-
-import static java.util.Collections.emptyList;
-
-import java.io.IOException;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static java.util.Collections.emptyList;
+import static org.apache.dolphinscheduler.common.Constants.DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE;
 
 /**
  * NetUtils
  */
 public class NetUtils {
 
+
     private NetUtils() {
-        throw new UnsupportedOperationException("Construct NetUtils");
+        throw new IllegalStateException("Utility class");
     }
 
     private static Logger logger = LoggerFactory.getLogger(NetUtils.class);

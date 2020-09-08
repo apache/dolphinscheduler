@@ -16,7 +16,6 @@
 */
 
 -- uc_dolphin_T_t_ds_task_instance_A_first_submit_time
-delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_first_submit_time() RETURNS void AS $$
 BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
@@ -27,15 +26,12 @@ BEGIN
        END IF;
 END;
 $$ LANGUAGE plpgsql;
-d//
 
-delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_first_submit_time();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_first_submit_time();
 
 
 -- uc_dolphin_T_t_ds_task_instance_A_delay_time
-delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_delay_time() RETURNS void AS $$
 BEGIN
        IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
@@ -46,14 +42,11 @@ BEGIN
        END IF;
 END;
 $$ LANGUAGE plpgsql;
-d//
 
-delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_delay_time();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_delay_time();
 
 -- uc_dolphin_T_t_ds_process_definition_A_modify_by
-delimiter d//
 CREATE OR REPLACE FUNCTION ct_dolphin_T_t_ds_process_definition_version() RETURNS void AS $$
 BEGIN
 CREATE TABLE t_ds_process_definition_version (
@@ -76,15 +69,14 @@ create index process_definition_id_and_version on t_ds_process_definition_versio
 
 END;
 $$ LANGUAGE plpgsql;
-d//
 
-delimiter ;
 SELECT ct_dolphin_T_t_ds_process_definition_version();
 DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_process_definition_version();
 
 
 
---  add t_ds_resources_un
+
+-- add t_ds_resources_un
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_resources_un() RETURNS void AS $$
 BEGIN
     IF NOT EXISTS (
@@ -100,6 +92,7 @@ $$ LANGUAGE plpgsql;
 
 SELECT uc_dolphin_T_t_ds_resources_un();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_un();
+
 
 
 

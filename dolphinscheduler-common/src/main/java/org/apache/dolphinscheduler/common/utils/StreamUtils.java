@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.common.utils;
 
 import java.util.Iterator;
@@ -23,9 +22,7 @@ import java.util.stream.StreamSupport;
 
 public class StreamUtils {
 
-    private StreamUtils() {
-        throw new UnsupportedOperationException("Construct StreamUtils");
-    }
+    private StreamUtils() { }
 
     public static <T> Stream<T> asStream(Iterator<T> sourceIterator) {
         return asStream(sourceIterator, false);

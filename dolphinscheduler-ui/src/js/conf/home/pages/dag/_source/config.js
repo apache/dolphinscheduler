@@ -229,13 +229,6 @@ const tasksState = {
     color: '#5101be',
     icoUnicode: 'ans-icon-dependence',
     isSpin: false
-  },
-  DELAY_EXECUTION: {
-    id: 12,
-    desc: `${i18n.$t('Delay execution')}`,
-    color: '#5102ce',
-    icoUnicode: 'ans-icon-coin',
-    isSpin: false
   }
 }
 

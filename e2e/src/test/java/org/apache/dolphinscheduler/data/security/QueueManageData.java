@@ -22,8 +22,6 @@ public class QueueManageData {
      */
     public static final String QUEUE_NAME = "selenium_queue_name";
 
-    public static final String CREATE_QUEUE = "创建队列";
-
     /**
      * Create Queue Value
      */
@@ -32,12 +30,12 @@ public class QueueManageData {
     /**
      * Edit Queue Name
      */
-    public static final String EDIT_QUEUE_NAME = "selenium_queue_value_edit";
+    public static final String EDIT_QUEUE_NAME = "_edit";
 
     /**
      * Edit Queue Value
      */
-    public static final String EDIT_QUEUE_VALUE = "selenium_queue_value_edit";
+    public static final String EDIT_QUEUE_VALUE = "_edit";
 
     public static final String QUEUE_MANAGE = "队列管理 - DolphinScheduler";
 

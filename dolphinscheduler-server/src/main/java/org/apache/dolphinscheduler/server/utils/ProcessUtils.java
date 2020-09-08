@@ -14,52 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.server.utils;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 /**
- *  mainly used to get the start command line of a process.
+ *  mainly used to get the start command line of a process
  */
 public class ProcessUtils {
   /**
-   * logger.
+   * logger
    */
-  private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
+  private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
   /**
    * Initialization regularization, solve the problem of pre-compilation performance,
-   * avoid the thread safety problem of multi-thread operation.
+   * avoid the thread safety problem of multi-thread operation
    */
   private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
 
   private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
 
   /**
-   * build command line characters.
+   * build command line characters
    * @param commandList command list
    * @return command
+   * @throws IOException io exception
    */
-  public static String buildCommandStr(List<String> commandList) {
+  public static String buildCommandStr(List<String> commandList) throws IOException {
     String cmdstr;
     String[] cmd = commandList.toArray(new String[commandList.size()]);
     SecurityManager security = System.getSecurityManager();
@@ -101,6 +102,7 @@ public class ProcessUtils {
         }
       }
 
+
       cmdstr = createCommandLine(
 
               isShellFile(executablePath) ? VERIFICATION_CMD_BAT : VERIFICATION_WIN32, quoteString(executablePath), cmd);
@@ -109,12 +111,13 @@ public class ProcessUtils {
   }
 
   /**
-   * get executable path.
+   * get executable path
    *
    * @param path path
    * @return executable path
+   * @throws IOException io exception
    */
-  private static String getExecutablePath(String path) {
+  private static String getExecutablePath(String path) throws IOException {
     boolean pathIsQuoted = isQuoted(true, path, "Executable name has embedded quote, split the arguments");
 
     File fileToRun = new File(pathIsQuoted ? path.substring(1, path.length() - 1) : path);
@@ -122,7 +125,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether is shell file.
+   * whether is shell file
    *
    * @param executablePath executable path
    * @return true if endsWith .CMD or .BAT
@@ -133,7 +136,7 @@ public class ProcessUtils {
   }
 
   /**
-   * quote string.
+   * quote string
    *
    * @param arg argument
    * @return format arg
@@ -144,7 +147,7 @@ public class ProcessUtils {
   }
 
   /**
-   * get tokens from command.
+   * get tokens from command
    *
    * @param command command
    * @return token string array
@@ -159,7 +162,7 @@ public class ProcessUtils {
   }
 
   /**
-   * Lazy Pattern.
+   * Lazy Pattern
    */
   private static class LazyPattern {
     // Escape-support version:
@@ -168,29 +171,34 @@ public class ProcessUtils {
   }
 
   /**
-   * verification cmd bat.
+   * verification cmd bat
    */
   private static final int VERIFICATION_CMD_BAT = 0;
 
   /**
-   * verification win32.
+   * verification win32
    */
   private static final int VERIFICATION_WIN32 = 1;
 
   /**
-   * verification legacy.
+   * verification legacy
    */
   private static final int VERIFICATION_LEGACY = 2;
 
   /**
-   * escape verification.
+   * escape verification
    */
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
-    {' ', '\t', '<', '>'}, {' ', '\t'}};
+          {' ', '\t', '<', '>'}, {' ', '\t'}};
 
   /**
-   * create command line.
+   * matcher
+   */
+  private static Matcher matcher;
+
+  /**
+   * create command line
    * @param verificationType  verification type
    * @param executablePath    executable path
    * @param cmd               cmd
@@ -219,7 +227,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether is quoted.
+   * whether is quoted
    * @param noQuotesInside
    * @param arg
    * @param errorMessage
@@ -247,7 +255,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether needs escaping.
+   * whether needs escaping
    *
    * @param verificationType  verification type
    * @param arg               arg
@@ -269,14 +277,16 @@ public class ProcessUtils {
   }
 
   /**
-   * kill yarn application.
+   * kill yarn application
    *
    * @param appIds      app id list
    * @param logger      logger
    * @param tenantCode  tenant code
    * @param executePath     execute path
+   * @throws IOException io exception
    */
-  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
+  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String executePath)
+          throws IOException {
     if (appIds.size() > 0) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
@@ -314,17 +324,17 @@ public class ProcessUtils {
   }
 
   /**
-   * kill tasks according to different task types.
+   * kill tasks according to different task types
    *
    * @param taskExecutionContext  taskExecutionContext
    */
   public static void kill(TaskExecutionContext taskExecutionContext) {
     try {
       int processId = taskExecutionContext.getProcessId();
-      if (processId == 0) {
+      if(processId == 0 ){
         logger.error("process kill failed, process id :{}, task id:{}",
                 processId, taskExecutionContext.getTaskInstanceId());
-        return;
+        return ;
       }
 
       String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
@@ -342,13 +352,13 @@ public class ProcessUtils {
   }
 
   /**
-   * get pids str.
+   * get pids str
    *
    * @param processId process id
    * @return pids
    * @throws Exception exception
    */
-  public static String getPidsStr(int processId) throws Exception {
+  public static String getPidsStr(int processId)throws Exception{
     StringBuilder sb = new StringBuilder();
     Matcher mat;
     // pstree pid get sub pids
@@ -360,14 +370,14 @@ public class ProcessUtils {
       mat = WINDOWSATTERN.matcher(pids);
     }
 
-    while (mat.find()) {
+    while (mat.find()){
       sb.append(mat.group(1)).append(" ");
     }
     return sb.toString().trim();
   }
 
   /**
-   * find logs and kill yarn tasks.
+   * find logs and kill yarn tasks
    *
    * @param taskExecutionContext  taskExecutionContext
    */
@@ -382,7 +392,7 @@ public class ProcessUtils {
                 Constants.RPC_PORT,
                 taskExecutionContext.getLogPath());
       } finally {
-        if (logClient != null) {
+        if(logClient != null){
           logClient.close();
         }
       }

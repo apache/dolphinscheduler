@@ -28,10 +28,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
- *  task future
+ *  task fulture
  */
 public class TaskFuture {
 
@@ -56,11 +55,11 @@ public class TaskFuture {
     /**
      *  response command
      */
-    private  AtomicReference<Command> responseCommandReference = new AtomicReference<>();
+    private volatile Command responseCommand;
 
     private volatile boolean sendOk = true;
 
-    private  AtomicReference<Throwable> causeReference;
+    private volatile Throwable cause;
 
     public TaskFuture(long opaque, long timeoutMillis) {
         this.opaque = opaque;
@@ -75,7 +74,7 @@ public class TaskFuture {
      */
     public Command waitResponse() throws InterruptedException {
         this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-        return this.responseCommandReference.get();
+        return this.responseCommand;
     }
 
     /**
@@ -84,7 +83,7 @@ public class TaskFuture {
      * @param responseCommand responseCommand
      */
     public void putResponse(final Command responseCommand) {
-        responseCommandReference.set(responseCommand);
+        this.responseCommand = responseCommand;
         this.latch.countDown();
         FUTURE_TABLE.remove(opaque);
     }
@@ -115,11 +114,11 @@ public class TaskFuture {
     }
 
     public void setCause(Throwable cause) {
-        causeReference.set(cause);
+        this.cause = cause;
     }
 
     public Throwable getCause() {
-        return causeReference.get();
+        return cause;
     }
 
     public long getOpaque() {
@@ -135,11 +134,11 @@ public class TaskFuture {
     }
 
     public Command getResponseCommand() {
-        return responseCommandReference.get();
+        return responseCommand;
     }
 
     public void setResponseCommand(Command responseCommand) {
-        responseCommandReference.set(responseCommand);
+        this.responseCommand = responseCommand;
     }
 
 
@@ -167,9 +166,9 @@ public class TaskFuture {
                 ", timeoutMillis=" + timeoutMillis +
                 ", latch=" + latch +
                 ", beginTimestamp=" + beginTimestamp +
-                ", responseCommand=" + responseCommandReference.get() +
+                ", responseCommand=" + responseCommand +
                 ", sendOk=" + sendOk +
-                ", cause=" + causeReference.get() +
+                ", cause=" + cause +
                 '}';
     }
 }

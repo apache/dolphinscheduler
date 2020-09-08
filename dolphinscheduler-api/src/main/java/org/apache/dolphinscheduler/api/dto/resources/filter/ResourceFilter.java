@@ -57,10 +57,11 @@ public class ResourceFilter implements IFilter {
      * @return file filtered by suffix
      */
     public Set<Resource> fileFilter(){
-        return resourceList.stream().filter(t -> {
+        Set<Resource> resources = resourceList.stream().filter(t -> {
             String alias = t.getAlias();
             return alias.endsWith(suffix);
         }).collect(Collectors.toSet());
+        return resources;
     }
 
     /**
