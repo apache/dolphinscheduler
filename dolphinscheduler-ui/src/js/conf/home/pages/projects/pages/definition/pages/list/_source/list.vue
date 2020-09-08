@@ -139,6 +139,8 @@
     </x-poptip>
     <template v-if="strSelectIds !== ''">
       <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
+      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
+      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
     </template>
 
   </div>
@@ -147,6 +149,7 @@
   import _ from 'lodash'
   import mStart from './start'
   import mTiming from './timing'
+  import mRelatedItems from './relatedItems'
   import { mapActions } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
   import mVersions from './versions'
@@ -166,7 +169,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
@@ -317,8 +320,27 @@
        */
       _copyProcess (item) {
         this.copyProcess({
-          processId: item.id
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
         }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      /**
+       * move
+       */
+      _moveProcess (item) {
+        this.moveProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
           this.$message.success(res.msg)
           $('body').find('.tooltip.fade.top.in').remove()
           this._onUpdate()
@@ -469,7 +491,64 @@
           this.$message.error(e.msg)
         })
       },
-
+      /**
+       * Batch Copy
+       */
+      _batchCopy () {
+          let self = this
+          let modal = this.$modal.dialog({
+            closable: false,
+            showMask: true,
+            escClose: true,
+            className: 'v-modal-custom',
+            transitionName: 'opacityp',
+            render (h) {
+              return h(mRelatedItems, {
+                on: {
+                  onBatchCopy (item) {
+                    self._copyProcess({id: self.strSelectIds,projectId: item})
+                    modal.remove()
+                  },
+                  close () {
+                    modal.remove()
+                  }
+                },
+                props: {
+                  tmp: false
+                }
+              })
+            }
+          })
+      },
+      /**
+       * _batchMove
+       */
+      _batchMove() {
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'v-modal-custom',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mRelatedItems, {
+              on: {
+                onBatchMove (item) {
+                  self._moveProcess({id: self.strSelectIds,projectId: item})
+                  modal.remove()
+                },
+                close () {
+                  modal.remove()
+                }
+              },
+              props: {
+                tmp: true
+              }
+            })
+          }
+        })
+      },
       /**
        * Edit state
        */

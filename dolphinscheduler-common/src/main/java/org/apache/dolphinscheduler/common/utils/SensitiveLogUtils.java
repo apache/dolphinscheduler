@@ -14,21 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 
 /**
- *  sensitive log Util
+ * sensitive log Util
  */
 public class SensitiveLogUtils {
+
+    private SensitiveLogUtils() {
+        throw new UnsupportedOperationException("Construct SensitiveLogUtils");
+    }
 
     /**
      * @param dataSourcePwd data source password
      * @return String
      */
-    public static String maskDataSourcePwd(String dataSourcePwd){
+    public static String maskDataSourcePwd(String dataSourcePwd) {
 
         if (StringUtils.isNotEmpty(dataSourcePwd)) {
             dataSourcePwd = Constants.PASSWORD_DEFAULT;
