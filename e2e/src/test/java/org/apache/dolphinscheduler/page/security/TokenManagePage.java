@@ -27,24 +27,26 @@ public class TokenManagePage extends PageCommon {
     }
 
     /**
-     * create token
+     * createTenant
      *
-     * @return Whether to enter the specified page after create tenant
+     * @return Whether to enter the specified page after creat tenant
      */
     public boolean createToken() throws InterruptedException {
         //create token
+        Thread.sleep(1000);
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
-
-        //determine whether the create token button exists
-        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN,TokenManageData.CREATE_TOKEN);
+        Thread.sleep(1000);
 
         // click  create token button
         clickButton(TokenManageLocator.CLICK_CREATE_TOKEN);
+        Thread.sleep(1000);
+
+        //selectDate(TokenManageLocator.js, TokenManageLocator.CLICK_TIME, TokenManageData.DATE);
 
         clickButton(TokenManageLocator.SELECT_USER);
 
         clickButton(TokenManageLocator.CLICK_GENERATE_TOKEN_BUTTON);
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         // click  button
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
@@ -53,25 +55,21 @@ public class TokenManagePage extends PageCommon {
         return ifTitleContains(TokenManageData.TOKEN_MANAGE);
     }
 
-    /**
-     * edit token
-     *
-     * @return Whether to enter the specified page after edit tenant
-     */
+
+    //edit token
     public boolean editToken() throws InterruptedException {
-        // edit token
-        ifTextExists(TokenManageLocator.TOKEN, "1");
+        // click  token manage
+        clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
+        Thread.sleep(1000);
 
-        // determine the existence of the editing token
-        locateElement(TokenManageLocator.EDIT_TOKEN_BUTTON);
-
-        // click  edit token button
+        // click  create token button
         clickButton(TokenManageLocator.CLICK_EDIT_BUTTON);
+        Thread.sleep(1000);
 
         clickButton(TokenManageLocator.SELECT_USER);
 
         clickButton(TokenManageLocator.CLICK_GENERATE_TOKEN_BUTTON);
-        Thread.sleep(2000);
+        Thread.sleep(2500);
 
         // click  button
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
@@ -85,6 +83,7 @@ public class TokenManagePage extends PageCommon {
     public boolean deleteToken() throws InterruptedException {
         // click  token manage
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
+        Thread.sleep(1000);
 
         clickButton(TokenManageLocator.CLICK_DELETE_BUTTON);
         clickButton(TokenManageLocator.CLICK_CONFIRM_DELETE_BUTTON);

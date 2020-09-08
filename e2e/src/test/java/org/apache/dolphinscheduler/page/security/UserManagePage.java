@@ -29,14 +29,11 @@ public class UserManagePage extends PageCommon {
     /**
      * create user
      *
-     * @return Whether to enter the specified page after create tenant
+     * @return Whether to enter the specified page after creat tenant
      */
     public boolean createUser() throws InterruptedException {
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-
-        //determine whether the create user button exists
-        ifTextExists(UserManageLocator.CLICK_CREATE_USER_BUTTON,UserManageData.CREATE_USER_BUTTON);
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
@@ -67,10 +64,8 @@ public class UserManagePage extends PageCommon {
         //edit general user
         // click  user manage
         System.out.println("start edit general user");
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-
-        //determine whether the general user exists
-        ifTextExists(UserManageLocator.USER_NAME,UserManageData.USERNAME);
 
         // click  edit user button
         clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
@@ -102,14 +97,12 @@ public class UserManagePage extends PageCommon {
     /**
      * edit admin user
      */
-    public boolean editAdminUser() throws InterruptedException {
+    public boolean editAdminlUser() throws InterruptedException {
         //edit admin user
         // click  user manage
         System.out.println("start edit admin user");
+        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-
-        //determine whether the general user edit success
-        ifTextExists(UserManageLocator.USER_NAME,UserManageData.EDIT_USERNAME);
 
         // click  edit user button
         clickButton(UserManageLocator.EDIT_ADMIN_USER_BUTTON );
@@ -122,6 +115,7 @@ public class UserManagePage extends PageCommon {
         // click  button
         clickButton(UserManageLocator.SUBMIT);
         System.out.println("end edit admin user");
+        Thread.sleep(500);
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);
     }

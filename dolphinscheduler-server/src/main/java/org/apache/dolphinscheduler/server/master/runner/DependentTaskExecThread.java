@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -26,22 +24,16 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.*;
+
+import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
 public class DependentTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -72,7 +64,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     public DependentTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
-        taskInstance.setStartTime(new Date());
     }
 
 
@@ -180,7 +171,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
+        taskInstance.setLogPath(getTaskLogPath(taskInstance));
         taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());

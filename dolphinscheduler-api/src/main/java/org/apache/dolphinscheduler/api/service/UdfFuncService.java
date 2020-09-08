@@ -136,7 +136,10 @@ public class UdfFuncService extends BaseService{
      */
     private boolean checkUdfFuncNameExists(String name){
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
-        return resource != null && resource.size() > 0;
+        if(resource != null && resource.size() > 0){
+            return true;
+        }
+        return false;
     }
 
 

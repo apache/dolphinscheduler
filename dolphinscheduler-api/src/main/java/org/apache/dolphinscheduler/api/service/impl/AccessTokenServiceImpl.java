@@ -120,7 +120,7 @@ public class AccessTokenServiceImpl extends BaseService implements AccessTokenSe
      */
     public Map<String, Object> generateToken(int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>(5);
-        String token = EncryptionUtils.getMd5(userId + expireTime + System.currentTimeMillis());
+        String token = EncryptionUtils.getMd5(userId + expireTime + String.valueOf(System.currentTimeMillis()));
         result.put(Constants.DATA_LIST, token);
         putMsg(result, Status.SUCCESS);
         return result;

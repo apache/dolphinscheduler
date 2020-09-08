@@ -20,6 +20,8 @@ import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.utils.dependent.DependentDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,35 +29,32 @@ import java.util.List;
 
 public class DependentUtils {
 
-    private DependentUtils() {
-        throw new UnsupportedOperationException("Construct DependentUtils");
-    }
+    private static final Logger logger = LoggerFactory.getLogger(DependentUtils.class);
 
     public static DependResult getDependResultForRelation(DependentRelation relation,
-                                                          List<DependResult> dependResultList) {
+                                                          List<DependResult> dependResultList){
 
         DependResult dependResult = DependResult.SUCCESS;
 
-        switch (relation) {
+        switch (relation){
             case AND:
-                if (dependResultList.contains(DependResult.FAILED)) {
+                if(dependResultList.contains(DependResult.FAILED)){
                     dependResult = DependResult.FAILED;
-                }
-                if (dependResultList.contains(DependResult.WAITING)) {
+                } if(dependResultList.contains(DependResult.WAITING)){
                     dependResult = DependResult.WAITING;
                 }
                 break;
             case OR:
-                if (dependResultList.contains(DependResult.SUCCESS)) {
+                if(dependResultList.contains(DependResult.SUCCESS)){
                     dependResult = DependResult.SUCCESS;
-                } else if (dependResultList.contains(DependResult.WAITING)) {
+                }else if(dependResultList.contains(DependResult.WAITING)){
                     dependResult = DependResult.WAITING;
-                } else {
+                }else{
                     dependResult = DependResult.FAILED;
                 }
                 break;
             default:
-                break;
+               break;
         }
         return dependResult;
     }
@@ -63,37 +62,36 @@ public class DependentUtils {
 
     /**
      * get date interval list by business date and date value.
-     *
      * @param businessDate business date
      * @param dateValue date value
      * @return date interval list by business date and date value.
      */
-    public static List<DateInterval> getDateIntervalList(Date businessDate, String dateValue) {
+    public static List<DateInterval> getDateIntervalList(Date businessDate, String dateValue){
         List<DateInterval> result = new ArrayList<>();
-        switch (dateValue) {
+        switch (dateValue){
             case "currentHour":
                 result = DependentDateUtils.getLastHoursInterval(businessDate, 0);
                 break;
             case "last1Hour":
-                result = DependentDateUtils.getLastHoursInterval(businessDate, 1);
+                result =  DependentDateUtils.getLastHoursInterval(businessDate, 1);
                 break;
             case "last2Hours":
-                result = DependentDateUtils.getLastHoursInterval(businessDate, 2);
+                result =  DependentDateUtils.getLastHoursInterval(businessDate, 2);
                 break;
             case "last3Hours":
-                result = DependentDateUtils.getLastHoursInterval(businessDate, 3);
+                result =  DependentDateUtils.getLastHoursInterval(businessDate, 3);
                 break;
             case "last24Hours":
                 result = DependentDateUtils.getSpecialLastDayInterval(businessDate);
                 break;
             case "today":
-                result = DependentDateUtils.getTodayInterval(businessDate);
+                result =  DependentDateUtils.getTodayInterval(businessDate);
                 break;
             case "last1Days":
-                result = DependentDateUtils.getLastDayInterval(businessDate, 1);
+                result =  DependentDateUtils.getLastDayInterval(businessDate, 1);
                 break;
             case "last2Days":
-                result = DependentDateUtils.getLastDayInterval(businessDate, 2);
+                result =  DependentDateUtils.getLastDayInterval(businessDate, 2);
                 break;
             case "last3Days":
                 result = DependentDateUtils.getLastDayInterval(businessDate, 3);
@@ -145,5 +143,6 @@ public class DependentUtils {
         }
         return result;
     }
+
 
 }

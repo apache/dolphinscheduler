@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.entity;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
@@ -26,38 +26,30 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
- * master/worker task transport
+ *  master/worker task transport
  */
-public class TaskExecutionContext implements Serializable {
+public class TaskExecutionContext implements Serializable{
 
     /**
-     * task id
+     *  task id
      */
     private int taskInstanceId;
 
 
     /**
-     * task name
+     *  task name
      */
     private String taskName;
 
     /**
-     * task first submit time.
+     *  task start time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date firstSubmitTime;
-
-    /**
-     * task start time
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
-     * task type
+     *  task type
      */
     private String taskType;
 
@@ -65,9 +57,9 @@ public class TaskExecutionContext implements Serializable {
      * host
      */
     private String host;
-
+    
     /**
-     * task execute path
+     *  task execute path
      */
     private String executePath;
 
@@ -77,7 +69,7 @@ public class TaskExecutionContext implements Serializable {
     private String logPath;
 
     /**
-     * task json
+     *  task json
      */
     private String taskJson;
 
@@ -92,53 +84,53 @@ public class TaskExecutionContext implements Serializable {
     private String appIds;
 
     /**
-     * process instance id
+     *  process instance id
      */
     private int processInstanceId;
 
 
     /**
-     * process instance schedule time
+     *  process instance schedule time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date scheduleTime;
 
     /**
-     * process instance global parameters
+     *  process instance global parameters
      */
     private String globalParams;
 
 
     /**
-     * execute user id
+     *  execute user id
      */
     private int executorId;
 
 
     /**
-     * command type if complement
+     *  command type if complement
      */
     private int cmdTypeIfComplement;
 
 
     /**
-     * tenant code
+     *  tenant code
      */
     private String tenantCode;
 
     /**
-     * task queue
+     *  task queue
      */
     private String queue;
 
 
     /**
-     * process define id
+     *  process define id
      */
     private int processDefineId;
 
     /**
-     * project id
+     *  project id
      */
     private int projectId;
 
@@ -148,12 +140,12 @@ public class TaskExecutionContext implements Serializable {
     private String taskParams;
 
     /**
-     * envFile
+     *  envFile
      */
     private String envFile;
 
     /**
-     * definedParams
+     *  definedParams
      */
     private Map<String, String> definedParams;
 
@@ -163,7 +155,7 @@ public class TaskExecutionContext implements Serializable {
     private String taskAppId;
 
     /**
-     * task timeout strategy
+     *  task timeout strategy
      */
     private int taskTimeoutStrategy;
 
@@ -178,27 +170,17 @@ public class TaskExecutionContext implements Serializable {
     private String workerGroup;
 
     /**
-     * delay execution time.
-     */
-    private int delayTime;
-
-    /**
-     * current execution status
-     */
-    private ExecutionStatus currentExecutionStatus;
-
-    /**
      * resources full name and tenant code
      */
-    private Map<String, String> resources;
+    private Map<String,String> resources;
 
     /**
-     * sql TaskExecutionContext
+     *  sql TaskExecutionContext
      */
     private SQLTaskExecutionContext sqlTaskExecutionContext;
 
     /**
-     * datax TaskExecutionContext
+     *  datax TaskExecutionContext
      */
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
@@ -213,7 +195,7 @@ public class TaskExecutionContext implements Serializable {
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
 
     /**
-     * procedure TaskExecutionContext
+     *  procedure TaskExecutionContext
      */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
@@ -231,14 +213,6 @@ public class TaskExecutionContext implements Serializable {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
-    }
-
-    public Date getFirstSubmitTime() {
-        return firstSubmitTime;
-    }
-
-    public void setFirstSubmitTime(Date firstSubmitTime) {
-        this.firstSubmitTime = firstSubmitTime;
     }
 
     public Date getStartTime() {
@@ -433,22 +407,6 @@ public class TaskExecutionContext implements Serializable {
         this.workerGroup = workerGroup;
     }
 
-    public int getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(int delayTime) {
-        this.delayTime = delayTime;
-    }
-
-    public ExecutionStatus getCurrentExecutionStatus() {
-        return currentExecutionStatus;
-    }
-
-    public void setCurrentExecutionStatus(ExecutionStatus currentExecutionStatus) {
-        this.currentExecutionStatus = currentExecutionStatus;
-    }
-
     public SQLTaskExecutionContext getSqlTaskExecutionContext() {
         return sqlTaskExecutionContext;
     }
@@ -473,7 +431,7 @@ public class TaskExecutionContext implements Serializable {
         this.procedureTaskExecutionContext = procedureTaskExecutionContext;
     }
 
-    public Command toCommand() {
+    public Command toCommand(){
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
         requestCommand.setTaskExecutionContext(JsonSerializer.serializeToString(this));
         return requestCommand.convert2Command();
@@ -505,42 +463,39 @@ public class TaskExecutionContext implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskExecutionContext{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", currentExecutionStatus=" + currentExecutionStatus
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", startTime=" + startTime
-                + ", taskType='" + taskType + '\''
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", taskJson='" + taskJson + '\''
-                + ", processId=" + processId
-                + ", appIds='" + appIds + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", scheduleTime=" + scheduleTime
-                + ", globalParams='" + globalParams + '\''
-                + ", executorId=" + executorId
-                + ", cmdTypeIfComplement=" + cmdTypeIfComplement
-                + ", tenantCode='" + tenantCode + '\''
-                + ", queue='" + queue + '\''
-                + ", processDefineId=" + processDefineId
-                + ", projectId=" + projectId
-                + ", taskParams='" + taskParams + '\''
-                + ", envFile='" + envFile + '\''
-                + ", definedParams=" + definedParams
-                + ", taskAppId='" + taskAppId + '\''
-                + ", taskTimeoutStrategy=" + taskTimeoutStrategy
-                + ", taskTimeout=" + taskTimeout
-                + ", workerGroup='" + workerGroup + '\''
-                + ", delayTime=" + delayTime
-                + ", resources=" + resources
-                + ", sqlTaskExecutionContext=" + sqlTaskExecutionContext
-                + ", dataxTaskExecutionContext=" + dataxTaskExecutionContext
-                + ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext
-                + ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext
-                + ", procedureTaskExecutionContext=" + procedureTaskExecutionContext
-                + '}';
+        return "TaskExecutionContext{" +
+                "taskInstanceId=" + taskInstanceId +
+                ", taskName='" + taskName + '\'' +
+                ", startTime=" + startTime +
+                ", taskType='" + taskType + '\'' +
+                ", host='" + host + '\'' +
+                ", executePath='" + executePath + '\'' +
+                ", logPath='" + logPath + '\'' +
+                ", taskJson='" + taskJson + '\'' +
+                ", processId=" + processId +
+                ", appIds='" + appIds + '\'' +
+                ", processInstanceId=" + processInstanceId +
+                ", scheduleTime=" + scheduleTime +
+                ", globalParams='" + globalParams + '\'' +
+                ", executorId=" + executorId +
+                ", cmdTypeIfComplement=" + cmdTypeIfComplement +
+                ", tenantCode='" + tenantCode + '\'' +
+                ", queue='" + queue + '\'' +
+                ", processDefineId=" + processDefineId +
+                ", projectId=" + projectId +
+                ", taskParams='" + taskParams + '\'' +
+                ", envFile='" + envFile + '\'' +
+                ", definedParams=" + definedParams +
+                ", taskAppId='" + taskAppId + '\'' +
+                ", taskTimeoutStrategy=" + taskTimeoutStrategy +
+                ", taskTimeout=" + taskTimeout +
+                ", workerGroup='" + workerGroup + '\'' +
+                ", resources=" + resources +
+                ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
+                ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +
+                ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext +
+                ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext +
+                ", procedureTaskExecutionContext=" + procedureTaskExecutionContext +
+                '}';
     }
 }

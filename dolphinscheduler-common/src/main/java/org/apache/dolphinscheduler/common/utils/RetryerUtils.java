@@ -17,20 +17,14 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import com.github.rholder.retry.*;
 import org.apache.dolphinscheduler.common.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 
 /**
  * The Retryer util.
@@ -41,7 +35,7 @@ public class RetryerUtils {
     private static Retryer<Boolean> defaultRetryerResultNoCheck;
 
     private RetryerUtils() {
-        throw new UnsupportedOperationException("Construct RetryerUtils");
+
     }
 
     private static Retryer<Boolean> getDefaultRetryerResultNoCheck() {

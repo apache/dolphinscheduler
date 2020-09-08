@@ -220,7 +220,11 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         if (resourceListing == null) {
             return null;
         }
-        return resourceListing.getInfo();
+        ApiInfo info = resourceListing.getInfo();
+        if (info == null) {
+            return null;
+        }
+        return info;
     }
 
     protected List<Tag> tagSetToTagList(Set<springfox.documentation.service.Tag> set) {
