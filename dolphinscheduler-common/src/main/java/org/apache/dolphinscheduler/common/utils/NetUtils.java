@@ -236,7 +236,7 @@ public class NetUtils {
      */
     public static NetworkInterface findIntranetAddress(List<NetworkInterface> validNetworkInterfaces) {
 
-        if (validNetworkInterfaces.size() == 0) {
+        if (validNetworkInterfaces.isEmpty()) {
             return null;
         }
         NetworkInterface networkInterface = null;
