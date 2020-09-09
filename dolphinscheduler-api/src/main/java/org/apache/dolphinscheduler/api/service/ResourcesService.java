@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -137,6 +138,10 @@ public class ResourcesService extends BaseService {
                 }
             }
             result.setData(resultMap);
+        } catch (DuplicateKeyException e) {
+            logger.error("resource directory {} has exist, can't recreate", fullName);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
         } catch (Exception e) {
             logger.error("resource already exists, can't recreate ", e);
             throw new RuntimeException("resource already exists, can't recreate");
