@@ -235,7 +235,7 @@ public class NetUtils {
         if (validNetworkInterfaces.isEmpty()) {
             return null;
         }
-        String networkPriority = PropertyUtils.getString(Constants.NETWORK_PRIORITY_STRATEGY, "default");
+        String networkPriority = PropertyUtils.getString(Constants.NETWORK_PRIORITY_STRATEGY, NETWORK_PRIORITY_DEFAULT);
         if (NETWORK_PRIORITY_DEFAULT.equalsIgnoreCase(networkPriority)) {
             return findAddressByDefaultPolicy(validNetworkInterfaces);
         } else if (NETWORK_PRIORITY_INNER.equalsIgnoreCase(networkPriority)) {
