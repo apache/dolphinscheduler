@@ -70,7 +70,7 @@ public class LogUtils {
      * get task log path by TaskExecutionContext
      */
     public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(taskExecutionContext.getProcessId(), taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+        return getTaskLogPath(taskExecutionContext.getProcessDefineId(), taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
     }
 
 }
