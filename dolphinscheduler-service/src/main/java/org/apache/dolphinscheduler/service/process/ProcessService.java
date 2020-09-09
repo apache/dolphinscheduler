@@ -144,7 +144,7 @@ public class ProcessService {
 
     @Autowired
     private ResourceMapper resourceMapper;
-    
+
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
