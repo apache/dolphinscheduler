@@ -48,9 +48,9 @@ public class NetUtils {
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
-    private static Logger logger = LoggerFactory.getLogger(NetUtils.class);
-    private static String ANY_HOST_VALUE = "0.0.0.0";
-    private static String LOCAL_HOST_VALUE = "127.0.0.1";
+    private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
+    private static final String ANY_HOST_VALUE = "0.0.0.0";
+    private static final String LOCAL_HOST_VALUE = "127.0.0.1";
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
 
@@ -66,7 +66,7 @@ public class NetUtils {
         InetAddress address = getLocalAddress();
         if (address != null) {
             HOST_ADDRESS = address.getHostAddress();
-                    return HOST_ADDRESS;
+            return HOST_ADDRESS;
         }
         return LOCAL_HOST_VALUE;
     }
