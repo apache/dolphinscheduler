@@ -277,6 +277,12 @@
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
+        <!-- Pre-tasks in workflow -->
+        <m-pre-tasks
+          v-if="['SHELL', 'SUB_PROCESS'].indexOf(taskType) > -1"
+          @on-pre-tasks="_onPreTasks"
+          ref="PRE_TASK"
+          :backfill-item="backfillItem"></m-pre-tasks>
       </div>
     </div>
     <div class="bottom-box">
@@ -310,6 +316,7 @@
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mWorkerGroups from './_source/workerGroups'
+  import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import { isNameExDag, rtBantpl } from './../plugIn/util'
@@ -369,7 +376,11 @@
             value: 'failed',
             label: `${i18n.$t('failed')}`
           }
-        ]
+        ],
+        // preTasks
+        preTaskIdsInWorkflow: [],
+        preTasksToAdd: [],    // pre-taskIds to add, used in jsplumb connects
+        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
       }
     },
     /**
@@ -392,6 +403,14 @@
        */
       _onDependent (o) {
         this.dependence = Object.assign(this.dependence, {}, o)
+      },
+      /**
+       * Pre-tasks in workflow
+       */
+      _onPreTasks (o) {
+        this.preTaskIdsInWorkflow = o.preTasks
+        this.preTasksToAdd = o.preTasksToAdd
+        this.preTasksToDelete = o.preTasksToDelete
       },
       /**
        * cache dependent
@@ -543,6 +562,43 @@
         if (!this.$refs[this.taskType]._verification()) {
           return
         }
+        // Verify preTasks and update dag-things
+        if (this.$refs['PRE_TASK']) {
+          if (!this.$refs['PRE_TASK']._verification()) {
+            return
+          }
+          else {
+            // Sync data-targetarr
+            $(`#${this.id}`).attr(
+              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
+
+            // Update JSP connections
+            let plumbIns = JSP.JspInstance
+            var targetId = this.id
+
+            // Update new connections
+            this.preTasksToAdd.map(sourceId => {
+              plumbIns.connect({
+                source: sourceId,
+                target: targetId,
+                type: 'basic',
+                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+                HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
+              })
+            })
+
+            // Update remove connections
+            let currentConnects = plumbIns.getAllConnections()
+            let len = currentConnects.length
+            for (let i = 0; i < len; i++) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId == targetId) {
+                plumbIns.deleteConnection(currentConnects[i])
+                i -= 1
+                len -= 1
+              }
+            }
+          }
+        }
 
         $(`#${this.id}`).find('span').text(this.name)
         this.conditionResult.successNode[0] = this.successBranch
@@ -684,6 +740,16 @@
       }
       this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
+
+      // Init value of preTask selector
+      let preTaskIds = $(`#${this.id}`).attr('data-targetarr')
+      if (!_.isEmpty(this.backfillItem)) {
+        if (preTaskIds && preTaskIds.length) {
+          this.backfillItem.preTasks = preTaskIds.split(',')
+        } else {
+          this.backfillItem.preTasks = []
+        }
+      }
     },
     mounted () {
       let self = this
@@ -745,7 +811,8 @@
       mSelectInput,
       mTimeoutAlarm,
       mPriority,
-      mWorkerGroups
+      mWorkerGroups,
+      mPreTasks,
     }
   }
 </script>
