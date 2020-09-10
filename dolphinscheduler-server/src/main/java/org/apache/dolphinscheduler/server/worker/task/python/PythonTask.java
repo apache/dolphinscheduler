@@ -124,7 +124,8 @@ public class PythonTask extends AbstractTask {
     
     try {
         rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
-    }catch (StringIndexOutOfBoundsException e) {
+    }
+    catch (StringIndexOutOfBoundsException e) {
       // TODO: handle exception
     }
     
