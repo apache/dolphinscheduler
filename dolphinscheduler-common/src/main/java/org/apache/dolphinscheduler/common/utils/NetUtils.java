@@ -273,8 +273,7 @@ public class NetUtils {
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (ip.isSiteLocalAddress()
-                        && !ip.isLoopbackAddress()
-                        && !ip.getHostAddress().contains(":")) {
+                        && !ip.isLoopbackAddress()) {
                     networkInterface = ni;
                 }
             }
@@ -289,8 +288,7 @@ public class NetUtils {
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (!ip.isSiteLocalAddress()
-                        && !ip.isLoopbackAddress()
-                        && !ip.getHostAddress().contains(":")) {
+                        && !ip.isLoopbackAddress()) {
                     networkInterface = ni;
                 }
             }
