@@ -195,7 +195,7 @@ public class WorkflowDefinePage extends PageCommon {
         System.out.println("submit workflow");
         clickButton(WorkflowDefineLocator.CLICK_ADD_BUTTON);
 
-        return ifTextExists(WorkflowDefineLocator.WORKFLOWNAME, workflowDefineData.getWorkflowDefineData("workflowName"));
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("workflowDefineTitle"));
     }
 
     public boolean onlineWorkflow() throws InterruptedException {

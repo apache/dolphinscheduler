@@ -179,7 +179,7 @@ public class WorkflowDefineLocator {
     //scroll to element bottom
     public static final By SCROLL_BOTTOM = By.xpath("//span/a/em");
 
-    public static final By WORKFLOWNAME = By.xpath("//table/tr[2]/td[3]/span/a");
+    public static final By WORKFLOW_NAME = By.xpath("//table/tr[2]/td[3]/span/a");
 
     /**
      * online workflow

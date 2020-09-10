@@ -20,7 +20,6 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
-
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class TenantManageData {
