@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.project;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class ProjectData {
-    public String getProjectData(String param){
+    public String getProjectData(String param) {
         YmlReader ymlReader = new YmlReader();
         String projectData = ymlReader.getDataYml("testData/workflow_zh_cn", "projectManage", param);
         return  projectData;

@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.util;
 
 import org.ho.yaml.Yaml;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -35,7 +35,6 @@ public class YmlReader {
         try {
             InputStream inputStream = resource.getInputStream();
             map = yaml.loadType(inputStream, HashMap.class);
-
         } catch (IOException e) {
             e.printStackTrace();
         }

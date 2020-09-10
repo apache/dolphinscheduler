@@ -60,7 +60,7 @@ public class WorkflowDefinePage extends PageCommon {
         dragAndDrop(WorkflowDefineLocator.MOUSE_DOWN_AT_SHELL, WorkflowDefineLocator.MOUSE_MOVE_SHELL_AT_DAG);
 
         //input shell task _name
-        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_NAME , workflowDefineData.getWorkflowDefineData("shellTaskName"));
+        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_NAME, workflowDefineData.getWorkflowDefineData("shellTaskName"));
         //click stop run type
         clickElement(WorkflowDefineLocator.CLICK_STOP_RUN_TYPE);
 
@@ -68,7 +68,7 @@ public class WorkflowDefinePage extends PageCommon {
         clickElement(WorkflowDefineLocator.CLICK_NORMAL_RUN_TYPE);
 
         //input shell task description
-        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_DESCRIPTION , workflowDefineData.getWorkflowDefineData("shellTaskDescription"));
+        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_DESCRIPTION, workflowDefineData.getWorkflowDefineData("shellTaskDescription"));
 
         //select task priority
         clickElement(WorkflowDefineLocator.CLICK_TASK_PRIORITY);

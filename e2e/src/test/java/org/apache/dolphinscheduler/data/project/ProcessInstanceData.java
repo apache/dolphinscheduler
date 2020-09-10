@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.project;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class ProcessInstanceData {
-    public String getProcessInstanceData(String param){
+    public String getProcessInstanceData(String param) {
         YmlReader ymlReader = new YmlReader();
         String processInstanceData = ymlReader.getDataYml("testData/workflow_zh_cn", "processInstance", param);
         return  processInstanceData;

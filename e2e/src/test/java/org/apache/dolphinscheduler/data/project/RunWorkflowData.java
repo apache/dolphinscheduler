@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.project;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class RunWorkflowData {
-    public String getRunWorkflowData(String param){
+    public String getRunWorkflowData(String param) {
         YmlReader ymlReader = new YmlReader();
         String runWorkflowData = ymlReader.getDataYml("testData/workflow_zh_cn", "runWorkflow", param);
         return  runWorkflowData;
