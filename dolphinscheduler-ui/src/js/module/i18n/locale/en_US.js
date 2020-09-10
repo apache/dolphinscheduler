@@ -642,5 +642,6 @@ export default {
   'Related items': 'Related items',
   'Project name is required': 'Project name is required',
   'Batch move': 'Batch move',
-  Version: 'Version'
+  Version: 'Version',
+  'Pre tasks': 'Pre tasks',
 }
