@@ -23,6 +23,7 @@ import org.openqa.selenium.WebDriver;
 
 public class TenantManagePage extends PageCommon {
     TenantManageData tenantManageData = new TenantManageData();
+
     /**
      * Unique constructor
      * @param driver driver
@@ -38,7 +39,7 @@ public class TenantManagePage extends PageCommon {
      */
     public boolean jumpSecurity() throws InterruptedException {
         clickTopElement(TenantManageLocator.SECURITY_CENTER);
-        return ifTitleContains(tenantManageData.tenantData("tenantTitle"));
+        return ifTitleContains(tenantManageData.getTenantData("tenantTitle"));
     }
 
     /**
@@ -53,16 +54,16 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
         // tenant data
-        sendInput(TenantManageLocator.TENANT_INPUT_CODE, tenantManageData.tenantData("tenantCode"));
-        sendInput(TenantManageLocator.TENANT_INPUT_NAME, tenantManageData.tenantData("tenantName"));
-        sendInput(TenantManageLocator.QUEUE, tenantManageData.tenantData("queue"));
-        sendInput(TenantManageLocator.DESCRIPTION, tenantManageData.tenantData("description"));
+        sendInput(TenantManageLocator.TENANT_INPUT_CODE, tenantManageData.getTenantData("tenantCode"));
+        sendInput(TenantManageLocator.TENANT_INPUT_NAME, tenantManageData.getTenantData("tenantName"));
+        sendInput(TenantManageLocator.QUEUE, tenantManageData.getTenantData("queue"));
+        sendInput(TenantManageLocator.DESCRIPTION, tenantManageData.getTenantData("description"));
 
         // click  button
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTextExists(TenantManageLocator.TENANT_CODE_FIRST, tenantManageData.tenantData("tenantCode"));
+        return ifTextExists(TenantManageLocator.TENANT_CODE_FIRST, tenantManageData.getTenantData("tenantCode"));
     }
 
     public boolean deleteTenant() throws InterruptedException {
@@ -75,6 +76,6 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.CONFIRM_DELETE_TENANT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(tenantManageData.tenantData("tenantTitle"));
+        return ifTitleContains(tenantManageData.getTenantData("tenantTitle"));
     }
 }

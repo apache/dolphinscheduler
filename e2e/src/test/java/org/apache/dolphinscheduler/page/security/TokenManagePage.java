@@ -38,7 +38,7 @@ public class TokenManagePage extends PageCommon {
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
 
         //determine whether the create token button exists
-        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.tokenData("createTokenButton"));
+        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.getTokenData("createTokenButton"));
 
         // click  create token button
         clickButton(TokenManageLocator.CLICK_CREATE_TOKEN);
@@ -52,7 +52,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(tokenManageData.tokenData("tokenTitle"));
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
     /**
@@ -79,7 +79,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(tokenManageData.tokenData("tokenTitle"));
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 
@@ -91,7 +91,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_DELETE_BUTTON);
         clickButton(TokenManageLocator.CLICK_CONFIRM_DELETE_BUTTON);
 
-        return ifTitleContains(tokenManageData.tokenData("tokenTitle"));
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 }

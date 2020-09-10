@@ -29,9 +29,9 @@ import java.util.HashMap;
  */
 public class YmlReader {
     public static HashMap<String,HashMap<String, String>> map;
-    public String getDataYml(String fileName, String key1, String key2) {
+    public String getDataYml(String filePath, String key1, String key2) {
         Yaml yaml = new Yaml();
-        Resource resource = new DefaultResourceLoader().getResource("classpath:testData/" + fileName + ".yml");
+        Resource resource = new DefaultResourceLoader().getResource("classpath:" + filePath + ".yml");
         try {
             InputStream inputStream = resource.getInputStream();
             map = yaml.loadType(inputStream, HashMap.class);

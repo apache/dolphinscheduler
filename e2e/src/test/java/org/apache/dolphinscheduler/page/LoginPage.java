@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
-
-
 public class LoginPage extends PageCommon {
     TenantManageData tenantManageData = new TenantManageData();
 
@@ -35,7 +33,6 @@ public class LoginPage extends PageCommon {
     public LoginPage(WebDriver driver) {
         super(driver);
     }
-
 
     /**
      * jump page
@@ -68,6 +65,6 @@ public class LoginPage extends PageCommon {
         moveToElement(LoginLocator.LOGIN_BUTTON_MOVE);
 
         // Whether to enter the specified page after login
-        return ifTitleContains(tenantManageData.tenantData("tenantTitle"));
+        return ifTitleContains(tenantManageData.getTenantData("tenantTitle"));
     }
 }

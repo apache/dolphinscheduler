@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.data.security;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class UserManageData  {
-    public String userData(String param){
+    public String getUserData(String param){
         YmlReader ymlReader = new YmlReader();
-        String userManage = ymlReader.getDataYml("security_zh_cn", "userManage", param);
-        return  userManage;
+        String userData = ymlReader.getDataYml("testData/security_zh_cn", "userManage", param);
+        return  userData;
     }
 }
