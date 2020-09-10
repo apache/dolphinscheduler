@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.security;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class AlertManageData {
-    public String getAlertData(String param){
+    public String getAlertData(String param) {
         YmlReader ymlReader = new YmlReader();
         String alertData = ymlReader.getDataYml("testData/security_zh_cn", "alertManage", param);
         return  alertData;

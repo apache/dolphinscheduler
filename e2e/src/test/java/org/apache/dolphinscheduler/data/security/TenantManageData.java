@@ -24,7 +24,7 @@ package org.apache.dolphinscheduler.data.security;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class TenantManageData {
-    public String getTenantData(String param){
+    public String getTenantData(String param) {
         YmlReader ymlReader = new YmlReader();
         String tenantData = ymlReader.getDataYml("testData/security_zh_cn", "tenantManage", param);
         return  tenantData;

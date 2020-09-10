@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.data.security;
 import org.apache.dolphinscheduler.util.YmlReader;
 
 public class QueueManageData {
-    public String getQueueData(String param){
+    public String getQueueData(String param) {
         YmlReader ymlReader = new YmlReader();
         String queueData = ymlReader.getDataYml("testData/security_zh_cn", "queueManage", param);
         return  queueData;
