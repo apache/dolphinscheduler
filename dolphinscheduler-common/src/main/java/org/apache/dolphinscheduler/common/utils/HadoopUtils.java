@@ -698,4 +698,5 @@ public class HadoopUtils implements Closeable {
         }
 
     }
+
 }
