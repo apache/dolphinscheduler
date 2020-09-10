@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.page;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.data.LoginData;
+import org.apache.dolphinscheduler.data.security.TenantManageData;
 import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
@@ -25,6 +26,8 @@ import org.openqa.selenium.WebDriver;
 
 
 public class LoginPage extends PageCommon {
+    TenantManageData tenantManageData = new TenantManageData();
+
     /**
      * Unique constructor
      * @param driver driver
@@ -65,6 +68,6 @@ public class LoginPage extends PageCommon {
         moveToElement(LoginLocator.LOGIN_BUTTON_MOVE);
 
         // Whether to enter the specified page after login
-        return ifTitleContains(LoginData.TENANT);
+        return ifTitleContains(tenantManageData.tenantData("tenantTitle"));
     }
 }

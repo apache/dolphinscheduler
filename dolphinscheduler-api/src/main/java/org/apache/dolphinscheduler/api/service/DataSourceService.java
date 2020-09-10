@@ -189,10 +189,7 @@ public class DataSourceService extends BaseService {
 
     private boolean checkName(String name) {
         List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
-        if (queryDataSource != null && queryDataSource.size() > 0) {
-            return true;
-        }
-        return false;
+        return queryDataSource != null && queryDataSource.size() > 0;
     }
 
 

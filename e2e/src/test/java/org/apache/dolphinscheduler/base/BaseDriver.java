@@ -23,7 +23,6 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -91,7 +90,7 @@ public class BaseDriver {
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
         //Browser client running requires annotation --headless
-        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
         chromeOptions.addArguments("--disable-infobars");

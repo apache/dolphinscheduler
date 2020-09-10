@@ -33,6 +33,7 @@ public class TimingPage extends PageCommon {
      * create timing
      */
     public boolean createTiming() throws InterruptedException {
+        flushPage();
         // Determine whether the workflow status is online
         ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, WorkflowDefineData.WORKFLOW_ONLINE_STATE);
 
