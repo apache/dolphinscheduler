@@ -27,7 +27,6 @@ userManage:
   editPhone: '15800001111'
   userTitle:  用户管理 - DolphinScheduler
 
-
 tenantManage:
   tenantCode:  selenium_tenant_code_1
   tenantName:  selenium_tenant_Name
