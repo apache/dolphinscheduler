@@ -21,7 +21,7 @@ import org.ho.yaml.Yaml;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 
 /**
@@ -35,7 +35,7 @@ public class YmlReader {
         try {
             InputStream inputStream = resource.getInputStream();
             map = yaml.loadType(inputStream, HashMap.class);
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         String data = map.get(key1).get(key2);
