@@ -24,6 +24,8 @@ public class TokenManageLocator {
 
     public static final By CLICK_CREATE_TOKEN = By.xpath("//div[2]/div/div[2]/div[2]/div/div[1]/button/span");
 
+    public static final By CREATE_TOKEN_POPUP = By.xpath("//div[5]/div/div[2]/div/div[1]/span");
+
     public static final By SELECT_USER = By.xpath("//div[2]/div[2]/div/div/div/span/i");
 
     public static final By CLICK_GENERATE_TOKEN_BUTTON = By.xpath("//div[3]/div[2]/button/span");

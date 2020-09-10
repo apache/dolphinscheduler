@@ -38,10 +38,12 @@ public class TokenManagePage extends PageCommon {
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
 
         //determine whether the create token button exists
-        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.getTokenData("createTokenButton"));
+        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.getTokenData("createTokenText"));
 
         // click  create token button
         clickButton(TokenManageLocator.CLICK_CREATE_TOKEN);
+
+        ifTextExists(TokenManageLocator.CREATE_TOKEN_POPUP,tokenManageData.getTokenData("createTokenText"));
 
         clickButton(TokenManageLocator.SELECT_USER);
 

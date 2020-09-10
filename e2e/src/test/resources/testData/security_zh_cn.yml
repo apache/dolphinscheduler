@@ -51,5 +51,5 @@ queueManage:
 
 tokenManage:
   tokenTitle: 令牌管理 - DolphinScheduler
-  createTokenButton: 创建令牌
+  createTokenText: 创建令牌
   userName: admin
