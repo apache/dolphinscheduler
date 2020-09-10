@@ -191,6 +191,16 @@
         </if>
         order by end_time desc limit 1
     </select>
-
+    <select id="queryByProcessDefineIdAndStatus"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        where process_definition_id=#{processDefinitionId}
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+        order by id asc
+    </select>
 
 </mapper>

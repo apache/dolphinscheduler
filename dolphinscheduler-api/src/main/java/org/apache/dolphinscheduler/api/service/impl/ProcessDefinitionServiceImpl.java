@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionVersionService;
+import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -64,7 +65,6 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
@@ -134,7 +134,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private ProcessDefinitionMapper processDefineMapper;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private ProcessInstanceService processInstanceService;
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
@@ -486,6 +486,12 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE, processDefinitionId);
+            return result;
+        }
+        // check process instances is already running
+        List<ProcessInstance> processInstances =  processInstanceService.queryByProcessDefineIdAndStatus(processDefinitionId, Constants.NOT_TERMINATED_STATES);
+        if (CollectionUtils.isNotEmpty(processInstances)) {
+            putMsg(result, Status.DELETE_PROCESS_DEFINITION_BY_ID_FAIL,processInstances.size());
             return result;
         }
 
@@ -1247,7 +1253,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         /**
          * List of process instances
          */
-        List<ProcessInstance> processInstanceList = processInstanceMapper.queryByProcessDefineId(processId, limit);
+        List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineId(processId, limit);
 
         for (ProcessInstance processInstance : processInstanceList) {
             processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(), processInstance.getEndTime()));
