@@ -52,12 +52,6 @@ public class ProcedureTask extends AbstractTask {
     private ProcedureParameters procedureParameters;
 
     /**
-     * base datasource
-     */
-    private BaseDataSource baseDataSource;
-
-
-    /**
      * taskExecutionContext
      */
     private TaskExecutionContext taskExecutionContext;
@@ -102,7 +96,7 @@ public class ProcedureTask extends AbstractTask {
             DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
 
             // get datasource
-            baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
+            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
 

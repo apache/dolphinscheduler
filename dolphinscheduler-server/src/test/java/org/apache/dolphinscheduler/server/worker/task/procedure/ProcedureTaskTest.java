@@ -40,7 +40,8 @@ import org.springframework.context.ApplicationContext;
 public class ProcedureTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcedureTaskTest.class);
 
-    private static final String CONNECTION_PARAMS = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}";
+    private static final String CONNECTION_PARAMS = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\","
+            + "\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}";
 
     private ProcedureTask procedureTask;
 
@@ -94,7 +95,11 @@ public class ProcedureTaskTest {
 
     @Test
     public void testHandle() {
-
+        try {
+            procedureTask.handle();
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
-
+    
 }
