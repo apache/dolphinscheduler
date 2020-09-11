@@ -474,6 +474,7 @@ export default {
   'Create worker group': 'Create worker group',
   'Edit worker group': 'Edit worker group',
   'Token manage': 'Token manage',
+  'Alarm plugin example': 'Alarm plugin example',
   'Create token': 'Create token',
   'Edit token': 'Edit token',
   'Please enter the IP address separated by commas': 'Please enter the IP address separated by commas',
@@ -638,5 +639,6 @@ export default {
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
   'Please save the DAG before formatting': 'Please save the DAG before formatting',
-  'Batch copy': 'Batch copy'
+  'Batch copy': 'Batch copy',
+  'Instance type': 'Instance type'
 }
