@@ -30,7 +30,6 @@ public class TaskParams {
 
     public void setLocalParams(Map<String,String>[] localParams) {
         this.localParams = localParams;
-//        this.localParams = JSONUtils.parseObject(localParams, LocalParam[].class);
     }
 
     public String getRawScript() {
