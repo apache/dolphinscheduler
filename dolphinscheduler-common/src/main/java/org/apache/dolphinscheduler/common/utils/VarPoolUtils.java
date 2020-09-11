@@ -33,7 +33,7 @@ public class VarPoolUtils {
     public static void setTaskNodeLocalParams(TaskNode taskNode, String prop, Object value) {
         String taskParamsJson = taskNode.getParams();
         TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
-        if(taskParams == null) {
+        if (taskParams == null) {
             return;
         }
         taskParams.setLocalParamValue(prop, value);
@@ -48,7 +48,7 @@ public class VarPoolUtils {
     public static void setTaskNodeLocalParams(TaskNode taskNode, Map<String, Object> propToValue) {
         String taskParamsJson = taskNode.getParams();
         TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
-        if(taskParams == null) {
+        if (taskParams == null) {
             return;
         }
         taskParams.setLocalParamValue(propToValue);
