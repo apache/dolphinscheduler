@@ -281,8 +281,7 @@
             <property name="allowMissingParamTags" value="true"/>
         </module>
 
-        <module name="AvoidStarImport">
-            <property name="excludes" value="java.io,java.net,java.lang.Math"/>
-        </module>
+        <module name="AvoidStarImport"/>
+
     </module>
 </module>
