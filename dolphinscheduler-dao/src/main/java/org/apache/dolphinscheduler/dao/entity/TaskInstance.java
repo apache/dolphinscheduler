@@ -238,11 +238,11 @@ public class TaskInstance implements Serializable {
     }
 
     public String getVarPool() {
-      return varPool;
+        return varPool;
     }
 
     public void setVarPool(String varPool) {
-      this.varPool = varPool;
+        this.varPool = varPool;
     }
     
     public ProcessInstance getProcessInstance() {

@@ -661,10 +661,10 @@ public class MasterExecThread implements Runnable {
         List<TaskInstance> taskInstances = new ArrayList<>();
         for(String taskNode : submitTaskNodeList){
             try {
-              VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
+                VarPoolUtils.convertVarPoolToMap(propToValue, processInstance.getVarPool());
             } catch (ParseException e) {
-                  logger.error("parse {} exception", processInstance.getVarPool(), e);
-              }
+                logger.error("parse {} exception", processInstance.getVarPool(), e);
+            }
             TaskNode taskNodeObject = dag.getNode(taskNode);
             VarPoolUtils.setTaskNodeLocalParams(taskNodeObject, propToValue);
             taskInstances.add(createTaskInstance(processInstance, taskNode,

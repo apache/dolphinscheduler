@@ -69,11 +69,11 @@ public class TaskExecuteResponseCommand implements Serializable {
     private String varPool;
 
     public void setVarPool(String varPool) {
-      this.varPool = varPool;
+        this.varPool = varPool;
     }
 
     public String getVarPool() {
-      return varPool;
+        return varPool;
     }
     
     public int getTaskInstanceId() {

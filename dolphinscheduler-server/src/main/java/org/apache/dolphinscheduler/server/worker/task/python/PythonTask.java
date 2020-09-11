@@ -123,13 +123,13 @@ public class PythonTask extends AbstractTask {
                         taskExecutionContext.getScheduleTime());
         
         try {
-                rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
+            rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
         }
         catch (StringIndexOutOfBoundsException e) {
             // TODO: handle exception
         }
         
-        if (paramsMap != null){
+        if (paramsMap != null) {
             rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
         }
 
@@ -143,7 +143,5 @@ public class PythonTask extends AbstractTask {
     public AbstractParameters getParameters() {
         return pythonParameters;
     }
-
-
-
+    
 }
