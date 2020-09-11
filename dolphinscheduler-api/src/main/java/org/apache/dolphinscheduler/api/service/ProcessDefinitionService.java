@@ -17,13 +17,20 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -260,5 +267,31 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
             , int processDefinitionId, long version);
+
+    /**
+     * add ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return grant result code
+     */
+    Map<String, Object> addProcessDefinitionTags(int processId, String tagIds);
+
+    /**
+     * delete ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return grant result code
+     */
+    Map<String, Object> deleteProcessDefinitionTags(int processId, String tagIds);
+
+    /**
+     * query process definition list by tag id
+     *
+     * @param tagId tag id
+     * @return definition list
+     */
+    Map<String, Object> queryProcessDefinitionByTagId(Integer tagId);
 }
 

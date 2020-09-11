@@ -17,23 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_COPY_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -73,6 +56,8 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
+
+import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 
 /**
@@ -651,4 +636,64 @@ public class ProcessDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
+    /**
+     * query process definition all by tag id
+     *
+     * @param loginUser login user
+     * @param tagId tag id
+     * @return process definition list
+     */
+    @ApiOperation(value = "queryProcessDefinitionByTagId", notes = "QUERY_PROCESS_DEFINITION_All_BY_Tag_ID_NOTES")
+    @GetMapping(value = "/queryProcessDefinitionByTagId")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
+    public Result queryProcessDefinitionByTagId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                       @RequestParam("tagId") Integer tagId) {
+        logger.info("query process definition list by tag id, login user:{}, project id:{}",
+                loginUser.getUserName(), tagId);
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByTagId(tagId);
+        return returnDataList(result);
+    }
+
+    /**
+     * add ProcessDefinition Tags
+     *
+     * @param processId     ProcessDefinition id
+     * @param tagIds tag id array
+     * @return result code
+     */
+    @ApiOperation(value = "addProcessTags", notes = "ADD_PROCESS_TAGS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processId", value = "PROCESS_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "tagIds", value = "TAG_IDS", type = "String")
+    })
+    @PostMapping(value = "/add-process-tags")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(ADD_PROCESS_TAGS_ERROR)
+    public Result addProcessDefinitionTags(@RequestParam(value = "processId") int processId,
+            @RequestParam(value = "tagIds") String tagIds) {
+        Map<String, Object> result = processDefinitionService.addProcessDefinitionTags(processId, tagIds);
+        return returnDataList(result);
+    }
+
+    /**
+     * add ProcessDefinition Tags
+     *
+     * @param processId     ProcessDefinition id
+     * @param tagIds tag id array
+     * @return result code
+     */
+    @ApiOperation(value = "deleteProcessTags", notes = "DELETE_PROCESS_TAGS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processId", value = "PROCESS_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "tagIds", value = "TAG_IDS", type = "String")
+    })
+    @PostMapping(value = "/delete-process-tags")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_PROCESS_TAGS_ERROR)
+    public Result deleteProcessDefinitionTags(@RequestParam(value = "processId") int processId,
+                                           @RequestParam(value = "tagIds") String tagIds) {
+        Map<String, Object> result = processDefinitionService.deleteProcessDefinitionTags(processId, tagIds);
+        return returnDataList(result);
+    }
 }

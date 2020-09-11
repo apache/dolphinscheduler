@@ -424,6 +424,23 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_process_definition_tags
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definiton_tags`;
+CREATE TABLE `t_ds_process_definiton_tags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `name` varchar(255) DEFAULT NULL COMMENT 'process definition tag name',
+  `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+  `user_id` int(11) DEFAULT NULL COMMENT 'process definition tag creator id',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_tag_unique` (`name`,`project_id`),
+  KEY `process_definition_tags_index` (`project_id`,`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- Records of t_ds_process_definition_tags
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_process_definition_version
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_definition_version`;
@@ -550,6 +567,21 @@ CREATE TABLE `t_ds_relation_datasource_user` (
 
 -- ----------------------------
 -- Records of t_ds_relation_datasource_user
+-- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for t_ds_relation_process_tag
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_process_tag`;
+CREATE TABLE `t_ds_relation_process_tag` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `process_id` int(11) NOT NULL COMMENT 'process id',
+  `tag_id` int(11) DEFAULT NULL COMMENT 'tag id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- ----------------------------
+-- Records of t_ds_relation_process_tag
 -- ----------------------------
 
 -- ----------------------------

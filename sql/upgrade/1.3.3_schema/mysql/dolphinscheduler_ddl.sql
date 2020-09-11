@@ -87,3 +87,44 @@ delimiter ;
 CALL ct_dolphin_T_t_ds_process_definition_version;
 DROP PROCEDURE ct_dolphin_T_t_ds_process_definition_version;
 
+-- uc_dolphin_T_t_ds_process_definition_A_process_tag
+drop PROCEDURE if EXISTS ct_dolphin_T_t_ds_relation_process_tag;
+delimiter d//
+CREATE PROCEDURE ct_dolphin_T_t_ds_relation_process_tag()
+BEGIN
+    CREATE TABLE `t_ds_relation_process_tag` (
+                                              `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+                                              `process_id` int(11) NOT NULL COMMENT 'process id',
+                                              `tag_id` int(11) DEFAULT NULL COMMENT 'tag id',
+                                              PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+END;
+
+d//
+
+delimiter ;
+CALL ct_dolphin_T_t_ds_relation_process_tag;
+DROP PROCEDURE ct_dolphin_T_t_ds_relation_process_tag;
+
+-- uc_dolphin_T_t_ds_process_definition_A_tag
+drop PROCEDURE if EXISTS ct_dolphin_T_t_ds_process_definiton_tags;
+delimiter d//
+CREATE PROCEDURE ct_dolphin_T_t_ds_process_definiton_tags()
+BEGIN
+    CREATE TABLE `t_ds_process_definiton_tags` (
+                                                 `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+                                                 `name` varchar(255) DEFAULT NULL COMMENT 'process definition tag name',
+                                                 `project_id` int(11) DEFAULT NULL COMMENT 'project id',
+                                                 `user_id` int(11) DEFAULT NULL COMMENT 'process definition tag creator id',
+                                                  PRIMARY KEY (`id`),
+                                                  UNIQUE KEY `process_definition_tag_unique` (`name`,`project_id`),
+                                                  KEY `process_definition_tags_index` (`project_id`,`id`) USING BTREE
+    ) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+END;
+
+d//
+
+delimiter ;
+CALL ct_dolphin_T_t_ds_process_definiton_tags;
+DROP PROCEDURE ct_dolphin_T_t_ds_process_definiton_tags;
+

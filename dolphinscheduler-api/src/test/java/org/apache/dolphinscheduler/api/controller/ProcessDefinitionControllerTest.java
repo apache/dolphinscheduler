@@ -346,6 +346,19 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
+    public void testQueryProcessDefinitionByTagId() throws Exception {
+        int tagId = 1;
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.queryProcessDefinitionByTagId(tagId)).thenReturn(result);
+        Result response = processDefinitionController.queryProcessDefinitionByTagId(user,tagId);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+
+    @Test
     public void testViewTree() throws Exception {
         String projectName = "test";
         int processId = 1;
@@ -446,6 +459,40 @@ public class ProcessDefinitionControllerTest {
                 , projectName
                 , 1
                 , 10);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+    }
+
+    @Test
+    public void testAddProcessDefinitionTags() {
+        int processId = 22;
+        String tagIds = "3";
+        Map<String, Object> resultMap = new HashMap<>();
+        putMsg(resultMap, Status.SUCCESS);
+        Mockito.when(processDefinitionService.addProcessDefinitionTags(
+                processId,
+                tagIds))
+                .thenReturn(resultMap);
+        Result result = processDefinitionController.addProcessDefinitionTags(
+                processId,
+                tagIds);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+    }
+
+    @Test
+    public void testDeleteProcessDefinitionTags() {
+        int processId = 22;
+        String tagIds = "3";
+        Map<String, Object> resultMap = new HashMap<>();
+        putMsg(resultMap, Status.SUCCESS);
+        Mockito.when(processDefinitionService.deleteProcessDefinitionTags(
+                processId,
+                tagIds))
+                .thenReturn(resultMap);
+        Result result = processDefinitionController.deleteProcessDefinitionTags(
+                processId,
+                tagIds);
 
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
     }

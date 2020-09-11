@@ -51,6 +51,14 @@
         where project_id = #{projectId}
         order by create_time desc
     </select>
+    <select id="queryAllDefinitionListByTagId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select pd.*
+        from t_ds_process_definition pd
+        left join t_ds_relation_process_tag pt on pd.id = pt.process_id
+        left join t_ds_process_definiton_tags ta on ta.id = pt.tag_id
+        where pt.tag_id = #{tagId}
+        order by create_time desc
+    </select>
     <select id="queryDefinitionListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select *
         from t_ds_process_definition

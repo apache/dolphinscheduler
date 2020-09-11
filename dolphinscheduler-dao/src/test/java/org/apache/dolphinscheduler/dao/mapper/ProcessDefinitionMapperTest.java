@@ -19,12 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 
 import java.util.Date;
 import java.util.List;
@@ -63,6 +58,12 @@ public class ProcessDefinitionMapperTest {
 
     @Autowired
     ProjectMapper projectMapper;
+
+    @Autowired
+    TagMapper tagMapper;
+
+    @Autowired
+    ProcessTagMapper processTagMapper;
 
     /**
      * insert
@@ -196,6 +197,27 @@ public class ProcessDefinitionMapperTest {
     public void testQueryAllDefinitionList() {
         ProcessDefinition processDefinition = insertOne();
         List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionList(1010);
+        Assert.assertNotEquals(processDefinitionIPage.size(), 0);
+    }
+
+    /**
+     * test query all process definition by tag id
+     */
+    @Test
+    public void testQueryAllDefinitionListByTagId() {
+        ProcessDefinition processDefinition = insertOne();
+        Tag tag = new Tag();
+        tag.setName("ut tag");
+        tag.setUserId(111);
+        tag.setProjectId(1010);
+        tagMapper.insert(tag);
+
+        ProcessTag processTag = new ProcessTag();
+        processTag.setProcessID(processDefinition.getId());
+        processTag.settagID(tag.getId());
+        processTagMapper.insert(processTag);
+
+        List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionListByTagId(tag.getId());
         Assert.assertNotEquals(processDefinitionIPage.size(), 0);
     }
 

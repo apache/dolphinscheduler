@@ -72,6 +72,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import static org.mockito.Mockito.when;
+
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceTest {
 
@@ -705,6 +707,18 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    public void testQueryProcessDefinitionByTagId() {
+        int tagId = 1;
+        ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setProcessDefinitionJson(SHELL_JSON);
+        List<ProcessDefinition> processDefinitionList = new ArrayList<>();
+        processDefinitionList.add(processDefinition);
+        Mockito.when(processDefineMapper.queryAllDefinitionListByTagId(tagId)).thenReturn(processDefinitionList);
+        Map<String, Object> successRes = processDefinitionService.queryProcessDefinitionByTagId(tagId);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+    @Test
     public void testViewTree() throws Exception {
         //process definition not exist
         ProcessDefinition processDefinition = getProcessDefinition();
@@ -983,6 +997,36 @@ public class ProcessDefinitionServiceTest {
 
         processDefinitionService.batchExportProcessDefinitionByIds(
                 loginUser, projectName, "1", null);
+    }
+
+    @Test
+    public void testAddProcessDefinitionTags(){
+
+        when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
+        User loginUser = new User();
+        String  tagIds= "10,12";
+
+        //processDefine not exist
+        Map<String, Object> result = processDefinitionService.addProcessDefinitionTags(47, tagIds);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
+        //success
+        result = processDefinitionService.addProcessDefinitionTags(46, tagIds);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testDeleteProcessDefinitionTags(){
+
+        when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
+        User loginUser = new User();
+        String  tagIds= "10,12";
+
+        //processDefine not exist
+        Map<String, Object> result = processDefinitionService.deleteProcessDefinitionTags(47, tagIds);
+        Assert.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
+        //success
+        result = processDefinitionService.deleteProcessDefinitionTags(46, tagIds);
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     /**
