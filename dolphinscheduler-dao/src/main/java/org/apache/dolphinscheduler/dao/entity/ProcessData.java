@@ -27,114 +27,113 @@ import java.util.List;
  */
 public class ProcessData {
 
-  private Long serialCommandLengh;
-  /**
-   * task list
-   */
-  private List<TaskNode> tasks;
+    private Long serialCommandLengh;
+    /**
+     * task list
+     */
+    private List<TaskNode> tasks;
 
-  /**
-   * global parameters
-   */
-  private List<Property> globalParams;
-
-
-  private int timeout;
-
-  private int tenantId;
-
-  /**
-   * 0:serial,1:parallel
-   */
-  private int isParallel;
+    /**
+     * global parameters
+     */
+    private List<Property> globalParams;
 
 
-  public int getIsParallel() {
-    return isParallel;
-  }
+    private int timeout;
 
-  public void setIsParallel(int isParallel) {
-    this.isParallel = isParallel;
-  }
+    private int tenantId;
 
-  public ProcessData() {
-  }
+    /**
+     * 0:serial,1:parallel
+     */
+    private int isParallel;
 
-  /**
-   *
-   * @param tasks tasks
-   * @param globalParams globalParams
-   */
-  public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
-    this.tasks = tasks;
-    this.globalParams = globalParams;
-  }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    public int getIsParallel() {
+        return isParallel;
     }
 
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    public void setIsParallel(int isParallel) {
+        this.isParallel = isParallel;
     }
 
-    ProcessData that = (ProcessData) o;
+    public ProcessData() {
+    }
 
-    return CollectionUtils.equalLists(tasks, that.tasks) &&
-            CollectionUtils.equalLists(globalParams, that.globalParams);
-  }
+    /**
+     * @param tasks        tasks
+     * @param globalParams globalParams
+     */
+    public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+        this.tasks = tasks;
+        this.globalParams = globalParams;
+    }
 
-  public List<TaskNode> getTasks() {
-    return tasks;
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
-  public void setTasks(List<TaskNode> tasks) {
-    this.tasks = tasks;
-  }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-  public List<Property> getGlobalParams() {
-    return globalParams;
-  }
+        ProcessData that = (ProcessData) o;
 
-  public void setGlobalParams(List<Property> globalParams) {
-    this.globalParams = globalParams;
-  }
+        return CollectionUtils.equalLists(tasks, that.tasks) &&
+                CollectionUtils.equalLists(globalParams, that.globalParams);
+    }
 
-  public int getTimeout() {
-    return timeout;
-  }
+    public List<TaskNode> getTasks() {
+        return tasks;
+    }
 
-  public void setTimeout(int timeout) {
-    this.timeout = timeout;
-  }
+    public void setTasks(List<TaskNode> tasks) {
+        this.tasks = tasks;
+    }
 
-  public int getTenantId() {
-    return tenantId;
-  }
+    public List<Property> getGlobalParams() {
+        return globalParams;
+    }
 
-  public void setTenantId(int tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setGlobalParams(List<Property> globalParams) {
+        this.globalParams = globalParams;
+    }
 
-  public Long getSerialCommandLengh() {
-    return serialCommandLengh;
-  }
+    public int getTimeout() {
+        return timeout;
+    }
 
-  public void setSerialCommandLengh(Long serialCommandLengh) {
-    this.serialCommandLengh = serialCommandLengh;
-  }
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
-  @Override
-  public String toString() {
-    return "ProcessData{" +
-            "serialCommandLengh=" + serialCommandLengh +
-            ", tasks=" + tasks +
-            ", globalParams=" + globalParams +
-            ", timeout=" + timeout +
-            ", tenantId=" + tenantId +
-            ", isParallel=" + isParallel +
-            '}';
-  }
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public Long getSerialCommandLengh() {
+        return serialCommandLengh;
+    }
+
+    public void setSerialCommandLengh(Long serialCommandLengh) {
+        this.serialCommandLengh = serialCommandLengh;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessData{" +
+                "serialCommandLengh=" + serialCommandLengh +
+                ", tasks=" + tasks +
+                ", globalParams=" + globalParams +
+                ", timeout=" + timeout +
+                ", tenantId=" + tenantId +
+                ", isParallel=" + isParallel +
+                '}';
+    }
 }
