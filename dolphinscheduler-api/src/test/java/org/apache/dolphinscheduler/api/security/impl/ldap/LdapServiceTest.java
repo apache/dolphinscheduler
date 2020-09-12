@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.common.enums.UserType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,13 +45,20 @@ import org.springframework.test.context.junit4.SpringRunner;
         })
 public class LdapServiceTest {
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    protected AutowireCapableBeanFactory beanFactory;
+
     private LdapService ldapService;
 
     @Before
     public void setUp() {
         ldapService = new LdapService();
         beanFactory.autowireBean(ldapService);
+    }
+
+    @Test
+    public void getUserType() {
+        UserType userType = ldapService.getUserType("read-only-admin");
+        Assert.assertEquals(userType, UserType.ADMIN_USER);
     }
 
     @Test

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import org.apache.dolphinscheduler.common.enums.UserType;
 
@@ -73,11 +73,11 @@ public class LdapService {
     }
 
     /**
-     * login by userId and return userName
+     * login by userId and return user email
      *
-     * @param userId user identity id ,eg:user@domain.com
+     * @param userId user identity id
      * @param userPwd user login password
-     * @return ldap userName
+     * @return user email
      */
     public String ldapLogin(String userId, String userPwd) {
         Properties searchEnv = getManagerLdapEnv();
@@ -106,9 +106,7 @@ public class LdapService {
                     }
                     Attribute attr = (Attribute) attrs.next();
                     if (attr.getID().equals(ldapEmailAttribute)) {
-                        String userName = (String) attr.get();
-                        logger.info("Authentication successful:{}/{}", userId, userName);
-                        return userName;
+                        return (String) attr.get();
                     }
                 }
             }

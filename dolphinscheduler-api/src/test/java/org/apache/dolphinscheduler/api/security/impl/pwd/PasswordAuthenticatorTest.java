@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.pwd;
 
 import static org.mockito.Mockito.when;
 
@@ -63,7 +63,7 @@ public class PasswordAuthenticatorTest {
     private Session mockSession;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         authenticator = new PasswordAuthenticator();
         beanFactory.autowireBean(authenticator);
 
@@ -79,6 +79,13 @@ public class PasswordAuthenticatorTest {
         mockSession.setIp("127.0.0.1");
         mockSession.setUserId(1);
         mockSession.setLastLoginTime(new Date());
+    }
+
+    @Test
+    public void testLogin() {
+        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        User login = authenticator.login("test", "test", "127.0.0.1");
+        Assert.assertNotNull(login);
     }
 
     @Test

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import static org.mockito.Mockito.when;
 
@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -44,15 +45,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
+@TestPropertySource(
+        properties = {
+                "security.authentication.type=LDAP",
+                "security.authentication.ldap.user.admin=read-only-admin",
+                "ldap.urls=ldap://ldap.forumsys.com:389/",
+                "ldap.base.dn=dc=example,dc=com",
+                "ldap.username=cn=read-only-admin,dc=example,dc=com",
+                "ldap.password=password",
+                "ldap.user.identity.attribute=uid",
+                "ldap.user.email.attribute=mail",
+        })
 public class LdapAuthenticatorTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
-
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    protected AutowireCapableBeanFactory beanFactory;
     @MockBean
     private LdapService ldapService;
     @MockBean
@@ -82,6 +94,7 @@ public class LdapAuthenticatorTest {
         mockUser.setUserName(ldapUid);
         mockUser.setEmail(ldapEmail);
         mockUser.setUserType(userType);
+        mockUser.setState(Flag.YES.getCode());
 
         mockSession = new Session();
         mockSession.setId(UUID.randomUUID().toString());
