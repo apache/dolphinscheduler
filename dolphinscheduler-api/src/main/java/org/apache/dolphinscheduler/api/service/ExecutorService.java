@@ -380,10 +380,10 @@ public class ExecutorService extends BaseService{
 
         int create = processService.createCommand(command);
 
-        if (create > 0){
+        if (create > 0) {
             putMsg(result, Status.SUCCESS);
         }
-        else if (create == -1){
+        else if (create == -1) {
             putMsg(result, Status.START_PROCESS_OUT_OF_SERIAL_QUEUE);
         }
         else {
