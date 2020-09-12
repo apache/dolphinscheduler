@@ -81,8 +81,8 @@ public class ProcessData {
 
         ProcessData that = (ProcessData) o;
 
-        return CollectionUtils.equalLists(tasks, that.tasks) &&
-                CollectionUtils.equalLists(globalParams, that.globalParams);
+        return CollectionUtils.equalLists(tasks, that.tasks)
+                && CollectionUtils.equalLists(globalParams, that.globalParams);
     }
 
     public List<TaskNode> getTasks() {
@@ -128,12 +128,12 @@ public class ProcessData {
     @Override
     public String toString() {
         return "ProcessData{" +
-                "serialCommandLengh=" + serialCommandLengh +
-                ", tasks=" + tasks +
-                ", globalParams=" + globalParams +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                ", isParallel=" + isParallel +
-                '}';
+                "serialCommandLengh=" + serialCommandLengh
+                + ", tasks=" + tasks
+                + ", globalParams=" + globalParams
+                + ", timeout=" + timeout
+                + ", tenantId=" + tenantId
+                + ", isParallel=" + isParallel
+                + '}';
     }
 }

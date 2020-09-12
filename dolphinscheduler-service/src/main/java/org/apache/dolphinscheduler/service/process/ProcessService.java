@@ -241,8 +241,8 @@ public class ProcessService {
             if (!(processDefinition.getIsParallel() == 0 && queueLength > processDefinition.getSerialCommandLengh())) {
                 result = commandMapper.insert(command);
             } else {
-                logger.info("processDefinition id:{},name:{} is serial run and def serialCommandLengh is:{},but command queue length is:{}," +
-                                "so this command [command CommandParam:{}] will not insert into command queue...", processDefinition.getId(), processDefinition.getName(),
+                logger.info("processDefinition id:{},name:{} is serial run and def serialCommandLengh is:{},but command queue length is:{},"
+                                + "so this command [command CommandParam:{}] will not insert into command queue...", processDefinition.getId(), processDefinition.getName(),
                         processDefinition.getSerialCommandLengh(), queueLength, command.getCommandParam());
             }
         }
@@ -1019,8 +1019,8 @@ public class ProcessService {
             String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
             // sub process must begin with schedule/complement data
             // if father begin with scheduler/complement data
-            if (fatherHistoryCommand.startsWith(CommandType.SCHEDULER.toString()) ||
-                    fatherHistoryCommand.startsWith(CommandType.COMPLEMENT_DATA.toString())) {
+            if (fatherHistoryCommand.startsWith(CommandType.SCHEDULER.toString())
+                    || fatherHistoryCommand.startsWith(CommandType.COMPLEMENT_DATA.toString())) {
                 commandType = CommandType.valueOf(fatherHistoryCommand.split(Constants.COMMA)[0]);
             }
         }
@@ -1033,8 +1033,8 @@ public class ProcessService {
         String processMapStr = JSONUtils.toJsonString(instanceMap);
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
 
-        if (commandType == CommandType.COMPLEMENT_DATA ||
-                (childInstance != null && childInstance.isComplementData())) {
+        if (commandType == CommandType.COMPLEMENT_DATA
+                || (childInstance != null && childInstance.isComplementData())) {
             Map<String, String> parentParam = JSONUtils.toMap(parentProcessInstance.getCommandParam());
             String endTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
             String startTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
