@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,6 +62,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
      */
     public ConditionsTaskExecThread(TaskInstance taskInstance) {
         super(taskInstance);
+        taskInstance.setStartTime(new Date());
     }
 
     @Override
@@ -123,7 +125,7 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
-        this.taskInstance.setLogPath(getTaskLogPath(taskInstance));
+        this.taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
         this.taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());

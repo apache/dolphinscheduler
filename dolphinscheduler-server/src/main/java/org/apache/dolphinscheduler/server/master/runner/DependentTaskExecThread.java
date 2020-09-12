@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.DependentExecute;
 
 import java.util.ArrayList;
@@ -214,7 +215,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     private void initTaskParameters() {
-        taskInstance.setLogPath(getTaskLogPath(taskInstance));
+        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance));
         taskInstance.setHost(NetUtils.getHost() + Constants.COLON + masterConfig.getListenPort());
         taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
