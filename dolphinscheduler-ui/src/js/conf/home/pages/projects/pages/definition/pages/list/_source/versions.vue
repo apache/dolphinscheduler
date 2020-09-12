@@ -25,13 +25,10 @@
       <table class="fixed">
         <caption><!-- placeHolder --></caption>
         <tr>
-          <th scope="col">
-            <span>#</span>
+          <th scope="col" style="min-width: 40px;text-align: left">
+            <span>{{$t('Version')}}</span>
           </th>
-          <th scope="col" style="min-width: 40px">
-            <span>Version</span>
-          </th>
-          <th scope="col" style="min-width: 200px;max-width: 300px;">
+          <th scope="col" style="min-width: 30px">
             <span>{{$t('Description')}}</span>
           </th>
           <th scope="col" style="min-width: 50px">
@@ -43,16 +40,13 @@
         </tr>
         <tr v-for="(item, $index) in processDefinitionVersions" :key="item.id">
           <td>
-            <span>-</span>
-          </td>
-          <td>
             <span v-if="item.version">
               <span v-if="item.version === processDefinition.version" style="color: green"><strong>{{item.version}} {{$t('Current Version')}}</strong></span>
               <span v-else>{{item.version}}</span>
             </span>
             <span v-else>-</span>
           </td>
-          <td>
+          <td style="word-break:break-all;">
             <span v-if="item.description">{{item.description}}</span>
             <span v-else>-</span>
           </td>
@@ -64,7 +58,7 @@
             <x-poptip
               :ref="'poptip-switch-version-' + $index"
               placement="top-end"
-              width="90">
+              width="260">
               <p>{{$t('Confirm Switch To This Version?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
                 <x-button type="text" size="xsmall" shape="circle" @click="_closeSwitchVersion($index)">
@@ -195,18 +189,14 @@
        * Close the switch version layer
        */
       _closeSwitchVersion (i) {
-        if (i > 0) {
-          this.$refs[`poptip-switch-version-${i}`][0].doClose()
-        }
+        this.$refs[`poptip-switch-version-${i}`][0].doClose()
       },
 
       /**
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
 
       /**
