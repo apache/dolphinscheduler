@@ -382,7 +382,11 @@ public class ExecutorService extends BaseService{
 
         if (create > 0) {
             putMsg(result, Status.SUCCESS);
-        } else {
+        }
+        else if(create == -1){
+            putMsg(result, Status.START_PROCESS_OUT_OF_SERIAL_QUEUE);
+        }
+        else {
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
 

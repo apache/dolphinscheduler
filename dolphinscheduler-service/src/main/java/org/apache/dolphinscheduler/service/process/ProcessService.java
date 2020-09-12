@@ -244,6 +244,7 @@ public class ProcessService {
                 logger.info("processDefinition id:{},name:{} is serial run and def serialCommandLengh is:{},but command queue length is:{},"
                                 + "so this command [command CommandParam:{}] will not insert into command queue...", processDefinition.getId(), processDefinition.getName(),
                         processDefinition.getSerialCommandLengh(), queueLength, command.getCommandParam());
+                result = -1;
             }
         }
         return result;
