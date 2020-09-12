@@ -1168,9 +1168,11 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
         if (
-            // running, delayed or killed
-            // the task already exists in task queue
-            // return state
+        /**
+         *  running, delayed or killed
+         *  the task already exists in task queue
+         *  return state
+         */
                 state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
@@ -1928,7 +1930,6 @@ public class ProcessService {
 
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
-
             switch (authorizationType) {
                 case RESOURCE_FILE_ID:
                     Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());

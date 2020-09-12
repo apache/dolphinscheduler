@@ -48,7 +48,6 @@ public class ProcessData {
      */
     private int isParallel;
 
-
     public int getIsParallel() {
         return isParallel;
     }
@@ -127,8 +126,8 @@ public class ProcessData {
 
     @Override
     public String toString() {
-        return "ProcessData{" +
-                "serialCommandLengh=" + serialCommandLengh
+        return "ProcessData{"
+                + "serialCommandLengh=" + serialCommandLengh
                 + ", tasks=" + tasks
                 + ", globalParams=" + globalParams
                 + ", timeout=" + timeout
