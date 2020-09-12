@@ -268,8 +268,8 @@ export default {
         state.timeout = processInstanceJson.timeout
 
         state.tenantId = processInstanceJson.tenantId
-        state.isParallel = processDefinitionJson.isParallel
-        state.serialCommandLengh = processDefinitionJson.serialCommandLengh
+        state.isParallel = processInstanceJson.isParallel
+        state.serialCommandLengh = processInstanceJson.serialCommandLengh
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
         state.startup.commandParam = JSON.parse(res.data.commandParam)
