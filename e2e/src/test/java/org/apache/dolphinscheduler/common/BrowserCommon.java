@@ -23,7 +23,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import redis.clients.jedis.Jedis;
-
+import org.openqa.selenium.JavascriptExecutor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +115,7 @@ public class BrowserCommon {
 
     /**
      * Click button element
+     *
      * @param locator By
      * @return clickButton
      */
@@ -128,12 +129,13 @@ public class BrowserCommon {
 
     /**
      * Click Navigation Bar element
+     *
      * @param locator By
      * @return clickButton
      */
     public void clickTopElement(By locator) {
         WebElement element = driver.findElement(locator);
-        JavascriptExecutor executor = (JavascriptExecutor)driver;
+        JavascriptExecutor executor = (JavascriptExecutor) driver;
         executor.executeScript("arguments[0].click();", element);
     }
 
@@ -164,6 +166,24 @@ public class BrowserCommon {
         inputElement.sendKeys(content);
         return inputElement;
     }
+
+
+    /**
+     * input element after clearing
+     *
+     * @param locator By
+     * @param content Input content
+     * @return inputElement
+     */
+    public WebElement clearSendInput(By locator, String content) {
+        WebElement inputElement = locateElement(locator);
+        //input date
+        inputElement.clear();
+        inputElement.sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END));
+        inputElement.sendKeys(content);
+        return inputElement;
+    }
+
     /**
      * clear element
      *
@@ -182,9 +202,8 @@ public class BrowserCommon {
      *
      * @param codeMirrorLocator By codeMirror
      * @param codeMirrorLineLocator By codeMirrorLine
-
      */
-    public void inputCodeMirror(By codeMirrorLocator,By codeMirrorLineLocator,String content) {
+    public void inputCodeMirror(By codeMirrorLocator, By codeMirrorLineLocator, String content) {
         WebElement codeMirrorElement = locateElement(codeMirrorLocator);
         WebElement codeMirrorLineElement = locateElement(codeMirrorLineLocator);
         codeMirrorElement.click();
@@ -193,32 +212,57 @@ public class BrowserCommon {
 
     /**
      * move to element
+     *
      * @param locator BY
      * @return actions
      */
-    public Actions moveToElement(By locator){
+    public Actions moveToElement(By locator) {
         return actions.moveToElement(locateElement(locator));
     }
 
     /**
      * mouse drag  element
      *
-     * @param source_locator BY
-     * @param target_locator BY
+     * @param sourceLocator BY
+     * @param targetLocator BY
      */
-    public void dragAndDrop(By source_locator, By target_locator){
-        WebElement sourceElement = locateElement(source_locator);
-        WebElement targetElement = locateElement(target_locator);
+    public void dragAndDrop(By sourceLocator, By targetLocator) {
+        WebElement sourceElement = locateElement(sourceLocator);
+        WebElement targetElement = locateElement(targetLocator);
         actions.dragAndDrop(sourceElement, targetElement).perform();
         actions.release();
     }
 
-    public void moveToDragElement(By target_locator, int X, int Y){
-        WebElement targetElement = locateElement(target_locator);
-        actions.dragAndDropBy(targetElement, X, Y).perform();
+    public void moveToDragElement(By targetLocator, int x, int y) {
+        WebElement targetElement = locateElement(targetLocator);
+        actions.dragAndDropBy(targetElement, x, y).perform();
         actions.release();
     }
 
+    /**
+     * Right mouse click on the element
+     *
+     * @param locator By
+     * @return actions
+     */
+    public void mouseRightClickElement(By locator) {
+        WebElement mouseRightClickElement = locateElement(locator);
+        actions.contextClick(mouseRightClickElement).perform();
+    }
+
+    /**
+     * The mouse moves from a position to a specified positionØ
+     *
+     * @param sourceLocator BY
+     * @param targetLocator BY
+     * @return actions
+     */
+    public void mouseMovePosition(By sourceLocator, By targetLocator) throws InterruptedException {
+        WebElement sourceElement = locateElement(sourceLocator);
+        WebElement targetElement = locateElement(targetLocator);
+        actions.dragAndDrop(sourceElement,targetElement).perform();
+        actions.click();
+    }
 
     /**
      * jump page
@@ -249,9 +293,22 @@ public class BrowserCommon {
         return driver;
     }
 
+    /**
+     * select time
+     *
+     * @return WebElement
+     */
+    public WebElement selectDate(String js, By locator_time, String date) {
+        JavascriptExecutor removeAttribute = (JavascriptExecutor) driver;
+        removeAttribute.executeScript("var setDate=" + js + ";setDate.removeAttribute('readonly');");
+        WebElement dateElement = locateElement(locator_time);
 
-
-
+        //input date
+        dateElement.clear();
+        dateElement.sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END));
+        dateElement.sendKeys(date);
+        return dateElement;
+    }
 
         /**
          * Multi-window switch handle, according to the handle number passed in
@@ -386,5 +443,9 @@ public class BrowserCommon {
      */
     public boolean ifTextExists(By locator, String text) {
         return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+
+    public void flushPage() {
+        driver.navigate().refresh();
     }
 }

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -98,7 +98,7 @@ public class ExecutorService extends BaseService{
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup, Integer timeout) throws ParseException {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
@@ -176,7 +176,7 @@ public class ExecutorService extends BaseService{
      * @return check result code
      */
     public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId){
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (processDefinition == null) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,processDefineId);
@@ -201,7 +201,7 @@ public class ExecutorService extends BaseService{
      * @return execute result code
      */
     public Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = checkResultAndAuth(loginUser, projectName, project);
@@ -294,7 +294,7 @@ public class ExecutorService extends BaseService{
      */
     private Map<String, Object> checkExecuteType(ProcessInstance processInstance, ExecuteType executeType) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         ExecutionStatus executionStatus = processInstance.getState();
         boolean checkResult = false;
         switch (executeType) {
@@ -339,7 +339,7 @@ public class ExecutorService extends BaseService{
      * @return update result
      */
     private Map<String, Object> updateProcessInstancePrepare(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
@@ -365,7 +365,7 @@ public class ExecutorService extends BaseService{
      * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Command command = new Command();
         command.setCommandType(commandType);
         command.setProcessDefinitionId(processDefinitionId);
@@ -509,7 +509,7 @@ public class ExecutorService extends BaseService{
         if(warningType != null){
             command.setWarningType(warningType);
         }
-        command.setCommandParam(JSONUtils.toJson(cmdParam));
+        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(executorId);
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
@@ -532,7 +532,7 @@ public class ExecutorService extends BaseService{
                 if(runMode == RunMode.RUN_MODE_SERIAL){
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
-                    command.setCommandParam(JSONUtils.toJson(cmdParam));
+                    command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                     return processService.createCommand(command);
                 }else if (runMode == RunMode.RUN_MODE_PARALLEL){
                     List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
@@ -547,7 +547,7 @@ public class ExecutorService extends BaseService{
                         for (Date date : listDate) {
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
-                            command.setCommandParam(JSONUtils.toJson(cmdParam));
+                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                         }
                         return listDate.size();
@@ -558,7 +558,7 @@ public class ExecutorService extends BaseService{
                             runCunt += 1;
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
-                            command.setCommandParam(JSONUtils.toJson(cmdParam));
+                            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
                             processService.createCommand(command);
                             start = DateUtils.getSomeDay(start, 1);
                         }
@@ -570,7 +570,7 @@ public class ExecutorService extends BaseService{
                         processDefineId, schedule);
             }
         }else{
-            command.setCommandParam(JSONUtils.toJson(cmdParam));
+            command.setCommandParam(JSONUtils.toJsonString(cmdParam));
             return processService.createCommand(command);
         }
 

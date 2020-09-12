@@ -19,6 +19,25 @@ import _ from 'lodash'
 import io from '@/module/io'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
 
+// delete 'definitionList' from tasks
+const deleteDefinitionList = (tasks) => {
+  const newTasks = [];
+  tasks.forEach(item => {
+    const newItem = Object.assign({}, item);
+    if(newItem.dependence && newItem.dependence.dependTaskList) {
+      newItem.dependence.dependTaskList.forEach(dependTaskItem => {
+        if (dependTaskItem.dependItemList) {
+          dependTaskItem.dependItemList.forEach(dependItem => {
+            Reflect.deleteProperty(dependItem, 'definitionList');
+          })
+        }
+      })
+    }
+    newTasks.push(newItem);
+  });
+  return newTasks;
+}
+
 export default {
   /**
    *  Task status acquisition
@@ -60,6 +79,46 @@ export default {
       })
     })
   },
+
+  /**
+   * get process definition versions pagination info
+   */
+  getProcessDefinitionVersionsPage ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/versions`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * switch process definition version
+   */
+  switchProcessDefinitionVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/version/switch`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * delete process definition version
+   */
+  deleteProcessDefinitionVersion ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/version/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
   /**
    * Update process instance status
    */
@@ -107,6 +166,8 @@ export default {
         state.connects = JSON.parse(res.data.connects)
         // locations
         state.locations = JSON.parse(res.data.locations)
+        // version
+        state.version = res.data.version
         // Process definition
         const processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
         // tasks info
@@ -135,8 +196,38 @@ export default {
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/process/copy`, {
-        processId: payload.processId
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
       }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get process definition DAG diagram details
+   */
+  moveProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/process/move`, {
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get all the items created by the logged in user
+   */
+  getAllItems ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/login-user-created-project`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -193,7 +284,7 @@ export default {
     return new Promise((resolve, reject) => {
       const data = {
         globalParams: state.globalParams,
-        tasks: state.tasks,
+        tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
         timeout: state.timeout
       }
@@ -217,7 +308,7 @@ export default {
     return new Promise((resolve, reject) => {
       const data = {
         globalParams: state.globalParams,
-        tasks: state.tasks,
+        tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
         timeout: state.timeout
       }
@@ -230,6 +321,7 @@ export default {
         id: payload
       }, res => {
         resolve(res)
+        state.isEditDag = false
       }).catch(e => {
         reject(e)
       })
@@ -254,6 +346,7 @@ export default {
         syncDefine: state.syncDefine
       }, res => {
         resolve(res)
+        state.isEditDag = false
       }).catch(e => {
         reject(e)
       })

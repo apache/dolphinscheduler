@@ -37,6 +37,16 @@
         order by id asc
     </select>
 
+    <select id="queryTopNProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        where state = #{status}
+        and start_time between
+        #{startTime} and #{endTime}
+        order by end_time-start_time desc
+        limit #{size}
+    </select>
+
     <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
         from t_ds_process_instance
@@ -181,6 +191,16 @@
         </if>
         order by end_time desc limit 1
     </select>
-
+    <select id="queryByProcessDefineIdAndStatus"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        where process_definition_id=#{processDefinitionId}
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+        order by id asc
+    </select>
 
 </mapper>

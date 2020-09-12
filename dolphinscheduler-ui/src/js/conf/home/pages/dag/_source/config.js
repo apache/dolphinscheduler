@@ -153,7 +153,7 @@ const tasksState = {
     icoUnicode: 'ans-icon-dot-circle',
     isSpin: false
   },
-  RUNNING_EXEUTION: {
+  RUNNING_EXECUTION: {
     id: 1,
     desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
@@ -229,6 +229,13 @@ const tasksState = {
     color: '#5101be',
     icoUnicode: 'ans-icon-dependence',
     isSpin: false
+  },
+  DELAY_EXECUTION: {
+    id: 12,
+    desc: `${i18n.$t('Delay execution')}`,
+    color: '#5102ce',
+    icoUnicode: 'ans-icon-coin',
+    isSpin: false
   }
 }
 
@@ -242,6 +249,10 @@ const tasksType = {
   SHELL: {
     desc: 'SHELL',
     color: '#646464'
+  },
+  WATERDROP: {
+    desc: 'WATERDROP',
+    color: '#646465'
   },
   SUB_PROCESS: {
     desc: 'SUB_PROCESS',

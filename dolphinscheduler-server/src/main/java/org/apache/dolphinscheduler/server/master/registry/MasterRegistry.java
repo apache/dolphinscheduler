@@ -14,31 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.registry;
+
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.registry.HeartBeatTask;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Sets;
 
 /**
- *  master registry
+ * master registry
  */
 @Service
 public class MasterRegistry {
@@ -46,7 +51,7 @@ public class MasterRegistry {
     private final Logger logger = LoggerFactory.getLogger(MasterRegistry.class);
 
     /**
-     *  zookeeper registry center
+     * zookeeper registry center
      */
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
@@ -63,89 +68,75 @@ public class MasterRegistry {
     private ScheduledExecutorService heartBeatExecutor;
 
     /**
-     * worker start time
+     * master start time
      */
     private String startTime;
 
-
     @PostConstruct
-    public void init(){
+    public void init() {
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
     /**
-     *  registry
+     * registry
      */
     public void registry() {
-        String address = OSUtils.getHost();
+        String address = NetUtils.getHost();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if(newState == ConnectionState.LOST){
+                if (newState == ConnectionState.LOST) {
                     logger.error("master : {} connection lost from zookeeper", address);
-                } else if(newState == ConnectionState.RECONNECTED){
+                } else if (newState == ConnectionState.RECONNECTED) {
                     logger.info("master : {} reconnected to zookeeper", address);
                     zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-                } else if(newState == ConnectionState.SUSPENDED){
+                } else if (newState == ConnectionState.SUSPENDED) {
                     logger.warn("master : {} connection SUSPENDED ", address);
                 }
             }
         });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
-        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
-        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
+        HeartBeatTask heartBeatTask = new HeartBeatTask(startTime,
+                masterConfig.getMasterReservedMemory(),
+                masterConfig.getMasterMaxCpuloadAvg(),
+                Sets.newHashSet(getMasterPath()),
+                zookeeperRegistryCenter);
+
+        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0, masterHeartbeatInterval, TimeUnit.SECONDS);
+        logger.info("master node : {} registry to ZK path {} successfully with heartBeatInterval : {}s"
+                , address, localNodePath, masterHeartbeatInterval);
     }
 
     /**
-     *  remove registry info
+     * remove registry info
      */
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getMasterPath();
+        heartBeatExecutor.shutdownNow();
         zookeeperRegistryCenter.getZookeeperCachedOperator().remove(localNodePath);
-        logger.info("master node : {} unRegistry to ZK.", address);
+        logger.info("master node : {} unRegistry from ZK path {}."
+                , address, localNodePath);
     }
 
     /**
-     *  get master path
-     * @return
+     * get master path
      */
     private String getMasterPath() {
         String address = getLocalAddress();
-        String localNodePath = this.zookeeperRegistryCenter.getMasterPath() + "/" + address;
-        return localNodePath;
+        return this.zookeeperRegistryCenter.getMasterPath() + "/" + address;
     }
 
     /**
-     *  get local address
-     * @return
+     * get local address
      */
-    private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+    private String getLocalAddress() {
+
+        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
+
     }
 
-    /**
-     * hear beat task
-     */
-    class HeartBeatTask implements Runnable{
-
-        @Override
-        public void run() {
-            try {
-                StringBuilder builder = new StringBuilder(100);
-                builder.append(OSUtils.cpuUsage()).append(COMMA);
-                builder.append(OSUtils.memoryUsage()).append(COMMA);
-                builder.append(OSUtils.loadAverage()).append(COMMA);
-                builder.append(startTime).append(COMMA);
-                builder.append(DateUtils.dateToString(new Date()));
-                String masterPath = getMasterPath();
-                zookeeperRegistryCenter.getZookeeperCachedOperator().update(masterPath, builder.toString());
-            } catch (Throwable ex){
-                logger.error("error write master heartbeat info", ex);
-            }
-        }
-    }
 }

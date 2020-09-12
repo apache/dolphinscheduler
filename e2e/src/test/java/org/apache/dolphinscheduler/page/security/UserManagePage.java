@@ -27,13 +27,16 @@ public class UserManagePage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create user
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createUser() throws InterruptedException {
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        //determine whether the create user button exists
+        ifTextExists(UserManageLocator.CLICK_CREATE_USER_BUTTON,UserManageData.CREATE_USER_BUTTON);
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
@@ -45,8 +48,10 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.SELECT_TENANT);
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
-        sendInput(UserManageLocator.TENANT_INPUT_EMAIL, UserManageData.EMAIL);
-        sendInput(UserManageLocator.TENANT_INPUT_PHONE, UserManageData.PHONE);
+        sendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EMAIL);
+        sendInput(UserManageLocator.INPUT_PHONE, UserManageData.PHONE);
+        clickElement(UserManageLocator.SELECT_STOP_STATE);
+        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
@@ -55,15 +60,87 @@ public class UserManagePage extends PageCommon {
         return ifTitleContains(UserManageData.USER_MANAGE);
     }
 
-    public boolean deleteUser() throws InterruptedException {
+    /**
+     * edit general user
+     */
+    public boolean editGeneralUser() throws InterruptedException {
+        //edit general user
+        // click  user manage
+        System.out.println("start edit general user");
+        clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
+        //determine whether the general user exists
+        ifTextExists(UserManageLocator.USER_NAME,UserManageData.USERNAME);
+
+        // click  edit user button
+        clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
+
+        // input user data
+        clearSendInput(UserManageLocator.INPUT_USERNAME, UserManageData.EDIT_USERNAME);
+        clearSendInput(UserManageLocator.INPUT_PASSWORD, UserManageData.EDIT_PASSWORD);
+
+        clickButton(UserManageLocator.CLICK_TENANT);
+        clickButton(UserManageLocator.SELECT_TENANT);
+
+        clickButton(UserManageLocator.CLICK_QUEUE);
+        clickButton(UserManageLocator.SELECT_QUEUE);
+
+        clearSendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EDIT_EMAIL);
+        clearSendInput(UserManageLocator.INPUT_PHONE, UserManageData.EDIT_PHONE);
+
+        clickElement(UserManageLocator.SELECT_STOP_STATE);
+        clickElement(UserManageLocator.SELECT_ENABLE_STATE);
+
+        // click  button
+        clickButton(UserManageLocator.SUBMIT);
+        System.out.println("end edit general user");
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(UserManageData.USER_MANAGE);
+    }
+
+    /**
+     * edit admin user
+     */
+    public boolean editAdminUser() throws InterruptedException {
+        //edit admin user
+        // click  user manage
+        System.out.println("start edit admin user");
+        clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        //determine whether the general user edit success
+        ifTextExists(UserManageLocator.USER_NAME,UserManageData.EDIT_USERNAME);
+
+        // click  edit user button
+        clickButton(UserManageLocator.EDIT_ADMIN_USER_BUTTON );
+
+        // select tenant
+        clickButton(UserManageLocator.CLICK_TENANT);
+
+        clickButton(UserManageLocator.SELECT_TENANT);
+
+        // click  button
+        clickButton(UserManageLocator.SUBMIT);
+        System.out.println("end edit admin user");
+        // Whether to enter the specified page after submit
+        return ifTitleContains(UserManageData.USER_MANAGE);
+    }
+
+
+    /**
+     * delete user
+     */
+    public boolean deleteUser() throws InterruptedException {
+        System.out.println("jump to user manage");
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
 
         // click  delete user button
+        System.out.println("click delete user");
         clickButton(UserManageLocator.DELETE_USER_BUTTON );
 
         // click confirm delete button
+        System.out.println("click confirm delete user");
         clickButton(UserManageLocator.CONFIRM_DELETE_USER_BUTTON);
 
         // Whether to enter the specified page after submit

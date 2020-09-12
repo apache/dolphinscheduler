@@ -20,6 +20,9 @@ import org.openqa.selenium.By;
 
 public class UserManageLocator {
 
+    /**
+     * create user
+     */
     public static final By CLICK_USER_MANAGE = By.xpath("//div[3]/div/a/div/a/span");
 
     public static final By CLICK_CREATE_USER_BUTTON = By.xpath("//span[contains(.,'创建用户')]");
@@ -36,13 +39,28 @@ public class UserManageLocator {
 
     public static final By SELECT_QUEUE = By.xpath("//div[4]/div[2]/div/div[2]/div/div/div/ul/li/span");
 
-    public static final By TENANT_INPUT_EMAIL = By.xpath("//div[5]/div[2]/div/input");
+    public static final By INPUT_EMAIL = By.xpath("//div[5]/div[2]/div/input");
 
-    public static final By TENANT_INPUT_PHONE = By.xpath("//div[6]/div[2]/div/input");
+    public static final By INPUT_PHONE = By.xpath("//div[6]/div[2]/div/input");
+
+    public static final By SELECT_STOP_STATE = By.xpath("//div[7]/div[2]/div/label[2]/span/input");
+
+    public static final By SELECT_ENABLE_STATE = By.xpath("//div[7]/div[2]/div/label[1]/span/input");
 
     public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
 
-    public static final By DELETE_USER_BUTTON = By.xpath("//span[2]/button");
+    /**
+     * edit user
+     */
+    public static final By USER_NAME = By.xpath("//table/tr[2]/td[2]/span");
 
-    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//div[2]/div/button[2]/span");
+    public static final By EDIT_GENERAL_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[11]/button");
+
+    public static final By EDIT_ADMIN_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[3]/td[11]/button");
+    /**
+     * delete user
+     */
+    public static final By DELETE_USER_BUTTON = By.xpath("//table/tr[3]/td[11]/span[2]/button");
+
+    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//tr[3]/td[11]/span[2]/div/div[2]/div/button[2]/span");
 }

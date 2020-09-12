@@ -24,16 +24,10 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content">
-            <x-radio-group v-model="type" size="small">
-              <x-radio :label="'MYSQL'">MYSQL</x-radio>
-              <x-radio :label="'POSTGRESQL'">POSTGRESQL</x-radio>
-              <x-radio :label="'HIVE'">HIVE/IMPALA</x-radio>
-              <x-radio :label="'SPARK'">SPARK</x-radio>
-              <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
-              <x-radio :label="'ORACLE'">ORACLE</x-radio>
-              <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
-              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
-            </x-radio-group>
+              <x-select style="width: 100%;" v-model="type">
+                <x-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
+                </x-option>
+              </x-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
@@ -200,7 +194,45 @@
         showdDatabase: false,
         showConnectType: false,
         isShowPrincipal:true,
-        prePortMapper:{}
+        prePortMapper:{},
+        datasourceTypeList: [
+          {
+            value: 'MYSQL',
+            label: 'MYSQL'
+          },
+          {
+            value: 'POSTGRESQL',
+            label: 'POSTGRESQL'
+          },
+          {
+            value: 'HIVE',
+            label: 'HIVE/IMPALA'
+          },
+          {
+            value: 'SPARK',
+            label: 'SPARK'
+          },
+          {
+            value: 'CLICKHOUSE',
+            label: 'CLICKHOUSE'
+          },
+          {
+            value: 'ORACLE',
+            label: 'ORACLE'
+          },
+          {
+            value: 'SQLSERVER',
+            label: 'SQLSERVER'
+          },
+          {
+            value: 'DB2',
+            label: 'DB2'
+          },
+          {
+            value: 'PRESTO',
+            label: 'PRESTO'
+          }
+        ]
       }
     },
     props: {
@@ -405,6 +437,9 @@
           case 'DB2':
             defaultPort = '50000'
             break
+          case 'PRESTO':
+            defaultPort = '8080'
+            break
           default:
             break
 
@@ -429,14 +464,14 @@
           this.showdDatabase = false;
         }
 
-        if (value== 'ORACLE') {
+        if (value== 'ORACLE' && !this.item.id) {
           this.showConnectType = true;
           this.connectType = 'ORACLE_SERVICE_NAME'
+        } else if(value== 'ORACLE' && this.item.id) {
+          this.showConnectType = true;
         } else {
           this.showConnectType = false;
-          this.connectType = ''
         }
-
         //Set default port for each type datasource
         this._setDefaultValues(value)
 

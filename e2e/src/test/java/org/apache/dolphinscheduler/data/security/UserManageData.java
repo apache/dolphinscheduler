@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.data.security;
 
 
 public class UserManageData  {
+    /**
+     * create user
+     */
     public static final String USERNAME = "selenium_user_1";
 
     public static final String PASSWORD = "123456qwe";
@@ -28,4 +31,14 @@ public class UserManageData  {
 
     public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
 
+    public static final String CREATE_USER_BUTTON = "创建用户";
+
+
+    /**
+     * edit user
+     */
+    public static final String EDIT_USERNAME = "selenium_user_edit";
+    public static final String EDIT_PASSWORD = "123456qwe";
+    public static final String EDIT_EMAIL = "123456_edit@qq.com";
+    public static final String EDIT_PHONE = "15800001111";
 }

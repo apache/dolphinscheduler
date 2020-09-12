@@ -136,10 +136,7 @@ public class UdfFuncService extends BaseService{
      */
     private boolean checkUdfFuncNameExists(String name){
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
-        if(resource != null && resource.size() > 0){
-            return true;
-        }
-        return false;
+        return resource != null && resource.size() > 0;
     }
 
 
@@ -151,7 +148,7 @@ public class UdfFuncService extends BaseService{
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -247,7 +244,7 @@ public class UdfFuncService extends BaseService{
      * @return udf function list page
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
 
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
@@ -286,7 +283,7 @@ public class UdfFuncService extends BaseService{
      * @return resource list
      */
     public Map<String, Object> queryResourceList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(loginUser.getId(), type);
 
         result.put(Constants.DATA_LIST, udfFuncList);
@@ -300,7 +297,7 @@ public class UdfFuncService extends BaseService{
      * @param id udf function id
      * @return delete result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Result delete(int id) {
         Result result = new Result();
         

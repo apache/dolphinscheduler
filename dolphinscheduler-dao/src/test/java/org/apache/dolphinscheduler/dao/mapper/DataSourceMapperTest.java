@@ -71,7 +71,6 @@ public class DataSourceMapperTest {
     @Test
     public void testInsert(){
         DataSource dataSource = createDataSource();
-        assertNotNull(dataSource.getId());
         assertThat(dataSource.getId(), greaterThan(0));
     }
 

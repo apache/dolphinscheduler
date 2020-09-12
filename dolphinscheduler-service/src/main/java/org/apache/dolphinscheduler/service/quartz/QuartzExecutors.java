@@ -20,7 +20,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -62,19 +62,19 @@ public class QuartzExecutors {
   private static Scheduler scheduler;
 
   /**
-   * instance of QuartzExecutors
-   */
-  private static volatile QuartzExecutors INSTANCE = null;
-
-  /**
    * load conf
    */
   private static Configuration conf;
+
+  private static final class Holder {
+    private static final QuartzExecutors instance = new QuartzExecutors();
+  }
 
 
   private QuartzExecutors() {
     try {
       conf = new PropertiesConfiguration(QUARTZ_PROPERTIES_PATH);
+      init();
     }catch (ConfigurationException e){
       logger.warn("not loaded quartz configuration file, will used default value",e);
     }
@@ -85,18 +85,7 @@ public class QuartzExecutors {
    * @return instance of Quartz Executors
    */
   public static QuartzExecutors getInstance() {
-    if (INSTANCE == null) {
-      synchronized (QuartzExecutors.class) {
-        // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
-        if (INSTANCE == null) {
-          QuartzExecutors quartzExecutors = new QuartzExecutors();
-          //finish QuartzExecutors init
-          quartzExecutors.init();
-          INSTANCE = quartzExecutors;
-        }
-      }
-    }
-    return INSTANCE;
+   return Holder.instance;
   }
 
 
@@ -334,7 +323,7 @@ public class QuartzExecutors {
     Map<String, Object> dataMap = new HashMap<>(3);
     dataMap.put(PROJECT_ID, projectId);
     dataMap.put(SCHEDULE_ID, scheduleId);
-    dataMap.put(SCHEDULE, JSONUtils.toJson(schedule));
+    dataMap.put(SCHEDULE, JSONUtils.toJsonString(schedule));
 
     return dataMap;
   }

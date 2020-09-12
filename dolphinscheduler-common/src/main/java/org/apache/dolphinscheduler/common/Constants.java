@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     private Constants() {
-        throw new IllegalStateException("Constants class");
+        throw new UnsupportedOperationException("Construct Constants");
     }
 
     /**
@@ -138,7 +139,7 @@ public final class Constants {
     /**
      * python home
      */
-    public static final String PYTHON_HOME="PYTHON_HOME";
+    public static final String PYTHON_HOME = "PYTHON_HOME";
 
     /**
      * resource.view.suffixs
@@ -239,6 +240,10 @@ public final class Constants {
      * EQUAL SIGN
      */
     public static final String EQUAL_SIGN = "=";
+    /**
+     * AT SIGN
+     */
+    public static final String AT_SIGN = "@";
 
 
     public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
@@ -300,7 +305,7 @@ public final class Constants {
     /**
      * user name regex
      */
-    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
+    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
 
     /**
      * email regex
@@ -360,7 +365,6 @@ public final class Constants {
      * worker reserved memory
      */
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
-
 
 
     /**
@@ -512,7 +516,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 5;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
     /**
@@ -748,7 +752,7 @@ public final class Constants {
 
 
     /**
-     *  preview schedule execute count
+     * preview schedule execute count
      */
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 
@@ -782,6 +786,10 @@ public final class Constants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
 
+    /**
+     * com.amazonaws.services.s3.enableV4
+     */
+    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
 
     /**
      * loginUserFromKeytab user
@@ -823,7 +831,8 @@ public final class Constants {
 
     public static final int[] NOT_TERMINATED_STATES = new int[]{
             ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+            ExecutionStatus.DELAY_EXECUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal(),
             ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
@@ -844,18 +853,17 @@ public final class Constants {
     /**
      * data total
      */
-    public  static final String COUNT = "count";
+    public static final String COUNT = "count";
 
     /**
      * page size
      */
-    public  static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
      */
-    public  static final String PAGE_NUMBER = "pageNo";
-
+    public static final String PAGE_NUMBER = "pageNo";
 
 
     /**
@@ -890,6 +898,7 @@ public final class Constants {
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
+    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
 
     /**
      * database type
@@ -902,6 +911,7 @@ public final class Constants {
     public static final String ORACLE = "ORACLE";
     public static final String SQLSERVER = "SQLSERVER";
     public static final String DB2 = "DB2";
+    public static final String PRESTO = "PRESTO";
 
     /**
      * jdbc url
@@ -914,6 +924,7 @@ public final class Constants {
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
+    public static final String JDBC_PRESTO = "jdbc:presto://";
 
 
     public static final String ADDRESS = "address";
@@ -921,6 +932,7 @@ public final class Constants {
     public static final String JDBC_URL = "jdbcUrl";
     public static final String PRINCIPAL = "principal";
     public static final String OTHER = "other";
+    public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
 
 
     /**
@@ -954,11 +966,11 @@ public final class Constants {
     /**
      * authorize writable perm
      */
-    public static final int AUTHORIZE_WRITABLE_PERM=7;
+    public static final int AUTHORIZE_WRITABLE_PERM = 7;
     /**
      * authorize readable perm
      */
-    public static final int AUTHORIZE_READABLE_PERM=4;
+    public static final int AUTHORIZE_READABLE_PERM = 4;
 
 
     /**
@@ -966,4 +978,26 @@ public final class Constants {
      */
     public static final String PLUGIN_JAR_SUFFIX = ".jar";
 
+    public static final int NORAML_NODE_STATUS = 0;
+    public static final int ABNORMAL_NODE_STATUS = 1;
+
+    public static final String START_TIME = "start time";
+    public static final String END_TIME = "end time";
+    /**
+     * system line separator
+     */
+    public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
+
+    /**
+     * net system properties
+     */
+    public static final String DOLPHIN_SCHEDULER_PREFERRED_NETWORK_INTERFACE = "dolphin.scheduler.network.interface.preferred";
+
+
+    /**
+     * datasource encryption salt
+     */
+    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
+    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
+    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 }

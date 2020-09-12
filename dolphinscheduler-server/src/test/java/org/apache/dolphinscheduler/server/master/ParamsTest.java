@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import com.alibaba.fastjson.JSON;
+import org.apache.dolphinscheduler.common.utils.*;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,7 @@ public class ParamsTest {
 
         Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap,
                 localParams, CommandType.START_PROCESS, new Date());
-        logger.info(JSON.toJSONString(paramsMap));
+        logger.info(JSONUtils.toJsonString(paramsMap));
 
 
     }

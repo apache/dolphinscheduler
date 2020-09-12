@@ -24,22 +24,33 @@ echo "init env variables"
 #============================================================================
 # Database Source
 #============================================================================
-export POSTGRESQL_HOST=${POSTGRESQL_HOST:-"127.0.0.1"}
-export POSTGRESQL_PORT=${POSTGRESQL_PORT:-"5432"}
-export POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME:-"root"}
-export POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD:-"root"}
-export POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE:-"dolphinscheduler"}
+export DATABASE_HOST=${DATABASE_HOST:-"127.0.0.1"}
+export DATABASE_PORT=${DATABASE_PORT:-"5432"}
+export DATABASE_USERNAME=${DATABASE_USERNAME:-"root"}
+export DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
+export DATABASE_DATABASE=${DATABASE_DATABASE:-"dolphinscheduler"}
+export DATABASE_TYPE=${DATABASE_TYPE:-"postgresql"}
+export DATABASE_DRIVER=${DATABASE_DRIVER:-"org.postgresql.Driver"}
+export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 
 #============================================================================
 # System
 #============================================================================
 export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
+export DOLPHINSCHEDULER_OPTS=${DOLPHINSCHEDULER_OPTS:-""}
+export RESOURCE_STORAGE_TYPE=${RESOURCE_STORAGE_TYPE:-"NONE"}
+export RESOURCE_UPLOAD_PATH=${RESOURCE_UPLOAD_PATH:-"/ds"}
+export FS_DEFAULT_FS=${FS_DEFAULT_FS:-"s3a://xxxx"}
+export FS_S3A_ENDPOINT=${FS_S3A_ENDPOINT:-"s3.xxx.amazonaws.com"}
+export FS_S3A_ACCESS_KEY=${FS_S3A_ACCESS_KEY:-"xxxxxxx"}
+export FS_S3A_SECRET_KEY=${FS_S3A_SECRET_KEY:-"xxxxxxx"}
 
 #============================================================================
 # Zookeeper
 #============================================================================
 export ZOOKEEPER_QUORUM=${ZOOKEEPER_QUORUM:-"127.0.0.1:2181"}
+export ZOOKEEPER_ROOT=${ZOOKEEPER_ROOT:-"/dolphinscheduler"}
 
 #============================================================================
 # Master Server
@@ -63,10 +74,13 @@ export WORKER_MAX_CPULOAD_AVG=${WORKER_MAX_CPULOAD_AVG:-"100"}
 export WORKER_RESERVED_MEMORY=${WORKER_RESERVED_MEMORY:-"0.1"}
 export WORKER_LISTEN_PORT=${WORKER_LISTEN_PORT:-"1234"}
 export WORKER_GROUP=${WORKER_GROUP:-"default"}
+export WORKER_WEIGHT=${WORKER_WEIGHT:-"100"}
 
 #============================================================================
 # Alert Server
 #============================================================================
+# alert plugin dir
+export ALERT_PLUGIN_DIR=${ALERT_PLUGIN_DIR:-"/opt/dolphinscheduler"}
 # XLS FILE
 export XLS_FILE_PATH=${XLS_FILE_PATH:-"/tmp/xls"}
 # mail
