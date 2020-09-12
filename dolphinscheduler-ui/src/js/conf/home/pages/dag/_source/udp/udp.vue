@@ -46,6 +46,29 @@
         <span class="text-b">{{$t('select tenant')}}</span>
         <form-tenant v-model="tenantId"></form-tenant>
       </div>
+      <!-- select run type sign -->
+      <div class="clearfix list" style="padding-top: 6px;">
+        <div class="text-box"><span>{{$t('select run type')}}</span></div>
+        <div class="cont-box">
+          <label class="label-box">
+            <x-radio-group v-model="isParallel">
+              <x-radio :label="0" :disabled="isDetails">{{$t('Serial execution')}}</x-radio>
+              <x-radio :label="1" :disabled="isDetails">{{$t('Parallel execution')}}</x-radio>
+            </x-radio-group>
+          </label>
+        </div>
+      </div>
+      <div class="clearfix list" v-if="isParallel===0">
+        <div class="text-box">
+          <span>{{$t('command queue length')}}</span>
+        </div>
+        <div class="cont-box">
+          <label class="label-box">
+            <x-input v-model="serialCommandLengh" style="width: 200px;" :disabled="isDetails" maxlength="9">
+            </x-input>
+          </label>
+        </div>
+      </div>
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
@@ -112,7 +135,8 @@
         syncDefine: true,
         // Timeout alarm
         timeout: 0,
-
+        isParallel: 1,
+        serialCommandLengh:0,
         tenantId: -1,
         // checked Timeout alarm
         checkedTimeout: true
@@ -136,11 +160,21 @@
         }
         return true
       },
+        _verifSerialCommandLengh() {
+            const reg = /^[0-9]\d*$/
+            if (!reg.test(this.serialCommandLengh)) {
+                this.$message.warning(`${i18n.$t('Please enter a positive integer greater than or equal 0')}`)
+                return false
+            }
+            return true
+        },
       _accuStore(){
         this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
+        this.store.commit('dag/setIsParallel', _.cloneDeep(this.isParallel))
+        this.store.commit('dag/setSerialCommandLengh', _.cloneDeep(this.serialCommandLengh))
         this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
       },
@@ -162,6 +196,10 @@
           if (this.checkedTimeout && !this._verifTimeout()) {
             return
           }
+            // verification SerialCommandLengh
+           if (!this._verifSerialCommandLengh()) {
+                return
+           }
 
           // Storage global globalParams
           this._accuStore()
@@ -203,6 +241,8 @@
       this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
+      this.isParallel = dag.isParallel ||0
+      this.serialCommandLengh = dag.serialCommandLengh ||0
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
       this.$nextTick(() => {

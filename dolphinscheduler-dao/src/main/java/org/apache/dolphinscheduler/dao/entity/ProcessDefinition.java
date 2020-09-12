@@ -42,6 +42,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @TableName("t_ds_process_definition")
 public class ProcessDefinition {
 
+
+    private Long serialCommandLengh;
+
+    private int isParallel;
+
     /**
      * id
      */
@@ -388,10 +393,28 @@ public class ProcessDefinition {
         this.modifyBy = modifyBy;
     }
 
+    public Long getSerialCommandLengh() {
+        return serialCommandLengh;
+    }
+
+    public void setSerialCommandLengh(Long serialCommandLengh) {
+        this.serialCommandLengh = serialCommandLengh;
+    }
+
+    public int getIsParallel() {
+        return isParallel;
+    }
+
+    public void setIsParallel(int isParallel) {
+        this.isParallel = isParallel;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
-                "id=" + id +
+                "serialCommandLengh=" + serialCommandLengh +
+                ", isParallel=" + isParallel +
+                ", id=" + id +
                 ", name='" + name + '\'' +
                 ", version=" + version +
                 ", releaseState=" + releaseState +
@@ -418,5 +441,4 @@ public class ProcessDefinition {
                 ", resourceIds='" + resourceIds + '\'' +
                 '}';
     }
-
 }

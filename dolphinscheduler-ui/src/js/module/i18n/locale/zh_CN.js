@@ -644,4 +644,7 @@ export default {
   'Batch move': '批量移动',
   Version: '版本',
   'Pre tasks': '前置任务',
+  'command queue length': '命令等待队列长度',
+  'Please enter a positive integer greater than or equal 0': '请输入大于等于 0 的正整数',
+  'select run type': '选择执行方式'
 }

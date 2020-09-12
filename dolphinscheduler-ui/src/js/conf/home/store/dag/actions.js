@@ -183,6 +183,8 @@ export default {
         state.timeout = processDefinitionJson.timeout
 
         state.tenantId = processDefinitionJson.tenantId
+        state.isParallel = processDefinitionJson.isParallel
+        state.serialCommandLengh = processDefinitionJson.serialCommandLengh
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -266,7 +268,8 @@ export default {
         state.timeout = processInstanceJson.timeout
 
         state.tenantId = processInstanceJson.tenantId
-
+        state.isParallel = processDefinitionJson.isParallel
+        state.serialCommandLengh = processDefinitionJson.serialCommandLengh
         // startup parameters
         state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroup', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
         state.startup.commandParam = JSON.parse(res.data.commandParam)
@@ -286,6 +289,8 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
+        serialCommandLengh:state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
@@ -310,6 +315,8 @@ export default {
         globalParams: state.globalParams,
         tasks: deleteDefinitionList(state.tasks),
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
+        serialCommandLengh:state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
@@ -336,6 +343,8 @@ export default {
         globalParams: state.globalParams,
         tasks: state.tasks,
         tenantId: state.tenantId,
+        isParallel:state.isParallel,
+        serialCommandLengh:state.serialCommandLengh,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {

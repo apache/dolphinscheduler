@@ -33,6 +33,12 @@ import java.util.Objects;
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
 
+    @TableField(exist = false)
+    private int isParallel;
+
+    @TableField(exist = false)
+    private Long serialCommandLengh;
+
     /**
      * id
      */
@@ -581,10 +587,28 @@ public class ProcessInstance {
         this.receiversCc = receiversCc;
     }
 
+    public int getIsParallel() {
+        return isParallel;
+    }
+
+    public void setIsParallel(int isParallel) {
+        this.isParallel = isParallel;
+    }
+
+    public Long getSerialCommandLengh() {
+        return serialCommandLengh;
+    }
+
+    public void setSerialCommandLengh(Long serialCommandLengh) {
+        this.serialCommandLengh = serialCommandLengh;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{" +
-                "id=" + id +
+                "isParallel=" + isParallel +
+                ", serialCommandLengh=" + serialCommandLengh +
+                ", id=" + id +
                 ", processDefinitionId=" + processDefinitionId +
                 ", state=" + state +
                 ", recovery=" + recovery +
@@ -606,6 +630,7 @@ public class ProcessInstance {
                 ", globalParams='" + globalParams + '\'' +
                 ", processInstanceJson='" + processInstanceJson + '\'' +
                 ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 ", tenantCode='" + tenantCode + '\'' +
                 ", queue='" + queue + '\'' +
                 ", isSubProcess=" + isSubProcess +

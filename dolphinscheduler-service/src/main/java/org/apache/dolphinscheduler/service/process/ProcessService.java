@@ -231,8 +231,14 @@ public class ProcessService {
      */
     public int createCommand(Command command) {
         int result = 0;
-        if (command != null){
-            result = commandMapper.insert(command);
+        if (command != null) {
+            ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(command.getProcessDefinitionId());
+            int queueLength = commandMapper.countNeedRunSerialCommandByProcessDefinitionId(command.getProcessDefinitionId());
+            if (!(processDefinition.getIsParallel() == 0 && queueLength > processDefinition.getSerialCommandLengh())) {
+                result = commandMapper.insert(command);
+            } else {
+                logger.info("processDefinition id:{},name:{} is serial run and def serialCommandLengh is:{},but command queue length is:{},so this command [command CommandParam:{}] will not insert into command queue...", processDefinition.getId(), processDefinition.getName(), processDefinition.getSerialCommandLengh(), queueLength,command.getCommandParam());
+            }
         }
         return result;
     }

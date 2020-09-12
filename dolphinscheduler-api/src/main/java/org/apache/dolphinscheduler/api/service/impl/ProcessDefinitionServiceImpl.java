@@ -196,7 +196,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
         processDefine.setResourceIds(getResourceIds(processData));
-
+        processDefine.setSerialCommandLengh(processData.getSerialCommandLengh());
+        processDefine.setIsParallel(processData.getIsParallel());
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
         if (CollectionUtils.isNotEmpty(globalParamsList)) {
@@ -399,7 +400,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
         processDefine.setResourceIds(getResourceIds(processData));
-
+        processDefine.setSerialCommandLengh(processData.getSerialCommandLengh());
+        processDefine.setIsParallel(processData.getIsParallel());
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(processData.getGlobalParams())) {

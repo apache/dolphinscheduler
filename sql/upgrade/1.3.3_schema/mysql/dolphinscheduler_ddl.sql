@@ -112,4 +112,42 @@ CALL uc_dolphin_T_t_ds_resources_un();
 DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
 
 
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_is_parallel;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_is_parallel()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='is_parallel')
+   THEN
+         alter table t_ds_process_definition add is_parallel tinyint default '1' comment '0:serial,1:parallel';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_is_parallel();
+
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_serial_command_lengh;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_serial_command_lengh()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='serial_command_lengh')
+   THEN
+         alter table t_ds_process_definition add serial_command_lengh bigint default '0' comment 'serial exec command lengh';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_serial_command_lengh();
+
+
+
 

@@ -26,6 +26,8 @@ import java.util.List;
  * definition json data structure
  */
 public class ProcessData {
+
+  private Long serialCommandLengh;
   /**
    * task list
    */
@@ -41,6 +43,19 @@ public class ProcessData {
 
   private int tenantId;
 
+  /**
+   * 0:serial,1:parallel
+   */
+  private int isParallel;
+
+
+  public int getIsParallel() {
+    return isParallel;
+  }
+
+  public void setIsParallel(int isParallel) {
+    this.isParallel = isParallel;
+  }
 
   public ProcessData() {
   }
@@ -68,7 +83,7 @@ public class ProcessData {
     ProcessData that = (ProcessData) o;
 
     return CollectionUtils.equalLists(tasks, that.tasks) &&
-        CollectionUtils.equalLists(globalParams, that.globalParams);
+            CollectionUtils.equalLists(globalParams, that.globalParams);
   }
 
   public List<TaskNode> getTasks() {
@@ -103,13 +118,23 @@ public class ProcessData {
     this.tenantId = tenantId;
   }
 
+  public Long getSerialCommandLengh() {
+    return serialCommandLengh;
+  }
+
+  public void setSerialCommandLengh(Long serialCommandLengh) {
+    this.serialCommandLengh = serialCommandLengh;
+  }
+
   @Override
   public String toString() {
     return "ProcessData{" +
-            "tasks=" + tasks +
+            "serialCommandLengh=" + serialCommandLengh +
+            ", tasks=" + tasks +
             ", globalParams=" + globalParams +
             ", timeout=" + timeout +
             ", tenantId=" + tenantId +
+            ", isParallel=" + isParallel +
             '}';
   }
 }

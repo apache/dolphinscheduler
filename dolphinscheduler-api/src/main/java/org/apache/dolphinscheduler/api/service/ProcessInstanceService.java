@@ -189,6 +189,8 @@ public class ProcessInstanceService extends BaseService {
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());
+        processInstance.setIsParallel(processDefinition.getIsParallel());
+        processInstance.setSerialCommandLengh(processDefinition.getSerialCommandLengh());
         result.put(DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 

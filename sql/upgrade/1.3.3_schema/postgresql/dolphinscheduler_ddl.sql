@@ -103,6 +103,34 @@ DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_un();
 
 
 
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_is_parallel() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='is_parallel')
+      THEN
+        ALTER TABLE t_ds_process_definition ADD COLUMN is_parallel smallint DEFAULT '1';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_serial_command_lengh() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='serial_command_lengh')
+      THEN
+        alter table t_ds_process_definition add COLUMN serial_command_lengh bigint DEFAULT '0';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+
+
 
 
 

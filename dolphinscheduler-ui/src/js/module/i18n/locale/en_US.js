@@ -644,4 +644,7 @@ export default {
   'Batch move': 'Batch move',
   Version: 'Version',
   'Pre tasks': 'Pre tasks',
+  'select run type': 'select run type',
+  'command queue length': 'command wait queue length',
+  'Please enter a positive integer greater than or equal 0':'Please enter a positive integer greater than or equal 0'
 }

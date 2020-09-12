@@ -50,6 +50,6 @@ public interface CommandMapper extends BaseMapper<Command> {
             @Param("endTime") Date endTime,
             @Param("projectIdArray") Integer[] projectIdArray);
 
-
+    int countNeedRunSerialCommandByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
 
 }

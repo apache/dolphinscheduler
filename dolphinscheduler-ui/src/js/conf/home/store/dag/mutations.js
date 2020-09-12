@@ -64,6 +64,18 @@ export default {
     state.tenantId = payload
   },
   /**
+   * set isParallel
+   */
+  setIsParallel (state, payload) {
+    state.isParallel = payload
+  },
+  /**
+   * set serialCommandLengh
+   */
+  setSerialCommandLengh (state, payload) {
+    state.serialCommandLengh = payload
+  },
+  /**
    * set global params
    */
   setGlobalParams (state, payload) {
@@ -106,6 +118,8 @@ export default {
     state.description = (payload && payload.description) || ''
     state.timeout = (payload && payload.timeout) || 0
     state.tenantId = (payload && payload.tenantId) || -1
+    state.isParallel = (payload && payload.isParallel) || 1
+    state.serialCommandLengh = (payload && payload.serialCommandLengh) || 0
     state.processListS = (payload && payload.processListS) || []
     state.resourcesListS = (payload && payload.resourcesListS) || []
     state.resourcesListJar = (payload && payload.resourcesListJar) || []
