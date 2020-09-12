@@ -605,47 +605,47 @@ public class ProcessInstance {
 
     @Override
     public String toString() {
-        return "ProcessInstance{" +
-                "isParallel=" + isParallel +
-                ", serialCommandLengh=" + serialCommandLengh +
-                ", id=" + id +
-                ", processDefinitionId=" + processDefinitionId +
-                ", state=" + state +
-                ", recovery=" + recovery +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", runTimes=" + runTimes +
-                ", name='" + name + '\'' +
-                ", host='" + host + '\'' +
-                ", processDefinition=" + processDefinition +
-                ", commandType=" + commandType +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", maxTryTimes=" + maxTryTimes +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", commandStartTime=" + commandStartTime +
-                ", globalParams='" + globalParams + '\'' +
-                ", processInstanceJson='" + processInstanceJson + '\'' +
-                ", executorId=" + executorId +
-                ", executorName='" + executorName + '\'' +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queue='" + queue + '\'' +
-                ", isSubProcess=" + isSubProcess +
-                ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
-                ", historyCmd='" + historyCmd + '\'' +
-                ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
-                ", duration=" + duration +
-                ", processInstancePriority=" + processInstancePriority +
-                ", workerGroup='" + workerGroup + '\'' +
-                ", timeout=" + timeout +
-                ", tenantId=" + tenantId +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                '}';
+        return "ProcessInstance{"
+                + "isParallel=" + isParallel
+                + ", serialCommandLengh=" + serialCommandLengh
+                + ", id=" + id
+                + ", processDefinitionId=" + processDefinitionId
+                + ", state=" + state
+                + ", recovery=" + recovery
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", runTimes=" + runTimes
+                + ", name='" + name + '\''
+                + ", host='" + host + '\''
+                + ", processDefinition=" + processDefinition
+                + ", commandType=" + commandType
+                + ", commandParam='" + commandParam + '\''
+                + ", taskDependType=" + taskDependType
+                + ", maxTryTimes=" + maxTryTimes
+                + ", failureStrategy=" + failureStrategy
+                + ", warningType=" + warningType
+                + ", warningGroupId=" + warningGroupId
+                + ", scheduleTime=" + scheduleTime
+                + ", commandStartTime=" + commandStartTime
+                + ", globalParams='" + globalParams + '\''
+                + ", processInstanceJson='" + processInstanceJson + '\''
+                + ", executorId=" + executorId
+                + ", executorName='" + executorName + '\''
+                + ", tenantCode='" + tenantCode + '\''
+                + ", queue='" + queue + '\''
+                + ", isSubProcess=" + isSubProcess
+                + ", locations='" + locations + '\''
+                + ", connects='" + connects + '\''
+                + ", historyCmd='" + historyCmd + '\''
+                + ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\''
+                + ", duration=" + duration
+                + ", processInstancePriority=" + processInstancePriority
+                + ", workerGroup='" + workerGroup + '\''
+                + ", timeout=" + timeout
+                + ", tenantId=" + tenantId
+                + ", receivers='" + receivers + '\''
+                + ", receiversCc='" + receiversCc + '\''
+                + '}';
     }
 
     @Override
