@@ -1168,11 +1168,7 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState) {
         ExecutionStatus state = taskInstance.getState();
         if (
-        /**
-         *  running, delayed or killed
-         *  the task already exists in task queue
-         *  return state
-         */
+                //running, delayed or killed the task already exists in task queuereturn state
                 state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
@@ -1950,6 +1946,8 @@ public class ProcessService {
                 case UDF:
                     Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
                     originResSet.removeAll(authorizedUdfs);
+                    break;
+                default:
                     break;
             }
 
