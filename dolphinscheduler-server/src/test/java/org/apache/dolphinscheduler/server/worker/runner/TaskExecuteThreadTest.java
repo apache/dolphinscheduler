@@ -123,18 +123,6 @@ public class TaskExecuteThreadTest {
         Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
     }
 
-    @Test
-    public void testDelayExecution() {
-        taskExecutionContext.setTaskType("PYTHON");
-        taskExecutionContext.setStartTime(null);
-        taskExecutionContext.setDelayTime(1);
-        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
-        taskExecuteThread.run();
-
-        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
-    }
-
     private class SimpleTask extends AbstractTask {
 
         protected SimpleTask(TaskExecutionContext taskExecutionContext, Logger logger) {
