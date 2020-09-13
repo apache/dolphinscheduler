@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
@@ -27,6 +24,9 @@ import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class VarPoolUtilsTest {
     
@@ -57,7 +57,7 @@ public class VarPoolUtilsTest {
     public void testConvertVarPoolToMap() throws Exception {
         String varPool = "p1,66$guyinyou$p2,69$guyinyou$";
         Map<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
-        VarPoolUtils.convertVarPoolToMap(propToValue , varPool);
+        VarPoolUtils.convertVarPoolToMap(propToValue, varPool);
         logger.info(propToValue.toString());
     }
     
