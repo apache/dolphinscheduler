@@ -73,10 +73,17 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
+    /**
+     * task delay execution manager
+     */
+    private final TaskDelayExecManagerThread taskDelayExecManager;
+
     public TaskExecuteProcessor(){
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
+        this.taskDelayExecManager = new TaskDelayExecManagerThread(this.workerExecService);
+        this.workerExecService.submit(this.taskDelayExecManager);
     }
 
     @Override
@@ -105,10 +112,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
 
         // custom logger
-        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+        String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId()));
+                taskExecutionContext.getTaskInstanceId());
+        Logger taskLogger = LoggerFactory.getLogger(taskId);
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
@@ -127,7 +135,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L) > 0) {
+        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L);
+        if (remainTime > 0) {
             taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
             taskExecutionContext.setStartTime(null);
         } else {
@@ -144,7 +153,13 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
                 return Boolean.TRUE;
             });
             // submit task
-            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
+            TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+            if (taskExecutionContext.getCurrentExecutionStatus() == ExecutionStatus.DELAY_EXECUTION) {
+                logger.info("delay the execution of {}, delay time: {} s", taskId, remainTime);
+                taskDelayExecManager.offer(taskExecuteThread);
+            } else {
+                workerExecService.submit(taskExecuteThread);
+            }
         } catch (ExecutionException | RetryException e) {
             logger.error(e.getMessage(), e);
         }
