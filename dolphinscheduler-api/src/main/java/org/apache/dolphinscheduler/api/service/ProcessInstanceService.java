@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.Constants.TASK_LIST;
 
-
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -709,6 +708,26 @@ public class ProcessInstanceService extends BaseService {
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
 
         return DagHelper.buildDagGraph(processDag);
+    }
+
+    /**
+     * query process instance by processDefinitionId and stateArray
+     * @param processDefinitionId processDefinitionId
+     * @param states states array
+     * @return process instance list
+     */
+    public List<ProcessInstance> queryByProcessDefineIdAndStatus(int processDefinitionId, int[] states) {
+        return processInstanceMapper.queryByProcessDefineIdAndStatus(processDefinitionId, states);
+    }
+
+    /**
+     * query process instance by processDefinitionId
+     * @param processDefinitionId processDefinitionId
+     * @param size size
+     * @return process instance list
+     */
+    public List<ProcessInstance> queryByProcessDefineId(int processDefinitionId,int size) {
+        return processInstanceMapper.queryByProcessDefineId(processDefinitionId, size);
     }
 
 }

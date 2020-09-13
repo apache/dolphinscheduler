@@ -128,3 +128,29 @@ delimiter ;
 CALL ct_dolphin_T_t_ds_process_definiton_tags;
 DROP PROCEDURE ct_dolphin_T_t_ds_process_definiton_tags;
 
+
+
+
+--    add t_ds_resources_un
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_resources_un()
+BEGIN
+    IF NOT EXISTS (
+            SELECT * FROM information_schema.KEY_COLUMN_USAGE
+            WHERE  TABLE_NAME = 't_ds_resources'
+              AND CONSTRAINT_NAME = 't_ds_resources_un'
+        )
+    THEN
+        ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE KEY (full_name,`type`);
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_resources_un();
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+
+
+

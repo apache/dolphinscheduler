@@ -208,7 +208,6 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
           ConnectionOverlays: [
             [
               'Arrow',
@@ -791,7 +790,8 @@
                 props: {
                   processDefinition: {
                     id: self.urlParam.id,
-                    version: self.$store.state.dag.version
+                    version: self.$store.state.dag.version,
+                    state: self.releaseState
                   },
                   processDefinitionVersions: processDefinitionVersions,
                   total: total,
@@ -832,7 +832,6 @@
           ],
           Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
           ConnectionOverlays: [
             [
               'Arrow',

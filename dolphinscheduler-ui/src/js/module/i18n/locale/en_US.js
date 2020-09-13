@@ -637,5 +637,11 @@ export default {
   'Directory detail': 'Directory detail',
   'Connection name': 'Connection name',
   'Current connection settings': 'Current connection settings',
-  'Please save the DAG before formatting': 'Please save the DAG before formatting'
+  'Please save the DAG before formatting': 'Please save the DAG before formatting',
+  'Batch copy': 'Batch copy',
+  'Related items': 'Related items',
+  'Project name is required': 'Project name is required',
+  'Batch move': 'Batch move',
+  Version: 'Version',
+  'Pre tasks': 'Pre tasks',
 }
