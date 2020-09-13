@@ -43,7 +43,7 @@ datanucleus-api-jdo-4.2.1.jar
 datanucleus-core-4.1.6.jar
 datanucleus-rdbms-4.1.7.jar
 derby-10.14.2.0.jar
-druid-1.1.14.jar
+druid-1.1.22.jar
 gson-2.8.5.jar
 guava-20.0.jar
 guice-3.0.jar
