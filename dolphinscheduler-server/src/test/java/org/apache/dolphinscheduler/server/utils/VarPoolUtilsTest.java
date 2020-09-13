@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
 
 public class VarPoolUtilsTest {
     
@@ -46,7 +45,7 @@ public class VarPoolUtilsTest {
         VarPoolUtils.setTaskNodeLocalParams(taskNode, "p1", "test1");
         logger.info(JSONUtils.toJsonString(taskNode));
         
-        Map<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
+        ConcurrentHashMap<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
         propToValue.put("p1", "test2");
         
         VarPoolUtils.setTaskNodeLocalParams(taskNode, propToValue);
@@ -56,7 +55,7 @@ public class VarPoolUtilsTest {
     @Test
     public void testConvertVarPoolToMap() throws Exception {
         String varPool = "p1,66$guyinyou$p2,69$guyinyou$";
-        Map<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
+        ConcurrentHashMap<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
         VarPoolUtils.convertVarPoolToMap(propToValue, varPool);
         logger.info(propToValue.toString());
     }
