@@ -114,7 +114,7 @@ public class DependentTaskExecThreadTest {
                 .thenReturn(null).thenReturn(processInstance);
 
         // Note that the interval here is a negative number, and the task will directly time out.
-        taskInstance.setTaskJson(taskInstance.getTaskJson().replaceAll("\"interval\":5", "\"interval\":-1"));
+        taskInstance.setTaskJson(taskInstance.getTaskJson().replaceAll("\"interval\":3", "\"interval\":-1"));
         execThread.call();
         Assert.assertEquals(ExecutionStatus.FAILURE, execThread.taskInstance.getState());
     }
