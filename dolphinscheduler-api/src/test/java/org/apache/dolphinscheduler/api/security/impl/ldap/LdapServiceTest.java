@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.common.enums.UserType;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,8 @@ import org.springframework.test.context.junit4.SpringRunner;
         })
 public class LdapServiceTest {
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    protected AutowireCapableBeanFactory beanFactory;
+
     private LdapService ldapService;
 
     @Before
@@ -54,9 +56,24 @@ public class LdapServiceTest {
     }
 
     @Test
+    public void getUserType() {
+        UserType userType = ldapService.getUserType("read-only-admin");
+        Assert.assertEquals(UserType.ADMIN_USER, userType);
+    }
+
+    @Test
     public void ldapLogin() {
         String email = ldapService.ldapLogin("tesla", "password");
-        Assert.assertEquals(email, "tesla@ldap.forumsys.com");
+        Assert.assertEquals("tesla@ldap.forumsys.com", email);
+
+        String email2 = ldapService.ldapLogin("tesla", "error password");
+        Assert.assertNull(email2);
+    }
+
+    @Test
+    public void ldapLoginError() {
+        String email = ldapService.ldapLogin("tesla", "password");
+        Assert.assertEquals("tesla@ldap.forumsys.com", email);
 
         String email2 = ldapService.ldapLogin("tesla", "error password");
         Assert.assertNull(email2);

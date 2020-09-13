@@ -700,7 +700,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                       <include>**/alert/utils/DingTalkUtilsTest.java</include>
+                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
@@ -717,8 +717,11 @@
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
-                        <include>**/api/security/PasswordAuthenticatorTest.java</include>
-                        <include>**/api/security/SecurityConfigTest.java</include>
+                        <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
+                        <include>**/api/security/impl/ldap/LdapServiceTest.java</include>
+                        <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
+                        <include>**/api/security/SecurityConfigLDAPTest.java</include>
+                        <include>**/api/security/SecurityConfigPasswordTest.java</include>
                         <include>**/api/service/AccessTokenServiceTest.java</include>
                         <include>**/api/service/AlertGroupServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import static org.mockito.Mockito.when;
 
@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -44,16 +45,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
+@TestPropertySource(
+        properties = {
+                "security.authentication.type=LDAP",
+                "security.authentication.ldap.user.admin=read-only-admin",
+                "ldap.urls=ldap://ldap.forumsys.com:389/",
+                "ldap.base.dn=dc=example,dc=com",
+                "ldap.username=cn=read-only-admin,dc=example,dc=com",
+                "ldap.password=password",
+                "ldap.user.identity.attribute=uid",
+                "ldap.user.email.attribute=mail",
+        })
 public class LdapAuthenticatorTest {
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
-
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    protected AutowireCapableBeanFactory beanFactory;
     @MockBean
     private LdapService ldapService;
     @MockBean
@@ -61,7 +72,7 @@ public class LdapAuthenticatorTest {
     @MockBean
     private UsersService usersService;
 
-    private LdapAuthenticator authenticator;
+    private LdapAuthenticator ldapAuthenticator;
 
     //test param
     private User mockUser;
@@ -75,14 +86,15 @@ public class LdapAuthenticatorTest {
 
     @Before
     public void setUp() {
-        authenticator = new LdapAuthenticator();
-        beanFactory.autowireBean(authenticator);
+        ldapAuthenticator = new LdapAuthenticator();
+        beanFactory.autowireBean(ldapAuthenticator);
 
         mockUser = new User();
         mockUser.setId(1);
         mockUser.setUserName(ldapUid);
         mockUser.setEmail(ldapEmail);
         mockUser.setUserType(userType);
+        mockUser.setState(Flag.YES.getCode());
 
         mockSession = new Session();
         mockSession.setId(UUID.randomUUID().toString());
@@ -100,9 +112,18 @@ public class LdapAuthenticatorTest {
 
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
 
-        Result result = authenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Result result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
+
+        when(sessionService.createSession(mockUser, ip)).thenReturn(null);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Assert.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
+
+        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
+        when(usersService.getUserByUserName(ldapUid)).thenReturn(null);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
     }
 
     @Test
@@ -111,7 +132,11 @@ public class LdapAuthenticatorTest {
         when(usersService.queryUser(mockUser.getId())).thenReturn(mockUser);
         when(sessionService.getSession(request)).thenReturn(mockSession);
 
-        User user = authenticator.getAuthUser(request);
+        User user = ldapAuthenticator.getAuthUser(request);
         Assert.assertNotNull(user);
+
+        when(sessionService.getSession(request)).thenReturn(null);
+        user = ldapAuthenticator.getAuthUser(request);
+        Assert.assertNull(user);
     }
 }

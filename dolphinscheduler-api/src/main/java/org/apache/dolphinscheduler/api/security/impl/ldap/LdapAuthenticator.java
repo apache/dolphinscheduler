@@ -15,31 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.ldap;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
+import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
-@TestPropertySource(properties = {
-        "security.authentication.type=PASSWORD",
-})
-public class SecurityConfigPassWordTest {
-
+public class LdapAuthenticator extends AbstractAuthenticator {
     @Autowired
-    private SecurityConfig securityConfig;
+    private UsersService usersService;
+    @Autowired
+    LdapService ldapService;
 
-    @Test
-    public void testAuthenticator() {
-        Authenticator authenticator = securityConfig.authenticator();
-        Assert.assertNotNull(authenticator);
+    @Override
+    public User login(String userId, String password, String extra) {
+        User user = null;
+        String ldapEmail = ldapService.ldapLogin(userId, password);
+        if (ldapEmail != null) {
+            //check if user exist
+            user = usersService.getUserByUserName(userId);
+            if (user == null) {
+                user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+            }
+        }
+        return user;
     }
 }
