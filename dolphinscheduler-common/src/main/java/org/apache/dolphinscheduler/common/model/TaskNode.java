@@ -336,12 +336,16 @@ public class TaskNode {
      * @return TaskTimeoutParameter
      */
     private TaskTimeoutParameter parseTimeoutParameter(String timeoutParameterString) {
+        TaskTimeoutParameter taskTimeoutParameter = null;
         if (StringUtils.isNotEmpty(timeoutParameterString)) {
             String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
             String taskTimeout = timeoutParameterString.replace(formatStr, TaskTimeoutStrategy.WARNFAILED.name());
-            return JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
+            taskTimeoutParameter = JSONUtils.parseObject(taskTimeout, TaskTimeoutParameter.class);
         }
-        return new TaskTimeoutParameter(false);
+        if (taskTimeoutParameter == null) {
+            taskTimeoutParameter = new TaskTimeoutParameter(false);
+        }
+        return taskTimeoutParameter;
     }
 
   public boolean isConditionsTask(){

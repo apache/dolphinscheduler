@@ -754,6 +754,7 @@
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/ResultTest.java</include>
                         <include>**/common/graph/DAGTest.java</include>
+                        <include>**/common/model/TaskNodeTest.java</include>
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
                         <include>**/common/shell/ShellExecutorTest.java</include>
