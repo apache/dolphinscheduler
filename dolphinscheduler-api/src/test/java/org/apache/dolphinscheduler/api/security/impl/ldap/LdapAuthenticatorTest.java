@@ -72,7 +72,7 @@ public class LdapAuthenticatorTest {
     @MockBean
     private UsersService usersService;
 
-    private LdapAuthenticator authenticator;
+    private LdapAuthenticator ldapAuthenticator;
 
     //test param
     private User mockUser;
@@ -86,8 +86,8 @@ public class LdapAuthenticatorTest {
 
     @Before
     public void setUp() {
-        authenticator = new LdapAuthenticator();
-        beanFactory.autowireBean(authenticator);
+        ldapAuthenticator = new LdapAuthenticator();
+        beanFactory.autowireBean(ldapAuthenticator);
 
         mockUser = new User();
         mockUser.setId(1);
@@ -112,9 +112,18 @@ public class LdapAuthenticatorTest {
 
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
 
-        Result result = authenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Result result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
+
+        when(sessionService.createSession(mockUser, ip)).thenReturn(null);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Assert.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
+
+        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
+        when(usersService.getUserByUserName(ldapUid)).thenReturn(null);
+        result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
+        Assert.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
     }
 
     @Test
@@ -123,7 +132,11 @@ public class LdapAuthenticatorTest {
         when(usersService.queryUser(mockUser.getId())).thenReturn(mockUser);
         when(sessionService.getSession(request)).thenReturn(mockSession);
 
-        User user = authenticator.getAuthUser(request);
+        User user = ldapAuthenticator.getAuthUser(request);
         Assert.assertNotNull(user);
+
+        when(sessionService.getSession(request)).thenReturn(null);
+        user = ldapAuthenticator.getAuthUser(request);
+        Assert.assertNull(user);
     }
 }

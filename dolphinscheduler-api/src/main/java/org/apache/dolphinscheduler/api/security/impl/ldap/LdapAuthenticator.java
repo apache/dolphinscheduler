@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class LdapAuthenticator extends AbstractAuthenticator {
     @Autowired
-    private UsersService userService;
+    private UsersService usersService;
     @Autowired
     LdapService ldapService;
 
@@ -35,9 +35,9 @@ public class LdapAuthenticator extends AbstractAuthenticator {
         String ldapEmail = ldapService.ldapLogin(userId, password);
         if (ldapEmail != null) {
             //check if user exist
-            user = userService.getUserByUserName(userId);
+            user = usersService.getUserByUserName(userId);
             if (user == null) {
-                user = userService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+                user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
             }
         }
         return user;
