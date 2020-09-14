@@ -157,7 +157,7 @@ public class WorkflowDefineLocator {
     public static final By CLICK_WORKFLOW_GLOBAL_PARAMETERS = By.xpath("//span/a/em");
 
     //input workflow  global parameters
-    public static final By INPUT_WORKFLOW_GLOBAL_PARAMETERS = By.xpath("//div[8]/div/div/div/div/input");
+    public static final By INPUT_WORKFLOW_GLOBAL_PARAMETERS = By.xpath("//div[9]/div/div/div/div/input");
 
     //input workflow  global parameters value
     public static final By INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES = By.xpath("//div[2]/input");
