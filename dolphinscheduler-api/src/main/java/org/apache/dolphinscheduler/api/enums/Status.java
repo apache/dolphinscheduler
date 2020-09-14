@@ -195,6 +195,17 @@ public enum Status {
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10162,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
 
+    DELETE_TAG_ERROR(10170,"delete tag error","删除标签错误"),
+    TAG_ALREADY_EXISTS(10171,"tag already exists","标签名已存在"),
+    UPDATE_TAG_ERROR(10172,"update tag error","更新标签错误"),
+    CREATE_TAG_ERROR(10173, "create tag error", "新建标签错误"),
+    TAG_NOT_EXIST(10174, "tag not exist","标签不存在"),
+    TAG_NOT_FOUND(10175, "tag not found","标签未找到"),
+    QUERY_TAG_LIST_PAGING_ERROR(10176, "query tag list paging error", "分页查询标签错误"),
+    ADD_PROCESS_TAGS_ERROR(10177, "add processdefinition tags error", "工作流定义添加标签错误"),
+    DELETE_PROCESS_TAGS_ERROR(10178, "delete processdefinition tags error", "工作流定义删除标签错误"),
+
+
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),

@@ -64,10 +64,12 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.ProcessTag;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTagMapper;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -144,6 +146,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private ProcessTagMapper processTagMapper;
 
     /**
      * create process definition
@@ -1727,5 +1732,97 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
     }
 
+    /**
+     * add ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> addProcessDefinitionTags(int processId, String tagIds) {
+
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        }
+
+        if (StringUtils.isEmpty(tagIds)) {
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
+
+        String[] tagIdArr = tagIds.split(",");
+
+        for (String tagId : tagIdArr) {
+
+            ProcessTag processTag = new ProcessTag();
+            processTag.setProcessID(processId);
+            processTag.settagID(Integer.parseInt(tagId));
+            processTagMapper.insert(processTag);
+        }
+
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * delete ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return result code
+     */
+    @Override
+    public Map<String, Object> deleteProcessDefinitionTags(int processId, String tagIds) {
+
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        }
+
+        if (StringUtils.isEmpty(tagIds)) {
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
+
+        String[] tagIdArr = tagIds.split(",");
+
+        for (String tagId : tagIdArr) {
+            processTagMapper.deleteProcessRelation(processId,Integer.parseInt(tagId));
+        }
+
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query process definition list
+     *
+     * @param tagId tag id
+     * @return definition list
+     */
+    @Override
+    public Map<String, Object> queryProcessDefinitionByTagId(Integer tagId) {
+
+        HashMap<String, Object> result = new HashMap<>();
+
+        List<ProcessDefinition> resourceList = processDefineMapper.queryAllDefinitionListByTagId(tagId);
+        result.put(Constants.DATA_LIST, resourceList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
 }
 

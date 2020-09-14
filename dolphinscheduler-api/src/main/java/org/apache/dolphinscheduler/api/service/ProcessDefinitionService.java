@@ -260,5 +260,31 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
             , int processDefinitionId, long version);
+
+    /**
+     * add ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return grant result code
+     */
+    Map<String, Object> addProcessDefinitionTags(int processId, String tagIds);
+
+    /**
+     * delete ProcessDefinition Tags
+     *
+     * @param processId ProcessDefinition id
+     * @param tagIds tag id array
+     * @return grant result code
+     */
+    Map<String, Object> deleteProcessDefinitionTags(int processId, String tagIds);
+
+    /**
+     * query process definition list by tag id
+     *
+     * @param tagId tag id
+     * @return definition list
+     */
+    Map<String, Object> queryProcessDefinitionByTagId(Integer tagId);
 }
 
