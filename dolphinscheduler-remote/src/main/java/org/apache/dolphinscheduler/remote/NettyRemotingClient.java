@@ -159,6 +159,7 @@ public class NettyRemotingClient {
             .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
             .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
             .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
             .handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
