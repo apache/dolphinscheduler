@@ -38,6 +38,7 @@ public class VarPoolUtils {
         }
         return taskParams.getLocalParamValue(prop);
     }
+    
     /**
      * setTaskNodeLocalParams
      * @param taskNode taskNode

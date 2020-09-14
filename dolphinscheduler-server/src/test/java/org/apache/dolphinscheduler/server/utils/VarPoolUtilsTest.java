@@ -67,9 +67,9 @@ public class VarPoolUtilsTest {
     public void testConvertPythonScriptPlaceholders() throws Exception {
         String rawScript = "print(${p1});\n${setShareVar(${p1},3)};\n${setShareVar(${p2},4)};";
         rawScript = VarPoolUtils.convertPythonScriptPlaceholders(rawScript);
-        Assert.assertEquals(rawScript, "print(${p1});\n" + 
-            "print(\"${{setValue({},{})}}\".format(\"p1\",3));\n" + 
-            "print(\"${{setValue({},{})}}\".format(\"p2\",4));");
+        Assert.assertEquals(rawScript, "print(${p1});\n"
+            + "print(\"${{setValue({},{})}}\".format(\"p1\",3));\n"
+            + "print(\"${{setValue({},{})}}\".format(\"p2\",4));");
         logger.info(rawScript);
     }
 }
