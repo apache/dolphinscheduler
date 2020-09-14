@@ -86,20 +86,23 @@ public class TaskCallbackService {
      * @return callback channel
      */
     private NettyRemoteChannel getRemoteChannel(int taskInstanceId){
+        Channel newChannel;
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(taskInstanceId);
-        if(nettyRemoteChannel == null){
-            throw new IllegalArgumentException("nettyRemoteChannel is empty, should call addRemoteChannel first");
+        if(nettyRemoteChannel != null){
+            if(nettyRemoteChannel.isActive()){
+                return nettyRemoteChannel;
+            }
+            newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
+            if(newChannel != null){
+                return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+            }
+
         }
-        if(nettyRemoteChannel.isActive()){
-            return nettyRemoteChannel;
-        }
-        Channel newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
-        if(newChannel != null){
-            return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
-        }
+
         logger.warn("original master : {} for task : {} is not reachable, random select master",
                 nettyRemoteChannel.getHost(),
                 taskInstanceId);
+
         Set<String> masterNodes = null;
         int ntries = 0;
         while (Stopper.isRunning()) {
@@ -119,7 +122,7 @@ public class TaskCallbackService {
             for (String masterNode : masterNodes) {
                 newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
                 if (newChannel != null) {
-                    return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
+                    return getRemoteChannel(newChannel,taskInstanceId);
                 }
             }
             masterNodes = null;
@@ -137,6 +140,12 @@ public class TaskCallbackService {
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId){
         NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel, opaque);
+        addRemoteChannel(taskInstanceId, remoteChannel);
+        return remoteChannel;
+    }
+
+    private NettyRemoteChannel getRemoteChannel(Channel newChannel, int taskInstanceId){
+        NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel);
         addRemoteChannel(taskInstanceId, remoteChannel);
         return remoteChannel;
     }

@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
+import java.util.Random;
+
 /**
  *  callback channel
  */
@@ -43,11 +45,19 @@ public class NettyRemoteChannel {
      */
     private final Host host;
 
+    private final Random random = new Random();
+
 
     public NettyRemoteChannel(Channel channel, long opaque) {
         this.channel = channel;
         this.host = ChannelUtils.toAddress(channel);
         this.opaque = opaque;
+    }
+
+    public NettyRemoteChannel(Channel channel) {
+        this.channel = channel;
+        this.host = ChannelUtils.toAddress(channel);
+        this.opaque = random.nextLong();
     }
 
     public Channel getChannel() {
