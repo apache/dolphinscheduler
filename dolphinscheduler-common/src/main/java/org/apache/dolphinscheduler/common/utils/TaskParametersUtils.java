@@ -59,9 +59,8 @@ public class TaskParametersUtils {
             switch (EnumUtils.getEnum(TaskType.class, taskType)) {
                 case SUB_PROCESS:
                     return JSONUtils.parseObject(parameter, SubProcessParameters.class);
-                case WATERDROP:
-                    return JSONUtils.parseObject(parameter, ShellParameters.class);
                 case SHELL:
+                case WATERDROP:
                     return JSONUtils.parseObject(parameter, ShellParameters.class);
                 case PROCEDURE:
                     return JSONUtils.parseObject(parameter, ProcedureParameters.class);
