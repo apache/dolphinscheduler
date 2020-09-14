@@ -39,7 +39,6 @@ public class TaskDelayExecManagerThread implements Runnable {
 
     public TaskDelayExecManagerThread(ExecutorService executorService) {
         this.workerExecService = executorService;
-        Thread.currentThread().setName("Worker-Delay-Exec-Manager-Thread");
     }
 
     public boolean offer(TaskExecuteThread taskExecuteThread) {
@@ -48,6 +47,7 @@ public class TaskDelayExecManagerThread implements Runnable {
 
     @Override
     public void run() {
+        Thread.currentThread().setName("Worker-Delay-Exec-Manager-Thread");
         TaskExecuteThread taskExecuteThread;
         while (Stopper.isRunning()) {
             try {
