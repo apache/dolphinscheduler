@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.security;
+
+package org.apache.dolphinscheduler.api.security.impl.pwd;
+
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -23,12 +26,17 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Date;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +44,6 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -58,7 +63,7 @@ public class PasswordAuthenticatorTest {
     private Session mockSession;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         authenticator = new PasswordAuthenticator();
         beanFactory.autowireBean(authenticator);
 
@@ -74,6 +79,13 @@ public class PasswordAuthenticatorTest {
         mockSession.setIp("127.0.0.1");
         mockSession.setUserId(1);
         mockSession.setLastLoginTime(new Date());
+    }
+
+    @Test
+    public void testLogin() {
+        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        User login = authenticator.login("test", "test", "127.0.0.1");
+        Assert.assertNotNull(login);
     }
 
     @Test
