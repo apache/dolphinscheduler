@@ -22,13 +22,13 @@ import java.util.Map;
 public class TaskParams {
 
     private String rawScript;
-    private Map<String,String>[] localParams;
+    private Map<String, String>[] localParams;
 
     public void setRawScript(String rawScript) {
         this.rawScript = rawScript;
     }
 
-    public void setLocalParams(Map<String,String>[] localParams) {
+    public void setLocalParams(Map<String, String>[] localParams) {
         this.localParams = localParams;
     }
 
@@ -47,7 +47,7 @@ public class TaskParams {
         }
     }
 
-    public void setLocalParamValue(Map<String,Object> propToValue) {
+    public void setLocalParamValue(Map<String, Object> propToValue) {
         if (localParams == null) {
             return;
         }
@@ -59,7 +59,20 @@ public class TaskParams {
         }
     }
 
-    public Map<String,String>[] getLocalParams() {
+    public String getLocalParamValue(String prop) {
+        if (localParams == null) {
+            return null;
+        }
+        for (int i = 0; i < localParams.length; i++) {
+            String tmpProp = localParams[i].get("prop");
+            if (tmpProp.equals(prop)) {
+                return localParams[i].get("value");
+            }
+        }
+        return null;
+    }
+    
+    public Map<String, String>[] getLocalParams() {
         return localParams;
     }
 } 

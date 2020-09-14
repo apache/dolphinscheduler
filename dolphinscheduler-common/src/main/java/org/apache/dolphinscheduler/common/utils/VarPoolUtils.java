@@ -25,6 +25,20 @@ import java.util.Map;
 
 public class VarPoolUtils {
     /**
+     * getTaskNodeLocalParam
+     * @param taskNode taskNode
+     * @param prop prop
+     * @return localParamForProp
+     */
+    public static Object getTaskNodeLocalParam(TaskNode taskNode, String prop) {
+        String taskParamsJson = taskNode.getParams();
+        TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
+        if (taskParams == null) {
+            return null;
+        }
+        return taskParams.getLocalParamValue(prop);
+    }
+    /**
      * setTaskNodeLocalParams
      * @param taskNode taskNode
      * @param prop LocalParamName

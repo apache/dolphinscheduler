@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +44,13 @@ public class VarPoolUtilsTest {
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         
         VarPoolUtils.setTaskNodeLocalParams(taskNode, "p1", "test1");
-        logger.info(JSONUtils.toJsonString(taskNode));
+        Assert.assertEquals(VarPoolUtils.getTaskNodeLocalParam(taskNode, "p1"), "test1");
         
         ConcurrentHashMap<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
         propToValue.put("p1", "test2");
         
         VarPoolUtils.setTaskNodeLocalParams(taskNode, propToValue);
-        logger.info(JSONUtils.toJsonString(taskNode));
+        Assert.assertEquals(VarPoolUtils.getTaskNodeLocalParam(taskNode, "p1"), "test2");
     }
     
     @Test
@@ -57,6 +58,8 @@ public class VarPoolUtilsTest {
         String varPool = "p1,66$guyinyou$p2,69$guyinyou$";
         ConcurrentHashMap<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
         VarPoolUtils.convertVarPoolToMap(propToValue, varPool);
+        Assert.assertEquals((String)propToValue.get("p1"), "66");
+        Assert.assertEquals((String)propToValue.get("p2"), "69");
         logger.info(propToValue.toString());
     }
     
@@ -64,6 +67,9 @@ public class VarPoolUtilsTest {
     public void testConvertPythonScriptPlaceholders() throws Exception {
         String rawScript = "print(${p1});\n${setShareVar(${p1},3)};\n${setShareVar(${p2},4)};";
         rawScript = VarPoolUtils.convertPythonScriptPlaceholders(rawScript);
+        Assert.assertEquals(rawScript, "print(${p1});\n" + 
+            "print(\"${{setValue({},{})}}\".format(\"p1\",3));\n" + 
+            "print(\"${{setValue({},{})}}\".format(\"p2\",4));");
         logger.info(rawScript);
     }
 }
