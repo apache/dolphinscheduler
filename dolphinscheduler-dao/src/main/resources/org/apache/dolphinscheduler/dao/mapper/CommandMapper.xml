@@ -21,28 +21,28 @@
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
 SELECT command.*
 FROM (
-	SELECT *
-	FROM t_ds_process_definition definition
-	WHERE definition.release_state = 1
+    SELECT *
+    FROM t_ds_process_definition definition
+    WHERE definition.release_state = 1
 		AND definition.flag = 1
 ) definition_new, (
-		SELECT process_definition_id, state
-		FROM t_ds_process_instance instance, (
-				SELECT MAX(id) AS max_id
-				FROM t_ds_process_instance
-				GROUP BY process_definition_id
-			) instance_maxid
-		WHERE instance.id = instance_maxid.max_id
-			AND instance.state IN (5, 6, 7, 9)
-	) instance_new, t_ds_command command
+        SELECT process_definition_id, state
+        FROM t_ds_process_instance instance, (
+                SELECT MAX(id) AS max_id
+                FROM t_ds_process_instance
+                GROUP BY process_definition_id
+           ) instance_maxid
+         WHERE instance.id = instance_maxid.max_id
+            AND instance.state IN (5, 6, 7, 9)
+    ) instance_new, t_ds_command command
 WHERE definition_new.id = command.process_definition_id
-	AND (definition_new.is_parallel = 1
-		OR (definition_new.is_parallel = 0
-			AND (instance_new.process_definition_id = definition_new.id
-				OR definition_new.id NOT IN (
-					SELECT DISTINCT process_definition_id
-					FROM t_ds_process_instance
-				))))
+    AND (definition_new.is_parallel = 1
+       OR (definition_new.is_parallel = 0
+            AND (instance_new.process_definition_id = definition_new.id
+                OR definition_new.id NOT IN (
+                    SELECT DISTINCT process_definition_id
+                    FROM t_ds_process_instance
+                ))))
 ORDER BY command.update_time ASC
 LIMIT 1
     </select>
