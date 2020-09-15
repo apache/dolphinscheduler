@@ -61,7 +61,7 @@ public class HiveTargetGenerator implements ITargetGenerator {
                 }
 
                 if(targetHiveParameter.isHiveOverWrite()){
-                    result.append(" --hive-overwrite --delete-target-dir");
+                    result.append(" --hive-overwrite -delete-target-dir");
                 }
 
                 if(StringUtils.isNotEmpty(targetHiveParameter.getReplaceDelimiter())){
