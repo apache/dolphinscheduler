@@ -1000,4 +1000,9 @@ public final class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
+
+    /**
+     * Network IP gets priority, default inner outer
+     */
+    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
 }

@@ -69,7 +69,7 @@
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
-        <druid.version>1.1.14</druid.version>
+        <druid.version>1.1.22</druid.version>
         <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.6</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
@@ -847,6 +847,7 @@
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
