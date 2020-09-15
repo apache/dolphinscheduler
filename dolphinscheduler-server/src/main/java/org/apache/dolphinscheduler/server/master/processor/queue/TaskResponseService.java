@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.DBTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -132,12 +133,16 @@ public class TaskResponseService {
         switch (event){
             case ACK:
                 try {
-                    processService.changeTaskState(taskResponseEvent.getState(),
-                            taskResponseEvent.getStartTime(),
-                            taskResponseEvent.getWorkerAddress(),
-                            taskResponseEvent.getExecutePath(),
-                            taskResponseEvent.getLogPath(),
-                            taskResponseEvent.getTaskInstanceId());
+                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+                    if (taskInstance != null){
+                        processService.changeTaskState(taskResponseEvent.getState(),
+                                taskResponseEvent.getStartTime(),
+                                taskResponseEvent.getWorkerAddress(),
+                                taskResponseEvent.getExecutePath(),
+                                taskResponseEvent.getLogPath(),
+                                taskResponseEvent.getTaskInstanceId());
+                    }
+                    // if taskInstance is null (maybe deleted) . retry will be meaningless . so ack success
                     DBTaskAckCommand taskAckCommand = new DBTaskAckCommand(ExecutionStatus.SUCCESS.getCode(),taskResponseEvent.getTaskInstanceId());
                     channel.writeAndFlush(taskAckCommand.convert2Command());
                 }catch (Exception e){
@@ -148,11 +153,15 @@ public class TaskResponseService {
                 break;
             case RESULT:
                 try {
-                    processService.changeTaskState(taskResponseEvent.getState(),
-                            taskResponseEvent.getEndTime(),
-                            taskResponseEvent.getProcessId(),
-                            taskResponseEvent.getAppIds(),
-                            taskResponseEvent.getTaskInstanceId());
+                    TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
+                    if (taskInstance != null){
+                        processService.changeTaskState(taskResponseEvent.getState(),
+                                taskResponseEvent.getEndTime(),
+                                taskResponseEvent.getProcessId(),
+                                taskResponseEvent.getAppIds(),
+                                taskResponseEvent.getTaskInstanceId());
+                    }
+                    // if taskInstance is null (maybe deleted) . retry will be meaningless . so response success
                     DBTaskResponseCommand taskResponseCommand = new DBTaskResponseCommand(ExecutionStatus.SUCCESS.getCode(),taskResponseEvent.getTaskInstanceId());
                     channel.writeAndFlush(taskResponseCommand.convert2Command());
                 }catch (Exception e){

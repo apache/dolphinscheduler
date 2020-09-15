@@ -99,10 +99,6 @@ public class TaskCallbackService {
 
         }
 
-        logger.warn("original master : {} for task : {} is not reachable, random select master",
-                nettyRemoteChannel.getHost(),
-                taskInstanceId);
-
         Set<String> masterNodes = null;
         int ntries = 0;
         while (Stopper.isRunning()) {
