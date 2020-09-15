@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ResponceCache {
 
-    private static volatile ResponceCache instance = null;
+    private static  ResponceCache instance = null;
 
     private ResponceCache(){}
 
