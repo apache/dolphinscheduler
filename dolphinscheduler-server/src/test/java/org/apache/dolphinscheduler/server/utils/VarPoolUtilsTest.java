@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class VarPoolUtilsTest {
     
-    private static final Logger logger = LoggerFactory.getLogger(VarPoolUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(VarPoolUtilsTest.class);
     
     @Test
     public void testSetTaskNodeLocalParams() {
