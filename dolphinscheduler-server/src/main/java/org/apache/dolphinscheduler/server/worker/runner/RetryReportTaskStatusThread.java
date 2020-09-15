@@ -41,7 +41,7 @@ public class RetryReportTaskStatusThread implements Runnable {
     /**
      * every 5 minutes
      */
-    private static long RETRY_REPORT_TASK_STATUS_TIME = 5 * 60 * 1000;
+    private static long RETRY_REPORT_TASK_STATUS_TIME = 5 * 60 * 1000L;
     /**
      *  task callback service
      */

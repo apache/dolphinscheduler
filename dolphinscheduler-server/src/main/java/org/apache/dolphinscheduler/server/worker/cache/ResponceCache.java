@@ -27,6 +27,8 @@ public class ResponceCache {
 
     private static volatile ResponceCache instance = null;
 
+    private ResponceCache(){}
+
     public static ResponceCache get(){
         if (instance == null){
             synchronized (ResponceCache.class){
