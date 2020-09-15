@@ -640,5 +640,10 @@ export default {
   'Current connection settings': '当前连线设置',
   'Please save the DAG before formatting': '格式化前请先保存DAG',
   'Batch copy': '批量复制',
-  'Instance type': '实例类型'
+  'Instance type': '实例类型',
+  'Related items': '关联项目',
+  'Project name is required': '项目名称必填',
+  'Batch move': '批量移动',
+  Version: '版本',
+  'Pre tasks': '前置任务',
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -27,7 +28,7 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     private Constants() {
-        throw new IllegalStateException("Constants class");
+        throw new UnsupportedOperationException("Construct Constants");
     }
 
     /**
@@ -999,4 +1000,9 @@ public final class Constants {
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
+
+    /**
+     * Network IP gets priority, default inner outer
+     */
+    public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
 }

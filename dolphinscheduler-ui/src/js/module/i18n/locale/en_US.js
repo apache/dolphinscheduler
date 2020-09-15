@@ -640,5 +640,10 @@ export default {
   'Current connection settings': 'Current connection settings',
   'Please save the DAG before formatting': 'Please save the DAG before formatting',
   'Batch copy': 'Batch copy',
-  'Instance type': 'Instance type'
+  'Instance type': 'Instance type',
+  'Related items': 'Related items',
+  'Project name is required': 'Project name is required',
+  'Batch move': 'Batch move',
+  Version: 'Version',
+  'Pre tasks': 'Pre tasks',
 }
