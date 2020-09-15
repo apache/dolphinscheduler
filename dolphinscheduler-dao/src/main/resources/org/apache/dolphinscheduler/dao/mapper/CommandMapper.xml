@@ -24,7 +24,7 @@ FROM (
     SELECT *
     FROM t_ds_process_definition definition
     WHERE definition.release_state = 1
-		AND definition.flag = 1
+        AND definition.flag = 1
 ) definition_new, (
         SELECT process_definition_id, state
         FROM t_ds_process_instance instance, (
