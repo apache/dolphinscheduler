@@ -25,18 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ResponceCache {
 
-    private static  ResponceCache instance = null;
+    private static final ResponceCache instance = new ResponceCache();
 
     private ResponceCache(){}
 
     public static ResponceCache get(){
-        if (instance == null){
-            synchronized (ResponceCache.class){
-                if (instance == null){
-                    instance = new ResponceCache();
-                }
-            }
-        }
         return instance;
     }
 
