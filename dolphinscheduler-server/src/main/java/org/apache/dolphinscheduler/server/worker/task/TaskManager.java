@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
 import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;
 import org.apache.dolphinscheduler.server.worker.task.sql.SqlTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopTask;
-
 import org.slf4j.Logger;
 
 /**
@@ -46,7 +45,13 @@ public class TaskManager {
      * @throws IllegalArgumentException illegal argument exception
      */
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger) throws IllegalArgumentException {
-        switch (EnumUtils.getEnum(TaskType.class,taskExecutionContext.getTaskType())) {
+        TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType());
+        if (anEnum == null) {
+            String msg = String.format("not support task type: %s", taskExecutionContext.getTaskType());
+            logger.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        switch (anEnum) {
             case SHELL:
             case WATERDROP:
                 return new ShellTask(taskExecutionContext, logger);
@@ -69,7 +74,7 @@ public class TaskManager {
             case SQOOP:
                 return new SqoopTask(taskExecutionContext, logger);
             default:
-                logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
+                logger.error("not support task type: {}", taskExecutionContext.getTaskType());
                 throw new IllegalArgumentException("not support task type");
         }
     }
