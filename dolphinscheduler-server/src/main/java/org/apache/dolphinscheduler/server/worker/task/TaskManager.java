@@ -74,8 +74,9 @@ public class TaskManager {
             case SQOOP:
                 return new SqoopTask(taskExecutionContext, logger);
             default:
-                logger.error("not support task type: {}", taskExecutionContext.getTaskType());
-                throw new IllegalArgumentException("not support task type");
+                String msg = String.format("not support task type: %s", taskExecutionContext.getTaskType());
+                logger.error(msg);
+                throw new IllegalArgumentException(msg);
         }
     }
 }
