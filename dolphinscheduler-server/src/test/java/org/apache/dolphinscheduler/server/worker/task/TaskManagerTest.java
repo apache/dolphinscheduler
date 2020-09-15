@@ -21,6 +21,9 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +33,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({SpringApplicationContext.class})
@@ -96,17 +97,17 @@ public class TaskManagerTest {
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
         taskExecutionContext.setTaskType("SQOOP");
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
-        try{
+        try {
             taskExecutionContext.setTaskType(null);
             TaskManager.newTask(taskExecutionContext,taskLogger);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 
-        try{
+        try {
             taskExecutionContext.setTaskType("XXX");
             TaskManager.newTask(taskExecutionContext,taskLogger);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 
