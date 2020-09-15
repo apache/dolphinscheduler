@@ -19,23 +19,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
     <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select * from
-        (select command.* from t_ds_command command,
-        t_ds_process_definition definition
-        where command.process_definition_id = definition.id and definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=1
-        union
-        select command.* from t_ds_command command,
-        t_ds_process_definition definition,(select process_definition_id,state from t_ds_process_instance instance,
-        (select max(id) as max_id from t_ds_process_instance group by process_definition_id) instance_maxid
-        where instance.id=instance_maxid.max_id and instance.state in(5,6,7,9)) instance_new
-        where command.process_definition_id = definition.id and definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=0
-        AND instance_new.process_definition_id=definition.id
-        union
-        select command.* from t_ds_command command,
-        t_ds_process_definition definition
-        where definition.release_state = 1 AND definition.flag = 1 AND definition.is_parallel=0 and command.process_definition_id = definition.id
-        and definition.id not in (select distinct(process_definition_id) from  t_ds_process_instance)
-        ) command_new order by command_new.update_time asc limit 1
+SELECT command.*
+FROM (
+	SELECT *
+	FROM t_ds_process_definition definition
+	WHERE definition.release_state = 1
+		AND definition.flag = 1
+) definition_new, (
+		SELECT process_definition_id, state
+		FROM t_ds_process_instance instance, (
+				SELECT MAX(id) AS max_id
+				FROM t_ds_process_instance
+				GROUP BY process_definition_id
+			) instance_maxid
+		WHERE instance.id = instance_maxid.max_id
+			AND instance.state IN (5, 6, 7, 9)
+	) instance_new, t_ds_command command
+WHERE definition_new.id = command.process_definition_id
+	AND (definition_new.is_parallel = 1
+		OR (definition_new.is_parallel = 0
+			AND (instance_new.process_definition_id = definition_new.id
+				OR definition_new.id NOT IN (
+					SELECT DISTINCT process_definition_id
+					FROM t_ds_process_instance
+				))))
+ORDER BY command.update_time ASC
+LIMIT 1
     </select>
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
         select cmd.command_type as command_type, count(1) as count
