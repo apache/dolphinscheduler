@@ -55,15 +55,15 @@ public class RetryReportTaskStatusThread implements Runnable {
     public RetryReportTaskStatusThread(){
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
     }
+
+    /**
+     * retry ack/response
+     */
     @Override
     public void run() {
         ResponceCache responceCache = ResponceCache.get();
 
         while (Stopper.isRunning()){
-            if (responceCache.getAckCache().isEmpty() && responceCache.getResponseCache().isEmpty()){
-                continue;
-            }
-
             try {
                 if (!responceCache.getAckCache().isEmpty()){
                     Map<Integer,Command> ackCache =  responceCache.getAckCache();

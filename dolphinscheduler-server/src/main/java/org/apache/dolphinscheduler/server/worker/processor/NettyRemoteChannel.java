@@ -45,8 +45,6 @@ public class NettyRemoteChannel {
      */
     private final Host host;
 
-    private final Random random = new Random();
-
 
     public NettyRemoteChannel(Channel channel, long opaque) {
         this.channel = channel;
@@ -57,7 +55,7 @@ public class NettyRemoteChannel {
     public NettyRemoteChannel(Channel channel) {
         this.channel = channel;
         this.host = ChannelUtils.toAddress(channel);
-        this.opaque = random.nextLong();
+        this.opaque = -1;
     }
 
     public Channel getChannel() {

@@ -23,6 +23,9 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Responce Cache : cache worker send master result
+ */
 public class ResponceCache {
 
     private static final ResponceCache instance = new ResponceCache();
@@ -37,6 +40,12 @@ public class ResponceCache {
     private Map<Integer,Command> responseCache = new ConcurrentHashMap<>();
 
 
+    /**
+     * cache response
+     * @param taskInstanceId taskInstanceId
+     * @param command command
+     * @param event event ACK/RESULT
+     */
     public void cache(Integer taskInstanceId, Command command, Event event){
         switch (event){
             case ACK:
@@ -51,17 +60,34 @@ public class ResponceCache {
     }
 
 
+    /**
+     * remove ack cache
+     * @param taskInstanceId taskInstanceId
+     */
     public void removeAckCache(Integer taskInstanceId){
         ackCache.remove(taskInstanceId);
     }
+
+    /**
+     * remove reponse cache
+     * @param taskInstanceId taskInstanceId
+     */
     public void removeResponseCache(Integer taskInstanceId){
         responseCache.remove(taskInstanceId);
     }
 
+    /**
+     * getAckCache
+     * @return getAckCache
+     */
     public Map<Integer,Command> getAckCache(){
         return ackCache;
     }
 
+    /**
+     * getResponseCache
+     * @return getResponseCache
+     */
     public Map<Integer,Command> getResponseCache(){
         return responseCache;
     }
