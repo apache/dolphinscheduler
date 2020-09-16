@@ -763,15 +763,11 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                       <include>**/alert/utils/DingTalkUtilsTest.java</include>
-                        <include>**/alert/template/AlertTemplateFactoryTest.java</include>
-                        <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
+                        <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
+                        <include>**/alert/runner/AlertSenderTest.java</include>
+                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
-                        <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
-                        <include>**/alert/utils/JSONUtilsTest.java</include>
-                        <!--<include>**/alert/utils/MailUtilsTest.java</include>-->
-                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
@@ -933,6 +929,8 @@
                         <include>**/dao/mapper/UDFUserMapperTest.java</include>
                         <include>**/dao/mapper/UserAlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/UserMapperTest.java</include>
+                        <include>**/dao/mapper/AlertPluginInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/PluginDefineTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
                         <include>**/dao/datasource/OracleDataSourceTest.java</include>
@@ -940,9 +938,12 @@
                         <include>**/dao/upgrade/ProcessDefinitionDaoTest.java</include>
                         <include>**/dao/upgrade/WokrerGrouopDaoTest.java</include>
                         <include>**/dao/upgrade/UpgradeDaoTest.java</include>
-                        <include>**/plugin/model/AlertDataTest.java</include>
-                        <include>**/plugin/model/AlertInfoTest.java</include>
-                        <include>**/plugin/utils/PropertyUtilsTest.java</include>
+                        <include>**/plugin/alert/email/EmailAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/email/EmailAlertChannelTest.java</include>
+                        <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
+                        <include>**/plugin/alert/email/MailUtilsTest.java</include>
+                        <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
+                        <include>**/spi/params/PluginParamsTransferTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
