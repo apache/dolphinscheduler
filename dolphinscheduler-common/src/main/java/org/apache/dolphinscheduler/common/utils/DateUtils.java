@@ -36,6 +36,10 @@ public class DateUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
+    private DateUtils() {
+        throw new UnsupportedOperationException("Construct DateUtils");
+    }
+
     /**
      * date to local datetime
      *
