@@ -126,7 +126,7 @@ public class PythonTask extends AbstractTask {
             rawPythonScript = VarPoolUtils.convertPythonScriptPlaceholders(rawPythonScript);
         }
         catch (StringIndexOutOfBoundsException e) {
-            // TODO: handle exception
+            logger.error("setShareVar field format error, raw python script : {}", rawPythonScript);
         }
         
         if (paramsMap != null) {
