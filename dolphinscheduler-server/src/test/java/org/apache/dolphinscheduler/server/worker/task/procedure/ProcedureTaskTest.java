@@ -17,12 +17,21 @@
 
 package org.apache.dolphinscheduler.server.worker.task.procedure;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.Collection;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -31,12 +40,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest({ DriverManager.class })
 public class ProcedureTaskTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcedureTaskTest.class);
 
@@ -69,23 +80,24 @@ public class ProcedureTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(
-                "{\"localParams\":[],\"type\":\"MYSQL\",\"datasource\":1,\"method\":\"add\"}");
+                "{\"localParams\":[],\"type\":\"POSTGRESQL\",\"datasource\":1,\"method\":\"add\"}");
 
-        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
-        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
-        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
-        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
-        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
-        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
+        taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
+        PowerMockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
+        PowerMockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        PowerMockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
+        PowerMockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
+        PowerMockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        PowerMockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
+        PowerMockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
 
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
         procedureTaskExecutionContext.setConnectionParams(CONNECTION_PARAMS);
-        Mockito.when(taskExecutionContext.getProcedureTaskExecutionContext()).thenReturn(procedureTaskExecutionContext);
+        PowerMockito.when(taskExecutionContext.getProcedureTaskExecutionContext()).thenReturn(procedureTaskExecutionContext);
 
         procedureTask = new ProcedureTask(taskExecutionContext, logger);
         procedureTask.init();
+
     }
 
     @Test
@@ -95,7 +107,6 @@ public class ProcedureTaskTest {
 
     @Test
     public void testHandle() {
-        //TODO PR Unable to connect to the database
         try {
             procedureTask.handle();
         } catch (Exception e) {
