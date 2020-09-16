@@ -63,8 +63,7 @@ public class ProcedureTask extends AbstractTask {
      * base datasource
      */
     private BaseDataSource baseDataSource;
-
-
+    
     /**
      * taskExecutionContext
      */
