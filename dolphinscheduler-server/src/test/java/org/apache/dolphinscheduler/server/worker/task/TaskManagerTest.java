@@ -97,19 +97,18 @@ public class TaskManagerTest {
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
         taskExecutionContext.setTaskType("SQOOP");
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
-        try {
-            taskExecutionContext.setTaskType(null);
-            TaskManager.newTask(taskExecutionContext,taskLogger);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
 
-        try {
-            taskExecutionContext.setTaskType("XXX");
-            TaskManager.newTask(taskExecutionContext,taskLogger);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
+    }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewTaskIsNull() {
+        taskExecutionContext.setTaskType(null);
+        TaskManager.newTask(taskExecutionContext,taskLogger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewTaskIsNotExists() {
+        taskExecutionContext.setTaskType("XXX");
+        TaskManager.newTask(taskExecutionContext,taskLogger);
     }
 }

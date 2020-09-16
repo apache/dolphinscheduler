@@ -47,9 +47,8 @@ public class TaskManager {
     public static AbstractTask newTask(TaskExecutionContext taskExecutionContext, Logger logger) throws IllegalArgumentException {
         TaskType anEnum = EnumUtils.getEnum(TaskType.class, taskExecutionContext.getTaskType());
         if (anEnum == null) {
-            String msg = String.format("not support task type: %s", taskExecutionContext.getTaskType());
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+            logger.error("not support task type: {}", taskExecutionContext.getTaskType());
+            throw new IllegalArgumentException("not support task type");
         }
         switch (anEnum) {
             case SHELL:
@@ -74,9 +73,8 @@ public class TaskManager {
             case SQOOP:
                 return new SqoopTask(taskExecutionContext, logger);
             default:
-                String msg = String.format("not support task type: %s", taskExecutionContext.getTaskType());
-                logger.error(msg);
-                throw new IllegalArgumentException(msg);
+                logger.error("not support task type: {}", taskExecutionContext.getTaskType());
+                throw new IllegalArgumentException("not support task type");
         }
     }
 }
