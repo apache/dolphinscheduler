@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.VarPoolUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
