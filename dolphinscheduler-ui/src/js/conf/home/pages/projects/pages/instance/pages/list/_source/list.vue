@@ -288,7 +288,6 @@
       </table>
     </div>
     <x-poptip
-            v-show="strDelete !== ''"
             ref="poptipDeleteAll"
             placement="bottom-start"
             width="90">
@@ -298,7 +297,7 @@
         <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
       </div>
       <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
+        <x-button size="xsmall" :disabled="!strDelete" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
   </div>
