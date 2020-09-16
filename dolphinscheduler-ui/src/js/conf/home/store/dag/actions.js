@@ -196,8 +196,38 @@ export default {
   copyProcess ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/process/copy`, {
-        processId: payload.processId
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
       }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get process definition DAG diagram details
+   */
+  moveProcess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/process/move`, {
+        processDefinitionIds: payload.processDefinitionIds,
+        targetProjectId: payload.targetProjectId
+      }, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+
+  /**
+   * Get all the items created by the logged in user
+   */
+  getAllItems ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/login-user-created-project`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)

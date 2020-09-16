@@ -657,7 +657,8 @@ CREATE TABLE `t_ds_resources` (
   `pid` int(11) DEFAULT NULL,
   `full_name` varchar(64) DEFAULT NULL,
   `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
