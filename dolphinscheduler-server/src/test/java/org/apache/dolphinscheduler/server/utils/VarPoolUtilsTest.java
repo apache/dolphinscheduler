@@ -55,7 +55,7 @@ public class VarPoolUtilsTest {
     
     @Test
     public void testConvertVarPoolToMap() throws Exception {
-        String varPool = "p1,66$guyinyou$p2,69$guyinyou$";
+        String varPool = "p1,66$VarPool$p2,69$VarPool$";
         ConcurrentHashMap<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
         VarPoolUtils.convertVarPoolToMap(propToValue, varPool);
         Assert.assertEquals((String)propToValue.get("p1"), "66");

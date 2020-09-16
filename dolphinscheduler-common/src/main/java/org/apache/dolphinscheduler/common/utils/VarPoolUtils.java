@@ -80,7 +80,7 @@ public class VarPoolUtils {
         if (varPool == null) {
             return;
         }
-        String[] splits = varPool.split("\\$guyinyou\\$");
+        String[] splits = varPool.split("\\$VarPool\\$");
         for (String kv : splits) {
             String[] kvs = kv.split(",");
             if (kvs.length == 2) {

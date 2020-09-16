@@ -353,7 +353,7 @@ public abstract class AbstractCommandExecutor {
                     while ((line = inReader.readLine()) != null) {
                         if (line.startsWith("${setValue(")) {
                             varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                            varPool.append("$guyinyou$");
+                            varPool.append("$VarPool$");
                         } else {
                             logBuffer.add(line);
                             lastFlushTime = flush(lastFlushTime);
