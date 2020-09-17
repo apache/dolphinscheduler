@@ -17,16 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
-import org.apache.dolphinscheduler.alert.AlertServer;
-import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
-import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
 
@@ -34,8 +27,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * EmailAlertChannelFactory Tester.
