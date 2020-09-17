@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert.runner;
+package org.apache.dolphinscheduler.plugin.alert.email;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
@@ -49,34 +51,47 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * AlertSender Tester.
+ * test load and use alert plugin
  */
-public class AlertSenderTest {
+public class EmailAlertPluginTest {
 
     AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
     PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 
-    @Before
-    public void before() throws Exception {
-    }
-
-    @After
-    public void after() throws Exception {
-    }
-
-    /**
-     * Method: run()
-     */
     @Test
-    public void testRun() throws Exception {
+    public void testLoadPlugins() throws Exception {
+        System.out.println(System.getProperty("user.dir"));
+        AlertPluginManager alertPluginManager = new AlertPluginManager();
+        DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
+        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
+        alertPluginManagerConfig.setPlugins(path + "../../pom.xml");
+        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
+            alertPluginManagerConfig.setInstalledPluginsDir(org.apache.dolphinscheduler.alert.utils.PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
+        }
+
+        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
+            alertPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY).trim());
+        }
+
+        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
+        try {
+            alertPluginLoader.loadPlugins();
+        } catch (Exception e) {
+            throw new RuntimeException("load Alert Plugin Failed !", e);
+        }
+
+        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("email alert"));
+
+    }
+
+    @Test
+    public void testRunSend() throws Exception {
 
         //create alert group
         AlertGroup alertGroup = new AlertGroup();
@@ -93,6 +108,7 @@ public class AlertSenderTest {
         map1.put("mysql service name", "mysql200");
         map1.put("mysql address", "192.168.xx.xx");
         map1.put("port", "3306");
+        map1.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         map1.put("no index of number", "80");
         map1.put("database client connections", "190");
 
@@ -101,6 +117,7 @@ public class AlertSenderTest {
         map2.put("mysql address", "192.168.xx.xx");
         map2.put("port", "3306");
         map2.put("no index of number", "10");
+        map1.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
         map2.put("database client connections", "90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
@@ -118,7 +135,8 @@ public class AlertSenderTest {
         //load email alert plugin
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
-        alertPluginManagerConfig.setPlugins("../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
+        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
+        alertPluginManagerConfig.setPlugins(path + "../../pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
             alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
@@ -229,7 +247,7 @@ public class AlertSenderTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = RadioParam.newBuilder("showType", "showType")
+        RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
                 .setParamsOptionsList(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
@@ -249,5 +267,4 @@ public class AlertSenderTest {
 
         return PluginParamsTransfer.transferParamsToJson(paramsList);
     }
-
-} 
+}

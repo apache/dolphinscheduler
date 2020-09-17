@@ -81,30 +81,4 @@ public class EmailAlertChannelFactoryTest {
         Assert.assertNotNull(alertChannel);
     }
 
-    @Test
-    public void testLoadPlugins() throws Exception {
-        System.out.println(System.getProperty("user.dir"));
-        AlertPluginManager alertPluginManager = new AlertPluginManager();
-        DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
-        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
-        System.out.println(path);
-        alertPluginManagerConfig.setPlugins(path + "../../pom.xml");
-        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
-            alertPluginManagerConfig.setInstalledPluginsDir(org.apache.dolphinscheduler.alert.utils.PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
-        }
-
-        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
-            alertPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY).trim());
-        }
-
-        DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
-        try {
-            alertPluginLoader.loadPlugins();
-        } catch (Exception e) {
-            throw new RuntimeException("load Alert Plugin Failed !", e);
-        }
-
-        Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("email alert"));
-
-    }
 }

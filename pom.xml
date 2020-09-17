@@ -768,7 +768,6 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/alert/plugin/DolphinPluginLoaderTest.java</include>
                         <include>**/alert/runner/AlertSenderTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
