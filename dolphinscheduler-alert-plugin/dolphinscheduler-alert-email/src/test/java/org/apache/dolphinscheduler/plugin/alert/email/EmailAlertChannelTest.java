@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.email;
 
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
@@ -150,7 +151,7 @@ public class EmailAlertChannelTest {
         emailShowTypeList.add(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.ATTACHMENT.getDescp(), ShowType.ATTACHMENT.getDescp(), false));
         emailShowTypeList.add(new ParamsOptions(ShowType.TABLEATTACHMENT.getDescp(), ShowType.TABLEATTACHMENT.getDescp(), false));
-        RadioParam showType = RadioParam.newBuilder("showType", "showType")
+        RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, "showType")
                 .setParamsOptionsList(emailShowTypeList)
                 .setValue(ShowType.TABLE.getDescp())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
