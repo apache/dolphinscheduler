@@ -951,6 +951,7 @@
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
                         <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
+                        <include>**/plugin/alert/email/EmailAlertPluginTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
