@@ -50,7 +50,9 @@ public class DolphinPluginLoaderTest {
         System.out.println(System.getProperty("user.dir"));
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
-        alertPluginManagerConfig.setPlugins("../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
+        String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
+        System.out.println(path);
+        alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
             alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
