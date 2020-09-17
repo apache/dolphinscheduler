@@ -36,10 +36,6 @@
             <artifactId>dolphinscheduler-spi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert-plugin</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
