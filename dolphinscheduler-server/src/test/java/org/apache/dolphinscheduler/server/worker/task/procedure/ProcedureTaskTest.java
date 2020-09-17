@@ -22,6 +22,9 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +34,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-
-import java.util.Date;
 
 @RunWith(PowerMockRunner.class)
 public class ProcedureTaskTest {
@@ -94,11 +95,12 @@ public class ProcedureTaskTest {
 
     @Test
     public void testHandle() {
+        //TODO DriverManager.getConnection() can't mock
         try {
             procedureTask.handle();
         } catch (Exception e) {
             //Assert.fail(e.getMessage());
         }
     }
-    
+
 }
