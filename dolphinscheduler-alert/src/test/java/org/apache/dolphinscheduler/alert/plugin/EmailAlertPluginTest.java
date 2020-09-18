@@ -63,7 +63,6 @@ public class EmailAlertPluginTest {
 
     @Test
     public void testLoadPlugins() throws Exception {
-        System.out.println(System.getProperty("user.dir"));
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
