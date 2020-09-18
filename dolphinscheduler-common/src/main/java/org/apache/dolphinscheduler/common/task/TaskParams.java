@@ -37,7 +37,7 @@ public class TaskParams {
     }
 
     public void setLocalParamValue(String prop, Object value) {
-        if (localParams == null) {
+        if (localParams == null || value == null) {
             return;
         }
         for (int i = 0; i < localParams.length; i++) {
@@ -48,7 +48,7 @@ public class TaskParams {
     }
 
     public void setLocalParamValue(Map<String, Object> propToValue) {
-        if (localParams == null) {
+        if (localParams == null || propToValue == null) {
             return;
         }
         for (int i = 0; i < localParams.length; i++) {
