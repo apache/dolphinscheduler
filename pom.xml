@@ -768,10 +768,6 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
-                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
-                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
-                        <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
@@ -952,6 +948,10 @@
                         <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
+                        <include>**/alert/utils/DingTalkUtilsTest.java</include>
+                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
+                        <include>**/alert/utils/FuncUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
