@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.email;
+package org.apache.dolphinscheduler.alert.plugin;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
-import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
-import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
@@ -70,7 +67,7 @@ public class EmailAlertPluginTest {
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
-        alertPluginManagerConfig.setPlugins(path + "../../pom.xml");
+        alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
             alertPluginManagerConfig.setInstalledPluginsDir(org.apache.dolphinscheduler.alert.utils.PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }
@@ -136,7 +133,7 @@ public class EmailAlertPluginTest {
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
-        alertPluginManagerConfig.setPlugins(path + "../../pom.xml");
+        alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
         if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
             alertPluginManagerConfig.setInstalledPluginsDir(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
         }

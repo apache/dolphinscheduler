@@ -232,6 +232,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-email</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-alert</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -768,7 +773,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/alert/runner/AlertSenderTest.java</include>
+                        <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
@@ -951,7 +956,6 @@
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
                         <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
-                        <include>**/plugin/alert/email/EmailAlertPluginTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->

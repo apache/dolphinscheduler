@@ -119,6 +119,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- In order to test PluginLoader, we must have at least one plug-in compiled, so here add dolphinscheduler-alert-email to the dependency scope as test, other plug-ins do not need to do this -->
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-email</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito2</artifactId>
