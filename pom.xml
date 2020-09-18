@@ -1005,6 +1005,9 @@
                         </licenseFamily>
                     </licenseFamilies>
                     <excludes>
+                        <exclude>**/alert/plugin/DolphinPluginClassLoader.java</exclude>
+                        <exclude>**/alert/plugin/DolphinPluginDiscovery.java</exclude>
+                        <exclude>**/alert/plugin/DolphinPluginLoader.java</exclude>
                         <exclude>**/node_modules/**</exclude>
                         <exclude>**/node/**</exclude>
                         <exclude>**/dist/**</exclude>
