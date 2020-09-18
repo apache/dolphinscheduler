@@ -48,7 +48,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -232,25 +232,14 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return resource ids
      */
     private String getResourceIds(ProcessData processData) {
-        List<TaskNode> tasks = processData.getTasks();
-        Set<Integer> resourceIds = new HashSet<>();
-        for (TaskNode taskNode : tasks) {
-            String taskParameter = taskNode.getParams();
-            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
-            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t -> t.getId()).collect(Collectors.toSet());
-                resourceIds.addAll(tempSet);
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i : resourceIds) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(i);
-        }
-        return sb.toString();
+        return processData.getTasks()
+                .stream()
+                .map(taskNode -> TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams()))
+                .filter(Objects::nonNull)
+                .flatMap(parameters -> parameters.getResourceFilesList().stream())
+                .map(ResourceInfo::getId)
+                .map(Objects::toString)
+                .collect(Collectors.joining(","));
     }
 
     /**
