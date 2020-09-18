@@ -54,13 +54,13 @@ public class AlertPluginManager extends DolphinPluginManager {
         }
 
         try {
-            loadConfiguredAlertChannel(alertChannelFactory.getName());
+            loadAlertChannel(alertChannelFactory.getName());
         } catch (Exception e) {
-            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load , read config file failed.", alertChannelFactory.getName()));
+            throw new IllegalArgumentException(format("Alert Plugin '{}' is can not load .", alertChannelFactory.getName()));
         }
     }
 
-    protected void loadConfiguredAlertChannel(String name) {
+    protected void loadAlertChannel(String name) {
         requireNonNull(name, "name is null");
 
         AlertChannelFactory alertChannelFactory = alertChannelFactoryMap.get(name);
