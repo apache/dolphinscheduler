@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.ProjectData;
 import org.apache.dolphinscheduler.data.project.WorkflowDefineData;
 import org.apache.dolphinscheduler.locator.project.ProjectLocator;
@@ -25,6 +24,9 @@ import org.apache.dolphinscheduler.locator.project.WorkflowDefineLocator;
 import org.openqa.selenium.WebDriver;
 
 public class WorkflowDefinePage extends PageCommon {
+    WorkflowDefineData workflowDefineData = new WorkflowDefineData();
+    ProjectData projectData = new ProjectData();
+
     public WorkflowDefinePage(WebDriver driver) {
         super(driver);
     }
@@ -34,18 +36,18 @@ public class WorkflowDefinePage extends PageCommon {
      */
 
     public boolean jumpWorkflowPage() throws InterruptedException {
-        ifTextExists(ProjectLocator.LIST_PROJECT_NAME, ProjectData.PROJECT_NAME);
+        ifTextExists(ProjectLocator.LIST_PROJECT_NAME, projectData.getProjectData("projectName"));
 
         // click project name
         clickElement(WorkflowDefineLocator.CLICK_PROJECT_NAME);
 
-        ifTextExists(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE,WorkflowDefineData.workflow_define);
+        ifTextExists(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE,workflowDefineData.getWorkflowDefineData("workflowDefine"));
 
         System.out.println("Click on workflow define to jump to workflow define page");
         // click workflow define
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
-        return ifTitleContains(WorkflowDefineData.WORKFLOW_TITLE);
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("workflowDefineTitle"));
     }
 
     public boolean createWorkflow() throws InterruptedException {
@@ -58,8 +60,7 @@ public class WorkflowDefinePage extends PageCommon {
         dragAndDrop(WorkflowDefineLocator.MOUSE_DOWN_AT_SHELL, WorkflowDefineLocator.MOUSE_MOVE_SHELL_AT_DAG);
 
         //input shell task _name
-        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_NAME , WorkflowDefineData.SHELL_TASK_NAME);
-
+        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_NAME, workflowDefineData.getWorkflowDefineData("shellTaskName"));
         //click stop run type
         clickElement(WorkflowDefineLocator.CLICK_STOP_RUN_TYPE);
 
@@ -67,7 +68,7 @@ public class WorkflowDefinePage extends PageCommon {
         clickElement(WorkflowDefineLocator.CLICK_NORMAL_RUN_TYPE);
 
         //input shell task description
-        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_DESCRIPTION , WorkflowDefineData.SHELL_TASK_DESCRIPTION);
+        sendInput(WorkflowDefineLocator.INPUT_SHELL_TASK_DESCRIPTION, workflowDefineData.getWorkflowDefineData("shellTaskDescription"));
 
         //select task priority
         clickElement(WorkflowDefineLocator.CLICK_TASK_PRIORITY);
@@ -100,20 +101,20 @@ public class WorkflowDefinePage extends PageCommon {
         clearInput(WorkflowDefineLocator.SELECT_TIMEOUT);
 
         //input timeout
-        sendInput(WorkflowDefineLocator.SELECT_TIMEOUT, WorkflowDefineData.INPUT_TIMEOUT);
+        sendInput(WorkflowDefineLocator.SELECT_TIMEOUT, workflowDefineData.getWorkflowDefineData("taskTimeout"));
 
         //click codeMirror and input script
-        inputCodeMirror(WorkflowDefineLocator.CLICK_CODE_MIRROR, WorkflowDefineLocator.INPUT_SCRIPT, WorkflowDefineData.SHELL_SCRIPT);
+        inputCodeMirror(WorkflowDefineLocator.CLICK_CODE_MIRROR, WorkflowDefineLocator.INPUT_SCRIPT, workflowDefineData.getWorkflowDefineData("shellScript"));
         scrollToElementBottom(WorkflowDefineLocator.SCROLL_BOTTOM);
 
         //click custom parameters
         clickElement(WorkflowDefineLocator.CLICK_CUSTOM_PARAMETERS);
 
         //input custom parameters
-        sendInput(WorkflowDefineLocator.INPUT_CUSTOM_PARAMETERS, WorkflowDefineData.INPUT_CUSTOM_PARAMETERS);
+        sendInput(WorkflowDefineLocator.INPUT_CUSTOM_PARAMETERS, workflowDefineData.getWorkflowDefineData("customParameter1"));
 
         //input custom parameters value
-        sendInput(WorkflowDefineLocator.INPUT_CUSTOM_PARAMETERS_VALUE, WorkflowDefineData.INPUT_CUSTOM_PARAMETERS_VALUE);
+        sendInput(WorkflowDefineLocator.INPUT_CUSTOM_PARAMETERS_VALUE, workflowDefineData.getWorkflowDefineData("customParameterValue1"));
 
         //click add custom parameters
         clickElement(WorkflowDefineLocator.CLICK_ADD_CUSTOM_PARAMETERS);
@@ -121,10 +122,10 @@ public class WorkflowDefinePage extends PageCommon {
         scrollToElementBottom(WorkflowDefineLocator.SCROLL_BOTTOM);
 
         //input add custom parameters
-        sendInput(WorkflowDefineLocator.INPUT_ADD_CUSTOM_PARAMETERS, WorkflowDefineData.INPUT_ADD_CUSTOM_PARAMETERS);
+        sendInput(WorkflowDefineLocator.INPUT_ADD_CUSTOM_PARAMETERS, workflowDefineData.getWorkflowDefineData("customParameter2"));
 
         //input add custom parameters value
-        sendInput(WorkflowDefineLocator.INPUT_ADD_CUSTOM_PARAMETERS_VALUE, WorkflowDefineData.INPUT_ADD_CUSTOM_PARAMETERS_VALUE);
+        sendInput(WorkflowDefineLocator.INPUT_ADD_CUSTOM_PARAMETERS_VALUE, workflowDefineData.getWorkflowDefineData("customParameterValue2"));
 
         //click delete custom parameters
         clickElement(WorkflowDefineLocator.CLICK_DELETE_CUSTOM_PARAMETERS);
@@ -140,7 +141,7 @@ public class WorkflowDefinePage extends PageCommon {
         clickButton(WorkflowDefineLocator.COPY_TASK);
         clickButton(WorkflowDefineLocator.CLICK_LINE);
         mouseMovePosition(WorkflowDefineLocator.LINE_SOURCES_TASK,WorkflowDefineLocator.LINE_TARGET_TASK);
-        return ifTitleContains(WorkflowDefineData.CREATE_WORKFLOW_TITLE);
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("createWorkflowTitle"));
     }
 
     /**
@@ -153,10 +154,10 @@ public class WorkflowDefinePage extends PageCommon {
         clickElement(WorkflowDefineLocator.CLICK_SAVE_WORKFLOW_BUTTON);
 
         //input  workflow name
-        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_NAME, WorkflowDefineData.INPUT_WORKFLOW_NAME);
+        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_NAME, workflowDefineData.getWorkflowDefineData("workflowName"));
 
         //input  workflow description
-        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_DESCRIPTION, WorkflowDefineData.INPUT_WORKFLOW_DESCRIPTION);
+        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_DESCRIPTION, workflowDefineData.getWorkflowDefineData("workflowDescription"));
 
         //select tenant
         clickElement(WorkflowDefineLocator.CLICK_TENANT);
@@ -167,25 +168,25 @@ public class WorkflowDefinePage extends PageCommon {
         clearInput(WorkflowDefineLocator.INPUT_WORKFLOW_TIMEOUT);
 
         //input workflow timeout
-        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_TIMEOUT, WorkflowDefineData.INPUT_WORKFLOW_TIMEOUT);
+        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_TIMEOUT, workflowDefineData.getWorkflowDefineData("workflowTimeout"));
 
         //click workflow  global parameters
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_GLOBAL_PARAMETERS);
 
         //input workflow  global parameters
-        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_GLOBAL_PARAMETERS, WorkflowDefineData.INPUT_WORKFLOW_GLOBAL_PARAMETERS);
+        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_GLOBAL_PARAMETERS, workflowDefineData.getWorkflowDefineData("globalParameter1"));
 
         //input workflow  global parameters value
-        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES, WorkflowDefineData.INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES);
+        sendInput(WorkflowDefineLocator.INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES, workflowDefineData.getWorkflowDefineData("globalParameterValue1"));
 
         //click to add workflow  global parameters
         clickElement(WorkflowDefineLocator.CLICK_ADD_WORKFLOW_GLOBAL_PARAMETERS);
 
         //input to  add workflow  global parameters
-        sendInput(WorkflowDefineLocator.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS, WorkflowDefineData.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS);
+        sendInput(WorkflowDefineLocator.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS, workflowDefineData.getWorkflowDefineData("globalParameter2"));
 
         //input to add workflow  global parameters value
-        sendInput(WorkflowDefineLocator.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES, WorkflowDefineData.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES);
+        sendInput(WorkflowDefineLocator.INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES, workflowDefineData.getWorkflowDefineData("globalParameterValue2"));
 
         //delete workflow  global parameters value
         clickElement(WorkflowDefineLocator.CLICK_DELETE_WORKFLOW_GLOBAL_PARAMETERS);
@@ -194,33 +195,33 @@ public class WorkflowDefinePage extends PageCommon {
         System.out.println("submit workflow");
         clickButton(WorkflowDefineLocator.CLICK_ADD_BUTTON);
 
-        return ifTitleContains(WorkflowDefineData.CREATE_WORKFLOW_TITLE);
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("createWorkflowTitle"));
     }
 
     public boolean onlineWorkflow() throws InterruptedException {
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
         // Determine whether the workflow status is offline
-        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_OFFLINE_STATE);
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, workflowDefineData.getWorkflowDefineData("offline"));
 
         // click online button
         System.out.println("Click online workflow button");
         clickButton(WorkflowDefineLocator.CLICK_ONLINE_WORKFLOW_BUTTON);
 
-        return ifTitleContains(WorkflowDefineData.WORKFLOW_TITLE);
+        return ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, workflowDefineData.getWorkflowDefineData("online"));
     }
 
     public boolean offlineWorkflow() throws InterruptedException {
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
         // Determine whether the workflow status is online
-        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_ONLINE_STATE);
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, workflowDefineData.getWorkflowDefineData("online"));
 
         // click offline button
         System.out.println("offline workflow");
         clickButton(WorkflowDefineLocator.CLICK_OFFLINE_WORKFLOW_BUTTON);
 
-        return ifTitleContains(WorkflowDefineData.WORKFLOW_TITLE);
+        return ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, workflowDefineData.getWorkflowDefineData("offline"));
     }
 
 
@@ -229,7 +230,7 @@ public class WorkflowDefinePage extends PageCommon {
         clickElement(WorkflowDefineLocator.CLICK_WORKFLOW_DEFINE);
 
         // Determine whether the workflow status is offline
-        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE,WorkflowDefineData.WORKFLOW_OFFLINE_STATE);
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, workflowDefineData.getWorkflowDefineData("offline"));
 
         clickButton(WorkflowDefineLocator.DELETE_WORKFLOW_BOTTOM);
 
@@ -237,6 +238,6 @@ public class WorkflowDefinePage extends PageCommon {
         clickButton(WorkflowDefineLocator.CONFIRM_DELETE_WORKFLOW_BOTTOM);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(WorkflowDefineData.WORKFLOW_TITLE);
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("workflowDefineTitle"));
     }
 }
