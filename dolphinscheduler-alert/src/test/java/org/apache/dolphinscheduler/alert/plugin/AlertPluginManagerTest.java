@@ -30,9 +30,6 @@ import com.google.common.collect.ImmutableList;
 /**
  * AlertPluginManager Tester.
  *
- * @author <Authors name>
- * @version 1.0
- * @since <pre>Sep 19, 2020</pre>
  */
 public class AlertPluginManagerTest {
 
