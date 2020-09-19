@@ -949,6 +949,7 @@
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
+                        <include>**/alert/plugin/AlertPluginManagerTest.java</include>
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>

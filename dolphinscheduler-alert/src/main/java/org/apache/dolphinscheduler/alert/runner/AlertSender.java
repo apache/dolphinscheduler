@@ -70,10 +70,6 @@ public class AlertSender {
                     .setTitle(alert.getTitle());
 
             for (AlertPluginInstance instance : alertInstanceList) {
-                if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
-                    logger.warn("No Alert Plugin configured. Can not send alert info. ");
-                    return;
-                }
 
                 String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
                 String pluginInstanceName = instance.getInstanceName();
@@ -81,6 +77,12 @@ public class AlertSender {
                 alertInfo.setAlertData(alertData);
                 alertInfo.setAlertParams(instance.getPluginInstanceParams());
                 AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
+                if (alertChannel == null) {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "Alert send error, not found plugin " + pluginName, alert.getId());
+                    logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginName);
+                    continue;
+                }
+
                 AlertResult alertResult = alertChannel.process(alertInfo);
 
                 if (alertResult == null) {

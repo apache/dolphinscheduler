@@ -108,9 +108,13 @@ public class AlertServer {
                 logger.error(e.getMessage(), e);
                 Thread.currentThread().interrupt();
             }
-            List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
-            alertSender.run();
+            if (alertPluginManager == null || alertPluginManager.getAlertChannelMap().size() == 0) {
+                logger.warn("No Alert Plugin . Can not send alert info. ");
+            } else {
+                List<Alert> alerts = alertDao.listWaitExecutionAlert();
+                alertSender = new AlertSender(alerts, alertDao, alertPluginManager, pluginDao);
+                alertSender.run();
+            }
         }
     }
 
