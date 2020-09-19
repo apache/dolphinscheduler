@@ -17,40 +17,35 @@
 
 package org.apache.dolphinscheduler.alert.plugin;
 
-import org.apache.dolphinscheduler.alert.AlertServer;
-import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 
 /**
- * AlertPluginManager Tester.
+ * DolphinPluginLoader Tester.
  */
-public class AlertPluginManagerTest {
+public class DolphinPluginLoaderTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);
+    @Before
+    public void before() throws Exception {
+    }
 
+    @After
+    public void after() throws Exception {
+    }
+
+    /**
+     * Method: loadPlugins()
+     */
     @Test
     public void testLoadPlugins() throws Exception {
-        logger.info("begin test AlertPluginManagerTest");
         AlertPluginManager alertPluginManager = new AlertPluginManager();
         DolphinPluginManagerConfig alertPluginManagerConfig = new DolphinPluginManagerConfig();
         String path = DolphinPluginLoader.class.getClassLoader().getResource("").getPath();
         alertPluginManagerConfig.setPlugins(path + "../../../dolphinscheduler-alert-plugin/dolphinscheduler-alert-email/pom.xml");
-        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR))) {
-            alertPluginManagerConfig.setInstalledPluginsDir(org.apache.dolphinscheduler.alert.utils.PropertyUtils.getString(AlertServer.ALERT_PLUGIN_DIR, Constants.ALERT_PLUGIN_PATH).trim());
-        }
-
-        if (StringUtils.isNotBlank(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY))) {
-            alertPluginManagerConfig.setMavenLocalRepository(PropertyUtils.getString(AlertServer.MAVEN_LOCAL_REPOSITORY).trim());
-        }
-
         DolphinPluginLoader alertPluginLoader = new DolphinPluginLoader(alertPluginManagerConfig, ImmutableList.of(alertPluginManager));
         try {
             alertPluginLoader.loadPlugins();
