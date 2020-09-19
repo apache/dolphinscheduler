@@ -32,25 +32,25 @@ public class HostWeight {
 
     private final Host host;
 
-    private final int weight;
+    private final double weight;
 
-    private int currentWeight;
+    private double currentWeight;
 
     public HostWeight(Host host, double cpu, double memory, double loadAverage) {
-        this.weight = calculateWeight(cpu, memory, loadAverage);
-        this.host = host ;
-        this.currentWeight = weight ;
+        this.weight = calculateWeight(cpu, memory, loadAverage) / host.getWeight();
+        this.host = host;
+        this.currentWeight = weight;
     }
 
-    public int getCurrentWeight() {
+    public double getCurrentWeight() {
         return currentWeight;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setCurrentWeight(int currentWeight) {
+    public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
     }
 
@@ -60,14 +60,14 @@ public class HostWeight {
 
     @Override
     public String toString() {
-        return "HostWeight{" +
-                "host=" + host +
-                ", weight=" + weight +
-                ", currentWeight=" + currentWeight +
-                '}';
+        return "HostWeight{"
+            + "host=" + host
+            + ", weight=" + weight
+            + ", currentWeight=" + currentWeight
+            + '}';
     }
 
-    private int calculateWeight(double cpu, double memory, double loadAverage){
-        return (int)(cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
+    private double calculateWeight(double cpu, double memory, double loadAverage) {
+        return cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
     }
 }
