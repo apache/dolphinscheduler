@@ -55,8 +55,5 @@ public class AlertPluginManagerTest {
         }
 
         Assert.assertNotNull(alertPluginManager.getAlertChannelFactoryMap().get("email alert"));
-
     }
-
-
-} 
+}
