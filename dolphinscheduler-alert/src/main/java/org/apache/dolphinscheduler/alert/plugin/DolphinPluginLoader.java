@@ -61,9 +61,9 @@ public class DolphinPluginLoader {
     private final File installedPluginsDir;
     private final List<String> configPlugins;
     private ArtifactResolver resolver = null;
-    private final List<DolphinPluginManager> dolphinPluginManagerList;
+    private final List<AbstractDolphinPluginManager> dolphinPluginManagerList;
 
-    public DolphinPluginLoader(DolphinPluginManagerConfig config, List<DolphinPluginManager> dolphinPluginManagerList) {
+    public DolphinPluginLoader(DolphinPluginManagerConfig config, List<AbstractDolphinPluginManager> dolphinPluginManagerList) {
         installedPluginsDir = config.getInstalledPluginsDir();
         if (config.getPlugins() == null) {
             this.configPlugins = ImmutableList.of();
@@ -106,7 +106,7 @@ public class DolphinPluginLoader {
         checkState(!plugins.isEmpty(), "No service providers the plugin {}", DolphinSchedulerPlugin.class.getName());
         for (DolphinSchedulerPlugin plugin : plugins) {
             logger.info("Installing {}", plugin.getClass().getName());
-            for (DolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
+            for (AbstractDolphinPluginManager dolphinPluginManager : dolphinPluginManagerList) {
                 dolphinPluginManager.installPlugin(plugin);
             }
         }

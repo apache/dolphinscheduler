@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 
-public abstract class DolphinPluginManager {
+public abstract class AbstractDolphinPluginManager {
 
     protected PluginDao pluginDao = DaoFactory.getDaoInstance(PluginDao.class);
 

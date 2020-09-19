@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * load the configured alert plugin and manager them
  */
-public class AlertPluginManager extends DolphinPluginManager {
+public class AlertPluginManager extends AbstractDolphinPluginManager {
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final Map<String, AlertChannelFactory> alertChannelFactoryMap = new ConcurrentHashMap<>();
