@@ -35,6 +35,7 @@ public class HostTest {
         Assert.assertEquals(100, host.getWeight());
     }
 
+
     @Test
     public void testHost() {
         Host host = Host.of("192.158.2.2:22");
