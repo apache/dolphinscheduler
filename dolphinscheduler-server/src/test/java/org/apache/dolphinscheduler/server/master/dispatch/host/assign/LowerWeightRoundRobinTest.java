@@ -34,7 +34,7 @@ public class LowerWeightRoundRobinTest {
         sources.add(new HostWeight(Host.of("192.158.2.1:11:100"), 0.06, 0.44, 3.84));
         sources.add(new HostWeight(Host.of("192.158.2.1:22:100"), 0.06, 0.56, 3.24));
         sources.add(new HostWeight(Host.of("192.158.2.1:33:100"), 0.06, 0.80, 3.15));
-        System.out.println(sources);
+
         LowerWeightRoundRobin roundRobin = new LowerWeightRoundRobin();
         for (int i = 0; i < 100; i++) {
             System.out.println(roundRobin.select(sources));
