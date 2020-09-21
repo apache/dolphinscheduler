@@ -41,7 +41,7 @@ public class RetryReportTaskStatusThread implements Runnable {
     /**
      * every 5 minutes
      */
-    private static long RETRY_REPORT_TASK_STATUS_TIME = 5 * 60 * 1000L;
+    private static long RETRY_REPORT_TASK_STATUS_INTERVAL = 5 * 60 * 1000L;
     /**
      *  task callback service
      */
@@ -64,6 +64,10 @@ public class RetryReportTaskStatusThread implements Runnable {
         ResponceCache responceCache = ResponceCache.get();
 
         while (Stopper.isRunning()){
+
+            // sleep 5 minutes
+            ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_INTERVAL);
+
             try {
                 if (!responceCache.getAckCache().isEmpty()){
                     Map<Integer,Command> ackCache =  responceCache.getAckCache();
@@ -79,14 +83,12 @@ public class RetryReportTaskStatusThread implements Runnable {
                     for (Map.Entry<Integer, Command> entry : responseCache.entrySet()){
                         Integer taskInstanceId = entry.getKey();
                         Command responseCommand = entry.getValue();
-                        taskCallbackService.sendAck(taskInstanceId,responseCommand);
+                        taskCallbackService.sendResult(taskInstanceId,responseCommand);
                     }
                 }
             }catch (Exception e){
                 logger.warn("retry report task status error", e);
             }
-
-            ThreadUtils.sleep(RETRY_REPORT_TASK_STATUS_TIME);
         }
     }
 }
