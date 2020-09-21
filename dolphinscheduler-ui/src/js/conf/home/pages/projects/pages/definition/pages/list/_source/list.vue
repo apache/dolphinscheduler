@@ -263,6 +263,12 @@
        * Close the delete layer
        */
       _closeDelete (i) {
+        // close batch
+        if (i < 0) {
+          this.$refs['poptipDeleteAll'].doClose()
+          return
+        }
+        // close one
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
@@ -396,8 +402,10 @@
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
+          this.strSelectIds = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this.strSelectIds = ''
           this.checkAll = false
           this.$message.error(e.msg || '')
         })
