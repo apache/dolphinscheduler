@@ -24,13 +24,16 @@ import org.apache.dolphinscheduler.locator.project.WorkflowDefineLocator;
 import org.openqa.selenium.WebDriver;
 
 public class RunWorkflowPage extends PageCommon {
+    RunWorkflowData runWorkflowData = new RunWorkflowData();
+    WorkflowDefineData workflowDefineData = new WorkflowDefineData();
+
     public RunWorkflowPage(WebDriver driver) {
         super(driver);
     }
 
     public boolean runWorkflow() throws InterruptedException {
         // Determine whether the workflow status is online
-        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, WorkflowDefineData.WORKFLOW_ONLINE_STATE);
+        ifTextExists(WorkflowDefineLocator.WORKFLOW_STATE, runWorkflowData.getRunWorkflowData("online"));
 
         // click run workflow button
         System.out.println("Click run workflow button");
@@ -46,10 +49,10 @@ public class RunWorkflowPage extends PageCommon {
         clickElement(RunWorkflowLocator.SELECT_WORKER_GROUP);
         clickElement(RunWorkflowLocator.CLICK_NOTICE_GROUP);
         clickElement(RunWorkflowLocator.SELECT_NOTICE_GROUP);
-        sendInput(RunWorkflowLocator.INPUT_RECIPIENT, RunWorkflowData.RECIPIENT);
-        sendInput(RunWorkflowLocator.INPUT_Cc,RunWorkflowData.Cc);
+        sendInput(RunWorkflowLocator.INPUT_RECIPIENT, runWorkflowData.getRunWorkflowData("recipient"));
+        sendInput(RunWorkflowLocator.INPUT_Cc, runWorkflowData.getRunWorkflowData("Cc"));
         clickButton(RunWorkflowLocator.CLICK_RUNNING_BUTTON);
 
-        return ifTitleContains(RunWorkflowData.RUN_WORKFLOW_TITLE);
+        return ifTitleContains(workflowDefineData.getWorkflowDefineData("workflowDefineTitle"));
     }
 }

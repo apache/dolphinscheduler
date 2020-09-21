@@ -16,74 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class WorkflowDefineData {
-    /**
-     * create workflow data
-     */
-
-    public static final String workflow_define = "工作流定义";
-
-    //input shell task name
-    public static final String SHELL_TASK_NAME = "shell_task_selenium_1";
-
-    //input shell task description
-    public static final String SHELL_TASK_DESCRIPTION = "shell task description test";
-
-    //input timeout
-    public static final String INPUT_TIMEOUT = "60";
-
-    //input shell script
-    public static final String SHELL_SCRIPT = "echo 1111111";
-
-    //input custom parameters
-    public static final String INPUT_CUSTOM_PARAMETERS = "selenium_parameter";
-
-    //input custom parameters value
-    public static final String INPUT_CUSTOM_PARAMETERS_VALUE = "selenium_parameter_123";
-
-    //input add custom parameters
-    public static final String INPUT_ADD_CUSTOM_PARAMETERS = "selenium_parameter_delete";
-
-    //input add custom parameters value
-    public static final String INPUT_ADD_CUSTOM_PARAMETERS_VALUE = "selenium_parameter_delete_456";
-
-    //workflow define title
-    public static final String WORKFLOW_TITLE = "工作流定义 - DolphinScheduler";
-
-    //create workflow title
-    public static final String CREATE_WORKFLOW_TITLE = "创建流程定义 - DolphinScheduler";
-
-
-    /**
-     * save workflow data
-     */
-    //input  workflow name
-    public static final String INPUT_WORKFLOW_NAME = "selenium_shell_1";
-
-    //input  workflow description
-    public static final String INPUT_WORKFLOW_DESCRIPTION = "test selenium_shell_1 description";
-
-    //input workflow timeout
-    public static final String INPUT_WORKFLOW_TIMEOUT = "30";
-
-    //input workflow  global parameters
-    public static final String INPUT_WORKFLOW_GLOBAL_PARAMETERS = "selenium_global_parameters_1";
-
-    //input workflow  global parameters value
-    public static final String INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES = "selenium_global_parameters_value_1";
-
-    //input to  add workflow  global parameters
-    public static final String INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS = "selenium_global_parameters_2";
-
-    //input to add workflow  global parameters value
-    public static final String INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES = "selenium_global_parameters_value_2";
-
-    /**
-     * workflowDefine list
-     */
-    public static final String WORKFLOW_ONLINE_STATE = "上线";
-
-    public static final String WORKFLOW_OFFLINE_STATE = "下线";
-
-
+    public String getWorkflowDefineData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String workflowDefineData = ymlReader.getDataYml("testData/workflow_zh_cn", "workflowDefine", param);
+        return  workflowDefineData;
+    }
 }
