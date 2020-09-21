@@ -16,17 +16,13 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class AlertManageData {
-    //Alert Name
-    public static final String ALERT_NAME = "selenium_alert_Name";
-    public static final String CREATE_ALERT =  "创建告警组";
-
-    // Alert Type
-    public static final String ALERT_TYPE = "邮件";
-
-    //Alert Description
-    public static final String DESCRIPTION = "create alert test";
-
-    public static final String ALERT_MANAGE = "告警组管理 - DolphinScheduler";
+    public String getAlertData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String alertData = ymlReader.getDataYml("testData/security_zh_cn", "alertManage", param);
+        return  alertData;
+    }
 
 }
