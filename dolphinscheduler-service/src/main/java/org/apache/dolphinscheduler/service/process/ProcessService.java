@@ -851,6 +851,7 @@ public class ProcessService {
      * set work process instance map
      * consider o
      * repeat running  does not generate new sub process instance
+     * set map {parent instance id, task instance id, 0(child instance id)}
      * @param parentInstance parentInstance
      * @param parentTask parentTask
      * @return process instance map
@@ -919,7 +920,6 @@ public class ProcessService {
             return;
         }
 
-        // set map {parent instance id, task instance id, 0(child instance id)}
         instanceMap = setProcessInstanceMap(parentProcessInstance, task);
         ProcessInstance childInstance = null;
         if (instanceMap.getProcessInstanceId() != 0) {
@@ -928,7 +928,7 @@ public class ProcessService {
         CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
 
         // running if child instance
-        initSubInstanceState(childInstance, commandType);
+        initSubInstanceState(childInstance);
 
         TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
         Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
@@ -991,9 +991,8 @@ public class ProcessService {
      * initialize sub work flow state
      * child instance state would be initialized when 'recovery from pause/stop/failure'
      * @param childInstance
-     * @param commandType
      */
-    private void initSubInstanceState(ProcessInstance childInstance, CommandType commandType) {
+    private void initSubInstanceState(ProcessInstance childInstance) {
         if (childInstance != null) {
             childInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
             updateProcessInstance(childInstance);
