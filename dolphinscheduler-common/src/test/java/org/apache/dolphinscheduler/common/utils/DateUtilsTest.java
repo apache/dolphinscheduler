@@ -150,4 +150,12 @@ public class DateUtilsTest {
         Date curr = DateUtils.getEndOfHour(d1);
         Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:59:59");
     }
+
+    @Test
+    public void getCurrentTimeStamp() {
+        String timeStamp =  DateUtils.getCurrentTimeStamp();
+        Assert.assertNotNull(timeStamp);
+    }
+
+
 }
