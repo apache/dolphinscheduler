@@ -39,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1481,20 +1480,6 @@ public class ProcessService {
             result.add(String.valueOf(intVar));
         }
         return result;
-    }
-
-    /**
-     * update pid and app links field by task instance id
-     * @param taskInstId taskInstId
-     * @param pid pid
-     * @param appLinks appLinks
-     */
-    public void updatePidByTaskInstId(int taskInstId, int pid,String appLinks) {
-
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
-        taskInstance.setPid(pid);
-        taskInstance.setAppLink(appLinks);
-        saveTaskInstance(taskInstance);
     }
 
     /**
