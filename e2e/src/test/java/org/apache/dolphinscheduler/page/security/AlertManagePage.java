@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.locator.security.AlertManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class AlertManagePage extends PageCommon {
+    AlertManageData alertManageData = new AlertManageData();
+
     /**
      * Unique constructor
      * @param driver driver
@@ -41,26 +43,26 @@ public class AlertManagePage extends PageCommon {
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
 
         //determine whether the create alert button exists
-        ifTextExists(AlertManageLocator.CLICK_CREATE_ALERT,AlertManageData.CREATE_ALERT);
+        ifTextExists(AlertManageLocator.CLICK_CREATE_ALERT,alertManageData.getAlertData("createAlert"));
 
         // click  create alert button
         System.out.println("start click create alert  button");
         clickElement(AlertManageLocator.CLICK_CREATE_ALERT);
         // input alert data
         System.out.println("start input  alert ");
-        sendInput(AlertManageLocator.INPUT_ALERT_NAME, AlertManageData.ALERT_NAME);
+        sendInput(AlertManageLocator.INPUT_ALERT_NAME, alertManageData.getAlertData("alertName"));
 
         clickElement(AlertManageLocator.CLICK_ALERT_TYPE);
 
         clickElement(AlertManageLocator.SELECT_ALERT_EMAIL);
 
-        sendInput(AlertManageLocator.INPUT_ALERT_DESCRIPTION, AlertManageData.DESCRIPTION);
+        sendInput(AlertManageLocator.INPUT_ALERT_DESCRIPTION, alertManageData.getAlertData("description"));
 
         // click  button
         clickButton(AlertManageLocator.SUBMIT_ALERT);
 
         // Whether to enter the specified page after submit
-        return ifTextExists(AlertManageLocator.ALERT_NAME, AlertManageData.ALERT_NAME);
+        return ifTextExists(AlertManageLocator.ALERT_NAME, alertManageData.getAlertData("alertName"));
     }
 
     public boolean deleteAlert() throws InterruptedException {
@@ -68,7 +70,7 @@ public class AlertManagePage extends PageCommon {
         // click  alert manage
         clickElement(AlertManageLocator.CLICK_ALERT_MANAGE);
 
-        ifTextExists(AlertManageLocator.ALERT_NAME, AlertManageData.ALERT_NAME);
+        ifTextExists(AlertManageLocator.ALERT_NAME, alertManageData.getAlertData("alertName"));
 
         // click  delete alert button
         clickButton(AlertManageLocator.DELETE_ALERT_BUTTON);
@@ -77,6 +79,6 @@ public class AlertManagePage extends PageCommon {
         clickButton(AlertManageLocator.CONFIRM_DELETE_ALERT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(AlertManageData.ALERT_MANAGE);
+        return ifTitleContains(alertManageData.getAlertData("alertTitle"));
     }
 }

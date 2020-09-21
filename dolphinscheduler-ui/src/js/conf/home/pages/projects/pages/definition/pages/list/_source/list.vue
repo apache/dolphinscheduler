@@ -124,7 +124,6 @@
       </table>
     </div>
     <x-poptip
-            v-show="strSelectIds !== ''"
             ref="poptipDeleteAll"
             placement="bottom-start"
             width="90">
@@ -134,14 +133,12 @@
         <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
       </div>
       <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
+        <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
-    <template v-if="strSelectIds !== ''">
-      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
-      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
-      <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
-    </template>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
 
   </div>
 </template>
@@ -268,6 +265,12 @@
        * Close the delete layer
        */
       _closeDelete (i) {
+        // close batch
+        if (i < 0) {
+          this.$refs['poptipDeleteAll'].doClose()
+          return
+        }
+        // close one
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
@@ -596,8 +599,10 @@
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
+          this.strSelectIds = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this.strSelectIds = ''
           this.checkAll = false
           this.$message.error(e.msg || '')
         })
