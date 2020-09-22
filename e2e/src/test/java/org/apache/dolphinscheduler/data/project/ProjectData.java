@@ -16,11 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class ProjectData {
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project_1";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+    public String getProjectData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String projectData = ymlReader.getDataYml("testData/workflow_zh_cn", "projectManage", param);
+        return  projectData;
+    }
 }
