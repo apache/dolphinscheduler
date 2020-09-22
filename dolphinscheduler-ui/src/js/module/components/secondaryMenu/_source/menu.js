@@ -135,6 +135,15 @@ const menu = {
       icon: 'ans-icon-document',
       children: [],
       disabled: true
+    },
+    {
+      name: `${i18n.$t('Alarm plugin example')}`,
+      id: 2,
+      path: 'Alarm-plugin-example',
+      isOpen: true,
+      icon: 'ans-icon-document',
+      children: [],
+      disabled: true
     }
   ],
   resource: [
