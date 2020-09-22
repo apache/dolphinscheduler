@@ -86,7 +86,7 @@
             tenantId: this.userInfo.tenantId,
             email: this.userInfo.email,
             phone: this.userInfo.phone,
-            state: this.userinfo.state
+            state: this.userInfo.state
           }
           this.spinnerLoading = true
           this.updateUser(param).then(res => {
