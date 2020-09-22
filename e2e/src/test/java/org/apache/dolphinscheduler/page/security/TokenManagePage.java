@@ -22,60 +22,66 @@ import org.apache.dolphinscheduler.locator.security.TokenManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class TokenManagePage extends PageCommon {
+    TokenManageData tokenManageData = new TokenManageData();
+
     public TokenManagePage(WebDriver driver) {
         super(driver);
     }
 
     /**
-     * createTenant
+     * create token
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createToken() throws InterruptedException {
         //create token
-        Thread.sleep(1000);
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
-        Thread.sleep(1000);
+
+        //determine whether the create token button exists
+        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.getTokenData("createTokenText"));
 
         // click  create token button
         clickButton(TokenManageLocator.CLICK_CREATE_TOKEN);
-        Thread.sleep(1000);
 
-        //selectDate(TokenManageLocator.js, TokenManageLocator.CLICK_TIME, TokenManageData.DATE);
+        ifTextExists(TokenManageLocator.CREATE_TOKEN_POPUP,tokenManageData.getTokenData("createTokenText"));
 
         clickButton(TokenManageLocator.SELECT_USER);
 
         clickButton(TokenManageLocator.CLICK_GENERATE_TOKEN_BUTTON);
-        Thread.sleep(2500);
+        Thread.sleep(2000);
 
         // click  button
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
-
-    //edit token
+    /**
+     * edit token
+     *
+     * @return Whether to enter the specified page after edit tenant
+     */
     public boolean editToken() throws InterruptedException {
-        // click  token manage
-        clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
-        Thread.sleep(1000);
+        // edit token
+        ifTextExists(TokenManageLocator.TOKEN, "1");
 
-        // click  create token button
-        clickButton(TokenManageLocator.CLICK_EDIT_BUTTON);
-        Thread.sleep(1000);
+        // determine the existence of the editing token
+        locateElement(TokenManageLocator.EDIT_TOKEN_BUTTON);
+
+        // click  edit token button
+        clickButton(TokenManageLocator.EDIT_TOKEN_BUTTON);
 
         clickButton(TokenManageLocator.SELECT_USER);
 
         clickButton(TokenManageLocator.CLICK_GENERATE_TOKEN_BUTTON);
-        Thread.sleep(2500);
+        Thread.sleep(2000);
 
         // click  button
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 
@@ -83,12 +89,11 @@ public class TokenManagePage extends PageCommon {
     public boolean deleteToken() throws InterruptedException {
         // click  token manage
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
-        Thread.sleep(1000);
 
         clickButton(TokenManageLocator.CLICK_DELETE_BUTTON);
         clickButton(TokenManageLocator.CLICK_CONFIRM_DELETE_BUTTON);
 
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 }

@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.locator.security.UserManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class UserManagePage extends PageCommon {
+    UserManageData userManageData = new UserManageData();
+
     public UserManagePage(WebDriver driver) {
         super(driver);
     }
@@ -29,24 +31,26 @@ public class UserManagePage extends PageCommon {
     /**
      * create user
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createUser() throws InterruptedException {
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
+        //determine whether the create user button exists
+        ifTextExists(UserManageLocator.CLICK_CREATE_USER_BUTTON, userManageData.getUserData("createUserButton"));
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
 
         // input user data
-        sendInput(UserManageLocator.INPUT_USERNAME, UserManageData.USERNAME);
-        sendInput(UserManageLocator.INPUT_PASSWORD, UserManageData.PASSWORD);
+        sendInput(UserManageLocator.INPUT_USERNAME,  userManageData.getUserData("userName"));
+        sendInput(UserManageLocator.INPUT_PASSWORD, userManageData.getUserData("password"));
         clickButton(UserManageLocator.CLICK_TENANT);
         clickButton(UserManageLocator.SELECT_TENANT);
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
-        sendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EMAIL);
-        sendInput(UserManageLocator.INPUT_PHONE, UserManageData.PHONE);
+        sendInput(UserManageLocator.INPUT_EMAIL, userManageData.getUserData("email"));
+        sendInput(UserManageLocator.INPUT_PHONE, userManageData.getUserData("phone"));
         clickElement(UserManageLocator.SELECT_STOP_STATE);
         clickElement(UserManageLocator.SELECT_ENABLE_STATE);
 
@@ -54,7 +58,7 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.SUBMIT);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(UserManageData.USER_MANAGE);
+        return ifTextExists(UserManageLocator.USERNAME, userManageData.getUserData("userName"));
     }
 
     /**
@@ -64,15 +68,17 @@ public class UserManagePage extends PageCommon {
         //edit general user
         // click  user manage
         System.out.println("start edit general user");
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        //determine whether the general user exists
+        ifTextExists(UserManageLocator.USERNAME, userManageData.getUserData("userName"));
 
         // click  edit user button
         clickButton(UserManageLocator.EDIT_GENERAL_USER_BUTTON );
 
         // input user data
-        clearSendInput(UserManageLocator.INPUT_USERNAME, UserManageData.EDIT_USERNAME);
-        clearSendInput(UserManageLocator.INPUT_PASSWORD, UserManageData.EDIT_PASSWORD);
+        clearSendInput(UserManageLocator.INPUT_USERNAME, userManageData.getUserData("editUserName"));
+        clearSendInput(UserManageLocator.INPUT_PASSWORD, userManageData.getUserData("editPassword"));
 
         clickButton(UserManageLocator.CLICK_TENANT);
         clickButton(UserManageLocator.SELECT_TENANT);
@@ -80,8 +86,8 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.CLICK_QUEUE);
         clickButton(UserManageLocator.SELECT_QUEUE);
 
-        clearSendInput(UserManageLocator.INPUT_EMAIL, UserManageData.EDIT_EMAIL);
-        clearSendInput(UserManageLocator.INPUT_PHONE, UserManageData.EDIT_PHONE);
+        clearSendInput(UserManageLocator.INPUT_EMAIL, userManageData.getUserData("editEmail"));
+        clearSendInput(UserManageLocator.INPUT_PHONE, userManageData.getUserData("editPhone"));
 
         clickElement(UserManageLocator.SELECT_STOP_STATE);
         clickElement(UserManageLocator.SELECT_ENABLE_STATE);
@@ -91,18 +97,20 @@ public class UserManagePage extends PageCommon {
         System.out.println("end edit general user");
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(UserManageData.USER_MANAGE);
+        return ifTitleContains(userManageData.getUserData("userTitle"));
     }
 
     /**
      * edit admin user
      */
-    public boolean editAdminlUser() throws InterruptedException {
+    public boolean editAdminUser() throws InterruptedException {
         //edit admin user
         // click  user manage
         System.out.println("start edit admin user");
-        Thread.sleep(500);
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
+
+        //determine whether the general user edit success
+        ifTextExists(UserManageLocator.USER_NAME,userManageData.getUserData("editUserName"));
 
         // click  edit user button
         clickButton(UserManageLocator.EDIT_ADMIN_USER_BUTTON );
@@ -115,9 +123,8 @@ public class UserManagePage extends PageCommon {
         // click  button
         clickButton(UserManageLocator.SUBMIT);
         System.out.println("end edit admin user");
-        Thread.sleep(500);
         // Whether to enter the specified page after submit
-        return ifTitleContains(UserManageData.USER_MANAGE);
+        return ifTitleContains(userManageData.getUserData("userTitle"));
     }
 
 
@@ -138,6 +145,6 @@ public class UserManagePage extends PageCommon {
         clickButton(UserManageLocator.CONFIRM_DELETE_USER_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(UserManageData.USER_MANAGE);
+        return ifTitleContains(userManageData.getUserData("userTitle"));
     }
 }
