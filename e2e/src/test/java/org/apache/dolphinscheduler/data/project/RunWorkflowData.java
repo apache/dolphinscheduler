@@ -16,17 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class RunWorkflowData {
-    /**
-     * run workflow data
-     */
-    //input shell task name
-    public static final String RECIPIENT  = "123456789@qq.com";
-
-    //input shell task description
-    public static final String Cc = "qwe12312sds@qq.com";
-
-    public static final String RUN_WORKFLOW_TITLE = "工作流定义 - DolphinScheduler";
-
-
+    public String getRunWorkflowData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String runWorkflowData = ymlReader.getDataYml("testData/workflow_zh_cn", "runWorkflow", param);
+        return  runWorkflowData;
+    }
 }

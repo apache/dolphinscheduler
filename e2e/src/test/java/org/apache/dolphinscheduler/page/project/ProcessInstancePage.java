@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.data.project.ProcessInstanceData;
 
 
 public class ProcessInstancePage extends PageCommon {
+    ProcessInstanceData processInstanceData = new ProcessInstanceData();
+
     public ProcessInstancePage(WebDriver driver) {
         super(driver);
     }
@@ -34,8 +36,9 @@ public class ProcessInstancePage extends PageCommon {
     public boolean rerunWorkflowPage() throws InterruptedException {
         Thread.sleep(2000);
         clickTopElement(ProcessInstanceLocator.CLICK_PROCESS_INSTANCE_NAME);
+        locateElement(ProcessInstanceLocator.PROCESS_INSTANCE_SUCCESS_STATE);
         clickTopElement(ProcessInstanceLocator.CLICK_RERUN_BUTTON);
-        return ifTitleContains(ProcessInstanceData.PROCESS_INSTANCE_TITLE);
+        return ifTitleContains(processInstanceData.getProcessInstanceData("processInstanceTitle"));
     }
 
 }

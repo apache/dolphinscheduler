@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.locator.security.QueueManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class QueueManagePage extends PageCommon {
+    QueueManageData queueManageData = new QueueManageData();
+
     /**
      * Unique constructor
      * @param driver driver
@@ -37,27 +39,27 @@ public class QueueManagePage extends PageCommon {
      */
     public boolean createQueue() throws InterruptedException {
         // click queue manage
-        Thread.sleep(500);
         System.out.println("start click queue manage button");
         clickElement(QueueManageLocator.CLICK_QUEUE_MANAGE);
-        Thread.sleep(500);
+
+        //determine whether the create queue button exists
+        ifTextExists(QueueManageLocator.CLICK_CREATE_QUEUE, queueManageData.getQueueData("createQueueButton"));
 
         // click  create queue button
         System.out.println("start click create queue  button");
-        clickElement(QueueManageLocator.CLICK_CREATE_QUEUE);
-        Thread.sleep(500);
+        clickButton(QueueManageLocator.CLICK_CREATE_QUEUE);
 
         // input queue data
         System.out.println("start input queue");
-        sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.QUEUE_NAME);
+        sendInput(QueueManageLocator.INPUT_QUEUE_NAME, queueManageData.getQueueData("queueName"));
 
-        sendInput(QueueManageLocator.INPUT_QUEUE_VALUE, QueueManageData.QUEUE_VALUE);
+        sendInput(QueueManageLocator.INPUT_QUEUE_VALUE, queueManageData.getQueueData("queueValue"));
 
         // click  button
         clickButton(QueueManageLocator.SUBMIT_QUEUE);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(QueueManageData.QUEUE_MANAGE);
+        return ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, queueManageData.getQueueData("queueName"));
     }
 
 
@@ -68,22 +70,21 @@ public class QueueManagePage extends PageCommon {
      */
     public boolean editQueue() throws InterruptedException {
         // click queue manage
-        Thread.sleep(1000);
         clickElement(QueueManageLocator.CLICK_QUEUE_MANAGE);
-        Thread.sleep(1000);
+
+        ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, queueManageData.getQueueData("queueName"));
 
         // click  edit queue button
-        clickElement(QueueManageLocator.CLICK_EDIT_QUEUE);
-        Thread.sleep(1000);
+        clickButton(QueueManageLocator.CLICK_EDIT_QUEUE);
 
         // input queue data
-        sendInput(QueueManageLocator.INPUT_QUEUE_NAME, QueueManageData.EDIT_QUEUE_NAME);
-        sendInput(QueueManageLocator.INPUT_QUEUE_VALUE, QueueManageData.EDIT_QUEUE_VALUE);
+        clearSendInput(QueueManageLocator.INPUT_QUEUE_NAME, queueManageData.getQueueData("editQueueName"));
+        clearSendInput(QueueManageLocator.INPUT_QUEUE_VALUE, queueManageData.getQueueData("editQueueValue"));
 
         // click  button
         clickButton(QueueManageLocator.SUBMIT_QUEUE);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(QueueManageData.QUEUE_MANAGE);
+        return ifTextExists(QueueManageLocator.LIST_QUEUE_NAME, queueManageData.getQueueData("editQueueName"));
     }
 }

@@ -73,7 +73,7 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect  v-model="resourceList" :disable-branch-nodes="true" :multiple="true" :options="options" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
+        <treeselect  v-model="resourceList" maxHeight="200" :disable-branch-nodes="true" :multiple="true" :options="options" :normalizer="normalizer" :disabled="isDetails" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
