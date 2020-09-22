@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,22 +31,22 @@ import java.util.Collections;
 public class RandomSelectorTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSelectWithIllegalArgumentException(){
+    public void testSelectWithIllegalArgumentException() {
         RandomSelector selector = new RandomSelector();
-        selector.select(Collections.EMPTY_LIST);
+        selector.select(null);
     }
 
     @Test
-    public void testSelect1(){
+    public void testSelect1() {
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.2",80,20)));
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 100, System.currentTimeMillis()), new Host("192.168.1.2", 80, 20, System.currentTimeMillis())));
         Assert.assertNotNull(result);
     }
 
     @Test
-    public void testSelect(){
+    public void testSelect() {
         RandomSelector selector = new RandomSelector();
-        Host result = selector.select(Arrays.asList(new Host("192.168.1.1",80,100),new Host("192.168.1.1",80,20)));
+        Host result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 100, System.currentTimeMillis()), new Host("192.168.1.1", 80, 20, System.currentTimeMillis())));
         Assert.assertNotNull(result);
 
     }
