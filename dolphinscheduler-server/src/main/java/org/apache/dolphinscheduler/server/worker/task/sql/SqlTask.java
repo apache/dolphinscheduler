@@ -262,7 +262,7 @@ public class SqlTask extends AbstractTask {
         while (rowCount < LIMIT && resultSet.next()) {
             JSONObject mapOfColValues = new JSONObject(true);
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                mapOfColValues.put(md.getColumnLabel(i), resultSet.getObject(i));
             }
             resultJSONArray.add(mapOfColValues);
             rowCount++;
