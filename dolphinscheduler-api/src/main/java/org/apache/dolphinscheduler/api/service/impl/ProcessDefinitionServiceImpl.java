@@ -238,6 +238,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 .filter(Objects::nonNull)
                 .flatMap(parameters -> parameters.getResourceFilesList().stream())
                 .map(ResourceInfo::getId)
+                .distinct()
                 .map(Objects::toString)
                 .collect(Collectors.joining(","));
     }
