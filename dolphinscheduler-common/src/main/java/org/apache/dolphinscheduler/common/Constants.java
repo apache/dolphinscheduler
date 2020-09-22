@@ -267,6 +267,10 @@ public final class Constants {
     public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
     /**
+     * date format of yyyyMMddHHmmssSSS
+     */
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+    /**
      * http connect time out
      */
     public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
