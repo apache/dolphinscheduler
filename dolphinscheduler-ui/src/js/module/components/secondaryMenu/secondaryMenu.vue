@@ -55,7 +55,7 @@
 </template>
 <script>
   import menu from './_source/menu'
-
+  import store from '@/conf/home/store'
   export default {
     name: 'secondary-menu',
     data () {
@@ -85,8 +85,10 @@
         this.isTogHide = !this.isTogHide
         if(this.isTogHide) {
           sessionStorage.setItem('isLeft',0)
+          store.commit('projects/setSideBar',0)
         } else {
           sessionStorage.setItem('isLeft',1)
+          store.commit('projects/setSideBar',1)
         }
       }
     },
