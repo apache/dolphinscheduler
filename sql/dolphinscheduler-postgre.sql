@@ -340,6 +340,22 @@ CREATE TABLE t_ds_process_definition_version (
 create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
 
 --
+-- Table structure for table t_ds_process_definiton_tags
+--
+
+DROP TABLE IF EXISTS t_ds_process_definiton_tags;
+CREATE TABLE t_ds_process_definiton_tags (
+  id int NOT NULL  ,
+  name varchar(255) DEFAULT NULL ,
+  project_id int DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  PRIMARY KEY (id),
+  CONSTRAINT process_definition_tag_unique UNIQUE (name, project_id)
+) ;
+
+create index process_definition_tags_index on t_ds_process_definiton_tags (project_id,id);
+
+--
 -- Table structure for table t_ds_process_instance
 --
 
@@ -504,6 +520,18 @@ CREATE TABLE t_ds_relation_user_alertgroup (
   update_time timestamp DEFAULT NULL,
   PRIMARY KEY (id)
 );
+
+--
+-- Table structure for table t_ds_relation_project_user
+--
+
+DROP TABLE IF EXISTS t_ds_relation_process_tag;
+CREATE TABLE t_ds_relation_process_tag (
+  id int NOT NULL  ,
+  process_id int NOT NULL ,
+  tag_id int DEFAULT NULL ,
+  PRIMARY KEY (id)
+) ;
 
 --
 -- Table structure for table t_ds_resources
@@ -721,6 +749,9 @@ ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_pr
 DROP SEQUENCE IF EXISTS t_ds_process_definition_version_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_version_id_sequence;
 ALTER TABLE t_ds_process_definition_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_version_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definiton_tags_id_sequence;
+CREATE SEQUENCE  t_ds_process_definiton_tags_id_sequence;
+ALTER TABLE t_ds_process_definiton_tags ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definiton_tags_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
@@ -749,6 +780,9 @@ ALTER TABLE t_ds_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_re
 DROP SEQUENCE IF EXISTS t_ds_relation_user_alertgroup_id_sequence;
 CREATE SEQUENCE  t_ds_relation_user_alertgroup_id_sequence;
 ALTER TABLE t_ds_relation_user_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_user_alertgroup_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_process_tag_id_sequence;
+CREATE SEQUENCE  t_ds_relation_process_tag_id_sequence;
+ALTER TABLE t_ds_relation_process_tag ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_process_tag_id_sequence');
 
 DROP SEQUENCE IF EXISTS t_ds_resources_id_sequence;
 CREATE SEQUENCE  t_ds_resources_id_sequence;

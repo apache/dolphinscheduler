@@ -20,11 +20,10 @@ package org.apache.dolphinscheduler.api.controller;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.junit.Assert;
-
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -97,7 +96,6 @@ public class TagControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo","2");
         paramsMap.add("searchVal","test");
         paramsMap.add("pageSize","2");
-
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/tag/list-paging")
                 .header(SESSION_ID, sessionId)

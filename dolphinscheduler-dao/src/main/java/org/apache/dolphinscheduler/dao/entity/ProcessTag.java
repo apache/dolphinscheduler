@@ -18,11 +18,8 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import com.baomidou.mybatisplus.annotation.TableField;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
@@ -66,13 +63,14 @@ public class ProcessTag {
     public void setProcessID(int processID) {
         this.processID = processID;
     }
+
     @Override
     public String toString() {
 
-        return "ProcessTag{" +
-                "id=" + id +
-                ", processID=" + processID +
-                ", tagID=" + tagID +
-                '}';
+        return "ProcessTag{"
+                + "id=" + id
+                + ", processID=" + processID
+                + ", tagID=" + tagID
+                + '}';
     }
 }

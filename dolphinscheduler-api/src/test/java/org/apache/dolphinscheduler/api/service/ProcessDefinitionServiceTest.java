@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
@@ -70,8 +72,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessDefinitionServiceTest {
@@ -1003,7 +1003,7 @@ public class ProcessDefinitionServiceTest {
 
         when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
         User loginUser = new User();
-        String  tagIds= "10,12";
+        String  tagIds = "10,12";
 
         //processDefine not exist
         Map<String, Object> result = processDefinitionService.addProcessDefinitionTags(47, tagIds);
@@ -1018,7 +1018,7 @@ public class ProcessDefinitionServiceTest {
 
         when(processDefineMapper.selectById(46)).thenReturn(getProcessDefinition());
         User loginUser = new User();
-        String  tagIds= "10,12";
+        String  tagIds = "10,12";
 
         //processDefine not exist
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionTags(47, tagIds);

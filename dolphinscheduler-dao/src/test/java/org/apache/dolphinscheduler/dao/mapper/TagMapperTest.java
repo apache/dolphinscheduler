@@ -17,27 +17,25 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tag;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-
-@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)//删除一个空行
 @SpringBootTest
 @Transactional
 @Rollback(true)
@@ -56,7 +54,7 @@ public class TagMapperTest {
      * insert
      * @return Tag
      */
-    private Tag insertOne(){
+    private Tag insertOne() {
         //insertOne
         Tag tag = new Tag();
         tag.setName("ut tag");
@@ -65,11 +63,12 @@ public class TagMapperTest {
         tagMapper.insert(tag);
         return tag;
     }
+
     /**
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOne
         Tag tag = insertOne();
         //update
@@ -81,7 +80,7 @@ public class TagMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Tag tag = insertOne();
         int delete = tagMapper.deleteById(tag.getId());
         Assert.assertEquals(delete, 1);
@@ -95,8 +94,9 @@ public class TagMapperTest {
         Tag tag = insertOne();
         //query
         List<Tag> tags = tagMapper.selectList(null);
-        Assert.assertNotEquals(tags .size(), 0);
+        Assert.assertNotEquals(tags.size(), 0);
     }
+
     @Test
     public void queryByName() {
         User user = new User();

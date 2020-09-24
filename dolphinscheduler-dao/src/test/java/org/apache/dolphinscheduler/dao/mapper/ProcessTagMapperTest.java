@@ -17,22 +17,21 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
 import org.apache.dolphinscheduler.dao.entity.ProcessTag;
+
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -55,6 +54,7 @@ public class ProcessTagMapperTest {
         processTagMapper.insert(processTag);
         return processTag;
     }
+
     /**
      * test update
      */
@@ -84,8 +84,9 @@ public class ProcessTagMapperTest {
         ProcessTag processTag = inserOne();
         //query
         List<ProcessTag> processTags = processTagMapper.selectList(null);
-        Assert.assertNotEquals(processTags .size(), 0);
+        Assert.assertNotEquals(processTags.size(), 0);
     }
+
     @Test
     public void deleteProcessRelation() {
         ProcessTag processTag = inserOne();

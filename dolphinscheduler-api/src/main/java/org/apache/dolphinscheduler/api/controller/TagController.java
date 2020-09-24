@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TAG_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TAG_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TAG_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TAG_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TagService;
@@ -29,16 +29,28 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 @Api(tags = "PROCESS_DEFINITION'TAG_TAG")
 @RestController
@@ -65,9 +77,9 @@ public class TagController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TAG_ERROR)
-    public Result createTag (@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                             @RequestParam(value = "tagname", required = true) String tagname){
+                             @RequestParam(value = "tagname", required = true) String tagname) {
         logger.info("login user {}, create  tag, project name: {}, tag name: {} ",
                 loginUser.getUserName(), projectName, tagname);
         Map<String, Object> result = tagService.createTag(loginUser, projectName, tagname);
@@ -117,8 +129,7 @@ public class TagController extends BaseController {
     public Result updateTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "tagName", required = true) String tagName,
-                                          @RequestParam(value = "tagId", required = true) int tagId
-                                          ) {
+                                          @RequestParam(value = "tagId", required = true) int tagId) {
 
         logger.info("login user {}, update tag, project name: {}, tag name: {}, ",
                 loginUser.getUserName(), projectName, tagName);
@@ -159,6 +170,4 @@ public class TagController extends BaseController {
         result = tagService.queryTagListPaging(loginUser, projectName, pageSize, pageNo, searchVal);
         return returnDataListPaging(result);
     }
-
-
 }

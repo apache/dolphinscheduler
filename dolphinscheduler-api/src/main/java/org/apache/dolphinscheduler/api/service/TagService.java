@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -36,10 +33,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  *
@@ -104,17 +102,17 @@ public class TagService extends BaseService {
      */
     public Map<String,Object> deleteTag(User loginUser, String projectName, Integer tagId) {
 
-       Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
 
         //check project auth
-       Project project = projectMapper.queryByName(projectName);
-       Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-       Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-       if (resultStatus != Status.SUCCESS) {
+        Project project = projectMapper.queryByName(projectName);
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
             return checkResult;
-       }
+        }
 
-       Tag tag = tagMapper.selectById(tagId);
+        Tag tag = tagMapper.selectById(tagId);
 
         if (tag == null) {
             putMsg(result, Status.TAG_NOT_EXIST, tag);
@@ -126,14 +124,14 @@ public class TagService extends BaseService {
             return result;
         }
 
-       int delete = tagMapper.deleteById(tagId);
+        int delete = tagMapper.deleteById(tagId);
         int delete1 = processTagMapper.deleteProcessRelation(0,tagId);
-       if (delete > 0 && delete1 > 0) {
-           putMsg(result, Status.SUCCESS);
-       } else {
-           putMsg(result, Status.DELETE_TAG_ERROR);
-       }
-       return result;
+        if (delete > 0 && delete1 > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_TAG_ERROR);
+        }
+        return result;
     }
     /**
      * update Tag
@@ -144,6 +142,7 @@ public class TagService extends BaseService {
      * @param tagName tag name
      * @return update result code
      */
+
     public Map<String, Object> updateTag(User loginUser, String projectName, Integer tagId, String tagName) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -157,7 +156,7 @@ public class TagService extends BaseService {
 
         Tag tag = tagMapper.selectById(tagId);
 
-        if (tag == null ) {
+        if (tag == null) {
             putMsg(result, Status.TAG_NOT_EXIST, tagName);
             return result;
         } else {
@@ -217,6 +216,7 @@ public class TagService extends BaseService {
      * @param tagId tag id
      * @return tag detail information
      */
+
     public Map<String, Object> queryById(Integer tagId) {
 
         Map<String, Object> result = new HashMap<>(5);

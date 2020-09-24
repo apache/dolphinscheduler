@@ -101,6 +101,46 @@ $$ LANGUAGE plpgsql;
 SELECT uc_dolphin_T_t_ds_resources_un();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_un();
 
+-- ct_dolphin_T_t_ds_process_definiton_tags
+delimiter d//
+CREATE OR REPLACE FUNCTION ct_dolphin_T_t_ds_process_definiton_tags() RETURNS void AS $$
+BEGIN
+CREATE TABLE t_ds_process_definiton_tags (
+                                                 id int NOT NULL  ,
+                                                 name varchar(255) DEFAULT NULL ,
+                                                 project_id int DEFAULT NULL ,
+                                                 user_id int DEFAULT NULL ,
+                                                 PRIMARY KEY (id),
+                                                 CONSTRAINT process_definition_tag_unique UNIQUE (name, project_id)
+) ;
+create index process_definition_tags_index on t_ds_process_definiton_tags (project_id,id);
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT ct_dolphin_T_t_ds_process_definiton_tags();
+DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_process_definiton_tags();
+
+-- ct_dolphin_T_t_ds_relation_process_tag
+delimiter d//
+CREATE OR REPLACE FUNCTION t_ds_relation_process_tag() RETURNS void AS $$
+BEGIN
+CREATE TABLE t_ds_relation_process_tag (
+                                                 id int NOT NULL  ,
+                                                 process_id int NOT NULL ,
+                                                 tag_id int DEFAULT NULL ,
+                                                 PRIMARY KEY (id)
+) ;
+
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT ct_dolphin_T_t_ds_relation_process_tag();
+DROP FUNCTION IF EXISTS ct_dolphin_T_t_ds_relation_process_tag();
 
 
 

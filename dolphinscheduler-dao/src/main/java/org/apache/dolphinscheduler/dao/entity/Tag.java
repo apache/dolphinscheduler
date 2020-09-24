@@ -18,12 +18,8 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import com.baomidou.mybatisplus.annotation.TableName;
-
-
 
 /**
  * Tag
@@ -51,9 +47,6 @@ public class Tag {
      * tag user id
      */
     private int userId;
-
-
-
 
     public int getId() {
         return id;
@@ -87,17 +80,14 @@ public class Tag {
         this.userId = userId;
     }
 
-
-
-
     @Override
     public String toString() {
 
-        return "Tag{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", projectId=" + projectId +
-                ", userId=" + userId +
-                '}';
+        return "Tag{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", projectId=" + projectId
+                + ", userId=" + userId
+                + '}';
     }
 }
