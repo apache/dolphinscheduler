@@ -850,7 +850,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         try {
             createProcessResult = createProcessDefinition(loginUser
                     , currentProjectName,
-                    processDefinitionName + "_import_" + System.currentTimeMillis(),
+                    processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
                     importProcessParam,
                     processMeta.getProcessDefinitionDescription(),
                     processMeta.getProcessDefinitionLocations(),
@@ -1438,7 +1438,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
-                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
+                    processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp(),
                     processDefinition.getProcessDefinitionJson(),
                     processDefinition.getDescription(),
                     processDefinition.getLocations(),
