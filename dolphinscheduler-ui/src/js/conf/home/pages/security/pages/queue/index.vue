@@ -24,7 +24,7 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="queueList.length">
+      <template v-if="queueList.length || total>0">
         <m-list @on-edit="_onEdit"
                 :queue-list="queueList"
                 :page-no="searchParams.pageNo"
@@ -35,10 +35,10 @@
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!queueList.length">
+      <template v-if="!queueList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
-      <m-spin :is-spin="isLoading"></m-spin>
+      <m-spin :is-spin="isLoading" :is-left="isLeft"></m-spin>
     </template>
   </m-list-construction>
 </template>
@@ -66,6 +66,7 @@
           pageNo: 1,
           searchVal: ''
         },
+        isLeft: true,
         isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
       }
     },
@@ -116,12 +117,21 @@
         })
       },
       _getList (flag) {
+        if(sessionStorage.getItem('isLeft')==0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
         this.isLoading = !flag
         this.getQueueListP(this.searchParams).then(res => {
-          this.queueList = []
-          this.queueList = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.queueList = []
+            this.queueList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })
@@ -138,6 +148,9 @@
     },
     mounted () {
       this.$modal.destroy()
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft',1)
     },
     components: { mList, mListConstruction, mConditions, mSpin, mNoData }
   }

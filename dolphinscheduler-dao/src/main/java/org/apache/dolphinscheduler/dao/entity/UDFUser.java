@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
 /**
  * udf user relation
  */
-@Data
 @TableName("t_ds_relation_udfs_user")
 public class UDFUser {
 
@@ -54,11 +53,13 @@ public class UDFUser {
   /**
    * create time
    */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
   private Date createTime;
 
   /**
    * update time
    */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
   private Date updateTime;
 
   public int getId() {

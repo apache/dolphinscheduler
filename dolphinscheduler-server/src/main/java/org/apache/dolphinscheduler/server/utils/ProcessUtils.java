@@ -14,43 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.rpc.LogClient;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.service.log.LogClientService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
- *  mainly used to get the start command line of a process
+ *  mainly used to get the start command line of a process.
  */
 public class ProcessUtils {
   /**
-   * logger
+   * logger.
    */
-  private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
   /**
-   * build command line characters
+   * Initialization regularization, solve the problem of pre-compilation performance,
+   * avoid the thread safety problem of multi-thread operation.
+   */
+  private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
+
+  private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+
+  /**
+   * build command line characters.
    * @param commandList command list
    * @return command
-   * @throws IOException io exception
    */
-  public static String buildCommandStr(List<String> commandList) throws IOException {
+  public static String buildCommandStr(List<String> commandList) {
     String cmdstr;
     String[] cmd = commandList.toArray(new String[commandList.size()]);
     SecurityManager security = System.getSecurityManager();
@@ -59,7 +68,7 @@ public class ProcessUtils {
       allowAmbiguousCommands = true;
       String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
       if (value != null) {
-          allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
+        allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
       }
     }
     if (allowAmbiguousCommands) {
@@ -67,7 +76,7 @@ public class ProcessUtils {
       String executablePath = new File(cmd[0]).getPath();
 
       if (needsEscaping(VERIFICATION_LEGACY, executablePath)) {
-          executablePath = quoteString(executablePath);
+        executablePath = quoteString(executablePath);
       }
 
       cmdstr = createCommandLine(
@@ -80,7 +89,7 @@ public class ProcessUtils {
 
         StringBuilder join = new StringBuilder();
         for (String s : cmd) {
-            join.append(s).append(' ');
+          join.append(s).append(' ');
         }
 
         cmd = getTokensFromCommand(join.toString());
@@ -88,10 +97,9 @@ public class ProcessUtils {
 
         // Check new executable name once more
         if (security != null) {
-            security.checkExec(executablePath);
+          security.checkExec(executablePath);
         }
       }
-
 
       cmdstr = createCommandLine(
 
@@ -101,13 +109,12 @@ public class ProcessUtils {
   }
 
   /**
-   * get executable path
+   * get executable path.
    *
    * @param path path
    * @return executable path
-   * @throws IOException io exception
    */
-  private static String getExecutablePath(String path) throws IOException {
+  private static String getExecutablePath(String path) {
     boolean pathIsQuoted = isQuoted(true, path, "Executable name has embedded quote, split the arguments");
 
     File fileToRun = new File(pathIsQuoted ? path.substring(1, path.length() - 1) : path);
@@ -115,7 +122,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether is shell file
+   * whether is shell file.
    *
    * @param executablePath executable path
    * @return true if endsWith .CMD or .BAT
@@ -126,7 +133,7 @@ public class ProcessUtils {
   }
 
   /**
-   * quote string
+   * quote string.
    *
    * @param arg argument
    * @return format arg
@@ -137,7 +144,7 @@ public class ProcessUtils {
   }
 
   /**
-   * get tokens from command
+   * get tokens from command.
    *
    * @param command command
    * @return token string array
@@ -146,13 +153,13 @@ public class ProcessUtils {
     ArrayList<String> matchList = new ArrayList<>(8);
     Matcher regexMatcher = LazyPattern.PATTERN.matcher(command);
     while (regexMatcher.find()) {
-        matchList.add(regexMatcher.group());
+      matchList.add(regexMatcher.group());
     }
     return matchList.toArray(new String[matchList.size()]);
   }
 
   /**
-   * Lazy Pattern
+   * Lazy Pattern.
    */
   private static class LazyPattern {
     // Escape-support version:
@@ -161,34 +168,29 @@ public class ProcessUtils {
   }
 
   /**
-   * verification cmd bat
+   * verification cmd bat.
    */
   private static final int VERIFICATION_CMD_BAT = 0;
 
   /**
-   * verification win32
+   * verification win32.
    */
   private static final int VERIFICATION_WIN32 = 1;
 
   /**
-   * verification legacy
+   * verification legacy.
    */
   private static final int VERIFICATION_LEGACY = 2;
 
   /**
-   * escape verification
+   * escape verification.
    */
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
-          {' ', '\t', '<', '>'}, {' ', '\t'}};
+    {' ', '\t', '<', '>'}, {' ', '\t'}};
 
   /**
-   * matcher
-   */
-  private static Matcher matcher;
-
-  /**
-   * create command line
+   * create command line.
    * @param verificationType  verification type
    * @param executablePath    executable path
    * @param cmd               cmd
@@ -217,7 +219,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether is quoted
+   * whether is quoted.
    * @param noQuotesInside
    * @param arg
    * @param errorMessage
@@ -245,7 +247,7 @@ public class ProcessUtils {
   }
 
   /**
-   * whether needs escaping
+   * whether needs escaping.
    *
    * @param verificationType  verification type
    * @param arg               arg
@@ -267,20 +269,18 @@ public class ProcessUtils {
   }
 
   /**
-   * kill yarn application
+   * kill yarn application.
    *
    * @param appIds      app id list
    * @param logger      logger
    * @param tenantCode  tenant code
-   * @param workDir     work dir
-   * @throws IOException io exception
+   * @param executePath     execute path
    */
-  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String workDir)
-          throws IOException {
+  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
     if (appIds.size() > 0) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
-              .format("%s/%s.kill", workDir, appid);
+              .format("%s/%s.kill", executePath, appid);
       String cmd = "yarn application -kill " + appid;
       try {
         StringBuilder sb = new StringBuilder();
@@ -296,7 +296,7 @@ public class ProcessUtils {
         File f = new File(commandFile);
 
         if (!f.exists()) {
-          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
 
         String runCmd = "sh " + commandFile;
@@ -308,23 +308,23 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed : " + e.getMessage(), e);
+        logger.error("kill application error", e);
       }
     }
   }
 
   /**
-   * kill tasks according to different task types
+   * kill tasks according to different task types.
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void kill(TaskInstance taskInstance) {
+  public static void kill(TaskExecutionContext taskExecutionContext) {
     try {
-      int processId = taskInstance.getPid();
-      if(processId == 0 ){
-          logger.error("process kill failed, process id :{}, task id:{}",
-                  processId, taskInstance.getId());
-          return ;
+      int processId = taskExecutionContext.getProcessId();
+      if (processId == 0) {
+        logger.error("process kill failed, process id :{}, task id:{}",
+                processId, taskExecutionContext.getTaskInstanceId());
+        return;
       }
 
       String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
@@ -334,58 +334,67 @@ public class ProcessUtils {
       OSUtils.exeCmd(cmd);
 
       // find log and kill yarn job
-      killYarnJob(taskInstance);
+      killYarnJob(taskExecutionContext);
 
     } catch (Exception e) {
-      logger.error("kill failed : " + e.getMessage(), e);
+      logger.error("kill task failed", e);
     }
   }
 
   /**
-   * get pids str
+   * get pids str.
    *
    * @param processId process id
    * @return pids
    * @throws Exception exception
    */
-  public static String getPidsStr(int processId)throws Exception{
+  public static String getPidsStr(int processId) throws Exception {
     StringBuilder sb = new StringBuilder();
     Matcher mat;
     // pstree pid get sub pids
     if (OSUtils.isMacOS()) {
       String pids = OSUtils.exeCmd("pstree -sp " + processId);
-      mat = Pattern.compile("-[+|-]-\\s(\\d+)").matcher(pids);
+      mat = MACPATTERN.matcher(pids);
     } else {
       String pids = OSUtils.exeCmd("pstree -p " + processId);
-      mat = Pattern.compile("(\\d+)").matcher(pids);
+      mat = WINDOWSATTERN.matcher(pids);
     }
 
-    while (mat.find()){
+    while (mat.find()) {
       sb.append(mat.group(1)).append(" ");
     }
     return sb.toString().trim();
   }
 
   /**
-   * find logs and kill yarn tasks
+   * find logs and kill yarn tasks.
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void killYarnJob(TaskInstance taskInstance) {
+  public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-      LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
-
-      String log = logClient.viewLog(taskInstance.getLogPath());
+      LogClientService logClient = null;
+      String log = null;
+      try {
+        logClient = new LogClientService();
+        log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
+                Constants.RPC_PORT,
+                taskExecutionContext.getLogPath());
+      } finally {
+        if (logClient != null) {
+          logClient.close();
+        }
+      }
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
-        String workerDir = taskInstance.getExecutePath();
+        String workerDir = taskExecutionContext.getExecutePath();
         if (StringUtils.isEmpty(workerDir)) {
           logger.error("task instance work dir is empty");
           throw new RuntimeException("task instance work dir is empty");
         }
         if (appIds.size() > 0) {
-          cancelApplication(appIds, logger, taskInstance.getProcessInstance().getTenantCode(), taskInstance.getExecutePath());
+          cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
         }
       }
 

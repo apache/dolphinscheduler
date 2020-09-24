@@ -109,7 +109,7 @@
         {{$t('Worker group')}}
       </div>
       <div class="cont">
-        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+        <m-worker-groups v-model="workerGroup"></m-worker-groups>
       </div>
     </div>
     <div class="clearfix list">
@@ -122,8 +122,8 @@
                 :disabled="!notifyGroupList.length"
                 v-model="warningGroupId">
           <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
-            <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
+            <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
+            <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
           </x-input>
           <x-option
                   v-for="city in notifyGroupList"
@@ -186,7 +186,7 @@
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1,
+        workerGroup: '',
         previewTimes: []
       }
     },
@@ -232,7 +232,7 @@
             warningGroupId: this.warningGroupId =='' ? 0 : this.warningGroupId,
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || '',
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup
           }
           let msg = ''
 
@@ -280,8 +280,6 @@
 
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-          let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-          if (!notifyGroupListS.length) {
             this.store.dispatch('dag/getNotifyGroupList').then(res => {
               this.notifyGroupList = res
               if (this.notifyGroupList.length) {
@@ -290,10 +288,6 @@
                 reject(new Error(0))
               }
             })
-          } else {
-            this.notifyGroupList = notifyGroupListS
-            resolve()
-          }
         })
       },
       ok () {
@@ -309,18 +303,47 @@
     watch: {
     },
     created () {
+      if(this.item.workerGroup===undefined) {
+        let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+        if (stateWorkerGroupsList.length) {
+          this.workerGroup = stateWorkerGroupsList[0].id
+        } else {
+          this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+            this.$nextTick(() => {
+              this.workerGroup = res[0].id
+            })
+          })
+        }
+      } else {
+        this.workerGroup = this.item.workerGroup
+      }
       if(this.item.crontab !== null){
         this.crontab = this.item.crontab
       }
       if(this.type == 'timing') {
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+        let startDate = year + "-" + month + "-" + day + ' ' + '00:00:00'
+        let endDate = (year+100) + "-" + month + "-" + day + ' ' + '00:00:00'
+        let times = []
+        times[0] = startDate
+        times[1] = endDate
         this.crontab = '0 0 * * * ? *'
+        this.scheduleTime = times
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
     },
     mounted () {
       let item = this.item
-
       // Determine whether to echo
       if (this.item.crontab) {
         this.crontab = item.crontab
@@ -328,7 +351,6 @@
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
-        this.workerGroupId = item.workerGroupId || -1
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
@@ -396,5 +418,12 @@
     .list-box {
       padding: 0;
     }
+  }
+  .x-date-packer-panel .x-date-packer-day .lattice label.bg-hover {
+    background: #00BFFF!important; 
+    margin-top: -4px;
+  }
+  .x-date-packer-panel .x-date-packer-day .lattice em:hover {
+    background: #0098e1!important; 
   }
 </style>

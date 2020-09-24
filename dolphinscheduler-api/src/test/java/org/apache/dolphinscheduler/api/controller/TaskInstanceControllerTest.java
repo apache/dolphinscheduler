@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,10 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * task instance controller test
  */
 public class TaskInstanceControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(TaskInstanceControllerTest.class);
 
     @Test
-    public void queryTaskListPaging() throws Exception {
+    public void testQueryTaskListPaging() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         //paramsMap.add("processInstanceId","1380");
@@ -51,7 +51,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest{
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","20");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/task-instance/list-paging","project_test1")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/task-instance/list-paging","cxc_1113")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())

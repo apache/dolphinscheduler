@@ -95,7 +95,7 @@ const rewriterPath = p => {
     }
   }
 }
-
+const version = new Date().getTime();
 const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
   let pagePath = `${path.join(viewDir, p)}`
   let newPagePath = rewriterPath(pagePath)
@@ -109,18 +109,19 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     filename: newPagePath || path.join('view', p),
     template: `${path.join('src/view', p)}`,
     cache: true,
+    favicon:'./favicon.png',
     inject: true,
+    hash: version,
     chunks: chunks,
     minify: minifierConfig
   })
 })
-
 const baseConfig = {
   entry: jsEntry,
   output: {
     path: distDir,
     publicPath: '/',
-    filename: 'js/[name].[chunkhash:7].js'
+    filename: 'js/[name].[chunkhash:7]'+version+'.js'
   },
   module: {
     rules: [
@@ -202,28 +203,15 @@ const baseConfig = {
     ],
     alias: {
       '@': resolve('src/js'),
-      '~': resolve('src/lib')
+      '~': resolve('src/lib'),
+      'jquery':'jquery/dist/jquery.min.js',
+      'jquery-ui': 'jquery-ui'
     },
     extensions: ['.js', 'json', '.vue', '.scss']
   },
-  externals: {
-    'vue': 'Vue',
-    'vuex': 'Vuex',
-    'vue-router': 'VueRouter',
-    'jquery': '$',
-    'lodash': '_',
-    'bootstrap': 'bootstrap',
-    'd3': 'd3',
-    'canvg': 'canvg',
-    'html2canvas': 'html2canvas',
-    './jsplumb': 'jsPlumb',
-    './highlight.js': 'highlight.js',
-    './clipboard': 'clipboard',
-    './codemirror': 'CodeMirror'
-  },
   plugins: [
     new VueLoaderPlugin(),
-    new webpack.ProvidePlugin({ vue: 'Vue', _: 'lodash' }),
+    new webpack.ProvidePlugin({ vue: 'Vue', _: 'lodash',jQuery:"jquery/dist/jquery.min.js",$:"jquery/dist/jquery.min.js" }),
     new webpack.DefinePlugin({
       PUBLIC_PATH: JSON.stringify(process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : '')
     }),

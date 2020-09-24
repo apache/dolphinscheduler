@@ -86,10 +86,21 @@
         return _.filter(this.processDefinitionList, v => id === v.id)[0].code
       }
     },
-    watch: {},
+    watch: {
+      wdiCurr (val) {
+        this.$emit('on-cache-params', {
+          processDefinitionId: this.wdiCurr
+        })
+      }
+    },
     created () {
       let processListS = _.cloneDeep(this.store.state.dag.processListS)
-      let id = this.router.history.current.params.id || null
+      let id = null
+      if(this.router.history.current.name==='projects-instance-details') {
+        id = this.router.history.current.query.id || null
+      } else {
+        id = this.router.history.current.params.id || null
+      }
       this.processDefinitionList = (() => {
         let a = _.map(processListS, v => {
           return {

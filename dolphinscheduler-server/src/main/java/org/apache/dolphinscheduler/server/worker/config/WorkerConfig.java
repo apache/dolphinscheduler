@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,10 +17,15 @@
  */
 package org.apache.dolphinscheduler.server.worker.config;
 
+import java.util.Set;
+
+import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
     @Value("${worker.exec.threads:100}")
@@ -31,11 +37,36 @@ public class WorkerConfig {
     @Value("${worker.fetch.task.num:3}")
     private int workerFetchTaskNum;
 
-    @Value("${worker.max.cpuload.avg:10}")
+    @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${master.reserved.memory:1}")
+    @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
+
+    @Value("#{'${worker.groups:default}'.split(',')}")
+    private Set<String> workerGroups;
+
+    @Value("${worker.listen.port: 1234}")
+    private int listenPort;
+
+    @Value("${worker.weight:100}")
+    private int weight;
+
+    public int getListenPort() {
+        return listenPort;
+    }
+
+    public void setListenPort(int listenPort) {
+        this.listenPort = listenPort;
+    }
+
+    public Set<String> getWorkerGroups() {
+        return workerGroups;
+    }
+
+    public void setWorkerGroups(Set<String> workerGroups) {
+        this.workerGroups = workerGroups;
+    }
 
     public int getWorkerExecThreads() {
         return workerExecThreads;
@@ -70,10 +101,22 @@ public class WorkerConfig {
     }
 
     public int getWorkerMaxCpuloadAvg() {
+        if (workerMaxCpuloadAvg == -1){
+            return Constants.DEFAULT_WORKER_CPU_LOAD;
+        }
         return workerMaxCpuloadAvg;
     }
 
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    }
+
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

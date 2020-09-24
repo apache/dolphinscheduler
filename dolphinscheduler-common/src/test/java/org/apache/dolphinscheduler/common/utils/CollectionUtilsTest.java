@@ -76,11 +76,11 @@ public class CollectionUtilsTest {
         a = CollectionUtils.stringToMap("a=b;c=d", null);
         Assert.assertTrue(a.isEmpty());
         a = CollectionUtils.stringToMap("a=b;c=d;e=f", ";");
-        Assert.assertEquals(a.size(), 3);
+        Assert.assertEquals(3, a.size());
         a = CollectionUtils.stringToMap("a;b=f", ";");
         Assert.assertTrue(a.isEmpty());
         a = CollectionUtils.stringToMap("a=b;c=d;e=f;", ";", "test");
-        Assert.assertEquals(a.size(), 3);
+        Assert.assertEquals(3, a.size());
         Assert.assertNotNull(a.get("testa"));
     }
 
@@ -91,14 +91,14 @@ public class CollectionUtilsTest {
         originList.add(1);
         originList.add(2);
         List<Map<String, Object>> ret = CollectionUtils.getListByExclusion(originList, null);
-        Assert.assertEquals(ret.size(), 2);
+        Assert.assertEquals(2, ret.size());
         ret = CollectionUtils.getListByExclusion(originList, new HashSet<>());
-        Assert.assertEquals(ret.size(), 2);
+        Assert.assertEquals(2, ret.size());
         Assert.assertFalse(ret.get(0).isEmpty());
         Set<String> exclusion = new HashSet<>();
         exclusion.add(Constants.CLASS);
         ret = CollectionUtils.getListByExclusion(originList, exclusion);
-        Assert.assertEquals(ret.size(), 2);
+        Assert.assertEquals(2, ret.size());
         Assert.assertTrue(ret.get(0).isEmpty());
     }
 
@@ -108,5 +108,38 @@ public class CollectionUtilsTest {
         Assert.assertFalse(CollectionUtils.isNotEmpty(list));
         Assert.assertFalse(CollectionUtils.isNotEmpty(null));
     }
+    @Test
+    public void isEmpty(){
+        List<Integer> list = new ArrayList<>();
+        Assert.assertTrue(CollectionUtils.isEmpty(list));
+        Assert.assertTrue(CollectionUtils.isEmpty(null));
+        list.add(1);
+        Assert.assertFalse(CollectionUtils.isEmpty(list));
+    }
+    @Test
+    public void isEqualCollection() {
+        List<Integer> a = new ArrayList<>();
+        a.add(1);
+        List<Integer> b = new ArrayList<>();
+        b.add(1);
+        Assert.assertTrue(CollectionUtils.isEqualCollection(a,b));
+        b.add(2);
+        Assert.assertFalse(CollectionUtils.isEqualCollection(a,b));
+    }
 
+    @Test
+    public void getCardinalityMap(){
+        List<Integer> a = new ArrayList<>();
+        a.add(1);
+        a.add(2);
+        a.add(2);
+        a.add(3);
+        a.add(3);
+        a.add(3);
+        Map<Integer,Integer> cardinalityMap = CollectionUtils.getCardinalityMap(a);
+        Assert.assertEquals(3, cardinalityMap.size());
+        Assert.assertEquals(1, cardinalityMap.get(1).intValue());
+        Assert.assertEquals(2, cardinalityMap.get(2).intValue());
+        Assert.assertEquals(3, cardinalityMap.get(3).intValue());
+    }
 }

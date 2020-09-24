@@ -18,7 +18,8 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -49,25 +51,13 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     /**
      * constructor
      * @param logHandler    log handler
-     * @param taskDir       task dir
-     * @param taskAppId     task app id
-     * @param taskInstId    task instance id
-     * @param tenantCode    tenant code
-     * @param envFile       env file
-     * @param startTime     start time
-     * @param timeout       timeout
+     * @param taskExecutionContext       taskExecutionContext
      * @param logger        logger
      */
     public PythonCommandExecutor(Consumer<List<String>> logHandler,
-                                 String taskDir,
-                                 String taskAppId,
-                                 int taskInstId,
-                                 String tenantCode,
-                                 String envFile,
-                                 Date startTime,
-                                 int timeout,
+                                 TaskExecutionContext taskExecutionContext,
                                  Logger logger) {
-        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
+        super(logHandler,taskExecutionContext,logger);
     }
 
 
@@ -78,7 +68,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected String buildCommandFilePath() {
-        return String.format("%s/py_%s.command", taskDir, taskAppId);
+        return String.format("%s/py_%s.command", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
     }
 
     /**
@@ -89,7 +79,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", tenantCode, taskDir);
+        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
 
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("generate command file:{}", commandFile);
@@ -109,27 +99,28 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     }
 
     /**
+     * get command options
+     * @return command options list
+     */
+    @Override
+    protected List<String> commandOptions() {
+        // unbuffered binary stdout and stderr
+        return Collections.singletonList("-u");
+    }
+
+    /**
      * get python home
      * @return python home
      */
     @Override
-    protected String commandType() {
-        String pythonHome = getPythonHome(envFile);
+    protected String commandInterpreter() {
+        String pythonHome = getPythonHome(taskExecutionContext.getEnvFile());
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
         return pythonHome;
     }
 
-    /**
-     * check find yarn application id
-     * @param line line
-     * @return boolean
-     */
-    @Override
-    protected boolean checkFindApp(String line) {
-        return true;
-    }
 
 
     /**

@@ -14,21 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.KeyDeserializer;
+import java.io.IOException;
 import java.util.Date;
 
 /**
  * udf function
  */
-@Data
 @TableName("t_ds_udfs")
 public class UdfFunc {
     /**
@@ -84,11 +87,13 @@ public class UdfFunc {
     /**
      * create time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -189,24 +194,6 @@ public class UdfFunc {
     }
 
     @Override
-    public String toString() {
-        return "UdfFunc{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", funcName='" + funcName + '\'' +
-                ", className='" + className + '\'' +
-                ", argTypes='" + argTypes + '\'' +
-                ", database='" + database + '\'' +
-                ", description='" + description + '\'' +
-                ", resourceId=" + resourceId +
-                ", resourceName='" + resourceName + '\'' +
-                ", type=" + type +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -229,5 +216,21 @@ public class UdfFunc {
         int result = id;
         result = 31 * result + (funcName != null ? funcName.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return JSONUtils.toJsonString(this);
+    }
+
+    public static  class UdfFuncDeserializer extends KeyDeserializer {
+
+        @Override
+        public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+            if (StringUtils.isBlank(key)) {
+                return null;
+            }
+            return JSONUtils.parseObject(key);
+        }
     }
 }

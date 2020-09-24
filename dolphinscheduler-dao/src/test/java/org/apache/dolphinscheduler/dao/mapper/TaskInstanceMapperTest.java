@@ -32,13 +32,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class TaskInstanceMapperTest {
 
 
@@ -60,7 +64,7 @@ public class TaskInstanceMapperTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName("ut task");
-        taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
         taskInstance.setTaskJson("{}");
@@ -78,7 +82,7 @@ public class TaskInstanceMapperTest {
         TaskInstance taskInstance = insertOne();
         //update
         int update = taskInstanceMapper.updateById(taskInstance);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         taskInstanceMapper.deleteById(taskInstance.getId());
     }
 
@@ -89,7 +93,7 @@ public class TaskInstanceMapperTest {
     public void testDelete(){
         TaskInstance taskInstance = insertOne();
         int delete = taskInstanceMapper.deleteById(taskInstance.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -114,14 +118,14 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
         List<Integer> taskInstances = taskInstanceMapper.queryTaskByProcessIdAndState(
                 task.getProcessInstanceId(),
-                ExecutionStatus.RUNNING_EXEUTION.ordinal()
+                ExecutionStatus.RUNNING_EXECUTION.ordinal()
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
     }
 
     /**
-     * test find vaild task list by process instance id
+     * test find valid task list by process instance id
      */
     @Test
     public void testFindValidTaskListByProcessId() {
@@ -158,7 +162,7 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.updateById(task);
 
         List<TaskInstance> taskInstances = taskInstanceMapper.queryByHostAndStatus(
-                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXEUTION.ordinal()}
+                task.getHost(), new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()}
         );
         taskInstanceMapper.deleteById(task.getId());
         Assert.assertNotEquals(taskInstances.size(), 0);
@@ -175,7 +179,7 @@ public class TaskInstanceMapperTest {
 
         int setResult = taskInstanceMapper.setFailoverByHostAndStateArray(
                 task.getHost(),
-                new int[]{ExecutionStatus.RUNNING_EXEUTION.ordinal()},
+                new int[]{ExecutionStatus.RUNNING_EXECUTION.ordinal()},
                 ExecutionStatus.NEED_FAULT_TOLERANCE
         );
         taskInstanceMapper.deleteById(task.getId());
@@ -264,7 +268,7 @@ public class TaskInstanceMapperTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setProcessDefinitionId(definition.getId());
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
         processInstance.setName("ut process");
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
@@ -282,6 +286,7 @@ public class TaskInstanceMapperTest {
                 task.getProcessInstanceId(),
                 "",
                 "",
+                0,
                 new int[0],
                 "",
                 null,null

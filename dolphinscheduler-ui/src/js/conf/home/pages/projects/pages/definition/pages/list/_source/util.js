@@ -17,7 +17,7 @@
 
 import i18n from '@/module/i18n'
 
-let warningTypeList = [
+const warningTypeList = [
   {
     id: 'NONE',
     code: `${i18n.$t('none_1')}`
@@ -37,14 +37,14 @@ let warningTypeList = [
 ]
 
 const isEmial = (val) => {
-  let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ // eslint-disable-line
+  let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/ // eslint-disable-line
   return regEmail.test(val)
 }
 
 const fuzzyQuery = (list, keyWord) => {
-  let len = list.length
-  let arr = []
-  let reg = new RegExp(keyWord)
+  const len = list.length
+  const arr = []
+  const reg = new RegExp(keyWord)
   for (let i = 0; i < len; i++) {
     if (list[i].match(reg)) {
       arr.push(list[i])

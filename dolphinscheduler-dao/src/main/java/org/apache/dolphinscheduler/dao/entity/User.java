@@ -17,23 +17,19 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * user
  */
-@Data
 @TableName("t_ds_user")
-@ApiModel(description = "UserModelDesc")
 public class  User {
 
     /**
@@ -45,13 +41,11 @@ public class  User {
     /**
      * user name
      */
-    @ApiModelProperty(name = "userName", notes = "USER_NAME",dataType = "String",required = true)
     private String userName;
 
     /**
      * user password
      */
-    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD",dataType = "String",required = true)
     private String userPassword;
 
     /**
@@ -73,6 +67,11 @@ public class  User {
      *  tenant id
      */
     private int tenantId;
+
+    /**
+     * user state
+     */
+    private int state;
 
     /**
      * tenant code
@@ -106,11 +105,13 @@ public class  User {
     /**
      * create time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -226,6 +227,14 @@ public class  User {
         this.queue = queue;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -261,6 +270,7 @@ public class  User {
                 ", phone='" + phone + '\'' +
                 ", userType=" + userType +
                 ", tenantId=" + tenantId +
+                ", state=" + state +
                 ", tenantCode='" + tenantCode + '\'' +
                 ", tenantName='" + tenantName + '\'' +
                 ", queueName='" + queueName + '\'' +

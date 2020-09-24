@@ -19,14 +19,14 @@ package org.apache.dolphinscheduler.common.model;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.common.utils.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -108,15 +108,25 @@ public class TaskNode {
   @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
   private String dependence;
 
+
+  @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+  @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+  private String conditionResult;
+
   /**
    *  task instance priority
    */
   private Priority taskInstancePriority;
 
   /**
+   * worker group
+   */
+  private String workerGroup;
+
+  /**
    * worker group id
    */
-  private int workerGroupId;
+  private Integer workerGroupId;
 
 
   /**
@@ -125,6 +135,11 @@ public class TaskNode {
   @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
   @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
   private String timeout;
+
+    /**
+     * delay execution time.
+     */
+    private int delayTime;
 
   public String getId() {
     return id;
@@ -189,7 +204,7 @@ public class TaskNode {
 
   public void setDepList(List<String> depList) throws JsonProcessingException {
     this.depList = depList;
-    this.preTasks = JSONUtils.toJson(depList);
+    this.preTasks = JSONUtils.toJsonString(depList);
   }
 
   public String getLoc() {
@@ -230,7 +245,9 @@ public class TaskNode {
             Objects.equals(extras, taskNode.extras) &&
             Objects.equals(runFlag, taskNode.runFlag) &&
             Objects.equals(dependence, taskNode.dependence) &&
-            Objects.equals(workerGroupId, taskNode.workerGroupId) &&
+            Objects.equals(workerGroup, taskNode.workerGroup) &&
+            Objects.equals(conditionResult, taskNode.conditionResult) &&
+
             CollectionUtils.equalLists(depList, taskNode.depList);
   }
 
@@ -281,44 +298,73 @@ public class TaskNode {
 
   /**
    * get task time out parameter
-   * @return
+   * @return task time out parameter
    */
   public TaskTimeoutParameter getTaskTimeoutParameter() {
     if(StringUtils.isNotEmpty(this.getTimeout())){
       String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
-      String timeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
-      return JSONObject.parseObject(timeout,TaskTimeoutParameter.class);
+      String taskTimeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
+      return JSONUtils.parseObject(taskTimeout,TaskTimeoutParameter.class);
     }
     return new TaskTimeoutParameter(false);
   }
 
-  @Override
-  public String toString() {
-    return "TaskNode{" +
-            "id='" + id + '\'' +
-            ", name='" + name + '\'' +
-            ", desc='" + desc + '\'' +
-            ", type='" + type + '\'' +
-            ", runFlag='" + runFlag + '\'' +
-            ", loc='" + loc + '\'' +
-            ", maxRetryTimes=" + maxRetryTimes +
-            ", retryInterval=" + retryInterval +
-            ", params='" + params + '\'' +
-            ", preTasks='" + preTasks + '\'' +
-            ", extras='" + extras + '\'' +
-            ", depList=" + depList +
-            ", dependence='" + dependence + '\'' +
-            ", taskInstancePriority=" + taskInstancePriority +
-            ", timeout='" + timeout + '\'' +
-            ", workerGroupId='" + workerGroupId + '\'' +
-            '}';
+  public boolean isConditionsTask(){
+    return TaskType.CONDITIONS.toString().equalsIgnoreCase(this.getType());
   }
 
-  public int getWorkerGroupId() {
+  @Override
+  public String toString() {
+        return "TaskNode{"
+            + "id='" + id + '\''
+            + ", name='" + name + '\''
+            + ", desc='" + desc + '\''
+            + ", type='" + type + '\''
+            + ", runFlag='" + runFlag + '\''
+            + ", loc='" + loc + '\''
+            + ", maxRetryTimes=" + maxRetryTimes
+            + ", retryInterval=" + retryInterval
+            + ", params='" + params + '\''
+            + ", preTasks='" + preTasks + '\''
+            + ", extras='" + extras + '\''
+            + ", depList=" + depList
+            + ", dependence='" + dependence + '\''
+            + ", taskInstancePriority=" + taskInstancePriority
+            + ", timeout='" + timeout + '\''
+            + ", workerGroup='" + workerGroup + '\''
+            + ", delayTime=" + delayTime
+            + '}';
+  }
+
+  public String getWorkerGroup() {
+    return workerGroup;
+  }
+
+  public void setWorkerGroup(String workerGroup) {
+    this.workerGroup = workerGroup;
+  }
+
+  public String getConditionResult() {
+    return conditionResult;
+  }
+
+  public void setConditionResult(String conditionResult) {
+    this.conditionResult = conditionResult;
+  }
+
+  public Integer getWorkerGroupId() {
     return workerGroupId;
   }
 
-  public void setWorkerGroupId(int workerGroupId) {
+  public void setWorkerGroupId(Integer workerGroupId) {
     this.workerGroupId = workerGroupId;
   }
+
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
 }

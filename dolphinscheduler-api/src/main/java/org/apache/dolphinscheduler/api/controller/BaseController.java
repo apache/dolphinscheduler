@@ -20,8 +20,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -67,7 +67,7 @@ public class BaseController {
     public static String getClientIpAddress(HttpServletRequest request) {
         String clientIp = request.getHeader(HTTP_X_FORWARDED_FOR);
 
-        if (StringUtils.isNotEmpty(clientIp) && !StringUtils.equalsIgnoreCase(HTTP_HEADER_UNKNOWN, clientIp)) {
+        if (StringUtils.isNotEmpty(clientIp) && !clientIp.equalsIgnoreCase(HTTP_HEADER_UNKNOWN)) {
             int index = clientIp.indexOf(COMMA);
             if (index != -1) {
                 return clientIp.substring(0, index);
@@ -77,7 +77,7 @@ public class BaseController {
         }
 
         clientIp = request.getHeader(HTTP_X_REAL_IP);
-        if (StringUtils.isNotEmpty(clientIp) && !StringUtils.equalsIgnoreCase(HTTP_HEADER_UNKNOWN, clientIp)) {
+        if (StringUtils.isNotEmpty(clientIp) && !clientIp.equalsIgnoreCase(HTTP_HEADER_UNKNOWN)) {
             return clientIp;
         }
 
@@ -157,8 +157,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(String msg, Object list) {
-        Result result = getResult(msg, list);
-        return result;
+        return getResult(msg, list);
     }
 
     /**
@@ -168,8 +167,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(Object list) {
-        Result result = getResult(Status.SUCCESS.getMsg(), list);
-        return result;
+        return getResult(Status.SUCCESS.getMsg(), list);
     }
 
     /**
@@ -181,8 +179,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(String msg, Map<String, Object> object) {
-        Result result = getResult(msg, object);
-        return result;
+        return getResult(msg, object);
     }
 
     /**

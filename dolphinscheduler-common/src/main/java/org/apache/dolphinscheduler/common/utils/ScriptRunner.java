@@ -1,10 +1,9 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/**
+ * Copyright 2004-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *    http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -16,34 +15,17 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.Reader;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-/*
- * Slightly modified version of the com.ibatis.common.jdbc.ScriptRunner class
- * from the iBATIS Apache project. Only removed dependency on Resource class
- * and a constructor
- */
-/*
- *  Copyright 2004 Clinton Begin
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tool to run database scripts
@@ -94,9 +76,7 @@ public class ScriptRunner {
 			} finally {
 				connection.setAutoCommit(originalAutoCommit);
 			}
-		} catch (IOException e) {
-			throw e;
-		} catch (SQLException e) {
+		} catch (IOException | SQLException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException("Error running script.  Cause: " + e, e);
@@ -114,9 +94,7 @@ public class ScriptRunner {
 			} finally {
 				connection.setAutoCommit(originalAutoCommit);
 			}
-		} catch (IOException e) {
-			throw e;
-		} catch (SQLException e) {
+		} catch (IOException | SQLException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException("Error running script.  Cause: " + e, e);
@@ -161,44 +139,34 @@ public class ScriptRunner {
 						|| fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
 					command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
 					command.append(" ");
-					Statement statement = conn.createStatement();
-					boolean hasResults = false;
-					logger.info("sql:"+command.toString());
-					if (stopOnError) {
-						hasResults = statement.execute(command.toString());
-					} else {
-						try {
-							statement.execute(command.toString());
-						} catch (SQLException e) {
-							logger.error(e.getMessage(),e);
-							throw e;
-						}
-					}
+                    logger.info("sql: {}", command);
 
-					ResultSet rs = statement.getResultSet();
-					if (hasResults && rs != null) {
-						ResultSetMetaData md = rs.getMetaData();
-						int cols = md.getColumnCount();
-						for (int i = 0; i < cols; i++) {
-							String name = md.getColumnLabel(i);
-							logger.info(name + "\t");
-						}
-						logger.info("");
-						while (rs.next()) {
-							for (int i = 0; i < cols; i++) {
-								String value = rs.getString(i);
-								logger.info(value + "\t");
-							}
-							logger.info("");
-						}
-					}
-
+                    try (Statement statement = conn.createStatement()) {
+                        statement.execute(command.toString());
+                        try (ResultSet rs = statement.getResultSet()) {
+                            if (stopOnError && rs != null) {
+                                ResultSetMetaData md = rs.getMetaData();
+                                int cols = md.getColumnCount();
+                                for (int i = 1; i < cols; i++) {
+                                    String name = md.getColumnLabel(i);
+                                    logger.info("{} \t", name);
+                                }
+                                logger.info("");
+                                while (rs.next()) {
+                                    for (int i = 1; i < cols; i++) {
+                                        String value = rs.getString(i);
+                                        logger.info("{} \t", value);
+                                    }
+                                    logger.info("");
+                                }
+                            }
+                        }   
+                    } catch (SQLException e) {
+                        logger.error("SQLException", e);
+                        throw e;
+                    }
+                    
 					command = null;
-					try {
-						statement.close();
-					} catch (Exception e) {
-						// Ignore to workaround a bug in Jakarta DBCP
-					}
 					Thread.yield();
 				} else {
 					command.append(line);
@@ -207,11 +175,11 @@ public class ScriptRunner {
 			}
 
 		} catch (SQLException e) {
-			logger.error("Error executing: " + command.toString());
+			logger.error("Error executing: {}", command);
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
-			logger.error("Error executing: " + command.toString());
+			logger.error("Error executing: {}", command);
 			throw e;
 		}
 	}
@@ -243,46 +211,35 @@ public class ScriptRunner {
 						|| fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
 					command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
 					command.append(" ");
-					Statement statement = conn.createStatement();
-
 					sql = command.toString().replaceAll("\\{\\{APPDB\\}\\}", dbName);
-					boolean hasResults = false;
-					logger.info("sql : " + sql);
-					if (stopOnError) {
-						hasResults = statement.execute(sql);
-					} else {
-						try {
-							statement.execute(sql);
-						} catch (SQLException e) {
-							logger.error(e.getMessage(),e);
-							throw e;
-						}
-					}
-
-					ResultSet rs = statement.getResultSet();
-					if (hasResults && rs != null) {
-						ResultSetMetaData md = rs.getMetaData();
-						int cols = md.getColumnCount();
-						for (int i = 0; i < cols; i++) {
-							String name = md.getColumnLabel(i);
-							logger.info(name + "\t");
-						}
-						logger.info("");
-						while (rs.next()) {
-							for (int i = 0; i < cols; i++) {
-								String value = rs.getString(i);
-								logger.info(value + "\t");
-							}
-							logger.info("");
-						}
-					}
+                    logger.info("sql : {}", sql);
+                    
+                    try (Statement statement = conn.createStatement()) {
+                        statement.execute(sql);
+                        try (ResultSet rs = statement.getResultSet()) {
+                            if (stopOnError && rs != null) {
+                                ResultSetMetaData md = rs.getMetaData();
+                                int cols = md.getColumnCount();
+                                for (int i = 0; i < cols; i++) {
+                                    String name = md.getColumnLabel(i);
+                                    logger.info("{} \t", name);
+                                }
+                                logger.info("");
+                                while (rs.next()) {
+                                    for (int i = 0; i < cols; i++) {
+                                        String value = rs.getString(i);
+                                        logger.info("{} \t", value);
+                                    }
+                                    logger.info("");
+                                }
+                            }
+                        }   
+                    } catch (SQLException e) {
+                        logger.error("SQLException", e);
+                        throw e;
+                    }
 
 					command = null;
-					try {
-						statement.close();
-					} catch (Exception e) {
-						// Ignore to workaround a bug in Jakarta DBCP
-					}
 					Thread.yield();
 				} else {
 					command.append(line);
@@ -291,11 +248,10 @@ public class ScriptRunner {
 			}
 
 		} catch (SQLException e) {
-			logger.error("Error executing: " + sql);
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
-			logger.error("Error executing: " + sql);
+			logger.error("Error executing: {}", sql);
 			throw e;
 		}
 	}

@@ -52,7 +52,7 @@ function getChartContainers (el) {
     throw new Error('No corresponding DOM object found!')
   }
   let list
-  if (HTMLElement.prototype.isPrototypeOf(el)) {
+  if (Object.prototype.isPrototypeOf.call(HTMLElement.prototype, el)) {
     list = new Array(el)
   } else {
     list = Array.from(el)
@@ -70,7 +70,7 @@ function getChartContainers (el) {
  */
 export const checkKeyInModel = (model, ...params) => {
   for (const key of params) {
-    if (!model.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(model, key)) {
       throw new Error('Data format error! The specified property was not found:' + key)
     }
   }

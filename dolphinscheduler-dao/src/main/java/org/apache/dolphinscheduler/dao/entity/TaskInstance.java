@@ -16,37 +16,40 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * task instance
  */
-@Data
 @TableName("t_ds_task_instance")
-public class TaskInstance {
+public class TaskInstance implements Serializable {
 
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
 
     /**
      * task name
      */
     private String name;
+
 
     /**
      * task type
@@ -80,18 +83,27 @@ public class TaskInstance {
     private ExecutionStatus state;
 
     /**
+     * task first submit time.
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date firstSubmitTime;
+
+    /**
      * task submit time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submitTime;
 
     /**
      * task start time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
 
     /**
      * task end time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**
@@ -156,20 +168,17 @@ public class TaskInstance {
 
     /**
      * duration
-     * @return
      */
     @TableField(exist = false)
     private Long duration;
 
     /**
      * max retry times
-     * @return
      */
     private int maxRetryTimes;
 
     /**
      * task retry interval, unit: minute
-     * @return
      */
     private int retryInterval;
 
@@ -186,21 +195,38 @@ public class TaskInstance {
 
     /**
      * dependent state
-     * @return
      */
     @TableField(exist = false)
     private String dependentResult;
 
 
     /**
-     * worker group id
-     * @return
+     * workerGroup
      */
-    private int workerGroupId;
+    private String workerGroup;
 
 
+    /**
+     * executor id
+     */
+    private int executorId;
 
-    public void  init(String host,Date startTime,String executePath){
+    /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
+
+    @TableField(exist = false)
+    private Map<String, String> resources;
+
+    /**
+     * delay execution time.
+     */
+    private int delayTime;
+
+    public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
@@ -279,6 +305,14 @@ public class TaskInstance {
         this.state = state;
     }
 
+    public Date getFirstSubmitTime() {
+        return firstSubmitTime;
+    }
+
+    public void setFirstSubmitTime(Date firstSubmitTime) {
+        this.firstSubmitTime = firstSubmitTime;
+    }
+
     public Date getSubmitTime() {
         return submitTime;
     }
@@ -343,7 +377,7 @@ public class TaskInstance {
         this.retryTimes = retryTimes;
     }
 
-    public Boolean isTaskSuccess(){
+    public Boolean isTaskSuccess() {
         return this.state == ExecutionStatus.SUCCESS;
     }
 
@@ -363,19 +397,16 @@ public class TaskInstance {
         this.appLink = appLink;
     }
 
-
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
-    }
-
-    public String getDependency(){
-
-        if(this.dependency != null){
+    public String getDependency() {
+        if (this.dependency != null) {
             return this.dependency;
         }
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
+        return taskNode == null ? null : taskNode.getDependence();
+    }
 
-        return taskNode.getDependence();
+    public void setDependency(String dependency) {
+        this.dependency = dependency;
     }
 
     public Flag getFlag() {
@@ -385,6 +416,7 @@ public class TaskInstance {
     public void setFlag(Flag flag) {
         this.flag = flag;
     }
+
     public String getProcessInstanceName() {
         return processInstanceName;
     }
@@ -417,31 +449,66 @@ public class TaskInstance {
         this.retryInterval = retryInterval;
     }
 
-    public Boolean isTaskComplete() {
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
+    public Map<String, String> getResources() {
+        return resources;
+    }
+
+    public void setResources(Map<String, String> resources) {
+        this.resources = resources;
+    }
+
+    public boolean isSubProcess() {
+        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isDependTask() {
+        return TaskType.DEPENDENT.equals(TaskType.valueOf(this.taskType));
+    }
+
+    public boolean isConditionsTask() {
+        return TaskType.CONDITIONS.equals(TaskType.valueOf(this.taskType));
+    }
+
+
     /**
      * determine if you can try again
+     *
      * @return can try result
      */
     public boolean taskCanRetry() {
-        if(this.isSubProcess()){
+        if (this.isSubProcess()) {
             return false;
         }
-        if(this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE){
+        if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        }else {
+        } else {
             return (this.getState().typeIsFailure()
-                && this.getRetryTimes() < this.getMaxRetryTimes());
+                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
-    }
-
-    public void setDependency(String dependency) {
-        this.dependency = dependency;
     }
 
     public Priority getTaskInstancePriority() {
@@ -460,47 +527,12 @@ public class TaskInstance {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskInstance{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", taskType='" + taskType + '\'' +
-                ", processDefinitionId=" + processDefinitionId +
-                ", processInstanceId=" + processInstanceId +
-                ", processInstanceName='" + processInstanceName + '\'' +
-                ", taskJson='" + taskJson + '\'' +
-                ", state=" + state +
-                ", submitTime=" + submitTime +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", host='" + host + '\'' +
-                ", executePath='" + executePath + '\'' +
-                ", logPath='" + logPath + '\'' +
-                ", retryTimes=" + retryTimes +
-                ", alertFlag=" + alertFlag +
-                ", flag=" + flag +
-                ", processInstance=" + processInstance +
-                ", processDefine=" + processDefine +
-                ", pid=" + pid +
-                ", appLink='" + appLink + '\'' +
-                ", flag=" + flag +
-                ", dependency=" + dependency +
-                ", duration=" + duration +
-                ", maxRetryTimes=" + maxRetryTimes +
-                ", retryInterval=" + retryInterval +
-                ", taskInstancePriority=" + taskInstancePriority +
-                ", processInstancePriority=" + processInstancePriority +
-                ", workGroupId=" + workerGroupId +
-                '}';
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public String getDependentResult() {
@@ -509,5 +541,52 @@ public class TaskInstance {
 
     public void setDependentResult(String dependentResult) {
         this.dependentResult = dependentResult;
+    }
+
+    public int getDelayTime() {
+        return delayTime;
+    }
+
+    public void setDelayTime(int delayTime) {
+        this.delayTime = delayTime;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskInstance{"
+                + "id=" + id
+                + ", name='" + name + '\''
+                + ", taskType='" + taskType + '\''
+                + ", processDefinitionId=" + processDefinitionId
+                + ", processInstanceId=" + processInstanceId
+                + ", processInstanceName='" + processInstanceName + '\''
+                + ", taskJson='" + taskJson + '\''
+                + ", state=" + state
+                + ", firstSubmitTime=" + firstSubmitTime
+                + ", submitTime=" + submitTime
+                + ", startTime=" + startTime
+                + ", endTime=" + endTime
+                + ", host='" + host + '\''
+                + ", executePath='" + executePath + '\''
+                + ", logPath='" + logPath + '\''
+                + ", retryTimes=" + retryTimes
+                + ", alertFlag=" + alertFlag
+                + ", processInstance=" + processInstance
+                + ", processDefine=" + processDefine
+                + ", pid=" + pid
+                + ", appLink='" + appLink + '\''
+                + ", flag=" + flag
+                + ", dependency='" + dependency + '\''
+                + ", duration=" + duration
+                + ", maxRetryTimes=" + maxRetryTimes
+                + ", retryInterval=" + retryInterval
+                + ", taskInstancePriority=" + taskInstancePriority
+                + ", processInstancePriority=" + processInstancePriority
+                + ", dependentResult='" + dependentResult + '\''
+                + ", workerGroup='" + workerGroup + '\''
+                + ", executorId=" + executorId
+                + ", executorName='" + executorName + '\''
+                + ", delayTime=" + delayTime
+                + '}';
     }
 }

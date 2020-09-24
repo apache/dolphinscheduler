@@ -48,7 +48,7 @@ public class ThreadPoolExecutorsTest {
     class Thread2 extends Thread {
         @Override
         public void run() {
-            logger.info(String.format("ThreadPoolExecutors instance's hashcode is: %s ",ThreadPoolExecutors.getInstance("a",2).hashCode()));
+            logger.info("ThreadPoolExecutors instance's hashcode is: {} ",ThreadPoolExecutors.getInstance("a",2).hashCode());
         }
     }
 

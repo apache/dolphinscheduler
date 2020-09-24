@@ -20,9 +20,9 @@
             trigger="click"
             placement="bottom-start">
       <pre :id="'result-' + id" class="result"></pre>
-      <i class="iconfont" slot="reference">
+      <em class="iconfont" slot="reference">
         <slot name="reference"></slot>
-      </i>
+      </em>
     </x-poptip>
   </div>
 </template>

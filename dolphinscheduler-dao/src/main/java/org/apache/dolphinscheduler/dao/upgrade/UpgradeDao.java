@@ -16,24 +16,25 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.dolphinscheduler.common.Constants;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.common.utils.SchemaUtils;
-import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
 
@@ -41,8 +42,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
-    protected static final DruidDataSource dataSource = getDataSource();
+    protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
+
 
     @Override
     protected void init() {
@@ -53,13 +55,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * get datasource
      * @return DruidDataSource
      */
-    public static DruidDataSource getDataSource(){
-        DruidDataSource dataSource = ConnectionFactory.getDataSource();
-        dataSource.setInitialSize(2);
-        dataSource.setMinIdle(2);
-        dataSource.setMaxActive(2);
-
-        return dataSource;
+    public static DataSource getDataSource(){
+        return ConnectionFactory.getInstance().getDataSource();
     }
 
     /**
@@ -84,7 +81,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             return null;
         }finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -124,6 +121,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         // Execute the dolphinscheduler DML, it can be rolled back
         runInitDML(initSqlPath);
 
+
     }
 
     /**
@@ -156,14 +154,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -196,7 +196,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -258,6 +258,57 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         upgradeDolphinSchedulerDDL(schemaDir);
 
         upgradeDolphinSchedulerDML(schemaDir);
+    }
+
+
+    /**
+     * upgrade DolphinScheduler worker group
+     * ds-1.3.0 modify the worker group for process definition json
+     */
+    public void upgradeDolphinSchedulerWorkerGroup() {
+        updateProcessDefinitionJsonWorkerGroup();
+    }
+    /**
+     * updateProcessDefinitionJsonWorkerGroup
+     */
+    protected void updateProcessDefinitionJsonWorkerGroup(){
+        WorkerGroupDao workerGroupDao = new WorkerGroupDao();
+        ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
+        Map<Integer,String> replaceProcessDefinitionMap = new HashMap<>();
+        try {
+            Map<Integer, String> oldWorkerGroupMap = workerGroupDao.queryAllOldWorkerGroup(dataSource.getConnection());
+            Map<Integer,String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
+
+            for (Map.Entry<Integer,String> entry : processDefinitionJsonMap.entrySet()){
+                ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
+                ArrayNode tasks = JSONUtils.parseArray(jsonObject.get("tasks").toString());
+
+                for (int i = 0 ;i < tasks.size() ; i++){
+                    ObjectNode task = (ObjectNode) tasks.path(i);
+                    ObjectNode workerGroupNode = (ObjectNode) task.path("workerGroupId");
+                    Integer workerGroupId = -1;
+                    if(workerGroupNode != null && workerGroupNode.canConvertToInt()){
+                        workerGroupId = workerGroupNode.asInt(-1);
+                    }
+                    if (workerGroupId == -1) {
+                        task.put("workerGroup", "default");
+                    }else {
+                        task.put("workerGroup", oldWorkerGroupMap.get(workerGroupId));
+                    }
+                }
+
+                jsonObject.remove("task");
+
+                jsonObject.put("tasks",tasks);
+
+                replaceProcessDefinitionMap.put(entry.getKey(),jsonObject.toString());
+            }
+            if (replaceProcessDefinitionMap.size() > 0){
+                processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),replaceProcessDefinitionMap);
+            }
+        }catch (Exception e){
+            logger.error("update process definition json workergroup error",e);
+        }
 
     }
 
@@ -313,7 +364,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (SQLException e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -321,14 +374,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -371,7 +426,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -400,7 +455,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + upgradeSQL, e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }

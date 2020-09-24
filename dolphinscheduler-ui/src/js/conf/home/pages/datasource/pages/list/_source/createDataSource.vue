@@ -22,26 +22,21 @@
     <div class="content-p">
       <div class="create-datasource-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Datasource')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content">
-            <x-radio-group v-model="type" size="small">
-              <x-radio :label="'MYSQL'">MYSQL</x-radio>
-              <x-radio :label="'POSTGRESQL'">POSTGRESQL</x-radio>
-              <x-radio :label="'HIVE'">HIVE/IMPALA</x-radio>
-              <x-radio :label="'SPARK'">SPARK</x-radio>
-              <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
-              <x-radio :label="'ORACLE'">ORACLE</x-radio>
-              <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
-              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
-            </x-radio-group>
+              <x-select style="width: 100%;" v-model="type">
+                <x-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
+                </x-option>
+              </x-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Datasource Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Datasource Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="name"
+                    maxlength="60"
                     :placeholder="$t('Please enter datasource name')"
                     autocomplete="off">
             </x-input>
@@ -59,18 +54,19 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('IP')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('IP')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="host"
+                    maxlength="60"
                     :placeholder="$t('Please enter IP')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Port')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Port')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -81,7 +77,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
-          <template slot="name"><b>*</b>Principal</template>
+          <template slot="name"><strong>*</strong>Principal</template>
           <template slot="content">
             <x-input
               type="input"
@@ -92,11 +88,12 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="userName"
+                    maxlength="60"
                     :placeholder="$t('Please enter user name')"
                     autocomplete="off">
             </x-input>
@@ -114,14 +111,24 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b :class="{hidden:showdDatabase}">*</b>{{$t('Database Name')}}</template>
+          <template slot="name"><strong :class="{hidden:showdDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="database"
+                    maxlength="60"
                     :placeholder="$t('Please enter database name')"
                     autocomplete="off">
             </x-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f v-if="showConnectType">
+          <template slot="name"><strong>*</strong>{{$t('Oracle Connect Type')}}</template>
+          <template slot="content">
+            <x-radio-group v-model="connectType" size="small">
+              <x-radio :label="'ORACLE_SERVICE_NAME'">{{$t('Oracle Service Name')}}</x-radio>
+              <x-radio :label="'ORACLE_SID'">{{$t('Oracle SID')}}</x-radio>
+            </x-radio-group>
           </template>
         </m-list-box-f>
         <m-list-box-f>
@@ -148,7 +155,7 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import { isJson } from '@/module/util/util'
+  import {isJson} from '@/module/util/util'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
@@ -177,14 +184,55 @@
         userName: '',
         // Database password
         password: '',
+        // Database connect type
+        connectType: '',
         // Jdbc connection parameter
         other: '',
         // btn test loading
         testLoading: false,
         showPrincipal: true,
         showdDatabase: false,
+        showConnectType: false,
         isShowPrincipal:true,
-        prePortMapper:{}
+        prePortMapper:{},
+        datasourceTypeList: [
+          {
+            value: 'MYSQL',
+            label: 'MYSQL'
+          },
+          {
+            value: 'POSTGRESQL',
+            label: 'POSTGRESQL'
+          },
+          {
+            value: 'HIVE',
+            label: 'HIVE/IMPALA'
+          },
+          {
+            value: 'SPARK',
+            label: 'SPARK'
+          },
+          {
+            value: 'CLICKHOUSE',
+            label: 'CLICKHOUSE'
+          },
+          {
+            value: 'ORACLE',
+            label: 'ORACLE'
+          },
+          {
+            value: 'SQLSERVER',
+            label: 'SQLSERVER'
+          },
+          {
+            value: 'DB2',
+            label: 'DB2'
+          },
+          {
+            value: 'PRESTO',
+            label: 'PRESTO'
+          }
+        ]
       }
     },
     props: {
@@ -225,6 +273,7 @@
           principal: this.principal,
           userName: this.userName,
           password: this.password,
+          connectType: this.connectType,
           other: this.other
         }
       },
@@ -335,6 +384,7 @@
           this.database = res.database
           this.userName = res.userName
           this.password = res.password
+          this.connectType = res.connectType
           this.other = JSON.stringify(res.other) === '{}' ? '' : JSON.stringify(res.other)
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -387,6 +437,9 @@
           case 'DB2':
             defaultPort = '50000'
             break
+          case 'PRESTO':
+            defaultPort = '8080'
+            break
           default:
             break
 
@@ -411,6 +464,14 @@
           this.showdDatabase = false;
         }
 
+        if (value== 'ORACLE' && !this.item.id) {
+          this.showConnectType = true;
+          this.connectType = 'ORACLE_SERVICE_NAME'
+        } else if(value== 'ORACLE' && this.item.id) {
+          this.showConnectType = true;
+        } else {
+          this.showConnectType = false;
+        }
         //Set default port for each type datasource
         this._setDefaultValues(value)
 

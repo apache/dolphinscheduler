@@ -49,7 +49,7 @@
       </div>
       <div class="cont-box">
         <label class="label-box">
-          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails" maxlength="9">
+          <x-input v-model="interval" style="width: 200px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
           </x-input>
         </label>
@@ -91,7 +91,8 @@
           return false
         }
         // Verify timeout duration Non 0 positive integer
-        if (this.enable && !parseInt(this.interval) && !_.isInteger(this.interval)) {
+        const reg = /^[1-9]\d*$/
+        if (this.enable && !reg.test(this.interval)) {
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }

@@ -14,21 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.utils.BeanContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
 import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * master task exec base class
@@ -38,12 +43,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * logger of MasterBaseTaskExecThread
      */
-    private static final Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
 
     /**
-     * process dao
+     * process service
      */
-    protected ProcessDao processDao;
+    protected ProcessService processService;
 
     /**
      * alert database access
@@ -61,11 +67,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     protected TaskInstance taskInstance;
 
     /**
-     * task queue
-     */
-    protected ITaskQueue taskQueue;
-
-    /**
      * whether need cancel
      */
     protected boolean cancel;
@@ -73,95 +74,175 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * master config
      */
-    private MasterConfig masterConfig;
+    protected MasterConfig masterConfig;
+
+    /**
+     * taskUpdateQueue
+     */
+    private TaskPriorityQueue taskUpdateQueue;
 
     /**
      * constructor of MasterBaseTaskExecThread
-     * @param taskInstance      task instance
-     * @param processInstance   process instance
+     *
+     * @param taskInstance task instance
      */
-    public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        this.processDao = BeanContext.getBean(ProcessDao.class);
-        this.alertDao = BeanContext.getBean(AlertDao.class);
-        this.processInstance = processInstance;
-        this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
+    public MasterBaseTaskExecThread(TaskInstance taskInstance) {
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
     }
 
     /**
      * get task instance
+     *
      * @return TaskInstance
      */
-    public TaskInstance getTaskInstance(){
+    public TaskInstance getTaskInstance() {
         return this.taskInstance;
     }
 
     /**
      * kill master base task exec thread
      */
-    public void kill(){
+    public void kill() {
         this.cancel = true;
     }
 
     /**
      * submit master base task exec thread
+     *
      * @return TaskInstance
      */
-    protected TaskInstance submit(){
+    protected TaskInstance submit() {
         Integer commitRetryTimes = masterConfig.getMasterTaskCommitRetryTimes();
         Integer commitRetryInterval = masterConfig.getMasterTaskCommitInterval();
 
         int retryTimes = 1;
-        boolean taskDBFlag = false;
-        boolean taskQueueFlag = false;
+        boolean submitDB = false;
+        boolean submitTask = false;
         TaskInstance task = null;
-        while (true){
+        while (retryTimes <= commitRetryTimes){
             try {
-                if(!taskDBFlag){
+                if(!submitDB){
                     // submit task to db
-                    task = processDao.submitTask(taskInstance, processInstance);
+                    task = processService.submitTask(taskInstance);
                     if(task != null && task.getId() != 0){
-                        taskDBFlag = true;
+                        submitDB = true;
                     }
                 }
-                if(taskDBFlag && !taskQueueFlag){
-                    // submit task to queue
-                    taskQueueFlag = processDao.submitTaskToQueue(task);
+                if(submitDB && !submitTask){
+                    // dispatch task
+                    submitTask = dispatchTask(task);
                 }
-                if(taskDBFlag && taskQueueFlag){
+                if(submitDB && submitTask){
                     return task;
                 }
-                if(!taskDBFlag){
-                    logger.error("task commit to db failed , task has already retry {} times, please check the database", retryTimes);
-                }else if(!taskQueueFlag){
-                    logger.error("task commit to queue failed , task has already retry {} times, please check the database", retryTimes);
-
+                if(!submitDB){
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                }else if(!submitTask){
+                    logger.error("task commit  failed , taskId {} has already retry {} times, please check", taskInstance.getId(), retryTimes);
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql and queue failed : " + e.getMessage(),e);
+                logger.error("task commit to mysql and dispatcht task failed",e);
             }
             retryTimes += 1;
         }
+        return task;
+    }
+
+
+    /**
+     * dispatcht task
+     *
+     * @param taskInstance taskInstance
+     * @return whether submit task success
+     */
+    public Boolean dispatchTask(TaskInstance taskInstance) {
+        try{
+            if(taskInstance.isConditionsTask()
+                    || taskInstance.isDependTask()
+                    || taskInstance.isSubProcess()){
+                return true;
+            }
+            if(taskInstance.getState().typeIsFinished()){
+                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                return true;
+            }
+            // task cannot be submitted because its execution state is RUNNING or DELAY.
+            if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
+                    || taskInstance.getState() == ExecutionStatus.DELAY_EXECUTION) {
+                logger.info("submit task, but the status of the task {} is already running or delayed.", taskInstance.getName());
+                return true;
+            }
+            logger.info("task ready to submit: {}", taskInstance);
+
+            /**
+             *  taskPriorityInfo
+             */
+            String taskPriorityInfo = buildTaskPriorityInfo(processInstance.getProcessInstancePriority().getCode(),
+                    processInstance.getId(),
+                    taskInstance.getProcessInstancePriority().getCode(),
+                    taskInstance.getId(),
+                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+            taskUpdateQueue.put(taskPriorityInfo);
+            logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
+            return true;
+        }catch (Exception e){
+            logger.error("submit task  Exception: ", e);
+            logger.error("task error : %s", JSONUtils.toJsonString(taskInstance));
+            return false;
+        }
+    }
+
+
+    /**
+     * buildTaskPriorityInfo
+     *
+     * @param processInstancePriority processInstancePriority
+     * @param processInstanceId processInstanceId
+     * @param taskInstancePriority taskInstancePriority
+     * @param taskInstanceId taskInstanceId
+     * @param workerGroup workerGroup
+     * @return TaskPriorityInfo
+     */
+    private String buildTaskPriorityInfo(int processInstancePriority,
+                                         int processInstanceId,
+                                         int taskInstancePriority,
+                                         int taskInstanceId,
+                                         String workerGroup) {
+        return processInstancePriority +
+                UNDERLINE +
+                processInstanceId +
+                UNDERLINE +
+                taskInstancePriority +
+                UNDERLINE +
+                taskInstanceId +
+                UNDERLINE +
+                workerGroup;
     }
 
     /**
      * submit wait complete
+     *
      * @return true
      */
-    protected Boolean submitWaitComplete(){
+    protected Boolean submitWaitComplete() {
         return true;
     }
 
     /**
      * call
+     *
      * @return boolean
      * @throws Exception exception
      */
     @Override
     public Boolean call() throws Exception {
+        this.processInstance = processService.findProcessInstanceById(taskInstance.getProcessInstanceId());
         return submitWaitComplete();
     }
 

@@ -17,12 +17,13 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * command types
  */
-@Getter
 public enum CommandType {
 
     /**
@@ -49,7 +50,7 @@ public enum CommandType {
     REPEAT_RUNNING(7, "repeat running a process"),
     PAUSE(8, "pause a process"),
     STOP(9, "stop a process"),
-    RECOVER_WAITTING_THREAD(10, "recover waitting thread");
+    RECOVER_WAITTING_THREAD(10, "recover waiting thread");
 
     CommandType(int code, String descp){
         this.code = code;
@@ -59,4 +60,28 @@ public enum CommandType {
     @EnumValue
     private final int code;
     private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
+
+    private static final Map<Integer, CommandType> COMMAND_TYPE_MAP = new HashMap<>();
+
+    static {
+        for (CommandType commandType : CommandType.values()) {
+            COMMAND_TYPE_MAP.put(commandType.code,commandType);
+        }
+    }
+
+
+    public static CommandType of(Integer status) {
+        if (COMMAND_TYPE_MAP.containsKey(status)) {
+            return COMMAND_TYPE_MAP.get(status);
+        }
+        throw new IllegalArgumentException("invalid status : " + status);
+    }
 }

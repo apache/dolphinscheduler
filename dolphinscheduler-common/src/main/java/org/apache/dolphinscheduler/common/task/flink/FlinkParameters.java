@@ -20,11 +20,11 @@ import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * spark parameters
+ * flink parameters
  */
 public class FlinkParameters extends AbstractParameters {
 
@@ -49,35 +49,35 @@ public class FlinkParameters extends AbstractParameters {
   private String mainArgs;
 
   /**
-   * slot个数
+   * slot count
    */
   private int slot;
 
   /**
-   *Yarn application的名字
+   *Yarn application name
    */
 
   private String appName;
 
   /**
-   * taskManager 数量
+   * taskManager count
    */
   private int  taskManager;
 
   /**
-   * jobManagerMemory 内存大小
+   * job manager memory
    */
   private String  jobManagerMemory ;
 
   /**
-   * taskManagerMemory内存大小
+   * task manager memory
    */
   private String  taskManagerMemory;
 
   /**
    * resource list
    */
-  private List<ResourceInfo> resourceList;
+  private List<ResourceInfo> resourceList = new ArrayList<>();
 
   /**
    * The YARN queue to submit to
@@ -88,6 +88,11 @@ public class FlinkParameters extends AbstractParameters {
    * other arguments
    */
   private String others;
+
+  /**
+   * flink version
+   */
+  private String flinkVersion;
 
   /**
    * program type
@@ -199,6 +204,14 @@ public class FlinkParameters extends AbstractParameters {
     this.programType = programType;
   }
 
+  public String getFlinkVersion() {
+    return flinkVersion;
+  }
+
+  public void setFlinkVersion(String flinkVersion) {
+    this.flinkVersion = flinkVersion;
+  }
+
   @Override
   public boolean checkParameters() {
     return mainJar != null && programType != null;
@@ -206,14 +219,10 @@ public class FlinkParameters extends AbstractParameters {
 
 
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList !=null ) {
-      this.resourceList.add(mainJar);
-      return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null && !resourceList.contains(mainJar)) {
+      resourceList.add(mainJar);
     }
-    return null;
+    return resourceList;
   }
-
-
 }

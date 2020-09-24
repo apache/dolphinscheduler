@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.api.utils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -35,7 +35,9 @@ import java.util.regex.Pattern;
  */
 public class CheckUtils {
 
-
+  private CheckUtils() {
+    throw new IllegalStateException("CheckUtils class");
+  }
   /**
    * check username
    *
@@ -84,7 +86,7 @@ public class CheckUtils {
    * @return true if other parameters are valid, otherwise return false
    */
   public static boolean checkOtherParams(String otherParams) {
-    return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonVaild(otherParams);
+    return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonValid(otherParams);
   }
 
   /**
@@ -104,7 +106,7 @@ public class CheckUtils {
    * @return true if phone regex valid, otherwise return false
    */
   public static boolean checkPhone(String phone) {
-    return StringUtils.isEmpty(phone) || phone.length() <= 11;
+    return StringUtils.isEmpty(phone) || phone.length() == 11;
   }
 
 
@@ -113,7 +115,7 @@ public class CheckUtils {
    *
    * @param parameter parameter
    * @param taskType task type
-   * @return true if taks node parameters are valid, otherwise return false
+   * @return true if task node parameters are valid, otherwise return false
    */
   public static boolean checkTaskNodeParameters(String parameter, String taskType) {
     AbstractParameters abstractParameters = TaskParametersUtils.getParameters(taskType, parameter);
@@ -148,7 +150,7 @@ public class CheckUtils {
    * @return true if regex pattern is right, otherwise return false
    */
   private static boolean regexChecks(String str, Pattern pattern) {
-    if (org.apache.commons.lang3.StringUtils.isEmpty(str)) {
+    if (StringUtils.isEmpty(str)) {
       return false;
     }
 

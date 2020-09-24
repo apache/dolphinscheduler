@@ -19,31 +19,36 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th width="50">
+          <th scope="col" style="min-width: 50px">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th width="40">
+          <th scope="col" style="min-width: 40px">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col" style="min-width: 200px;max-width: 300px;">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="50">
+          <th scope="col" style="min-width: 50px">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" style="min-width: 130px">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th>
+          <th scope="col" style="min-width: 150px">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="90">
-            <span>{{$t('Timing state')}}</span>
+          <th scope="col" style="min-width: 70px">
+            <span>{{$t('Modify User')}}</span>
           </th>
-          <th width="240">
+          <th scope="col" style="min-width: 70px">
+            <div style="width: 80px">
+              <span>{{$t('Timing state')}}</span>
+            </div>
+          </th>
+          <th scope="col" style="min-width: 300px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -52,9 +57,9 @@
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
-          <td>
+          <td style="min-width: 200px;max-width: 300px;padding-right: 10px;">
             <span class="ellipsis">
-              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links">
+              <router-link :to="{ path: '/projects/definition/list/' + item.id}" tag="a" class="links" :title="item.name">
                 {{item.name}}
               </router-link>
             </span>
@@ -69,7 +74,11 @@
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.modifyBy">{{item.modifyBy}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -77,13 +86,14 @@
             <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
-          <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
-            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('下线')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
+          <td style="z-index: inherit;">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-edit"><!--{{$t('编辑')}}--></x-button>
+            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-play"><!--{{$t('启动')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="ans-icon-timer"><!--{{$t('定时')}}--></x-button>
+            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="ans-icon-upward"><!--{{$t('下线')}}--></x-button>
+            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="ans-icon-downward"><!--{{$t('上线')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Copy Workflow')" @click="_copyProcess(item)" :disabled="item.releaseState === 'ONLINE'"  icon="ans-icon-copy"><!--{{$t('复制')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="ans-icon-datetime"><!--{{$t('定时管理')}}--></x-button>
             <x-poptip
               :ref="'poptip-delete-' + $index"
               placement="bottom-end"
@@ -95,7 +105,7 @@
               </div>
               <template slot="reference">
                 <x-button
-                  icon="iconfont icon-shanchu"
+                  icon="ans-icon-trash"
                   type="error"
                   shape="circle"
                   size="xsmall"
@@ -105,15 +115,15 @@
                 </x-button>
               </template>
             </x-poptip>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="iconfont icon-download"><!--{{$t('导出')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="ans-icon-node"><!--{{$t('树形图')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="ans-icon-download"><!--{{$t('导出')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Version Info')" @click="_version(item)" :disabled="item.releaseState === 'ONLINE'" icon="ans-icon-dependence"><!--{{$t('版本信息')}}--></x-button>
 
           </td>
         </tr>
       </table>
     </div>
     <x-poptip
-            v-show="strDelete !== ''"
             ref="poptipDeleteAll"
             placement="bottom-start"
             width="90">
@@ -123,9 +133,12 @@
         <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
       </div>
       <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
+        <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</x-button>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</x-button>
+    <x-button size="xsmall" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</x-button>
 
   </div>
 </template>
@@ -133,15 +146,17 @@
   import _ from 'lodash'
   import mStart from './start'
   import mTiming from './timing'
+  import mRelatedItems from './relatedItems'
   import { mapActions } from 'vuex'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
+  import mVersions from './versions'
 
   export default {
     name: 'definition-list',
     data () {
       return {
         list: [],
-        strDelete: '',
+        strSelectIds: '',
         checkAll: false
       }
     },
@@ -151,7 +166,8 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -162,6 +178,7 @@
        * Start
        */
       _start (item) {
+        this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionId: item.id }).then(res => {
           let self = this
           let modal = this.$modal.dialog({
@@ -248,11 +265,13 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        if (i > 0) {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
-        }else{
+        // close batch
+        if (i < 0) {
           this.$refs['poptipDeleteAll'].doClose()
+          return
         }
+        // close one
+        this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
        * delete
@@ -299,12 +318,238 @@
           releaseState: 1
         })
       },
-      _export (item) {
-        this.exportDefinition({
-          processDefinitionId: item.id,
-          processDefinitionName: item.name
+      /**
+       * copy
+       */
+      _copyProcess (item) {
+        this.copyProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
         }).catch(e => {
           this.$message.error(e.msg || '')
+        })
+      },
+
+      /**
+       * move
+       */
+      _moveProcess (item) {
+        this.moveProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      _export (item) {
+        this.exportDefinition({
+          processDefinitionIds: item.id,
+          fileName: item.name
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      _version (item) {
+        let self = this
+        this.getProcessDefinitionVersionsPage({
+          pageNo: 1,
+          pageSize: 10,
+          processDefinitionId: item.id
+        }).then(res => {
+          let processDefinitionVersions = res.data.lists
+          let total = res.data.totalCount
+          let pageSize = res.data.pageSize
+          let pageNo = res.data.currentPage
+          if (this.versionsModel) {
+            this.versionsModel.remove()
+          }
+          this.versionsModel = this.$drawer({
+            direction: 'right',
+            closable: true,
+            showMask: true,
+            escClose: true,
+            render (h) {
+              return h(mVersions, {
+                on: {
+                  /**
+                   * switch version in process definition version list
+                   *
+                   * @param version the version user want to change
+                   * @param processDefinitionId the process definition id
+                   * @param fromThis fromThis
+                   */
+                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+                    self.switchProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success($t('Switch Version Successfully'))
+                      setTimeout(() => {
+                        fromThis.$destroy()
+                        self.versionsModel.remove()
+                      }, 0)
+                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * Paging event of process definition versions
+                   *
+                   * @param pageNo page number
+                   * @param pageSize page size
+                   * @param processDefinitionId the process definition id of page version
+                   * @param fromThis fromThis
+                   */
+                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+                    self.getProcessDefinitionVersionsPage({
+                      pageNo: pageNo,
+                      pageSize: pageSize,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      fromThis.processDefinitionVersions = res.data.lists
+                      fromThis.total = res.data.totalCount
+                      fromThis.pageSize = res.data.pageSize
+                      fromThis.pageNo = res.data.currentPage
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * delete one version of process definition
+                   *
+                   * @param version the version need to delete
+                   * @param processDefinitionId the process definition id user want to delete
+                   * @param fromThis fromThis
+                   */
+                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+                    self.deleteProcessDefinitionVersion({
+                      version: version,
+                      processDefinitionId: processDefinitionId
+                    }).then(res => {
+                      self.$message.success(res.msg || '')
+                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
+                        pageNo: 1,
+                        pageSize: 10,
+                        processDefinitionId: processDefinitionId,
+                        fromThis: fromThis
+                      })
+                    }).catch(e => {
+                      self.$message.error(e.msg || '')
+                    })
+                  },
+
+                  /**
+                   * remove this drawer
+                   *
+                   * @param fromThis
+                   */
+                  close ({ fromThis }) {
+                    setTimeout(() => {
+                      fromThis.$destroy()
+                      self.versionsModel.remove()
+                    }, 0)
+                  }
+                },
+                props: {
+                  processDefinition: item,
+                  processDefinitionVersions: processDefinitionVersions,
+                  total: total,
+                  pageNo: pageNo,
+                  pageSize: pageSize
+                }
+              })
+            }
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      _batchExport () {
+        this.exportDefinition({
+          processDefinitionIds: this.strSelectIds,
+          fileName: "process_"+new Date().getTime()
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.strSelectIds = ''
+        }).catch(e => {
+          this.strSelectIds = ''
+          this.checkAll = false
+          this.$message.error(e.msg)
+        })
+      },
+      /**
+       * Batch Copy
+       */
+      _batchCopy () {
+          let self = this
+          let modal = this.$modal.dialog({
+            closable: false,
+            showMask: true,
+            escClose: true,
+            className: 'v-modal-custom',
+            transitionName: 'opacityp',
+            render (h) {
+              return h(mRelatedItems, {
+                on: {
+                  onBatchCopy (item) {
+                    self._copyProcess({id: self.strSelectIds,projectId: item})
+                    modal.remove()
+                  },
+                  close () {
+                    modal.remove()
+                  }
+                },
+                props: {
+                  tmp: false
+                }
+              })
+            }
+          })
+      },
+      /**
+       * _batchMove
+       */
+      _batchMove() {
+        let self = this
+        let modal = this.$modal.dialog({
+          closable: false,
+          showMask: true,
+          escClose: true,
+          className: 'v-modal-custom',
+          transitionName: 'opacityp',
+          render (h) {
+            return h(mRelatedItems, {
+              on: {
+                onBatchMove (item) {
+                  self._moveProcess({id: self.strSelectIds,projectId: item})
+                  modal.remove()
+                },
+                close () {
+                  modal.remove()
+                }
+              },
+              props: {
+                tmp: true
+              }
+            })
+          }
         })
       },
       /**
@@ -339,7 +584,7 @@
             arr.push(item.id)
           }
         })
-        this.strDelete = _.join(arr, ',')
+        this.strSelectIds = _.join(arr, ',')
         if (v === false) {
           this.checkAll = false
         }
@@ -350,12 +595,14 @@
       _batchDelete () {
         this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteDefinition({
-          processDefinitionIds: this.strDelete
+          processDefinitionIds: this.strSelectIds
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
+          this.strSelectIds = ''
           this.$message.success(res.msg)
         }).catch(e => {
+          this.strSelectIds = ''
           this.checkAll = false
           this.$message.error(e.msg || '')
         })
@@ -374,13 +621,13 @@
         deep: true
       },
       pageNo () {
-        this.strDelete = ''
+        this.strSelectIds = ''
       }
     },
     created () {
     },
     mounted () {
     },
-    components: { }
+    components: { mVersions }
   }
 </script>

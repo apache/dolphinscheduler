@@ -19,7 +19,7 @@ import i18n from '@/module/i18n'
 import config from '~/external/config'
 import Permissions from '@/module/permissions'
 
-let menu = {
+const menu = {
   projects: [
     {
       name: `${i18n.$t('Project Home')}`,
@@ -27,16 +27,25 @@ let menu = {
       path: 'projects-index',
       isOpen: true,
       disabled: true,
-      icon: 'fa-home',
+      icon: 'ans-icon-home-solid',
+      children: []
+    },
+    {
+      name: `${i18n.$t('Kinship')}`,
+      id: 1,
+      path: 'projects-kinship',
+      isOpen: true,
+      disabled: true,
+      icon: 'ans-icon-node',
       children: []
     },
     {
       name: `${i18n.$t('Process')}`,
-      id: 1,
+      id: 2,
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'fa-gear',
+      icon: 'ans-icon-gear',
       children: [
         {
           name: `${i18n.$t('Process definition')}`,
@@ -79,7 +88,7 @@ let menu = {
       path: 'tenement-manage',
       isOpen: true,
       disabled: true,
-      icon: 'fa-users',
+      icon: 'ans-icon-user-solid',
       children: []
     },
     {
@@ -88,7 +97,7 @@ let menu = {
       path: 'users-manage',
       isOpen: true,
       disabled: true,
-      icon: 'fa-user-circle',
+      icon: 'ans-icon-user-circle-solid',
       children: []
     },
     {
@@ -97,16 +106,7 @@ let menu = {
       path: 'warning-groups-manage',
       isOpen: true,
       disabled: true,
-      icon: 'fa-warning',
-      children: []
-    },
-    {
-      name: `${i18n.$t('Queue manage')}`,
-      id: 3,
-      path: 'queue-manage',
-      isOpen: true,
-      disabled: true,
-      icon: 'fa-recycle',
+      icon: 'ans-icon-danger-solid',
       children: []
     },
     {
@@ -115,7 +115,16 @@ let menu = {
       path: 'worker-groups-manage',
       isOpen: true,
       disabled: true,
-      icon: 'fa-address-book',
+      icon: 'ans-icon-diary',
+      children: []
+    },
+    {
+      name: `${i18n.$t('Queue manage')}`,
+      id: 3,
+      path: 'queue-manage',
+      isOpen: true,
+      disabled: true,
+      icon: 'ans-icon-recycle',
       children: []
     },
     {
@@ -123,7 +132,7 @@ let menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
-      icon: 'fa-file-text',
+      icon: 'ans-icon-document',
       children: [],
       disabled: true
     }
@@ -134,7 +143,7 @@ let menu = {
       id: 0,
       path: 'file',
       isOpen: true,
-      icon: 'fa-files-o',
+      icon: 'ans-icon-documents',
       children: [],
       disabled: true
     },
@@ -143,18 +152,18 @@ let menu = {
       id: 1,
       path: '',
       isOpen: true,
-      icon: 'fa-file-text',
+      icon: 'ans-icon-document',
       disabled: true,
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
-          path: 'resource-udf-resource',
+          path: 'resource-udf',
           id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
-          path: 'resource-udf-function',
+          path: 'resource-func',
           id: 1,
           disabled: true
         }
@@ -167,7 +176,7 @@ let menu = {
       id: 0,
       path: 'account',
       isOpen: true,
-      icon: 'fa-user',
+      icon: 'ans-icon-user-solid',
       children: [],
       disabled: true
     },
@@ -176,7 +185,7 @@ let menu = {
       id: 1,
       path: 'password',
       isOpen: true,
-      icon: 'fa-key',
+      icon: 'ans-icon-key',
       children: [],
       disabled: true
     },
@@ -185,7 +194,7 @@ let menu = {
       id: 2,
       path: 'token',
       isOpen: true,
-      icon: 'fa-file-text',
+      icon: 'ans-icon-diary',
       children: [],
       disabled: Permissions.getAuth()
     }
@@ -197,7 +206,7 @@ let menu = {
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'fa-server',
+      icon: 'ans-icon-menu',
       children: [
         {
           name: 'Master',
@@ -231,10 +240,10 @@ let menu = {
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'fa-server',
+      icon: 'ans-icon-menu',
       children: [
         {
-          name: "Statistics",
+          name: 'Statistics',
           path: 'statistics',
           id: 0,
           disabled: true

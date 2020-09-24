@@ -1,0 +1,123 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+	<property>
+		<name>dolphin.database.type</name>
+		<value>mysql</value>
+		<description>Dolphin Scheduler DataBase Type Which Is Select</description>
+		<display-name>Dolphin Database Type</display-name>
+		<value-attributes>
+			<type>value-list</type>
+			<entries>
+				<entry>
+					<value>mysql</value>
+					<label>Mysql</label>
+				</entry>
+				<entry>
+					<value>postgresql</value>
+					<label>Postgresql</label>
+				</entry>
+			</entries>
+			<selection-cardinality>1</selection-cardinality>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphin.database.host</name>
+		<value></value>
+		<display-name>Dolphin Database Host</display-name>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphin.database.port</name>
+		<value></value>
+		<display-name>Dolphin Database Port</display-name>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphin.database.username</name>
+		<value></value>
+		<display-name>Dolphin Database Username</display-name>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphin.database.password</name>
+		<value></value>
+		<display-name>Dolphin Database Password</display-name>
+		<property-type>PASSWORD</property-type>
+		<value-attributes>
+			<type>password</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphin.user</name>
+		<value></value>
+		<description>Which user to install and admin dolphin scheduler</description>
+		<display-name>Deploy User</display-name>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>dolphin.group</name>
+		<value></value>
+		<description>Which user to install and admin dolphin scheduler</description>
+		<display-name>Deploy Group</display-name>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>dolphinscheduler-env-content</name>
+		<display-name>Dolphinscheduler Env template</display-name>
+		<description>This is the jinja template for dolphinscheduler.env.sh file</description>
+		<value>#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+export HADOOP_HOME=/opt/soft/hadoop
+export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
+export SPARK_HOME1=/opt/soft/spark1
+export SPARK_HOME2=/opt/soft/spark2
+export PYTHON_HOME=/opt/soft/python
+export JAVA_HOME=/opt/soft/java
+export HIVE_HOME=/opt/soft/hive
+export FLINK_HOME=/opt/soft/flink</value>
+		<value-attributes>
+			<type>content</type>
+			<empty-value-valid>false</empty-value-valid>
+			<show-property-name>false</show-property-name>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+</configuration>

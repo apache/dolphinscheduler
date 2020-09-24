@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * user type
  */
-@Getter
 public enum UserType {
     /**
      * 0 admin user; 1 general user
@@ -39,5 +37,13 @@ public enum UserType {
     @EnumValue
     private final int code;
     private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }
 

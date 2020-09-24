@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.model.DateInterval;
@@ -32,20 +33,76 @@ import java.util.List;
 
 public class DependentUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(ShellExecutorTest.class);
+
     @Test
     public void getDependResultForRelation() {
-
+        //failed
         DependentRelation dependentRelation = DependentRelation.AND;
         List<DependResult> dependResultList = new ArrayList<>();
         dependResultList.add(DependResult.FAILED);
         dependResultList.add(DependResult.SUCCESS);
-        DependResult result = DependentUtils.getDependResultForRelation( dependentRelation, dependResultList);
+        DependResult result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
         Assert.assertEquals(result, DependResult.FAILED);
 
-        dependentRelation = DependentRelation.OR;
+        //waiting
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.WAITING);
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.WAITING);
 
-        Assert.assertEquals(DependentUtils.getDependResultForRelation( dependentRelation, dependResultList),
-                DependResult.SUCCESS);
+        //success
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.SUCCESS);
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.SUCCESS);
+
+        //one success
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.SUCCESS);
+
+        //one failed
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.FAILED);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.FAILED);
+
+        //or success
+        dependentRelation = DependentRelation.OR;
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.FAILED);
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.SUCCESS);
+
+        //waiting
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.WAITING);
+        dependResultList.add(DependResult.FAILED);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.WAITING);
+
+        //success
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.SUCCESS);
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.SUCCESS);
+
+        //one success
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.SUCCESS);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.SUCCESS);
+
+        //one failed
+        dependResultList = new ArrayList<>();
+        dependResultList.add(DependResult.FAILED);
+        result = DependentUtils.getDependResultForRelation(dependentRelation, dependResultList);
+        Assert.assertEquals(result, DependResult.FAILED);
     }
 
     @Test
@@ -101,6 +158,115 @@ public class DependentUtilsTest {
         Assert.assertEquals(dateIntervals.get(0), monthHead);
         Assert.assertEquals(dateIntervals.get(dateIntervals.size() - 1), monthThis);
 
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last1Hour");
+        DateInterval expect = new DateInterval(DateUtils.stringToDate("2019-02-04 09:00:00"),
+                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 09:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last2Hours");
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-04 08:00:00"),
+                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 08:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-04 10:00:00"), "last3Hours");
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-04 07:00:00"),
+                DateUtils.getEndOfHour(DateUtils.stringToDate("2019-02-04 07:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+
+        dateValue = "last3Days";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-07 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-07 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+
+        dateValue = "last7Days";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+
+        dateValue = "lastWeek";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-28 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(6));
+        Assert.assertEquals(7, dateIntervals.size());
+
+        dateValue = "lastMonday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-28 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-28 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastTuesday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-29 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-29 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastWednesday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-30 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-30 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastThursday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastFriday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-01 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-01 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastSaturday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-02 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-02 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastSunday";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-02-03 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-02-03 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastMonth";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-01 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(30));
+        Assert.assertEquals(31, dateIntervals.size());
+
+        dateValue = "lastMonthBegin";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-01 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-01 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+
+        dateValue = "lastMonthEnd";
+        dateIntervals = DependentUtils.getDateIntervalList(DateUtils.stringToDate("2019-02-10 07:00:00"), dateValue);
+        expect = new DateInterval(DateUtils.stringToDate("2019-01-31 00:00:00"),
+                DateUtils.getEndOfDay(DateUtils.stringToDate("2019-01-31 00:00:00")));
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
     }
 
     @Test
@@ -178,6 +344,45 @@ public class DependentUtilsTest {
 
     }
 
+    @Test
+    public void testGetCurretHour() {
+        String dateValue = "currentHour";
+
+        Date curDay = DateUtils.stringToDate("2020-05-15 12:10:00");
+
+        List<DateInterval> dateIntervals  = DependentUtils.getDateIntervalList(curDay, dateValue);
+
+        DateInterval expect = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 12:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 12:59:59")));
+
+        Assert.assertEquals(expect, dateIntervals.get(0));
+        Assert.assertEquals(1, dateIntervals.size());
+    }
+
+    @Test
+    public void testGetLast24Hour() {
+        Date curDay = DateUtils.stringToDate("2020-05-15 12:10:00");
+        String dateValue = "last24Hours";
+
+        List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
+
+        List<DateInterval> expect = Lists.newArrayList();
+        for (int a = 1; a < 24; a++) {
+            String i = a + "";
+            if (a < 10) {
+                i = "0" + i;
+            }
+            DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-14 " + i + ":59:59")));
+            expect.add(dateInterval);
+        }
+        DateInterval dateInterval = new DateInterval(DateUtils.getStartOfHour(DateUtils.stringToDate("2020-05-15 00:00:00")), DateUtils.getEndOfHour(DateUtils.stringToDate("2020-05-15 00:59:59")));
+        expect.add(dateInterval);
+
+        Assert.assertEquals(24, dateIntervals.size());
+
+        for (int i = 0; i< expect.size(); i++) {
+            Assert.assertEquals(expect.get(i), dateIntervals.get(i));
+        }
+    }
 
     @Test
     public void testMonth(){

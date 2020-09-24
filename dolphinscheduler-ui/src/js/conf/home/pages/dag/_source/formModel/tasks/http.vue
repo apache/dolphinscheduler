@@ -85,6 +85,39 @@
         </x-input>
       </div>
     </m-list-box>
+
+
+    <m-list-box  >
+      <div slot="text">{{$t('Timeout Settings')}}</div>
+      <div slot="content">
+        <label class="label-box">
+          <div style="padding-top: 5px;">
+            <x-switch
+              v-model="timeoutSettings"
+              :disabled="isDetails"
+            ></x-switch>
+          </div>
+        </label>
+      </div>
+    </m-list-box>
+
+    <div class="clearfix list" v-if = "timeoutSettings" >
+      <div class="text-box">
+        <span>{{$t('Connect Timeout')}}</span>
+      </div>
+      <div class="cont-box">
+        <span  class="label-box"  style="width: 193px;display: inline-block;" >
+          <x-input v-model='connectTimeout' maxlength="7" />
+        </span>
+        <span>{{$t('ms')}}</span>
+        <span class="text-b">{{$t('Socket Timeout')}}</span>
+        <span  class="label-box" style="width: 193px;display: inline-block;" >
+          <x-input v-model='socketTimeout' maxlength="7" />
+        </span>
+        <span>{{$t('ms')}}</span>
+      </div>
+    </div>
+
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -101,7 +134,7 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
-  import cookie from '@/module/util/cookie'
+  import cookies from 'js-cookie'
   import mLocalParams from './_source/localParams'
   import mHttpParams from './_source/httpParams'
   import mListBox from './_source/listBox'
@@ -110,6 +143,10 @@
     name: 'http',
     data () {
       return {
+        timeoutSettings: false,
+        connectTimeout : 60000 ,
+        socketTimeout :  60000 ,
+
         url: '',
         condition: '',
         localParams: [],
@@ -117,7 +154,7 @@
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
-        httpCheckConditionList: cookie.get('language') == 'en_US'? [{ code: 'STATUS_CODE_DEFAULT',value:'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM',value:'Custom response code' }, { code: 'BODY_CONTAINS',value:'Content includes' }, { code: 'BODY_NOT_CONTAINS',value:'Content does not contain' }]:[{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
+        httpCheckConditionList: cookies.get('language') == 'en_US'? [{ code: 'STATUS_CODE_DEFAULT',value:'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM',value:'Custom response code' }, { code: 'BODY_CONTAINS',value:'Content includes' }, { code: 'BODY_NOT_CONTAINS',value:'Content does not contain' }]:[{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
       }
     },
     props: {
@@ -152,6 +189,14 @@
         if (!this.$refs.refHttpParams._verifValue()) {
           return false
         }
+        if (!_.isNumber(parseInt(this.socketTimeout))) {
+          this.$message.warning(`${i18n.$t('Socket Timeout be a positive integer')}`)
+          return false
+        }
+        if (!_.isNumber(parseInt(this.connectTimeout))) {
+          this.$message.warning(`${i18n.$t('Connect timeout be a positive integer')}`)
+          return false
+        }
         // storage
         this.$emit('on-params', {
           localParams: this.localParams,
@@ -159,12 +204,35 @@
           url: this.url,
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
-          condition: this.condition
+          condition: this.condition,
+          connectTimeout : this.connectTimeout ,
+          socketTimeout : this.socketTimeout
         })
         return true
       }
     },
+    computed: {
+      cacheParams () {
+        return {
+          localParams: this.localParams,
+          httpParams: this.httpParams,
+          url: this.url,
+          httpMethod: this.httpMethod,
+          httpCheckCondition: this.httpCheckCondition,
+          condition: this.condition,
+          connectTimeout : this.connectTimeout ,
+          socketTimeout : this.socketTimeout
+        }
+      }
+    },
     watch: {
+      /**
+       * Watch the cacheParams
+       * @param val
+       */
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
     },
     created () {
         let o = this.backfillItem
@@ -174,6 +242,11 @@
           this.httpMethod = o.params.httpMethod || 'GET'
           this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
           this.condition = o.params.condition || ''
+          this.connectTimeout = o.params.connectTimeout
+          this.socketTimeout = o.params.socketTimeout
+          if(this.connectTimeout != 60000 || this.socketTimeout != 60000 ){
+            this.timeoutSettings = true
+          }
           // backfill localParams
           let localParams = o.params.localParams || []
           if (localParams.length) {

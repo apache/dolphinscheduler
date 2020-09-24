@@ -22,7 +22,6 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Process Pid')}}: {{item.port}}</span>
               <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
             </div>
             <div class="right">
@@ -48,7 +47,7 @@
             <div class="col-md-4">
               <div class="text-num-model">
                 <div class="value-p">
-                  <b :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</b>
+                  <strong :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</strong>
                 </div>
                 <div class="text-1">
                   loadAverage
@@ -96,6 +95,7 @@
       this.getMasterData().then(res => {
         this.masterList = _.map(res, (v, i) => {
           return _.assign(v, {
+            id: v.host + "_" + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })

@@ -47,7 +47,7 @@
   #spin-model {
     position: fixed;
     left: 20px;
-    top: 80px;
+    top: 60px;
     background: #fff;
     z-index: 99;
     border-radius: 3px;
@@ -69,11 +69,11 @@
     }
     &.spin-sp1 {
       width: calc(100% - 40px);
-      height: calc(100% - 100px);
+      height: calc(100% - 60px);
     }
     &.spin-sp2 {
-      width: calc(100% - 240px);
-      height: calc(100% - 100px);
+      width: calc(100% - 220px);
+      height: calc(100% - 60px);
       left: 220px;
     }
   }

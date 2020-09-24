@@ -19,28 +19,31 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('UDF Resource Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
+            <span>{{$t('Whether directory')}}</span>
+          </th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('File Size')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="110">
+          <th scope="col" width="110">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -49,16 +52,19 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis">
-              <a href="javascript:" class="links" >{{item.alias}}</a>
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
+              <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
             </span>
           </td>
-          <td><span class="ellipsis">{{item.fileName}}</span></td>
+          <td>
+            <span>{{item.directory? $t('Yes') : $t('No')}}</span>
+          </td>
+          <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
           <td>
             <span>{{_rtSize(item.size)}}</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -74,7 +80,7 @@
                     type="info"
                     shape="circle"
                     size="xsmall"
-                    icon="iconfont icon-wendangxiugai"
+                    icon="ans-icon-play"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
                     @click="_rename(item,$index)">
@@ -85,7 +91,8 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
-                    icon="iconfont icon-download"
+                    :disabled="item.directory? true: false"
+                    icon="ans-icon-download"
                     @click="_downloadFile(item)">
             </x-button>
             <x-poptip
@@ -104,7 +111,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
-                        icon="iconfont icon-shanchu">
+                        icon="ans-icon-trash">
                 </x-button>
               </template>
             </x-poptip>
@@ -120,7 +127,7 @@
   import mRename from './rename'
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
-
+  import localStore from '@/module/util/localStorage'
   export default {
     name: 'udf-manage-list',
     data () {
@@ -140,6 +147,13 @@
           id: item.id
         })
       },
+      _go (item) {
+        localStore.setItem('file', `${item.alias}|${item.size}`)
+        if(item.directory) {
+          localStore.setItem('currentDir', `${item.fullName}`)
+          this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
+        }
+      },
       _rtSize (val) {
         return bytesToSize(parseInt(val))
       },
@@ -151,7 +165,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()

@@ -18,14 +18,15 @@ package org.apache.dolphinscheduler.api.controller;
 
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Map;
+
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * user login controller
- *
+ * <p>
  * swagger bootstrap ui docs refer : https://doc.xiaominfo.com/guide/enh-func.html
  */
 @Api(tags = "LOGIN_TAG", position = 1)
@@ -55,94 +58,77 @@ public class LoginController extends BaseController {
     private SessionService sessionService;
 
     @Autowired
-    private UsersService userService;
+    private Authenticator authenticator;
 
 
     /**
      * login
      *
-     * @param userName user name
+     * @param userName     user name
      * @param userPassword user password
-     * @param request request
-     * @param response  response
+     * @param request      request
+     * @param response     response
      * @return login result
      */
-    @ApiOperation(value = "login", notes= "LOGIN_NOTES")
+    @ApiOperation(value = "login", notes = "LOGIN_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType ="String")
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType = "String")
     })
     @PostMapping(value = "/login")
+    @ApiException(USER_LOGIN_FAILURE)
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
+        logger.info("login user name: {} ", userName);
 
-        try {
-            logger.info("login user name: {} ", userName);
-
-            //user name check
-            if (StringUtils.isEmpty(userName)) {
-                return error(Status.USER_NAME_NULL.getCode(),
-                        Status.USER_NAME_NULL.getMsg());
-            }
-
-            // user ip check
-            String ip = getClientIpAddress(request);
-            if (StringUtils.isEmpty(ip)) {
-                return error(IP_IS_EMPTY.getCode(), IP_IS_EMPTY.getMsg());
-            }
-
-            // verify username and password
-            User user = userService.queryUser(userName, userPassword);
-
-            if (user == null) {
-                return error(Status.USER_NAME_PASSWD_ERROR.getCode(),Status.USER_NAME_PASSWD_ERROR.getMsg()
-                );
-            }
-
-            // create session
-            String sessionId = sessionService.createSession(user, ip);
-
-            if (sessionId == null) {
-                return error(Status.LOGIN_SESSION_FAILED.getCode(),
-                        Status.LOGIN_SESSION_FAILED.getMsg()
-                );
-            }
-
-            response.setStatus(HttpStatus.SC_OK);
-            response.addCookie(new Cookie(Constants.SESSION_ID, sessionId));
-
-            logger.info("sessionId : {}" , sessionId);
-            return success(LOGIN_SUCCESS.getMsg(), sessionId);
-        } catch (Exception e) {
-            logger.error(USER_LOGIN_FAILURE.getMsg(),e);
-            return error(USER_LOGIN_FAILURE.getCode(), USER_LOGIN_FAILURE.getMsg());
+        //user name check
+        if (StringUtils.isEmpty(userName)) {
+            return error(Status.USER_NAME_NULL.getCode(),
+                    Status.USER_NAME_NULL.getMsg());
         }
+
+        // user ip check
+        String ip = getClientIpAddress(request);
+        if (StringUtils.isEmpty(ip)) {
+            return error(IP_IS_EMPTY.getCode(), IP_IS_EMPTY.getMsg());
+        }
+
+        // verify username and password
+        Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
+            return result;
+        }
+
+        response.setStatus(HttpStatus.SC_OK);
+        Map<String, String> cookieMap = result.getData();
+        for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
+            Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
+        }
+
+        return result;
     }
 
     /**
      * sign out
      *
      * @param loginUser login user
-     * @param request  request
+     * @param request   request
      * @return sign out result
      */
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
+    @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
-
-        try {
-            logger.info("login user:{} sign out", loginUser.getUserName());
-            String ip = getClientIpAddress(request);
-            sessionService.signOut(ip, loginUser);
-            //clear session
-            request.removeAttribute(Constants.SESSION_USER);
-            return success();
-        } catch (Exception e) {
-            logger.error(SIGN_OUT_ERROR.getMsg(),e);
-            return error(SIGN_OUT_ERROR.getCode(), SIGN_OUT_ERROR.getMsg());
-        }
+        logger.info("login user:{} sign out", loginUser.getUserName());
+        String ip = getClientIpAddress(request);
+        sessionService.signOut(ip, loginUser);
+        //clear session
+        request.removeAttribute(Constants.SESSION_USER);
+        return success();
     }
 }

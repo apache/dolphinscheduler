@@ -19,13 +19,14 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -33,12 +34,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
-import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -68,7 +68,7 @@ public class SchedulerService extends BaseService {
     private MonitorService monitorService;
 
     @Autowired
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -92,11 +92,10 @@ public class SchedulerService extends BaseService {
      * @param processInstancePriority process instance priority
      * @param receivers receivers
      * @param receiversCc receivers cc
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @return create result code
-     * @throws IOException ioexception
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName,
                                               Integer processDefineId,
                                               String schedule,
@@ -106,7 +105,7 @@ public class SchedulerService extends BaseService {
                                               String receivers,
                                               String receiversCc,
                                               Priority processInstancePriority,
-                                              int workerGroupId) throws IOException {
+                                              String workerGroup) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -119,7 +118,7 @@ public class SchedulerService extends BaseService {
         }
 
         // check work flow define release state
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
+        ProcessDefinition processDefinition = processService.findProcessDefineById(processDefineId);
         result = executorService.checkProcessDefinitionValid(processDefinition, processDefineId);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
@@ -156,7 +155,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
-        scheduleObj.setWorkerGroupId(workerGroupId);
+        scheduleObj.setWorkerGroup(workerGroup);
         scheduleMapper.insert(scheduleObj);
 
         /**
@@ -165,8 +164,12 @@ public class SchedulerService extends BaseService {
         processDefinition.setReceivers(receivers);
         processDefinition.setReceiversCc(receiversCc);
         processDefinitionMapper.updateById(processDefinition);
+
+        // return scheduler object with ID
+        result.put(Constants.DATA_LIST, scheduleMapper.selectById(scheduleObj.getId()));
         putMsg(result, Status.SUCCESS);
 
+        result.put("scheduleId", scheduleObj.getId());
         return result;
     }
 
@@ -181,15 +184,14 @@ public class SchedulerService extends BaseService {
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @param processInstancePriority process instance priority
      * @param receiversCc receiver cc
      * @param receivers receivers
      * @param scheduleStatus schedule status
      * @return update result code
-     * @throws IOException ioexception
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> updateSchedule(User loginUser,
                                               String projectName,
                                               Integer id,
@@ -201,7 +203,7 @@ public class SchedulerService extends BaseService {
                                               String receiversCc,
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
-                                              int workerGroupId) throws IOException {
+                                              String workerGroup) {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -220,7 +222,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
 
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(schedule.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefineById(schedule.getProcessDefinitionId());
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionId());
             return result;
@@ -265,7 +267,7 @@ public class SchedulerService extends BaseService {
         if (scheduleStatus != null) {
             schedule.setReleaseState(scheduleStatus);
         }
-        schedule.setWorkerGroupId(workerGroupId);
+        schedule.setWorkerGroup(workerGroup);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.updateById(schedule);
@@ -291,7 +293,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleStatus  schedule status
      * @return publish result code
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> setScheduleState(User loginUser,
                                                 String projectName,
                                                 Integer id,
@@ -320,7 +322,7 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
             return result;
         }
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(scheduleObj.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefineById(scheduleObj.getProcessDefinitionId());
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionId());
             return result;
@@ -329,15 +331,14 @@ public class SchedulerService extends BaseService {
         if(scheduleStatus == ReleaseState.ONLINE){
             // check process definition release state
             if(processDefinition.getReleaseState() != ReleaseState.ONLINE){
-                ProcessDefinition definition = processDefinitionMapper.selectById(scheduleObj.getProcessDefinitionId());
                 logger.info("not release process definition id: {} , name : {}",
                         processDefinition.getId(), processDefinition.getName());
-                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, definition.getName());
+                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
                 return result;
             }
             // check sub process definition release state
             List<Integer> subProcessDefineIds = new ArrayList<>();
-            processDao.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
+            processService.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
             Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
             if (subProcessDefineIds.size() > 0){
                 List<ProcessDefinition> subProcessDefinitionList =
@@ -364,6 +365,7 @@ public class SchedulerService extends BaseService {
 
         if (masterServers.size() == 0) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
+            return result;
         }
 
         // set status
@@ -374,12 +376,12 @@ public class SchedulerService extends BaseService {
         try {
             switch (scheduleStatus) {
                 case ONLINE: {
-                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}, port: {}", project.getId(), processDefinition.getId(), masterServers);
-                    setSchedule(project.getId(), id);
+                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
+                    setSchedule(project.getId(), scheduleObj);
                     break;
                 }
                 case OFFLINE: {
-                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}, port: {}", project.getId(), processDefinition.getId(), masterServers);
+                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     deleteSchedule(project.getId(), id);
                     break;
                 }
@@ -390,7 +392,7 @@ public class SchedulerService extends BaseService {
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
-            throw new RuntimeException(result.get(Constants.MSG).toString());
+            throw new ServiceException(result.get(Constants.MSG).toString());
         }
 
         putMsg(result, Status.SUCCESS);
@@ -422,7 +424,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
 
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
+        ProcessDefinition processDefinition = processService.findProcessDefineById(processDefineId);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
             return result;
@@ -450,7 +452,7 @@ public class SchedulerService extends BaseService {
      * @return schedule list
      */
     public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
@@ -467,15 +469,10 @@ public class SchedulerService extends BaseService {
         return result;
     }
 
-    public void setSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public void setSchedule(int projectId, Schedule schedule) {
+
+        int scheduleId = schedule.getId();
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
-
-
-        Schedule schedule = processDao.querySchedule(scheduleId);
-        if (schedule == null) {
-            logger.warn("process schedule info not exists");
-            return;
-        }
 
         Date startDate = schedule.getStartTime();
         Date endDate = schedule.getEndTime();
@@ -497,7 +494,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleId schedule id
      * @throws RuntimeException runtime exception
      */
-    public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
+    public static void deleteSchedule(int projectId, int scheduleId) {
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
         String jobName = QuartzExecutors.buildJobName(scheduleId);
@@ -505,7 +502,7 @@ public class SchedulerService extends BaseService {
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
             logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
-            throw new RuntimeException(String.format("set offline failure"));
+            throw new ServiceException("set offline failure");
         }
 
     }
@@ -537,7 +534,7 @@ public class SchedulerService extends BaseService {
      */
     public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -586,7 +583,7 @@ public class SchedulerService extends BaseService {
      * @return the next five fire time
      */
     public Map<String,Object> previewSchedule(User loginUser, String projectName, String schedule) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         CronExpression cronExpression;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         Date now = new Date();
