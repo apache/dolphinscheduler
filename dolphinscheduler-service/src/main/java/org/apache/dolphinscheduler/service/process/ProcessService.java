@@ -919,24 +919,19 @@ public class ProcessService {
             // recover failover tolerance would not create a new command when the sub command already have been created
             return;
         }
-
         instanceMap = setProcessInstanceMap(parentProcessInstance, task);
         ProcessInstance childInstance = null;
         if (instanceMap.getProcessInstanceId() != 0) {
             childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
         }
-        CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
-
-        // running if child instance
+        Command subProcessCommand = createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
+        updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionId());
         initSubInstanceState(childInstance);
-
-        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
-        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
-        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
-        updateSubProcessDefinitionByParent(parentProcessInstance, childDefineId);
-        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
-        createSubProcessCommand(commandType, processParam, parentProcessInstance, childDefineId);
+        createCommand(subProcessCommand);
+        logger.info("sub process command created: {} ", subProcessCommand.toString());
     }
+
+
 
     /**
      * complement data needs transform parent parameter to child.
@@ -961,30 +956,34 @@ public class ProcessService {
 
     /**
      * create sub work process command
-     * @param commandType
-     * @param processParam
      * @param parentProcessInstance
-     * @param childDefineId
+     * @param childInstance
+     * @param instanceMap
+     * @param task
      */
-    private void createSubProcessCommand(CommandType commandType,
-                                         String processParam,
-                                         ProcessInstance parentProcessInstance,
-                                         Integer childDefineId
-    ) {
+    private Command createSubProcessCommand(ProcessInstance parentProcessInstance,
+                                            ProcessInstance childInstance,
+                                            ProcessInstanceMap instanceMap,
+                                            TaskInstance task) {
+        CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
+        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
+        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
+        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
+        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
 
-        Command command = new Command();
-        command.setWarningType(parentProcessInstance.getWarningType());
-        command.setWarningGroupId(parentProcessInstance.getWarningGroupId());
-        command.setFailureStrategy(parentProcessInstance.getFailureStrategy());
-        command.setProcessDefinitionId(childDefineId);
-        command.setScheduleTime(parentProcessInstance.getScheduleTime());
-        command.setExecutorId(parentProcessInstance.getExecutorId());
-        command.setCommandParam(processParam);
-        command.setCommandType(commandType);
-        command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
-        command.setWorkerGroup(parentProcessInstance.getWorkerGroup());
-        createCommand(command);
-        logger.info("sub process command created: {} ", command.toString());
+        Command command = new Command(
+                commandType,
+                TaskDependType.TASK_POST,
+                parentProcessInstance.getFailureStrategy(),
+                parentProcessInstance.getExecutorId(),
+                childDefineId,
+                processParam,
+                parentProcessInstance.getWarningType(),
+                parentProcessInstance.getWarningGroupId(),
+                parentProcessInstance.getScheduleTime(),
+                parentProcessInstance.getProcessInstancePriority()
+        );
+        return command;
     }
 
     /**
