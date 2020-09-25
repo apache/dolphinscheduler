@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -126,7 +127,7 @@ public class TaskInstanceServiceTest {
         //executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
-        Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "" ,"",
+        Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullRes.get(Constants.STATUS));
 
