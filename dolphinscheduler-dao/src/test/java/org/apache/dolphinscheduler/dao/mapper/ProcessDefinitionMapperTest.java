@@ -214,6 +214,8 @@ public class ProcessDefinitionMapperTest {
     @Test
     public void testQueryAllDefinitionListByTagId() {
         ProcessDefinition processDefinition = insertOne();
+        ProcessDefinition processDefinition1 = insertTwo();
+
         Tag tag = new Tag();
         tag.setName("ut tag");
         tag.setUserId(111);
@@ -225,8 +227,12 @@ public class ProcessDefinitionMapperTest {
         processTag.settagID(tag.getId());
         processTagMapper.insert(processTag);
 
-        List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionListByTagId(tag.getId());
-        Assert.assertNotEquals(processDefinitionIPage.size(), 0);
+        ProcessTag processTag1 = new ProcessTag();
+        processTag1.setProcessID(processDefinition1.getId());
+        processTag1.settagID(tag.getId());
+        processTagMapper.insert(processTag1);
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryAllDefinitionListByTagId(tag.getId());
+        Assert.assertEquals(2, processDefinitions.size());
     }
 
     /**
