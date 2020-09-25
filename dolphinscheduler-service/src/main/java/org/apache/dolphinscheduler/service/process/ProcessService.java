@@ -908,7 +908,7 @@ public class ProcessService {
      * @param parentProcessInstance parentProcessInstance
      * @param task task
      */
-    private void createSubWorkProcess(ProcessInstance parentProcessInstance,
+    public void createSubWorkProcess(ProcessInstance parentProcessInstance,
                                       TaskInstance task) {
         if (!task.isSubProcess()) {
             return;
@@ -961,7 +961,7 @@ public class ProcessService {
      * @param instanceMap
      * @param task
      */
-    private Command createSubProcessCommand(ProcessInstance parentProcessInstance,
+    public Command createSubProcessCommand(ProcessInstance parentProcessInstance,
                                             ProcessInstance childInstance,
                                             ProcessInstanceMap instanceMap,
                                             TaskInstance task) {
