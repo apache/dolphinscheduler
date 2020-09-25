@@ -77,7 +77,7 @@ public class VarPoolUtils {
      * @throws ParseException ParseException
      */
     public static void convertVarPoolToMap(Map<String, Object> propToValue, String varPool) throws ParseException {
-        if (varPool == null) {
+        if (varPool == null || propToValue == null) {
             return;
         }
         String[] splits = varPool.split("\\$VarPool\\$");
