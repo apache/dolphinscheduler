@@ -20,6 +20,7 @@
       <template slot="conditions">
         <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
       </template>
+
       <template slot="content">
         <template v-if="taskInstanceList.length">
           <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
@@ -45,7 +46,7 @@
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
+  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
 
   export default {
     name: 'task-instance-list-index',
@@ -72,7 +73,8 @@
           // end date
           endDate: '',
           // Exectuor Name
-          executorName: ''
+          executorName: '',
+          processInstanceName: ''
         },
         isLeft: true
       }
