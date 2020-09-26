@@ -50,6 +50,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest{
         paramsMap.add("endDate","2019-02-26 19:48:22");
         paramsMap.add("pageNo","1");
         paramsMap.add("pageSize","20");
+        paramsMap.add("processInstanceName","");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/task-instance/list-paging","cxc_1113")
                 .header(SESSION_ID, sessionId)
