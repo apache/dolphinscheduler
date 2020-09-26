@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.utils;
 
 /**
@@ -23,10 +24,14 @@ public class Constants {
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
+
     /**
      * alert properties path
      */
     public static final String ALERT_PROPERTIES_PATH = "/alert.properties";
+
+    /** default alert plugin dir **/
+    public static final String ALERT_PLUGIN_PATH = "./lib/plugin/alert";
 
     public static final String DATA_SOURCE_PROPERTIES_PATH = "/dao/data_source.properties";
 
@@ -41,41 +46,7 @@ public class Constants {
 
     public static final String MESSAGE = "message";
 
-    public static final String MAIL_PROTOCOL = "mail.protocol";
-
-    public static final String MAIL_SERVER_HOST = "mail.server.host";
-
-    public static final String MAIL_SERVER_PORT = "mail.server.port";
-
-    public static final String MAIL_SENDER = "mail.sender";
-
-    public static final String MAIL_USER = "mail.user";
-
-    public static final String MAIL_PASSWD = "mail.passwd";
-
-    public static final String XLS_FILE_PATH = "xls.file.path";
-
-    public static final String MAIL_HOST = "mail.smtp.host";
-
-    public static final String MAIL_PORT = "mail.smtp.port";
-
-    public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
-
-    public static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
-
-    public static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
-
-    public static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
-
-    public static final String MAIL_SMTP_SSL_TRUST="mail.smtp.ssl.trust";
-
-    public static final String TEXT_HTML_CHARSET_UTF_8 = "text/html;charset=utf-8";
-
-    public static final String STRING_TRUE = "true";
-
-    public static final String EXCEL_SUFFIX_XLS = ".xls";
-
-    public static final int NUMBER_1000 = 1000;
+    
 
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
@@ -174,25 +145,11 @@ public class Constants {
 
     public static final String DINGTALK_ENABLE = "dingtalk.isEnable";
 
-    public static final String HTML_HEADER_PREFIX = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><html><head><title>dolphinscheduler</title><meta name='Keywords' content=''><meta name='Description' content=''><style type=\"text/css\">table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: left;}table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: left;}</style></head><body style=\"margin:0;padding:0\"><table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\"> ";
 
-    public static final String TABLE_BODY_HTML_TAIL = "</table></body></html>";
 
     /**
      * plugin config
      */
-    public static final String PLUGIN_DIR = "plugin.dir";
-
-    public static final String PLUGIN_DEFAULT_EMAIL_ID = "email";
-
-    public static final String PLUGIN_DEFAULT_EMAIL_CH = "邮件";
-
-    public static final String PLUGIN_DEFAULT_EMAIL_EN = "email";
-
-    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
-
-    public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
-
-    public static final String RETMAP_MSG = "msg";
+    
 
 }

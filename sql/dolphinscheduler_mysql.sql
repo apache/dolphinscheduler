@@ -848,3 +848,34 @@ INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 1
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);
+
+-- ----------------------------
+-- Table structure for t_ds_plugin_define
+-- ----------------------------
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+DROP TABLE IF EXISTS `t_ds_plugin_define`;
+CREATE TABLE `t_ds_plugin_define` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_name` varchar(100) NOT NULL COMMENT 'the name of plugin eg: email',
+  `plugin_type` varchar(100) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
+  `plugin_params` text COMMENT 'plugin params',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_alert_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
+CREATE TABLE `t_ds_alert_plugin_instance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plugin_define_id` int NOT NULL,
+  `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `alert_group_id` int DEFAULT NULL,
+  `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -14,23 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.runner;
 
-import org.apache.dolphinscheduler.alert.utils.Constants;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.plugin.PluginManager;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
-import org.apache.dolphinscheduler.plugin.model.AlertData;
-import org.apache.dolphinscheduler.plugin.model.AlertInfo;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * alert sender
@@ -41,57 +42,59 @@ public class AlertSender {
 
     private List<Alert> alertList;
     private AlertDao alertDao;
-    private PluginManager pluginManager;
+    private PluginDao pluginDao;
+    private AlertPluginManager alertPluginManager;
 
-    public AlertSender() {
+    public AlertSender(AlertPluginManager alertPluginManager) {
+        this.alertPluginManager = alertPluginManager;
     }
 
-    public AlertSender(List<Alert> alertList, AlertDao alertDao, PluginManager pluginManager) {
+    public AlertSender(List<Alert> alertList, AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
         super();
         this.alertList = alertList;
         this.alertDao = alertDao;
-        this.pluginManager = pluginManager;
+        this.pluginDao = pluginDao;
+        this.alertPluginManager = alertPluginManager;
     }
 
     public void run() {
-        List<User> users;
-        Map<String, Object> retMaps = null;
         for (Alert alert : alertList) {
-            users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
-
-            // receiving group list
-            List<String> receiversList = new ArrayList<>();
-            for (User user : users) {
-                receiversList.add(user.getEmail());
-            }
+            //get alert group from alert
+            int alertGroupId = alert.getAlertGroupId();
+            List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
 
             AlertData alertData = new AlertData();
             alertData.setId(alert.getId())
-                    .setAlertGroupId(alert.getAlertGroupId())
                     .setContent(alert.getContent())
                     .setLog(alert.getLog())
-                    .setReceivers(alert.getReceivers())
-                    .setReceiversCc(alert.getReceiversCc())
-                    .setShowType(alert.getShowType().getDescp())
                     .setTitle(alert.getTitle());
 
-            AlertInfo alertInfo = new AlertInfo();
-            alertInfo.setAlertData(alertData);
+            for (AlertPluginInstance instance : alertInstanceList) {
 
-            alertInfo.addProp("receivers", receiversList);
+                String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
+                String pluginInstanceName = instance.getInstanceName();
+                AlertInfo alertInfo = new AlertInfo();
+                alertInfo.setAlertData(alertData);
+                alertInfo.setAlertParams(instance.getPluginInstanceParams());
+                AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
+                if (alertChannel == null) {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "Alert send error, not found plugin " + pluginName, alert.getId());
+                    logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginName);
+                    continue;
+                }
 
-            AlertPlugin emailPlugin = pluginManager.findOne(Constants.PLUGIN_DEFAULT_EMAIL_ID);
-            retMaps = emailPlugin.process(alertInfo);
+                AlertResult alertResult = alertChannel.process(alertInfo);
 
-            if (retMaps == null) {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
-                logger.error("alert send error : return value is null");
-            } else if (!Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)))) {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
-                logger.error("alert send error : {}", retMaps.get(Constants.MESSAGE));
-            } else {
-                alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, (String) retMaps.get(Constants.MESSAGE), alert.getId());
-                logger.info("alert send success");
+                if (alertResult == null) {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
+                    logger.info("Alert Plugin {} send error : return value is null", pluginInstanceName);
+                } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(alertResult.getMessage()), alert.getId());
+                    logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
+                } else {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, alertResult.getMessage(), alert.getId());
+                    logger.info("Alert Plugin {} send success", pluginInstanceName);
+                }
             }
         }
 

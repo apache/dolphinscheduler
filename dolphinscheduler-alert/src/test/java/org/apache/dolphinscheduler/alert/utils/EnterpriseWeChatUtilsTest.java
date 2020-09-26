@@ -18,10 +18,15 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.plugin.model.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,6 +52,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
  * enterprise.wechat.agent.id
  * enterprise.wechat.users
  */
+
 @PrepareForTest(PropertyUtils.class)
 @RunWith(PowerMockRunner.class)
 public class EnterpriseWeChatUtilsTest {
@@ -125,10 +131,19 @@ public class EnterpriseWeChatUtilsTest {
     public void testMarkdownByAlertForText() {
         Alert alertForText = createAlertForText();
         AlertData alertData = new AlertData();
+        AlertInfo alertInfo = new AlertInfo();
+        //TODO:
+        List<PluginParams> paramsList = new ArrayList<>();
+        RadioParam showType = new RadioParam.Builder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
+                .setValue(ShowType.TEXT)
+                .build();
+        paramsList.add(showType);
+        alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
+        alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-                .setShowType(alertForText.getShowType().getDescp())
+                //.setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
     }
 
@@ -136,10 +151,19 @@ public class EnterpriseWeChatUtilsTest {
     public void testMarkdownByAlertForTable() {
         Alert alertForText = createAlertForTable();
         AlertData alertData = new AlertData();
+        AlertInfo alertInfo = new AlertInfo();
+        //TODO:
+        List<PluginParams> paramsList = new ArrayList<>();
+        RadioParam showType = new RadioParam.Builder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
+                .setValue(ShowType.TABLE)
+                .build();
+        paramsList.add(showType);
+        alertInfo.setAlertParams(PluginParamsTransfer.transferParamsToJson(paramsList));
+        alertInfo.setAlertData(alertData);
         alertData.setTitle(alertForText.getTitle())
-                .setShowType(alertForText.getShowType().getDescp())
+                //.setShowType(alertForText.getShowType().getDescp())
                 .setContent(alertForText.getContent());
-        String result = EnterpriseWeChatUtils.markdownByAlert(alertData);
+        String result = EnterpriseWeChatUtils.markdownByAlert(alertInfo);
         Assert.assertNotNull(result);
     }
 
@@ -166,7 +190,7 @@ public class EnterpriseWeChatUtilsTest {
 
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-        alert.setShowType(ShowType.TEXT);
+        //alert.setShowType(ShowType.TEXT);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(4);
@@ -200,7 +224,7 @@ public class EnterpriseWeChatUtilsTest {
     private Alert createAlertForTable() {
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
-        alert.setShowType(ShowType.TABLE);
+        //alert.setShowType(ShowType.TABLE.getDescp());
         String content = list2String();
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);

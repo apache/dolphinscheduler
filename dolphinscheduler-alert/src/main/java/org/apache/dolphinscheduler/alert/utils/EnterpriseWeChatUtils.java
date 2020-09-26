@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.alert.utils;
 
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.plugin.model.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -119,7 +121,7 @@ public class EnterpriseWeChatUtils {
      *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
@@ -133,7 +135,7 @@ public class EnterpriseWeChatUtils {
      *
      * @param toParty the toParty
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
@@ -146,9 +148,9 @@ public class EnterpriseWeChatUtils {
     /**
      * make team single user message
      *
-     * @param toUser the toUser
+     * @param toUser  the toUser
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
@@ -160,9 +162,9 @@ public class EnterpriseWeChatUtils {
     /**
      * make team multi user message
      *
-     * @param toUser the toUser
+     * @param toUser  the toUser
      * @param agentId the agentId
-     * @param msg the msg
+     * @param msg     the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
@@ -176,8 +178,8 @@ public class EnterpriseWeChatUtils {
      * send Enterprise WeChat
      *
      * @param charset the charset
-     * @param data the data
-     * @param token the token
+     * @param data    the data
+     * @param token   the token
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException the IOException
      */
@@ -208,7 +210,7 @@ public class EnterpriseWeChatUtils {
     /**
      * convert table to markdown style
      *
-     * @param title the title
+     * @param title   the title
      * @param content the content
      * @return markdown table content
      */
@@ -238,7 +240,7 @@ public class EnterpriseWeChatUtils {
     /**
      * convert text to markdown style
      *
-     * @param title the title
+     * @param title   the title
      * @param content the content
      * @return markdown text
      */
@@ -272,12 +274,14 @@ public class EnterpriseWeChatUtils {
      *
      * @return the markdown alert table/text
      */
-    public static String markdownByAlert(AlertData alert) {
+    public static String markdownByAlert(AlertInfo alertInfo) {
         String result = "";
-        if (alert.getShowType().equals(ShowType.TABLE.getDescp())) {
-            result = markdownTable(alert.getTitle(), alert.getContent());
-        } else if (alert.getShowType().equals(ShowType.TEXT.getDescp())) {
-            result = markdownText(alert.getTitle(), alert.getContent());
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertInfo.getAlertParams());
+        String showType = paramsMap.get(AlertConstants.SHOW_TYPE);
+        if (showType.equals(ShowType.TABLE.getDescp())) {
+            result = markdownTable(alertInfo.getAlertData().getTitle(), alertInfo.getAlertData().getContent());
+        } else if (showType.equals(ShowType.TEXT.getDescp())) {
+            result = markdownText(alertInfo.getAlertData().getTitle(), alertInfo.getAlertData().getContent());
         }
         return result;
 
