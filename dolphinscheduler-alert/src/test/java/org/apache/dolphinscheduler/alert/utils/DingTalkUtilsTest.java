@@ -14,10 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +34,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
-import static org.junit.Assert.*;
-
 @PrepareForTest(PropertyUtils.class)
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.net.ssl.*")
@@ -45,7 +45,7 @@ public class DingTalkUtilsTest {
     private static final String msg = "ding talk test";
 
     @Before
-    public void init(){
+    public void init() {
         PowerMockito.mockStatic(PropertyUtils.class);
         Mockito.when(PropertyUtils.getString(Constants.DINGTALK_WEBHOOK)).thenReturn(mockUrl);
         Mockito.when(PropertyUtils.getString(Constants.DINGTALK_KEYWORD)).thenReturn(mockKeyWords);
@@ -56,32 +56,18 @@ public class DingTalkUtilsTest {
         Mockito.when(PropertyUtils.getInt(Constants.DINGTALK_PORT)).thenReturn(80);
     }
 
-//    @Test
-//    @Ignore
-//    public void testSendMsg() {
-//        try {
-//           String msgTosend = "msg to send";
-//            logger.info(PropertyUtils.getString(Constants.DINGTALK_WEBHOOK));
-//           String rsp = DingTalkUtils.sendDingTalkMsg(msgTosend, Constants.UTF_8);
-//           logger.info("send msg result:{}",rsp);
-//            String errmsg = JSONUtils.parseObject(rsp).getString("errmsg");
-//            Assert.assertEquals("ok", errmsg);
-//        }  catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @Test
     public void testCreateDefaultClient() {
-        CloseableHttpClient client = DingTalkUtils.getDefaultClient();;
+        CloseableHttpClient client = DingTalkUtils.getDefaultClient();
         try {
             Assert.assertNotNull(client);
             client.close();
         } catch (IOException ex) {
-            logger.info("close exception",ex.getMessage());
+            logger.info("close exception", ex.getMessage());
             new Throwable();
         }
     }
+
     @Test
     public void testCreateProxyClient() {
         CloseableHttpClient client = DingTalkUtils.getProxyClient();
@@ -89,11 +75,12 @@ public class DingTalkUtilsTest {
             Assert.assertNotNull(client);
             client.close();
         } catch (IOException ex) {
-            logger.info("close exception",ex.getMessage());
+            logger.info("close exception", ex.getMessage());
             new Throwable();
         }
 
     }
+
     @Test
     public void testProxyConfig() {
         RequestConfig rc = DingTalkUtils.getProxyConfig();
@@ -109,6 +96,7 @@ public class DingTalkUtilsTest {
         String expect = "{\"text\":{\"content\":\"this is test\"},\"msgtype\":\"text\"}";
         Assert.assertEquals(expect, jsonString);
     }
+
     @Test
     public void testDingTalkMsgUtf8() {
         String msg = DingTalkUtils.textToJsonString("this is test:中文");

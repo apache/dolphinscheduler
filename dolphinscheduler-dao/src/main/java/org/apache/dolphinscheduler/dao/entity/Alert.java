@@ -14,19 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
+
+import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @TableName("t_ds_alert")
 public class Alert {
@@ -43,8 +44,9 @@ public class Alert {
     /**
      * show_type
      */
+    //TODO ShowType should be delete from Alert, Because showType is move to the plugin params
     @TableField(value = "show_type")
-    private ShowType showType;
+    private String showType;
     /**
      * content
      */
@@ -53,6 +55,7 @@ public class Alert {
     /**
      * alert_type
      */
+    //TODO alertType should be delete from Alert, because alert type is decide by the AlertPlugin instance
     @TableField(value = "alert_type")
     private AlertType alertType;
     /**
@@ -73,11 +76,13 @@ public class Alert {
     /**
      * receivers
      */
+    //TODO receivers should be delete from Alert, because only email alert need receivers . And receivers is move to Email Alert Plugin params.
     @TableField("receivers")
     private String receivers;
     /**
      * receivers_cc
      */
+    //TODO receivers_cc should be delete from Alert, because only email alert need receivers_cc . And receivers_cc is move to Email Alert Plugin params.
     @TableField("receivers_cc")
     private String receiversCc;
     /**
@@ -112,13 +117,13 @@ public class Alert {
         this.title = title;
     }
 
-    public ShowType getShowType() {
-        return showType;
-    }
-
-    public void setShowType(ShowType showType) {
-        this.showType = showType;
-    }
+    //    public String getShowType() {
+    //        return showType;
+    //    }
+    //
+    //    public void setShowType(String showType) {
+    //        this.showType = showType;
+    //    }
 
     public String getContent() {
         return content;
@@ -268,20 +273,37 @@ public class Alert {
 
     @Override
     public String toString() {
-        return "Alert{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", showType=" + showType +
-                ", content='" + content + '\'' +
-                ", alertType=" + alertType +
-                ", alertStatus=" + alertStatus +
-                ", log='" + log + '\'' +
-                ", alertGroupId=" + alertGroupId +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", info=" + info +
-                '}';
+        return "Alert{"
+                + "id="
+                + id
+                + ", title='"
+                + title + '\''
+                + ", showType="
+                + showType
+                + ", content='"
+                + content
+                + '\''
+                + ", alertType="
+                + alertType
+                + ", alertStatus="
+                + alertStatus
+                + ", log='"
+                + log
+                + '\''
+                + ", alertGroupId="
+                + alertGroupId
+                + ", receivers='"
+                + receivers
+                + '\''
+                + ", receiversCc='"
+                + receiversCc
+                + '\''
+                + ", createTime="
+                + createTime
+                + ", updateTime="
+                + updateTime
+                + ", info="
+                + info
+                + '}';
     }
 }
