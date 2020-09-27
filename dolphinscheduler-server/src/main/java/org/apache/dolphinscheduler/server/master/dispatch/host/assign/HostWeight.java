@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 /**
@@ -67,22 +68,19 @@ public class HostWeight {
             + '}';
     }
 
-    private int getWeight(double cpu, double memory, double loadAverage, Host host) {
-        int calculateWeight = (int) (cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
+    private double getWeight(double cpu, double memory, double loadAverage, Host host) {
+        double calculateWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
         return getWarmUpWeight(host, calculateWeight);
-
     }
 
-    private double calculateWeight(double cpu, double memory, double loadAverage) {
-        return cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
     /**
      * If the warm-up is not over, add the weight
      */
-    private int getWarmUpWeight(Host host, int weight) {
+    private double getWarmUpWeight(Host host, double weight) {
         long startTime = host.getStartTime();
         long uptime = System.currentTimeMillis() - startTime;
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
-            return (int) ((weight * Constants.WARM_UP_TIME) / uptime);
+            return weight * Constants.WARM_UP_TIME / uptime;
         }
         return weight;
     }
