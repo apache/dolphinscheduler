@@ -14,13 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class DateUtilsTest {
     @Test
@@ -38,10 +40,8 @@ public class DateUtilsTest {
         Assert.assertEquals("01 09:23:08", readableDate);
     }
 
-
     @Test
-    public void testWeek(){
-
+    public void testWeek() {
         Date curr = DateUtils.stringToDate("2019-02-01 00:00:00");
         Date monday1 = DateUtils.stringToDate("2019-01-28 00:00:00");
         Date sunday1 = DateUtils.stringToDate("2019-02-03 00:00:00");
@@ -54,7 +54,7 @@ public class DateUtilsTest {
     }
 
     @Test
-    public void diffHours(){
+    public void diffHours() {
         Date d1 = DateUtils.stringToDate("2019-01-28 00:00:00");
         Date d2 = DateUtils.stringToDate("2019-01-28 20:00:00");
         Assert.assertEquals(DateUtils.diffHours(d1, d2), 20);
@@ -150,4 +150,11 @@ public class DateUtilsTest {
         Date curr = DateUtils.getEndOfHour(d1);
         Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:59:59");
     }
+
+    @Test
+    public void getCurrentTimeStamp() {
+        String timeStamp =  DateUtils.getCurrentTimeStamp();
+        Assert.assertNotNull(timeStamp);
+    }
+
 }

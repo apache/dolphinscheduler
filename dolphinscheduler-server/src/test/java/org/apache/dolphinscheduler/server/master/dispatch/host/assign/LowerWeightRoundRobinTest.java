@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import org.apache.dolphinscheduler.remote.utils.Host;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -31,13 +32,45 @@ public class LowerWeightRoundRobinTest {
     @Test
     public void testSelect() {
         Collection<HostWeight> sources = new ArrayList<>();
-        sources.add(new HostWeight(Host.of("192.158.2.1:11:100"), 0.06, 0.44, 3.84));
-        sources.add(new HostWeight(Host.of("192.158.2.1:22:100"), 0.06, 0.56, 3.24));
-        sources.add(new HostWeight(Host.of("192.158.2.1:33:100"), 0.06, 0.80, 3.15));
+        sources.add(new HostWeight(Host.of("192.158.2.1:11:100:" + (System.currentTimeMillis() - 60 * 8 * 1000)), 0.06, 0.44, 3.84));
+        sources.add(new HostWeight(Host.of("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 5 * 1000)), 0.06, 0.56, 3.24));
+        sources.add(new HostWeight(Host.of("192.158.2.3:33:100:" + (System.currentTimeMillis() - 60 * 2 * 1000)), 0.06, 0.80, 3.15));
 
         LowerWeightRoundRobin roundRobin = new LowerWeightRoundRobin();
-        for (int i = 0; i < 100; i++) {
-            System.out.println(roundRobin.select(sources));
-        }
+        HostWeight result;
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.2", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.2", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.2", result.getHost().getIp());
+    }
+
+    @Test
+    public void testWarmUpSelect() {
+        Collection<HostWeight> sources = new ArrayList<>();
+        sources.add(new HostWeight(Host.of("192.158.2.1:11:100:" + (System.currentTimeMillis() - 60 * 8 * 1000)), 0.06, 0.44, 3.84));
+        sources.add(new HostWeight(Host.of("192.158.2.2:22:100:" + (System.currentTimeMillis() - 60 * 5 * 1000)), 0.06, 0.44, 3.84));
+        sources.add(new HostWeight(Host.of("192.158.2.3:33:100:" + (System.currentTimeMillis() - 60 * 3 * 1000)), 0.06, 0.44, 3.84));
+        sources.add(new HostWeight(Host.of("192.158.2.4:33:100:" + (System.currentTimeMillis() - 60 * 11 * 1000)), 0.06, 0.44, 3.84));
+
+        LowerWeightRoundRobin roundRobin = new LowerWeightRoundRobin();
+        HostWeight result;
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.4", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.2", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.4", result.getHost().getIp());
+        result = roundRobin.select(sources);
+        Assert.assertEquals("192.158.2.1", result.getHost().getIp());
     }
 }

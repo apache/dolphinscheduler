@@ -377,6 +377,7 @@ CREATE TABLE t_ds_process_instance (
   worker_group varchar(64) ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_id,id);
@@ -595,6 +596,7 @@ CREATE TABLE t_ds_task_instance (
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
 
