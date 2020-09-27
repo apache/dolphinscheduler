@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.mockito.Mockito.when;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -48,6 +47,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTagMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
@@ -111,6 +111,9 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private ProcessDefinitionVersionService processDefinitionVersionService;
+
+    @Mock
+    private ProcessTagMapper processTagMapper;
 
     private static final String SHELL_JSON = "{\n"
             + "    \"globalParams\": [\n"

@@ -17,96 +17,118 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.TagService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 public class TagControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(TagControllerTest.class);
 
+    @InjectMocks
+    private TagController tagController;
+
+    @Mock
+    private TagService tagService;
+
+    protected User user;
+
+    @Before
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+
+        user = loginUser;
+    }
+
     @Test
     public void testCreateTag() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tagName","tag_test1");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/tag/create")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        String projectName = "project_test";
+        String tagName = "tag_test";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put("tagId", 1);
 
+        Mockito.when(tagService.createTag(user,projectName,tagName)).thenReturn(result);
+
+        Result response = tagController.createTag(user, projectName, tagName);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testDeleteTag() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tagId","18");
+        String projectName = "project_test";
+        int id = 1;
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/tag/delete")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Mockito.when(tagService.deleteTag(user, projectName, id)).thenReturn(result);
+        Result response = tagController.deleteTag(user, projectName, id);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testUpdateTag() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("tagId","18");
-        paramsMap.add("tagName","tag_test_update");
+        String projectName = "project_test";
+        String tagName = "tag_test";
+        int tagId = 1;
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put("tagId", 1);
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/tag/update")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        Mockito.when(tagService.updateTag(user, projectName, tagId, tagName)).thenReturn(result);
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Result response = tagController.updateTag(user, projectName, tagName, tagId);
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testTagListPaging() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pageNo","2");
-        paramsMap.add("searchVal","test");
-        paramsMap.add("pageSize","2");
+        String projectName = "project_test";
+        int pageNo = 1;
+        int pageSize = 10;
+        String searchVal = "";
+        int userId = 1;
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/tag/list-paging")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, new PageInfo<Resource>(1, 10));
 
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Mockito.when(tagService.queryTagListPaging(user, projectName, pageSize, pageNo, searchVal)).thenReturn(result);
+        Result response = tagController.queryTagListPaging(user, projectName, pageNo, searchVal, pageSize);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+        result.put(Constants.STATUS, status);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, status.getMsg());
+        }
     }
 }

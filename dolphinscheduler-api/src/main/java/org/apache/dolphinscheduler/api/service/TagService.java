@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tag;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTagMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TagMapper;
 
@@ -56,9 +55,6 @@ public class TagService extends BaseService {
 
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private ProcessTagMapper processTagMapper;
 
     /**
      * create tag
@@ -125,8 +121,7 @@ public class TagService extends BaseService {
         }
 
         int delete = tagMapper.deleteById(tagId);
-        int delete1 = processTagMapper.deleteProcessRelation(0,tagId);
-        if (delete > 0 && delete1 > 0) {
+        if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_TAG_ERROR);

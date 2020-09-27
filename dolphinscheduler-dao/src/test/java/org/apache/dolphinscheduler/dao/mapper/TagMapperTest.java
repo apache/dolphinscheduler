@@ -120,7 +120,7 @@ public class TagMapperTest {
     public void queryTagListPaging() {
         Tag tag = insertOne();
         Page<Tag> page = new Page(1,3);
-        IPage<Tag> tagIPage = tagMapper.queryTagListPaging(page,111,1101,null);
+        IPage<Tag> tagIPage = tagMapper.queryTagListPaging(page,111,1010,"ut tag");
         Assert.assertNotEquals(tagIPage.getTotal(), 0);
     }
 }

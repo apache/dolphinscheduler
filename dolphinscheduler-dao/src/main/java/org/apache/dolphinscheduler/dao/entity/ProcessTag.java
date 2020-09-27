@@ -52,7 +52,7 @@ public class ProcessTag {
         return tagID;
     }
 
-    public void settagID(int userId) {
+    public void settagID(int tagID) {
         this.tagID = tagID;
     }
 

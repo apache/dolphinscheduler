@@ -94,9 +94,11 @@ public class TagServiceTest {
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
 
         //success
+        putMsg(result, Status.SUCCESS, projectName);
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         Mockito.when(tagMapper.selectById(46)).thenReturn(getTag());
-        Map<String, Object> deleteSuccess = tagService.createTag(loginUser, "project_test1", tagName);
-        Assert.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
+        Map<String, Object> createSuccess = tagService.createTag(loginUser, "project_test1", tagName);
+        Assert.assertEquals(Status.SUCCESS, createSuccess.get(Constants.STATUS));
 
     }
 
@@ -134,6 +136,7 @@ public class TagServiceTest {
                 "project_test1", 46);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, userNoAuthRes.get(Constants.STATUS));
         //success
+        loginUser.setId(1);
         Mockito.when(tagMapper.deleteById(46)).thenReturn(1);
         Map<String, Object> deleteSuccess = tagService.deleteTag(loginUser,
                 "project_test1", 46);
@@ -157,8 +160,9 @@ public class TagServiceTest {
 
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-
-        Map<String, Object> updateResult = tagService.updateTag(loginUser,projectName,tag.getId(),"tag_test");
+        Mockito.when(tagMapper.selectById(46)).thenReturn(tag);
+        Mockito.when(tagMapper.updateById(tag)).thenReturn(1);
+        Map<String, Object> updateResult = tagService.updateTag(loginUser,projectName,46,"tag_test_1");
         Assert.assertEquals(Status.SUCCESS, updateResult.get(Constants.STATUS));
     }
 

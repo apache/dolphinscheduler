@@ -27,13 +27,13 @@
         limit 1
     </select>
     <select id="queryTagListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Tag">
-        select t.id,t.name,COUNT (t.id) as processcount
+        select t.*
         from t_ds_process_definiton_tags t
         left join t_ds_relation_process_tag pt ON t.id = pt.tag_id
         left join t_ds_process_definition d ON d.id = pt.process_id
         where t.project_id = #{projectId}
-        <if test=" searchVal != null and searchVal != ''">
-            and t.name like concat('%', #{searchVal}, '%')
+        <if test=" searchName != null and searchName != ''">
+            and t.name like concat('%', #{searchName}, '%')
         </if>
         <if test=" userId != 0">
         and t.user_id = #{userId}
