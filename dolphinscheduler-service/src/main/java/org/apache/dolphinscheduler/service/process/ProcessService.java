@@ -928,7 +928,7 @@ public class ProcessService {
         updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionId());
         initSubInstanceState(childInstance);
         createCommand(subProcessCommand);
-        logger.info("sub process command created: {} ", subProcessCommand.toString());
+        logger.info("sub process command created: {} ", subProcessCommand);
     }
 
 
@@ -971,7 +971,7 @@ public class ProcessService {
         Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
         String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
 
-        Command command = new Command(
+        return new Command(
                 commandType,
                 TaskDependType.TASK_POST,
                 parentProcessInstance.getFailureStrategy(),
@@ -983,7 +983,6 @@ public class ProcessService {
                 parentProcessInstance.getScheduleTime(),
                 parentProcessInstance.getProcessInstancePriority()
         );
-        return command;
     }
 
     /**

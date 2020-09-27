@@ -35,8 +35,6 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class ProcessServiceTest {
 
-
-
     @Test
     public void testCreateSubCommand(){
         ProcessService processService = new ProcessService();
@@ -92,8 +90,8 @@ public class ProcessServiceTest {
         Assert.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
 
         JSONObject complementDate = JSONUtils.parseObject(command.getCommandParam());
-        Assert.assertEquals(String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE)), "2020-01-01");
-        Assert.assertEquals(String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE)), "2020-01-10");
+        Assert.assertEquals("2020-01-01", String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE)) );
+        Assert.assertEquals("2020-01-10", String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE)) );
 
         //father history: start,failure,start failure; child not null == command type: start failure
         childInstance = new ProcessInstance();
