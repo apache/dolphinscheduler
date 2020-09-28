@@ -33,9 +33,9 @@ public class HostWeight {
 
     private final Host host;
 
-    private final int weight;
+    private final double weight;
 
-    private int currentWeight;
+    private double currentWeight;
 
     public HostWeight(Host host, double cpu, double memory, double loadAverage) {
         this.weight = getWeight(cpu, memory, loadAverage, host);
@@ -43,15 +43,15 @@ public class HostWeight {
         this.currentWeight = weight;
     }
 
-    public int getCurrentWeight() {
+    public double getCurrentWeight() {
         return currentWeight;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setCurrentWeight(int currentWeight) {
+    public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
     }
 
@@ -68,20 +68,19 @@ public class HostWeight {
             + '}';
     }
 
-    private int getWeight(double cpu, double memory, double loadAverage, Host host) {
-        int calculateWeight = (int) (cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
+    private double getWeight(double cpu, double memory, double loadAverage, Host host) {
+        double calculateWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
         return getWarmUpWeight(host, calculateWeight);
-
     }
 
     /**
      * If the warm-up is not over, add the weight
      */
-    private int getWarmUpWeight(Host host, int weight) {
+    private double getWarmUpWeight(Host host, double weight) {
         long startTime = host.getStartTime();
         long uptime = System.currentTimeMillis() - startTime;
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
-            return (int) ((weight * Constants.WARM_UP_TIME) / uptime);
+            return weight * Constants.WARM_UP_TIME / uptime;
         }
         return weight;
     }
