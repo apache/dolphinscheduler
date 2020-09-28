@@ -785,6 +785,7 @@
                         <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/VarPoolUtilsTest.java</include>
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/utils/KerberosHttpClientTest.java</include>
@@ -832,6 +833,7 @@
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
+                        <include>**/server/utils/HostTest.java</include>
                         <!--<include>**/server/utils/FlinkArgsUtilsTest.java</include>-->
                         <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
