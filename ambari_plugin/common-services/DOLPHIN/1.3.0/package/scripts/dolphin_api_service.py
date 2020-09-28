@@ -45,6 +45,10 @@ class DolphinApiService(Script):
         init_cmd=format("sh " + params.dolphin_home + "/script/create-dolphinscheduler.sh")
         Execute(init_cmd, user=params.dolphin_user)
 
+        #upgrade
+        upgrade_cmd=format("sh " + params.dolphin_home + "/script/upgrade-dolphinscheduler.sh")
+        Execute(upgrade_cmd, user=params.dolphin_user)
+
         no_op_test = format("ls {dolphin_pidfile_dir}/api-server.pid >/dev/null 2>&1 && ps `cat {dolphin_pidfile_dir}/api-server.pid` | grep `cat {dolphin_pidfile_dir}/api-server.pid` >/dev/null 2>&1")
 
         start_cmd = format("sh " + params.dolphin_bin_dir + "/dolphinscheduler-daemon.sh start api-server")
