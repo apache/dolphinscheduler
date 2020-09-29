@@ -54,7 +54,7 @@
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
   import mNoData from '@/module/components/noData/noData'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
 
   export default {
     name: 'task-status-count',

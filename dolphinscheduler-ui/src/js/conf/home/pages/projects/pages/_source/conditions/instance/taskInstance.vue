@@ -68,7 +68,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from './common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
     name: 'task-instance-conditions',

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -110,7 +111,16 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam("pageSize") Integer pageSize) {
 
         logger.info("query task instance list, projectName:{}, processInstanceId:{}, processInstanceName:{}, search value:{}, taskName:{}, executorName: {}, stateType:{}, host:{}, start:{}, end:{}",
-                projectName, processInstanceId, processInstanceName, searchVal, taskName, executorName, stateType, host, startTime, endTime);
+                StringUtils.replaceNRTtoUnderline(projectName),
+                processInstanceId,
+                StringUtils.replaceNRTtoUnderline(processInstanceName),
+                StringUtils.replaceNRTtoUnderline(searchVal),
+                StringUtils.replaceNRTtoUnderline(taskName),
+                StringUtils.replaceNRTtoUnderline(executorName),
+                stateType,
+                StringUtils.replaceNRTtoUnderline(host),
+                StringUtils.replaceNRTtoUnderline(startTime),
+                StringUtils.replaceNRTtoUnderline(endTime));
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
