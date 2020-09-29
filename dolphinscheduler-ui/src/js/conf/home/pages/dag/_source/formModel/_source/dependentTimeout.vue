@@ -50,6 +50,12 @@
             <span slot="append">{{$t('Minute')}}</span>
           </x-input>
           <span class="text-box">
+            <span>{{$t('Check interval')}}</span>
+          </span>
+          <x-input v-model="waitStartTimeout.checkInterval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+            <span slot="append">{{$t('Minute')}}</span>
+          </x-input>
+          <span class="text-box">
             <span>{{$t('Timeout strategy')}}</span>
           </span>
           <div style="padding-top: 6px;">
@@ -110,7 +116,8 @@
           // Timeout strategy
           strategy: ['FAILED'],
           // Timeout period
-          interval: null
+          interval: null,
+          checkInterval: null
         },
         waitCompleteTimeout: {
           enable: false,
@@ -131,6 +138,7 @@
         // p = 0 for timeout switch; p = 1 for wait start timeout switch; p = 2 for wait complete timeout switch.
         if (p === 1 || p === 0) {
           this.waitStartTimeout.interval = is ? 30 : null
+          this.waitStartTimeout.checkInterval = is ? 1 : null
         }
         if (p === 2 || p === 0) {
           this.waitCompleteTimeout.strategy = is ? ['WARN'] : []
@@ -149,7 +157,7 @@
         const reg = /^[1-9]\d*$/
         if (this.enable 
           && (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval))
-          || (this.waitStartTimeout.enable && !reg.test(this.waitStartTimeout.interval))) {
+          || (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }
@@ -157,6 +165,7 @@
           waitStartTimeout: {
             strategy: 'FAILED',
             interval: parseInt(this.waitStartTimeout.interval),
+            checkInterval: parseInt(this.waitStartTimeout.checkInterval),
             enable: this.waitStartTimeout.enable
           },
           waitCompleteTimeout: {
@@ -193,6 +202,7 @@
           this.waitStartTimeout.enable = o.waitStartTimeout.enable || false
           this.waitStartTimeout.strategy = ['FAILED']
           this.waitStartTimeout.interval = o.waitStartTimeout.interval || null
+          this.waitStartTimeout.checkInterval = o.waitStartTimeout.checkInterval || null
         }
       }
     },
