@@ -520,10 +520,9 @@
       _gantt (item) {
         this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
       },
+
       _topCheckBoxClick (v) {
-        this.list.forEach((item, i) => {
-          this.$set(this.list[i], 'isCheck', v)
-        })
+        _.map(this.list , v => v.isCheck = v.state === 'RUNNING_EXEUTION' ? false : true)
         this._arrDelChange()
       },
       _arrDelChange (v) {
