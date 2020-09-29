@@ -426,6 +426,8 @@ export default {
   'Timeout alarm': 'Timeout alarm',
   'Timeout failure': 'Timeout failure',
   'Timeout period': 'Timeout period',
+  'Waiting Dependent complete': 'Waiting Dependent complete',
+  'Waiting Dependent start': 'Waiting Dependent start',
   'Timeout strategy must be selected': 'Timeout strategy must be selected',
   'Timeout must be a positive integer': 'Timeout must be a positive integer',
   'Add dependency': 'Add dependency',
