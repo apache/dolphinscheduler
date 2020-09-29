@@ -735,6 +735,18 @@ export default {
     })
   },
   /**
+   * Force fail/kill/need_fault_tolerance task success
+   */
+  forceTaskSuccess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/task-instance/force-success`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Query task record list
    */
   getTaskRecordList ({ state }, payload) {
