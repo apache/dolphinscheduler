@@ -91,7 +91,7 @@ DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_var_pool();
 delimiter d//
 CREATE OR REPLACE FUNCTION ct_dolphin_T_t_ds_process_definition_version() RETURNS void AS $$
 BEGIN
-CREATE TABLE t_ds_process_definition_version (
+CREATE TABLE IF NOT EXISTS t_ds_process_definition_version (
                                                  id int NOT NULL  ,
                                                  process_definition_id int NOT NULL  ,
                                                  version int DEFAULT NULL ,
