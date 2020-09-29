@@ -161,6 +161,11 @@
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }
+        // Verify timeout duration longer than check interval
+        if (this.enable && this.waitStartTimeout.enable && this.waitStartTimeout.checkInterval >= this.waitStartTimeout.interval) {
+          this.$message.warning(`${this.$t('Timeout must be longer than check interval')}`)
+          return false
+        }
         this.$emit('on-timeout', {
           waitStartTimeout: {
             strategy: 'FAILED',
