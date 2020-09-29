@@ -420,6 +420,8 @@ export default {
   'Timeout alarm': '超时告警',
   'Timeout failure': '超时失败',
   'Timeout period': '超时时长',
+  'Waiting Dependent complete': '等待依赖完成',
+  'Waiting Dependent start': '等待依赖启动',
   'Timeout strategy must be selected': '超时策略必须选一个',
   'Timeout must be a positive integer': '超时时长必须为正整数',
   'Add dependency': '添加依赖',
