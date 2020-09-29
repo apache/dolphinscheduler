@@ -429,6 +429,7 @@ export default {
   'Waiting Dependent complete': 'Waiting Dependent complete',
   'Waiting Dependent start': 'Waiting Dependent start',
   'Check interval': 'Check interval',
+  'Timeout must be longer than check interval': 'Timeout must be longer than check interval',
   'Timeout strategy must be selected': 'Timeout strategy must be selected',
   'Timeout must be a positive integer': 'Timeout must be a positive integer',
   'Add dependency': 'Add dependency',
