@@ -28,6 +28,7 @@ services:
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
+      POSTGRESQL_REPLICATION_PASSWORD: dolphinscheduler@123
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     - dolphinscheduler-postgresql-initdb:/docker-entrypoint-initdb.d
@@ -62,6 +63,8 @@ services:
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
+      DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30s
@@ -73,6 +76,7 @@ services:
     - dolphinscheduler-zookeeper
     volumes:
     - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-resource-storage-local:/dolphinscheduler
     networks:
     - dolphinscheduler
 
@@ -194,6 +198,8 @@ services:
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
+      DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
       interval: 30s
@@ -213,6 +219,9 @@ services:
     - type: volume
       source: dolphinscheduler-logs
       target: /opt/dolphinscheduler/logs
+    - type: volume
+      source: dolphinscheduler-resource-storage-local
+      target: /dolphinscheduler
     networks:
     - dolphinscheduler
 
@@ -226,6 +235,7 @@ volumes:
   dolphinscheduler-zookeeper:
   dolphinscheduler-worker-data:
   dolphinscheduler-logs:
+  dolphinscheduler-resource-storage-local:
 
 configs:
   dolphinscheduler-worker-task-env:

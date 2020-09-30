@@ -630,7 +630,8 @@ CREATE TABLE `t_ds_resources` (
   `pid` int(11) DEFAULT NULL,
   `full_name` varchar(64) DEFAULT NULL,
   `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -798,7 +799,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version` VALUES ('1', '1.3.0');
+INSERT INTO `t_ds_version` VALUES ('1', '1.3.3');
 
 
 -- ----------------------------

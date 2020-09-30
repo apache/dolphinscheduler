@@ -13,13 +13,31 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-export default {
-    /**
-   * set sideBar
-   * */
-  setSideBar (state, payload) {
-    state.sideBar = payload
-  },
-}
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
+
+--    add t_ds_resources_un
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_resources_un()
+BEGIN
+    IF NOT EXISTS (
+            SELECT * FROM information_schema.KEY_COLUMN_USAGE
+            WHERE  TABLE_NAME = 't_ds_resources'
+              AND CONSTRAINT_NAME = 't_ds_resources_un'
+        )
+    THEN
+        ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE KEY (full_name,`type`);
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_resources_un();
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+
+
+

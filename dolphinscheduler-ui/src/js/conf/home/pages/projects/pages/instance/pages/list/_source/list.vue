@@ -65,7 +65,7 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
-          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
+          <td width="50"><x-checkbox v-model="item.isCheck" :disabled="item.state === 'RUNNING_EXEUTION'" @on-change="_arrDelChange"></x-checkbox></td>
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
@@ -344,6 +344,12 @@
        * Close the delete layer
        */
       _closeDelete (i) {
+        // close batch
+        if (i < 0) {
+          this.$refs['poptipDeleteAll'].doClose()
+          return
+        }
+        // close one
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
@@ -514,10 +520,9 @@
       _gantt (item) {
         this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
       },
+
       _topCheckBoxClick (v) {
-        this.list.forEach((item, i) => {
-          this.$set(this.list[i], 'isCheck', v)
-        })
+        _.map(this.list , v => v.isCheck = v.state === 'RUNNING_EXEUTION' ? false : true)
         this._arrDelChange()
       },
       _arrDelChange (v) {
@@ -539,9 +544,11 @@
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
+          this.strDelete = ''
           this.$message.success(res.msg)
         }).catch(e => {
           this.checkAll = false
+          this.strDelete = ''
           this.$message.error(e.msg || '')
         })
       }

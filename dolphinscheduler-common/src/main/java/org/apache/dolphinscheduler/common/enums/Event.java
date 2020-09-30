@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-export default {
-    /**
-   * set sideBar
-   * */
-  setSideBar (state, payload) {
-    state.sideBar = payload
-  },
+package org.apache.dolphinscheduler.common.enums;
+
+public enum Event {
+    ACK,
+    RESULT;
 }
