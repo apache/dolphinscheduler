@@ -90,14 +90,15 @@ public class VarPoolUtils {
             }
         }
     }
-
+    
     /**
-     * convertPythonScriptPlaceholders
+     * convertScriptPlaceholders
      * @param rawScript rawScript
+     * @param formate formate
      * @return String
      * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
      */
-    public static String convertPythonScriptPlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
+    public static String convertScriptPlaceholders(String rawScript, String format) throws StringIndexOutOfBoundsException {
         int len = "${setShareVar(${".length();
         int scriptStart = 0;
         while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
@@ -113,13 +114,23 @@ public class VarPoolUtils {
             start = rawScript.indexOf('}', start) + 1;
             end = rawScript.length();
 
-            String replaceScript = String.format("print(\"${{setValue({},{})}}\".format(\"%s\",%s))", prop, value);
+            String replaceScript = String.format(format, prop, value);
 
             rawScript = rawScript.substring(0, scriptStart) + replaceScript + rawScript.substring(start, end);
 
             scriptStart += replaceScript.length();
         }
         return rawScript;
+    }
+
+    /**
+     * convertPythonScriptPlaceholders
+     * @param rawScript rawScript
+     * @return String
+     * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
+     */
+    public static String convertPythonScriptPlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
+        return convertScriptPlaceholders(rawScript, "print(\"${{setValue({},{})}}\".format(\"%s\",%s))");
     }
     
     /**
@@ -129,27 +140,6 @@ public class VarPoolUtils {
      * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
      */
     public static String convertShellScriptPlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
-        int len = "${setShareVar(${".length();
-        int scriptStart = 0;
-        while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
-            int start = -1;
-            int end = rawScript.indexOf('}', scriptStart + len);
-            String prop = rawScript.substring(scriptStart + len, end);
-
-            start = rawScript.indexOf(',', end);
-            end = rawScript.indexOf(')', start);
-
-            String value = rawScript.substring(start + 1, end);
-
-            start = rawScript.indexOf('}', start) + 1;
-            end = rawScript.length();
-
-            String replaceScript = String.format("echo \"\\${setValue(%s,%s)}\"", prop, value);
-
-            rawScript = rawScript.substring(0, scriptStart) + replaceScript + rawScript.substring(start, end);
-
-            scriptStart += replaceScript.length();
-        }
-        return rawScript;
+        return convertScriptPlaceholders(rawScript, "echo \"\\${setValue(%s,%s)}\"");
     }
 } 
