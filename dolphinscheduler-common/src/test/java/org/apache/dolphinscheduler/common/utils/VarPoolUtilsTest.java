@@ -70,4 +70,13 @@ public class VarPoolUtilsTest {
             + "print(\"${{setValue({},{})}}\".format(\"p2\",4));");
         logger.info(rawScript);
     }
+    
+    @Test
+    public void testConvertShellScriptPlaceholders() throws Exception {
+        String rawScript = "value=600+60+6\n${setShareVar(${p1},$value)}";
+        rawScript = VarPoolUtils.convertShellScriptPlaceholders(rawScript);
+        Assert.assertEquals(rawScript, "value=600+60+6\n"
+            + "echo \"\\${setValue(p1,$value)}\"");
+        logger.info(rawScript);
+    }
 }

@@ -22,10 +22,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -135,6 +132,14 @@ public class ShellTask extends AbstractTask {
             shellParameters.getLocalParametersMap(),
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
+    
+    try {
+      script = VarPoolUtils.convertShellScriptPlaceholders(script);
+    }
+    catch (StringIndexOutOfBoundsException e) {
+        logger.error("setShareVar field format error, raw shell script : {}", script);
+    }
+    
     if (paramsMap != null){
       script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }

@@ -121,4 +121,35 @@ public class VarPoolUtils {
         }
         return rawScript;
     }
+    
+    /**
+     * convertShellScriptPlaceholders
+     * @param rawScript rawScript
+     * @return String
+     * @throws StringIndexOutOfBoundsException StringIndexOutOfBoundsException
+     */
+    public static String convertShellScriptPlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
+        int len = "${setShareVar(${".length();
+        int scriptStart = 0;
+        while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
+            int start = -1;
+            int end = rawScript.indexOf('}', scriptStart + len);
+            String prop = rawScript.substring(scriptStart + len, end);
+
+            start = rawScript.indexOf(',', end);
+            end = rawScript.indexOf(')', start);
+
+            String value = rawScript.substring(start + 1, end);
+
+            start = rawScript.indexOf('}', start) + 1;
+            end = rawScript.length();
+
+            String replaceScript = String.format("echo \"\\${setValue(%s,%s)}\"", prop, value);
+
+            rawScript = rawScript.substring(0, scriptStart) + replaceScript + rawScript.substring(start, end);
+
+            scriptStart += replaceScript.length();
+        }
+        return rawScript;
+    }
 } 
