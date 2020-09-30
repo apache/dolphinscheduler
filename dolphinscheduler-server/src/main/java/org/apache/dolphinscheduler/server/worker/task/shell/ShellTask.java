@@ -133,12 +133,12 @@ public class ShellTask extends AbstractTask {
             CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
             taskExecutionContext.getScheduleTime());
     
-    try {
-      script = VarPoolUtils.convertShellScriptPlaceholders(script);
-    }
-    catch (StringIndexOutOfBoundsException e) {
-        logger.error("setShareVar field format error, raw shell script : {}", script);
-    }
+        try {
+            script = VarPoolUtils.convertShellScriptPlaceholders(script);
+        }
+        catch (StringIndexOutOfBoundsException e) {
+            logger.error("setShareVar field format error, raw shell script : {}", script);
+        }
     
     if (paramsMap != null){
       script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
