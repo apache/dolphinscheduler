@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -91,6 +92,11 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
         if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+
+        if (RegexUtils.isNumeric(tenantCode)) {
+            putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
             return result;
         }
 
