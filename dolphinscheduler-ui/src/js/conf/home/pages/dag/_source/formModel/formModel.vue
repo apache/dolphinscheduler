@@ -162,10 +162,18 @@
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
+          v-if="taskType !== 'DEPENDENT'"
           ref="timeout"
           :backfill-item="backfillItem"
           @on-timeout="_onTimeout">
         </m-timeout-alarm>
+        <!-- Dependent timeout alarm -->
+        <m-dependent-timeout
+          v-if="taskType === 'DEPENDENT'"
+          ref="dependentTimeout"
+          :backfill-item="backfillItem"
+          @on-timeout="_onDependentTimeout">
+        </m-dependent-timeout>
 
         <!-- shell node -->
         <m-shell
@@ -315,6 +323,7 @@
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
+  import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
   import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
@@ -363,6 +372,8 @@
         delayTime: '0',
         // Task timeout alarm
         timeout: {},
+        // (For Dependent nodes) Wait start timeout alarm
+        waitStartTimeout: {},
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
@@ -423,6 +434,13 @@
        */
       _onTimeout (o) {
         this.timeout = Object.assign(this.timeout, {}, o)
+      },
+      /**
+       * Dependent timeout alarm
+       */
+      _onDependentTimeout (o) {
+        this.timeout = Object.assign(this.timeout, {}, o.waitCompleteTimeout)
+        this.waitStartTimeout = Object.assign(this.waitStartTimeout, {}, o.waitStartTimeout)
       },
       /**
        * Click external to close the current component
@@ -502,6 +520,7 @@
             retryInterval: this.retryInterval,
             delayTime: this.delayTime,
             timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -555,9 +574,16 @@
           return
         }
         // Verify task alarm parameters
-        if (!this.$refs['timeout']._verification()) {
-          return
+        if (this.taskType === 'DEPENDENT') {
+          if (!this.$refs['dependentTimeout']._verification()) {
+            return
+          }
+        } else {
+          if (!this.$refs['timeout']._verification()) {
+            return
+          }
         }
+        
         // Verify node parameters
         if (!this.$refs[this.taskType]._verification()) {
           return
@@ -618,6 +644,7 @@
             retryInterval: this.retryInterval,
             delayTime: this.delayTime,
             timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -785,6 +812,7 @@
           retryInterval: this.retryInterval,
           delayTime: this.delayTime,
           timeout: this.timeout,
+          waitStartTimeout: this.waitStartTimeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
           successBranch: this.successBranch,
@@ -810,6 +838,7 @@
       mConditions,
       mSelectInput,
       mTimeoutAlarm,
+      mDependentTimeout,
       mPriority,
       mWorkerGroups,
       mPreTasks,
