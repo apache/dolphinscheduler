@@ -30,6 +30,9 @@ public class RegexUtils {
      */
     private static final String CHECK_NUMBER = "^-?\\d+(\\.\\d+)?$";
 
+    private RegexUtils() {
+    }
+
     /**
      * check if the input is number
      *
