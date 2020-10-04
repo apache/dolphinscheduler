@@ -44,6 +44,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * remoting netty server
@@ -183,10 +185,11 @@ public class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast("encoder", encoder);
-        pipeline.addLast("decoder", new NettyDecoder());
-        pipeline.addLast("handler", serverHandler);
+        ch.pipeline()
+            .addLast("encoder", encoder)
+            .addLast("decoder", new NettyDecoder())
+            .addLast("server-idle-handle", new IdleStateHandler(0, 0, 10, MILLISECONDS))
+            .addLast("handler", serverHandler);
     }
 
     /**

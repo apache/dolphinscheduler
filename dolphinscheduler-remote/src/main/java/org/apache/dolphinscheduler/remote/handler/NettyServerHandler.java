@@ -18,12 +18,16 @@
 package org.apache.dolphinscheduler.remote.handler;
 
 import io.netty.channel.*;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
- *  netty server request handler
+ * netty server request handler
  */
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
@@ -40,22 +44,23 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
     /**
-     *  netty remote server
+     * netty remote server
      */
     private final NettyRemotingServer nettyRemotingServer;
 
     /**
-     *  server processors queue
+     * server processors queue
      */
     private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap();
 
-    public NettyServerHandler(NettyRemotingServer nettyRemotingServer){
+    public NettyServerHandler(NettyRemotingServer nettyRemotingServer) {
         this.nettyRemotingServer = nettyRemotingServer;
     }
 
     /**
-     *  When the current channel is not active,
-     *  the current channel has reached the end of its life cycle
+     * When the current channel is not active,
+     * the current channel has reached the end of its life cycle
+     *
      * @param ctx channel handler context
      * @throws Exception
      */
@@ -73,38 +78,39 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        processReceived(ctx.channel(), (Command)msg);
+        processReceived(ctx.channel(), (Command) msg);
     }
 
     /**
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
+     * @param processor   processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
     }
 
     /**
-     *  register processor
+     * register processor
      *
      * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
-        if(executorRef == null){
+        if (executorRef == null) {
             executorRef = nettyRemotingServer.getDefaultExecutor();
         }
         this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
     }
 
     /**
-     *  process received logic
+     * process received logic
+     *
      * @param channel channel
-     * @param msg message
+     * @param msg     message
      */
     private void processReceived(final Channel channel, final Command msg) {
         final CommandType commandType = msg.getType();
@@ -132,22 +138,22 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     *  caught exception
+     * caught exception
      *
-     * @param ctx channel handler context
+     * @param ctx   channel handler context
      * @param cause cause
      * @throws Exception
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}",cause.getMessage(), cause);
+        logger.error("exceptionCaught : {}", cause.getMessage(), cause);
         ctx.channel().close();
     }
 
     /**
-     *  channel write changed
+     * channel write changed
      *
-     * @param ctx  channel handler context
+     * @param ctx channel handler context
      * @throws Exception
      */
     @Override
@@ -158,16 +164,26 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (!ch.isWritable()) {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is not writable, over high water level : {}",
-                        ch, config.getWriteBufferHighWaterMark());
+                    ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is writable, to low water : {}",
-                        ch, config.getWriteBufferLowWaterMark());
+                    ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);
+        }
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        // send heartbeat when read idle.
+        if (evt instanceof IdleStateEvent) {
+            ctx.channel().close();
+        } else {
+            super.userEventTriggered(ctx, evt);
         }
     }
 }
