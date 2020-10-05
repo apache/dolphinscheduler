@@ -27,6 +27,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.dolphinscheduler.remote.utils.Constants.NETTY_CLIENT_HEART_BEAT_TIME;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
@@ -166,7 +170,8 @@ public class NettyRemotingClient {
                     ch.pipeline().addLast(
                         new NettyDecoder(),
                         clientHandler,
-                        encoder);
+                        encoder)
+                        .addLast("client-idle-handler", new IdleStateHandler(NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, MILLISECONDS));
                 }
             });
         this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {

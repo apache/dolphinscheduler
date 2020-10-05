@@ -30,6 +30,10 @@ public class Constants {
 
     public static final String SLASH = "/";
 
+    public static final long NETTY_SERVER_HEART_BEAT_TIME = 1000 * 60 * 4;
+
+    public static final long NETTY_CLIENT_HEART_BEAT_TIME = 1000 * 60;
+
     /**
      * charset
      */

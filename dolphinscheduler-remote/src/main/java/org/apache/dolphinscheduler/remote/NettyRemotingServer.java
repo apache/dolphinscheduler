@@ -46,6 +46,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.apache.dolphinscheduler.remote.utils.Constants.NETTY_SERVER_HEART_BEAT_TIME;
 
 /**
  * remoting netty server
@@ -188,7 +189,7 @@ public class NettyRemotingServer {
         ch.pipeline()
             .addLast("encoder", encoder)
             .addLast("decoder", new NettyDecoder())
-            .addLast("server-idle-handle", new IdleStateHandler(0, 0, 10, MILLISECONDS))
+            .addLast("server-idle-handle", new IdleStateHandler(0, 0, NETTY_SERVER_HEART_BEAT_TIME, MILLISECONDS))
             .addLast("handler", serverHandler);
     }
 
