@@ -107,21 +107,21 @@ public class DolphinSchedulerManager {
                 logger.error("Unable to determine current software version, so cannot upgrade");
                 throw new RuntimeException("Unable to determine current software version, so cannot upgrade");
             }
+            
             // The target version of the upgrade
             String schemaVersion = "";
-            for(String schemaDir : schemaList) {
-                schemaVersion = schemaDir.split("_")[0];
-                if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
-                    logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
-                    logger.info("Begin upgrading DolphinScheduler's table structure");
-                    upgradeDao.upgradeDolphinScheduler(schemaDir);
-                    if ("1.3.0".equals(schemaVersion)) {
-                        upgradeDao.upgradeDolphinSchedulerWorkerGroup();
-                    }
-                    version = schemaVersion;
+            
+            String schemaDir = schemaList.get(schemaList.size() - 1);
+            schemaVersion = schemaDir.split("_")[0];
+            if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
+                logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
+                logger.info("Begin upgrading DolphinScheduler's table structure");
+                upgradeDao.upgradeDolphinScheduler(schemaDir);
+                if ("1.3.0".equals(schemaVersion)) {
+                    upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                 }
-
             }
+
         }
 
         // Assign the value of the version field in the version table to the version of the product
