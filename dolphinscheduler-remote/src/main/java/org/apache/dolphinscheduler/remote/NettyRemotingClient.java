@@ -166,12 +166,10 @@ public class NettyRemotingClient {
             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
             .handler(new ChannelInitializer<SocketChannel>() {
                 @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(
-                        new NettyDecoder(),
-                        clientHandler,
-                        encoder)
-                        .addLast("client-idle-handler", new IdleStateHandler(NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, MILLISECONDS));
+                public void initChannel(SocketChannel ch) {
+                    ch.pipeline()
+                        .addLast("client-idle-handler", new IdleStateHandler(NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, MILLISECONDS))
+                        .addLast(new NettyDecoder(), clientHandler, encoder);
                 }
             });
         this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {
