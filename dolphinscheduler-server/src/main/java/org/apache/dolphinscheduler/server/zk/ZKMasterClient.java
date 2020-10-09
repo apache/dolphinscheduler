@@ -81,7 +81,6 @@ public class ZKMasterClient extends AbstractZKClient {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             }
 
-
             // self tolerant
             if (getActiveMasterNum() == 1) {
                 failoverWorker(null, true);
