@@ -178,6 +178,7 @@ export default {
   Queue: '队列',
   'Please enter the tenant code in English': '请输入租户编码只允许英文',
   'Please enter tenant code in English': '请输入英文租户编码',
+  'Please enter tenant name without special characters': '请输入不包含特殊字符的租户名称',
   'Edit User': '编辑用户',
   Tenant: '租户',
   Email: '邮件',
