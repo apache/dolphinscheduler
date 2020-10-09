@@ -32,7 +32,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
- *
  * process service test
  */
 public class ProcessServiceTest {
