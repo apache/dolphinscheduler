@@ -318,7 +318,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        if (name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
+        if (file == null && name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
             putMsg(result, Status.SUCCESS);
             return result;
         }
