@@ -150,24 +150,24 @@ public class ZKMasterClient extends AbstractZKClient {
 	/**
 	 * failover server when server down
 	 *
-	 * @param serverHost	server host
-	 * @param zkNodeType	zookeeper node type
-	 * @throws Exception	exception
+	 * @param serverHost server host
+	 * @param zkNodeType zookeeper node type
+	 * @throws Exception exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-        if(StringUtils.isEmpty(serverHost)) {
-            return;
-        }
-        switch (zkNodeType) {
-            case MASTER:
-                failoverMaster(serverHost);
-                break;
-            case WORKER:
-                failoverWorker(serverHost, true);
-            default:
-                break;
-        }
-    }
+		if (StringUtils.isEmpty(serverHost)) {
+			return;
+		}
+		switch (zkNodeType) {
+			case MASTER:
+				failoverMaster(serverHost);
+				break;
+			case WORKER:
+				failoverWorker(serverHost, true);
+			default:
+				break;
+		}
+	}
 
 	/**
 	 * get failover lock path
