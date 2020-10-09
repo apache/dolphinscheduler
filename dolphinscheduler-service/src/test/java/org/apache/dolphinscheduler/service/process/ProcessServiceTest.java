@@ -39,7 +39,6 @@ public class ProcessServiceTest {
 
     @Test
     public void testCreateSubCommand() {
-
         ProcessService processService = new ProcessService();
         ProcessInstance parentInstance = new ProcessInstance();
         parentInstance.setProcessDefinitionId(1);
@@ -101,7 +100,5 @@ public class ProcessServiceTest {
                 parentInstance, childInstance, instanceMap, task
         );
         Assert.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
-
-
     }
 }

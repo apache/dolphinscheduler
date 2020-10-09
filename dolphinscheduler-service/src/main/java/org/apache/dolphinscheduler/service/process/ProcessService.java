@@ -905,13 +905,13 @@ public class ProcessService {
     }
 
     /**
-     * set work process instance map	     * set work process instance map
+     * set work process instance map
      * consider o
      * repeat running  does not generate new sub process instance
      * set map {parent instance id, task instance id, 0(child instance id)}
-     * @param parentInstance parentInstance	     * @param parentInstance parentInstance
-     * @param parentTask parentTask	     * @param parentTask parentTask
-     * @return process instance map	     * @return process instance map
+     * @param parentInstance parentInstance
+     * @param parentTask parentTask
+     * @return process instance map
      */
     private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask){
         ProcessInstanceMap processMap = findWorkProcessMapByParent(parentInstance.getId(), parentTask.getId());
