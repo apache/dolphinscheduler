@@ -155,8 +155,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-		if (StringUtils.isEmpty(serverHost)){
-			return ;
+		if (StringUtils.isEmpty(serverHost)) {
+			return;
 		}
 		switch (zkNodeType) {
 			case MASTER:
@@ -256,7 +256,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return true if task instance start time after worker server start date
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
-		if(StringUtils.isEmpty(taskInstance.getHost())){
+		if (StringUtils.isEmpty(taskInstance.getHost())) {
 			return false;
 		}
 		Date workerServerStartDate = null;
@@ -267,12 +267,10 @@ public class ZKMasterClient extends AbstractZKClient {
 				break;
 			}
 		}
-
-		if(workerServerStartDate != null){
+		if (workerServerStartDate != null) {
 			return taskInstance.getStartTime().after(workerServerStartDate);
-		}else{
-			return false;
 		}
+		return false;
 	}
 
 	/**
