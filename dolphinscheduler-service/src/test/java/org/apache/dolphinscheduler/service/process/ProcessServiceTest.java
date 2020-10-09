@@ -20,16 +20,35 @@ package org.apache.dolphinscheduler.service.process;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
+import org.apache.hadoop.hdfs.web.JsonUtil;
+import org.apache.logging.log4j.core.util.JsonUtils;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonParser.NumberType;
+import com.fasterxml.jackson.core.JsonPointer;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 /**
  * process service test
@@ -45,7 +64,7 @@ public class ProcessServiceTest {
         parentInstance.setWarningGroupId(0);
 
         TaskInstance task = new TaskInstance();
-        task.setTaskJson("{params:{processDefinitionId:100}}");
+        task.setTaskJson("{\"params\":{\"processDefinitionId\":100}}");
         task.setId(10);
 
         ProcessInstance childInstance = null;
@@ -79,17 +98,25 @@ public class ProcessServiceTest {
         Assert.assertEquals(CommandType.SCHEDULER, command.getCommandType());
 
         //father history: complement,start failure; child null == command type: complement
+
+        String startString = "2020-01-01 00:00:00";
+        String endString = "2020-01-10 00:00:00";
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("COMPLEMENT_DATA,START_FAILURE_TASK_PROCESS");
-        parentInstance.setCommandParam("{complementStartDate:'2020-01-01',complementEndDate:'2020-01-10'}");
+        Map<String,String> complementMap = new HashMap<>();
+        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE, startString);
+        complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
+        parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
         command = processService.createSubProcessCommand(
                 parentInstance, childInstance, instanceMap, task
         );
         Assert.assertEquals(CommandType.COMPLEMENT_DATA, command.getCommandType());
 
         JsonNode complementDate = JSONUtils.parseObject(command.getCommandParam());
-        Assert.assertEquals("2020-01-01", String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE)));
-        Assert.assertEquals("2020-01-10", String.valueOf(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE)));
+        Date start = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE).asText());
+        Date end = DateUtils.stringToDate(complementDate.get(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE).asText());
+        Assert.assertEquals(startString, DateUtils.dateToString(start));
+        Assert.assertEquals(endString, DateUtils.dateToString(end));
 
         //father history: start,failure,start failure; child not null == command type: start failure
         childInstance = new ProcessInstance();
