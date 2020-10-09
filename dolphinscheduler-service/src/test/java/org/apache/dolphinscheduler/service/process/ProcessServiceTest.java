@@ -27,28 +27,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import org.apache.hadoop.hdfs.web.JsonUtil;
-import org.apache.logging.log4j.core.util.JsonUtils;
-
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonParser.NumberType;
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 /**
  * process service test
