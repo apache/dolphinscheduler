@@ -31,12 +31,11 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-
 /**
+ *
  * process service test
  */
 public class ProcessServiceTest {
-
 
     @Test
     public void testCreateSubCommand() {
@@ -72,7 +71,6 @@ public class ProcessServiceTest {
                 parentInstance, childInstance, instanceMap, task
         );
         Assert.assertEquals(CommandType.START_PROCESS, command.getCommandType());
-
 
         //father history: scheduler,start failure; child null == command type: scheduler
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
