@@ -30,7 +30,7 @@
                     :disabled="item ? true : false"
                     v-model="tenantCode"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')">
+                    :placeholder="$t('Please enter tenant code')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -41,7 +41,7 @@
                     type="input"
                     v-model="tenantName"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
+                    :placeholder="$t('Please enter tenant Name')"
                     autocomplete="off">
             </x-input>
           </template>
@@ -88,7 +88,7 @@
         store,
         queueList: [],
         queueId: '',
-        tenantCode: '',
+        tenantCode: null,
         tenantName: '',
         description: '',
       }
@@ -133,17 +133,20 @@
       },
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
+        let isNumber = /^\d+$/
+        let isComb =/^[0-9a-zA-Z]*$/g
 
-        if (!this.tenantCode.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
+        if(!isComb.test(this.tenantCode)) {
+          this.$message.warning(`${i18n.$t('The tenant code. Only letters or a combination of letters and numbers are allowed')}`)
           return false
         }
-        if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
+        if(isNumber.test(this.tenantCode)) {
+          this.$message.warning(`${i18n.$t('The tenant code. Only letters or a combination of letters and numbers are allowed')}`)
           return false
         }
+
         if (!this.tenantName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter name')}`)
+          this.$message.warning(`${i18n.$t('Please enter tenant Name')}`)
           return false
         }
         // Verify tenant name cannot contain special characters
