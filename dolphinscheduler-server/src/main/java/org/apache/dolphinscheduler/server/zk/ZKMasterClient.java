@@ -256,9 +256,9 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return true if task instance start time after worker server start date
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
-		if (StringUtils.isEmpty(taskInstance.getHost())) {
-			return false;
-		}
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            return false;
+        }
 		Date workerServerStartDate = null;
 		List<Server> workerServers = getServersList(ZKNodeType.WORKER);
 		for (Server workerServer : workerServers) {
