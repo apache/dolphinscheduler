@@ -176,6 +176,7 @@ public enum Status {
     QUERY_WORKER_GROUP_FAIL(10146, "query worker group fail ", "查询worker分组失败"),
     DELETE_WORKER_GROUP_FAIL(10147, "delete worker group fail ", "删除worker分组失败"),
     COPY_PROCESS_DEFINITION_ERROR(10148, "copy process definition from {0} to {1} error : {2}", "从{0}复制工作流到{1}错误 : {2}"),
+    CHECK_TENANT_CODE_ERROR(10149, "Please enter the English tenant code", "请输入英文租户编码"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),

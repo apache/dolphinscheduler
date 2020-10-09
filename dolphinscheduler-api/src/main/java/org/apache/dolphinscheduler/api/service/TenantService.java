@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -89,6 +90,11 @@ public class TenantService extends BaseService{
     Map<String, Object> result = new HashMap<>(5);
     result.put(Constants.STATUS, false);
     if (checkAdmin(loginUser, result)) {
+      return result;
+    }
+
+    if (RegexUtils.isNumeric(tenantCode)) {
+      putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
       return result;
     }
 
@@ -188,6 +194,12 @@ public class TenantService extends BaseService{
      * if the tenant code is modified, the original resource needs to be copied to the new tenant.
      */
     if (!tenant.getTenantCode().equals(tenantCode)){
+
+      if (RegexUtils.isNumeric(tenantCode)) {
+        putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
+        return result;
+      }
+
       if (checkTenantExists(tenantCode)){
         // if hdfs startup
         if (PropertyUtils.getResUploadStartupState()){
