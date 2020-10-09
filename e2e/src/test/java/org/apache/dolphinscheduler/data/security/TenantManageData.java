@@ -25,7 +25,7 @@ public class TenantManageData {
     /**
      * Tenant Code
      */
-    public static final String TENANT_CODE = "seleniumTenantCode_1";
+    public static final String TENANT_CODE = "seleniumTenantCode1";
 
     /**
      * Tenant Name
