@@ -144,8 +144,6 @@ public class ProcessService {
     @Autowired
     private ResourceMapper resourceMapper;
 
-
-
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
@@ -180,7 +178,7 @@ public class ProcessService {
         processInstance.addHistoryCmd(command.getCommandType());
         saveProcessInstance(processInstance);
         this.setSubProcessParam(processInstance);
-        delCommandByid(command.getId());
+        delCommandById(command.getId());
         return processInstance;
     }
 
@@ -193,7 +191,7 @@ public class ProcessService {
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
-        delCommandByid(command.getId());
+        delCommandById(command.getId());
     }
 
     /**
@@ -1310,7 +1308,7 @@ public class ProcessService {
      * delete a command by id
      * @param id  id
      */
-    public void delCommandByid(int id) {
+    public void delCommandById(int id) {
         commandMapper.deleteById(id);
     }
 
@@ -1642,7 +1640,7 @@ public class ProcessService {
      * @param ids ids
      * @return udf function list
      */
-    public List<UdfFunc> queryUdfFunListByids(int[] ids){
+    public List<UdfFunc> queryUdfFunListByIds(int[] ids){
         return udfFuncMapper.queryUdfByIdStr(ids, null);
     }
 
