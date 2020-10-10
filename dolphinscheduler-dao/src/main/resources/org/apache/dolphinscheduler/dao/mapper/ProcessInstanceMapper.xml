@@ -167,8 +167,7 @@
     <select id="queryLastRunningProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
         from t_ds_process_instance
-        where 1=1
-        and process_definition_id=#{processDefinitionId}
+        where process_definition_id=#{processDefinitionId}
         <if test="states !=null and states.length != 0">
             and state in
             <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
