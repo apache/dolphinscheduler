@@ -183,7 +183,6 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        // send heartbeat when read idle.
         if (evt instanceof IdleStateEvent) {
             ctx.channel().close();
         } else {
