@@ -63,6 +63,9 @@ const stateType = [
   }, {
     code: 'DELAY_EXECUTION',
     label: `${i18n.$t('Delay execution')}`
+  }, {
+    code: 'FORCED_SUCCESS',
+    label: `${i18n.$t('Forced success')}`
   }
 ]
 

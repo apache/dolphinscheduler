@@ -236,6 +236,13 @@ const tasksState = {
     color: '#5102ce',
     icoUnicode: 'ans-icon-coin',
     isSpin: false
+  },
+  FORCED_SUCCESS: {
+    id: 13,
+    desc: `${i18n.$t('Forced success')}`,
+    color: '#5102ce',
+    icoUnicode: 'ans-icon-success-solid',
+    isSpin: false
   }
 }
 
