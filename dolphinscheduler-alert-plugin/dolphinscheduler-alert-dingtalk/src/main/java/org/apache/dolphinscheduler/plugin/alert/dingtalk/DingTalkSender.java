@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
-import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -61,8 +60,6 @@ public class DingTalkSender {
     private String user;
 
     private String password;
-
-    private boolean dingTalkIsEnable = false;
 
 
     public DingTalkSender(Map<String, String> config) {

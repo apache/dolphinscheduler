@@ -74,7 +74,6 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                     .setRequired(true).build())
                 .build();
-        //todo
         PasswordParam passwordParam = PasswordParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, DingTalkParamsConstants.DING_TALK_PASSWORD)
             .setPlaceholder("if enable use authentication, you need input password")
             .build();
