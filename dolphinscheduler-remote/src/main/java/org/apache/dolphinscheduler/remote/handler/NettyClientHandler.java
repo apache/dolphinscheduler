@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -52,6 +53,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * netty client
      */
     private final NettyRemotingClient nettyRemotingClient;
+
+    private static byte[] heartBeatData = "heart_beat".getBytes();
 
     /**
      * callback thread executor
@@ -188,7 +191,9 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             Command heartBeat = new Command();
             heartBeat.setType(CommandType.HEART_BEAT);
-            ctx.writeAndFlush(heartBeat);
+            heartBeat.setBody(heartBeatData);
+            ctx.writeAndFlush(heartBeat)
+                .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
 
         } else {
             super.userEventTriggered(ctx, evt);
