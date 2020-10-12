@@ -177,7 +177,6 @@ export default {
   'Please enter tenant Name': 'Please enter tenant Name',
   'The tenant code. Only letters or a combination of letters and numbers are allowed': 'The tenant code. Only letters or a combination of letters and numbers are allowed',
   'The tenant code cannot be all numbers': 'The tenant code cannot be all numbers',
-  'Please enter tenant name without special characters': 'Please enter tenant name without special characters',
   'Edit User': 'Edit User',
   Tenant: 'Tenant',
   Email: 'Email',
