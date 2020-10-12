@@ -896,7 +896,7 @@ public class ProcessService {
             return task;
         }
         if(!task.getState().typeIsFinished()){
-            createSubWorkProcessCommand(processInstance, task);
+            createSubWorkProcess(processInstance, task);
         }
 
         logger.info("end submit task to db successfully:{} state:{} complete, instance id:{} state: {}  ",
@@ -906,20 +906,22 @@ public class ProcessService {
 
     /**
      * set work process instance map
+     * consider o
+     * repeat running  does not generate new sub process instance
+     * set map {parent instance id, task instance id, 0(child instance id)}
      * @param parentInstance parentInstance
      * @param parentTask parentTask
      * @return process instance map
      */
     private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask){
         ProcessInstanceMap processMap = findWorkProcessMapByParent(parentInstance.getId(), parentTask.getId());
-        if(processMap != null){
+        if (processMap != null) {
             return processMap;
-        }else if(parentInstance.getCommandType() == CommandType.REPEAT_RUNNING
-                || parentInstance.isComplementData()){
+        }
+        if (parentInstance.getCommandType() == CommandType.REPEAT_RUNNING) {
             // update current task id to map
-            // repeat running  does not generate new sub process instance
             processMap = findPreviousTaskProcessMap(parentInstance, parentTask);
-            if(processMap!= null){
+            if (processMap != null) {
                 processMap.setParentTaskInstanceId(parentTask.getId());
                 updateWorkProcessInstanceMap(processMap);
                 return processMap;
@@ -944,11 +946,11 @@ public class ProcessService {
 
         Integer preTaskId = 0;
         List<TaskInstance> preTaskList = this.findPreviousTaskListByWorkProcessId(parentProcessInstance.getId());
-        for(TaskInstance task : preTaskList){
-            if(task.getName().equals(parentTask.getName())){
+        for (TaskInstance task : preTaskList) {
+            if (task.getName().equals(parentTask.getName())) {
                 preTaskId = task.getId();
                 ProcessInstanceMap map = findWorkProcessMapByParent(parentProcessInstance.getId(), preTaskId);
-                if(map!=null){
+                if (map != null) {
                     return map;
                 }
             }
@@ -960,66 +962,111 @@ public class ProcessService {
 
     /**
      * create sub work process command
+     *
      * @param parentProcessInstance parentProcessInstance
-     * @param task task
+     * @param task                  task
      */
-    private void createSubWorkProcessCommand(ProcessInstance parentProcessInstance,
-                                             TaskInstance task){
-        if(!task.isSubProcess()){
+    public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
+        if (!task.isSubProcess()) {
             return;
         }
-        ProcessInstanceMap instanceMap = setProcessInstanceMap(parentProcessInstance, task);
-        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
-        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
-        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
-
-        ProcessInstance childInstance = findSubProcessInstance(parentProcessInstance.getId(), task.getId());
-
-        CommandType fatherType = parentProcessInstance.getCommandType();
-        CommandType commandType = fatherType;
-        if(childInstance == null){
-            String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
-            // sub process must begin with schedule/complement data
-            // if father begin with scheduler/complement data
-            if(fatherHistoryCommand.startsWith(CommandType.SCHEDULER.toString()) ||
-                    fatherHistoryCommand.startsWith(CommandType.COMPLEMENT_DATA.toString())){
-                commandType = CommandType.valueOf(fatherHistoryCommand.split(Constants.COMMA)[0]);
-            }
+        //check create sub work flow firstly
+        ProcessInstanceMap instanceMap = findWorkProcessMapByParent(parentProcessInstance.getId(), task.getId());
+        if (null != instanceMap && CommandType.RECOVER_TOLERANCE_FAULT_PROCESS == parentProcessInstance.getCommandType()) {
+            // recover failover tolerance would not create a new command when the sub command already have been created
+            return;
         }
-
-        if(childInstance != null){
-            childInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-            updateProcessInstance(childInstance);
+        instanceMap = setProcessInstanceMap(parentProcessInstance, task);
+        ProcessInstance childInstance = null;
+        if (instanceMap.getProcessInstanceId() != 0) {
+            childInstance = findProcessInstanceById(instanceMap.getProcessInstanceId());
         }
+        Command subProcessCommand = createSubProcessCommand(parentProcessInstance, childInstance, instanceMap, task);
+        updateSubProcessDefinitionByParent(parentProcessInstance, subProcessCommand.getProcessDefinitionId());
+        initSubInstanceState(childInstance);
+        createCommand(subProcessCommand);
+        logger.info("sub process command created: {} ", subProcessCommand);
+    }
+
+    /**
+     * complement data needs transform parent parameter to child.
+     * @param instanceMap
+     * @param parentProcessInstance
+     * @return
+     */
+    private String getSubWorkFlowParam(ProcessInstanceMap instanceMap, ProcessInstance parentProcessInstance) {
         // set sub work process command
         String processMapStr = JSONUtils.toJsonString(instanceMap);
         Map<String, String> cmdParam = JSONUtils.toMap(processMapStr);
-
-        if(commandType == CommandType.COMPLEMENT_DATA ||
-                (childInstance != null && childInstance.isComplementData())){
+        if (parentProcessInstance.isComplementData()) {
             Map<String, String> parentParam = JSONUtils.toMap(parentProcessInstance.getCommandParam());
-            String endTime =  parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
-            String startTime =  parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
+            String endTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE);
+            String startTime = parentParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE);
             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, endTime);
             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
             processMapStr = JSONUtils.toJsonString(cmdParam);
         }
+        return processMapStr;
+    }
 
-        updateSubProcessDefinitionByParent(parentProcessInstance, childDefineId);
+    /**
+     * create sub work process command
+     * @param parentProcessInstance
+     * @param childInstance
+     * @param instanceMap
+     * @param task
+     */
+    public Command createSubProcessCommand(ProcessInstance parentProcessInstance,
+                                           ProcessInstance childInstance,
+                                           ProcessInstanceMap instanceMap,
+                                           TaskInstance task) {
+        CommandType commandType = getSubCommandType(parentProcessInstance, childInstance);
+        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
+        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
+        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
+        String processParam = getSubWorkFlowParam(instanceMap, parentProcessInstance);
 
-        Command command = new Command();
-        command.setWarningType(parentProcessInstance.getWarningType());
-        command.setWarningGroupId(parentProcessInstance.getWarningGroupId());
-        command.setFailureStrategy(parentProcessInstance.getFailureStrategy());
-        command.setProcessDefinitionId(childDefineId);
-        command.setScheduleTime(parentProcessInstance.getScheduleTime());
-        command.setExecutorId(parentProcessInstance.getExecutorId());
-        command.setCommandParam(processMapStr);
-        command.setCommandType(commandType);
-        command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
-        command.setWorkerGroup(parentProcessInstance.getWorkerGroup());
-        createCommand(command);
-        logger.info("sub process command created: {} ", command.toString());
+        return new Command(
+                commandType,
+                TaskDependType.TASK_POST,
+                parentProcessInstance.getFailureStrategy(),
+                parentProcessInstance.getExecutorId(),
+                childDefineId,
+                processParam,
+                parentProcessInstance.getWarningType(),
+                parentProcessInstance.getWarningGroupId(),
+                parentProcessInstance.getScheduleTime(),
+                parentProcessInstance.getProcessInstancePriority()
+        );
+    }
+
+    /**
+     * initialize sub work flow state
+     * child instance state would be initialized when 'recovery from pause/stop/failure'
+     * @param childInstance
+     */
+    private void initSubInstanceState(ProcessInstance childInstance) {
+        if (childInstance != null) {
+            childInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+            updateProcessInstance(childInstance);
+        }
+    }
+
+    /**
+     * get sub work flow command type
+     * child instance exist: child command = fatherCommand
+     * child instance not exists: child command = fatherCommand[0]
+     *
+     * @param parentProcessInstance
+     * @return
+     */
+    private CommandType getSubCommandType(ProcessInstance parentProcessInstance, ProcessInstance childInstance) {
+        CommandType commandType = parentProcessInstance.getCommandType();
+        if (childInstance == null) {
+            String fatherHistoryCommand = parentProcessInstance.getHistoryCmd();
+            commandType = CommandType.valueOf(fatherHistoryCommand.split(Constants.COMMA)[0]);
+        }
+        return commandType;
     }
 
     /**
@@ -1495,20 +1542,6 @@ public class ProcessService {
             result.add(String.valueOf(intVar));
         }
         return result;
-    }
-
-    /**
-     * update pid and app links field by task instance id
-     * @param taskInstId taskInstId
-     * @param pid pid
-     * @param appLinks appLinks
-     */
-    public void updatePidByTaskInstId(int taskInstId, int pid,String appLinks) {
-
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
-        taskInstance.setPid(pid);
-        taskInstance.setAppLink(appLinks);
-        saveTaskInstance(taskInstance);
     }
 
     /**
