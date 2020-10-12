@@ -377,6 +377,7 @@ CREATE TABLE t_ds_process_instance (
   worker_group varchar(64) ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_id,id);
@@ -595,6 +596,7 @@ CREATE TABLE t_ds_task_instance (
   executor_id int DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
 
@@ -793,3 +795,33 @@ INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('defaul
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_version(version) VALUES ('1.3.0');
+
+--
+-- Table structure for table t_ds_plugin_define
+--
+DROP TABLE IF EXISTS t_ds_plugin_define;
+CREATE TABLE t_ds_plugin_define (
+	id serial NOT NULL,
+	plugin_name varchar(100) NOT NULL,
+	plugin_type varchar(100) NOT NULL,
+	plugin_params text NULL,
+	create_time timestamp NULL,
+	update_time timestamp NULL,
+	CONSTRAINT t_ds_plugin_define_pk PRIMARY KEY (id),
+	CONSTRAINT t_ds_plugin_define_un UNIQUE (plugin_name, plugin_type)
+);
+
+--
+-- Table structure for table t_ds_alert_plugin_instance
+--
+DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
+CREATE TABLE t_ds_alert_plugin_instance (
+	id serial NOT NULL,
+	plugin_define_id int4 NOT NULL,
+	plugin_instance_params text NULL,
+	create_time timestamp NULL,
+	update_time timestamp NULL,
+	alert_group_id int4 NOT NULL,
+	instance_name varchar(200) NULL,
+	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
+);

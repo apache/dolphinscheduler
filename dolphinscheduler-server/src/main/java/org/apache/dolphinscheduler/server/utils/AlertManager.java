@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -29,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,7 +89,7 @@ public class AlertManager {
      * get process instance content
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
@@ -141,7 +141,7 @@ public class AlertManager {
     /**
      * getting worker fault tolerant content
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      * @return worker tolerance content
      */
@@ -164,14 +164,14 @@ public class AlertManager {
     /**
      * send worker alert fault tolerance
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
         try {
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
-            alert.setShowType(ShowType.TABLE);
+            //alert.setShowType(ShowType.TABLE);
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
             alert.setAlertType(AlertType.EMAIL);
@@ -192,7 +192,7 @@ public class AlertManager {
      * send process instance alert
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances) {
@@ -226,7 +226,7 @@ public class AlertManager {
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
-        alert.setShowType(showType);
+        //alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
@@ -242,7 +242,7 @@ public class AlertManager {
     /**
      * send process timeout alert
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param processDefinition process definition
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {

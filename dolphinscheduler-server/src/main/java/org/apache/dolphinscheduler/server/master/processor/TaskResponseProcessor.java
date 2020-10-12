@@ -90,7 +90,8 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
-                responseCommand.getTaskInstanceId());
+                responseCommand.getTaskInstanceId(),
+                responseCommand.getVarPool());
 
         taskResponseService.addResponse(taskResponseEvent);
 
