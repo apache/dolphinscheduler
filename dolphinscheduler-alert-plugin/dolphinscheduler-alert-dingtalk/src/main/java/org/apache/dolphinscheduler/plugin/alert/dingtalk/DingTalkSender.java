@@ -34,12 +34,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Ding Talk Sender
@@ -62,7 +63,7 @@ public class DingTalkSender {
     private String password;
 
 
-    public DingTalkSender(Map<String, String> config) {
+    DingTalkSender(Map<String, String> config) {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_ENABLE));
@@ -75,7 +76,6 @@ public class DingTalkSender {
         }
 
     }
-
 
     public String sendDingTalkMsg(String msg, String charset) throws IOException {
         String msgToJson = textToJsonString(msg + "#" + keyword);
@@ -107,7 +107,7 @@ public class DingTalkSender {
         }
     }
 
-    public static HttpPost constructHttpPost(String url, String msg, String charset) {
+    private static HttpPost constructHttpPost(String url, String msg, String charset) {
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(msg, charset);
         post.setEntity(entity);
@@ -115,19 +115,18 @@ public class DingTalkSender {
         return post;
     }
 
-    public static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
+    private static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(provider).build();
-        return httpClient;
+        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
     }
 
-    public static CloseableHttpClient getDefaultClient() {
+    private static CloseableHttpClient getDefaultClient() {
         return HttpClients.createDefault();
     }
 
-    public static RequestConfig getProxyConfig(String proxy, int port) {
+    private static RequestConfig getProxyConfig(String proxy, int port) {
         HttpHost httpProxy = new HttpHost(proxy, port);
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
