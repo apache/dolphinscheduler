@@ -133,15 +133,14 @@
       },
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
-        let isNumber = /^\d+$/
-        let isComb =/^[0-9a-zA-Z]*$/g
 
-        if(!isComb.test(this.tenantCode)) {
-          this.$message.warning(`${i18n.$t('The tenant code. Only letters or a combination of letters and numbers are allowed')}`)
+        if (!this.tenantCode.replace(/\s*/g,"")) {
+          this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
-        if(isNumber.test(this.tenantCode)) {
-          this.$message.warning(`${i18n.$t('The tenant code. Only letters or a combination of letters and numbers are allowed')}`)
+
+        if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
+          this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
 
