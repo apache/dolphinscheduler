@@ -28,6 +28,7 @@
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
 
+
     <dependencies>
 
         <dependency>
