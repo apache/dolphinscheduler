@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - 1.3.3-release
+      - dev
 env:
   LOG_DIR: /tmp/dolphinscheduler
 
