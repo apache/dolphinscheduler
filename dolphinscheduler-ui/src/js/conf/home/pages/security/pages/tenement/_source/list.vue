@@ -16,7 +16,7 @@
  */
 <template>
   <div class="list-model">
-    <div class="table-box">
+    <!-- <div class="table-box">
       <table>
         <tr>
           <th>
@@ -106,6 +106,45 @@
           </td>
         </tr>
       </table>
+    </div> -->
+    <div class="table-box">
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" width="50"></el-table-column>
+        <el-table-column prop="tenantCode" :label="$t('Tenant Code')" width="180"></el-table-column>
+        <el-table-column prop="tenantName" :label="$t('Tenant Name')" width="180"></el-table-column>
+        <el-table-column prop="description" :label="$t('Description')" width="180"></el-table-column>
+        <el-table-column prop="queueName" :label="$t('Queue')" width="180"></el-table-column>
+        <el-table-column :label="$t('Create Time')">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Edit')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="_edit(scope.row)" circle></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('delete')" placement="top">
+              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -127,18 +166,13 @@
     },
     methods: {
       ...mapActions('security', ['deleteQueue']),
-      _closeDelete (i) {
-        this.$refs[`poptip-${i}`][0].doClose()
-      },
       _delete (item, i) {
         this.deleteQueue({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },

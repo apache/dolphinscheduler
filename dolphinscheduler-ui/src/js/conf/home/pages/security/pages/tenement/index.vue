@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create Tenant')}}</x-button>
+          <el-button type="ghost" size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
         </template>
       </m-conditions>
     </template>
