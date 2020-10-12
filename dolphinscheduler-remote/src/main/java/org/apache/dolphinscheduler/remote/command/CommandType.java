@@ -99,7 +99,12 @@ public enum CommandType {
     TASK_KILL_RESPONSE,
 
     /**
-     *  ping
+     * HEART_BEAT
+     */
+    HEART_BEAT,
+
+    /**
+     * ping
      */
     PING,
 
