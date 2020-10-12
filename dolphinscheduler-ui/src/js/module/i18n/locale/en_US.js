@@ -342,6 +342,7 @@ export default {
   'Drag the file into the current upload window': 'Drag the file into the current upload window',
   'Drag area upload': 'Drag area upload',
   Upload: 'Upload',
+  'ReUpload File': 'Re-upload file',
   'Please enter file name': 'Please enter file name',
   'Please select the file to upload': 'Please select the file to upload',
   'Resources manage': 'Resources',
