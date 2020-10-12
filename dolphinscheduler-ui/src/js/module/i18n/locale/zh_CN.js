@@ -179,7 +179,6 @@ export default {
   'Please enter tenant code': '请输入租户编码',
   'Please enter tenant Name': '请输入租户名称',
   'The tenant code. Only letters or a combination of letters and numbers are allowed': '租户编码只允许字母或字母与数字组合',
-  'Please enter tenant name without special characters': '请输入不包含特殊字符的租户名称',
   'Edit User': '编辑用户',
   Tenant: '租户',
   Email: '邮件',

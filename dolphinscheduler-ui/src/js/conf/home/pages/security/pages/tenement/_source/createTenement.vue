@@ -149,13 +149,6 @@
           this.$message.warning(`${i18n.$t('Please enter tenant Name')}`)
           return false
         }
-        // Verify tenant name cannot contain special characters
-        let isSpecial = /[~#^$@%&!*()<>《》:;'"{}【】	]/gi
-        if (isSpecial.test(this.tenantName)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant name without special characters')}`)
-          return false
-        }
-
         return true
       },
       _submit () {
