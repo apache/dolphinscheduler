@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+<<<<<<< HEAD:dolphinscheduler-dao/src/main/java/org/apache/dolphinscheduler/dao/mapper/AlertPluginInstanceMapper.java
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -41,7 +42,7 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @return AlertPluginInstance list
      */
     List<AlertPluginInstance> queryByAlertGroupId(@Param("alertGroupId") int alertGroupId);
-
+=======
 package org.apache.dolphinscheduler.api.utils;
 
 import java.util.regex.Matcher;
@@ -71,4 +72,5 @@ public class RegexUtils {
         Matcher isNum = pattern.matcher(str);
         return isNum.matches();
     }
+>>>>>>> 1d254347df32ed832b69c621a24c242f33df0b13:dolphinscheduler-api/src/main/java/org/apache/dolphinscheduler/api/utils/RegexUtils.java
 }
