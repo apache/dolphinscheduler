@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.locator.security.TokenManageLocator;
 import org.openqa.selenium.WebDriver;
 
 public class TokenManagePage extends PageCommon {
+    TokenManageData tokenManageData = new TokenManageData();
+
     public TokenManagePage(WebDriver driver) {
         super(driver);
     }
@@ -36,10 +38,12 @@ public class TokenManagePage extends PageCommon {
         clickElement(TokenManageLocator.CLICK_TOKEN_MANAGE);
 
         //determine whether the create token button exists
-        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN,TokenManageData.CREATE_TOKEN);
+        ifTextExists(TokenManageLocator.CLICK_CREATE_TOKEN, tokenManageData.getTokenData("createTokenText"));
 
         // click  create token button
         clickButton(TokenManageLocator.CLICK_CREATE_TOKEN);
+
+        ifTextExists(TokenManageLocator.CREATE_TOKEN_POPUP,tokenManageData.getTokenData("createTokenText"));
 
         clickButton(TokenManageLocator.SELECT_USER);
 
@@ -50,7 +54,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
     /**
@@ -66,7 +70,7 @@ public class TokenManagePage extends PageCommon {
         locateElement(TokenManageLocator.EDIT_TOKEN_BUTTON);
 
         // click  edit token button
-        clickButton(TokenManageLocator.CLICK_EDIT_BUTTON);
+        clickButton(TokenManageLocator.EDIT_TOKEN_BUTTON);
 
         clickButton(TokenManageLocator.SELECT_USER);
 
@@ -77,7 +81,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 
@@ -89,7 +93,7 @@ public class TokenManagePage extends PageCommon {
         clickButton(TokenManageLocator.CLICK_DELETE_BUTTON);
         clickButton(TokenManageLocator.CLICK_CONFIRM_DELETE_BUTTON);
 
-        return ifTitleContains(TokenManageData.TOKEN_MANAGE);
+        return ifTitleContains(tokenManageData.getTokenData("tokenTitle"));
     }
 
 }

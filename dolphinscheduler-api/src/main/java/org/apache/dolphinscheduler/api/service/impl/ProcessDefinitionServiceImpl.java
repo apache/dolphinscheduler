@@ -48,7 +48,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -77,6 +77,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,6 +85,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -232,25 +234,16 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @return resource ids
      */
     private String getResourceIds(ProcessData processData) {
-        List<TaskNode> tasks = processData.getTasks();
-        Set<Integer> resourceIds = new HashSet<>();
-        for (TaskNode taskNode : tasks) {
-            String taskParameter = taskNode.getParams();
-            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
-            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-                Set<Integer> tempSet = params.getResourceFilesList().stream().map(t -> t.getId()).collect(Collectors.toSet());
-                resourceIds.addAll(tempSet);
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i : resourceIds) {
-            if (sb.length() > 0) {
-                sb.append(",");
-            }
-            sb.append(i);
-        }
-        return sb.toString();
+        return Optional.ofNullable(processData.getTasks())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(taskNode -> TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams()))
+                .filter(Objects::nonNull)
+                .flatMap(parameters -> parameters.getResourceFilesList().stream())
+                .map(ResourceInfo::getId)
+                .distinct()
+                .map(Objects::toString)
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -690,6 +683,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         exportProcessMeta.setProjectName(processDefinition.getProjectName());
         exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
         exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+        exportProcessMeta.setProcessDefinitionDescription(processDefinition.getDescription());
         exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
         exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
 
@@ -845,7 +839,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         try {
             createProcessResult = createProcessDefinition(loginUser
                     , currentProjectName,
-                    processDefinitionName + "_import_" + System.currentTimeMillis(),
+                    processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
                     importProcessParam,
                     processMeta.getProcessDefinitionDescription(),
                     processMeta.getProcessDefinitionLocations(),
@@ -1433,7 +1427,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return createProcessDefinition(
                     loginUser,
                     targetProject.getName(),
-                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
+                    processDefinition.getName() + "_copy_" + DateUtils.getCurrentTimeStamp(),
                     processDefinition.getProcessDefinitionJson(),
                     processDefinition.getDescription(),
                     processDefinition.getLocations(),

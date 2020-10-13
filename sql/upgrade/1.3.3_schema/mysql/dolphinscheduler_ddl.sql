@@ -56,12 +56,52 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_A_delay_time();
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_delay_time;
 
+-- uc_dolphin_T_t_ds_task_instance_A_var_pool
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_var_pool;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='var_pool')
+   THEN
+         ALTER TABLE t_ds_task_instance ADD `var_pool` longtext NULL;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_A_var_pool();
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_var_pool;
+
+-- uc_dolphin_T_t_ds_process_instance_A_var_pool
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_A_var_pool;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_instance_A_var_pool()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='var_pool')
+   THEN
+         ALTER TABLE t_ds_process_instance ADD `var_pool` longtext NULL;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_instance_A_var_pool();
+DROP PROCEDURE uc_dolphin_T_t_ds_process_instance_A_var_pool;
+
 -- uc_dolphin_T_t_ds_process_definition_A_modify_by
 drop PROCEDURE if EXISTS ct_dolphin_T_t_ds_process_definition_version;
 delimiter d//
 CREATE PROCEDURE ct_dolphin_T_t_ds_process_definition_version()
 BEGIN
-    CREATE TABLE `t_ds_process_definition_version` (
+    CREATE TABLE IF NOT EXISTS `t_ds_process_definition_version` (
                                                        `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
                                                        `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
                                                        `version` int(11) DEFAULT NULL COMMENT 'process definition version',
@@ -86,4 +126,30 @@ d//
 delimiter ;
 CALL ct_dolphin_T_t_ds_process_definition_version;
 DROP PROCEDURE ct_dolphin_T_t_ds_process_definition_version;
+
+
+
+
+--    add t_ds_resources_un
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_resources_un()
+BEGIN
+    IF NOT EXISTS (
+            SELECT * FROM information_schema.KEY_COLUMN_USAGE
+            WHERE  TABLE_NAME = 't_ds_resources'
+              AND CONSTRAINT_NAME = 't_ds_resources_un'
+        )
+    THEN
+        ALTER TABLE t_ds_resources ADD CONSTRAINT t_ds_resources_un UNIQUE KEY (full_name,`type`);
+    END IF;
+END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_resources_un();
+DROP PROCEDURE IF EXISTS uc_dolphin_T_t_ds_resources_un;
+
+
 

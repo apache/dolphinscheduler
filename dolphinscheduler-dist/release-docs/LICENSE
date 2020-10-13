@@ -502,6 +502,7 @@ MIT licenses
     vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
     vuex 3.0.0: https://github.com/vuejs/vuex MIT
     vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
+    dagre 0.8.5: https://github.com/dagrejs/dagre MIT
 
 ========================================
 Apache 2.0 licenses
