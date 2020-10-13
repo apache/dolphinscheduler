@@ -16,10 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class ProcessInstanceData {
-    //Process Instance page title
-    public static final String PROCESS_INSTANCE_TITLE = "工作流实例 - DolphinScheduler";
-    public static final String RERUN_TYPE= "重跑";
-
-
+    public String getProcessInstanceData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String processInstanceData = ymlReader.getDataYml("testData/workflow_zh_cn", "processInstance", param);
+        return  processInstanceData;
+    }
 }

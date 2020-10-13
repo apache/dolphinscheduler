@@ -487,6 +487,7 @@ CREATE TABLE `t_ds_process_instance` (
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_id`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
@@ -657,7 +658,8 @@ CREATE TABLE `t_ds_resources` (
   `pid` int(11) DEFAULT NULL,
   `full_name` varchar(64) DEFAULT NULL,
   `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -736,6 +738,7 @@ CREATE TABLE `t_ds_task_instance` (
   `executor_id` int(11) DEFAULT NULL,
   `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
   `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,
