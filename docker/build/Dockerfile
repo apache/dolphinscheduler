@@ -43,7 +43,7 @@ RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ 
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 #4. install database, if use mysql as your backend database, the `mysql-client` package should be installed
-RUN apk add --update --no-cache postgresql postgresql-contrib
+RUN apk add --update --no-cache postgresql postgresql-contrib mariadb-client
 
 #5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
