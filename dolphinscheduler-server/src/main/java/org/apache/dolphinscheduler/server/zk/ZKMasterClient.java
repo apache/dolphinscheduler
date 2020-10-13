@@ -155,10 +155,10 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-		if(StringUtils.isEmpty(serverHost) || serverHost.startsWith(OSUtils.getHost())){
-			return ;
+		if (StringUtils.isEmpty(serverHost)) {
+			return;
 		}
-		switch (zkNodeType){
+		switch (zkNodeType) {
 			case MASTER:
 				failoverMaster(serverHost);
 				break;
@@ -262,7 +262,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		Date workerServerStartDate = null;
 		List<Server> workerServers = getServersList(ZKNodeType.WORKER);
 		for(Server workerServer : workerServers){
-		    if(taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())){
+			if(taskInstance.getHost().equals(workerServer.getHost() + Constants.COLON + workerServer.getPort())){
 				workerServerStartDate = workerServer.getCreateTime();
 				break;
 			}
@@ -336,7 +336,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		//updateProcessInstance host is null and insert into command
 		for(ProcessInstance processInstance : needFailoverProcessInstanceList){
 			if(Constants.NULL.equals(processInstance.getHost()) ){
-			    continue;
+				continue;
 			}
 			processService.processNeedFailoverProcessInstances(processInstance);
 		}
