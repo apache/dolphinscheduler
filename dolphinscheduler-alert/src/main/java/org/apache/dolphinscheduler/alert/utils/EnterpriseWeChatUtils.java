@@ -104,10 +104,7 @@ public class EnterpriseWeChatUtils {
             }
 
             Map<String, String> map = JSONUtils.toMap(resp);
-            if (map == null) {
-                return null;
-            }
-            return map.get("access_token");
+            return map == null ? null : map.get("access_token");
         } finally {
             httpClient.close();
         }
