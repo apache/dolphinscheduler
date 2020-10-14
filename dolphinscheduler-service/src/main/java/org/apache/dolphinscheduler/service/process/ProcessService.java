@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
@@ -353,7 +354,6 @@ public class ProcessService {
         return 1;
     }
 
-
     /**
      * remove task log file
      * @param processInstanceId processInstanceId
@@ -382,12 +382,10 @@ public class ProcessService {
                 ip = taskInstance.getHost();
             }
 
-
             // remove task log from loggerserver
             logClient.removeTaskLog(ip,port,taskLogPath);
         }
     }
-
 
     /**
      * calculate sub process number in the process define.
@@ -462,7 +460,7 @@ public class ProcessService {
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
-            return ;
+            return;
         }
 
         // update the command time if current command if recover from waiting
@@ -616,7 +614,7 @@ public class ProcessService {
             }
         }
 
-        if(cmdParam != null ){
+        if(cmdParam != null){
             Integer processInstanceId = 0;
             // recover from failure or pause tasks
             if(cmdParam.containsKey(Constants.CMDPARAM_RECOVER_PROCESS_ID_STRING)) {
@@ -690,7 +688,7 @@ public class ProcessService {
                 cmdParam.put(Constants.CMDPARAM_RECOVERY_START_NODE_STRING,
                         String.join(Constants.COMMA, convertIntListToString(failedList)));
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                processInstance.setRunTimes(runTime +1 );
+                processInstance.setRunTimes(runTime +1);
                 break;
             case START_CURRENT_TASK_PROCESS:
                 break;
@@ -789,7 +787,6 @@ public class ProcessService {
                 CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
 
     }
-
 
     /**
      * set sub work process parameters.
@@ -1093,17 +1090,17 @@ public class ProcessService {
 
         if(taskInstance.getState().typeIsFailure()){
             if(taskInstance.isSubProcess()){
-                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
             }else {
 
-                if( processInstanceState != ExecutionStatus.READY_STOP
+                if(processInstanceState != ExecutionStatus.READY_STOP
                         && processInstanceState != ExecutionStatus.READY_PAUSE){
                     // failure task set invalid
                     taskInstance.setFlag(Flag.NO);
                     updateTaskInstance(taskInstance);
                     // crate new task instance
                     if(taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE){
-                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
                     }
                     taskInstance.setSubmitTime(null);
                     taskInstance.setStartTime(null);
@@ -1129,7 +1126,6 @@ public class ProcessService {
         }
         return taskInstance;
     }
-
 
     /**
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskInstanceId}_${task executed by ip1},${ip2}...
@@ -1172,9 +1168,9 @@ public class ProcessService {
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState){
         ExecutionStatus state = taskInstance.getState();
         if(
-            // running, delayed or killed
-            // the task already exists in task queue
-            // return state
+                // running, delayed or killed
+                // the task already exists in task queue
+                // return state
                 state == ExecutionStatus.RUNNING_EXECUTION
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
@@ -1184,7 +1180,7 @@ public class ProcessService {
         }
         //return pasue /stop if process instance state is ready pause / stop
         // or return submit success
-        if( processInstanceState == ExecutionStatus.READY_PAUSE){
+        if(processInstanceState == ExecutionStatus.READY_PAUSE){
             state = ExecutionStatus.PAUSE;
         }else if(processInstanceState == ExecutionStatus.READY_STOP
                 || !checkProcessStrategy(taskInstance)) {
@@ -1250,7 +1246,7 @@ public class ProcessService {
 
         if (processInstance == null){
             logger.error("save error, process instance is null!");
-            return ;
+            return;
         }
         if(processInstance.getId() != 0){
             processInstanceMapper.updateById(processInstance);
@@ -1304,6 +1300,7 @@ public class ProcessService {
         int count = taskInstanceMapper.updateById(taskInstance);
         return count > 0;
     }
+
     /**
      * delete a command by id
      * @param id  id
@@ -1320,7 +1317,6 @@ public class ProcessService {
     public TaskInstance findTaskInstanceById(Integer taskId){
         return taskInstanceMapper.selectById(taskId);
     }
-
 
     /**
      * package task instance，associate processInstance and processDefine
@@ -1342,7 +1338,6 @@ public class ProcessService {
         taskInstance.setProcessDefine(processDefine);
         return taskInstance;
     }
-
 
     /**
      * get id list by task state
@@ -1380,7 +1375,6 @@ public class ProcessService {
     public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap){
         return processInstanceMapMapper.updateById(processInstanceMap);
     }
-
 
     /**
      * create work process instance map
@@ -1445,7 +1439,6 @@ public class ProcessService {
         processInstance = findProcessInstanceById(processInstanceMap.getParentProcessInstanceId());
         return processInstance;
     }
-
 
     /**
      * change task state
@@ -1608,7 +1601,6 @@ public class ProcessService {
         return dataSourceMapper.selectById(id);
     }
 
-
     /**
      * update process instance state by id
      * @param processInstanceId processInstanceId
@@ -1696,7 +1688,6 @@ public class ProcessService {
             logger.warn("scheduledFireTime is null!is invalid!");
             return cycleDependencyList;
         }
-
 
         String strCrontab = "";
         CronExpression depCronExpression;
@@ -1806,8 +1797,6 @@ public class ProcessService {
         }
         return queue;
     }
-
-
 
     /**
      * get task worker group
@@ -1921,7 +1910,6 @@ public class ProcessService {
     public Resource getResourceById(int resoruceId){
         return resourceMapper.selectById(resoruceId);
     }
-
 
     /**
      * list resources by ids
