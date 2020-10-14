@@ -253,6 +253,7 @@ public enum Status {
     IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error", "导入工作流定义错误"),
     NO_VALID_FORCED_SUCCESS_TASK(50030, "there is no valid forced success node in process instance {0}", "工作流实例[{0}]中不包含有效的强制成功的任务实例"),
 
+    
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
