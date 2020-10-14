@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -73,11 +74,11 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
      * @param tenantName tenant name
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -91,6 +92,11 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
         if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+
+        if (RegexUtils.isNumeric(tenantCode)) {
+            putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
             return result;
         }
 
@@ -131,8 +137,8 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -157,12 +163,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser login user
-     * @param id tennat id
+     * @param loginUser  login user
+     * @param id         tennat id
      * @param tenantCode tennat code
      * @param tenantName tennat name
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
@@ -229,7 +235,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */
