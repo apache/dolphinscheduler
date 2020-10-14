@@ -360,8 +360,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-boot-starter-logging 2.1.17.RELEASE: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-logging/2.1.17.RELEASE, Apache 2.0
     spring-boot-starter-web 2.1.17.RELEASE: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.1.17.RELEASE, Apache 2.0
     spring-context 5.1.18.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-context/5.1.18.RELEASE, Apache 2.0
-    spring-core 5.1.18.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-core, Apache 2.0
-    spring-expression 5.1.18.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-expression, Apache 2.0
+    spring-core 5.1.18.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-core/5.1.18.RELEASE, Apache 2.0
+    spring-expression 5.1.18.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.1.18.RELEASE, Apache 2.0
     springfox-core 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-core, Apache 2.0
     springfox-schema 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-schema, Apache 2.0
     springfox-spi 2.9.2: https://mvnrepository.com/artifact/io.springfox/springfox-spi, Apache 2.0
