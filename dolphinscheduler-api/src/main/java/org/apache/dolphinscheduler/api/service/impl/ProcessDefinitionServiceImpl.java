@@ -434,7 +434,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -683,6 +683,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         exportProcessMeta.setProjectName(processDefinition.getProjectName());
         exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
         exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+        exportProcessMeta.setProcessDefinitionDescription(processDefinition.getDescription());
         exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
         exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
 
