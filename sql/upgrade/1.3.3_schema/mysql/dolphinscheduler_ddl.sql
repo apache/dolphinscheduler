@@ -101,7 +101,7 @@ drop PROCEDURE if EXISTS ct_dolphin_T_t_ds_process_definition_version;
 delimiter d//
 CREATE PROCEDURE ct_dolphin_T_t_ds_process_definition_version()
 BEGIN
-    CREATE TABLE `t_ds_process_definition_version` (
+    CREATE TABLE IF NOT EXISTS `t_ds_process_definition_version` (
                                                        `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
                                                        `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
                                                        `version` int(11) DEFAULT NULL COMMENT 'process definition version',
