@@ -108,6 +108,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionService.class);
 
+    private static final String PROCESSDEFINITION_ID = "processDefinitionId";
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -195,7 +196,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setFlag(Flag.YES);
         processDefineMapper.insert(processDefine);
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId",processDefine.getId());
+        result.put(PROCESSDEFINITION_ID,processDefine.getId());
         return result;
     }
 
@@ -836,7 +837,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //create process definition
         Integer processDefinitionId =
-                Objects.isNull(createProcessResult.get("processDefinitionId")) ? null : Integer.parseInt(createProcessResult.get("processDefinitionId").toString());
+                Objects.isNull(createProcessResult.get(PROCESSDEFINITION_ID)) ? null : Integer.parseInt(createProcessResult.get(PROCESSDEFINITION_ID).toString());
 
         //scheduler param
         return getImportProcessScheduleResult(loginUser,
@@ -1039,7 +1040,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             if (checkTaskHasSubProcess(taskType)) {
                 //get sub process info
                 JSONObject subParams = JSONUtils.parseObject(taskNode.getString("params"));
-                Integer subProcessId = subParams.getInteger("processDefinitionId");
+                Integer subProcessId = subParams.getInteger(PROCESSDEFINITION_ID);
                 ProcessDefinition subProcess = processDefineMapper.queryByDefineId(subProcessId);
                 //check is sub process exist in db
                 if (null != subProcess) {
@@ -1099,7 +1100,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
                         if (null != newSubProcessDefine) {
                             subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
-                            subParams.put("processDefinitionId", newSubProcessDefine.getId());
+                            subParams.put(PROCESSDEFINITION_ID, newSubProcessDefine.getId());
                             taskNode.put("params", subParams);
                         }
                     }
