@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.handler;
 
-import io.netty.channel.*;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -25,16 +25,24 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
+
 /**
- *  netty client request handler
+ * netty client request handler
  */
 @ChannelHandler.Sharable
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
@@ -42,12 +50,14 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
     /**
-     *  netty client
+     * netty client
      */
     private final NettyRemotingClient nettyRemotingClient;
 
+    private static byte[] heartBeatData = "heart_beat".getBytes();
+
     /**
-     *  callback thread executor
+     * callback thread executor
      */
     private final ExecutorService callbackExecutor;
 
@@ -57,19 +67,19 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors;
 
     /**
-     *  default executor
+     * default executor
      */
     private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
 
-    public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor){
+    public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor) {
         this.nettyRemotingClient = nettyRemotingClient;
         this.callbackExecutor = callbackExecutor;
         this.processors = new ConcurrentHashMap();
     }
 
     /**
-     *  When the current channel is not active,
-     *  the current channel has reached the end of its life cycle
+     * When the current channel is not active,
+     * the current channel has reached the end of its life cycle
      *
      * @param ctx channel handler context
      * @throws Exception
@@ -81,7 +91,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     *  The current channel reads data from the remote
+     * The current channel reads data from the remote
      *
      * @param ctx channel handler context
      * @param msg message
@@ -89,55 +99,55 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        processReceived(ctx.channel(), (Command)msg);
+        processReceived(ctx.channel(), (Command) msg);
     }
 
     /**
      * register processor
      *
      * @param commandType command type
-     * @param processor processor
+     * @param processor   processor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
     }
 
     /**
-     *  register processor
+     * register processor
      *
      * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
-        if(executorRef == null){
+        if (executorRef == null) {
             executorRef = defaultExecutor;
         }
         this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
     }
 
     /**
-     *  process received logic
+     * process received logic
      *
      * @param command command
      */
     private void processReceived(final Channel channel, final Command command) {
         ResponseFuture future = ResponseFuture.getFuture(command.getOpaque());
-        if(future != null){
+        if (future != null) {
             future.setResponseCommand(command);
             future.release();
-            if(future.getInvokeCallback() != null){
+            if (future.getInvokeCallback() != null) {
                 this.callbackExecutor.submit(new Runnable() {
                     @Override
                     public void run() {
                         future.executeInvokeCallback();
                     }
                 });
-            } else{
+            } else {
                 future.putResponse(command);
             }
-        } else{
+        } else {
             processByCommandType(channel, command);
         }
     }
@@ -163,9 +173,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     /**
-     *  caught exception
-     * @param ctx channel handler context
-     * @param cause  cause
+     * caught exception
+     *
+     * @param ctx   channel handler context
+     * @param cause cause
      * @throws Exception
      */
     @Override
@@ -173,6 +184,20 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         logger.error("exceptionCaught : {}", cause);
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            Command heartBeat = new Command();
+            heartBeat.setType(CommandType.HEART_BEAT);
+            heartBeat.setBody(heartBeatData);
+            ctx.writeAndFlush(heartBeat)
+                .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
     }
 
 }
