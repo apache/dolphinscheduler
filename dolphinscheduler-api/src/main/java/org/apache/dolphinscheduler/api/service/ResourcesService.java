@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,6 +140,10 @@ public class ResourcesService extends BaseService {
                 }
             }
             result.setData(resultMap);
+        } catch (DuplicateKeyException e) {
+            logger.error("resource directory {} has exist, can't recreate", fullName);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
         } catch (Exception e) {
             logger.error("resource already exists, can't recreate ", e);
             throw new RuntimeException("resource already exists, can't recreate");
@@ -272,10 +277,7 @@ public class ResourcesService extends BaseService {
     private boolean checkResourceExists(String fullName, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        if (resources != null && resources.size() > 0) {
-            return true;
-        }
-        return false;
+        return resources != null && resources.size() > 0;
     }
 
 
@@ -402,7 +404,7 @@ public class ResourcesService extends BaseService {
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<>(5);
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -447,7 +449,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
-        HashMap<String, Object> result = new HashMap<>(5);
+        HashMap<String, Object> result = new HashMap<>();
         Page<Resource> page = new Page(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
@@ -548,7 +550,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
@@ -571,7 +573,7 @@ public class ResourcesService extends BaseService {
      */
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         int userId = loginUser.getId();
         if(isAdmin(loginUser)){
             userId = 0;
@@ -1094,7 +1096,7 @@ public class ResourcesService extends BaseService {
      * @return unauthorized result code
      */
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         //only admin can operate
         if (checkAdmin(loginUser, result)) {
             return result;
@@ -1146,7 +1148,7 @@ public class ResourcesService extends BaseService {
      * @return authorized result
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)){
             return result;
         }

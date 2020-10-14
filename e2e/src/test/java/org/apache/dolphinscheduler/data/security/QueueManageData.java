@@ -16,27 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
+import org.apache.dolphinscheduler.util.YmlReader;
+
 public class QueueManageData {
-    /**
-     * Create Queue Name
-     */
-    public static final String QUEUE_NAME = "selenium_queue_name";
-
-    /**
-     * Create Queue Value
-     */
-    public static final String QUEUE_VALUE = "selenium_queue_value";
-
-    /**
-     * Edit Queue Name
-     */
-    public static final String EDIT_QUEUE_NAME = "_edit";
-
-    /**
-     * Edit Queue Value
-     */
-    public static final String EDIT_QUEUE_VALUE = "_edit";
-
-    public static final String QUEUE_MANAGE = "队列管理 - DolphinScheduler";
-
+    public String getQueueData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String queueData = ymlReader.getDataYml("testData/security_zh_cn", "queueManage", param);
+        return  queueData;
+    }
 }

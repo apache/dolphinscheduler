@@ -60,6 +60,12 @@ const stateType = [
   }, {
     code: 'WAITTING_DEPEND',
     label: `${i18n.$t('Waiting for dependency to complete')}`
+  }, {
+    code: 'DELAY_EXECUTION',
+    label: `${i18n.$t('Delay execution')}`
+  }, {
+    code: 'FORCED_SUCCESS',
+    label: `${i18n.$t('Forced success')}`
   }
 ]
 
