@@ -14,9 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -24,7 +27,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.datasource.*;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -33,7 +36,6 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +49,8 @@ import java.util.*;
 
 import static org.apache.dolphinscheduler.common.utils.PropertyUtils.getString;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
- * datasource service.
+ * datasource service
  */
 @Service
 public class DataSourceService extends BaseService {
@@ -78,7 +76,7 @@ public class DataSourceService extends BaseService {
     private DataSourceUserMapper datasourceUserMapper;
 
     /**
-     * create data source.
+     * create data source
      *
      * @param loginUser login user
      * @param name      data source name
@@ -127,8 +125,9 @@ public class DataSourceService extends BaseService {
         return result;
     }
 
+
     /**
-     * updateProcessInstance datasource.
+     * updateProcessInstance datasource
      *
      * @param loginUser login user
      * @param name      data source name
@@ -193,8 +192,9 @@ public class DataSourceService extends BaseService {
         return queryDataSource != null && queryDataSource.size() > 0;
     }
 
+
     /**
-     * updateProcessInstance datasource.
+     * updateProcessInstance datasource
      *
      * @param id datasource id
      * @return data source detail
@@ -283,7 +283,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * query datasource list by keyword.
+     * query datasource list by keyword
      *
      * @param loginUser login user
      * @param searchVal search value
@@ -314,7 +314,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * handle datasource connection password for safety.
+     * handle datasource connection password for safety
      *
      * @param dataSourceList
      */
@@ -331,7 +331,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * query data resource list.
+     * query data resource list
      *
      * @param loginUser login user
      * @param type      data source type
@@ -355,7 +355,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * verify datasource exists.
+     * verify datasource exists
      *
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
@@ -374,7 +374,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * get connection.
+     * get connection
      *
      * @param dbType    datasource type
      * @param parameter parameter
@@ -445,7 +445,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * check connection.
+     * check connection
      *
      * @param type      data source type
      * @param parameter data source parameters
@@ -466,7 +466,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * test connection.
+     * test connection
      *
      * @param id datasource id
      * @return connect result code
@@ -481,7 +481,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * build paramters.
+     * build paramters
      *
      * @param type      data source  type
      * @param host      data source  host
@@ -504,8 +504,8 @@ public class DataSourceService extends BaseService {
             parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
 
-        if (CommonUtils.getKerberosStartupState()
-                && (type == DbType.HIVE || type == DbType.SPARK)) {
+        if (CommonUtils.getKerberosStartupState() &&
+                (type == DbType.HIVE || type == DbType.SPARK)) {
             jdbcUrl += ";principal=" + principal;
         }
 
@@ -529,13 +529,13 @@ public class DataSourceService extends BaseService {
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, CommonUtils.encodePassword(password));
-        if (CommonUtils.getKerberosStartupState()
-                && (type == DbType.HIVE || type == DbType.SPARK)) {
+        if (CommonUtils.getKerberosStartupState() &&
+                (type == DbType.HIVE || type == DbType.SPARK)) {
             parameterMap.put(Constants.PRINCIPAL, principal);
         }
         if (other != null && !"".equals(other)) {
             Map<String, String> map = JSONUtils.toMap(other);
-            if (map != null) {
+            if (map.size() > 0) {
                 StringBuilder otherSb = new StringBuilder();
                 for (Map.Entry<String, String> entry : map.entrySet()) {
                     otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
@@ -552,6 +552,7 @@ public class DataSourceService extends BaseService {
             logger.info("parameters map:{}", JSONUtils.toJsonString(parameterMap));
         }
         return JSONUtils.toJsonString(parameterMap);
+
 
     }
 
@@ -597,7 +598,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * delete datasource.
+     * delete datasource
      *
      * @param loginUser    login user
      * @param datasourceId data source id
@@ -629,7 +630,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * unauthorized datasource.
+     * unauthorized datasource
      *
      * @param loginUser login user
      * @param userId    user id
@@ -668,8 +669,9 @@ public class DataSourceService extends BaseService {
         return result;
     }
 
+
     /**
-     * authorized datasource.
+     * authorized datasource
      *
      * @param loginUser login user
      * @param userId    user id
@@ -689,8 +691,9 @@ public class DataSourceService extends BaseService {
         return result;
     }
 
+
     /**
-     * get host and port by address.
+     * get host and port by address
      *
      * @param address address
      * @return sting array: [host,port]
@@ -700,7 +703,7 @@ public class DataSourceService extends BaseService {
     }
 
     /**
-     * get host and port by address.
+     * get host and port by address
      *
      * @param address   address
      * @param separator separator
