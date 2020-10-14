@@ -1181,7 +1181,7 @@ public class ProcessService {
                         || state == ExecutionStatus.DELAY_EXECUTION
                         || state == ExecutionStatus.KILL
                         || checkTaskExistsInTaskQueue(taskInstance)
-        ){
+                ){
             return state;
         }
         //return pasue /stop if process instance state is ready pause / stop
@@ -1362,7 +1362,7 @@ public class ProcessService {
      * @return task instance list
      */
     public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId){
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
+         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
     }
 
     /**
