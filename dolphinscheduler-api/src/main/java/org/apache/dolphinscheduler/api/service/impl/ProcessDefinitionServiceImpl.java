@@ -434,7 +434,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
