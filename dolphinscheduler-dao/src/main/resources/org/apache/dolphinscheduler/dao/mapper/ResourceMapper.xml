@@ -144,4 +144,25 @@
             #{i}
         </foreach>
     </select>
+
+    <select id="queryResourceInfoForTask" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select r.*, t.tenant_code
+        from t_ds_resources r
+        join t_ds_user u on r.user_id = u.id
+        join t_ds_tenant t on u.tenant_id = t.id
+        where 1 = 0
+        <if test="resIds != null and resIds.length > 0">
+            or r.id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        <if test="fullNames != null and fullNames.length > 0">
+            or (r.full_name in
+            <foreach collection="fullNames" item="fullName" open="(" close=")" separator=",">
+                #{fullName}
+            </foreach>
+            and r.type=#{resType})
+        </if>
+    </select>
 </mapper>

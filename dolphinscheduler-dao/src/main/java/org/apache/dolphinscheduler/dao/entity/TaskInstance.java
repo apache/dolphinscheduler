@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -209,7 +210,7 @@ public class TaskInstance implements Serializable {
 
 
     @TableField(exist = false)
-    private Map<String,String> resources;
+    private List<Resource> resources;
 
 
 
@@ -451,11 +452,11 @@ public class TaskInstance implements Serializable {
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
 
-    public Map<String, String> getResources() {
+    public List<Resource> getResources() {
         return resources;
     }
 
-    public void setResources(Map<String, String> resources) {
+    public void setResources(List<Resource> resources) {
         this.resources = resources;
     }
 

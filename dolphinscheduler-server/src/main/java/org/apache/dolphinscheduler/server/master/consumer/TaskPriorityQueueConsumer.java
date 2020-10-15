@@ -52,7 +52,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * TaskUpdateQueue consumer
@@ -194,7 +193,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setExecutePath(getExecLocalPath(taskInstance));
-        taskInstance.setResources(getResourceFullNames(taskNode));
+        taskInstance.setResources(getResources(taskNode));
 
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
@@ -364,10 +363,9 @@ public class TaskPriorityQueueConsumer extends Thread{
     }
 
     /**
-     * get resource map key is full name and value is tenantCode
+     * get detailed resource info
      */
-    private Map<String,String> getResourceFullNames(TaskNode taskNode) {
-        Map<String,String> resourceMap = new HashMap<>();
+    private List<Resource> getResources(TaskNode taskNode) {
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
@@ -375,29 +373,19 @@ public class TaskPriorityQueueConsumer extends Thread{
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
 
                 // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources = projectResourceFiles.stream().filter(t -> t.getId() == 0).collect(Collectors.toSet());
-                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
+                Set<String> oldVersionResourceNamesSet = projectResourceFiles.stream().filter(
+                        resourceInfo -> resourceInfo.getId() == 0
+                ).map(ResourceInfo::getRes).collect(Collectors.toSet());
 
-                    oldVersionResources.forEach(
-                            (t)->resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
-                    );
-                }
+                // filter the resources that the resource id != 0
+                Set<Integer> resourceIdsSet = projectResourceFiles.stream().filter(
+                        resourceInfo -> resourceInfo.getId() != 0
+                ).map(ResourceInfo::getId).collect(Collectors.toSet());
 
-                // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
-                Set<Integer> resourceIdsSet = resourceIdStream.filter(resId-> resId != 0).collect(Collectors.toSet());
-
-                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
-                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
-
-                    List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(
-                            (t)->resourceMap.put(t.getFullName(),processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
-                    );
-                }
+                return processService.queryResourceInfoForTask(resourceIdsSet, oldVersionResourceNamesSet);
             }
         }
 
-        return resourceMap;
+        return new ArrayList<>();
     }
 }

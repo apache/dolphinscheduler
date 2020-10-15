@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -167,9 +168,9 @@ public class TaskExecutionContext implements Serializable{
     private String workerGroup;
 
     /**
-     * resources full name and tenant code
+     * detailed resource info
      */
-    private Map<String,String> resources;
+    private List<TaskResourceDownloadContext> resources;
 
     /**
      *  sql TaskExecutionContext
@@ -442,11 +443,11 @@ public class TaskExecutionContext implements Serializable{
         this.dependenceTaskExecutionContext = dependenceTaskExecutionContext;
     }
 
-    public Map<String, String> getResources() {
+    public List<TaskResourceDownloadContext> getResources() {
         return resources;
     }
 
-    public void setResources(Map<String, String> resources) {
+    public void setResources(List<TaskResourceDownloadContext> resources) {
         this.resources = resources;
     }
 

@@ -19,12 +19,17 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -425,5 +430,113 @@ public class FileUtils {
         }
     }
 
+    public static void renameDir(String srcDirPath, String dstDirPath) {
+        Path srcPath = Paths.get(srcDirPath);
+        Path dstPath = Paths.get(dstDirPath);
+        //check
+        if(!srcPath.getParent().equals(dstPath.getParent())) {
+            throw new RuntimeException(String.format("%s and %s parent directory is not the same", srcPath, dstPath));
+        }
+
+        if (Files.exists(srcPath) && !Files.exists(dstPath)) {
+            try {
+                Files.move(srcPath, dstPath);
+            } catch (IOException e) {
+                throw new RuntimeException(String.format("rename %s to %s failed", srcDirPath, dstDirPath), e);
+            }
+        } else {
+            throw new RuntimeException(String.format("%s should exist & %s should not exist", srcDirPath, dstDirPath));
+        }
+    }
+
+    public static void copySubFilesToDir(String srcDirPath, String dstDirPath) {
+        Path srcPath = Paths.get(srcDirPath);
+        Path dstPath = Paths.get(dstDirPath);
+
+        if (!Files.exists(dstPath)) {
+            try {
+                Files.createDirectory(dstPath);
+            } catch (IOException e) {
+                throw new RuntimeException(String.format("create directory for dstDirPath[%s] failed", dstDirPath));
+            }
+        }
+
+        if (Files.isDirectory(srcPath) && Files.isDirectory(dstPath)) {
+            try {
+                for (Path path : Files.list(srcPath).collect(Collectors.toList())) {
+                    copyByPath(path, Paths.get(dstDirPath + File.separator + path.getFileName()));
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("copySubFilesToDir srcDirPath[%s] dstDirPath[%s] failed",
+                        srcDirPath, dstDirPath), e);
+            }
+        } else {
+            throw new RuntimeException(String.format("srcDirPath[%s] should be directory & dstDirPath[%s] should not exist",
+                    srcDirPath, dstDirPath));
+        }
+    }
+
+    public static void linkSubFilesToDir(String srcDirPath, String dstDirPath) {
+        File srcDirFile = new File(srcDirPath);
+        File dstDirFile = new File(dstDirPath);
+
+        if (!dstDirFile.exists()){
+            if (!dstDirFile.mkdirs()) {
+                throw new RuntimeException(String.format("create directory for dstDirPath[%s] failed", dstDirPath));
+            }
+        }
+
+        if (srcDirFile.isDirectory() && dstDirFile.isDirectory()) {
+            File[] files = srcDirFile.listFiles();
+            if (null != files) {
+                for (File file : files) {
+                    Path targetFile = Paths.get(String.format("%s%s%s", srcDirPath, File.separator, file.getName()));
+                    Path linkFile = Paths.get(String.format("%s%s%s", dstDirPath, File.separator, file.getName()));
+                    try {
+                        Files.createSymbolicLink(linkFile, targetFile);
+                    } catch (Exception e) {
+                        throw new RuntimeException(String.format("link[%s] from %s failed", linkFile, targetFile), e);
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException(String.format("srcDirPath[%s] should be directory & dstDirPath[%s] should be directory",
+                    srcDirPath, dstDirPath));
+        }
+    }
+
+    private static void copyByPath(Path srcPath, Path dstPath) {
+        String srcPathStr = srcPath.toAbsolutePath().toString();
+        String dstPathStr = dstPath.toAbsolutePath().toString();
+
+        try {
+            Files.walkFileTree(srcPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Path toPath = Paths.get(file.toAbsolutePath().toString().replace(srcPathStr, dstPathStr));
+                    if (!Files.exists(toPath.getParent())) {
+                        Files.createDirectories(toPath.getParent());
+                    }
+                    if (Files.isSymbolicLink(file)) {
+                        Files.createSymbolicLink(toPath, Files.readSymbolicLink(file));
+                    } else {
+                        Files.copy(file, toPath);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Path toPath = Paths.get(dir.toAbsolutePath().toString().replace(srcPathStr, dstPathStr));
+                    if (!Files.exists(toPath)) {
+                        Files.createDirectories(toPath);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("copy file %s to %s failed.", srcPath, dstPath), e);
+        }
+    }
 
 }

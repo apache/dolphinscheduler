@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.server.builder;
 
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.entity.*;
+import org.apache.dolphinscheduler.server.entity.TaskResourceDownloadContext;
+
+import java.util.stream.Collectors;
 
 /**
  *  TaskExecutionContext builder
@@ -47,7 +50,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
-        taskExecutionContext.setResources(taskInstance.getResources());
+        taskExecutionContext.setResources(taskInstance.getResources().stream().map(TaskResourceDownloadContext::new).collect(Collectors.toList()));
         return this;
     }
 

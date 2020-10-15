@@ -388,7 +388,7 @@ public class MasterExecThread implements Runnable {
     private void postHandle() {
         logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
 
-        if (!CommonUtils.isDevelopMode()) {
+        if (false) {
             // get exec dir
             String execLocalPath = org.apache.dolphinscheduler.common.utils.FileUtils
                     .getProcessExecDir(processInstance.getProcessDefinition().getProjectId(),

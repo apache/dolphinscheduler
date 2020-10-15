@@ -39,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1557,6 +1556,19 @@ public class ProcessService {
         // in order to query tenant code successful although the version is older
         String fullName = resName.startsWith("/") ? resName : String.format("/%s",resName);
         return resourceMapper.queryTenantCodeByResourceName(fullName, resourceType.ordinal());
+    }
+
+    /**
+     * query resource info for task
+     * @param resIds resource id array
+     * @param resNames resource name array
+     * @return resource list
+     */
+    public List<Resource> queryResourceInfoForTask(Collection<Integer> resIds, Collection<String> resNames) {
+        return resourceMapper.queryResourceInfoForTask(resIds.toArray(new Integer[0]),
+                resNames.stream().map(
+                        resName -> resName.startsWith("/") ? resName : String.format("/%s", resName)
+                ).toArray(String[]::new), ResourceType.FILE.ordinal());
     }
 
     /**

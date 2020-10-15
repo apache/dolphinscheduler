@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -86,6 +87,12 @@ public class Resource {
    * update time
    */
   private Date updateTime;
+
+  /**
+   * tenant code
+   */
+  @TableField(exist = false)
+  private String tenantCode;
 
   public Resource() {
   }
@@ -232,6 +239,14 @@ public class Resource {
 
   public void setUpdateTime(Date updateTime) {
     this.updateTime = updateTime;
+  }
+
+  public String getTenantCode() {
+    return tenantCode;
+  }
+
+  public void setTenantCode(String tenantCode) {
+    this.tenantCode = tenantCode;
   }
 
   @Override
