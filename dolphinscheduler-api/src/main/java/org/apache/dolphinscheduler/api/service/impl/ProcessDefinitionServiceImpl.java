@@ -223,7 +223,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId", processDefine.getId());
+        result.put(PROCESSDEFINITIONID, processDefine.getId());
         return result;
     }
 
@@ -438,7 +438,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
+            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
         }
         return result;
     }
