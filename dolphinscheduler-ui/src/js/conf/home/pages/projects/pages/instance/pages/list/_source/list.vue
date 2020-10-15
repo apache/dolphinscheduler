@@ -521,8 +521,8 @@
         this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
       },
 
-      _topCheckBoxClick (v) {
-        _.map(this.list , v => v.isCheck = v.state === 'RUNNING_EXEUTION' ? false : true)
+      _topCheckBoxClick (is) {
+        _.map(this.list , v => v.isCheck = v.state === ('RUNNING_EXEUTION') || v.state === ('READY_STOP') || v.state === ('READY_PAUSE')? false : is)
         this._arrDelChange()
       },
       _arrDelChange (v) {
