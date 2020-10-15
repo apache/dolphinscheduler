@@ -30,8 +30,6 @@ import org.apache.dolphinscheduler.dao.mapper.TagMapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +42,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 public class TagService extends BaseService {
-
-    private static final Logger logger = LoggerFactory.getLogger(TagService.class);
 
     @Autowired
     private TagMapper tagMapper;
@@ -183,9 +179,9 @@ public class TagService extends BaseService {
     public Map<String, Object> queryTagListPaging(User loginUser, String projectName, Integer pageSize, Integer pageNo, String searchVal) {
 
         Map<String, Object> result = new HashMap<>();
-        PageInfo pageInfo = new PageInfo<Tag>(pageNo, pageSize);
+        PageInfo<Tag> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        Page<Tag> page = new Page(pageNo, pageSize);
+        Page<Tag> page = new Page<>(pageNo, pageSize);
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -205,7 +201,7 @@ public class TagService extends BaseService {
 
         return result;
     }
-    
+
     /**
      * query tag  by id
      *

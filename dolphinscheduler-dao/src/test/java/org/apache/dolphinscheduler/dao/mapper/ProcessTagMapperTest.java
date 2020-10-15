@@ -63,7 +63,7 @@ public class ProcessTagMapperTest {
         //insertOne
         ProcessTag processTag = inserOne();
         int update = processTagMapper.updateById(processTag);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
     }
 
     /**
@@ -73,7 +73,7 @@ public class ProcessTagMapperTest {
     public void testDelete() {
         ProcessTag processTag = inserOne();
         int delete = processTagMapper.deleteById(processTag.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

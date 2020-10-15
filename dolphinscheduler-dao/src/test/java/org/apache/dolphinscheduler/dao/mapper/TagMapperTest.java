@@ -73,7 +73,7 @@ public class TagMapperTest {
         Tag tag = insertOne();
         //update
         int update = tagMapper.updateById(tag);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
     }
 
     /**
@@ -83,7 +83,7 @@ public class TagMapperTest {
     public void testDelete() {
         Tag tag = insertOne();
         int delete = tagMapper.deleteById(tag.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

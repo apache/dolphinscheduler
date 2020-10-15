@@ -664,10 +664,8 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/queryProcessDefinitionByTagId")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    public Result queryProcessDefinitionByTagId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryProcessDefinitionByTagId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestParam("tagId") Integer tagId) {
-        logger.info("query process definition list by tag id, login user:{}, project id:{}",
-                loginUser.getUserName(), tagId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByTagId(tagId);
         return returnDataList(result);
     }
@@ -687,7 +685,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/add-process-tags")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ADD_PROCESS_TAGS_ERROR)
-    public Result addProcessDefinitionTags(@RequestParam(value = "processId") int processId,
+    public Result<Object> addProcessDefinitionTags(@RequestParam(value = "processId") int processId,
             @RequestParam(value = "tagIds") String tagIds) {
         Map<String, Object> result = processDefinitionService.addProcessDefinitionTags(processId, tagIds);
         return returnDataList(result);
@@ -708,7 +706,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/delete-process-tags")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_TAGS_ERROR)
-    public Result deleteProcessDefinitionTags(@RequestParam(value = "processId") int processId,
+    public Result<Object> deleteProcessDefinitionTags(@RequestParam(value = "processId") int processId,
                                            @RequestParam(value = "tagIds") String tagIds) {
         Map<String, Object> result = processDefinitionService.deleteProcessDefinitionTags(processId, tagIds);
         return returnDataList(result);

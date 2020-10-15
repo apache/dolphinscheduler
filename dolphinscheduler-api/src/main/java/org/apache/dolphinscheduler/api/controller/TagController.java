@@ -57,8 +57,6 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequestMapping("projects/{projectName}/tag")
 public class TagController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionController.class);
-
     @Autowired
     private TagService tagService;
 
@@ -77,11 +75,9 @@ public class TagController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TAG_ERROR)
-    public Result createTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> createTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                              @RequestParam(value = "tagname", required = true) String tagname) {
-        logger.info("login user {}, create  tag, project name: {}, tag name: {} ",
-                loginUser.getUserName(), projectName, tagname);
         Map<String, Object> result = tagService.createTag(loginUser, projectName, tagname);
         return returnDataList(result);
     }
@@ -100,11 +96,9 @@ public class TagController extends BaseController {
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TAG_ERROR)
-    public Result deleteTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> deleteTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                  @RequestParam(value = "tagId") int tagId) {
-        logger.info("login user {}, update tag, project name: {}, tag id: {}, ",
-                loginUser.getUserName(), projectName, tagId);
         Map<String, Object> result = tagService.deleteTag(loginUser, projectName, tagId);
         return returnDataList(result);
     }
@@ -126,13 +120,10 @@ public class TagController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TAG_ERROR)
-    public Result updateTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> updateTag(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                           @RequestParam(value = "tagName", required = true) String tagName,
                                           @RequestParam(value = "tagId", required = true) int tagId) {
-
-        logger.info("login user {}, update tag, project name: {}, tag name: {}, ",
-                loginUser.getUserName(), projectName, tagName);
         Map<String, Object> result = tagService.updateTag(loginUser, projectName, tagId, tagName);
         return returnDataList(result);
     }
@@ -156,12 +147,11 @@ public class TagController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TAG_LIST_PAGING_ERROR)
-    public Result queryTagListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> queryTagListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                    @RequestParam("pageNo") Integer pageNo,
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam("pageSize") Integer pageSize) {
-        logger.info("query tag list paging, login user:{}, project name:{}", loginUser.getUserName(), projectName);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
