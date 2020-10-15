@@ -382,24 +382,25 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkProcessJson;
         }
         ProcessDefinition processDefine = processService.findProcessDefineById(id);
+        // check process definition exists
+        if (processDefine == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
+            return result;
+        }
+
+        if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
+            // online can not permit edit
+            putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefine.getName());
+            return result;
+        }
+
         if (!name.equals(processDefine.getName())) {
+            // check whether the new process define name exist
             ProcessDefinition definition = processDefineMapper.verifyByDefineName(project.getId(), name);
             if (definition != null) {
                 putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
                 return result;
             }
-        }
-
-        if (processDefine == null) {
-            // check process definition exists
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
-            return result;
-        } else if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
-            // online can not permit edit
-            putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefine.getName());
-            return result;
-        } else {
-            putMsg(result, Status.SUCCESS);
         }
 
         Date now = new Date();
