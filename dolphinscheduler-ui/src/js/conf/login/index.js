@@ -20,6 +20,7 @@
 // import $ from 'jquery'
 import Vue from 'vue'
 import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/en'
 import 'element-ui/lib/theme-chalk/index.css'
 import App from './App'
 import i18n from '@/module/i18n'
@@ -31,7 +32,7 @@ import 'bootstrap/dist/js/bootstrap.min.js'
 
 import formCreate, {maker} from '@form-create/element-ui'
 
-Vue.use(ElementUI)
+i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
 Vue.use(ans)
 
