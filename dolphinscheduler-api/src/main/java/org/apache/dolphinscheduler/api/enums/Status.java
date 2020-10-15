@@ -193,7 +193,9 @@ public enum Status {
     BATCH_COPY_PROCESS_DEFINITION_ERROR(10159, "batch copy process definition error", "复制工作流错误"),
     BATCH_MOVE_PROCESS_DEFINITION_ERROR(10160, "batch move process definition error", "移动工作流错误"),
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
-    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10162,"delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10162, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
+    CHECK_TENANT_CODE_ERROR(10163, "Please enter the English tenant code", "请输入英文租户编码"),
+
 
     DELETE_TAG_ERROR(10170,"delete tag error","删除标签错误"),
     TAG_ALREADY_EXISTS(10171,"tag already exists","标签名已存在"),

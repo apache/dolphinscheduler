@@ -228,7 +228,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId", processDefine.getId());
+        result.put(PROCESSDEFINITIONID, processDefine.getId());
         return result;
     }
 
@@ -439,11 +439,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
+            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
         }
         return result;
     }
@@ -688,6 +688,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         exportProcessMeta.setProjectName(processDefinition.getProjectName());
         exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
         exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+        exportProcessMeta.setProcessDefinitionDescription(processDefinition.getDescription());
         exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
         exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
 
