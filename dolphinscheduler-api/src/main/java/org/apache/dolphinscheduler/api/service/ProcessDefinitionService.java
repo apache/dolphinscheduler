@@ -382,6 +382,14 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkProcessJson;
         }
         ProcessDefinition processDefine = processService.findProcessDefineById(id);
+        if (!name.equals(processDefine.getName())) {
+            ProcessDefinition definition = processDefineMapper.verifyByDefineName(project.getId(), name);
+            if (definition != null) {
+                putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+                return result;
+            }
+        }
+
         if (processDefine == null) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
