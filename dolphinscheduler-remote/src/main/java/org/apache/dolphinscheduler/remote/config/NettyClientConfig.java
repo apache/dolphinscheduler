@@ -48,6 +48,11 @@ public class NettyClientConfig {
      */
     private int receiveBufferSize = 65535;
 
+    /**
+     * connect timeout millis
+     */
+    private int connectTimeoutMillis = 3000;
+
     public int getWorkerThreads() {
         return workerThreads;
     }
@@ -88,4 +93,11 @@ public class NettyClientConfig {
         this.receiveBufferSize = receiveBufferSize;
     }
 
+    public int getConnectTimeoutMillis() {
+        return connectTimeoutMillis;
+    }
+
+    public void setConnectTimeoutMillis(int connectTimeoutMillis) {
+        this.connectTimeoutMillis = connectTimeoutMillis;
+    }
 }
