@@ -37,7 +37,7 @@ public class ThreadUtilsTest {
     @Test
     public void testNewDaemonFixedThreadExecutor() {
         // create core size and max size are all 3
-        ExecutorService testExec = ThreadUtils.newDaemonFixedThreadExecutor("test-exec-thread", 3);
+        ExecutorService testExec = ThreadUtils.newDaemonFixedThreadExecutor("test-exec-thread",3);
 
         for (int i = 0; i < 2; i++) {
             final int index = i;
