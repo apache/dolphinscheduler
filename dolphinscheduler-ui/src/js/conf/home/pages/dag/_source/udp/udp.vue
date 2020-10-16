@@ -82,7 +82,7 @@
           </div>
         </template>
         <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" @click="ok()">{{$t('Add')}}</x-button>
+        <x-button type="primary" shape="circle" :disabled="isDetails" @click="ok()">{{$t('Add')}}</x-button>
       </div>
     </div>
   </div>
@@ -99,6 +99,7 @@
     name: 'udp',
     data () {
       return {
+        originalName: '',
         // dag name
         name: '',
         // dag description
@@ -169,22 +170,14 @@
           this.$emit('onUdp')
         }
 
-        // Edit => direct storage
-        if (this.store.state.dag.name && this.store.state.dag.name===this.name) {
-          _verif()
-        } else if (this.store.state.dag.name && this.store.state.dag.name!==this.name) {
+        if (this.originalName !== this.name) {
           this.store.dispatch('dag/verifDAGName', this.name).then(res => {
             _verif()
           }).catch(e => {
             this.$message.error(e.msg || '')
           })
         } else {
-          // New First verify that the name exists
-          this.store.dispatch('dag/verifDAGName', this.name).then(res => {
-            _verif()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-          })
+          _verif()
         }
       },
       /**
@@ -207,6 +200,7 @@
       this.udpList = dag.globalParams
       this.udpListCache = dag.globalParams
       this.name = dag.name
+      this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
