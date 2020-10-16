@@ -170,8 +170,14 @@
         }
 
         // Edit => direct storage
-        if (this.store.state.dag.name) {
+        if (this.store.state.dag.name && this.store.state.dag.name===this.name) {
           _verif()
+        } else if (this.store.state.dag.name && this.store.state.dag.name!==this.name) {
+          this.store.dispatch('dag/verifDAGName', this.name).then(res => {
+            _verif()
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
         } else {
           // New First verify that the name exists
           this.store.dispatch('dag/verifDAGName', this.name).then(res => {
