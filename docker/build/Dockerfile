@@ -27,13 +27,13 @@ ENV DEBIAN_FRONTEND noninteractive
 #If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
 #RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
-    apk --update add --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
-    apk add --update procps && \
+    apk add --update --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
+    apk add --update --no-cache procps && \
     openrc boot && \
     pip install kazoo
 
 #2. install jdk
-RUN apk add openjdk8
+RUN apk add --update --no-cache openjdk8
 ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
@@ -43,19 +43,20 @@ RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-dolphinscheduler-bin/ 
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
 #4. install database, if use mysql as your backend database, the `mysql-client` package should be installed
-RUN apk add postgresql postgresql-contrib
+RUN apk add --update --no-cache postgresql postgresql-contrib
+
 #5. modify nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
     rm -rf /etc/nginx/conf.d/*
-ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
+COPY ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
 #6. add configuration and modify permissions and set soft links
-ADD ./checkpoint.sh /root/checkpoint.sh
-ADD ./startup-init-conf.sh /root/startup-init-conf.sh
-ADD ./startup.sh /root/startup.sh
-ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
-ADD ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
-ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+COPY ./checkpoint.sh /root/checkpoint.sh
+COPY ./startup-init-conf.sh /root/startup-init-conf.sh
+COPY ./startup.sh /root/startup.sh
+COPY ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
+COPY ./conf/dolphinscheduler/logback/* /opt/dolphinscheduler/conf/
+COPY conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
 RUN chmod +x /root/checkpoint.sh && \
     chmod +x /root/startup-init-conf.sh && \
     chmod +x /root/startup.sh && \
@@ -70,11 +71,11 @@ RUN chmod +x /root/checkpoint.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     rm -rf /bin/sh && \
     ln -s /bin/bash /bin/sh && \
-    mkdir -p /tmp/xls
-
-#7. remove apk index cache and disable coredup for sudo
-RUN rm -rf /var/cache/apk/* && \
+    mkdir -p /tmp/xls && \
+    #7. remove apk index cache and disable coredup for sudo
+    rm -rf /var/cache/apk/* && \
     echo "Set disable_coredump false" >> /etc/sudo.conf
+
 
 #8. expose port
 EXPOSE 2181 2888 3888 5432 5678 1234 12345 50051 8888

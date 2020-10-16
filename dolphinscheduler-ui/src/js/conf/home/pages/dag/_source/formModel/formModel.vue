@@ -162,10 +162,18 @@
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
+          v-if="taskType !== 'DEPENDENT'"
           ref="timeout"
           :backfill-item="backfillItem"
           @on-timeout="_onTimeout">
         </m-timeout-alarm>
+        <!-- Dependent timeout alarm -->
+        <m-dependent-timeout
+          v-if="taskType === 'DEPENDENT'"
+          ref="dependentTimeout"
+          :backfill-item="backfillItem"
+          @on-timeout="_onDependentTimeout">
+        </m-dependent-timeout>
 
         <!-- shell node -->
         <m-shell
@@ -277,6 +285,12 @@
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
+        <!-- Pre-tasks in workflow -->
+        <m-pre-tasks
+          v-if="['SHELL', 'SUB_PROCESS'].indexOf(taskType) > -1"
+          @on-pre-tasks="_onPreTasks"
+          ref="PRE_TASK"
+          :backfill-item="backfillItem"></m-pre-tasks>
       </div>
     </div>
     <div class="bottom-box">
@@ -309,7 +323,9 @@
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
+  import mDependentTimeout from './_source/dependentTimeout'
   import mWorkerGroups from './_source/workerGroups'
+  import mPreTasks from './tasks/pre_tasks'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
   import { isNameExDag, rtBantpl } from './../plugIn/util'
@@ -356,6 +372,8 @@
         delayTime: '0',
         // Task timeout alarm
         timeout: {},
+        // (For Dependent nodes) Wait start timeout alarm
+        waitStartTimeout: {},
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
@@ -369,7 +387,11 @@
             value: 'failed',
             label: `${i18n.$t('failed')}`
           }
-        ]
+        ],
+        // preTasks
+        preTaskIdsInWorkflow: [],
+        preTasksToAdd: [],    // pre-taskIds to add, used in jsplumb connects
+        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
       }
     },
     /**
@@ -394,6 +416,14 @@
         this.dependence = Object.assign(this.dependence, {}, o)
       },
       /**
+       * Pre-tasks in workflow
+       */
+      _onPreTasks (o) {
+        this.preTaskIdsInWorkflow = o.preTasks
+        this.preTasksToAdd = o.preTasksToAdd
+        this.preTasksToDelete = o.preTasksToDelete
+      },
+      /**
        * cache dependent
        */
       _onCacheDependent (o) {
@@ -404,6 +434,13 @@
        */
       _onTimeout (o) {
         this.timeout = Object.assign(this.timeout, {}, o)
+      },
+      /**
+       * Dependent timeout alarm
+       */
+      _onDependentTimeout (o) {
+        this.timeout = Object.assign(this.timeout, {}, o.waitCompleteTimeout)
+        this.waitStartTimeout = Object.assign(this.waitStartTimeout, {}, o.waitStartTimeout)
       },
       /**
        * Click external to close the current component
@@ -483,6 +520,7 @@
             retryInterval: this.retryInterval,
             delayTime: this.delayTime,
             timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -536,12 +574,56 @@
           return
         }
         // Verify task alarm parameters
-        if (!this.$refs['timeout']._verification()) {
-          return
+        if (this.taskType === 'DEPENDENT') {
+          if (!this.$refs['dependentTimeout']._verification()) {
+            return
+          }
+        } else {
+          if (!this.$refs['timeout']._verification()) {
+            return
+          }
         }
+        
         // Verify node parameters
         if (!this.$refs[this.taskType]._verification()) {
           return
+        }
+        // Verify preTasks and update dag-things
+        if (this.$refs['PRE_TASK']) {
+          if (!this.$refs['PRE_TASK']._verification()) {
+            return
+          }
+          else {
+            // Sync data-targetarr
+            $(`#${this.id}`).attr(
+              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
+
+            // Update JSP connections
+            let plumbIns = JSP.JspInstance
+            var targetId = this.id
+
+            // Update new connections
+            this.preTasksToAdd.map(sourceId => {
+              plumbIns.connect({
+                source: sourceId,
+                target: targetId,
+                type: 'basic',
+                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+                HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
+              })
+            })
+
+            // Update remove connections
+            let currentConnects = plumbIns.getAllConnections()
+            let len = currentConnects.length
+            for (let i = 0; i < len; i++) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId == targetId) {
+                plumbIns.deleteConnection(currentConnects[i])
+                i -= 1
+                len -= 1
+              }
+            }
+          }
         }
 
         $(`#${this.id}`).find('span').text(this.name)
@@ -562,6 +644,7 @@
             retryInterval: this.retryInterval,
             delayTime: this.delayTime,
             timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -684,6 +767,16 @@
       }
       this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
       this.isContentBox = true
+
+      // Init value of preTask selector
+      let preTaskIds = $(`#${this.id}`).attr('data-targetarr')
+      if (!_.isEmpty(this.backfillItem)) {
+        if (preTaskIds && preTaskIds.length) {
+          this.backfillItem.preTasks = preTaskIds.split(',')
+        } else {
+          this.backfillItem.preTasks = []
+        }
+      }
     },
     mounted () {
       let self = this
@@ -719,6 +812,7 @@
           retryInterval: this.retryInterval,
           delayTime: this.delayTime,
           timeout: this.timeout,
+          waitStartTimeout: this.waitStartTimeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
           successBranch: this.successBranch,
@@ -744,8 +838,10 @@
       mConditions,
       mSelectInput,
       mTimeoutAlarm,
+      mDependentTimeout,
       mPriority,
-      mWorkerGroups
+      mWorkerGroups,
+      mPreTasks,
     }
   }
 </script>

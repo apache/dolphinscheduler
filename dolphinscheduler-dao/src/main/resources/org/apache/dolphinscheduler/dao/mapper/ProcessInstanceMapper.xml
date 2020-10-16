@@ -167,7 +167,7 @@
     <select id="queryLastRunningProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
         from t_ds_process_instance
-        where 1=1
+        where process_definition_id=#{processDefinitionId}
         <if test="states !=null and states.length != 0">
             and state in
             <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
@@ -175,7 +175,6 @@
             </foreach>
         </if>
         <if test="startTime!=null and endTime != null ">
-            and process_definition_id=#{processDefinitionId}
             and (schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
                   or start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime})
         </if>
