@@ -99,7 +99,6 @@
     name: 'udp',
     data () {
       return {
-        originalName: '',
         // dag name
         name: '',
         // dag description
@@ -170,7 +169,7 @@
           this.$emit('onUdp')
         }
 
-        if (this.originalName !== this.name) {
+        if (this.store.state.dag.name !== this.name) {
           this.store.dispatch('dag/verifDAGName', this.name).then(res => {
             _verif()
           }).catch(e => {
@@ -200,7 +199,6 @@
       this.udpList = dag.globalParams
       this.udpListCache = dag.globalParams
       this.name = dag.name
-      this.originalName = dag.name
       this.description = dag.description
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
