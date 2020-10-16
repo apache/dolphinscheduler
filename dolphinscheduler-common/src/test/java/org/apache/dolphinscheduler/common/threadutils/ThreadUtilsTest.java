@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.threadutils;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +32,14 @@ import static org.junit.Assert.*;
 
 public class ThreadUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(ThreadUtilsTest.class);
+
     /**
      * create a naming thread
      */
     @Test
     public void testNewDaemonFixedThreadExecutor() {
         // create core size and max size are all 3
-        ExecutorService testExec = ThreadUtils.newDaemonFixedThreadExecutor("test-exec-thread",3);
+        ExecutorService testExec = ThreadUtils.newDaemonFixedThreadExecutor("test-exec-thread", 3);
 
         for (int i = 0; i < 2; i++) {
             final int index = i;
@@ -73,8 +75,8 @@ public class ThreadUtilsTest {
                 // send heart beat work
                 while (start.getTime().getTime() <= end.getTime().getTime()) {
                     System.out.println("worker here");
-                    System.out.println(index ++);
-                    start.add(Calendar.SECOND,  1);
+                    System.out.println(index++);
+                    start.add(Calendar.SECOND, 1);
                     globalTimer.add(Calendar.SECOND, 1);
                 }
             }
@@ -102,19 +104,17 @@ public class ThreadUtilsTest {
 
     /**
      * test threadPoolExecutors with 3 workers and current each 5 tasks
-     * @throws InterruptedException
      */
     @Test
     public void testThreadInfo() throws InterruptedException {
         ThreadPoolExecutors workers = ThreadPoolExecutors.getInstance("worker", 1);
-        for (int i = 0; i < 2; ++i ) {
+        for (int i = 0; i < 2; ++i) {
             int index = i;
             workers.execute(() -> {
                 for (int j = 0; j < 1; ++j) {
                     try {
                         Thread.sleep(100);
                         logger.info("worker %s is doing the task", index);
-//                        workers.printStatus();
                     } catch (InterruptedException e) {
                         logger.error("InterruptedException", e);
                     }
@@ -129,7 +129,7 @@ public class ThreadUtilsTest {
      * test a single daemon thread pool
      */
     @Test
-    public void  testNewDaemonSingleThreadExecutor() {
+    public void testNewDaemonSingleThreadExecutor() {
         ExecutorService threadTest = ThreadUtils.newDaemonSingleThreadExecutor("thread_test");
         threadTest.execute(() -> {
             for (int i = 0; i < 2; ++i) {
@@ -148,7 +148,7 @@ public class ThreadUtilsTest {
         ThreadPoolExecutor threadPoolExecutor = ThreadUtils.newDaemonCachedThreadPool("threadTest-");
         Thread thread1 = threadPoolExecutor.getThreadFactory().newThread(() -> {
             for (int i = 0; i < 2; ++i) {
-                logger.info("this task is with index " + i );
+                logger.info("this task is with index " + i);
             }
         });
         assertTrue(thread1.getName().startsWith("threadTest-"));
@@ -160,7 +160,7 @@ public class ThreadUtilsTest {
     @Test
     public void testNewDaemonCachedThreadPoolWithThreadNumber() {
         ThreadPoolExecutor threadPoolExecutor = ThreadUtils.newDaemonCachedThreadPool("threadTest--", 3, 10);
-        for (int i = 0; i < 2; ++ i) {
+        for (int i = 0; i < 2; ++i) {
             threadPoolExecutor.getThreadFactory().newThread(() -> {
                 assertEquals(3, threadPoolExecutor.getActiveCount());
                 logger.info("this task is first work to do");
@@ -170,7 +170,6 @@ public class ThreadUtilsTest {
         threadPoolExecutor.shutdown();
         assertTrue(threadPoolExecutor.isShutdown());
     }
-
 
 
 }
