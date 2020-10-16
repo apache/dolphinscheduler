@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
+import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 /**
@@ -32,25 +33,25 @@ public class HostWeight {
 
     private final Host host;
 
-    private final int weight;
+    private final double weight;
 
-    private int currentWeight;
+    private double currentWeight;
 
     public HostWeight(Host host, double cpu, double memory, double loadAverage) {
-        this.weight = calculateWeight(cpu, memory, loadAverage);
-        this.host = host ;
-        this.currentWeight = weight ;
+        this.weight = getWeight(cpu, memory, loadAverage, host);
+        this.host = host;
+        this.currentWeight = weight;
     }
 
-    public int getCurrentWeight() {
+    public double getCurrentWeight() {
         return currentWeight;
     }
 
-    public int getWeight() {
+    public double getWeight() {
         return weight;
     }
 
-    public void setCurrentWeight(int currentWeight) {
+    public void setCurrentWeight(double currentWeight) {
         this.currentWeight = currentWeight;
     }
 
@@ -60,14 +61,27 @@ public class HostWeight {
 
     @Override
     public String toString() {
-        return "HostWeight{" +
-                "host=" + host +
-                ", weight=" + weight +
-                ", currentWeight=" + currentWeight +
-                '}';
+        return "HostWeight{"
+            + "host=" + host
+            + ", weight=" + weight
+            + ", currentWeight=" + currentWeight
+            + '}';
     }
 
-    private int calculateWeight(double cpu, double memory, double loadAverage){
-        return (int)(cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR);
+    private double getWeight(double cpu, double memory, double loadAverage, Host host) {
+        double calculateWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
+        return getWarmUpWeight(host, calculateWeight);
+    }
+
+    /**
+     * If the warm-up is not over, add the weight
+     */
+    private double getWarmUpWeight(Host host, double weight) {
+        long startTime = host.getStartTime();
+        long uptime = System.currentTimeMillis() - startTime;
+        if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
+            return weight * Constants.WARM_UP_TIME / uptime;
+        }
+        return weight;
     }
 }

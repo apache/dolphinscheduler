@@ -56,9 +56,9 @@
             <!--<class name="org.apache.dolphinscheduler.testcase.testProject.TestTiming">-->
                 <!--<methods>-->
                     <!--<include name="testCreateTiming" />-->
+                    <!--<include name="testEditTiming" />-->
                     <!--<include name="testOnlineTiming" />-->
                     <!--<include name="testOfflineTiming" />-->
-                    <!--<include name="testEditTiming" />-->
                     <!--<include name="testDeleteTiming" />-->
                 <!--</methods>-->
             <!--</class>-->

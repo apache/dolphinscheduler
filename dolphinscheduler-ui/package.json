@@ -20,6 +20,7 @@
     "clipboard": "^2.0.1",
     "codemirror": "^5.43.0",
     "d3": "^3.5.17",
+    "dagre": "^0.8.5",
     "dayjs": "^1.7.8",
     "echarts": "4.1.0",
     "html2canvas": "^0.5.0-beta4",

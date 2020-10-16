@@ -139,7 +139,8 @@ public class TaskResponseService {
                         taskResponseEvent.getEndTime(),
                         taskResponseEvent.getProcessId(),
                         taskResponseEvent.getAppIds(),
-                        taskResponseEvent.getTaskInstanceId());
+                        taskResponseEvent.getTaskInstanceId(),
+                        taskResponseEvent.getVarPool());
                 break;
             default:
                 throw new IllegalArgumentException("invalid event type : " + event);
