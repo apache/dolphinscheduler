@@ -73,7 +73,7 @@ public class FileResourceCache extends AbstractResourceCache {
             realReferenceParentPath += relativePath;
             realCachePath += relativePath;
         }
-        if (!OSUtils.isWindows()) {
+        if (OSUtils.isWindows()) {
             FileUtils.copySubFilesToDir(realCachePath, realReferenceParentPath);
         } else {
             FileUtils.linkSubFilesToDir(realCachePath, realReferenceParentPath);

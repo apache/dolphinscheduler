@@ -30,6 +30,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -462,10 +463,8 @@ public class FileUtils {
         }
 
         if (Files.isDirectory(srcPath) && Files.isDirectory(dstPath)) {
-            try {
-                for (Path path : Files.list(srcPath).collect(Collectors.toList())) {
-                    copyByPath(path, Paths.get(dstDirPath + File.separator + path.getFileName()));
-                }
+            try (Stream<Path> pathStream = Files.list(srcPath)) {
+                pathStream.forEach(path->copyByPath(path, Paths.get(dstDirPath + File.separator + path.getFileName())));
             } catch (Exception e) {
                 throw new RuntimeException(String.format("copySubFilesToDir srcDirPath[%s] dstDirPath[%s] failed",
                         srcDirPath, dstDirPath), e);

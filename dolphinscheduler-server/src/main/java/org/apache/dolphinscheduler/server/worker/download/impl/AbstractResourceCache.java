@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class AbstractResourceCache implements IResourceCache {
     private static String versionFormat = Constants.YYYYMMDDHHMMSS;
-    private static long cacheExpiredMs = 7*24*3600*1000;
+    private static long cacheExpiredMs = 7*24*3600*1000L;
     private static int cacheMinKeepCount = 2;
 
     private Lock lock;
@@ -84,7 +84,7 @@ public abstract class AbstractResourceCache implements IResourceCache {
                             break;
                         }
                     } catch (InterruptedException e) {
-                        logger.warn("condition await is interrupted");
+                        logger.warn("condition await is interrupted", e);
                     }
                 }
                 break;
