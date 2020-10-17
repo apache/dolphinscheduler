@@ -80,7 +80,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param host host
      * @param startTime startTime
      * @param endTime endTime
-     * @return process instance page
+     * @return process instance IPage
      */
     IPage<ProcessInstance> queryProcessInstanceListPaging(Page<ProcessInstance> page,
                                                           @Param("projectId") int projectId,
