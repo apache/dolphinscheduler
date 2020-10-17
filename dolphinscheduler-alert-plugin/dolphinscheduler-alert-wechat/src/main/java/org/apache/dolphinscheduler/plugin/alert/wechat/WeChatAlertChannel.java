@@ -17,8 +17,17 @@
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +39,22 @@ public class WeChatAlertChannel implements AlertChannel {
     private static final Logger logger = LoggerFactory.getLogger(WeChatAlertChannel.class);
     @Override
     public AlertResult process(AlertInfo info) {
-        return null;
+        AlertData alertData = info.getAlertData();
+        String alertParams = info.getAlertParams();
+        List<PluginParams> pluginParams = JSONUtils.toList(alertParams, PluginParams.class);
+        Map<String, String> paramsMap = new HashMap<>();
+        for (PluginParams param : pluginParams) {
+            paramsMap.put(param.getName(), param.getValue().toString());
+        }
+        AlertResult alertResult = new AlertResult();
+        alertResult.setStatus(Boolean.toString(Boolean.TRUE));
+        WeChatSender weChatSender = new WeChatSender(paramsMap);
+        try {
+            weChatSender.sendEnterpriseWeChat(alertData.getTitle(), alertData.getContent());
+        } catch (IOException e) {
+            alertResult.setStatus(Boolean.toString(Boolean.FALSE));
+            logger.error(e.getMessage(), e);
+        }
+        return alertResult;
     }
 }

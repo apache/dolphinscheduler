@@ -147,12 +147,10 @@ public class WeChatSender {
 
     /**
      * send Enterprise WeChat
-     *
-     * @param charset the charset
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException the IOException
      */
-    public String sendEnterpriseWeChat(String charset, String title, String content) throws IOException {
+    public String sendEnterpriseWeChat(String title, String content) throws IOException {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
