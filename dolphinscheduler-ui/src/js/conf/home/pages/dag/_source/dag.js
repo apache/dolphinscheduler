@@ -135,10 +135,12 @@ Dag.prototype.backfill = function (arg) {
     const dataObject = {}
     g.nodes().forEach(function (v) {
       const node = g.node(v)
+      const location = store.state.dag.locations[node.label]
       const obj = {}
-      obj.name = node.label
+      obj.name = location.name
       obj.x = node.x + marginX
       obj.y = node.y
+      obj.targetarr = location.targetarr
       dataObject[node.label] = obj
     })
     jsPlumb.ready(() => {
