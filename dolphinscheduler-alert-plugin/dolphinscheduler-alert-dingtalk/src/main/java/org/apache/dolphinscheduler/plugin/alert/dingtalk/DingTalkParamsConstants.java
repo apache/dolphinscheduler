@@ -22,35 +22,35 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 public class DingTalkParamsConstants {
 
 
-    public static final String DING_TALK_WEB_HOOK = "dingtalk.webhook";
+    static final String DING_TALK_WEB_HOOK = "dingtalk.webhook";
 
-    public static final String NAME_DING_TALK_WEB_HOOK = "dingTalkWebHook";
+    static final String NAME_DING_TALK_WEB_HOOK = "dingTalkWebHook";
 
-    public static final String DING_TALK_KEYWORD = "dingtalk.keyword";
+    static final String DING_TALK_KEYWORD = "dingtalk.keyword";
 
-    public static final String NAME_DING_TALK_KEYWORD = "dingTalkKeyword";
+    static final String NAME_DING_TALK_KEYWORD = "dingTalkKeyword";
 
     public static final String DING_TALK_PROXY_ENABLE = "dingtalk.isEnableProxy";
 
-    public static final String NAME_DING_TALK_PROXY_ENABLE = "dingTalkIsEnableProxy";
+    static final String NAME_DING_TALK_PROXY_ENABLE = "dingTalkIsEnableProxy";
 
-    public static final String DING_TALK_PROXY = "dingtalk.proxy";
+    static final String DING_TALK_PROXY = "dingtalk.proxy";
 
-    public static final String NAME_DING_TALK_PROXY = "dingTalkProxy";
+    static final String NAME_DING_TALK_PROXY = "dingTalkProxy";
 
-    public static final String DING_TALK_PORT = "dingtalk.port";
+    static final String DING_TALK_PORT = "dingtalk.port";
 
-    public static final String NAME_DING_TALK_PORT = "dingTalkPort";
+    static final String NAME_DING_TALK_PORT = "dingTalkPort";
 
-    public static final String DING_TALK_USER = "dingtalk.user";
+    static final String DING_TALK_USER = "dingtalk.user";
 
-    public static final String NAME_DING_TALK_USER = "dingTalkUser";
+    static final String NAME_DING_TALK_USER = "dingTalkUser";
 
-    public static final String DING_TALK_PASSWORD = "dingtalk.password";
+    static final String DING_TALK_PASSWORD = "dingtalk.password";
 
-    public static final String NAME_DING_TALK_PASSWORD = "dingTalkPassword";
+    static final String NAME_DING_TALK_PASSWORD = "dingTalkPassword";
 
     public static final String DING_TALK_ENABLE = "dingtalk.isEnable";
 
-    public static final String NAME_DING_TALK_ENABLE = "dingTalkIsEnable";
+    static final String NAME_DING_TALK_ENABLE = "dingTalkIsEnable";
 }

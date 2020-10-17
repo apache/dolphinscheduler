@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 
 /**
- * @author jiangli
- * @date 2020-07-20 20:34
+ * WeChatAlertPlugin
  */
 public class WeChatAlertPlugin implements DolphinSchedulerPlugin {
 

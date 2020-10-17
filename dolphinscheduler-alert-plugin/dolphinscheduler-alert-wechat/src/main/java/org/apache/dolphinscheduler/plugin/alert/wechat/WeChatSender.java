@@ -16,10 +16,7 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
-import org.apache.dolphinscheduler.spi.alert.AlertConstants;
-import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
@@ -33,6 +30,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -45,8 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jiangli
- * @date 2020-07-20 21:29
+ * WeChatSender
  */
 public class WeChatSender {
 
@@ -55,12 +52,6 @@ public class WeChatSender {
     private String weChatAgentId;
 
     private String weChatUsers;
-
-    private String weChatCorpId;
-
-    private String weChatSecret;
-
-    private String weChatTokenUrl;
 
     private String weChatPushUrl;
 
@@ -72,6 +63,8 @@ public class WeChatSender {
 
     private String weChatToken;
 
+    private String showType;
+
 
     private static final String agentIdRegExp = "\\{agentId}";
     private static final String msgRegExp = "\\{msg}";
@@ -80,12 +73,13 @@ public class WeChatSender {
     WeChatSender(Map<String, String> config) {
         weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
         weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);
-        weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
-        weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
-        weChatTokenUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL);
+        String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
+        String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
+        String weChatTokenUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL);
         weChatPushUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL);
         weChatTeamSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG);
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
+        showType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SHOW_TYPE);
         weChatTokenUrlReplace = weChatTokenUrl == null ? null : weChatTokenUrl
                 .replaceAll("\\{corpId}", weChatCorpId)
                 .replaceAll("\\{secret}", weChatSecret);
@@ -116,7 +110,7 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
-        String listParty = mkString(toParty, "|");
+        String listParty = mkString(toParty);
         return weChatTeamSendMsg.replaceAll("\\{toParty}", listParty)
                 .replaceAll(agentIdRegExp, agentId)
                 .replaceAll(msgRegExp, msg);
@@ -145,7 +139,7 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
-        String listUser = mkString(toUser, "|");
+        String listUser = mkString(toUser);
         return weChatUserSendMsg.replaceAll(userRegExp, listUser)
                 .replaceAll(agentIdRegExp, agentId)
                 .replaceAll(msgRegExp, msg);
@@ -155,13 +149,15 @@ public class WeChatSender {
      * send Enterprise WeChat
      *
      * @param charset the charset
-     * @param data the data
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException the IOException
      */
-    public String sendEnterpriseWeChat(String charset, String data) throws IOException {
+    public String sendEnterpriseWeChat(String charset, String title, String content) throws IOException {
+        List<String> userList = Arrays.asList(weChatUsers.split(","));
+        String data = markdownByAlert(title, content);
+        String msg = makeUserSendMsg(userList, weChatAgentId, data);
         String enterpriseWeChatPushUrlReplace = weChatPushUrl.replaceAll("\\{token}", weChatToken);
-        return post(enterpriseWeChatPushUrlReplace, data);
+        return post(enterpriseWeChatPushUrlReplace, msg);
     }
 
     private static String post(String url, String data) throws IOException {
@@ -190,7 +186,7 @@ public class WeChatSender {
      * @param content the content
      * @return markdown table content
      */
-    public static String markdownTable(String title, String content) {
+    private static String markdownTable(String title, String content) {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
 
@@ -220,7 +216,7 @@ public class WeChatSender {
      * @param content the content
      * @return markdown text
      */
-    public static String markdownText(String title, String content) {
+    private static String markdownText(String title, String content) {
         if (StringUtils.isNotEmpty(content)) {
             List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
             if (null != mapItemsList) {
@@ -229,9 +225,7 @@ public class WeChatSender {
                 for (LinkedHashMap mapItems : mapItemsList) {
 
                     Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
-                    Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
-                    while (iterator.hasNext()) {
-                        Map.Entry<String, Object> entry = iterator.next();
+                    for (Entry<String, Object> entry : entries) {
                         contents.append(WeChatAlertConstants.MARKDOWN_QUOTE);
                         contents.append(entry.getKey()).append(":").append(entry.getValue());
                         contents.append(WeChatAlertConstants.MARKDOWN_ENTER);
@@ -250,14 +244,12 @@ public class WeChatSender {
      *
      * @return the markdown alert table/text
      */
-    public static String markdownByAlert(AlertInfo alertInfo) {
+    private String markdownByAlert(String title, String content) {
         String result = "";
-        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertInfo.getAlertParams());
-        String showType = paramsMap.get(AlertConstants.SHOW_TYPE);
         if (showType.equals(ShowType.TABLE.getDescp())) {
-            result = markdownTable(alertInfo.getAlertData().getTitle(), alertInfo.getAlertData().getContent());
+            result = markdownTable(title, content);
         } else if (showType.equals(ShowType.TEXT.getDescp())) {
-            result = markdownText(alertInfo.getAlertData().getTitle(), alertInfo.getAlertData().getContent());
+            result = markdownText(title, content);
         }
         return result;
 
@@ -272,19 +264,15 @@ public class WeChatSender {
         return null;
     }
 
-    public static String get(String url) throws IOException {
+    private static String get(String url) throws IOException {
         String resp;
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        try {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet httpGet = new HttpGet(url);
-            CloseableHttpResponse response = httpClient.execute(httpGet);
-            try {
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();
                 resp = EntityUtils.toString(entity, WeChatAlertConstants.CHARSET);
                 EntityUtils.consume(entity);
-            } finally {
-                response.close();
             }
 
             Map<String, String> map = JSONUtils.toMap(resp);
@@ -293,14 +281,12 @@ public class WeChatSender {
             } else {
                 return null;
             }
-        } finally {
-            httpClient.close();
         }
     }
 
-    private static String mkString(Iterable<String> list, String split) {
+    private static String mkString(Iterable<String> list) {
 
-        if (null == list || StringUtils.isEmpty(split)) {
+        if (null == list || StringUtils.isEmpty("|")) {
             return null;
         }
 
@@ -310,7 +296,7 @@ public class WeChatSender {
             if (first) {
                 first = false;
             } else {
-                sb.append(split);
+                sb.append("|");
             }
             sb.append(item);
         }

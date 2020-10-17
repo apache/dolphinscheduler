@@ -17,8 +17,7 @@
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 /**
- * @author jiangli
- * @date 2020-07-20 20:38
+ * WeChatAlertParamsConstants
  */
 public class WeChatAlertParamsConstants {
 
@@ -27,32 +26,32 @@ public class WeChatAlertParamsConstants {
 
     public static final String ENTERPRISE_WE_CHAT_CORP_ID = "enterprise.wechat.corp.id";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "enterpriseWeChatCorpId";
+    static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "enterpriseWeChatCorpId";
 
 
     public static final String ENTERPRISE_WE_CHAT_SECRET = "enterprise.wechat.secret";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "enterpriseWeChatSecret";
+    static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "enterpriseWeChatSecret";
 
 
     public static final String ENTERPRISE_WE_CHAT_TOKEN_URL = "enterprise.wechat.token.url";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_TOKEN_URL = "enterpriseWeChatTokenUrl";
+    static final String NAME_ENTERPRISE_WE_CHAT_TOKEN_URL = "enterpriseWeChatTokenUrl";
 
 
     public static final String ENTERPRISE_WE_CHAT_PUSH_URL = "enterprise.wechat.push.url";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_PUSH_URL = "enterpriseWeChatPushUrl";
+    static final String NAME_ENTERPRISE_WE_CHAT_PUSH_URL = "enterpriseWeChatPushUrl";
 
 
     public static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterpriseWeChatTeamSendMsg";
+    static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterpriseWeChatTeamSendMsg";
 
 
     public static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterpriseWeChatUserSendMsg";
+    static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterpriseWeChatUserSendMsg";
 
 
     public static final String ENTERPRISE_WE_CHAT_AGENT_ID = "enterprise.wechat.agent.id";
@@ -64,5 +63,10 @@ public class WeChatAlertParamsConstants {
 
 
     public static final String NAME_ENTERPRISE_WE_CHAT_USERS = "enterpriseWeChatUsers";
+
+    //todo
+    public  static final String ENTERPRISE_WE_CHAT_SHOW_TYPE="showType";
+
+    public static final String NAME_ENTERPRISE_WE_CHAT_SHOW_TYPE="showType";
 
 }

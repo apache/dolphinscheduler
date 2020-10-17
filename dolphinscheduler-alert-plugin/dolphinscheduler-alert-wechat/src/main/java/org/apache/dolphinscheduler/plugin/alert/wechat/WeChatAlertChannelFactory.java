@@ -18,8 +18,12 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.params.InputParam;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.spi.params.base.Validate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -33,11 +37,61 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> getParams() {
-        return null;
+        List<PluginParams> paramsList = new ArrayList<>();
+        InputParam corpIdParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_CORP_ID)
+                .setPlaceholder("please input corp id ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        InputParam secretParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_SECRET)
+                .setPlaceholder("please input secret ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        InputParam pushUrlParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_PUSH_URL)
+                .setPlaceholder("please input push url ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        InputParam tokenUrlParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_TOKEN_URL)
+                .setPlaceholder("please input we chat token url ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+        InputParam usersParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USERS)
+                .setPlaceholder("please input users ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        InputParam userSendMsgParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USER_SEND_MSG)
+                .setPlaceholder("please input corp id ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        InputParam agentIdParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_AGENT_ID)
+                .setPlaceholder("please input agent id ")
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
+
+        return Arrays.asList( corpIdParam, secretParam, pushUrlParam,usersParam, tokenUrlParam, userSendMsgParam, agentIdParam);
+
     }
 
     @Override
     public AlertChannel create() {
-        return null;
+        return new WeChatAlertChannel();
     }
 }
