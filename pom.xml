@@ -59,8 +59,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
-        <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
+        <spring.version>5.1.18.RELEASE</spring.version>
+        <spring.boot.version>2.1.17.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
@@ -71,7 +71,7 @@
         <cron.utils.version>5.0.5</cron.utils.version>
         <druid.version>1.1.22</druid.version>
         <h2.version>1.4.200</h2.version>
-        <commons.codec.version>1.6</commons.codec.version>
+        <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
@@ -785,6 +785,7 @@
                         <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/VarPoolUtilsTest.java</include>
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
                         <include>**/common/utils/KerberosHttpClientTest.java</include>
@@ -832,6 +833,7 @@
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
+                        <include>**/server/utils/HostTest.java</include>
                         <!--<include>**/server/utils/FlinkArgsUtilsTest.java</include>-->
                         <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
@@ -851,6 +853,7 @@
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
+                        <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>

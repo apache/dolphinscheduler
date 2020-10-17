@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 @PrepareForTest({SpringApplicationContext.class})
 public class TaskManagerTest {
 
+    private static Logger logger = LoggerFactory.getLogger(TaskManagerTest.class);
+
     private TaskExecutionContext taskExecutionContext;
 
     private Logger taskLogger;
@@ -95,9 +97,18 @@ public class TaskManagerTest {
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
         taskExecutionContext.setTaskType("SQOOP");
         Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
-        //taskExecutionContext.setTaskType(null);
-        //Assert.assertNull(TaskManager.newTask(taskExecutionContext,taskLogger));
-        //taskExecutionContext.setTaskType("XXX");
-        //Assert.assertNotNull(TaskManager.newTask(taskExecutionContext,taskLogger));
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewTaskIsNull() {
+        taskExecutionContext.setTaskType(null);
+        TaskManager.newTask(taskExecutionContext,taskLogger);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewTaskIsNotExists() {
+        taskExecutionContext.setTaskType("XXX");
+        TaskManager.newTask(taskExecutionContext,taskLogger);
     }
 }
