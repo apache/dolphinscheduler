@@ -42,7 +42,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Ding Talk Sender
  */
@@ -63,11 +62,10 @@ public class DingTalkSender {
 
     private String password;
 
-
     DingTalkSender(Map<String, String> config) {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
-        enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_ENABLE));
+        enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (enableProxy) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
             Object key;
@@ -77,7 +75,6 @@ public class DingTalkSender {
         }
 
     }
-
 
     public AlertResult sendDingTalkMsg(String msg, String charset) {
         AlertResult alertResult;
@@ -159,7 +156,6 @@ public class DingTalkSender {
         return JSONUtils.toJsonString(items);
     }
 
-
     public static class DingTalkSendMsgResponse {
         private Integer errcode;
         private String errmsg;
@@ -206,6 +202,5 @@ public class DingTalkSender {
         logger.info("alert send error : {}", sendMsgResponse.getErrmsg());
         return alertResult;
     }
-
 
 }

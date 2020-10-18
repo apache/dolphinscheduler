@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * WeChatAlertPlugin

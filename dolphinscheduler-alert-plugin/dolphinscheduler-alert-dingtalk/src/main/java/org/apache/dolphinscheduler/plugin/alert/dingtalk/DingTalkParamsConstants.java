@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
 /**
@@ -50,7 +51,4 @@ public class DingTalkParamsConstants {
 
     static final String NAME_DING_TALK_PASSWORD = "dingTalkPassword";
 
-    public static final String DING_TALK_ENABLE = "dingtalk.isEnable";
-
-    static final String NAME_DING_TALK_ENABLE = "dingTalkIsEnable";
 }
