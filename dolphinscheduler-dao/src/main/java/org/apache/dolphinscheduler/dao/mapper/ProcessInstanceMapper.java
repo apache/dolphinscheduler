@@ -65,19 +65,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      */
     List<ProcessInstance> queryByWorkerGroupIdAndStatus(@Param("workerGroupId") int workerGroupId,
                                                    @Param("states") int[] states);
-
-    /**
-     * process instance page
-     * @param page page
-     * @param projectId projectId
-     * @param processDefinitionId processDefinitionId
-     * @param searchVal searchVal
-     * @param statusArray statusArray
-     * @param host host
-     * @param startTime startTime
-     * @param endTime endTime
-     * @return process instance IPage
-     */
+    
 
     /**
      * process instance page
