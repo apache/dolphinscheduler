@@ -21,12 +21,8 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -43,20 +39,7 @@ public class DingTalkAlertChannel implements AlertChannel {
 
         AlertData alertData = alertInfo.getAlertData();
         String alertParams = alertInfo.getAlertParams();
-        List<PluginParams> pluginParams = JSONUtils.toList(alertParams, PluginParams.class);
-        Map<String, String> paramsMap = new HashMap<>();
-        for (PluginParams param : pluginParams) {
-            paramsMap.put(param.getName(), param.getValue().toString());
-        }
-        AlertResult alertResult = new AlertResult();
-        alertResult.setStatus(Boolean.toString(Boolean.TRUE));
-        DingTalkSender dingTalkSender = new DingTalkSender(paramsMap);
-        try {
-            dingTalkSender.sendDingTalkMsg(alertData.getTitle(), alertData.getContent());
-        } catch (IOException e) {
-            alertResult.setStatus(Boolean.toString(Boolean.FALSE));
-            logger.error(e.getMessage(), e);
-        }
-        return alertResult;
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
+        return new DingTalkSender(paramsMap).sendDingTalkMsg(alertData.getTitle(), alertData.getContent());
     }
 }

@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
-import java.io.IOException;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +34,7 @@ public class DingTalkSenderTest {
     private static Map<String, String> dingTalkConfig = new HashMap<>();
 
     @Before
-    public  void initDingTalkConfig() {
+    public void initDingTalkConfig() {
 
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, "keyWord");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, "https://oapi.dingtalk.com/robot/");
@@ -43,12 +45,14 @@ public class DingTalkSenderTest {
     }
 
     @Test
-    public void sendTest() throws IOException {
+    public void sendTest() {
         DingTalkSender dingTalkSender = new DingTalkSender(dingTalkConfig);
         dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "true");
         dingTalkSender = new DingTalkSender(dingTalkConfig);
-        dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
+        AlertResult alertResult = dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
+        Assert.assertEquals(alertResult.getStatus(),"false");
+
     }
 
 }

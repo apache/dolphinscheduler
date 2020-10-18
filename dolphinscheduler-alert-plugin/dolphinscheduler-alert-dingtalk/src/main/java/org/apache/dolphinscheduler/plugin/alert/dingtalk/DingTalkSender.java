@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.StringUtils;
@@ -77,7 +78,23 @@ public class DingTalkSender {
 
     }
 
-    public String sendDingTalkMsg(String msg, String charset) throws IOException {
+
+    public AlertResult sendDingTalkMsg(String msg, String charset) {
+        AlertResult alertResult;
+        try {
+            String resp = sendMsg(msg, charset);
+            return checkSendDingTalkSendMsgResult(resp);
+        } catch (Exception e) {
+            logger.info("send ding talk alert msg  exception : {}", e.getMessage());
+            alertResult = new AlertResult();
+            alertResult.setStatus("false");
+            alertResult.setMessage("send ding talk alert fail.");
+        }
+        return alertResult;
+    }
+
+    private String sendMsg(String msg, String charset) throws IOException {
+
         String msgToJson = textToJsonString(msg + "#" + keyword);
         HttpPost httpPost = constructHttpPost(url, msgToJson, charset);
 
@@ -139,8 +156,56 @@ public class DingTalkSender {
         String txt = StringUtils.newStringUtf8(byt);
         textContent.put("content", txt);
         items.put("text", textContent);
-
         return JSONUtils.toJsonString(items);
-
     }
+
+
+    public static class DingTalkSendMsgResponse {
+        private Integer errcode;
+        private String errmsg;
+
+        public Integer getErrcode() {
+            return errcode;
+        }
+
+        public void setErrcode(Integer errcode) {
+            this.errcode = errcode;
+        }
+
+        public String getErrmsg() {
+            return errmsg;
+        }
+
+        public void setErrmsg(String errmsg) {
+            this.errmsg = errmsg;
+        }
+    }
+
+    private static AlertResult checkSendDingTalkSendMsgResult(String result) {
+        AlertResult alertResult = new AlertResult();
+        alertResult.setStatus("false");
+
+        if (null == result) {
+            alertResult.setMessage("we chat alert send error");
+            logger.info("send ding talk msg error,ding talk server resp is null");
+            return alertResult;
+        }
+        DingTalkSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, DingTalkSendMsgResponse.class);
+        if (null == sendMsgResponse) {
+            alertResult.setMessage("we chat send fail");
+            logger.info("send we chat msg error,resp error");
+            return alertResult;
+        }
+        if (sendMsgResponse.errcode == 0) {
+            alertResult.setStatus("true");
+            alertResult.setMessage("send ding talk msg success");
+            logger.info("alert send success");
+            return alertResult;
+        }
+        alertResult.setMessage(String.format("alert send error : %s", sendMsgResponse.getErrmsg()));
+        logger.info("alert send error : {}", sendMsgResponse.getErrmsg());
+        return alertResult;
+    }
+
+
 }

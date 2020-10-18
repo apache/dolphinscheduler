@@ -18,7 +18,11 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
+import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.params.InputParam;
+import org.apache.dolphinscheduler.spi.params.RadioParam;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
@@ -86,7 +90,14 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
 
-        return Arrays.asList( corpIdParam, secretParam, pushUrlParam,usersParam, tokenUrlParam, userSendMsgParam, agentIdParam);
+        RadioParam showType = RadioParam.newBuilder(AlertConstants.SHOW_TYPE, AlertConstants.SHOW_TYPE)
+                .addParamsOptions(new ParamsOptions(ShowType.TABLE.getDescp(), ShowType.TABLE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(ShowType.TEXT.getDescp(), ShowType.TEXT.getDescp(), false))
+                .setValue(ShowType.TABLE.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
+
+        return Arrays.asList(corpIdParam, secretParam, pushUrlParam, usersParam, tokenUrlParam, userSendMsgParam, agentIdParam,showType);
 
     }
 

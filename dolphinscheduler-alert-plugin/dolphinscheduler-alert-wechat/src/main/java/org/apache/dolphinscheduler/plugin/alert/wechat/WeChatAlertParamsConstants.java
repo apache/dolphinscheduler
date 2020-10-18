@@ -22,51 +22,45 @@ package org.apache.dolphinscheduler.plugin.alert.wechat;
 public class WeChatAlertParamsConstants {
 
 
-    public static final String ENTERPRISE_WE_CHAT_ENABLE = "enterprise.wechat.enable";
-
-    public static final String ENTERPRISE_WE_CHAT_CORP_ID = "enterprise.wechat.corp.id";
+    static final String ENTERPRISE_WE_CHAT_CORP_ID = "enterprise.wechat.corp.id";
 
     static final String NAME_ENTERPRISE_WE_CHAT_CORP_ID = "enterpriseWeChatCorpId";
 
 
-    public static final String ENTERPRISE_WE_CHAT_SECRET = "enterprise.wechat.secret";
+    static final String ENTERPRISE_WE_CHAT_SECRET = "enterprise.wechat.secret";
 
     static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "enterpriseWeChatSecret";
 
 
-    public static final String ENTERPRISE_WE_CHAT_TOKEN_URL = "enterprise.wechat.token.url";
+    static final String ENTERPRISE_WE_CHAT_TOKEN_URL = "enterprise.wechat.token.url";
 
     static final String NAME_ENTERPRISE_WE_CHAT_TOKEN_URL = "enterpriseWeChatTokenUrl";
 
 
-    public static final String ENTERPRISE_WE_CHAT_PUSH_URL = "enterprise.wechat.push.url";
+    static final String ENTERPRISE_WE_CHAT_PUSH_URL = "enterprise.wechat.push.url";
 
     static final String NAME_ENTERPRISE_WE_CHAT_PUSH_URL = "enterpriseWeChatPushUrl";
 
 
-    public static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
+    static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
 
     static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterpriseWeChatTeamSendMsg";
 
 
-    public static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
+    static final String ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
 
     static final String NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG = "enterpriseWeChatUserSendMsg";
 
 
-    public static final String ENTERPRISE_WE_CHAT_AGENT_ID = "enterprise.wechat.agent.id";
+    static final String ENTERPRISE_WE_CHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "enterpriseWeChatAgentId";
-
-
-    public static final String ENTERPRISE_WE_CHAT_USERS = "enterprise.wechat.users";
+    static final String NAME_ENTERPRISE_WE_CHAT_AGENT_ID = "enterpriseWeChatAgentId";
 
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_USERS = "enterpriseWeChatUsers";
+    static final String ENTERPRISE_WE_CHAT_USERS = "enterprise.wechat.users";
 
-    //todo
-    public  static final String ENTERPRISE_WE_CHAT_SHOW_TYPE="showType";
 
-    public static final String NAME_ENTERPRISE_WE_CHAT_SHOW_TYPE="showType";
+    static final String NAME_ENTERPRISE_WE_CHAT_USERS = "enterpriseWeChatUsers";
+
 
 }

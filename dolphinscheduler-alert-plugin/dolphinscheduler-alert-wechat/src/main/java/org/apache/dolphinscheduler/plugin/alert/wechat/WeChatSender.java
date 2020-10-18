@@ -16,6 +16,10 @@
  */
 package org.apache.dolphinscheduler.plugin.alert.wechat;
 
+import static java.util.Objects.requireNonNull;
+
+import org.apache.dolphinscheduler.spi.alert.AlertConstants;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
 import org.apache.dolphinscheduler.spi.alert.ShowType;
 import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
@@ -69,6 +73,11 @@ public class WeChatSender {
     private static final String agentIdRegExp = "\\{agentId}";
     private static final String msgRegExp = "\\{msg}";
     private static final String userRegExp = "\\{toUser}";
+    private static final String corpIdRegex = "\\{corpId}";
+    private static final String secretRegex = "\\{secret}";
+    private static final String toPartyRegex = "\\{toParty}";
+    private static final String toUserRegex = "\\{toUser}";
+    private static final String tokenRegex = "\\{token}";
 
     WeChatSender(Map<String, String> config) {
         weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
@@ -79,10 +88,11 @@ public class WeChatSender {
         weChatPushUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL);
         weChatTeamSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG);
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
-        showType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SHOW_TYPE);
+        showType = config.get(AlertConstants.SHOW_TYPE);
+        requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
         weChatTokenUrlReplace = weChatTokenUrl == null ? null : weChatTokenUrl
-                .replaceAll("\\{corpId}", weChatCorpId)
-                .replaceAll("\\{secret}", weChatSecret);
+                .replaceAll(corpIdRegex, weChatCorpId)
+                .replaceAll(secretRegex, weChatSecret);
         weChatToken = getToken();
     }
 
@@ -96,7 +106,7 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return weChatTeamSendMsg.replaceAll("\\{toParty}", toParty)
+        return weChatTeamSendMsg.replaceAll(toPartyRegex, toParty)
                 .replaceAll(agentIdRegExp, agentId)
                 .replaceAll(msgRegExp, msg);
     }
@@ -111,7 +121,7 @@ public class WeChatSender {
      */
     private String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = mkString(toParty);
-        return weChatTeamSendMsg.replaceAll("\\{toParty}", listParty)
+        return weChatTeamSendMsg.replaceAll(toPartyRegex, listParty)
                 .replaceAll(agentIdRegExp, agentId)
                 .replaceAll(msgRegExp, msg);
     }
@@ -125,7 +135,7 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return weChatUserSendMsg.replaceAll("\\{toUser}", toUser)
+        return weChatUserSendMsg.replaceAll(toUserRegex, toUser)
                 .replaceAll(agentIdRegExp, agentId)
                 .replaceAll(msgRegExp, msg);
     }
@@ -147,15 +157,25 @@ public class WeChatSender {
 
     /**
      * send Enterprise WeChat
+     *
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
-     * @throws IOException the IOException
+     * @throws Exception the Exception
      */
-    public String sendEnterpriseWeChat(String title, String content) throws IOException {
+    public AlertResult sendEnterpriseWeChat(String title, String content) {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
-        String enterpriseWeChatPushUrlReplace = weChatPushUrl.replaceAll("\\{token}", weChatToken);
-        return post(enterpriseWeChatPushUrlReplace, msg);
+        String enterpriseWeChatPushUrlReplace = weChatPushUrl.replaceAll(tokenRegex, weChatToken);
+        AlertResult alertResult;
+        try {
+            return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
+        } catch (Exception e) {
+            logger.info("send we chat alert msg  exception : {}", e.getMessage());
+            alertResult = new AlertResult();
+            alertResult.setMessage("send we chat alert fail");
+            alertResult.setStatus("false");
+        }
+        return alertResult;
     }
 
     private static String post(String url, String data) throws IOException {
@@ -301,4 +321,49 @@ public class WeChatSender {
         return sb.toString();
     }
 
+    public static class WeChatSendMsgResponse {
+        private Integer errcode;
+        private String errmsg;
+
+        public Integer getErrcode() {
+            return errcode;
+        }
+
+        public void setErrcode(Integer errcode) {
+            this.errcode = errcode;
+        }
+
+        public String getErrmsg() {
+            return errmsg;
+        }
+
+        public void setErrmsg(String errmsg) {
+            this.errmsg = errmsg;
+        }
+    }
+
+    private static AlertResult checkWeChatSendMsgResult(String result) {
+        AlertResult alertResult = new AlertResult();
+        alertResult.setStatus("false");
+
+        if (null == result) {
+            alertResult.setMessage("we chat send fail");
+            logger.info("send we chat msg error,resp is null");
+            return alertResult;
+        }
+        WeChatSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, WeChatSendMsgResponse.class);
+        if (null == sendMsgResponse) {
+            alertResult.setMessage("we chat send fail");
+            logger.info("send we chat msg error,resp error");
+            return alertResult;
+        }
+        if (sendMsgResponse.errcode == 0) {
+            alertResult.setStatus("true");
+            alertResult.setMessage("we chat alert send success");
+            return alertResult;
+        }
+        alertResult.setStatus("false");
+        alertResult.setMessage(sendMsgResponse.getErrmsg());
+        return alertResult;
+    }
 }

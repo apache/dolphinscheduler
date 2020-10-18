@@ -52,7 +52,8 @@ public class DingTalkAlertChannelFactory implements AlertChannelFactory {
             .build();
         RadioParam isEnableProxy =
             RadioParam.newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE)
-                .addParamsOptions(new ParamsOptions("NO", false, false))
+                    .addParamsOptions(new ParamsOptions("YES", true, false))
+                    .addParamsOptions(new ParamsOptions("NO", false, false))
                 .setValue(true)
                 .addValidate(Validate.newBuilder()
                     .setRequired(true)
