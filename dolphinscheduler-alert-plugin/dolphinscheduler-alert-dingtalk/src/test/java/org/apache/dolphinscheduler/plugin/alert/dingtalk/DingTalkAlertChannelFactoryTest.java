@@ -31,7 +31,6 @@ import org.junit.Test;
  */
 public class DingTalkAlertChannelFactoryTest {
 
-
     @Test
     public void testGetParams() {
         DingTalkAlertChannelFactory dingTalkAlertChannelFactory = new DingTalkAlertChannelFactory();

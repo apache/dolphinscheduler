@@ -65,5 +65,4 @@ public class WeChatSenderTest {
         Assert.assertEquals(alertResult.getStatus(), "false");
     }
 
-
 }
