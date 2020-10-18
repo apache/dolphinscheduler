@@ -25,14 +25,10 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * DingTalkAlertChannel
  */
 public class DingTalkAlertChannel implements AlertChannel {
-    private static final Logger logger = LoggerFactory.getLogger(DingTalkAlertChannel.class);
 
     @Override
     public AlertResult process(AlertInfo alertInfo) {

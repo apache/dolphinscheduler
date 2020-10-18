@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,6 +34,7 @@ import java.util.List;
  * WeChatAlertChannelFactory
  */
 public class WeChatAlertChannelFactory implements AlertChannelFactory {
+
     @Override
     public String getName() {
         return "we chat alert";
@@ -42,7 +42,6 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> getParams() {
-        List<PluginParams> paramsList = new ArrayList<>();
         InputParam corpIdParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_CORP_ID)
                 .setPlaceholder("please input corp id ")
                 .addValidate(Validate.newBuilder()
@@ -99,7 +98,6 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         return Arrays.asList(corpIdParam, secretParam, pushUrlParam, usersParam, tokenUrlParam, userSendMsgParam, agentIdParam,showType);
-
     }
 
     @Override

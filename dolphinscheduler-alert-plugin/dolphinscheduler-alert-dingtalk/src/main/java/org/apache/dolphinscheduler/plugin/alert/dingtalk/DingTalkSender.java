@@ -66,9 +66,8 @@ public class DingTalkSender {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
-        if (enableProxy) {
+        if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
-            Object key;
             proxy = config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY);
             user = config.get(DingTalkParamsConstants.DING_TALK_USER);
             password = config.get(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD);
@@ -96,7 +95,7 @@ public class DingTalkSender {
         HttpPost httpPost = constructHttpPost(url, msgToJson, charset);
 
         CloseableHttpClient httpClient;
-        if (enableProxy) {
+        if (Boolean.TRUE.equals(enableProxy)) {
             httpClient = getProxyClient(proxy, port, user, password);
             RequestConfig rcf = getProxyConfig(proxy, port);
             httpPost.setConfig(rcf);
@@ -114,7 +113,7 @@ public class DingTalkSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send [{}], resp:{%s}", msg, resp);
+            logger.info("Ding Talk send [%s], resp:{%s}", msg, resp);
             return resp;
         } finally {
             httpClient.close();
@@ -146,9 +145,9 @@ public class DingTalkSender {
     }
 
     private static String textToJsonString(String text) {
-        Map<String, Object> items = new HashMap<String, Object>();
+        Map<String, Object> items = new HashMap<>();
         items.put("msgtype", "text");
-        Map<String, String> textContent = new HashMap<String, String>();
+        Map<String, String> textContent = new HashMap<>();
         byte[] byt = StringUtils.getBytesUtf8(text);
         String txt = StringUtils.newStringUtf8(byt);
         textContent.put("content", txt);

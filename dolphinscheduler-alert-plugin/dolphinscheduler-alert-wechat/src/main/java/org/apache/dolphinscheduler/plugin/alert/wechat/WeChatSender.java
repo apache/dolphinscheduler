@@ -92,8 +92,8 @@ public class WeChatSender {
         showType = config.get(AlertConstants.SHOW_TYPE);
         requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
         weChatTokenUrlReplace = weChatTokenUrl == null ? null : weChatTokenUrl
-                .replaceAll(corpIdRegex, weChatCorpId)
-                .replaceAll(secretRegex, weChatSecret);
+                .replace(corpIdRegex, weChatCorpId)
+                .replace(secretRegex, weChatSecret);
         weChatToken = getToken();
     }
 
@@ -106,9 +106,9 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return weChatTeamSendMsg.replaceAll(toPartyRegex, toParty)
-                .replaceAll(agentIdRegExp, agentId)
-                .replaceAll(msgRegExp, msg);
+        return weChatTeamSendMsg.replace(toPartyRegex, toParty)
+                .replace(agentIdRegExp, agentId)
+                .replace(msgRegExp, msg);
     }
 
     /**
@@ -121,9 +121,9 @@ public class WeChatSender {
      */
     private String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = mkString(toParty);
-        return weChatTeamSendMsg.replaceAll(toPartyRegex, listParty)
-                .replaceAll(agentIdRegExp, agentId)
-                .replaceAll(msgRegExp, msg);
+        return weChatTeamSendMsg.replace(toPartyRegex, listParty)
+                .replace(agentIdRegExp, agentId)
+                .replace(msgRegExp, msg);
     }
 
     /**
@@ -135,9 +135,9 @@ public class WeChatSender {
      * @return Enterprise WeChat send message
      */
     private String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return weChatUserSendMsg.replaceAll(toUserRegex, toUser)
-                .replaceAll(agentIdRegExp, agentId)
-                .replaceAll(msgRegExp, msg);
+        return weChatUserSendMsg.replace(toUserRegex, toUser)
+                .replace(agentIdRegExp, agentId)
+                .replace(msgRegExp, msg);
     }
 
     /**
@@ -150,9 +150,9 @@ public class WeChatSender {
      */
     private String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = mkString(toUser);
-        return weChatUserSendMsg.replaceAll(userRegExp, listUser)
-                .replaceAll(agentIdRegExp, agentId)
-                .replaceAll(msgRegExp, msg);
+        return weChatUserSendMsg.replace(userRegExp, listUser)
+                .replace(agentIdRegExp, agentId)
+                .replace(msgRegExp, msg);
     }
 
     /**
@@ -165,7 +165,7 @@ public class WeChatSender {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
-        String enterpriseWeChatPushUrlReplace = weChatPushUrl.replaceAll(tokenRegex, weChatToken);
+        String enterpriseWeChatPushUrlReplace = weChatPushUrl.replace(tokenRegex, weChatToken);
         AlertResult alertResult;
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));
@@ -211,23 +211,21 @@ public class WeChatSender {
             throw new RuntimeException("itemsList is null");
         }
         StringBuilder contents = new StringBuilder(200);
+        for (LinkedHashMap mapItems : mapItemsList) {
+            Set<Entry<String, Object>> entries = mapItems.entrySet();
+            Iterator<Entry<String, Object>> iterator = entries.iterator();
+            StringBuilder t = new StringBuilder(String.format("`%s`%s", title, WeChatAlertConstants.MARKDOWN_ENTER));
 
-        if (null != mapItemsList) {
-            for (LinkedHashMap mapItems : mapItemsList) {
-                Set<Entry<String, Object>> entries = mapItems.entrySet();
-                Iterator<Entry<String, Object>> iterator = entries.iterator();
-                StringBuilder t = new StringBuilder(String.format("`%s`%s", title, WeChatAlertConstants.MARKDOWN_ENTER));
+            while (iterator.hasNext()) {
 
-                while (iterator.hasNext()) {
-
-                    Map.Entry<String, Object> entry = iterator.next();
-                    t.append(WeChatAlertConstants.MARKDOWN_QUOTE);
-                    t.append(entry.getKey()).append(":").append(entry.getValue());
-                    t.append(WeChatAlertConstants.MARKDOWN_ENTER);
-                }
-                contents.append(t);
+                Map.Entry<String, Object> entry = iterator.next();
+                t.append(WeChatAlertConstants.MARKDOWN_QUOTE);
+                t.append(entry.getKey()).append(":").append(entry.getValue());
+                t.append(WeChatAlertConstants.MARKDOWN_ENTER);
             }
+            contents.append(t);
         }
+
         return contents.toString();
     }
 
@@ -283,7 +281,7 @@ public class WeChatSender {
         try {
             return get(weChatTokenUrlReplace);
         } catch (IOException e) {
-            e.printStackTrace();
+           logger.info("we chat alert get token error{}", e.getMessage());
         }
         return null;
     }

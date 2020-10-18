@@ -53,7 +53,7 @@ public class WeChatSenderTest {
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         String content = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals(alertResult.getStatus(), "false");
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class WeChatSenderTest {
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         String content = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals(alertResult.getStatus(), "false");
+        Assert.assertEquals("false", alertResult.getStatus());
     }
 
 }

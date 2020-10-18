@@ -25,15 +25,10 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * WeChatAlertChannel
  */
 public class WeChatAlertChannel implements AlertChannel {
-
-    private static final Logger logger = LoggerFactory.getLogger(WeChatAlertChannel.class);
 
     @Override
     public AlertResult process(AlertInfo info) {
