@@ -206,6 +206,10 @@ public class WeChatSender {
      */
     private static String markdownTable(String title, String content) {
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        if (null == mapItemsList || mapItemsList.isEmpty()) {
+            logger.error("itemsList is null");
+            throw new RuntimeException("itemsList is null");
+        }
         StringBuilder contents = new StringBuilder(200);
 
         if (null != mapItemsList) {
@@ -237,22 +241,24 @@ public class WeChatSender {
     private static String markdownText(String title, String content) {
         if (StringUtils.isNotEmpty(content)) {
             List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
-            if (null != mapItemsList) {
-                StringBuilder contents = new StringBuilder(100);
-                contents.append(String.format("`%s`%n", title));
-                for (LinkedHashMap mapItems : mapItemsList) {
-
-                    Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
-                    for (Entry<String, Object> entry : entries) {
-                        contents.append(WeChatAlertConstants.MARKDOWN_QUOTE);
-                        contents.append(entry.getKey()).append(":").append(entry.getValue());
-                        contents.append(WeChatAlertConstants.MARKDOWN_ENTER);
-                    }
-
-                }
-                return contents.toString();
+            if (null == mapItemsList || mapItemsList.isEmpty()) {
+                logger.error("itemsList is null");
+                throw new RuntimeException("itemsList is null");
             }
 
+            StringBuilder contents = new StringBuilder(100);
+            contents.append(String.format("`%s`%n", title));
+            for (LinkedHashMap mapItems : mapItemsList) {
+
+                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
+                for (Entry<String, Object> entry : entries) {
+                    contents.append(WeChatAlertConstants.MARKDOWN_QUOTE);
+                    contents.append(entry.getKey()).append(":").append(entry.getValue());
+                    contents.append(WeChatAlertConstants.MARKDOWN_ENTER);
+                }
+
+            }
+            return contents.toString();
         }
         return null;
     }

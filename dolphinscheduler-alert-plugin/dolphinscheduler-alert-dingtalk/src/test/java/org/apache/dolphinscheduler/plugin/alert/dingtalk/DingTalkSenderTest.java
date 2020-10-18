@@ -37,22 +37,21 @@ public class DingTalkSenderTest {
     public void initDingTalkConfig() {
 
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD, "keyWord");
-        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, "https://oapi.dingtalk.com/robot/");
+        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK, "url");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "false");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD, "password");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PORT, "9988");
-        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_USER, "user");
+        dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_USER, "user1,user2");
     }
 
     @Test
-    public void sendTest() {
+    public void testSend() {
         DingTalkSender dingTalkSender = new DingTalkSender(dingTalkConfig);
         dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "true");
         dingTalkSender = new DingTalkSender(dingTalkConfig);
         AlertResult alertResult = dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
-        Assert.assertEquals(alertResult.getStatus(),"false");
-
+        Assert.assertEquals(alertResult.getStatus(), "false");
     }
 
 }
