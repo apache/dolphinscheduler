@@ -281,7 +281,7 @@ public class WeChatSender {
         try {
             return get(weChatTokenUrlReplace);
         } catch (IOException e) {
-           logger.info("we chat alert get token error{}", e.getMessage());
+            logger.info("we chat alert get token error{}", e.getMessage());
         }
         return null;
     }
