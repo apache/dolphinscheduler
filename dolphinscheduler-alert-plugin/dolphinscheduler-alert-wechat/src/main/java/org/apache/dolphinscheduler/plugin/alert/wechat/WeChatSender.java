@@ -71,14 +71,14 @@ public class WeChatSender {
     private String showType;
 
 
-    private static final String agentIdRegExp = "\\{agentId}";
-    private static final String msgRegExp = "\\{msg}";
-    private static final String userRegExp = "\\{toUser}";
-    private static final String corpIdRegex = "\\{corpId}";
-    private static final String secretRegex = "\\{secret}";
-    private static final String toPartyRegex = "\\{toParty}";
-    private static final String toUserRegex = "\\{toUser}";
-    private static final String tokenRegex = "\\{token}";
+    private static final String agentIdRegExp = "{agentId}";
+    private static final String msgRegExp = "{msg}";
+    private static final String userRegExp = "{toUser}";
+    private static final String corpIdRegex = "{corpId}";
+    private static final String secretRegex = "{secret}";
+    private static final String toPartyRegex = "{toParty}";
+    private static final String toUserRegex = "{toUser}";
+    private static final String tokenRegex = "{token}";
 
     WeChatSender(Map<String, String> config) {
         weChatAgentId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);
@@ -98,20 +98,6 @@ public class WeChatSender {
     }
 
     /**
-     * make team single Enterprise WeChat message
-     *
-     * @param toParty the toParty
-     * @param agentId the agentId
-     * @param msg the msg
-     * @return Enterprise WeChat send message
-     */
-    private String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return weChatTeamSendMsg.replace(toPartyRegex, toParty)
-                .replace(agentIdRegExp, agentId)
-                .replace(msgRegExp, msg);
-    }
-
-    /**
      * make team multi Enterprise WeChat message
      *
      * @param toParty the toParty
@@ -122,20 +108,6 @@ public class WeChatSender {
     private String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = mkString(toParty);
         return weChatTeamSendMsg.replace(toPartyRegex, listParty)
-                .replace(agentIdRegExp, agentId)
-                .replace(msgRegExp, msg);
-    }
-
-    /**
-     * make team single user message
-     *
-     * @param toUser the toUser
-     * @param agentId the agentId
-     * @param msg the msg
-     * @return Enterprise WeChat send message
-     */
-    private String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return weChatUserSendMsg.replace(toUserRegex, toUser)
                 .replace(agentIdRegExp, agentId)
                 .replace(msgRegExp, msg);
     }
@@ -178,7 +150,7 @@ public class WeChatSender {
         return alertResult;
     }
 
-    private static String post(String url, String data) throws IOException {
+    public static String post(String url, String data) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(data, WeChatAlertConstants.CHARSET));

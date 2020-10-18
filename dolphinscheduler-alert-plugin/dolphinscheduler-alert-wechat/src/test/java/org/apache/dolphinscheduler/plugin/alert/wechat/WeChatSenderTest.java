@@ -35,15 +35,39 @@ public class WeChatSenderTest {
 
     private static Map<String, String> weChatConfig = new HashMap<>();
 
+    String  content = "[{\"id\":\"69\","
+            +
+            "\"name\":\"UserBehavior-0--1193959466\","
+            +
+            "\"Job name\":\"Start workflow\","
+            +
+            "\"State\":\"SUCCESS\","
+            +
+            "\"Recovery\":\"NO\","
+            +
+            "\"Run time\":\"1\","
+            +
+            "\"Start time\": \"2018-08-06 10:31:34.0\","
+            +
+            "\"End time\": \"2018-08-06 10:31:49.0\","
+            +
+            "\"Host\": \"192.168.xx.xx\","
+            +
+            "\"Notify group\" :\"4\"}]";
+
     @Before
     public void initDingTalkConfig() {
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "1234");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "1234");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL, "https://www.*");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "SECRET");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL, "https://token.url");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, "msg");
-        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, "user");
+        // Just for this test, I will delete these configurations before this PR is merged
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "1000002");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "ww8cc690c06761eaa3");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL, "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "MYL0_O91ICNrdjkAhgeXIOAj4gEKIirf0-xoYnA25vg");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL, "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={secret}");
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, "{\"touser\":\"{toUser}\",\"agentid\":{agentId}"
+                +
+                ",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}"
+        );
+        weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, "Kris");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG, "msg");
         weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TABLE.getDescp());
     }
@@ -51,18 +75,17 @@ public class WeChatSenderTest {
     @Test
     public void testSendWeChatTableMsg() {
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
-        String content = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";
+
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals("false", alertResult.getStatus());
+        Assert.assertEquals("true", alertResult.getStatus());
     }
 
     @Test
     public void testSendWeChatTextMsg() {
         weChatConfig.put(AlertConstants.SHOW_TYPE, ShowType.TEXT.getDescp());
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
-        String content = "[{\"name\":\"ds name\",\"value\":\"ds value\"}]";
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assert.assertEquals("false", alertResult.getStatus());
+        Assert.assertEquals("true", alertResult.getStatus());
     }
 
 }
