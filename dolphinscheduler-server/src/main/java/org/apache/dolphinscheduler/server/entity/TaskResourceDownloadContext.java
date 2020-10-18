@@ -62,7 +62,7 @@ public class TaskResourceDownloadContext {
     public TaskResourceDownloadContext(Resource resource) {
         this.resourceType = resource.getType();
         this.id = resource.getId();
-        this.name = resource.getAlias();
+        this.name = resource.getFullName();
         this.fullName = resource.getFullName();
         this.tenantCode = resource.getTenantCode();
         this.updateTime = resource.getUpdateTime();

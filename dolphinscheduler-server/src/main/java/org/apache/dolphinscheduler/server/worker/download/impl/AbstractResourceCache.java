@@ -75,38 +75,71 @@ public abstract class AbstractResourceCache implements IResourceCache {
     public void cacheResource(TaskResourceDownloadContext downloadContext, Logger logger) {
         String cachePath = getCacheDir(downloadContext);
 
+        ResourceCacheStatus afterStatus;
         lock.lock();
         switch (cacheStatus) {
             case CACHING:
                 while (true) {
                     try {
                         if (condition.await(1, TimeUnit.MINUTES)) {
+                            afterStatus = cacheStatus;
                             break;
+                        } else {
+                            logger.warn("condition await timeout(1 minutes)");
                         }
                     } catch (InterruptedException e) {
                         logger.warn("condition await is interrupted", e);
                     }
                 }
+                lock.unlock();
                 break;
             case SUCCESS:
                 File cacheFile = new File(cachePath);
                 if (cacheFile.exists()) {
+                    afterStatus = cacheStatus;
                     lock.unlock();
                     break;
                 }
             case FAILED:
-                download(downloadContext, logger);
-                cacheByDownloadedResource(downloadContext, logger);
-                condition.signalAll();
+                cacheStatus = ResourceCacheStatus.CACHING;
+                lock.unlock();
 
-                // cleanup after download
+                boolean success = true;
                 try {
-                    cleanUp(downloadContext, logger);
+                    download(downloadContext, logger);
+                    cacheByDownloadedResource(downloadContext, logger);
                 } catch (Exception e) {
-                    logger.error("resource[{}-{}-{}] clean up cache failed",
-                            downloadContext.getTenantCode(), downloadContext.getResourceType(), downloadContext.getFullName());
+                    success = false;
+                    logger.error("do cache resource failed", e);
+                }
+
+                // set status & signal all waiter
+                lock.lock();
+                cacheStatus = success ? ResourceCacheStatus.SUCCESS : ResourceCacheStatus.FAILED;
+                afterStatus = cacheStatus;
+                condition.signalAll();
+                lock.unlock();
+
+                // clean expired after successfully download
+                if (success) {
+                    try {
+                        cleanExpired(downloadContext, logger);
+                    } catch (Exception e) {
+                        logger.error("resource[{}-{}-{}] clean up cache failed",
+                                downloadContext.getResourceType(), downloadContext.getId(), downloadContext.getName());
+                    }
                 }
                 break;
+            default:
+                logger.error("unknown cache status[{}]", cacheStatus);
+                cacheStatus = ResourceCacheStatus.FAILED;
+                afterStatus = cacheStatus;
+                lock.unlock();
+                break;
+        }
+
+        if (!afterStatus.equals(ResourceCacheStatus.SUCCESS)) {
+            throw new RuntimeException(String.format("cache resource failed, because afterStatus[%s]", afterStatus));
         }
     }
 
@@ -146,7 +179,7 @@ public abstract class AbstractResourceCache implements IResourceCache {
             } catch (IOException e) {
                 throw new RuntimeException(String.format("delete downloadDir[%s] failed", downloadDir), e);
             }
-            return String.format("%s%s", downloadDir, downloadContext.getFullName());
+            return String.format("%s%s", downloadDir, downloadContext.getName());
         }
     }
 
@@ -176,11 +209,11 @@ public abstract class AbstractResourceCache implements IResourceCache {
     public abstract void cacheByDownloadedResource(TaskResourceDownloadContext downloadContext, Logger logger);
 
     /**
-     * clean up
+     * clean expired
      * @param downloadContext
      * @param logger
      */
-    public void cleanUp(TaskResourceDownloadContext downloadContext, Logger logger) {
+    public void cleanExpired(TaskResourceDownloadContext downloadContext, Logger logger) {
         try {
             List<String> expiredCacheNameList = getExpiredCacheList(downloadContext);
             for (String name : expiredCacheNameList) {
