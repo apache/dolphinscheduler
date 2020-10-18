@@ -27,9 +27,12 @@
         where alertgroup_id = #{alertgroupId}
     </delete>
     <select id="listUserByAlertgroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
-           SELECT <include refid="baseSql"><property name="alias" value="u"/></include>
-           FROM t_ds_relation_user_alertgroup g_u
-           JOIN t_ds_user u on g_u.user_id = u.id
-           WHERE g_u.alertgroup_id = #{alertgroupId}
+        SELECT
+        <include refid="baseSql">
+            <property name="alias" value="u"/>
+        </include>
+        FROM t_ds_relation_user_alertgroup g_u
+        JOIN t_ds_user u on g_u.user_id = u.id
+        WHERE g_u.alertgroup_id = #{alertgroupId}
     </select>
 </mapper>

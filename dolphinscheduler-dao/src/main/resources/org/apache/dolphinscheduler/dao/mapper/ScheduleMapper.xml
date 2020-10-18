@@ -27,7 +27,10 @@
         ${alias}.warning_type, ${alias}.warning_group_id, ${alias}.process_instance_priority, ${alias}.worker_group, ${alias}.create_time, ${alias}.update_time
     </sql>
     <select id="queryByProcessDefineIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name, <include refid="baseSqlV2"><property name="alias" value="s"/></include>
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name,
+        <include refid="baseSqlV2">
+            <property name="alias" value="s"/>
+        </include>
         from t_ds_schedules s
         join t_ds_process_definition p_f on s.process_definition_id = p_f.id
         join t_ds_project as p on p_f.project_id = p.id
@@ -47,9 +50,10 @@
         where p.name = #{projectName}
     </select>
     <select id="selectAllByProcessDefineArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_schedules
-        where  1= 1
+        where 1= 1
         <if test="processDefineIds != null and processDefineIds.length != 0 ">
             and process_definition_id in
             <foreach collection="processDefineIds" index="index" item="i" open="(" separator="," close=")">
@@ -59,12 +63,15 @@
         and release_state = 1
     </select>
     <select id="queryByProcessDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_schedules
         where process_definition_id =#{processDefinitionId}
     </select>
-    <select id="queryReleaseSchedulerListByProcessDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select <include refid="baseSql"/>
+    <select id="queryReleaseSchedulerListByProcessDefinitionId"
+            resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select
+        <include refid="baseSql"/>
         from t_ds_schedules
         where process_definition_id =#{processDefinitionId} and release_state = 1
     </select>

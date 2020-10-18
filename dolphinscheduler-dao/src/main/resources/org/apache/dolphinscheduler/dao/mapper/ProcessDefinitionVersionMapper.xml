@@ -28,18 +28,22 @@
         where process_definition_id = #{processDefinitionId}
     </select>
 
-    <select id="queryProcessDefinitionVersionsPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion">
-        select <include refid="baseSql"/>
+    <select id="queryProcessDefinitionVersionsPaging"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion">
+        select
+        <include refid="baseSql"/>
         from t_ds_process_definition_version
         where process_definition_id = #{processDefinitionId}
         order by version desc
     </select>
 
-    <select id="queryByProcessDefinitionIdAndVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion">
-        select <include refid="baseSql"/>
+    <select id="queryByProcessDefinitionIdAndVersion"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinitionVersion">
+        select
+        <include refid="baseSql"/>
         from t_ds_process_definition_version
         where process_definition_id = #{processDefinitionId}
-          and version = #{version}
+        and version = #{version}
     </select>
 
     <delete id="deleteByProcessDefinitionIdAndVersion">

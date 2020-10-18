@@ -27,13 +27,15 @@
         where parent_process_instance_id=#{parentProcessId}
     </delete>
     <select id="queryByParentId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_relation_process_instance
         where parent_process_instance_id = #{parentProcessId}
         and parent_task_instance_id = #{parentTaskId}
     </select>
     <select id="queryBySubProcessId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_relation_process_instance
         where process_instance_id = #{subProcessId}
     </select>

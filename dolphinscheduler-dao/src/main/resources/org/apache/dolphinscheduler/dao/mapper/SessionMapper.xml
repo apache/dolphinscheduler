@@ -22,13 +22,15 @@
         id, user_id, ip, last_login_time
     </sql>
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Session">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_session
         where user_id = #{userId}
     </select>
 
     <select id="queryByUserIdAndIp" resultType="org.apache.dolphinscheduler.dao.entity.Session">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_session
         where user_id = #{userId} AND ip = #{ip}
     </select>

@@ -23,7 +23,8 @@
         alertgroup_id, receivers, receivers_cc, create_time, update_time
     </sql>
     <select id="listAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_alert
         where alert_status = #{alertStatus}
     </select>

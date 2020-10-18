@@ -22,7 +22,8 @@
         id, group_name, group_type, description, create_time, update_time
     </sql>
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_alertgroup
         where 1 = 1
         <if test="groupName != null and groupName != ''">
@@ -31,7 +32,8 @@
         order by update_time desc
     </select>
     <select id="queryByGroupName" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_alertgroup
         where group_name=#{groupName}
     </select>
@@ -42,12 +44,14 @@
         where r.user_id=#{userId}
     </select>
     <select id="queryByAlertType" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_alertgroup
         where group_type=#{alertType}
     </select>
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_alertgroup
         order by update_time desc
     </select>

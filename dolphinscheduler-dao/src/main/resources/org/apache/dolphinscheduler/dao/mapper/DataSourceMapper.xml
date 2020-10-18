@@ -22,29 +22,31 @@
         id, name, note, type, user_id, connection_params, create_time, update_time
     </sql>
     <select id="queryDataSourceByType" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where type=#{type}
         <if test="userId != 0">
-        and id in
-          (select datasource_id
-          from t_ds_relation_datasource_user
-          where user_id=#{userId}
-          union select id as datasource_id
-                from t_ds_datasource
-                where user_id=#{userId}
-         )
+            and id in
+            (select datasource_id
+            from t_ds_relation_datasource_user
+            where user_id=#{userId}
+            union select id as datasource_id
+            from t_ds_datasource
+            where user_id=#{userId}
+            )
         </if>
 
     </select>
 
     <select id="selectPaging" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where 1 =1
         <if test="userId != 0">
-         and id in
-          (select datasource_id
+            and id in
+            (select datasource_id
             from t_ds_relation_datasource_user
             where user_id=#{userId}
             union select id as datasource_id
@@ -53,12 +55,13 @@
             )
         </if>
         <if test="name != null and name != ''">
-             and name like concat ('%', #{name}, '%')
-         </if>
-         order by update_time desc
+            and name like concat ('%', #{name}, '%')
+        </if>
+        order by update_time desc
     </select>
     <select id="queryDataSourceByName" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where name=#{name}
     </select>
@@ -68,21 +71,24 @@
         where ds.id = rel.datasource_id AND rel.user_id = #{userId}
     </select>
     <select id="queryDatasourceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="listAllDataSourceByType" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where type = #{type}
     </select>
     <select id="listAuthorizedDataSource" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
-        select <include refid="baseSql"/>
+        select
+        <include refid="baseSql"/>
         from t_ds_datasource
         where
         id in (select datasource_id from t_ds_relation_datasource_user where user_id=#{userId}
-        union select id as datasource_id  from t_ds_datasource where user_id=#{userId})
+        union select id as datasource_id from t_ds_datasource where user_id=#{userId})
         <if test="dataSourceIds != null and dataSourceIds != ''">
             and id in
             <foreach collection="dataSourceIds" item="i" open="(" close=")" separator=",">
