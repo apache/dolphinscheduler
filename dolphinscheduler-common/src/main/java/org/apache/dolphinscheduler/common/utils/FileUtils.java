@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +27,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.dolphinscheduler.common.Constants.*;

@@ -75,11 +75,11 @@ public abstract class AbstractResourceCache implements IResourceCache {
     public void cacheResource(TaskResourceDownloadContext downloadContext, Logger logger) {
         String cachePath = getCacheDir(downloadContext);
 
-        ResourceCacheStatus afterStatus;
+        ResourceCacheStatus afterStatus = ResourceCacheStatus.FAILED;
         lock.lock();
         switch (cacheStatus) {
             case CACHING:
-                while (true) {
+                while (!Thread.currentThread().isInterrupted()) {
                     try {
                         if (condition.await(1, TimeUnit.MINUTES)) {
                             afterStatus = cacheStatus;
@@ -89,6 +89,8 @@ public abstract class AbstractResourceCache implements IResourceCache {
                         }
                     } catch (InterruptedException e) {
                         logger.warn("condition await is interrupted", e);
+                        afterStatus = ResourceCacheStatus.FAILED;
+                        Thread.currentThread().interrupt();
                     }
                 }
                 lock.unlock();
