@@ -1,48 +1,36 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <m-popup
-          ref="popup"
-          :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? $t('Edit Tenant') : $t('Create Tenant')"
-          @ok="_ok">
+    ref="popup"
+    :ok-text="item ? $t('Edit') : $t('Submit')"
+    :nameText="item ? $t('Edit Tenant') : $t('Create Tenant')"
+    @ok="_ok">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Tenant Code')}}</template>
           <template slot="content">
             <x-input
-                    type="input"
-                    :disabled="item ? true : false"
-                    v-model="tenantCode"
-                    maxlength="60"
-                    :placeholder="$t('Please enter name')">
-            </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Tenant Name')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="tenantName"
-                    maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
+              type="input"
+              :disabled="item ? true : false"
+              v-model="tenantCode"
+              maxlength="60"
+              :placeholder="$t('Please enter name')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -51,10 +39,10 @@
           <template slot="content">
             <x-select v-model="queueId">
               <x-option
-                      v-for="city in queueList"
-                      :key="city.id"
-                      :value="city.id"
-                      :label="city.code">
+                v-for="city in queueList"
+                :key="city.id"
+                :value="city.id"
+                :label="city.code">
               </x-option>
             </x-select>
           </template>
@@ -63,10 +51,10 @@
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <x-input
-                    type="textarea"
-                    v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
+              type="textarea"
+              v-model="description"
+              :placeholder="$t('Please enter description')"
+              autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
@@ -89,7 +77,6 @@
         queueList: [],
         queueId: '',
         tenantCode: '',
-        tenantName: '',
         description: '',
       }
     },
@@ -142,16 +129,6 @@
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
-        if (!this.tenantName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter name')}`)
-          return false
-        }
-        // Verify tenant name cannot contain special characters
-        let isSpecial = /[~#^$@%&!*()<>《》:;'"{}【】	]/gi
-        if (isSpecial.test(this.tenantName)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant name without special characters')}`)
-          return false
-        }
 
         return true
       },
@@ -159,7 +136,6 @@
         // 提交
         let param = {
           tenantCode: this.tenantCode,
-          tenantName: this.tenantName,
           queueId: this.queueId,
           description: this.description
         }
@@ -189,7 +165,6 @@
             this.queueId = this.item.queueId
           })
           this.tenantCode = this.item.tenantCode
-          this.tenantName = this.item.tenantName
           this.description = this.item.description
         }
       })

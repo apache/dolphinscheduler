@@ -85,7 +85,7 @@ const menu = {
     {
       name: `${i18n.$t('Tenant Manage')}`,
       id: 0,
-      path: 'tenement-manage',
+      path: 'tenant-manage',
       isOpen: true,
       disabled: true,
       icon: 'ans-icon-user-solid',

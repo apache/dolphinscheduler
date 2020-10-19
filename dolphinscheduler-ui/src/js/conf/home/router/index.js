@@ -347,13 +347,13 @@ const router = new Router({
         title: `${i18n.$t('Security')}`
       },
       redirect: {
-        name: 'tenement-manage'
+        name: 'tenant-manage'
       },
       children: [
         {
           path: '/security/tenant',
-          name: 'tenement-manage',
-          component: resolve => require(['../pages/security/pages/tenement/index'], resolve),
+          name: 'tenant-manage',
+          component: resolve => require(['../pages/security/pages/tenant/index'], resolve),
           meta: {
             title: `${i18n.$t('Tenant Manage')}`
           }

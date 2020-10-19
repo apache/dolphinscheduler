@@ -162,7 +162,7 @@
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 
         let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
-        
+
         let userNameLength = this.userName.length
         // user name
         if (userNameLength<3 || userNameLength>39) {
@@ -232,7 +232,7 @@
             this.tenantList = _.map(arr, v => {
               return {
                 id: v.id,
-                code: v.tenantName
+                code: v.tenantCode
               }
             })
             this.$nextTick(() => {

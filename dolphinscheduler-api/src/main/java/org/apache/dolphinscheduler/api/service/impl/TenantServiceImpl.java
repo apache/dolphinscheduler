@@ -76,16 +76,15 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId    queue id
      * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
-                                            String tenantName,
                                             int queueId,
                                             String desc) throws Exception {
 
@@ -113,7 +112,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             return result;
         }
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
         tenant.setCreateTime(now);
@@ -141,6 +139,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param pageSize  page size
      * @return tenant list page
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -166,13 +165,13 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser  login user
      * @param id         tennat id
      * @param tenantCode tennat code
-     * @param tenantName tennat name
      * @param queueId    queue id
      * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
+    @Override
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -215,10 +214,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             tenant.setTenantCode(tenantCode);
         }
 
-        if (StringUtils.isNotEmpty(tenantName)) {
-            tenant.setTenantName(tenantName);
-        }
-
         if (queueId != 0) {
             tenant.setQueueId(queueId);
         }
@@ -239,6 +234,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @return delete result code
      * @throws Exception exception
      */
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
@@ -297,6 +293,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser login user
      * @return tenant list
      */
+    @Override
     public Map<String, Object> queryTenantList(User loginUser) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -314,10 +311,11 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
+    @Override
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
