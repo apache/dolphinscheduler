@@ -32,17 +32,6 @@ public class WeChatAlertParamsConstants {
 
     static final String NAME_ENTERPRISE_WE_CHAT_SECRET = "enterpriseWeChatSecret";
 
-
-    static final String ENTERPRISE_WE_CHAT_TOKEN_URL = "enterprise.wechat.token.url";
-
-    static final String NAME_ENTERPRISE_WE_CHAT_TOKEN_URL = "enterpriseWeChatTokenUrl";
-
-
-    static final String ENTERPRISE_WE_CHAT_PUSH_URL = "enterprise.wechat.push.url";
-
-    static final String NAME_ENTERPRISE_WE_CHAT_PUSH_URL = "enterpriseWeChatPushUrl";
-
-
     static final String ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
 
     static final String NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG = "enterpriseWeChatTeamSendMsg";

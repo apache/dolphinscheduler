@@ -58,8 +58,6 @@ public class WeChatSender {
 
     private String weChatUsers;
 
-    private String weChatPushUrl;
-
     private String weChatTeamSendMsg;
 
     private String weChatUserSendMsg;
@@ -85,13 +83,12 @@ public class WeChatSender {
         weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);
         String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);
         String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);
-        String weChatTokenUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL);
-        weChatPushUrl = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL);
+        String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;
         weChatTeamSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TEAM_SEND_MSG);
         weChatUserSendMsg = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG);
         showType = config.get(AlertConstants.SHOW_TYPE);
         requireNonNull(showType, AlertConstants.SHOW_TYPE + " must not null");
-        weChatTokenUrlReplace = weChatTokenUrl == null ? null : weChatTokenUrl
+        weChatTokenUrlReplace = weChatTokenUrl
                 .replace(corpIdRegex, weChatCorpId)
                 .replace(secretRegex, weChatSecret);
         weChatToken = getToken();
@@ -137,7 +134,7 @@ public class WeChatSender {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
-        String enterpriseWeChatPushUrlReplace = weChatPushUrl.replace(tokenRegex, weChatToken);
+        String enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(tokenRegex, weChatToken);
         AlertResult alertResult;
         try {
             return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msg));

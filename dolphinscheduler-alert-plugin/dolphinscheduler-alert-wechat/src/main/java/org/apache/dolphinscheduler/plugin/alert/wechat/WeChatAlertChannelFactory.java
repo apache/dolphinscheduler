@@ -56,19 +56,6 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
 
-        InputParam pushUrlParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_PUSH_URL)
-                .setPlaceholder("please input push url ")
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .build();
-
-        InputParam tokenUrlParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_TOKEN_URL)
-                .setPlaceholder("please input we chat token url ")
-                .addValidate(Validate.newBuilder()
-                        .setRequired(true)
-                        .build())
-                .build();
         InputParam usersParam = InputParam.newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS, WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_USERS)
                 .setPlaceholder("please input users ")
                 .addValidate(Validate.newBuilder()
@@ -97,7 +84,7 @@ public class WeChatAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
-        return Arrays.asList(corpIdParam, secretParam, pushUrlParam, usersParam, tokenUrlParam, userSendMsgParam, agentIdParam,showType);
+        return Arrays.asList(corpIdParam, secretParam, usersParam, userSendMsgParam, agentIdParam, showType);
     }
 
     @Override
