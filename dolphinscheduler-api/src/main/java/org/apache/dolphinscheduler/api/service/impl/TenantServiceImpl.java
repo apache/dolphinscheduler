@@ -85,7 +85,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
-                                            String tenantName,
                                             int queueId,
                                             String desc) throws Exception {
 
@@ -113,7 +112,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             return result;
         }
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
         tenant.setCreateTime(now);
@@ -166,13 +164,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser  login user
      * @param id         tennat id
      * @param tenantCode tennat code
-     * @param tenantName tennat name
      * @param queueId    queue id
      * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -213,10 +210,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         if (StringUtils.isNotEmpty(tenantCode)) {
             tenant.setTenantCode(tenantCode);
-        }
-
-        if (StringUtils.isNotEmpty(tenantName)) {
-            tenant.setTenantName(tenantName);
         }
 
         if (queueId != 0) {
