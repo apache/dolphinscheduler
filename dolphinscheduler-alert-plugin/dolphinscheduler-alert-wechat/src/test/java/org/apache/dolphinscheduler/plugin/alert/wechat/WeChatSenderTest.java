@@ -35,7 +35,7 @@ public class WeChatSenderTest {
 
     private static Map<String, String> weChatConfig = new HashMap<>();
 
-    String  content = "[{\"id\":\"69\","
+    private String content = "[{\"id\":\"69\","
             +
             "\"name\":\"UserBehavior-0--1193959466\","
             +
@@ -60,9 +60,7 @@ public class WeChatSenderTest {
         // Just for this test, I will delete these configurations before this PR is merged
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID, "1000002");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID, "ww8cc690c06761eaa3");
-      //  weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_PUSH_URL, "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET, "MYL0_O91ICNrdjkAhgeXIOAj4gEKIirf0-xoYnA25vg");
-      //  weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_TOKEN_URL, "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={corpId}&corpsecret={secret}");
         weChatConfig.put(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USER_SEND_MSG, "{\"touser\":\"{toUser}\",\"agentid\":{agentId}"
                 +
                 ",\"msgtype\":\"markdown\",\"markdown\":{\"content\":\"{msg}\"}}"
