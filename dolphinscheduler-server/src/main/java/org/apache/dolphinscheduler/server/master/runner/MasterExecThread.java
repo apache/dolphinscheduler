@@ -973,7 +973,7 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.isProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop() && Stopper.isRunning()){
 
             // send warning email if process time out.
             if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){
