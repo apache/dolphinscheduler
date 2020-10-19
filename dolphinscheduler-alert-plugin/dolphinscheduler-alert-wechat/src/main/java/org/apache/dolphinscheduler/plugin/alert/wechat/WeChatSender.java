@@ -37,6 +37,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -115,7 +116,7 @@ public class WeChatSender {
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws Exception the Exception
      */
-    AlertResult sendEnterpriseWeChat(String title, String content) {
+    public AlertResult sendEnterpriseWeChat(String title, String content) {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
@@ -251,9 +252,9 @@ public class WeChatSender {
                 EntityUtils.consume(entity);
             }
 
-            Map<String, String> map = JSONUtils.toMap(resp);
+            HashMap map = JSONUtils.parseObject(resp, HashMap.class);
             if (map != null) {
-                return map.get("access_token");
+                return map.get("access_token").toString();
             } else {
                 return null;
             }
