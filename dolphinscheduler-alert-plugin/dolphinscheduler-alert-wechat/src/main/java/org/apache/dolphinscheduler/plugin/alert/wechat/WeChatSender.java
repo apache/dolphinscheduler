@@ -95,22 +95,7 @@ public class WeChatSender {
     }
 
     /**
-     * make team multi Enterprise WeChat message
-     *
-     * @param toParty the toParty
-     * @param agentId the agentId
-     * @param msg the msg
-     * @return Enterprise WeChat send message
-     */
-    private String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
-        String listParty = mkString(toParty);
-        return weChatTeamSendMsg.replace(toPartyRegex, listParty)
-                .replace(agentIdRegExp, agentId)
-                .replace(msgRegExp, msg);
-    }
-
-    /**
-     * make team multi user message
+     * make user multi user message
      *
      * @param toUser the toUser
      * @param agentId the agentId
@@ -130,7 +115,7 @@ public class WeChatSender {
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws Exception the Exception
      */
-    public AlertResult sendEnterpriseWeChat(String title, String content) {
+    AlertResult sendEnterpriseWeChat(String title, String content) {
         List<String> userList = Arrays.asList(weChatUsers.split(","));
         String data = markdownByAlert(title, content);
         String msg = makeUserSendMsg(userList, weChatAgentId, data);
@@ -147,7 +132,7 @@ public class WeChatSender {
         return alertResult;
     }
 
-    public static String post(String url, String data) throws IOException {
+    private static String post(String url, String data) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(data, WeChatAlertConstants.CHARSET));
