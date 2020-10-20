@@ -227,7 +227,7 @@ export default {
    */
   getAllItems ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/login-user-created-project`, {}, res => {
+      io.get(`projects/created-and-authorized-project`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
