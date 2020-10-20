@@ -18,42 +18,13 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.TaskParams;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class VarPoolUtils {
-    /**
-     * getTaskNodeLocalParam
-     * @param taskNode taskNode
-     * @param prop prop
-     * @return localParamForProp
-     */
-    public static Object getTaskNodeLocalParam(TaskNode taskNode, String prop) {
-        String taskParamsJson = taskNode.getParams();
-        TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
-        if (taskParams == null) {
-            return null;
-        }
-        return taskParams.getLocalParamValue(prop);
-    }
-    
-    /**
-     * setTaskNodeLocalParams
-     * @param taskNode taskNode
-     * @param prop LocalParamName
-     * @param value LocalParamValue
-     */
-    public static void setTaskNodeLocalParams(TaskNode taskNode, String prop, Object value) {
-        String taskParamsJson = taskNode.getParams();
-        TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
-        if (taskParams == null) {
-            return;
-        }
-        taskParams.setLocalParamValue(prop, value);
-        taskNode.setParams(JSONUtils.toJsonString(taskParams));
-    }
 
     /**
      * setTaskNodeLocalParams
@@ -62,11 +33,20 @@ public class VarPoolUtils {
      */
     public static void setTaskNodeLocalParams(TaskNode taskNode, Map<String, Object> propToValue) {
         String taskParamsJson = taskNode.getParams();
-        TaskParams taskParams = JSONUtils.parseObject(taskParamsJson, TaskParams.class);
-        if (taskParams == null) {
-            return;
+        Map<String,Object> taskParams = JSONUtils.parseObject(taskParamsJson, HashMap.class);
+
+        Object localParamsObject = taskParams.get("localParams");
+        if (null != localParamsObject && propToValue.size() >0) {
+            ArrayList<Object> localParams = (ArrayList)localParamsObject;
+            for (int i = 0; i < localParams.size(); i++) {
+                Map<String,String> map = (Map)localParams.get(i);
+                String prop = map.get("prop");
+                if (StringUtils.isNotEmpty(prop) && propToValue.containsKey(prop)) {
+                    map.put("value",(String)propToValue.get(prop));
+                }
+            }
+            taskParams.put("localParams",localParams);
         }
-        taskParams.setLocalParamValue(propToValue);
         taskNode.setParams(JSONUtils.toJsonString(taskParams));
     }
 
