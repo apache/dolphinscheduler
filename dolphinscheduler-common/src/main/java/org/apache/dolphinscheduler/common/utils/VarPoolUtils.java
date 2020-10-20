@@ -36,7 +36,7 @@ public class VarPoolUtils {
         Map<String,Object> taskParams = JSONUtils.parseObject(taskParamsJson, HashMap.class);
 
         Object localParamsObject = taskParams.get("localParams");
-        if (null != localParamsObject && propToValue.size() >0) {
+        if (null != localParamsObject && null != propToValue && propToValue.size() > 0) {
             ArrayList<Object> localParams = (ArrayList)localParamsObject;
             for (int i = 0; i < localParams.size(); i++) {
                 Map<String,String> map = (Map)localParams.get(i);
