@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 
-import org.apache.dolphinscheduler.server.entity.TaskResourceDownloadContext;
+import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
 import org.apache.dolphinscheduler.server.worker.download.IResourceCache;
 import org.apache.dolphinscheduler.server.worker.download.ResourceCacheStatus;
 import org.slf4j.Logger;

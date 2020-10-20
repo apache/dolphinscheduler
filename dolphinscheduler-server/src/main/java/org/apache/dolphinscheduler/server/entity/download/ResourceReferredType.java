@@ -14,31 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.download;
-
-import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
-import org.slf4j.Logger;
+package org.apache.dolphinscheduler.server.entity.download;
 
 /**
- *  resource cache
+ * resource referred type
  */
-public interface IResourceCache {
-
+public enum ResourceReferredType {
     /**
-     * cache resource
-     *
-     * @param downloadContext
-     * @param logger
+     * 0 NORMAL
      */
-    void cacheResource(TaskResourceDownloadContext downloadContext, Logger logger);
-
-    /**
-     * make reference to cached resource
-     *
-     * @param downloadContext
-     * @param referenceParentPath
-     * @param logger
-     */
-    void makeReference(TaskResourceDownloadContext downloadContext, String referenceParentPath, Logger logger);
-
+    NORMAL
 }

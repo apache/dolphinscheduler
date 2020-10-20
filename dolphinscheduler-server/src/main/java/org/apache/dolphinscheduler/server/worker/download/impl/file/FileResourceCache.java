@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.download.impl.file;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.server.entity.TaskResourceDownloadContext;
+import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
 import org.apache.dolphinscheduler.server.worker.download.impl.AbstractResourceCache;
 import org.slf4j.Logger;
 
@@ -53,7 +53,7 @@ public class FileResourceCache extends AbstractResourceCache {
      */
     @Override
     public void cacheByDownloadedResource(TaskResourceDownloadContext downloadContext, Logger logger) {
-        FileUtils.renameDir(getResourceDownloadDir(downloadContext), getCacheDir(downloadContext));
+        FileUtils.rename(getResourceDownloadDir(downloadContext), getCacheDir(downloadContext));
     }
 
     /**

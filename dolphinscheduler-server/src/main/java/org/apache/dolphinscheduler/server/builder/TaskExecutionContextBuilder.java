@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.builder;
 
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.entity.*;
-import org.apache.dolphinscheduler.server.entity.TaskResourceDownloadContext;
+import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
 
 import java.util.stream.Collectors;
 

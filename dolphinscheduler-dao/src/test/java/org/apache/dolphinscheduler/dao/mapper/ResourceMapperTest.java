@@ -384,4 +384,19 @@ public class ResourceMapperTest {
         int result = resourceMapper.batchUpdateResource(resourceList);
         Assert.assertTrue(result>0);
     }
+
+    @Test
+    public void queryResourceInfoForTaskTest() {
+        Resource resource = insertOne();
+        Integer[] resIds = {resource.getId()};
+        String[] fullNames = {resource.getFullName()};
+
+        List<Resource> resourceList;
+        resourceList = resourceMapper.queryResourceInfoForTask(resIds, null, ResourceType.FILE.ordinal());
+        Assert.assertFalse(resourceList.contains(resource));
+        resourceList = resourceMapper.queryResourceInfoForTask(null, fullNames, ResourceType.FILE.ordinal());
+        Assert.assertFalse(resourceList.contains(resource));
+        resourceList = resourceMapper.queryResourceInfoForTask(resIds, fullNames, ResourceType.FILE.ordinal());
+        Assert.assertFalse(resourceList.contains(resource));
+    }
 }

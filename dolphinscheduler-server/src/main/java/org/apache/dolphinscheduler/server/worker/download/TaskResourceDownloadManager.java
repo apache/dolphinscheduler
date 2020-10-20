@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.download;
 
-import org.apache.dolphinscheduler.server.entity.TaskResourceDownloadContext;
+import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
 import org.apache.dolphinscheduler.server.worker.download.impl.file.FileResourceCache;
 import org.slf4j.Logger;
 
@@ -81,7 +81,7 @@ public class TaskResourceDownloadManager {
      * @return
      */
     private String buildCacheKey(TaskResourceDownloadContext downloadContext) {
-        return String.format("%s-%d", downloadContext.getResourceType(), downloadContext.getId());
+        return String.format("%s-%s-%d", downloadContext.getResourceType(), downloadContext.getReferredType(), downloadContext.getId());
     }
 
     /**
@@ -92,9 +92,14 @@ public class TaskResourceDownloadManager {
     private static IResourceCache newResourceCacheObject(TaskResourceDownloadContext downloadContext) {
         switch (downloadContext.getResourceType()) {
             case FILE:
-                return new FileResourceCache();
+                switch (downloadContext.getReferredType()) {
+                    case NORMAL:
+                        return new FileResourceCache();
+                    default:
+                        throw new RuntimeException(String.format("unknown referred type: %s", downloadContext.getReferredType()));
+                }
             default:
-                throw new RuntimeException(String.format("unknown download context type: %s", downloadContext.getClass().getName()));
+                throw new RuntimeException(String.format("unknown resource type: %s", downloadContext.getResourceType()));
         }
     }
 }

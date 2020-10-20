@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.entity;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.server.entity.download.TaskResourceDownloadContext;
 
 import java.io.Serializable;
 import java.util.Date;

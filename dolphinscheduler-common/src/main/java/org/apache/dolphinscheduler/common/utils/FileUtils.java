@@ -428,25 +428,32 @@ public class FileUtils {
         }
     }
 
-    public static void renameDir(String srcDirPath, String dstDirPath) {
-        Path srcPath = Paths.get(srcDirPath);
-        Path dstPath = Paths.get(dstDirPath);
+    /**
+     * rename file or directory
+     * @param srcDirPath
+     * @param dstDirPath
+     */
+    public static void rename(String srcDirPath, String dstDirPath) {
+        File srcDirFile = new File(srcDirPath);
+        File dstDirFile = new File(dstDirPath);
+
         //check
-        if(!srcPath.getParent().equals(dstPath.getParent())) {
-            throw new RuntimeException(String.format("%s and %s parent directory is not the same", srcPath, dstPath));
+        if(!srcDirFile.getParent().equals(dstDirFile.getParent())) {
+            throw new RuntimeException(String.format("%s and %s parent directory is not the same", srcDirPath, dstDirPath));
         }
 
-        if (Files.exists(srcPath) && !Files.exists(dstPath)) {
-            try {
-                Files.move(srcPath, dstPath);
-            } catch (IOException e) {
-                throw new RuntimeException(String.format("rename %s to %s failed", srcDirPath, dstDirPath), e);
-            }
+        if (srcDirFile.exists() && !dstDirFile.exists()) {
+            srcDirFile.renameTo(dstDirFile);
         } else {
             throw new RuntimeException(String.format("%s should exist & %s should not exist", srcDirPath, dstDirPath));
         }
     }
 
+    /**
+     * copy sub files to directory
+     * @param srcDirPath
+     * @param dstDirPath
+     */
     public static void copySubFilesToDir(String srcDirPath, String dstDirPath) {
         Path srcPath = Paths.get(srcDirPath);
         Path dstPath = Paths.get(dstDirPath);
@@ -472,6 +479,11 @@ public class FileUtils {
         }
     }
 
+    /**
+     * link sub files to directory
+     * @param srcDirPath
+     * @param dstDirPath
+     */
     public static void linkSubFilesToDir(String srcDirPath, String dstDirPath) {
         File srcDirFile = new File(srcDirPath);
         File dstDirFile = new File(dstDirPath);
@@ -501,6 +513,11 @@ public class FileUtils {
         }
     }
 
+    /**
+     * copy by path
+     * @param srcPath
+     * @param dstPath
+     */
     private static void copyByPath(Path srcPath, Path dstPath) {
         String srcPathStr = srcPath.toAbsolutePath().toString();
         String dstPathStr = dstPath.toAbsolutePath().toString();

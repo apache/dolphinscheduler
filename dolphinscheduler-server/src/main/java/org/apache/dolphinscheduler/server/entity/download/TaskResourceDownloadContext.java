@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.entity;
+package org.apache.dolphinscheduler.server.entity.download;
 
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -32,6 +32,11 @@ public class TaskResourceDownloadContext {
     private ResourceType resourceType;
 
     /**
+     * resource referred type
+     */
+    private ResourceReferredType referredType;
+
+    /**
      * download relative id
      */
     private Integer id;
@@ -42,6 +47,11 @@ public class TaskResourceDownloadContext {
     private String name;
 
     /**
+     * download relative update time
+     */
+    private Date updateTime;
+
+    /**
      * resource full name
      */
     private String fullName;
@@ -50,11 +60,6 @@ public class TaskResourceDownloadContext {
      * resource tenant code
      */
     private String tenantCode;
-
-    /**
-     * update time
-     */
-    private Date updateTime;
 
     public TaskResourceDownloadContext() {
     }
@@ -76,6 +81,14 @@ public class TaskResourceDownloadContext {
         this.resourceType = resourceType;
     }
 
+    public ResourceReferredType getReferredType() {
+        return referredType;
+    }
+
+    public void setReferredType(ResourceReferredType referredType) {
+        this.referredType = referredType;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -92,6 +105,14 @@ public class TaskResourceDownloadContext {
         this.name = name;
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
     public String getFullName() {
         return fullName;
     }
@@ -106,13 +127,5 @@ public class TaskResourceDownloadContext {
 
     public void setTenantCode(String tenantCode) {
         this.tenantCode = tenantCode;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 }
