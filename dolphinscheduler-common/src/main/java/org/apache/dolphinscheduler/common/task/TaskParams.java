@@ -17,12 +17,20 @@
 
 package org.apache.dolphinscheduler.common.task;
 
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+
+import java.util.List;
 import java.util.Map;
 
 public class TaskParams {
 
     private String rawScript;
     private Map<String, String>[] localParams;
+
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
     public void setRawScript(String rawScript) {
         this.rawScript = rawScript;
@@ -74,5 +82,13 @@ public class TaskParams {
     
     public Map<String, String>[] getLocalParams() {
         return localParams;
+    }
+
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
     }
 } 
