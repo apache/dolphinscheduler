@@ -26,6 +26,12 @@ import java.util.Map;
 
 public class VarPoolUtils {
 
+    private static final  String LOCALPARAMS = "localParams";
+
+    private static final  String PROP = "prop";
+
+    private static final  String VALUE = "value";
+
     /**
      * setTaskNodeLocalParams
      * @param taskNode taskNode
@@ -35,17 +41,17 @@ public class VarPoolUtils {
         String taskParamsJson = taskNode.getParams();
         Map<String,Object> taskParams = JSONUtils.parseObject(taskParamsJson, HashMap.class);
 
-        Object localParamsObject = taskParams.get("localParams");
+        Object localParamsObject = taskParams.get(LOCALPARAMS);
         if (null != localParamsObject && null != propToValue && propToValue.size() > 0) {
             ArrayList<Object> localParams = (ArrayList)localParamsObject;
             for (int i = 0; i < localParams.size(); i++) {
                 Map<String,String> map = (Map)localParams.get(i);
-                String prop = map.get("prop");
+                String prop = map.get(PROP);
                 if (StringUtils.isNotEmpty(prop) && propToValue.containsKey(prop)) {
-                    map.put("value",(String)propToValue.get(prop));
+                    map.put(VALUE,(String)propToValue.get(prop));
                 }
             }
-            taskParams.put("localParams",localParams);
+            taskParams.put(LOCALPARAMS,localParams);
         }
         taskNode.setParams(JSONUtils.toJsonString(taskParams));
     }
