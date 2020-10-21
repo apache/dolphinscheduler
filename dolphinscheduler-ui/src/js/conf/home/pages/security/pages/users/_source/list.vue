@@ -17,116 +17,60 @@
 <template>
   <div class="list-model user-list-model">
     <div class="table-box">
-      <table>
-        <tr>
-          <th>
-            <span>{{$t('#')}}</span>
-          </th>
-          <th>
-            <span>{{$t('User Name')}}</span>
-          </th>
-          <th>
-            <span>{{$t('User Type')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Tenant')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Queue')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Email')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Phone')}}</span>
-          </th>
-          <th id="state">
-            <span>{{$t('State')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Create Time')}}</span>
-          </th>
-          <th>
-            <span>{{$t('Update Time')}}</span>
-          </th>
-          <th width="120">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
-            <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
-          </td>
-          <td>
-            <span>
-              {{item.userName || '-'}}
-            </span>
-          </td>
-          <td>
-            <span>{{item.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
-          </td>
-          <td><span>{{item.tenantName || '-'}}</span></td>
-          <td><span>{{item.queue || '-'}}</span></td>
-          <td>
-            <span>{{item.email || '-'}}</span>
-          </td>
-          <td>
-            <span>{{item.phone || '-'}}</span>
-          </td>
-          <td>
-            <span v-if="item.state == 1">{{$t('Enable')}}</span>
-            <span v-else>{{$t('Disable')}}</span>
-          </td>
-          <td>
-            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <x-poptip
-                    :ref="'poptip-auth-' + $index"
-                    popper-class="user-list-poptip"
-                    placement="bottom-end">
-              <div class="auth-select-box">
-                <a href="javascript:" @click="_authProject(item,$index)">{{$t('Project')}}</a>
-                <a href="javascript:" @click="_authFile(item,$index)">{{$t('Resources')}}</a>
-                <a href="javascript:" @click="_authDataSource(item,$index)">{{$t('Datasource')}}</a>
-                <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF Function')}}</a>
-              </div>
-              <template slot="reference">
-                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="ans-icon-user-empty" :disabled="item.userType === 'ADMIN_USER'"></x-button>
-              </template>
-            </x-poptip>
-
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)">
-            </x-button>
-            <x-poptip
-                    :ref="'poptip-delete-' + $index"
-                    placement="bottom-end"
-                    width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
-              </div>
-              <template slot="reference">
-                <x-button
-                        type="error"
-                        shape="circle"
-                        size="xsmall"
-                        data-toggle="tooltip"
-                        :title="$t('delete')"
-                        :disabled="item.userType === 'ADMIN_USER'"
-                        icon="ans-icon-trash">
-                </x-button>
-              </template>
-            </x-poptip>
-          </td>
-        </tr>
-      </table>
+      <el-table :data="list" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
+        <el-table-column :label="$t('User Type')">
+          {{userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
+        </el-table-column>
+        <el-table-column prop="tenantName" :label="$t('Tenant')" width="160"></el-table-column>
+        <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
+        <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
+        <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
+        <el-table-column :label="$t('State')">
+          {{state == 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
+        </el-table-column>
+        <el-table-column :label="$t('Create Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Update Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.updateTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="130">
+          <template slot-scope="scope">
+            <el-dropdown trigger="click">
+              <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item @click.native="_authProject(scope.row,scope.row.id)">{{$t('Project')}}</el-dropdown-item>
+                <el-dropdown-item @click.native="_authFile(scope.row,scope.row.id)">{{$t('Resources')}}</el-dropdown-item>
+                <el-dropdown-item @click.native="_authDataSource(scope.row,scope.row.id)">{{$t('Datasource')}}</el-dropdown-item>
+                <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.row.id)">{{$t('UDF Function')}}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+            <el-tooltip :content="$t('Edit')" placement="top">
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="_edit(scope.row)" circle></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('delete')" placement="top">
+              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                :disabled="scope.row.userType === 'ADMIN_USER'"
+                @onConfirm="_delete(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -158,11 +102,9 @@
         this.deleteUser({
           id: item.id
         }).then(res => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
-          this.$refs[`poptip-delete-${i}`][0].doClose()
           this.$message.error(e.msg || '')
         })
       },
@@ -170,7 +112,6 @@
         this.$emit('on-edit', item)
       },
       _authProject (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'project',
@@ -239,7 +180,6 @@
         return result
       },
       _authFile (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getResourceList({
           id: item.id,
           type: 'file',
@@ -323,7 +263,6 @@
         })
       },
       _authDataSource (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'datasource',
@@ -375,7 +314,6 @@
         })
       },
       _authUdfFunc (item, i) {
-        this.$refs[`poptip-auth-${i}`][0].doClose()
         this.getAuthList({
           id: item.id,
           type: 'udf-func',

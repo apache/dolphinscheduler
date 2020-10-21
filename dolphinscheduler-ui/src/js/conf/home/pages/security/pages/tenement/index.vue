@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
-          <el-button type="ghost" size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
         </template>
       </m-conditions>
     </template>
@@ -30,7 +30,6 @@
                 :tenement-list="tenementList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
           <el-pagination
