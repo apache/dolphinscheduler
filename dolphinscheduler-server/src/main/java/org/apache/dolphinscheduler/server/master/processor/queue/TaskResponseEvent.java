@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
 import java.util.Date;
@@ -44,11 +45,13 @@ public class TaskResponseEvent {
     /**
      * start time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
      * end time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date endTime;
 
     /**
@@ -76,7 +79,12 @@ public class TaskResponseEvent {
      */
     private Event event;
 
-    public static TaskResponseEvent newAck(ExecutionStatus state, Date startTime, String workerAddress, String executePath, String logPath, int taskInstanceId){
+    /**
+     * varPool
+     */
+    private String varPool;
+    
+    public static TaskResponseEvent newAck(ExecutionStatus state, Date startTime, String workerAddress, String executePath, String logPath, int taskInstanceId) {
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setStartTime(startTime);
@@ -88,7 +96,7 @@ public class TaskResponseEvent {
         return event;
     }
 
-    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId){
+    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId, String varPool) {
         TaskResponseEvent event = new TaskResponseEvent();
         event.setState(state);
         event.setEndTime(endTime);
@@ -96,9 +104,18 @@ public class TaskResponseEvent {
         event.setAppIds(appIds);
         event.setTaskInstanceId(taskInstanceId);
         event.setEvent(Event.RESULT);
+        event.setVarPool(varPool);
         return event;
     }
 
+    public String getVarPool() {
+        return varPool;
+    }
+
+    public void setVarPool(String varPool) {
+        this.varPool = varPool;
+    }
+    
     public int getTaskInstanceId() {
         return taskInstanceId;
     }

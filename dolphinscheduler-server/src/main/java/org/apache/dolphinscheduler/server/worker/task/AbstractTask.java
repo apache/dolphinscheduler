@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -47,6 +47,11 @@ import java.util.Map;
  */
 public abstract class AbstractTask {
 
+    /**
+     * varPool string
+     */
+    protected String varPool;
+    
     /**
      * taskExecutionContext
      **/
@@ -121,6 +126,14 @@ public abstract class AbstractTask {
         logger.info(" -> {}", String.join("\n\t", logs));
     }
 
+    public void setVarPool(String varPool) {
+        this.varPool = varPool;
+    }
+
+    public String getVarPool() {
+        return varPool;
+    }
+    
     /**
      * get exit status code
      * @return  exit status code

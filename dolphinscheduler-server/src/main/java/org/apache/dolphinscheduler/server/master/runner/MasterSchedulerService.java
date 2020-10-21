@@ -16,27 +16,30 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  *  master scheduler thread
@@ -45,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public class MasterSchedulerService extends Thread {
 
     /**
-     * logger of MasterSchedulerThread
+     * logger of MasterSchedulerService
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
 
@@ -68,6 +71,11 @@ public class MasterSchedulerService extends Thread {
     private MasterConfig masterConfig;
 
     /**
+     * alert manager
+     */
+    private AlertManager alertManager = new AlertManager();
+
+    /**
      *  netty remoting client
      */
     private NettyRemotingClient nettyRemotingClient;
@@ -79,7 +87,7 @@ public class MasterSchedulerService extends Thread {
 
 
     /**
-     * constructor of MasterSchedulerThread
+     * constructor of MasterSchedulerService
      */
     @PostConstruct
     public void init(){
@@ -89,8 +97,8 @@ public class MasterSchedulerService extends Thread {
     }
 
     @Override
-    public void start(){
-        super.setName("MasterSchedulerThread");
+    public synchronized void start(){
+        super.setName("MasterSchedulerService");
         super.start();
     }
 
@@ -99,7 +107,9 @@ public class MasterSchedulerService extends Thread {
         boolean terminated = false;
         try {
             terminated = masterExecService.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException ignore) {}
+        } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
+        }
         if(!terminated){
             logger.warn("masterExecService shutdown without terminated, increase await time");
         }
@@ -108,7 +118,7 @@ public class MasterSchedulerService extends Thread {
     }
 
     /**
-     * run of MasterSchedulerThread
+     * run of MasterSchedulerService
      */
     @Override
     public void run() {
@@ -138,7 +148,13 @@ public class MasterSchedulerService extends Thread {
                                     this.masterConfig.getMasterExecThreads() - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemotingClient));
+                                masterExecService.execute(
+                                        new MasterExecThread(
+                                                processInstance
+                                                , processService
+                                                , nettyRemotingClient
+                                                , alertManager
+                                                , masterConfig));
                             }
                         }catch (Exception e){
                             logger.error("scan command error ", e);
@@ -158,6 +174,6 @@ public class MasterSchedulerService extends Thread {
     }
 
     private String getLocalAddress(){
-        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
+        return NetUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 }

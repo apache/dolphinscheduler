@@ -176,7 +176,7 @@ public class DependentTaskTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(10111);
         processInstance.setProcessDefinitionId(0);
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
 
         return processInstance;
     }

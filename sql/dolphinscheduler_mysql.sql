@@ -424,6 +424,33 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_process_definition_version
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_version`;
+CREATE TABLE `t_ds_process_definition_version` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+  `version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `process_definition_json` longtext COMMENT 'process definition json content',
+  `description` text,
+  `global_params` text COMMENT 'global parameters',
+  `locations` text COMMENT 'Node location information',
+  `connects` text COMMENT 'Node connection information',
+  `receivers` text COMMENT 'receivers',
+  `receivers_cc` text COMMENT 'cc',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_id_and_version` (`process_definition_id`,`version`) USING BTREE,
+  KEY `process_definition_index` (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_process_definition
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_instance`;
@@ -460,6 +487,7 @@ CREATE TABLE `t_ds_process_instance` (
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_id`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
@@ -479,8 +507,8 @@ CREATE TABLE `t_ds_project` (
   `description` varchar(200) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -630,7 +658,8 @@ CREATE TABLE `t_ds_resources` (
   `pid` int(11) DEFAULT NULL,
   `full_name` varchar(64) DEFAULT NULL,
   `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -707,6 +736,9 @@ CREATE TABLE `t_ds_task_instance` (
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `executor_id` int(11) DEFAULT NULL,
+  `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
+  `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,
@@ -775,6 +807,7 @@ CREATE TABLE `t_ds_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
+  `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -814,4 +847,4 @@ INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 1
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
-INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
+INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);

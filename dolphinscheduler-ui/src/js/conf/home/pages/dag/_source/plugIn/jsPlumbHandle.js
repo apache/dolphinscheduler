@@ -31,9 +31,11 @@ import {
   rtTasksTpl,
   setSvgColor,
   saveTargetarr,
-  rtTargetarrArr
+  rtTargetarrArr,
+  computeScale
 } from './util'
 import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
+import multiDrag from './multiDrag'
 
 const JSP = function () {
   this.dag = {}
@@ -82,8 +84,11 @@ JSP.prototype.init = function ({ dag, instance, options }) {
 
   // Monitor line click
   this.JspInstance.bind('click', e => {
+    // Untie event
     if (this.config.isClick) {
       this.connectClick(e)
+    } else {
+      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
     }
   })
 
@@ -91,6 +96,9 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   if (this.config.isNewNodes) {
     DragZoom.init()
   }
+
+  // support multi drag
+  multiDrag()
 }
 
 /**
@@ -144,12 +152,13 @@ JSP.prototype.draggable = function () {
       scope: 'plant',
       drop: function (ev, ui) {
         let id = 'tasks-' + Math.ceil(Math.random() * 100000) // eslint-disable-line
-        // Get mouse coordinates
-        const left = parseInt(ui.offset.left - $(this).offset().left)
-        let top = parseInt(ui.offset.top - $(this).offset().top) - 10
-        if (top < 25) {
-          top = 25
-        }
+
+        let scale = computeScale($(this))
+        scale = scale || 1
+
+        // Get mouse coordinates and after scale coordinate
+        const left = parseInt(ui.offset.left - $(this).offset().left) / scale
+        const top = parseInt(ui.offset.top - $(this).offset().top) / scale
         // Generate template node
         $('#canvas').append(rtTasksTpl({
           id: id,
@@ -490,6 +499,16 @@ JSP.prototype.removeNodes = function ($id) {
 
   // callback onRemoveNodes event
   this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
+  let connects = []
+  _.map(this.JspInstance.getConnections(), v => {
+    connects.push({
+      endPointSourceId: v.sourceId,
+      endPointTargetId: v.targetId,
+      label: v._jsPlumb.overlays.label.canvas.innerText
+    })
+  })
+  // Storage line dependence
+  store.commit('dag/setConnects', connects)
 }
 
 /**
@@ -639,14 +658,39 @@ JSP.prototype.saveStore = function () {
         tasks.push(tasksParam)
       }
     })
-
-    _.map(this.JspInstance.getConnections(), v => {
-      connects.push({
-        endPointSourceId: v.sourceId,
-        endPointTargetId: v.targetId
+    if(store.state.dag.connects.length ===this.JspInstance.getConnections().length) {
+      _.map(store.state.dag.connects, u => {
+        connects.push({
+          endPointSourceId: u.endPointSourceId,
+          endPointTargetId: u.endPointTargetId,
+          label: u.label
+        })
       })
-    })
-
+    } else if(store.state.dag.connects.length>0 && store.state.dag.connects.length < this.JspInstance.getConnections().length) {
+      _.map(this.JspInstance.getConnections(), v => {
+        connects.push({
+          endPointSourceId: v.sourceId,
+          endPointTargetId: v.targetId,
+          label: v._jsPlumb.overlays.label.canvas.innerText
+        })
+      })
+      _.map(store.state.dag.connects, u => {
+        _.map(connects, v => {
+          if(u.label && u.endPointSourceId === v.endPointSourceId && u.endPointTargetId===v.endPointTargetId) {
+            v.label = u.label
+          }
+        })
+      })
+    } else if(store.state.dag.connects.length===0) {
+      _.map(this.JspInstance.getConnections(), v => {
+        connects.push({
+          endPointSourceId: v.sourceId,
+          endPointTargetId: v.targetId,
+          label: v._jsPlumb.overlays.label.canvas.innerText
+        })
+      })
+    }
+    
     _.map(tasksAll(), v => {
       locations[v.id] = {
         name: v.name,
@@ -739,6 +783,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
     _.map(connects, v => {
       let sourceId = v.endPointSourceId.split('-')
       let targetId = v.endPointTargetId.split('-')
+      let labels = v.label
       if (sourceId.length === 4 && targetId.length === 4) {
         sourceId = `${sourceId[0]}-${sourceId[1]}-${sourceId[2]}`
         targetId = `${targetId[0]}-${targetId[1]}-${targetId[2]}`
@@ -754,7 +799,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: i18n.$t('success'), location:0.5, id:"label"} ]]
+          overlays:[["Label", { label: labels} ]]
         })
       } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
         this.JspInstance.connect({
@@ -763,7 +808,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#252d39' },
           HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: i18n.$t('failed'), location:0.5, id:"label"} ]]
+          overlays:[["Label", { label: labels} ]]
         })
       } else {
         this.JspInstance.connect({
@@ -771,7 +816,8 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           target: targetId,
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
+          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
+          overlays:[["Label", { label: labels} ]]
         })
       }
     })

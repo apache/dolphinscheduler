@@ -16,15 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -66,7 +63,7 @@ public class WorkerGroupService extends BaseService {
         // list to index
         Integer toIndex = (pageNo - 1) * pageSize + pageSize;
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -149,8 +146,8 @@ public class WorkerGroupService extends BaseService {
                 if (isPaging){
                     wg.setIpList(childrenNodes);
                     String registeredIpValue = zookeeperCachedOperator.get(workerGroupPath + "/" + childrenNodes.get(0));
-                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[3]));
-                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[4]));
+                    wg.setCreateTime(DateUtils.stringToDate(registeredIpValue.split(",")[6]));
+                    wg.setUpdateTime(DateUtils.stringToDate(registeredIpValue.split(",")[7]));
                 }
                 workerGroups.add(wg);
             }

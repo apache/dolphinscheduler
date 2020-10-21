@@ -279,7 +279,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 			try {
 				mutex.release();
 			} catch (Exception e) {
-				if(e.getMessage().equals("instance must be started before calling this method")){
+				if("instance must be started before calling this method".equals(e.getMessage())){
 					logger.warn("lock release");
 				}else{
 					logger.error("lock release failed",e);
@@ -326,7 +326,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	@Override
 	public String toString() {
 		return "AbstractZKClient{" +
-				"zkClient=" + zkClient +
+				"zkClient=" + getZkClient() +
 				", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
 				", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
 				", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +

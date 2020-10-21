@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@import "animation";
 @import "scrollbar";
 @import "table";
 
@@ -352,6 +351,10 @@ body::-webkit-scrollbar-thumb {
 }
 .f-f18 {
 	font-size:18px
+}
+.vue-treeselect__multi-value {
+  max-height: 200px;
+  overflow: auto;
 }
 
 

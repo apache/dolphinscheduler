@@ -14,14 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.beanutils.BeanMap;
 
-import org.apache.commons.collections.BeanMap;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides utility methods and decorators for {@link Collection} instances.
@@ -38,8 +43,9 @@ import java.util.*;
 public class CollectionUtils {
 
     private CollectionUtils() {
-        throw new IllegalStateException("CollectionUtils class");
+        throw new UnsupportedOperationException("Construct CollectionUtils");
     }
+
     /**
      * Returns a new {@link Collection} containing <i>a</i> minus a subset of
      * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
@@ -72,7 +78,7 @@ public class CollectionUtils {
     /**
      * String to map
      *
-     * @param str       string
+     * @param str string
      * @param separator separator
      * @return string to map
      */
@@ -83,7 +89,7 @@ public class CollectionUtils {
     /**
      * String to map
      *
-     * @param str       string
+     * @param str string
      * @param separator separator
      * @param keyPrefix prefix
      * @return string to map
@@ -113,7 +119,6 @@ public class CollectionUtils {
         return map;
     }
 
-
     /**
      * Helper class to easily access cardinality properties of two collections.
      *
@@ -138,8 +143,8 @@ public class CollectionUtils {
          * @param b the second collection
          */
         public CardinalityHelper(final Iterable<? extends O> a, final Iterable<? extends O> b) {
-            cardinalityA = CollectionUtils.<O>getCardinalityMap(a);
-            cardinalityB = CollectionUtils.<O>getCardinalityMap(b);
+            cardinalityA = CollectionUtils.getCardinalityMap(a);
+            cardinalityB = CollectionUtils.getCardinalityMap(b);
         }
 
         /**
@@ -228,7 +233,7 @@ public class CollectionUtils {
      * Only those elements present in the collection will appear as
      * keys in the map.
      *
-     * @param <O>  the type of object in the returned {@link Map}. This is a super type of O
+     * @param <O> the type of object in the returned {@link Map}. This is a super type of O
      * @param coll the collection to get the cardinality map for, must not be null
      * @return the populated cardinality map
      */
@@ -240,9 +245,9 @@ public class CollectionUtils {
         return count;
     }
 
-
     /**
      * Removes certain attributes of each object in the list
+     *
      * @param originList origin list
      * @param exclusionSet exclusion set
      * @param <T> T
@@ -259,8 +264,8 @@ public class CollectionUtils {
         Map<String, Object> instanceMap;
         for (T instance : originList) {
             Map<String, Object> dataMap = new BeanMap(instance);
-            instanceMap = new LinkedHashMap<>(16,0.75f,true);
-            for (Map.Entry<String, Object> entry: dataMap.entrySet()) {
+            instanceMap = new LinkedHashMap<>(16, 0.75f, true);
+            for (Map.Entry<String, Object> entry : dataMap.entrySet()) {
                 if (exclusionSet.contains(entry.getKey())) {
                     continue;
                 }

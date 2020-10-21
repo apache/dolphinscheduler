@@ -112,8 +112,8 @@
 		</fileSet>
 		<!--server end-->
 
-
-		<!--service end-->
+		
+                <!--service start-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
 			<includes>
@@ -189,6 +189,7 @@
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
 				<include>dolphinscheduler-daemon.sh</include>
+				<include>status-all.sh</include>
 			</includes>
 			<outputDirectory>./bin</outputDirectory>
 		</fileSet>

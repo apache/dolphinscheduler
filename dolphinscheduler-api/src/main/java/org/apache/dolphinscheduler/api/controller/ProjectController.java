@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -223,6 +224,24 @@ public class ProjectController extends BaseController {
                                          @RequestParam("userId") Integer userId) {
         logger.info("login user {}, query authorized project by user id: {}.", loginUser.getUserName(), userId);
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
+        return returnDataList(result);
+    }
+
+    /**
+     * query authorized and user created project
+     *
+     * @param loginUser login user
+     * @return projects which the user create and authorized
+     */
+    @ApiOperation(value = "queryProjectCreatedAndAuthorizedByUser", notes = "QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_NOTES")
+    @GetMapping(value = "/created-and-authorized-project")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
+    public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        logger.info("login user {}, query authorized and user created project by user id: {}.",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
+        Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return returnDataList(result);
     }
 

@@ -132,7 +132,7 @@
                         :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
                         @click="_stop(item,$index)"
                         :icon="item.state === 'STOP' ? 'ans-icon-pause-solid' : 'ans-icon-stop'"
-                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
+                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
                         size="xsmall"
@@ -140,7 +140,7 @@
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
                         :icon="item.state === 'PAUSE' ? 'ans-icon-pause-solid' : 'ans-icon-pause'"
-                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
+                        :disabled="item.state !== 'RUNNING_EXECUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
                       placement="top-end"
@@ -288,7 +288,6 @@
       </table>
     </div>
     <x-poptip
-            v-show="strDelete !== ''"
             ref="poptipDeleteAll"
             placement="bottom-start"
             width="90">
@@ -298,7 +297,7 @@
         <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
       </div>
       <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
+        <x-button size="xsmall" :disabled="!strDelete" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
   </div>
@@ -344,6 +343,12 @@
        * Close the delete layer
        */
       _closeDelete (i) {
+        // close batch
+        if (i < 0) {
+          this.$refs['poptipDeleteAll'].doClose()
+          return
+        }
+        // close one
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       /**
@@ -539,9 +544,11 @@
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
+          this.strDelete = ''
           this.$message.success(res.msg)
         }).catch(e => {
           this.checkAll = false
+          this.strDelete = ''
           this.$message.error(e.msg || '')
         })
       }

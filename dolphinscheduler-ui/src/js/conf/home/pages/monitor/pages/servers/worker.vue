@@ -22,8 +22,7 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Process Pid')}}: {{item.id}}</span>
-              <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
+              <span>{{$t('Zk registration directory')}}: <a href="javascript:" @click="_showZkDirectories(item)" class="links">{{$t('Directory detail')}}</a></span>
             </div>
             <div class="right">
               <span class="sp">{{$t('Create Time')}}: {{item.createTime | formatDate}}</span>
@@ -74,6 +73,7 @@
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import zookeeperDirectoriesPopup from './_source/zookeeperDirectories'
 
   export default {
     name: 'servers-worker',
@@ -86,7 +86,25 @@
     },
     props: {},
     methods: {
-      ...mapActions('monitor', ['getWorkerData'])
+      ...mapActions('monitor', ['getWorkerData']),
+      _showZkDirectories (item) {
+        let zkDirectories = []
+        item.zkDirectories.forEach(zkDirectory => {
+          zkDirectories.push({
+            zkDirectory: zkDirectory
+          })
+        })
+        this.$drawer({
+          direction: 'right',
+          render (h) {
+            return h(zookeeperDirectoriesPopup, {
+              props: {
+                zkDirectories: zkDirectories
+              }
+            })
+          }
+        })
+      }
     },
     watch: {},
     created () {
@@ -97,6 +115,7 @@
       this.getWorkerData().then(res => {
         this.workerList = _.map(res, (v, i) => {
           return _.assign(v, {
+            id: v.host + "_" + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })
@@ -105,7 +124,7 @@
         this.isLoading = true
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mGauge }
+    components: { mList, mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

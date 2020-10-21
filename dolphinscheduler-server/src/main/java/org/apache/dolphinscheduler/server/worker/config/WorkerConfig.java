@@ -17,6 +17,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.config;
 
+import java.util.Set;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -41,11 +43,14 @@ public class WorkerConfig {
     @Value("${worker.reserved.memory:0.3}")
     private double workerReservedMemory;
 
-    @Value("${worker.group: default}")
-    private String workerGroup;
+    @Value("#{'${worker.groups:default}'.split(',')}")
+    private Set<String> workerGroups;
 
     @Value("${worker.listen.port: 1234}")
     private int listenPort;
+
+    @Value("${worker.weight:100}")
+    private int weight;
 
     public int getListenPort() {
         return listenPort;
@@ -55,12 +60,12 @@ public class WorkerConfig {
         this.listenPort = listenPort;
     }
 
-    public String getWorkerGroup() {
-        return workerGroup;
+    public Set<String> getWorkerGroups() {
+        return workerGroups;
     }
 
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
+    public void setWorkerGroups(Set<String> workerGroups) {
+        this.workerGroups = workerGroups;
     }
 
     public int getWorkerExecThreads() {
@@ -104,5 +109,14 @@ public class WorkerConfig {
 
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    }
+
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

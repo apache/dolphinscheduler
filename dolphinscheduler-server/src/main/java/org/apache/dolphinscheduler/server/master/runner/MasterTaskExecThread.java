@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 
-
-import com.alibaba.fastjson.JSON;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -27,6 +24,8 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -152,7 +151,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     break;
                 }
                 if(checkTimeout){
-                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
+                    long remainTime = DateUtils.getRemainTime(taskInstance.getStartTime(), taskTimeoutParameter.getInterval() * 60L);
                     if (remainTime < 0) {
                         logger.warn("task id: {} execution time out",taskInstance.getId());
                         // process define
@@ -255,19 +254,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
-    }
-
-
-    /**
-     * get remain time?s?
-     *
-     * @return remain time
-     */
-    private long getRemaintime(long timeoutSeconds) {
-        Date startTime = taskInstance.getStartTime();
-        long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
-        return timeoutSeconds - usedTime;
     }
 }

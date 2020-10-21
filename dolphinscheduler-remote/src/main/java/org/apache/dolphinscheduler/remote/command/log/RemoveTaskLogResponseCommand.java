@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.remote.command.log;
 
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
@@ -28,7 +28,7 @@ import java.io.Serializable;
  */
 public class RemoveTaskLogResponseCommand implements Serializable {
 
-    /**
+    /*TaskPriorityQueueConsumer.*
      *  log path
      */
     private Boolean status;
@@ -56,7 +56,7 @@ public class RemoveTaskLogResponseCommand implements Serializable {
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
         command.setType(CommandType.REMOVE_TAK_LOG_RESPONSE);
-        byte[] body = FastJsonSerializer.serialize(this);
+        byte[] body = JsonSerializer.serialize(this);
         command.setBody(body);
         return command;
     }
