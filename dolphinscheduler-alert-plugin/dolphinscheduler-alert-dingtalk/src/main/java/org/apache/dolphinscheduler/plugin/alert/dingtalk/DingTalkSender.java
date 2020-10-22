@@ -181,24 +181,23 @@ public class DingTalkSender {
         alertResult.setStatus("false");
 
         if (null == result) {
-            alertResult.setMessage("we chat alert send error");
+            alertResult.setMessage("send ding talk msg error");
             logger.info("send ding talk msg error,ding talk server resp is null");
             return alertResult;
         }
         DingTalkSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, DingTalkSendMsgResponse.class);
         if (null == sendMsgResponse) {
-            alertResult.setMessage("we chat send fail");
-            logger.info("send we chat msg error,resp error");
+            alertResult.setMessage("send ding talk msg fail");
+            logger.info("send ding talk msg error,resp error");
             return alertResult;
         }
         if (sendMsgResponse.errcode == 0) {
             alertResult.setStatus("true");
             alertResult.setMessage("send ding talk msg success");
-            logger.info("alert send success");
             return alertResult;
         }
-        alertResult.setMessage(String.format("alert send error : %s", sendMsgResponse.getErrmsg()));
-        logger.info("alert send error : {}", sendMsgResponse.getErrmsg());
+        alertResult.setMessage(String.format("alert send ding talk msg error : %s", sendMsgResponse.getErrmsg()));
+        logger.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
         return alertResult;
     }
 
