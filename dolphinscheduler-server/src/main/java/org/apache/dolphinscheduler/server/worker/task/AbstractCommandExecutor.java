@@ -319,12 +319,16 @@ public abstract class AbstractCommandExecutor {
      * clear
      */
     private void clear() {
+
+        List<String> markerList = new ArrayList<>();
+        markerList.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
+
         if (!logBuffer.isEmpty()) {
             // log handle
             logHandler.accept(logBuffer);
-
             logBuffer.clear();
         }
+        logHandler.accept(markerList);
     }
 
     /**

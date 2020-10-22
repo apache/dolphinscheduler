@@ -45,6 +45,8 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+
 
 /**
  *  task scheduler thread
@@ -132,7 +134,6 @@ public class TaskExecuteThread implements Runnable {
 
             // task result process
             task.after();
-
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             responseCommand.setProcessId(task.getProcessId());
