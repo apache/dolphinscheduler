@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
+import org.apache.dolphinscheduler.alert.processor.AlertRequestProcessor;
 import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
@@ -28,6 +29,9 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import java.util.List;
@@ -63,6 +67,11 @@ public class AlertServer {
 
     public static final String MAVEN_LOCAL_REPOSITORY = "maven.local.repository";
 
+    /**
+     * netty server
+     */
+    private NettyRemotingServer server;
+
     private static class AlertServerHolder {
         private static final AlertServer INSTANCE = new AlertServer();
     }
@@ -96,11 +105,21 @@ public class AlertServer {
         }
     }
 
-    public void start() {
+    /**
+     * init netty remoting server
+     */
+    private void initRemoteServer() {
+        NettyServerConfig serverConfig = new NettyServerConfig();
+        serverConfig.setListenPort(50501);
+        this.server = new NettyRemotingServer(serverConfig);
+        this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager, pluginDao));
+        this.server.start();
+    }
 
-        initPlugin();
-
-        logger.info("alert server ready start ");
+    /**
+     * Cyclic alert info sending alert
+     */
+    private void runSender() {
         while (Stopper.isRunning()) {
             try {
                 Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
@@ -118,10 +137,35 @@ public class AlertServer {
         }
     }
 
+    /**
+     * start
+     */
+    public void start() {
+        initPlugin();
+        initRemoteServer();
+        logger.info("alert server ready start ");
+        runSender();
+    }
+
+    /**
+     * stop
+     */
+    public void stop() {
+        this.server.close();
+        logger.info("alert server shut down");
+    }
+
     public static void main(String[] args) {
         System.out.println(System.getProperty("user.dir"));
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                alertServer.stop();
+            }
+        });
+
     }
 
 }
