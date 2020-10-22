@@ -379,7 +379,8 @@
        * Task timeout alarm
        */
       _onTimeout (o) {
-        this.timeout = Object.assign(this.timeout, {}, o)
+        this.timeout = Object.assign({}, o)
+        this._cacheTimeOut(o)
       },
       /**
        * Click external to close the current component
@@ -439,9 +440,32 @@
 
       _onCacheParams (o) {
         this.params = Object.assign(this.params, {}, o)
-        this._cacheItem()
+        this._cacheItem(o)
       },
-
+      _cacheTimeOut(o) {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
+        this.$emit('cacheTaskInfo', {
+          item: {
+            type: this.taskType,
+            id: this.id,
+            name: this.name,
+            params: this.params,
+            description: this.description,
+            timeout: o,
+            runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
+            dependence: this.cacheDependence,
+            maxRetryTimes: this.maxRetryTimes,
+            retryInterval: this.retryInterval,
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroup: this.workerGroup,
+            status: this.status,
+            branch: this.branch
+          },
+          fromThis: this
+        })
+      },
       _cacheItem () {
         this.conditionResult.successNode[0] = this.successBranch
         this.conditionResult.failedNode[0] = this.failedBranch
@@ -457,7 +481,6 @@
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
-            timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -530,12 +553,12 @@
             name: this.name,
             params: this.params,
             description: this.description,
+            timeout: this.timeout,
             runFlag: this.runFlag,
             conditionResult: this.conditionResult,
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
-            timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
             workerGroup: this.workerGroup,
             status: this.status,
@@ -592,7 +615,7 @@
        * Watch the item change, cache the value it changes
        **/
       _item (val) {
-        // this._cacheItem()
+        this._cacheItem()
       }
     },
     created () {
@@ -686,7 +709,6 @@
           dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,
           retryInterval: this.retryInterval,
-          timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
           successBranch: this.successBranch,
