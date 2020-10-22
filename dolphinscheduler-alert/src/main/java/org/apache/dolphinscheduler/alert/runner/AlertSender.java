@@ -23,11 +23,13 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertData;
 import org.apache.dolphinscheduler.spi.alert.AlertInfo;
 import org.apache.dolphinscheduler.spi.alert.AlertResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -46,6 +48,13 @@ public class AlertSender {
     private AlertPluginManager alertPluginManager;
 
     public AlertSender(AlertPluginManager alertPluginManager) {
+        this.alertPluginManager = alertPluginManager;
+    }
+
+    public AlertSender(AlertDao alertDao, AlertPluginManager alertPluginManager, PluginDao pluginDao) {
+        super();
+        this.alertDao = alertDao;
+        this.pluginDao = pluginDao;
         this.alertPluginManager = alertPluginManager;
     }
 
@@ -71,33 +80,91 @@ public class AlertSender {
 
             for (AlertPluginInstance instance : alertInstanceList) {
 
-                String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
-                String pluginInstanceName = instance.getInstanceName();
-                AlertInfo alertInfo = new AlertInfo();
-                alertInfo.setAlertData(alertData);
-                alertInfo.setAlertParams(instance.getPluginInstanceParams());
-                AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
-                if (alertChannel == null) {
-                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "Alert send error, not found plugin " + pluginName, alert.getId());
-                    logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginName);
-                    continue;
-                }
+                AlertResult alertResult = getAlertResult(instance, alertData);
+                AlertStatus alertStatus = Boolean.parseBoolean(String.valueOf(alertResult.getStatus())) ? AlertStatus.EXECUTION_SUCCESS : AlertStatus.EXECUTION_FAILURE;
+                alertDao.updateAlert(alertStatus, alertResult.getMessage(), alert.getId());
 
-                AlertResult alertResult = alertChannel.process(alertInfo);
-
-                if (alertResult == null) {
-                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, "alert send error", alert.getId());
-                    logger.info("Alert Plugin {} send error : return value is null", pluginInstanceName);
-                } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
-                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(alertResult.getMessage()), alert.getId());
-                    logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
-                } else {
-                    alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, alertResult.getMessage(), alert.getId());
-                    logger.info("Alert Plugin {} send success", pluginInstanceName);
-                }
             }
         }
 
+    }
+
+    /**
+     * sync send alert handler
+     * @param alertGroupId alertGroupId
+     * @param title title
+     * @param content content
+     * @return AlertSendResponseCommand
+     */
+    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content) {
+
+        List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
+        AlertData alertData = new AlertData();
+        alertData.setContent(title)
+                .setTitle(content);
+
+        boolean sendResponseStatus = true;
+        List<AlertResult> sendResponseResults = new ArrayList<>();
+
+        if (alertInstanceList == null || alertInstanceList.size() == 0) {
+            sendResponseStatus = false;
+            AlertResult alertResult = new AlertResult();
+            String message = String.format("Alert GroupId %s send error : not found alert instance",alertGroupId);
+            alertResult.setStatus("false");
+            alertResult.setMessage(message);
+            sendResponseResults.add(alertResult);
+            logger.error("Alert GroupId {} send error : not found alert instance", alertGroupId);
+        }
+
+        for (AlertPluginInstance instance : alertInstanceList) {
+
+            AlertResult alertResult = getAlertResult(instance, alertData);
+            sendResponseStatus = sendResponseStatus && Boolean.parseBoolean(String.valueOf(alertResult.getStatus()));
+            sendResponseResults.add(alertResult);
+        }
+
+        return new AlertSendResponseCommand(sendResponseStatus,sendResponseResults);
+    }
+
+    /**
+     * alert result expansion
+     * @param instance instance
+     * @param alertData alertData
+     * @return AlertResult
+     */
+    private AlertResult getAlertResult(AlertPluginInstance instance, AlertData alertData) {
+        String pluginName = pluginDao.getPluginDefineById(instance.getPluginDefineId()).getPluginName();
+        AlertChannel alertChannel = alertPluginManager.getAlertChannelMap().get(pluginName);
+        AlertResult alertResultExtend = new AlertResult();
+        String pluginInstanceName = instance.getInstanceName();
+        if (alertChannel == null) {
+            String message = String.format("Alert Plugin %s send error : return value is null",pluginInstanceName);
+            alertResultExtend.setStatus("false");
+            alertResultExtend.setMessage(message);
+            logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginName);
+        }
+
+        AlertInfo alertInfo = new AlertInfo();
+        alertInfo.setAlertData(alertData);
+        alertInfo.setAlertParams(instance.getPluginInstanceParams());
+        AlertResult alertResult = alertChannel.process(alertInfo);
+
+        if (alertResult == null) {
+            String message = String.format("Alert Plugin %s send error : return value is null",pluginInstanceName);
+            alertResultExtend.setStatus("false");
+            alertResultExtend.setMessage(message);
+            logger.info("Alert Plugin {} send error : return value is null", pluginInstanceName);
+        } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
+            alertResultExtend.setStatus("false");
+            alertResultExtend.setMessage(alertResult.getMessage());
+            logger.info("Alert Plugin {} send error : {}", pluginInstanceName, alertResult.getMessage());
+        } else {
+            String message = String.format("Alert Plugin %s send success",pluginInstanceName);
+            alertResultExtend.setStatus("true");
+            alertResultExtend.setMessage(message);
+            logger.info("Alert Plugin {} send success", pluginInstanceName);
+        }
+        return alertResultExtend;
     }
 
 }
