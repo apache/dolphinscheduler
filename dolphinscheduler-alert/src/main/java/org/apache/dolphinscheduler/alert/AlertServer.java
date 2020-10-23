@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import static org.apache.dolphinscheduler.common.Constants.ALERT_RPC_PORT;
+
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginLoader;
 import org.apache.dolphinscheduler.alert.plugin.DolphinPluginManagerConfig;
@@ -110,7 +112,7 @@ public class AlertServer {
      */
     private void initRemoteServer() {
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(50501);
+        serverConfig.setListenPort(ALERT_RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
         this.server.registerProcessor(CommandType.ALERT_SEND_REQUEST, new AlertRequestProcessor(alertDao, alertPluginManager, pluginDao));
         this.server.start();
