@@ -340,7 +340,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @return
      */
     protected boolean checkRemainTime(){
-        if (taskInstance.getStartTime() == null){
+        if (!checkTimeout || taskInstance.getStartTime() == null){
             return false;
         }
         long remainTime = getRemainTime(taskTimeoutParameter.getInterval() * 60L);

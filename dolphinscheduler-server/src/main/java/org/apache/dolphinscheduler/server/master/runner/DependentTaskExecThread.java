@@ -138,7 +138,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
                     logger.error("process instance not exists , master task exec thread exit");
                     return true;
                 }
-                if (checkTimeout && checkRemainTime()) {
+                if (checkRemainTime()) {
                     alertTimeout();
                     handleTimeoutWarnFailed();
                 }
