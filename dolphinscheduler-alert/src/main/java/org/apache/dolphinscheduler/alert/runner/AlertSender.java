@@ -142,6 +142,7 @@ public class AlertSender {
             alertResultExtend.setStatus("false");
             alertResultExtend.setMessage(message);
             logger.error("Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginName);
+            return alertResultExtend;
         }
 
         AlertInfo alertInfo = new AlertInfo();
