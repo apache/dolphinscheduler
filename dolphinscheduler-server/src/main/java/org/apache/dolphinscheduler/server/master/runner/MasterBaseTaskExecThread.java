@@ -20,8 +20,12 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
@@ -34,7 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
+import java.util.Date;
 import java.util.concurrent.Callable;
+
+import com.alibaba.fastjson.JSON;
 
 
 /**
@@ -82,6 +89,17 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * taskUpdateQueue
      */
     private TaskPriorityQueue taskUpdateQueue;
+
+    /**
+     * whether need check task time out.
+     */
+    protected boolean checkTimeoutFlag = false;
+
+    /**
+     * task timeout parameters
+     */
+    protected TaskTimeoutParameter taskTimeoutParameter;
+
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
@@ -93,6 +111,27 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
+        initTaskParams();
+    }
+
+    /**
+     * init task ordinary parameters
+     */
+    private void initTaskParams() {
+        initTimeoutParams();
+    }
+
+    /**
+     * init task timeout parameters
+     */
+    private void initTimeoutParams() {
+        String taskJson = taskInstance.getTaskJson();
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
+        taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
+
+        if(taskTimeoutParameter.getEnable()){
+            checkTimeoutFlag = true;
+        }
     }
 
     /**
@@ -152,8 +191,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         return task;
     }
 
-
-
     /**
      * dispatcht task
      * @param taskInstance taskInstance
@@ -195,7 +232,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             return false;
         }
     }
-
 
     /**
      *  buildTaskPriorityInfo
@@ -272,5 +308,57 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         return logPath;
     }
 
+    /**
+     * alert time out
+     * @return
+     */
+    protected boolean alertTimeout(){
+        if( TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()){
+            return true;
+        }
+        logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
+                processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
+        // send warn mail
+        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
+                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
+                taskInstance.getId(),taskInstance.getName());
+        return true;
+    }
+
+    /**
+     * handle time out for time out strategy warn&&failed
+     */
+    protected void handleTimeoutFailed(){
+        if(TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()){
+            return;
+        }
+        logger.info("process id:{} name:{} task id:{} name:{} cancel because of timeout.",
+                processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
+        this.cancel = true;
+    }
+
+    /**
+     * check task remain time valid
+     * @return
+     */
+    protected boolean checkTaskTimeout(){
+        if (!checkTimeoutFlag || taskInstance.getStartTime() == null){
+            return false;
+        }
+        long remainTime = getRemainTime(taskTimeoutParameter.getInterval() * 60L);
+        return remainTime <= 0;
+    }
+
+    /**
+     * get remain time
+     *
+     * @return remain time
+     */
+    protected long getRemainTime(long timeoutSeconds) {
+        Date startTime = taskInstance.getStartTime();
+        long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
+        return timeoutSeconds - usedTime;
+    }
 
 }

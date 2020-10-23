@@ -163,9 +163,6 @@ public class MasterExecThread implements Runnable {
         this.nettyRemotingClient = nettyRemotingClient;
     }
 
-
-
-
     @Override
     public void run() {
 
@@ -174,13 +171,11 @@ public class MasterExecThread implements Runnable {
             logger.info("process instance is not exists");
             return;
         }
-
         // check to see if it's done
         if (processInstance.getState().typeIsFinished()){
             logger.info("process instance is done : {}",processInstance.getId());
             return;
         }
-
         try {
             if (processInstance.isComplementData() &&  Flag.NO == processInstance.getIsSubProcess()){
                 // sub process complement data
@@ -468,7 +463,7 @@ public class MasterExecThread implements Runnable {
             taskInstance.setAlertFlag(Flag.NO);
 
             // task instance start time
-            taskInstance.setStartTime(new Date());
+            taskInstance.setStartTime(null);
 
             // task instance flag
             taskInstance.setFlag(Flag.YES);

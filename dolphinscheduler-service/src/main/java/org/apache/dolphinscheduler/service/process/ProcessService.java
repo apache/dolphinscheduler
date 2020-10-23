@@ -412,6 +412,7 @@ public class ProcessService {
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
                     processInstance.getScheduleTime(),
+                    processInstance.getWorkerGroup(),
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -987,6 +988,7 @@ public class ProcessService {
                 parentProcessInstance.getWarningType(),
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
+                task.getWorkerGroup(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }
@@ -1059,7 +1061,7 @@ public class ProcessService {
                         taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
                     }
                     taskInstance.setEndTime(null);
-                    taskInstance.setStartTime(new Date());
+                    taskInstance.setStartTime(null);
                     taskInstance.setFlag(Flag.YES);
                     taskInstance.setHost(null);
                     taskInstance.setId(0);
