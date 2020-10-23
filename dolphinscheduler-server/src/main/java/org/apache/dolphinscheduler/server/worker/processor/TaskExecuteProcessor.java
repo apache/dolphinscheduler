@@ -90,6 +90,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
         taskExecutionContext.setHost(OSUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setStartTime(new Date());
+        taskExecutionContext.setLogPath(getTaskLogPath(taskExecutionContext));
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
@@ -147,15 +149,14 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
-        ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
+        ackCommand.setLogPath(taskExecutionContext.getLogPath() );
         ackCommand.setHost(taskExecutionContext.getHost());
-        ackCommand.setStartTime(new Date());
+        ackCommand.setStartTime(taskExecutionContext.getStartTime());
         if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);
         }else{
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
-        taskExecutionContext.setLogPath(ackCommand.getLogPath());
         return ackCommand;
     }
 
