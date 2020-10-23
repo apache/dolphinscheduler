@@ -104,9 +104,7 @@ public class DependentExecute {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionId(),
                                                     dateInterval);
             if(processInstance == null){
-                logger.error("cannot find the right process instance: definition id:{}, start:{}, end:{}",
-                       dependentItem.getDefinitionId(), dateInterval.getStartTime(), dateInterval.getEndTime() );
-                return DependResult.FAILED;
+                return DependResult.WAITING;
             }
             // need to check workflow for updates, so get all task and check the task state
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
