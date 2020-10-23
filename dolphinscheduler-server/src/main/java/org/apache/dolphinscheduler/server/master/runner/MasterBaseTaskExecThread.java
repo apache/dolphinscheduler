@@ -348,7 +348,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     * get remain time?s?
+     * get remain time
      *
      * @return remain time
      */
