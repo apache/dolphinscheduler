@@ -18,12 +18,13 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+
+import java.util.Objects;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
 
 /**
  * alert client service test
@@ -32,9 +33,8 @@ public class AlertClientServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientServiceTest.class);
 
-
     @Test
-    public void testSendAlert(){
+    public void testSendAlert() {
         String host;
         int port = 50501;
         int groupId = 1;
@@ -48,7 +48,7 @@ public class AlertClientServiceTest {
         Assert.assertNull(alertSendResponseCommand);
 
         host = "127.0.0.1";
-        AlertSendResponseCommand alertSendResponseCommand_1 = alertClient.sendAlert(host, port, groupId, title, content);
+        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content);
 
         if (Objects.nonNull(alertClient) && alertClient.isRunning()) {
             alertClient.close();
