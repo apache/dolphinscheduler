@@ -93,7 +93,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * whether need check task time out.
      */
-    protected boolean checkTimeout = false;
+    protected boolean checkTimeoutFlag = false;
 
     /**
      * task timeout parameters
@@ -130,7 +130,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
 
         if(taskTimeoutParameter.getEnable()){
-            checkTimeout = true;
+            checkTimeoutFlag = true;
         }
     }
 
@@ -313,6 +313,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @return
      */
     protected boolean alertTimeout(){
+        if( TaskTimeoutStrategy.FAILED == this.taskTimeoutParameter.getStrategy()){
+            return true;
+        }
         logger.warn("process id:{} process name:{} task id: {},name:{} execution time out",
                 processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
         // send warn mail
@@ -320,27 +323,27 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
                 processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
                 taskInstance.getId(),taskInstance.getName());
-        this.checkTimeout = false;
         return true;
     }
 
     /**
      * handle time out for time out strategy warn&&failed
      */
-    protected void handleTimeoutWarnFailed(){
-        if(this.taskTimeoutParameter.getEnable() && TaskTimeoutStrategy.WARNFAILED == this.taskTimeoutParameter.getStrategy()){
-            logger.info("process id:{} name:{} task id:{} name:{} cancel because of timeout.",
-                    processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
-            this.cancel = true;
+    protected void handleTimeoutFailed(){
+        if(TaskTimeoutStrategy.WARN == this.taskTimeoutParameter.getStrategy()){
+            return;
         }
+        logger.info("process id:{} name:{} task id:{} name:{} cancel because of timeout.",
+                processInstance.getId(), processInstance.getName(), taskInstance.getId(), taskInstance.getName());
+        this.cancel = true;
     }
 
     /**
      * check task remain time valid
      * @return
      */
-    protected boolean checkRemainTime(){
-        if (!checkTimeout || taskInstance.getStartTime() == null){
+    protected boolean checkTaskTimeout(){
+        if (!checkTimeoutFlag || taskInstance.getStartTime() == null){
             return false;
         }
         long remainTime = getRemainTime(taskTimeoutParameter.getInterval() * 60L);

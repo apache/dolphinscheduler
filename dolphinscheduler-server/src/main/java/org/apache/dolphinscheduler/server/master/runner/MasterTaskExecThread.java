@@ -135,8 +135,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
                     break;
                 }
-                if (checkRemainTime()) {
-                    alertTimeout();
+                if (checkTaskTimeout()) {
+                    this.checkTimeoutFlag = !alertTimeout();
                 }
                 // updateProcessInstance task instance
                 taskInstance = processService.findTaskInstanceById(taskInstance.getId());

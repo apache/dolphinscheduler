@@ -406,6 +406,7 @@ public class ProcessService {
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
                     processInstance.getScheduleTime(),
+                    processInstance.getWorkerGroup(),
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -981,6 +982,7 @@ public class ProcessService {
                 parentProcessInstance.getWarningType(),
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
+                parentProcessInstance.getWorkerGroup(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }

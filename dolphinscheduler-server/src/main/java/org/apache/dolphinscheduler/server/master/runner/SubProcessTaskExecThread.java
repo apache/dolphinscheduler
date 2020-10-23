@@ -136,9 +136,9 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                 }
             }
             subProcessInstance = processService.findProcessInstanceById(subProcessInstance.getId());
-            if (checkRemainTime()) {
-                alertTimeout();
-                handleTimeoutWarnFailed();
+            if (checkTaskTimeout()) {
+                this.checkTimeoutFlag = !alertTimeout();
+                handleTimeoutFailed();
             }
             updateParentProcessState();
             if (subProcessInstance.getState().typeIsFinished()){
