@@ -961,6 +961,19 @@ public class ResourcesService extends BaseService {
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
 
         // save data
         Date now = new Date();
