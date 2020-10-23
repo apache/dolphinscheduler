@@ -982,7 +982,7 @@ public class ProcessService {
                 parentProcessInstance.getWarningType(),
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
-                parentProcessInstance.getWorkerGroup(),
+                task.getWorkerGroup(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }
