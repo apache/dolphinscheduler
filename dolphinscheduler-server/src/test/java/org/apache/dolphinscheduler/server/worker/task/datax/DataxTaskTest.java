@@ -440,16 +440,21 @@ public class DataxTaskTest {
 
     @Test
     public void testLoadJvmEnv()   {
+        setTaskParems(0);
         DataxParameters dataxParameters = new DataxParameters();
-        dataxParameters.setXms(13);
+        dataxParameters.setXms(0);
         dataxParameters.setXmx(-100);
-        try {
-            Method method = DataxTask.class.getDeclaredMethod("loadJvmEnv");
-            method.setAccessible(true);
-            method.invoke(dataxTask, dataxParameters, "test throw RuntimeException");
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
+
+        String actual =  dataxTask.loadJvmEnv(dataxParameters);
+
+        String except = " --jvm=\"-Xms1G -Xmx1G\" ";
+        Assert.assertEquals(except,actual);
+
+        dataxParameters.setXms(13);
+        dataxParameters.setXmx(14);
+        actual =  dataxTask.loadJvmEnv(dataxParameters);
+        except = " --jvm=\"-Xms13G -Xmx14G\" ";
+        Assert.assertEquals(except,actual);
 
     }
 }
