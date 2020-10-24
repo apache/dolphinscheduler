@@ -167,7 +167,6 @@ public class AlertServer {
                 alertServer.stop();
             }
         });
-
     }
 
 }
