@@ -150,11 +150,11 @@
       </div>
       <div class="cont-box">
         <span >{{$t('Min Memory')}}</span>
-        <m-select-input v-model="Xms" :list="[1,2,3,4]">
+        <m-select-input v-model="xms" :list="[1,2,3,4]">
         </m-select-input>
         <span>&nbsp;&nbsp;&nbsp;G &nbsp;&nbsp;</span>
         <span >{{$t('Max Memory')}}</span>
-        <m-select-input v-model="Xmx" :list="[1,2,3,4]">
+        <m-select-input v-model="xmx" :list="[1,2,3,4]">
         </m-select-input>
         <span>&nbsp;&nbsp;&nbsp;G</span>
       </div>
@@ -213,9 +213,9 @@
         localParams: [],
         customConfig: 0,
         //jvm memory xms
-        Xms: 1,
+        xms: 1,
         //jvm memory xms
-        Xmx: 1,
+        xmx: 1,
       }
     },
     mixins: [disabledState],
@@ -345,8 +345,8 @@
             customConfig: this.customConfig,
             json: jsonEditor.getValue(),
             localParams: this.localParams,
-            Xms:+this.Xms,
-            Xmx:+this.Xmx
+            xms:+this.xms,
+            xmx:+this.xmx
           })
           return true
         } else {
@@ -394,8 +394,8 @@
             jobSpeedRecord: this.jobSpeedRecord,
             preStatements: this.preStatements,
             postStatements: this.postStatements,
-            Xms:+this.Xms,
-            Xmx:+this.Xmx
+            xms:+this.xms,
+            xmx:+this.xmx
           })
           return true
         }
@@ -471,8 +471,8 @@
           jobSpeedRecord: this.jobSpeedRecord,
           preStatements: this.preStatements,
           postStatements: this.postStatements,
-          Xms: +this.Xms,
-          Xmx: +this.Xmx,
+          xms: +this.xms,
+          xmx: +this.xmx,
         });
       },
       _destroyEditor () {
@@ -497,8 +497,8 @@
       if (!_.isEmpty(o)) {
 
         // set jvm memory
-        this.Xms = o.params.Xms || 1 ;
-        this.Xmx = o.params.Xmx || 1 ;
+        this.xms = o.params.xms || 1 ;
+        this.xmx = o.params.xmx || 1 ;
         // backfill
         if(o.params.customConfig == 0) {
           this.customConfig = 0
