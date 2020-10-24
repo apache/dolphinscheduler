@@ -651,4 +651,7 @@ export default {
   'Batch move': 'Batch move',
   Version: 'Version',
   'Pre tasks': 'Pre tasks',
+  'Running Memory':'Running Memory',
+  'Max Memory':'Max Memory',
+  'Min Memory':'Min Memory',
 }
