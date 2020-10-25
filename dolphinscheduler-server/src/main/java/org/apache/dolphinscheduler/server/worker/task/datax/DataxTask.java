@@ -103,12 +103,12 @@ public class DataxTask extends AbstractTask {
     /**
      * shell command executor
      */
-    private final ShellCommandExecutor shellCommandExecutor;
+    private ShellCommandExecutor shellCommandExecutor;
 
     /**
      * taskExecutionContext
      */
-    private final TaskExecutionContext taskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
@@ -167,7 +167,7 @@ public class DataxTask extends AbstractTask {
         } catch (Exception e) {
             logger.error("datax task failure", e);
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -399,7 +399,7 @@ public class DataxTask extends AbstractTask {
         sbr.append(" ");
         sbr.append(DATAX_HOME_EVN);
         sbr.append(" ");
-        sbr.append(String.format(JVM_EVN, dataXParameters.getXms(), dataXParameters.getXmx()));
+        sbr.append(loadJvmEnv(dataXParameters));
         sbr.append(jobConfigFilePath);
 
         // replace placeholder
@@ -420,6 +420,12 @@ public class DataxTask extends AbstractTask {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    public String loadJvmEnv(DataxParameters dataXParameters) {
+        int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
+        int xmx = dataXParameters.getXmx() < 1 ? 1 : dataXParameters.getXmx();
+        return String.format(JVM_EVN, xms, xmx);
     }
 
     /**
