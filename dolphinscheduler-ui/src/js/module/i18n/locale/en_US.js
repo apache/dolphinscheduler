@@ -187,6 +187,7 @@ export default {
   'Please select a queue': 'default is tenant association queue',
   'Please enter the tenant code in English': 'Please enter the tenant code in English',
   'Please enter tenant code in English': 'Please enter tenant code in English',
+  'Please enter tenant name without special characters': 'Please enter tenant name without special characters',
   'Edit User': 'Edit User',
   Tenant: 'Tenant',
   Email: 'Email',

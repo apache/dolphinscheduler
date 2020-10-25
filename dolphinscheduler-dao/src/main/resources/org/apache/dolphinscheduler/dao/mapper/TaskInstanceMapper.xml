@@ -98,7 +98,8 @@
         </if>
     </select>
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select instance.*,process.name as process_instance_name
+        select instance.id,instance.name,instance.task_type,instance.process_definition_id,instance.process_instance_id,instance.state,instance.submit_time,instance.start_time,instance.end_time,
+        instance.host,instance.execute_path,instance.log_path,instance.alert_flag,instance.retry_times,instance.pid,instance.app_link,instance.flag,instance.retry_interval,instance.max_retry_times,instance.task_instance_priority,instance.worker_group,instance.executor_id,process.name as process_instance_name
         from t_ds_task_instance instance
         join t_ds_process_definition define ON instance.process_definition_id = define.id
         join  t_ds_process_instance process on process.id=instance.process_instance_id
