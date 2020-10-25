@@ -223,7 +223,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         // return processDefinition object with ID
         result.put(Constants.DATA_LIST, processDefineMapper.selectById(processDefine.getId()));
         putMsg(result, Status.SUCCESS);
-        result.put("processDefinitionId", processDefine.getId());
+        result.put(PROCESSDEFINITIONID, processDefine.getId());
         return result;
     }
 
@@ -366,16 +366,24 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             return checkProcessJson;
         }
         ProcessDefinition processDefine = processService.findProcessDefineById(id);
+        // check process definition exists
         if (processDefine == null) {
-            // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
             return result;
-        } else if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
+        }
+        if (processDefine.getReleaseState() == ReleaseState.ONLINE) {
             // online can not permit edit
             putMsg(result, Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT, processDefine.getName());
             return result;
-        } else {
-            putMsg(result, Status.SUCCESS);
+        }
+
+        if (!name.equals(processDefine.getName())) {
+            // check whether the new process define name exist
+            ProcessDefinition definition = processDefineMapper.verifyByDefineName(project.getId(), name);
+            if (definition != null) {
+                putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
+                return result;
+            }
         }
 
         Date now = new Date();
@@ -434,11 +442,11 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(), name);
+        ProcessDefinition processDefinition = processDefineMapper.verifyByDefineName(project.getId(), name);
         if (processDefinition == null) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.PROCESS_INSTANCE_EXIST, name);
+            putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR, name);
         }
         return result;
     }
