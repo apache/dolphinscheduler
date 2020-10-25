@@ -440,7 +440,7 @@ public class DataxTaskTest {
 
     @Test
     public void testLoadJvmEnv()   {
-        setTaskParems(0);
+        DataxTask dataxTask = new DataxTask(null,null);
         DataxParameters dataxParameters = new DataxParameters();
         dataxParameters.setXms(0);
         dataxParameters.setXmx(-100);
