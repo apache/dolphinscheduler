@@ -197,9 +197,6 @@ public class DataxParameters extends AbstractParameters {
     }
 
     public int getXms() {
-        if (xms < 1) {
-            return 1;
-        }
         return xms;
     }
 
@@ -208,9 +205,6 @@ public class DataxParameters extends AbstractParameters {
     }
 
     public int getXmx() {
-        if (xmx < 1) {
-            return 1;
-        }
         return xmx;
     }
 
