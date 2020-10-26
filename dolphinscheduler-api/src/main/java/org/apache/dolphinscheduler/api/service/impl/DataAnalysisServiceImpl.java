@@ -265,6 +265,7 @@ public class DataAnalysisServiceImpl extends BaseService implements DataAnalysis
             return result;
         }
 
+        //TODO need to add detail data info 
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
