@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.alert.runner;
 
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -106,7 +107,7 @@ public class AlertSender {
         boolean sendResponseStatus = true;
         List<AlertResult> sendResponseResults = new ArrayList<>();
 
-        if (alertInstanceList == null || alertInstanceList.size() == 0) {
+        if (CollectionUtils.isEmpty(alertInstanceList)) {
             sendResponseStatus = false;
             AlertResult alertResult = new AlertResult();
             String message = String.format("Alert GroupId %s send error : not found alert instance",alertGroupId);
@@ -151,10 +152,10 @@ public class AlertSender {
         AlertResult alertResult = alertChannel.process(alertInfo);
 
         if (alertResult == null) {
-            String message = String.format("Alert Plugin %s send error : return value is null",pluginInstanceName);
+            String message = String.format("Alert Plugin %s send error : return alertResult value is null",pluginInstanceName);
             alertResultExtend.setStatus("false");
             alertResultExtend.setMessage(message);
-            logger.info("Alert Plugin {} send error : return value is null", pluginInstanceName);
+            logger.info("Alert Plugin {} send error : return alertResult value is null", pluginInstanceName);
         } else if (!Boolean.parseBoolean(String.valueOf(alertResult.getStatus()))) {
             alertResultExtend.setStatus("false");
             alertResultExtend.setMessage(alertResult.getMessage());
