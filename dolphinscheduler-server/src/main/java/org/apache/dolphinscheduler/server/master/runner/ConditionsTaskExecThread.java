@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
 
-
     /**
      * dependent parameters
      */
@@ -131,7 +130,6 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
         this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(), DependentParameters.class);
     }
 
-
     /**
      * depend result for depend item
      * @param item
@@ -154,6 +152,5 @@ public class ConditionsTaskExecThread extends MasterBaseTaskExecThread {
                 Constants.DEPENDENT_SPLIT, item.getDepTasks(), dependResult);
         return dependResult;
     }
-
 
 }
