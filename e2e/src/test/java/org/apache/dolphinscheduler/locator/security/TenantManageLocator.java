@@ -27,8 +27,6 @@ public class TenantManageLocator{
 
     public static final By TENANT_INPUT_CODE = By.xpath("//div[2]/div/div/div[2]/div/input");
 
-    public static final By TENANT_INPUT_NAME = By.xpath("//div[2]/div[2]/div/input");
-
     public static final By QUEUE = By.xpath("//textarea");
 
     public static final By DESCRIPTION = By.xpath("//textarea");
