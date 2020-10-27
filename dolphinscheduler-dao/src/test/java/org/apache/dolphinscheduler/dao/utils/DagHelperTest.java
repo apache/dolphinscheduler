@@ -55,6 +55,7 @@ public class DagHelperTest {
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
         TaskNode taskNode3 = dag.getNode("3");
         Map<String, TaskInstance> completeTaskList = new HashMap<>();
+        Map<String, TaskNode> skipNodeList = new HashMap<>();
         completeTaskList.putIfAbsent("1", new TaskInstance());
         Boolean canSubmit = false;
 
@@ -63,14 +64,14 @@ public class DagHelperTest {
         node2.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         TaskNode nodex = dag.getNode("4");
         nodex.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-        canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, completeTaskList);
+        canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
         Assert.assertEquals(canSubmit, true);
 
         // 2forbidden, 3 cannot be submit
         completeTaskList.putIfAbsent("2", new TaskInstance());
         TaskNode nodey = dag.getNode("4");
         nodey.setRunFlag("");
-        canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, completeTaskList);
+        canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
         Assert.assertEquals(canSubmit, false);
 
         // 2/3 forbidden submit 5
@@ -79,7 +80,7 @@ public class DagHelperTest {
         TaskNode node8 = dag.getNode("8");
         node8.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         TaskNode node5 = dag.getNode("5");
-        canSubmit = DagHelper.allDependsForbiddenOrEnd(node5, dag, completeTaskList);
+        canSubmit = DagHelper.allDependsForbiddenOrEnd(node5, dag, skipNodeList, completeTaskList);
         Assert.assertEquals(canSubmit, true);
     }
 

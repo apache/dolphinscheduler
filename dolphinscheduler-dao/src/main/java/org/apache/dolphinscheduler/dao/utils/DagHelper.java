@@ -248,6 +248,7 @@ public class DagHelper {
      */
     public static boolean allDependsForbiddenOrEnd(TaskNode taskNode,
                                                    DAG<String, TaskNode, TaskNodeRelation> dag,
+                                                   Map<String, TaskNode> skipTaskNodeList,
                                                    Map<String, TaskInstance> completeTaskList) {
         List<String> dependList = taskNode.getDepList();
         if (dependList == null) {
@@ -255,7 +256,9 @@ public class DagHelper {
         }
         for (String dependNodeName : dependList) {
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if (completeTaskList.containsKey(dependNodeName) || dependNode.isForbidden()) {
+            if (completeTaskList.containsKey(dependNodeName)
+                    || dependNode.isForbidden()
+                    || skipTaskNodeList.containsKey(dependNodeName)) {
                 continue;
             } else {
                 return false;
@@ -291,7 +294,7 @@ public class DagHelper {
                 setTaskNodeSkip(subsequent, dag, completeTaskList, skipTaskNodeList );
                 continue;
             }
-            if (!DagHelper.allDependsForbiddenOrEnd(taskNode, dag, completeTaskList)) {
+            if (!DagHelper.allDependsForbiddenOrEnd(taskNode, dag, skipTaskNodeList, completeTaskList)) {
                 continue;
             }
             if (taskNode.isForbidden() || completeTaskList.containsKey(subsequent)) {
