@@ -867,6 +867,8 @@
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/NettyUtilTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
+                        <include>**/remote/command/alert/AlertSendRequestCommandTest.java</include>
+                        <include>**/remote/command/alert/AlertSendResponseCommandTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
