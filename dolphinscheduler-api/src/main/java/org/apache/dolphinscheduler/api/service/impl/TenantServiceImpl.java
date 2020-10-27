@@ -76,7 +76,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId    queue id
      * @param desc       description
      * @return create result code
@@ -310,7 +309,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }

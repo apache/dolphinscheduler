@@ -231,8 +231,7 @@
             })
             this.tenantList = _.map(arr, v => {
               return {
-                id: v.id,
-                code: v.tenantName
+                id: v.id
               }
             })
             this.$nextTick(() => {
