@@ -196,8 +196,7 @@ public class DagHelperTest {
         Map<String, TaskNode> skipNodeList = new HashMap<>();
         Set<String> postNodes = null;
         // dag: 1-2-3-5-7 4-3-6 2-8-5-7
-        // 3-if, complete:1/2/3/4
-        // 1.expect post:5 skip:6
+        // 3-if
         completeTaskList.put("1", new TaskInstance());
         completeTaskList.put("2", new TaskInstance());
         completeTaskList.put("4", new TaskInstance());
@@ -212,13 +211,13 @@ public class DagHelperTest {
         completeTaskList.remove("3");
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(ExecutionStatus.SUCCESS);
-        //complete 1/2/3/4 expect:0
+        //complete 1/2/3/4 expect:8
         completeTaskList.put("3", taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assert.assertEquals(1, postNodes.size());
         Assert.assertTrue(postNodes.contains("8"));
 
-        //2.complete 1/2/3/4/8
+        //2.complete 1/2/3/4/8 expect:5 skip:6
         completeTaskList.put("8", new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null ,skipNodeList, dag, completeTaskList);
         Assert.assertTrue(postNodes.contains("5"));

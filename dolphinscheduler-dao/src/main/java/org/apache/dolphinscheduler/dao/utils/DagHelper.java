@@ -265,9 +265,11 @@ public class DagHelper {
     }
 
     /**
-     *
+     * parse the successor nodes of previous node.
+     * this function parse the condition node to find the right branch.
+     * also check all the depends nodes forbidden or complete
      * @param preNodeName
-     * @return
+     * @return successor nodes
      */
     public static Set<String> parsePostNodes(String preNodeName,
                                        Map<String, TaskNode> skipTaskNodeList,
