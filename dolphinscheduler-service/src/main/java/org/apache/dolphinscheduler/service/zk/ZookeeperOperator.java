@@ -56,13 +56,15 @@ public class ZookeeperOperator implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
         initStateLister();
-        registerListener();
+        treeCacheStart();
     }
 
     /**
      * this method is for sub class,
      */
     protected void registerListener(){}
+
+    protected void treeCacheStart(){}
 
     public void initStateLister() {
         checkNotNull(zkClient);
