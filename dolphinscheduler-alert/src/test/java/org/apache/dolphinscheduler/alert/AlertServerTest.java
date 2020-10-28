@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,6 +72,7 @@ public class AlertServerTest {
         PowerMockito.whenNew(AlertSender.class).withAnyArguments().thenReturn(alertSender);
 
         AlertServer alertServer = AlertServer.getInstance();
+        Assert.assertNotNull(alertServer);
 
         new Thread(() -> {
             alertServer.start(); })
