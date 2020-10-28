@@ -49,6 +49,41 @@ public class DataxParametersTest {
 
     }
 
+    @Test
+    public void testToString()   {
+
+        DataxParameters dataxParameters = new DataxParameters();
+        dataxParameters.setCustomConfig(0);
+        dataxParameters.setXms(0);
+        dataxParameters.setXmx(-100);
+        dataxParameters.setDataSource(1);
+        dataxParameters.setDataTarget(1);
+        dataxParameters.setDsType("MYSQL");
+        dataxParameters.setDtType("MYSQL");
+        dataxParameters.setJobSpeedByte(1);
+        dataxParameters.setJobSpeedRecord(1);
+        dataxParameters.setJson("json");
+
+        String expected = "DataxParameters"
+                + "{"
+                + "customConfig=0, "
+                + "json='json', "
+                + "dsType='MYSQL', "
+                + "dataSource=1, "
+                + "dtType='MYSQL', "
+                + "dataTarget=1, "
+                + "sql='null', "
+                + "targetTable='null', "
+                + "preStatements=null, "
+                + "postStatements=null, "
+                + "jobSpeedByte=1, "
+                + "jobSpeedRecord=1, "
+                + "xms=0, "
+                + "xmx=-100"
+                + "}";
+
+        Assert.assertEquals(expected,dataxParameters.toString());
+    }
 
     public String loadJvmEnvTest(DataxParameters dataXParameters) {
         int xms = dataXParameters.getXms() < 1 ? 1 : dataXParameters.getXms();
