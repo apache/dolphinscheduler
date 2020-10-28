@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -91,7 +92,10 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
         logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}",
-                loginUser.getUserName(), tenantCode, queueId, description);
+                StringUtils.replaceNRTtoUnderline(loginUser.toString()),
+                StringUtils.replaceNRTtoUnderline(tenantCode),
+                queueId,
+                StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
         return returnDataList(result);
     }
@@ -174,8 +178,11 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        logger.info("login user {}, updateProcessInstance tenant, tenantCode: {}, queueId: {}, description: {}",
-                loginUser.getUserName(), tenantCode, queueId, description);
+        logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}",
+                StringUtils.replaceNRTtoUnderline(loginUser.toString()),
+                StringUtils.replaceNRTtoUnderline(tenantCode),
+                queueId,
+                StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
     }

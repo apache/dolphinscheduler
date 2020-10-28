@@ -33,7 +33,7 @@ public class TenantManageLocator{
 
     public static final By SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 
-    public static final By DELETE_TENANT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[8]/span/button");
+    public static final By DELETE_TENANT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[7]/span/button");
 
     public static final By CONFIRM_DELETE_TENANT_BUTTON = By.xpath("//div[2]/div/button[2]/span");
 
