@@ -78,9 +78,7 @@ public class AlertClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, ALERT_REQUEST_TIMEOUT);
             if (response != null) {
-                AlertSendResponseCommand sendResponse = JsonSerializer.deserialize(
-                        response.getBody(), AlertSendResponseCommand.class);
-                return sendResponse;
+                return JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
             }
         } catch (Exception e) {
             logger.error("sync alert send error", e);

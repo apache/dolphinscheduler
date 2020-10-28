@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.remote.command.alert;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
-import org.apache.dolphinscheduler.spi.alert.AlertResult;
 
 import java.io.Serializable;
 import java.util.List;
@@ -33,17 +32,31 @@ public class AlertSendResponseCommand implements Serializable {
      */
     private boolean resStatus;
 
-    private List<AlertResult> resResults;
+    private List<AlertSendResponseResult> resResults;
 
+    public boolean getResStatus() {
+        return resStatus;
+    }
 
+    public void setResStatus(boolean resStatus) {
+        this.resStatus = resStatus;
+    }
+
+    public List<AlertSendResponseResult> getResResults() {
+        return resResults;
+    }
+
+    public void setResResults(List<AlertSendResponseResult> resResults) {
+        this.resResults = resResults;
+    }
 
     public AlertSendResponseCommand() {
 
     }
 
-    public AlertSendResponseCommand(boolean alertStatus, List<AlertResult> alertResults) {
-        this.alertStatus = alertStatus;
-        this.alertResults = alertResults;
+    public AlertSendResponseCommand(boolean resStatus, List<AlertSendResponseResult> resResults) {
+        this.resStatus = resStatus;
+        this.resResults = resResults;
     }
 
     /**
