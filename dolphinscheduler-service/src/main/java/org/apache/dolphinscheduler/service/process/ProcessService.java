@@ -1521,9 +1521,12 @@ public class ProcessService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
+        logger.info("set null host to process instance:{}", processInstance.getId());
         //1 update processInstance host is null
         processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
+
+        logger.info("create failover command for process instance:{}", processInstance.getId());
 
         //2 insert into recover command
         Command cmd = new Command();
