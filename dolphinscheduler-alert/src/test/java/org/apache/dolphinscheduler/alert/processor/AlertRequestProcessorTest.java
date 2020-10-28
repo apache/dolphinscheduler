@@ -21,8 +21,10 @@ import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
@@ -53,6 +55,7 @@ public class AlertRequestProcessorTest {
         Channel channel = PowerMockito.mock(Channel.class);
         AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(1,"title","content");
         Command reqCommand = alertSendRequestCommand.convert2Command();
+        Assert.assertEquals(CommandType.ALERT_SEND_REQUEST,reqCommand.getType());
         alertRequestProcessor.process(channel,reqCommand);
     }
 }

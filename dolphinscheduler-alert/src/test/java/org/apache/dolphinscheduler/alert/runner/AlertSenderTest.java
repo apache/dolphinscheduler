@@ -173,8 +173,9 @@ public class AlertSenderTest {
         ConcurrentHashMap alertChannelMap = new ConcurrentHashMap<>();
         alertChannelMap.put(pluginName,alertChannelMock);
         PowerMockito.when(alertPluginManager.getAlertChannelMap()).thenReturn(alertChannelMap);
-
+        Assert.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         alertSender.run();
+
     }
 
 }

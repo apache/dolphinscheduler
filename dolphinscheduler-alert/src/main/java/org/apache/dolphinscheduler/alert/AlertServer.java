@@ -158,7 +158,6 @@ public class AlertServer {
     }
 
     public static void main(String[] args) {
-        System.out.println(System.getProperty("user.dir"));
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
