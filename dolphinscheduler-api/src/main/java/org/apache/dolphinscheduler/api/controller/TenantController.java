@@ -179,10 +179,10 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
         logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.toString()),
-                StringUtils.replaceNRTtoUnderline(tenantCode),
+                loginUser.getUserName(),
+                tenantCode,
                 queueId,
-                StringUtils.replaceNRTtoUnderline(description));
+                description);
         Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
     }
