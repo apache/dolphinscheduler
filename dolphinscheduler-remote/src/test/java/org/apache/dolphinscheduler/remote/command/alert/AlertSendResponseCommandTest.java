@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.remote.command.alert;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,6 +31,17 @@ public class AlertSendResponseCommandTest {
     @Test
     public void testConvert2Command() {
         AlertSendResponseCommand alertSendResponseCommand = new AlertSendResponseCommand();
+        alertSendResponseCommand.setResStatus(false);
+        List<AlertSendResponseResult> responseResults = new ArrayList<>();
+        AlertSendResponseResult responseResult1 = new AlertSendResponseResult();
+        responseResult1.setStatus(false);
+        responseResult1.setMessage("fail");
+        responseResults.add(responseResult1);
+
+        AlertSendResponseResult responseResult2 = new AlertSendResponseResult(true,"success");
+        responseResults.add(responseResult2);
+        alertSendResponseCommand.setResResults(responseResults);
+
         Command command = alertSendResponseCommand.convert2Command(1);
         Assert.assertEquals(CommandType.ALERT_SEND_RESPONSE,command.getType());
     }
