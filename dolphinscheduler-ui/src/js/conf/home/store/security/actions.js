@@ -281,7 +281,8 @@ export default {
       io.get('tenant/list', payload, res => {
         const list = res.data
         list.unshift({
-          id: -1
+          id: -1,
+          tenantCode: 'default'
         })
         state.tenantAllList = list
         resolve(list)

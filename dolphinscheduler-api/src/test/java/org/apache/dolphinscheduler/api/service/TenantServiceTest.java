@@ -73,8 +73,6 @@ public class TenantServiceTest {
 
     private static final String tenantCode = "TenantServiceTest";
 
-    private static final String tenantName = "TenantServiceTest";
-
     @Test
     public void testCreateTenant() {
 

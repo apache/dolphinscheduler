@@ -91,7 +91,9 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
         logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}",
-                loginUser.getUserName(), tenantCode, queueId, description);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(tenantCode), queueId,
+                StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
         return returnDataList(result);
     }
@@ -175,7 +177,9 @@ public class TenantController extends BaseController {
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
         logger.info("login user {}, updateProcessInstance tenant, tenantCode: {}, queueId: {}, description: {}",
-                loginUser.getUserName(), tenantCode, queueId, description);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                StringUtils.replaceNRTtoUnderline(tenantCode), queueId,
+                StringUtils.replaceNRTtoUnderline(description));
         Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
     }
