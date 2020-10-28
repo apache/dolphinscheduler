@@ -31,25 +31,11 @@ public class AlertSendResponseCommand implements Serializable {
      * true:All alert are successful,
      * false:As long as one alert fails
      */
-    private boolean alertStatus;
+    private boolean resStatus;
 
-    private List<AlertResult> alertResults;
+    private List<AlertResult> resResults;
 
-    public boolean getAlertStatus() {
-        return alertStatus;
-    }
 
-    public void setAlertStatus(boolean alertStatus) {
-        this.alertStatus = alertStatus;
-    }
-
-    public List<AlertResult> getAlertResults() {
-        return alertResults;
-    }
-
-    public void setAlertResults(List<AlertResult> alertResults) {
-        this.alertResults = alertResults;
-    }
 
     public AlertSendResponseCommand() {
 
