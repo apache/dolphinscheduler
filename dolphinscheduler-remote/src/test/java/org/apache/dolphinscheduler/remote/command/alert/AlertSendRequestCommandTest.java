@@ -33,5 +33,10 @@ public class AlertSendRequestCommandTest {
         AlertSendRequestCommand requestCommand = new AlertSendRequestCommand(groupId,title,content);
         Command command = requestCommand.convert2Command();
         Assert.assertEquals(CommandType.ALERT_SEND_REQUEST,command.getType());
+        AlertSendRequestCommand verifyCommand = new AlertSendRequestCommand();
+        verifyCommand.setGroupId(groupId);
+        verifyCommand.setContent(content);
+        verifyCommand.setTitle(title);
+
     }
 }
