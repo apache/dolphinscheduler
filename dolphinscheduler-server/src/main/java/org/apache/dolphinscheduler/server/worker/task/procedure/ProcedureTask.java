@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.procedure;
 
-import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -114,7 +113,6 @@ public class ProcedureTask extends AbstractTask {
                     CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
                     taskExecutionContext.getScheduleTime());
 
-
             Collection<Property> userDefParamsList = null;
 
             if (procedureParameters.getLocalParametersMap() != null){
@@ -134,7 +132,6 @@ public class ProcedureTask extends AbstractTask {
             // outParameterMap
             Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, paramsMap, userDefParamsList);
 
-
             stmt.executeUpdate();
 
             /**
@@ -143,12 +140,11 @@ public class ProcedureTask extends AbstractTask {
             printOutParameter(stmt, outParameterMap);
 
             setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
-        }catch (Exception e){
+        } catch (Exception e) {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             logger.error("procedure task error",e);
             throw e;
-        }
-        finally {
+        }  finally {
             close(stmt,connection);
         }
     }
@@ -323,53 +319,45 @@ public class ProcedureTask extends AbstractTask {
      * @param value     value
      * @throws Exception exception
      */
-    private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception{
-        if (dataType.equals(VARCHAR)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.VARCHAR);
-            }else {
-                stmt.registerOutParameter(index, Types.VARCHAR, value);
-            }
+    private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception {
+        int sqlType; 
+        switch (dataType) {
+            case VARCHAR:
+                sqlType = Types.VARCHAR;
+                break;
+            case INTEGER:
+            case LONG:
+                sqlType = Types.INTEGER;
+                break;
+            case FLOAT:
+                sqlType = Types.FLOAT;
+                break;
+            case DOUBLE:
+                sqlType = Types.DOUBLE;
+                break;
+            case DATE:
+                sqlType = Types.DATE;
+                break;
+            case TIME:
+                sqlType = Types.TIME;
+                break;
+            case TIMESTAMP:
+                sqlType = Types.TIMESTAMP;
+                break;
+                
+            default:
+                throw new IllegalStateException("Unexpected value: " + dataType);
+        }
 
-        }else if (dataType.equals(INTEGER)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.INTEGER);
-            }else {
-                stmt.registerOutParameter(index, Types.INTEGER, value);
-            }
+        if (StringUtils.isEmpty(value)) {
+            stmt.registerOutParameter(index, sqlType);
+        } else {
+            stmt.registerOutParameter(index, sqlType, value);
+        }
+        
+        
 
-        }else if (dataType.equals(LONG)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index,Types.INTEGER);
-            }else {
-                stmt.registerOutParameter(index,Types.INTEGER ,value);
-            }
-        }else if (dataType.equals(FLOAT)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.FLOAT);
-            }else {
-                stmt.registerOutParameter(index, Types.FLOAT,value);
-            }
-        }else if (dataType.equals(DOUBLE)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.DOUBLE);
-            }else {
-                stmt.registerOutParameter(index, Types.DOUBLE , value);
-            }
 
-        }else if (dataType.equals(DATE)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.DATE);
-            }else {
-                stmt.registerOutParameter(index, Types.DATE , value);
-            }
-
-        }else if (dataType.equals(TIME)){
-            if (StringUtils.isEmpty(value)){
-                stmt.registerOutParameter(index, Types.TIME);
-            }else {
-                stmt.registerOutParameter(index, Types.TIME , value);
-            }
 
         }else if (dataType.equals(TIMESTAMP)){
             if (StringUtils.isEmpty(value)){
