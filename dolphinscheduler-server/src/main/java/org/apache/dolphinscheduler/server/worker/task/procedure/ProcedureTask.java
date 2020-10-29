@@ -160,7 +160,7 @@ public class ProcedureTask extends AbstractTask {
      */
     private String getCallMethod(Collection<Property> userDefParamsList) {
         String method;// no parameters
-        if (CollectionUtils.isEmpty(userDefParamsList)){
+        if (CollectionUtils.isEmpty(userDefParamsList)) {
             method = "{call " + procedureParameters.getMethod() + "}";
         }else { // exists parameters
             int size = userDefParamsList.size();
