@@ -312,11 +312,12 @@ public class MasterExecThread implements Runnable {
      * @throws Exception exception
      */
     private void prepareProcess() throws Exception {
-        // init task queue
-        initTaskQueue();
 
         // gen process dag
         buildFlowDag();
+
+        // init task queue
+        initTaskQueue();
         logger.info("prepare process :{} end", processInstance.getId());
     }
 
@@ -370,6 +371,9 @@ public class MasterExecThread implements Runnable {
         for(TaskInstance task : taskInstanceList){
             if(task.isTaskComplete()){
                 completeTaskList.put(task.getName(), task);
+            }
+            if(task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getName(), dag)){
+                continue;
             }
             if(task.getState().typeIsFailure() && !task.taskCanRetry()){
                 errorTaskList.put(task.getName(), task);
