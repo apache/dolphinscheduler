@@ -209,7 +209,7 @@ public class ProcedureTask extends AbstractTask {
                                                       Map<String, Property> paramsMap,
                                                       Collection<Property> userDefParamsList) throws Exception {
         Map<Integer,Property> outParameterMap = new HashMap<>();
-        if (userDefParamsList != null && userDefParamsList.size() > 0){
+        if (CollectionUtils.isNotEmpty(userDefParamsList)){
             int index = 1;
             for (Property property : userDefParamsList){
                 logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
@@ -256,7 +256,7 @@ public class ProcedureTask extends AbstractTask {
             try {
                 stmt.close();
             } catch (SQLException e) {
-
+                logger.error("close prepared statement error : {}",e.getMessage(),e);
             }
         }
         if (connection != null) {
