@@ -93,7 +93,6 @@ public class ProcedureTaskTest {
 
         procedureTask = new ProcedureTask(taskExecutionContext, logger);
         procedureTask.init();
-
     }
 
     @Test
