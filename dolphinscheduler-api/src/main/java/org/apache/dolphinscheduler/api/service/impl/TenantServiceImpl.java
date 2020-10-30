@@ -76,7 +76,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      *
      * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId    queue id
      * @param desc       description
      * @return create result code
@@ -85,7 +84,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
-                                            String tenantName,
                                             int queueId,
                                             String desc) throws Exception {
 
@@ -113,7 +111,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             return result;
         }
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         tenant.setQueueId(queueId);
         tenant.setDescription(desc);
         tenant.setCreateTime(now);
@@ -166,13 +163,12 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param loginUser  login user
      * @param id         tennat id
      * @param tenantCode tennat code
-     * @param tenantName tennat name
      * @param queueId    queue id
      * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, String tenantName, int queueId,
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -213,10 +209,6 @@ public class TenantServiceImpl extends BaseService implements TenantService {
 
         if (StringUtils.isNotEmpty(tenantCode)) {
             tenant.setTenantCode(tenantCode);
-        }
-
-        if (StringUtils.isNotEmpty(tenantName)) {
-            tenant.setTenantName(tenantName);
         }
 
         if (queueId != 0) {
@@ -317,7 +309,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
