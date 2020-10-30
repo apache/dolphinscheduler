@@ -53,7 +53,7 @@ public class RemoveTaskLogRequestCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.REMOVE_TAK_LOG_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);

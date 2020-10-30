@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -32,7 +33,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * log client
@@ -159,7 +159,6 @@ public class LogClientService {
         }
         return result;
     }
-
 
     /**
      * remove task log

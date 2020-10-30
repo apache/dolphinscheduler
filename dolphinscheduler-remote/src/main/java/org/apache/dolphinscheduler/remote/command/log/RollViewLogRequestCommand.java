@@ -81,7 +81,7 @@ public class RollViewLogRequestCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.ROLL_VIEW_LOG_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);

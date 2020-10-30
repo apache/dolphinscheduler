@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import io.netty.channel.Channel;
+import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
+
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -35,10 +36,11 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEve
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import io.netty.channel.Channel;
 
 /**
  *  task ack processor
@@ -63,7 +65,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private ProcessService processService;
 
-    public TaskAckProcessor(){
+    public TaskAckProcessor() {
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
@@ -96,10 +98,10 @@ public class TaskAckProcessor implements NettyRequestProcessor {
 
         taskResponseService.addResponse(taskResponseEvent);
 
-        while (Stopper.isRunning()){
+        while (Stopper.isRunning()) {
             TaskInstance taskInstance = processService.findTaskInstanceById(taskAckCommand.getTaskInstanceId());
 
-            if (taskInstance != null && ackStatus.typeIsRunning()){
+            if (taskInstance != null && ackStatus.typeIsRunning()) {
                 break;
             }
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);

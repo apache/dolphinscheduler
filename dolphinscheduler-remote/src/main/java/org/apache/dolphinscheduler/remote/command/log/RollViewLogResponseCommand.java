@@ -54,7 +54,7 @@ public class RollViewLogResponseCommand implements Serializable {
      * @param opaque request unique identification
      * @return command
      */
-    public Command convert2Command(long opaque){
+    public Command convert2Command(long opaque) {
         Command command = new Command(opaque);
         command.setType(CommandType.ROLL_VIEW_LOG_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);

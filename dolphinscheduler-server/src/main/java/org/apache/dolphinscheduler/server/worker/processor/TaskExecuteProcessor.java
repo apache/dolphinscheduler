@@ -72,7 +72,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
-    public TaskExecuteProcessor(){
+    public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
@@ -88,7 +88,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", taskRequestCommand);
 
-        if(taskRequestCommand == null){
+        if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
             return;
         }
@@ -96,7 +96,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
 
-        if(taskExecutionContext == null){
+        if (taskExecutionContext == null) {
             logger.error("task execution context is null");
             return;
         }
@@ -161,9 +161,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
+        if (taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())) {
             ackCommand.setExecutePath(null);
-        }else{
+        } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
@@ -175,7 +175,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
-    private String getExecLocalPath(TaskExecutionContext taskExecutionContext){
+    private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),

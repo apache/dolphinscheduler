@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -51,7 +52,6 @@ public class TaskKillResponseCommand implements Serializable {
      * other resource manager appId , for example : YARN etc
      */
     protected List<String> appIds;
-
 
     public int getTaskInstanceId() {
         return taskInstanceId;
@@ -98,7 +98,7 @@ public class TaskKillResponseCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.TASK_KILL_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);
@@ -108,12 +108,12 @@ public class TaskKillResponseCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "TaskKillResponseCommand{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", host='" + host + '\'' +
-                ", status=" + status +
-                ", processId=" + processId +
-                ", appIds=" + appIds +
-                '}';
+        return "TaskKillResponseCommand{"
+                + "taskInstanceId=" + taskInstanceId
+                + ", host='" + host + '\''
+                + ", status=" + status
+                + ", processId=" + processId
+                + ", appIds=" + appIds
+                + '}';
     }
 }

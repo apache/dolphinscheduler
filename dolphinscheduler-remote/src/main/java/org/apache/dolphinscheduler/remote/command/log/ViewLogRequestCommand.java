@@ -53,7 +53,7 @@ public class ViewLogRequestCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);

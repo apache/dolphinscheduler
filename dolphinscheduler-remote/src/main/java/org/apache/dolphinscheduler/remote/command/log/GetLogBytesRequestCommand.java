@@ -53,7 +53,7 @@ public class GetLogBytesRequestCommand implements Serializable {
      *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.GET_LOG_BYTES_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);

@@ -54,7 +54,7 @@ public class ViewLogResponseCommand implements Serializable {
      * @param opaque request unique identification
      * @return command
      */
-    public Command convert2Command(long opaque){
+    public Command convert2Command(long opaque) {
         Command command = new Command(opaque);
         command.setType(CommandType.VIEW_WHOLE_LOG_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);

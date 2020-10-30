@@ -17,15 +17,17 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.netty.channel.Channel;
 
 /**
  *  task response processor
@@ -48,6 +50,5 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
         TaskKillResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
         logger.info("received task kill response command : {}", responseCommand);
     }
-
 
 }
