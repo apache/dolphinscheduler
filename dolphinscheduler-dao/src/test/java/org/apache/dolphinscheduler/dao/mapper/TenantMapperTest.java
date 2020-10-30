@@ -137,12 +137,12 @@ public class TenantMapperTest {
 
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
-        tenant.setTenantName("ut name");
         tenant.setQueueId(queue.getId());
         tenantMapper.updateById(tenant);
         Page<Tenant> page = new Page(1,3);
 
-        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantName());
+        //tenant.getTenantCode() used instead of tenant.getTenantName()
+        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantCode());
 
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }

@@ -756,7 +756,6 @@ DROP TABLE IF EXISTS `t_ds_tenant`;
 CREATE TABLE `t_ds_tenant` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
-  `tenant_name` varchar(64) DEFAULT NULL COMMENT 'tenant name',
   `description` varchar(256) DEFAULT NULL,
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
