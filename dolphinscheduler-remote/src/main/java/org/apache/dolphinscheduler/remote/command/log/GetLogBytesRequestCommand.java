@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
@@ -56,7 +56,7 @@ public class GetLogBytesRequestCommand implements Serializable {
     public Command convert2Command(){
         Command command = new Command();
         command.setType(CommandType.GET_LOG_BYTES_REQUEST);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }

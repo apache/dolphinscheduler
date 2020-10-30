@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -101,7 +101,7 @@ public class TaskKillResponseCommand implements Serializable {
     public Command convert2Command(){
         Command command = new Command();
         command.setType(CommandType.TASK_KILL_RESPONSE);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }

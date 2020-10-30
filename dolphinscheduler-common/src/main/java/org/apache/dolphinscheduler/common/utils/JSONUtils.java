@@ -17,18 +17,21 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +127,19 @@ public class JSONUtils {
             logger.error("parse object exception!", e);
         }
         return null;
+    }
+
+    /**
+     *  deserialize
+     *
+     * @param src byte array
+     * @param clazz class
+     * @param <T> deserialize type
+     * @return deserialize type
+     */
+    public static <T> T parseObject(byte[] src, Class<T> clazz) {
+        String json = new String(src, UTF_8);
+        return parseObject(json, clazz);
     }
 
     /**
@@ -251,6 +267,24 @@ public class JSONUtils {
         } catch (Exception e) {
             throw new RuntimeException("Object json deserialization exception.", e);
         }
+    }
+
+    /**
+     * serialize to json byte
+     *
+     * @param obj object
+     * @param <T> object type
+     * @return byte array
+     */
+    public static <T> byte[] toJsonByteArray(T obj)  {
+        String json = "";
+        try {
+            json = toJsonString(obj);
+        } catch (Exception e) {
+            logger.error("json serialize exception.", e);
+        }
+
+        return json.getBytes(UTF_8);
     }
 
     public static ObjectNode parseObject(String text) {

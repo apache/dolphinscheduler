@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
@@ -57,7 +57,7 @@ public class ViewLogResponseCommand implements Serializable {
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
         command.setType(CommandType.VIEW_WHOLE_LOG_RESPONSE);
-        byte[] body = JsonSerializer.serialize(this);
+        byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }

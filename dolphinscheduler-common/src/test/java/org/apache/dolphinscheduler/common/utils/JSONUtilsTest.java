@@ -146,6 +146,14 @@ public class JSONUtilsTest {
     }
 
     @Test
+    public void testJsonByteArray() {
+        String str = "foo";
+        byte[] serializeByte = JSONUtils.toJsonByteArray(str);
+        String deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertEquals(str, deserialize);
+    }
+
+    @Test
     public void testToList() {
         Assert.assertEquals(new ArrayList(),
                 JSONUtils.toList("A1B2C3", null));
