@@ -687,9 +687,9 @@
                 <artifactId>dolphinscheduler-maven-plugin</artifactId>
                 <extensions>true</extensions>
                 <!--<configuration>-->
-                    <!--<allowedProvidedDependencies>-->
-                        <!--<allowedProvidedDependency>org.apache.dolphinscheduler:dolphinscheduler-common</allowedProvidedDependency>-->
-                    <!--</allowedProvidedDependencies>-->
+                <!--<allowedProvidedDependencies>-->
+                <!--<allowedProvidedDependency>org.apache.dolphinscheduler:dolphinscheduler-common</allowedProvidedDependency>-->
+                <!--</allowedProvidedDependencies>-->
                 <!--</configuration>-->
             </plugin>
 
@@ -950,6 +950,10 @@
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
                         <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
+                        <include>**/plugin/alert/dingtalk/DingTalkSenderTest.java</include>
+                        <include>**/plugin/alert/dingtalk/DingTalkAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/wechat/WeChatSenderTest.java</include>
+                        <include>**/plugin/alert/wechat/WeChatAlertChannelFactoryTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
