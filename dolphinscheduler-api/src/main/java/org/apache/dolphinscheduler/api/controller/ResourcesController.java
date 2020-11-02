@@ -14,7 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
+
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_FILE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZE_RESOURCE_TREE;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_RESOURCE_FILE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.EDIT_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_BY_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_PAGING;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UDF_FUNCTION_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_FILE_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_NOT_EXIST;
+import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_NAME_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -25,12 +50,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang.StringUtils;
+
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +62,21 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
-
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
  * resources controller
@@ -56,37 +88,21 @@ public class ResourcesController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class);
 
-
     @Autowired
     private ResourcesService resourceService;
     @Autowired
     private UdfFuncService udfFuncService;
 
     /**
-     * create directory
      *
-     * @param loginUser login user
-     * @param alias alias
-     * @param description description
-     * @param type type
-     * @return create result code
-     */
-
-    /**
-     * @param loginUser   login user
-     * @param type        type
-     * @param alias       alias
-     * @param description description
-     * @param pid         parent id
-     * @param currentDir  current directory
-     * @return
      */
     @ApiOperation(value = "createDirctory", notes = "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/directory/create")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -103,12 +119,13 @@ public class ResourcesController extends BaseController {
 
     /**
      * create resource
-     *
-     * @param loginUser   login user
-     * @param alias       alias
-     * @param description description
-     * @param type        type
-     * @param file        file
+     * @param loginUser
+     * @param type
+     * @param alias
+     * @param description
+     * @param file
+     * @param pid
+     * @param currentDir
      * @return create result code
      */
     @ApiOperation(value = "createResource", notes = "CREATE_RESOURCE_NOTES")
@@ -116,7 +133,9 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
     @ApiException(CREATE_RESOURCE_ERROR)
@@ -135,10 +154,10 @@ public class ResourcesController extends BaseController {
     /**
      * update resource
      *
-     * @param loginUser   login user
-     * @param alias       alias
-     * @param resourceId  resource id
-     * @param type        resource type
+     * @param loginUser login user
+     * @param alias alias
+     * @param resourceId resource id
+     * @param type resource type
      * @param description description
      * @return update result code
      */
@@ -165,7 +184,7 @@ public class ResourcesController extends BaseController {
      * query resources list
      *
      * @param loginUser login user
-     * @param type      resource type
+     * @param type resource type
      * @return resource list
      */
     @ApiOperation(value = "queryResourceList", notes = "QUERY_RESOURCE_LIST_NOTES")
@@ -187,10 +206,10 @@ public class ResourcesController extends BaseController {
      * query resources list paging
      *
      * @param loginUser login user
-     * @param type      resource type
+     * @param type resource type
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return resource list page
      */
     @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
@@ -227,7 +246,7 @@ public class ResourcesController extends BaseController {
     /**
      * delete resource
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param resourceId resource id
      * @return delete result code
      */
@@ -251,8 +270,8 @@ public class ResourcesController extends BaseController {
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param fullName  resource full name
-     * @param type      resource type
+     * @param fullName resource full name
+     * @param type resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyResourceName", notes = "VERIFY_RESOURCE_NAME_NOTES")
@@ -277,7 +296,7 @@ public class ResourcesController extends BaseController {
      * query resources jar list
      *
      * @param loginUser login user
-     * @param type      resource type
+     * @param type resource type
      * @return resource list
      */
     @ApiOperation(value = "queryResourceJarList", notes = "QUERY_RESOURCE_LIST_NOTES")
@@ -299,14 +318,16 @@ public class ResourcesController extends BaseController {
      * query resource by full name and type
      *
      * @param loginUser login user
-     * @param fullName  resource full name
-     * @param type      resource type
+     * @param fullName resource full name
+     * @param type resource type
+     * @param id resource id
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "queryResource", notes = "QUERY_BY_RESOURCE_NAME")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String")
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int")
     })
     @GetMapping(value = "/queryResource")
     @ResponseStatus(HttpStatus.OK)
@@ -325,10 +346,10 @@ public class ResourcesController extends BaseController {
     /**
      * view resource file online
      *
-     * @param loginUser   login user
-     * @param resourceId  resource id
+     * @param loginUser login user
+     * @param resourceId resource id
      * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param limit limit
      * @return resource content
      */
     @ApiOperation(value = "viewResource", notes = "VIEW_RESOURCE_BY_ID_NOTES")
@@ -352,13 +373,14 @@ public class ResourcesController extends BaseController {
 
     /**
      * create resource file online
-     *
-     * @param loginUser   login user
-     * @param type        resource type
-     * @param fileName    file name
-     * @param fileSuffix  file suffix
-     * @param description description
-     * @param content     content
+     * @param loginUser
+     * @param type
+     * @param fileName
+     * @param fileSuffix
+     * @param description
+     * @param content
+     * @param pid
+     * @param currentDir
      * @return create result code
      */
     @ApiOperation(value = "onlineCreateResource", notes = "ONLINE_CREATE_RESOURCE_NOTES")
@@ -367,7 +389,9 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "fileName", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataType = "String")
+            @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
@@ -392,9 +416,9 @@ public class ResourcesController extends BaseController {
     /**
      * edit resource file online
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param resourceId resource id
-     * @param content    content
+     * @param content content
      * @return update result code
      */
     @ApiOperation(value = "updateResourceContent", notes = "UPDATE_RESOURCE_NOTES")
@@ -420,7 +444,7 @@ public class ResourcesController extends BaseController {
     /**
      * download resource file
      *
-     * @param loginUser  login user
+     * @param loginUser login user
      * @param resourceId resource id
      * @return resource content
      */
@@ -449,14 +473,14 @@ public class ResourcesController extends BaseController {
     /**
      * create udf function
      *
-     * @param loginUser   login user
-     * @param type        udf type
-     * @param funcName    function name
-     * @param argTypes    argument types
-     * @param database    database
+     * @param loginUser login user
+     * @param type udf type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database database
      * @param description description
-     * @param className   class name
-     * @param resourceId  resource id
+     * @param className class name
+     * @param resourceId resource id
      * @return create result code
      */
     @ApiOperation(value = "createUdfFunc", notes = "CREATE_UDF_FUNCTION_NOTES")
@@ -490,12 +514,12 @@ public class ResourcesController extends BaseController {
      * view udf function
      *
      * @param loginUser login user
-     * @param id        resource id
+     * @param id resource id
      * @return udf function detail
      */
     @ApiOperation(value = "viewUIUdfFunction", notes = "VIEW_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
     @GetMapping(value = "/udf-func/update-ui")
@@ -512,26 +536,27 @@ public class ResourcesController extends BaseController {
     /**
      * update udf function
      *
-     * @param loginUser   login user
-     * @param type        resource type
-     * @param funcName    function name
-     * @param argTypes    argument types
-     * @param database    data base
+     * @param loginUser login user
+     * @param type resource type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database data base
      * @param description description
-     * @param resourceId  resource id
-     * @param className   class name
-     * @param udfFuncId   udf function id
+     * @param resourceId resource id
+     * @param className class name
+     * @param udfFuncId udf function id
      * @return update result code
      */
     @ApiOperation(value = "updateUdfFunc", notes = "UPDATE_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "UDF_ID", required = true, dataType = "Int"),
             @ApiImplicitParam(name = "type", value = "UDF_TYPE", required = true, dataType = "UdfType"),
             @ApiImplicitParam(name = "funcName", value = "FUNC_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "suffix", value = "CLASS_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "className", value = "CLASS_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES", dataType = "String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME", dataType = "String"),
             @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
     @PostMapping(value = "/udf-func/update")
@@ -556,8 +581,8 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param pageNo page number
+     * @param pageSize page size
      * @return udf function list page
      */
     @ApiOperation(value = "queryUdfFuncListPaging", notes = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
@@ -589,7 +614,7 @@ public class ResourcesController extends BaseController {
      * query resource list by type
      *
      * @param loginUser login user
-     * @param type      resource type
+     * @param type resource type
      * @return resource list
      */
     @ApiOperation(value = "queryResourceList", notes = "QUERY_RESOURCE_LIST_NOTES")
@@ -610,7 +635,7 @@ public class ResourcesController extends BaseController {
      * verify udf function name can use or not
      *
      * @param loginUser login user
-     * @param name      name
+     * @param name name
      * @return true if the name can user, otherwise return false
      */
     @ApiOperation(value = "verifyUdfFuncName", notes = "VERIFY_UDF_FUNCTION_NAME_NOTES")
@@ -655,7 +680,7 @@ public class ResourcesController extends BaseController {
      * authorized file resource list
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return authorized result
      */
     @ApiOperation(value = "authorizedFile", notes = "AUTHORIZED_FILE_NOTES")
@@ -677,7 +702,7 @@ public class ResourcesController extends BaseController {
      * unauthorized file resource list
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return unauthorized result code
      */
     @ApiOperation(value = "authorizeResourceTree", notes = "AUTHORIZE_RESOURCE_TREE_NOTES")
@@ -699,7 +724,7 @@ public class ResourcesController extends BaseController {
      * unauthorized udf function
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return unauthorized result code
      */
     @ApiOperation(value = "unauthUDFFunc", notes = "UNAUTHORIZED_UDF_FUNC_NOTES")
@@ -722,7 +747,7 @@ public class ResourcesController extends BaseController {
      * authorized udf function
      *
      * @param loginUser login user
-     * @param userId    user id
+     * @param userId user id
      * @return authorized result code
      */
     @ApiOperation(value = "authUDFFunc", notes = "AUTHORIZED_UDF_FUNC_NOTES")
