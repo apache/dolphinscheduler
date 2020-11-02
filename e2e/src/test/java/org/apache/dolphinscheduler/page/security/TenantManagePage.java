@@ -55,7 +55,6 @@ public class TenantManagePage extends PageCommon {
 
         // tenant data
         sendInput(TenantManageLocator.TENANT_INPUT_CODE, tenantManageData.getTenantData("tenantCode"));
-        sendInput(TenantManageLocator.TENANT_INPUT_NAME, tenantManageData.getTenantData("tenantName"));
         sendInput(TenantManageLocator.QUEUE, tenantManageData.getTenantData("queue"));
         sendInput(TenantManageLocator.DESCRIPTION, tenantManageData.getTenantData("description"));
 
