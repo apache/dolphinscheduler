@@ -137,6 +137,9 @@ public class JSONUtils {
      * @return deserialize type
      */
     public static <T> T parseObject(byte[] src, Class<T> clazz) {
+        if (src == null) {
+            return null;
+        }
         String json = new String(src, UTF_8);
         return parseObject(json, clazz);
     }

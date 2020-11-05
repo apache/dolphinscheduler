@@ -152,6 +152,10 @@ public class JSONUtilsTest {
         byte[] serializeByte = JSONUtils.toJsonByteArray(str);
         String deserialize = JSONUtils.parseObject(serializeByte, String.class);
         Assert.assertEquals(str, deserialize);
+        str = null;
+        serializeByte = JSONUtils.toJsonByteArray(str);
+        deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertNull(deserialize);
     }
 
     @Test
