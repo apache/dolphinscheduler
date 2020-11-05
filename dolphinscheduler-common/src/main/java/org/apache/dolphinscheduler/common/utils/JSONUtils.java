@@ -276,6 +276,9 @@ public class JSONUtils {
      * @return byte array
      */
     public static <T> byte[] toJsonByteArray(T obj)  {
+        if (obj == null) {
+            return null;
+        }
         String json = "";
         try {
             json = toJsonString(obj);
