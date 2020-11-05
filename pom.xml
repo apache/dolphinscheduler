@@ -867,6 +867,8 @@
                         <include>**/remote/NettyRemotingClientTest.java</include>
                         <include>**/remote/NettyUtilTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
+                        <include>**/remote/command/alert/AlertSendRequestCommandTest.java</include>
+                        <include>**/remote/command/alert/AlertSendResponseCommandTest.java</include>
                         <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
@@ -917,6 +919,7 @@
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
+                        <include>**/service/alert/AlertClientServiceTest.java</include>
 
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
@@ -961,6 +964,9 @@
                         <include>**/alert/utils/DingTalkUtilsTest.java</include>
                         <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
+                        <include>**/alert/processor/AlertRequestProcessorTest.java</include>
+                        <include>**/alert/runner/AlertSenderTest.java</include>
+                        <include>**/alert/AlertServerTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
