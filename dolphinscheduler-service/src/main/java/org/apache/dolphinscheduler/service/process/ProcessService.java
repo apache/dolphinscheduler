@@ -164,7 +164,7 @@ public class ProcessService {
      * @param command found command
      * @return process instance
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class)
     public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         //cannot construct process instance, return null;
@@ -190,7 +190,7 @@ public class ProcessService {
      * @param command command
      * @param message message
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional(rollbackFor = Exception.class)
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
@@ -888,8 +888,8 @@ public class ProcessService {
      * @param taskInstance taskInstance
      * @return task instance
      */
-    @Transactional(rollbackFor = RuntimeException.class)
-    public TaskInstance submitTask(TaskInstance taskInstance) {
+    @Transactional(rollbackFor = Exception.class)
+    public TaskInstance submitTask(TaskInstance taskInstance){
         ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         logger.info("start submit task : {}, instance id:{}, state: {}",
                 taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
@@ -967,9 +967,8 @@ public class ProcessService {
 
     /**
      * create sub work process command
-     *
      * @param parentProcessInstance parentProcessInstance
-     * @param task                  task
+     * @param task task
      */
     public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
         if (!task.isSubProcess()) {
