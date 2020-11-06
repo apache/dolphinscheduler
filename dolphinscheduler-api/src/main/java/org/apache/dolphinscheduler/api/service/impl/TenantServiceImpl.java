@@ -308,6 +308,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         } else {
             putMsg(result, Status.TENANT_NOT_EXIST);
         }
+        return result;
     }
 
     /**

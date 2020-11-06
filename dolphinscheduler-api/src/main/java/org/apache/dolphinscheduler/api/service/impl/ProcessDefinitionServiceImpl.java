@@ -881,7 +881,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     processMeta.getProcessDefinitionLocations(),
                     processMeta.getProcessDefinitionConnects());
             putMsg(result, Status.SUCCESS);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             logger.error("import process meta json data: {}", e.getMessage(), e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
         }
