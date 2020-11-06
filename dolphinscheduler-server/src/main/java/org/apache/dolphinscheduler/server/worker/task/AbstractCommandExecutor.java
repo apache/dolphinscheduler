@@ -202,6 +202,9 @@ public abstract class AbstractCommandExecutor {
         return result;
     }
 
+    public String getVarPool() {
+        return varPool.toString();
+    }
 
     /**
      * cancel application
