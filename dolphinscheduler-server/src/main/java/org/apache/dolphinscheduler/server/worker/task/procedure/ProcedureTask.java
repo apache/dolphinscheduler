@@ -149,8 +149,7 @@ public class ProcedureTask extends AbstractTask {
             setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             logger.error("procedure task error",e);
             throw e;
-        }
-        finally {
+        } finally {
             close(stmt,connection);
         }
     }
