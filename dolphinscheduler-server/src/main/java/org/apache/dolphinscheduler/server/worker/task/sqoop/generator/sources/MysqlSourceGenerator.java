@@ -73,11 +73,11 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                             && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())){
                         String srcQuery = sourceMysqlParameter.getSrcQuerySql();
                         if(srcQuery.toLowerCase().contains("where")){
-                            srcQuery += " AND "+"$CONDITIONS";
+                            srcQuery += " AND "+"\\$CONDITIONS";
                         }else{
-                            srcQuery += " WHERE $CONDITIONS";
+                            srcQuery += " WHERE \\$CONDITIONS";
                         }
-                        result.append(" --query \'").append(srcQuery).append("\'");
+                        result.append(" --query \"").append(srcQuery).append("\"");
 
                     }
 
