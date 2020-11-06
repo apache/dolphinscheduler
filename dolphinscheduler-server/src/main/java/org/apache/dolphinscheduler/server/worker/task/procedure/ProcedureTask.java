@@ -60,12 +60,6 @@ public class ProcedureTask extends AbstractTask {
     private ProcedureParameters procedureParameters;
 
     /**
-     * base datasource
-     */
-    private BaseDataSource baseDataSource;
-
-
-    /**
      * taskExecutionContext
      */
     private TaskExecutionContext taskExecutionContext;
@@ -109,7 +103,7 @@ public class ProcedureTask extends AbstractTask {
             DataSourceFactory.loadClass(DbType.valueOf(procedureParameters.getType()));
 
             // get datasource
-            baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
+            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(procedureParameters.getType()),
                     taskExecutionContext.getProcedureTaskExecutionContext().getConnectionParams());
 
             // get jdbc connection
@@ -217,7 +211,7 @@ public class ProcedureTask extends AbstractTask {
                                                       Map<String, Property> paramsMap,
                                                       Collection<Property> userDefParamsList) throws Exception {
         Map<Integer,Property> outParameterMap = new HashMap<>();
-        if (userDefParamsList != null && userDefParamsList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(userDefParamsList)) {
             int index = 1;
             for (Property property : userDefParamsList) {
                 logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
@@ -246,8 +240,8 @@ public class ProcedureTask extends AbstractTask {
      */
     private void setTimeout(CallableStatement stmt) throws SQLException {
         Boolean failed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED;
-        Boolean warnfailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
-        if (failed || warnfailed) {
+        Boolean warnFailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+        if (failed || warnFailed) {
             stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
         }
     }
@@ -258,8 +252,7 @@ public class ProcedureTask extends AbstractTask {
      * @param stmt
      * @param connection
      */
-    private void close(PreparedStatement stmt,
-                       Connection connection) {
+    private void close(PreparedStatement stmt, Connection connection) {
         if (stmt != null) {
             try {
                 stmt.close();
