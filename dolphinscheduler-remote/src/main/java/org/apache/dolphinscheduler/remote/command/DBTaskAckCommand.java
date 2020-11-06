@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
@@ -56,7 +56,7 @@ public class DBTaskAckCommand implements Serializable {
     public Command convert2Command(){
         Command command = new Command();
         command.setType(CommandType.DB_TASK_ACK);
-        byte[] body = FastJsonSerializer.serialize(this);
+        byte[] body = JsonSerializer.serialize(this);
         command.setBody(body);
         return command;
     }
