@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 public enum QueryType {
@@ -21,9 +22,9 @@ public enum QueryType {
     FORM,
     SQL;
 
-    public static QueryType getEnum(int value){
-        for (QueryType e:QueryType.values()) {
-            if(e.ordinal() == value) {
+    public static QueryType getEnum(int value) {
+        for (QueryType e : QueryType.values()) {
+            if (e.ordinal() == value) {
                 return e;
             }
         }
