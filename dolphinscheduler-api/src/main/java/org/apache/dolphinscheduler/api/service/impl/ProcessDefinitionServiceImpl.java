@@ -243,6 +243,9 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         for (TaskNode taskNode : tasks) {
             String taskParameter = taskNode.getParams();
             AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
+            if (params == null) {
+                continue;
+            }
             if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
                 Set<Integer> tempSet = params.getResourceFilesList().
                         stream()
