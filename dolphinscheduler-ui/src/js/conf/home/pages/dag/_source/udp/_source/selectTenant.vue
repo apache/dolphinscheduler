@@ -24,7 +24,7 @@
             v-for="item in itemList"
             :key="item.id"
             :value="item.id"
-            :label="item.tenantName">
+            :label="item.tenantCode">
     </x-option>
   </x-select>
 </template>

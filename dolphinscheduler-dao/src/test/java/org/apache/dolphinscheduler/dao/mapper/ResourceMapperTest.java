@@ -308,7 +308,6 @@ public class ResourceMapperTest {
 
 
         Tenant tenant = new Tenant();
-        tenant.setTenantName("ut tenant ");
         tenant.setTenantCode("ut tenant code for resource");
         int tenantInsertStatus = tenantMapper.insert(tenant);
 

@@ -78,7 +78,6 @@ public class TaskPriorityQueueConsumerTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("journey");
-        tenant.setTenantName("journey");
         tenant.setDescription("journey");
         tenant.setQueueId(1);
         tenant.setCreateTime(new Date());

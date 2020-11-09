@@ -35,18 +35,6 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Tenant Name')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="tenantName"
-                    maxlength="60"
-                    :placeholder="$t('Please enter tenant Name')"
-                    autocomplete="off">
-            </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueId">
@@ -88,8 +76,7 @@
         store,
         queueList: [],
         queueId: '',
-        tenantCode: null,
-        tenantName: '',
+        tenantCode: '',
         description: '',
       }
     },
@@ -144,24 +131,12 @@
           return false
         }
 
-        if (!this.tenantName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter tenant Name')}`)
-          return false
-        }
-        // Verify tenant name cannot contain special characters
-        let isSpecial = /[~#^$@%&!*()<>《》:;'"{}【】	]/gi
-        if (isSpecial.test(this.tenantName)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant name without special characters')}`)
-          return false
-        }
-
         return true
       },
       _submit () {
         // 提交
         let param = {
           tenantCode: this.tenantCode,
-          tenantName: this.tenantName,
           queueId: this.queueId,
           description: this.description
         }
@@ -191,7 +166,6 @@
             this.queueId = this.item.queueId
           })
           this.tenantCode = this.item.tenantCode
-          this.tenantName = this.item.tenantName
           this.description = this.item.description
         }
       })
