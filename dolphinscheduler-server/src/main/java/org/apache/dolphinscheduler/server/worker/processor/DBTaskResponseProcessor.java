@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.DBTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class DBTaskResponseProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.DB_TASK_RESPONSE == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
-        DBTaskResponseCommand taskResponseCommand = JsonSerializer.deserialize(
+        DBTaskResponseCommand taskResponseCommand = JSONUtils.parseObject(
                 command.getBody(), DBTaskResponseCommand.class);
 
         if (taskResponseCommand == null){
