@@ -166,7 +166,6 @@ Dag.prototype.backfill = function (arg) {
       })
     })
   } else {
-    const self = this
     let plumbIns = jsPlumb.getInstance()
     plumbIns.reset()
     plumbIns.ready(() => {
