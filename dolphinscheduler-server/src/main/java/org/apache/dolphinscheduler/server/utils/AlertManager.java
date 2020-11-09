@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -197,6 +198,9 @@ public class AlertManager {
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances) {
 
+        if(Flag.YES == processInstance.getIsSubProcess()){
+            return;
+        }
         boolean sendWarnning = false;
         WarningType warningType = processInstance.getWarningType();
         switch (warningType) {
