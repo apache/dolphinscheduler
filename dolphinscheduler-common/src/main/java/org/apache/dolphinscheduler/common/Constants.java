@@ -970,4 +970,14 @@ public final class Constants {
     public static final int ABNORMAL_NODE_STATUS = 1;
 
 
+    /**
+     * exec shell scripts
+     */
+    public static final String SH = "sh";
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
+
 }
