@@ -57,7 +57,7 @@ public class MasterTaskExecThreadTest {
         this.zookeeperRegistryCenter = PowerMockito.mock(ZookeeperRegistryCenter.class);
         PowerMockito.when(SpringApplicationContext.getBean(ZookeeperRegistryCenter.class))
                 .thenReturn(this.zookeeperRegistryCenter);
-        this.masterTaskExecThread = new MasterTaskExecThread(null);
+        this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
     }
 
     @Test
