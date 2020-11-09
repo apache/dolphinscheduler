@@ -91,7 +91,7 @@ public class TaskAckProcessorTest {
         PowerMockito.when(channel.remoteAddress()).thenReturn(socketAddress);
         PowerMockito.mockStatic(TaskResponseEvent.class);
 
-        PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt()))
+        PowerMockito.when(TaskResponseEvent.newAck(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), channel))
                 .thenReturn(taskResponseEvent);
         TaskInstance taskInstance = PowerMockito.mock(TaskInstance.class);
         PowerMockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);

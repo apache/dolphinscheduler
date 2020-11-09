@@ -46,7 +46,7 @@ public class TaskResponseServiceTest {
     @Test
     public void testAdd(){
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1);
+                "", "", "", 1,null);
         taskResponseService.addResponse(taskResponseEvent);
         Assert.assertTrue(taskResponseService.getEventQueue().size() == 1);
         try {
@@ -60,7 +60,7 @@ public class TaskResponseServiceTest {
     @Test
     public void testStop(){
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION, new Date(),
-                "", "", "", 1);
+                "", "", "", 1,null);
         taskResponseService.addResponse(taskResponseEvent);
         taskResponseService.stop();
         Assert.assertTrue(taskResponseService.getEventQueue().size() == 0);
