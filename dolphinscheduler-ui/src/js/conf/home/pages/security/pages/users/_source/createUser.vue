@@ -232,7 +232,7 @@
             this.tenantList = _.map(arr, v => {
               return {
                 id: v.id,
-                code: v.tenantName
+                code: v.tenantCode
               }
             })
             this.$nextTick(() => {

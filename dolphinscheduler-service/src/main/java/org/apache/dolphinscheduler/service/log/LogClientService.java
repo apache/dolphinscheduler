@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.log;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
@@ -28,11 +30,9 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * log client
@@ -90,7 +90,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog = JsonSerializer.deserialize(
+                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
                         response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
@@ -119,7 +119,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                ViewLogResponseCommand viewLog = JsonSerializer.deserialize(
+                ViewLogResponseCommand viewLog = JSONUtils.parseObject(
                         response.getBody(), ViewLogResponseCommand.class);
                 return viewLog.getMsg();
             }
@@ -148,7 +148,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetLogBytesResponseCommand getLog = JsonSerializer.deserialize(
+                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
                         response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData();
             }
@@ -159,7 +159,6 @@ public class LogClientService {
         }
         return result;
     }
-
 
     /**
      * remove task log
@@ -178,7 +177,7 @@ public class LogClientService {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse = JsonSerializer.deserialize(
+                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
                         response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }

@@ -710,6 +710,7 @@
                         <!--<include>**/alert/utils/MailUtilsTest.java</include>-->
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
@@ -830,6 +831,8 @@
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/master/SubProcessTaskTest.java</include>
+                        <include>**/server/master/processor/TaskAckProcessorTest.java</include>
+                        <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
