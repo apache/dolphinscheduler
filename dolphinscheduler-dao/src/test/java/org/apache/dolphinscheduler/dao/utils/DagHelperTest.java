@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -151,6 +152,7 @@ public class DagHelperTest {
 
     /**
      * test forbidden post node
+     *
      * @throws JsonProcessingException
      */
     @Test
@@ -188,6 +190,7 @@ public class DagHelperTest {
 
     /**
      * test condition post node
+     *
      * @throws JsonProcessingException
      */
     @Test
@@ -220,7 +223,7 @@ public class DagHelperTest {
 
         //2.complete 1/2/3/4/8 expect:5 skip:6
         completeTaskList.put("8", new TaskInstance());
-        postNodes = DagHelper.parsePostNodes(null ,skipNodeList, dag, completeTaskList);
+        postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assert.assertTrue(postNodes.contains("5"));
         Assert.assertEquals(1, skipNodeList.size());
         Assert.assertTrue(skipNodeList.containsKey("6"));
