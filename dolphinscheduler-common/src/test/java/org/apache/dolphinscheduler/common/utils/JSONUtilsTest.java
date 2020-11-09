@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.enums.Direct;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.Property;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +28,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.common.enums.DataType;
-import org.apache.dolphinscheduler.common.enums.Direct;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.process.Property;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JSONUtilsTest {
 
@@ -108,9 +110,8 @@ public class JSONUtilsTest {
         Assert.assertEquals(Direct.IN, direct);
     }
 
-
     @Test
-    public void String2MapTest() {
+    public void string2MapTest() {
         String str = list2String();
 
         List<LinkedHashMap> maps = JSONUtils.toList(str,
@@ -143,6 +144,18 @@ public class JSONUtilsTest {
     public void testParseObject() {
         Assert.assertNull(JSONUtils.parseObject(""));
         Assert.assertNull(JSONUtils.parseObject("foo", String.class));
+    }
+
+    @Test
+    public void testJsonByteArray() {
+        String str = "foo";
+        byte[] serializeByte = JSONUtils.toJsonByteArray(str);
+        String deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertEquals(str, deserialize);
+        str = null;
+        serializeByte = JSONUtils.toJsonByteArray(str);
+        deserialize = JSONUtils.parseObject(serializeByte, String.class);
+        Assert.assertNull(deserialize);
     }
 
     @Test
