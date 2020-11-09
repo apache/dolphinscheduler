@@ -236,6 +236,10 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private String getResourceIds(ProcessData processData) {
         List<TaskNode> tasks = processData.getTasks();
         Set<Integer> resourceIds = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        if (CollectionUtils.isEmpty(tasks)) {
+            return sb.toString();
+        }
         for (TaskNode taskNode : tasks) {
             String taskParameter = taskNode.getParams();
             AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
@@ -249,7 +253,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
             }
         }
 
-        StringBuilder sb = new StringBuilder();
         for (int i : resourceIds) {
             if (sb.length() > 0) {
                 sb.append(",");
