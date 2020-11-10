@@ -206,11 +206,16 @@ public class DagHelperTest {
         completeTaskList.put("4", new TaskInstance());
         TaskNode node3 = dag.getNode("3");
         node3.setType("CONDITIONS");
-        node3.setConditionResult("{\n" +
-                "                \"successNode\": [5\n" +
-                "                ],\n" +
-                "                \"failedNode\": [6\n" +
-                "                ]\n" +
+        node3.setConditionResult("{\n"
+                +
+                "                \"successNode\": [5\n"
+                +
+                "                ],\n"
+                +
+                "                \"failedNode\": [6\n"
+                +
+                "                ]\n"
+                +
                 "            }");
         completeTaskList.remove("3");
         TaskInstance taskInstance = new TaskInstance();
