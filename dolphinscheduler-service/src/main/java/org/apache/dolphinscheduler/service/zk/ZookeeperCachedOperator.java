@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
@@ -83,10 +85,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     @Override
     public void close() {
         treeCache.close();
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException ignore) {
-        }
+        ThreadUtils.sleep(500);
         super.close();
     }
 }
