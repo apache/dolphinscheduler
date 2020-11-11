@@ -65,7 +65,7 @@ public class ProcessUtils {
      */
     public static String buildCommandStr(List<String> commandList) {
         String cmdstr;
-        String[] cmd = (String[]) commandList.toArray();
+        String[] cmd = commandList.toArray(new String[0]);
         SecurityManager security = System.getSecurityManager();
         boolean allowAmbiguousCommands = false;
         if (security == null) {
@@ -158,7 +158,7 @@ public class ProcessUtils {
         while (regexMatcher.find()) {
             matchList.add(regexMatcher.group());
         }
-        return (String[]) matchList.toArray();
+        return matchList.toArray(new String[0]);
     }
 
     /**
@@ -365,19 +365,24 @@ public class ProcessUtils {
      */
     public static String getPidsStr(int processId) throws Exception {
         StringBuilder sb = new StringBuilder();
-        Matcher mat;
+        Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
             String pids = OSUtils.exeCmd("pstree -sp " + processId);
-            mat = MACPATTERN.matcher(pids);
+            if (null != pids) {
+                mat = MACPATTERN.matcher(pids);
+            }
         } else {
             String pids = OSUtils.exeCmd("pstree -p " + processId);
             mat = WINDOWSATTERN.matcher(pids);
         }
 
-        while (mat.find()) {
-            sb.append(mat.group(1)).append(" ");
+        if (null != mat) {
+            while (mat.find()) {
+                sb.append(mat.group(1)).append(" ");
+            }
         }
+
         return sb.toString().trim();
     }
 
