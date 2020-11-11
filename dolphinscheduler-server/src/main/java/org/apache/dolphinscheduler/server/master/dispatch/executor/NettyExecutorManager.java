@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
 import org.apache.commons.collections.CollectionUtils;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -159,9 +160,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
             } catch (Exception ex) {
                 logger.error(String.format("send command : %s to %s error", command, host), ex);
                 retryCount--;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignore) {}
+                ThreadUtils.sleep(100);
             }
         } while (retryCount >= 0 && !success);
 
