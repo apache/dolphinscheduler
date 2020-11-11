@@ -14,34 +14,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-import java.io.IOException;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({System.class, OSUtils.class})
 public class ProcessUtilsTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtilsTest.class);
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void getPidsStr() throws Exception {
-        String pidList = ProcessUtils.getPidsStr(1);
+        int processId = 1;
+        String pidList = ProcessUtils.getPidsStr(processId);
         Assert.assertNotEquals("The child process of process 1 should not be empty", pidList, "");
-        logger.info("Sub process list : {}", pidList);
+
+        PowerMockito.mockStatic(OSUtils.class);
+        when(OSUtils.isMacOS()).thenReturn(true);
+        when(OSUtils.exeCmd("pstree -sp " + processId)).thenReturn(null);
+        String pidListMac = ProcessUtils.getPidsStr(processId);
+        Assert.assertEquals(pidListMac, "");
     }
 
     @Test
     public void testBuildCommandStr() {
         List<String> commands = new ArrayList<>();
         commands.add("sudo");
-        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
+        commands.add("-u");
+        commands.add("tenantCode");
+        //allowAmbiguousCommands false
+        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo -u tenantCode");
 
+        //quota
+        commands.clear();
+        commands.add("\"sudo\"");
+        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "\"sudo\"");
+
+        //allowAmbiguousCommands true
+        commands.clear();
+        commands.add("sudo");
+        System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "false");
+        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "\"sudo\"");
     }
 
 }
