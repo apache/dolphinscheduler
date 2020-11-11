@@ -17,24 +17,17 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
-import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
-
-import java.util.Comparator;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.springframework.stereotype.Service;
 
-
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implementation
  */
 @Service
-public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
+public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
     /**
      * queue size
      */
@@ -43,7 +36,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
     /**
      * queue
      */
-    private PriorityBlockingQueue<String> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
+    private PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE);
 
     /**
      * put task takePriorityInfo
@@ -52,7 +45,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
      * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(String taskPriorityInfo) throws TaskPriorityQueueException {
+    public void put(TaskPriority taskPriorityInfo) throws TaskPriorityQueueException {
         queue.put(taskPriorityInfo);
     }
 
@@ -63,7 +56,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
      * @throws TaskPriorityQueueException
      */
     @Override
-    public String take() throws TaskPriorityQueueException, InterruptedException {
+    public TaskPriority take() throws TaskPriorityQueueException, InterruptedException {
         return queue.take();
     }
 
@@ -76,37 +69,5 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
     @Override
     public int size() throws TaskPriorityQueueException {
         return queue.size();
-    }
-
-    /**
-     * TaskInfoComparator
-     */
-    private class TaskInfoComparator implements Comparator<String> {
-
-        /**
-         * compare o1 o2
-         *
-         * @param o1 o1
-         * @param o2 o2
-         * @return compare result
-         */
-        @Override
-        public int compare(String o1, String o2) {
-            String s1 = o1;
-            String s2 = o2;
-            String[] s1Array = s1.split(UNDERLINE);
-            if (s1Array.length > TASK_INFO_LENGTH) {
-                // warning: if this length > 5, need to be changed
-                s1 = s1.substring(0, s1.lastIndexOf(UNDERLINE));
-            }
-
-            String[] s2Array = s2.split(UNDERLINE);
-            if (s2Array.length > TASK_INFO_LENGTH) {
-                // warning: if this length > 5, need to be changed
-                s2 = s2.substring(0, s2.lastIndexOf(UNDERLINE));
-            }
-
-            return s1.compareTo(s2);
-        }
     }
 }
