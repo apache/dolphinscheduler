@@ -94,11 +94,11 @@ v-ps<template>
             <x-poptip
                     :ref="'poptip-' + $index"
                     placement="bottom-end"
-                    width="190">
+                    width="90">
               <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
                 <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" :loading="spinnerLoading" @click="_delete(item,$index)">{{spinnerLoading ? 'Loading' : $t('Confirm')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -125,8 +125,7 @@ v-ps<template>
     name: 'udf-manage-list',
     data () {
       return {
-        list: [],
-        spinnerLoading: false
+        list: []
       }
     },
     props: {
@@ -140,18 +139,15 @@ v-ps<template>
         this.$refs[`poptip-${i}`][0].doClose()
       },
       _delete (item, i) {
-        this.spinnerLoading = true
         this.deleteUdf({
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
           this.$emit('on-update')
           this.$message.success(res.msg)
-          this.spinnerLoading = false
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
           this.$message.error(e.msg || '')
-          this.spinnerLoading = false
         })
       },
       _edit (item) {
