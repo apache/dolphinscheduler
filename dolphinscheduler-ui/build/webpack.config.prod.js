@@ -51,7 +51,12 @@ const config = merge.smart(baseConfig, {
     minimizer: [
       new TerserPlugin({
         terserOptions: {
-          compress: {}
+          compress: {
+            warnings: false,
+            drop_console: true,
+            drop_debugger: true,
+            pure_funcs: ['console.log']
+          }
         },
         cache: true,
         parallel: true,

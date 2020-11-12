@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import org.apache.commons.collections.CollectionUtils;
-
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import com.github.rholder.retry.RetryException;
+import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -32,15 +31,14 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  *  netty executor manager
@@ -88,17 +86,11 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      */
     @Override
     public Boolean execute(ExecutionContext context) throws ExecuteException {
-
-        /**
-         *  all nodes
-         */
-        Set<String> allNodes = getAllNodes(context);
-
-        /**
-         * fail nodes
-         */
-        Set<String> failNodeSet = new HashSet<>();
-
+        LinkedList<String> allNodes = new LinkedList<>();
+        Set<String> nodes = getAllNodes(context);
+        if (nodes != null) {
+            allNodes.addAll(nodes);
+        }
         /**
          *  build command accord executeContext
          */
@@ -107,31 +99,27 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         /**
          * execute task host
          */
-        Host host = context.getHost();
+        String startHostAddress = context.getHost().getAddress();
+        // remove start host address and add it to head
+        allNodes.remove(startHostAddress);
+        allNodes.addFirst(startHostAddress);
+ 
         boolean success = false;
-        while (!success) {
+        for (String address : allNodes) {
             try {
-                doExecute(host,command);
+                Host host = Host.of(address);
+                doExecute(host, command);
                 success = true;
                 context.setHost(host);
+                break;
             } catch (ExecuteException ex) {
-                logger.error(String.format("execute command : %s error", command), ex);
-                try {
-                    failNodeSet.add(host.getAddress());
-                    Set<String> tmpAllIps = new HashSet<>(allNodes);
-                    Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
-                    if (remained != null && remained.size() > 0) {
-                        host = Host.of(remained.iterator().next());
-                        logger.error("retry execute command : {} host : {}", command, host);
-                    } else {
-                        throw new ExecuteException("fail after try all nodes");
-                    }
-                } catch (Throwable t) {
-                    throw new ExecuteException("fail after try all nodes");
-                }
+                logger.error("retry execute command : {} host : {}", command, address);
             }
         }
-
+        if (!success) {
+            throw new ExecuteException("fail after try all nodes");
+        }
+        
         return success;
     }
 
@@ -148,24 +136,13 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @throws ExecuteException if error throws ExecuteException
      */
     private void doExecute(final Host host, final Command command) throws ExecuteException {
-        /**
-         * retry count，default retry 3
-         */
-        int retryCount = 3;
-        boolean success = false;
-        do {
-            try {
+        try {
+            RetryerUtils.retryCall(() -> {
                 nettyRemotingClient.send(host, command);
-                success = true;
-            } catch (Exception ex) {
-                logger.error(String.format("send command : %s to %s error", command, host), ex);
-                retryCount--;
-                ThreadUtils.sleep(100);
-            }
-        } while (retryCount >= 0 && !success);
-
-        if (!success) {
-            throw new ExecuteException(String.format("send command : %s to %s error", command, host));
+                return Boolean.TRUE;
+            });
+        } catch (ExecutionException | RetryException e) {
+            throw new ExecuteException(String.format("send command : %s to %s error", command, host), e);
         }
     }
 
