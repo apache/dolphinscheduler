@@ -1,0 +1,206 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<configuration>
+	<property>
+		<name>spring.datasource.initialSize</name>
+		<value>5</value>
+		<description>
+			Init connection number
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.minIdle</name>
+		<value>5</value>
+		<description>
+			Min connection number
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.maxActive</name>
+		<value>50</value>
+		<description>
+			Max connection number
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.maxWait</name>
+		<value>60000</value>
+		<description>
+			Max wait time for get a connection in milliseconds.
+			If configuring maxWait, fair locks are enabled by default and concurrency efficiency decreases.
+			If necessary, unfair locks can be used by configuring the useUnfairLock attribute to true.
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.timeBetweenEvictionRunsMillis</name>
+		<value>60000</value>
+		<description>
+			Milliseconds for check to close free connections
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.timeBetweenConnectErrorMillis</name>
+		<value>60000</value>
+		<description>
+			The Destroy thread detects the connection interval and closes the physical connection in milliseconds
+			if the connection idle time is greater than or equal to minEvictableIdleTimeMillis.
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.minEvictableIdleTimeMillis</name>
+		<value>300000</value>
+		<description>
+			The longest time a connection remains idle without being evicted, in milliseconds
+		</description>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.validationQuery</name>
+		<value>SELECT 1</value>
+		<description>
+			The SQL used to check whether the connection is valid requires a query statement.
+			If validation Query is null, testOnBorrow, testOnReturn, and testWhileIdle will not work.
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.validationQueryTimeout</name>
+		<value>3</value>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<description>
+			Check whether the connection is valid for timeout, in seconds
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.testWhileIdle</name>
+		<value>true</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+			When applying for a connection,
+			if it is detected that the connection is idle longer than time Between Eviction Runs Millis,
+			validation Query is performed to check whether the connection is valid
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.testOnBorrow</name>
+		<value>true</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+			Execute validation to check if the connection is valid when applying for a connection
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.testOnReturn</name>
+		<value>false</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+			Execute validation to check if the connection is valid when the connection is returned
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.defaultAutoCommit</name>
+		<value>true</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.keepAlive</name>
+		<value>false</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+
+	<property>
+		<name>spring.datasource.poolPreparedStatements</name>
+		<value>true</value>
+		<value-attributes>
+			<type>boolean</type>
+		</value-attributes>
+		<description>
+			Open PSCache, specify count PSCache for every connection
+		</description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.maxPoolPreparedStatementPerConnectionSize</name>
+		<value>20</value>
+		<value-attributes>
+			<type>int</type>
+		</value-attributes>
+		<description></description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.spring.datasource.filters</name>
+		<value>stat,wall,log4j</value>
+		<description></description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+	<property>
+		<name>spring.datasource.connectionProperties</name>
+		<value>druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000</value>
+		<description></description>
+		<on-ambari-upgrade add="true"/>
+	</property>
+</configuration>

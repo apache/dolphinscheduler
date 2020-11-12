@@ -68,6 +68,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -348,11 +349,12 @@ public class MasterExecThread implements Runnable {
      * @throws Exception exception
      */
     private void prepareProcess() throws Exception {
-        // init task queue
-        initTaskQueue();
 
         // gen process dag
         buildFlowDag();
+
+        // init task queue
+        initTaskQueue();
         logger.info("prepare process :{} end", processInstance.getId());
     }
 
@@ -406,6 +408,9 @@ public class MasterExecThread implements Runnable {
         for(TaskInstance task : taskInstanceList){
             if(task.isTaskComplete()){
                 completeTaskList.put(task.getName(), task);
+            }
+            if(task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getName(), dag)){
+                continue;
             }
             if(task.getState().typeIsFailure() && !task.taskCanRetry()){
                 errorTaskList.put(task.getName(), task);
@@ -498,6 +503,9 @@ public class MasterExecThread implements Runnable {
             // task instance whether alert
             taskInstance.setAlertFlag(Flag.NO);
 
+            // task instance start time
+            taskInstance.setStartTime(null);
+
             // task instance flag
             taskInstance.setFlag(Flag.YES);
 
@@ -532,132 +540,13 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
-
-
-    /**
-     * if all of the task dependence are skip, skip it too.
-     * @param taskNode
-     * @return
-     */
-    private boolean isTaskNodeNeedSkip(TaskNode taskNode){
-        if(CollectionUtils.isEmpty(taskNode.getDepList())){
-            return false;
-        }
-        for(String depNode : taskNode.getDepList()){
-            if(!skipTaskNodeList.containsKey(depNode)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * set task node skip if dependence all skip
-     * @param taskNodesSkipList
-     */
-    private void setTaskNodeSkip(List<String> taskNodesSkipList){
-        for(String skipNode : taskNodesSkipList){
-            skipTaskNodeList.putIfAbsent(skipNode, dag.getNode(skipNode));
-            Collection<String> postNodeList = DagHelper.getStartVertex(skipNode, dag, completeTaskList);
-            List<String> postSkipList = new ArrayList<>();
-            for(String post : postNodeList){
-                TaskNode postNode = dag.getNode(post);
-                if(isTaskNodeNeedSkip(postNode)){
-                    postSkipList.add(post);
-                }
-            }
-            setTaskNodeSkip(postSkipList);
-        }
-    }
-
-
-    /**
-     *  parse condition task find the branch process
-     *  set skip flag for another one.
-     * @param nodeName
-     * @return
-     */
-    private List<String> parseConditionTask(String nodeName){
-        List<String> conditionTaskList = new ArrayList<>();
-        TaskNode taskNode = dag.getNode(nodeName);
-        if(!taskNode.isConditionsTask()){
-            return conditionTaskList;
-        }
-        ConditionsParameters conditionsParameters =
-                JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
-
-        TaskInstance taskInstance = completeTaskList.get(nodeName);
-        if(taskInstance == null){
-            logger.error("task instance {} cannot find, please check it!", nodeName);
-            return conditionTaskList;
-        }
-
-        if(taskInstance.getState().typeIsSuccess()){
-            conditionTaskList = conditionsParameters.getSuccessNode();
-            setTaskNodeSkip(conditionsParameters.getFailedNode());
-        }else if(taskInstance.getState().typeIsFailure()){
-            conditionTaskList = conditionsParameters.getFailedNode();
-            setTaskNodeSkip(conditionsParameters.getSuccessNode());
-        }else{
-            conditionTaskList.add(nodeName);
-        }
-        return conditionTaskList;
-    }
-
-    /**
-     * parse post node list of previous node
-     * if condition node: return process according to the settings
-     * if post node completed, return post nodes of the completed node
-     * @param previousNodeName
-     * @return
-     */
-    private List<String> parsePostNodeList(String previousNodeName){
-        List<String> postNodeList = new ArrayList<>();
-
-        TaskNode taskNode = dag.getNode(previousNodeName);
-        if(taskNode != null  && taskNode.isConditionsTask()){
-            return parseConditionTask(previousNodeName);
-        }
-        Collection<String> postNodeCollection = DagHelper.getStartVertex(previousNodeName, dag, completeTaskList);
-        List<String> postSkipList = new ArrayList<>();
-        // delete success node, parse the past nodes
-        // if conditions node,
-        //  1. parse the branch process according the conditions setting
-        //  2. set skip flag on anther branch process
-        for(String postNode : postNodeCollection){
-            if(completeTaskList.containsKey(postNode)){
-                TaskInstance postTaskInstance = completeTaskList.get(postNode);
-                if(dag.getNode(postNode).isConditionsTask()){
-                    List<String> conditionTaskNodeList = parseConditionTask(postNode);
-                    for(String conditions : conditionTaskNodeList){
-                        postNodeList.addAll(parsePostNodeList(conditions));
-                    }
-                }else if(postTaskInstance.getState().typeIsSuccess()){
-                    postNodeList.addAll(parsePostNodeList(postNode));
-                }else{
-                    postNodeList.add(postNode);
-                }
-
-            }else if(isTaskNodeNeedSkip(dag.getNode(postNode))){
-                postSkipList.add(postNode);
-                setTaskNodeSkip(postSkipList);
-                postSkipList.clear();
-            }else{
-                postNodeList.add(postNode);
-            }
-        }
-        return postNodeList;
-    }
-
     /**
      * submit post node
      * @param parentNodeName parent node name
      */
     private Map<String,Object> propToValue = new ConcurrentHashMap<String, Object>();
     private void submitPostNode(String parentNodeName){
-
-        List<String> submitTaskNodeList = parsePostNodeList(parentNodeName);
-
+        Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeName, skipTaskNodeList, dag, completeTaskList);
         List<TaskInstance> taskInstances = new ArrayList<>();
         for(String taskNode : submitTaskNodeList){
             try {
@@ -702,7 +591,6 @@ public class MasterExecThread implements Runnable {
         if(startNodes.contains(taskName)){
             return DependResult.SUCCESS;
         }
-
         TaskNode taskNode = dag.getNode(taskName);
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
@@ -716,23 +604,42 @@ public class MasterExecThread implements Runnable {
                 return DependResult.WAITING;
             }
             ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
-            // conditions task would not return failed.
-            if(depTaskState.typeIsFailure()
-                    && !DagHelper.haveConditionsAfterNode(depsNode, dag )
-                    && !dag.getNode(depsNode).isConditionsTask()){
-                return DependResult.FAILED;
-            }
-
             if(depTaskState.typeIsPause() || depTaskState.typeIsCancel()){
                 return DependResult.WAITING;
             }
+            // ignore task state if current task is condition
+            if(taskNode.isConditionsTask()){
+                continue;
+            }
+            if(!dependTaskSuccess(depsNode, taskName)){
+                return DependResult.FAILED;
+            }
         }
-
         logger.info("taskName: {} completeDependTaskList: {}", taskName, Arrays.toString(completeTaskList.keySet().toArray()));
-
         return DependResult.SUCCESS;
     }
 
+    /**
+     * depend node is completed, but here need check the condition task branch is the next node
+     * @param dependNodeName
+     * @param nextNodeName
+     * @return
+     */
+    private boolean dependTaskSuccess(String dependNodeName, String nextNodeName){
+        if(dag.getNode(dependNodeName).isConditionsTask()){
+            //condition task need check the branch to run
+            List<String> nextTaskList = DagHelper.parseConditionTask(dependNodeName, skipTaskNodeList, dag, completeTaskList);
+            if(!nextTaskList.contains(nextNodeName)){
+                return false;
+            }
+        }else {
+            ExecutionStatus depTaskState = completeTaskList.get(dependNodeName).getState();
+            if(depTaskState.typeIsFailure()){
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * query task instance by complete state
@@ -890,6 +797,24 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
+     * whether standby task list have retry tasks
+     * @return
+     */
+    private boolean retryTaskExists() {
+
+        boolean result = false;
+
+        for(String taskName : readyToSubmitTaskList.keySet()){
+            TaskInstance task = readyToSubmitTaskList.get(taskName);
+            if(task.getState().typeIsFailure()){
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
      * whether complement end
      * @return Boolean whether is complement end
      */
@@ -976,7 +901,7 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.isProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop() && Stopper.isRunning()){
 
             // send warning email if process time out.
             if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){
