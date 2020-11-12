@@ -111,4 +111,17 @@
             </foreach>
         </if>
     </select>
+
+    <update id="batchUpdateUdfFunc" parameterType="java.util.List">
+        <foreach collection="udfFuncList" item="udf" index="index" open="" close="" separator =";">
+            update t_ds_udfs
+            <set>
+                resource_name=#{udf.resourceName},
+                update_time=#{udf.updateTime}
+            </set>
+            <where>
+                id=#{udf.id}
+            </where>
+        </foreach>
+    </update>
 </mapper>
