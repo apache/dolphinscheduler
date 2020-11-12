@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.server.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +35,14 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({System.class, OSUtils.class})
+@PrepareForTest({System.class, OSUtils.class, HadoopUtils.class})
 public class ProcessUtilsTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     @Before
     public void setUp() {
@@ -76,4 +83,54 @@ public class ProcessUtilsTest {
         Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "\"sudo\"");
     }
 
+    @Test
+    public void testKill() {
+        //get taskExecutionContext
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+
+        //process id eq 0
+        taskExecutionContext.setProcessId(0);
+        ProcessUtils.kill(taskExecutionContext);
+
+        //process id not eq 0
+        taskExecutionContext.setProcessId(1);
+        PowerMockito.mockStatic(OSUtils.class);
+        try {
+            when(OSUtils.exeCmd("pstree -sp " + 1)).thenReturn("1111");
+            when(OSUtils.exeCmd("pstree -p " + 1)).thenReturn("1111");
+            when(OSUtils.exeCmd("sudo kill -9")).thenReturn("1111");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        taskExecutionContext.setHost("127.0.0.1:8888");
+        taskExecutionContext.setLogPath("/log/1.log");
+        ProcessUtils.kill(taskExecutionContext);
+    }
+
+    @Test
+    public void testCancelApplication() {
+        List<String> appIds = new ArrayList<>();
+        appIds.add("application_1585532379175_228491");
+        appIds.add("application_1598885606600_3677");
+        String tenantCode = "dev";
+        String executePath = "/ds-exec/1/1/1";
+        ExecutionStatus running = ExecutionStatus.RUNNING_EXECUTION;
+
+        PowerMockito.mockStatic(HadoopUtils.class);
+        HadoopUtils hadoop = HadoopUtils.getInstance();
+
+        try {
+            PowerMockito.whenNew(HadoopUtils.class).withAnyArguments().thenReturn(hadoop);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            when(hadoop.getApplicationStatus("application_1585532379175_228491")).thenReturn(running);
+            when(hadoop.getApplicationStatus("application_1598885606600_3677")).thenReturn(running);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+        }
+    }
 }
