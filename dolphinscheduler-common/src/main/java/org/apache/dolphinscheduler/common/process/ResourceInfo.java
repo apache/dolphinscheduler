@@ -42,4 +42,6 @@ public class ResourceInfo {
   public void setRes(String res) {
     this.res = res;
   }
+
+
 }

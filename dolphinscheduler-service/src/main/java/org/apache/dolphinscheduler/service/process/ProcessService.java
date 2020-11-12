@@ -79,8 +79,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -164,7 +162,7 @@ public class ProcessService {
      * @param command found command
      * @return process instance
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         //cannot construct process instance, return null;
@@ -190,7 +188,7 @@ public class ProcessService {
      * @param command command
      * @param message message
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = RuntimeException.class)
     public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
@@ -360,39 +358,32 @@ public class ProcessService {
      * remove task log file
      * @param processInstanceId processInstanceId
      */
-    public void removeTaskLogFile(Integer processInstanceId){
+    public void removeTaskLogFile(Integer processInstanceId) {
 
-        LogClientService logClient = null;
+        LogClientService logClient = new LogClientService();
 
-        try {
-            logClient = new LogClientService();
-            List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
+        List<TaskInstance> taskInstanceList = findValidTaskListByProcessId(processInstanceId);
 
-            if (CollectionUtils.isEmpty(taskInstanceList)) {
-                return;
+        if (CollectionUtils.isEmpty(taskInstanceList)) {
+            return;
+        }
+
+        for (TaskInstance taskInstance : taskInstanceList) {
+            String taskLogPath = taskInstance.getLogPath();
+            if (StringUtils.isEmpty(taskInstance.getHost())) {
+                continue;
+            }
+            int port = Constants.RPC_PORT;
+            String ip = "";
+            try {
+                ip = Host.of(taskInstance.getHost()).getIp();
+            } catch (Exception e) {
+                // compatible old version
+                ip = taskInstance.getHost();
             }
 
-            for (TaskInstance taskInstance : taskInstanceList) {
-                String taskLogPath = taskInstance.getLogPath();
-                if (StringUtils.isEmpty(taskInstance.getHost())) {
-                    continue;
-                }
-                int port = Constants.RPC_PORT;
-                String ip = "";
-                try {
-                    ip = Host.of(taskInstance.getHost()).getIp();
-                } catch (Exception e) {
-                    // compatible old version
-                    ip = taskInstance.getHost();
-                }
-
-                // remove task log from loggerserver
-                logClient.removeTaskLog(ip, port, taskLogPath);
-            }
-        }finally {
-            if (logClient != null) {
-                logClient.close();
-            }
+            // remove task log from loggerserver
+            logClient.removeTaskLog(ip,port,taskLogPath);
         }
     }
 
@@ -466,7 +457,6 @@ public class ProcessService {
                     processInstance.getWarningType(),
                     processInstance.getWarningGroupId(),
                     processInstance.getScheduleTime(),
-                    processInstance.getWorkerGroup(),
                     processInstance.getProcessInstancePriority()
             );
             saveCommand(command);
@@ -888,8 +878,8 @@ public class ProcessService {
      * @param taskInstance taskInstance
      * @return task instance
      */
-    @Transactional(rollbackFor = Exception.class)
-    public TaskInstance submitTask(TaskInstance taskInstance){
+    @Transactional(rollbackFor = RuntimeException.class)
+    public TaskInstance submitTask(TaskInstance taskInstance) {
         ProcessInstance processInstance = this.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         logger.info("start submit task : {}, instance id:{}, state: {}",
                 taskInstance.getName(), taskInstance.getProcessInstanceId(), processInstance.getState());
@@ -967,8 +957,9 @@ public class ProcessService {
 
     /**
      * create sub work process command
+     *
      * @param parentProcessInstance parentProcessInstance
-     * @param task task
+     * @param task                  task
      */
     public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
         if (!task.isSubProcess()) {
@@ -1040,7 +1031,6 @@ public class ProcessService {
                 parentProcessInstance.getWarningType(),
                 parentProcessInstance.getWarningGroupId(),
                 parentProcessInstance.getScheduleTime(),
-                task.getWorkerGroup(),
                 parentProcessInstance.getProcessInstancePriority()
         );
     }
@@ -1651,10 +1641,8 @@ public class ProcessService {
      * @param resourceType resource type
      * @return tenant code
      */
-    public String queryTenantCodeByResName(String resName,ResourceType resourceType){
-        // in order to query tenant code successful although the version is older
-        String fullName = resName.startsWith("/") ? resName : String.format("/%s",resName);
-        return resourceMapper.queryTenantCodeByResourceName(fullName, resourceType.ordinal());
+    public String queryTenantCodeByResName(String resName,ResourceType resourceType) {
+        return resourceMapper.queryTenantCodeByResourceName(resName, resourceType.ordinal());
     }
 
     /**
@@ -1691,7 +1679,7 @@ public class ProcessService {
      */
     public List<CycleDependency> getCycleDependencies(int masterId,int[] ids,Date scheduledFireTime) throws Exception {
         List<CycleDependency> cycleDependencyList =  new ArrayList<CycleDependency>();
-        if(ArrayUtils.isEmpty(ids)){
+        if (ids == null || ids.length == 0) {
             logger.warn("ids[] is empty!is invalid!");
             return cycleDependencyList;
         }

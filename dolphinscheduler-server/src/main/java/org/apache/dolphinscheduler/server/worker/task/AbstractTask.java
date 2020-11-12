@@ -17,10 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
@@ -33,17 +30,17 @@ import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 
 /**
  * executive task
@@ -54,7 +51,7 @@ public abstract class AbstractTask {
      * varPool string
      */
     protected String varPool;
-
+    
     /**
      * taskExecutionContext
      **/
@@ -126,20 +123,17 @@ public abstract class AbstractTask {
      */
     public void logHandle(List<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
-        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
-            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-        } else {
-            logger.info(" -> {}", String.join("\n\t", logs));
-        }
+        logger.info(" -> {}", String.join("\n\t", logs));
     }
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;
     }
+
     public String getVarPool() {
         return varPool;
     }
-
+    
     /**
      * get exit status code
      * @return  exit status code

@@ -1035,15 +1035,15 @@ public class ProcessDefinitionServiceTest {
         taskNode5.setType("SHELL");
         ShellParameters shellParameters5 = new ShellParameters();
         ResourceInfo resourceInfo5A = new ResourceInfo();
-        resourceInfo5A.setId(1);
+        resourceInfo5A.setId(0);
         ResourceInfo resourceInfo5B = new ResourceInfo();
-        resourceInfo5B.setId(2);
+        resourceInfo5B.setId(1);
         shellParameters5.setResourceList(Arrays.asList(resourceInfo5A, resourceInfo5B));
         taskNode5.setParams(JSONUtils.toJsonString(shellParameters5));
         input5.setTasks(Collections.singletonList(taskNode5));
         String output5 = (String) testMethod.invoke(processDefinitionService, input5);
         assertThat(output5.split(",")).hasSize(2)
-                .containsExactlyInAnyOrder("1", "2");
+                .containsExactlyInAnyOrder("0", "1");
 
         // when resource id list is 0 1 1 2, then return 0,1,2
         ProcessData input6 = new ProcessData();
@@ -1051,7 +1051,7 @@ public class ProcessDefinitionServiceTest {
         taskNode6.setType("SHELL");
         ShellParameters shellParameters6 = new ShellParameters();
         ResourceInfo resourceInfo6A = new ResourceInfo();
-        resourceInfo6A.setId(3);
+        resourceInfo6A.setId(0);
         ResourceInfo resourceInfo6B = new ResourceInfo();
         resourceInfo6B.setId(1);
         ResourceInfo resourceInfo6C = new ResourceInfo();
@@ -1065,7 +1065,7 @@ public class ProcessDefinitionServiceTest {
         String output6 = (String) testMethod.invoke(processDefinitionService, input6);
 
         assertThat(output6.split(",")).hasSize(3)
-                .containsExactlyInAnyOrder("3", "1", "2");
+                .containsExactlyInAnyOrder("0", "1", "2");
     }
 
     /**

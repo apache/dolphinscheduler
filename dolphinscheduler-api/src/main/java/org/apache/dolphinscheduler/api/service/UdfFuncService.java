@@ -148,7 +148,7 @@ public class UdfFuncService extends BaseService{
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
 
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -244,7 +244,7 @@ public class UdfFuncService extends BaseService{
      * @return udf function list page
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
 
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
@@ -276,19 +276,15 @@ public class UdfFuncService extends BaseService{
     }
 
     /**
-     * query udf list
+     * query data resource by type
      *
      * @param loginUser login user
-     * @param type  udf type
-     * @return udf func list
+     * @param type  resource type
+     * @return resource list
      */
-    public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>(5);
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(userId, type);
+    public Map<String, Object> queryResourceList(User loginUser, Integer type) {
+        Map<String, Object> result = new HashMap<>();
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(loginUser.getId(), type);
 
         result.put(Constants.DATA_LIST, udfFuncList);
         putMsg(result, Status.SUCCESS);
