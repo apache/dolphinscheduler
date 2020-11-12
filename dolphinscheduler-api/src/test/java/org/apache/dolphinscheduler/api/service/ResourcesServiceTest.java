@@ -139,10 +139,6 @@ public class ResourcesServiceTest {
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
 
         //PARENT_RESOURCE_NOT_EXIST
-        user.setId(1);
-        user.setTenantId(1);
-        Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.selectById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.createDirectory(user,"directoryTest","directory test",ResourceType.FILE,1,"/");
@@ -163,19 +159,19 @@ public class ResourcesServiceTest {
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         User user = new User();
         //HDFS_NOT_STARTUP
-        Result result = resourcesService.updateResource(user,1,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE,null);
+        Result result = resourcesService.updateResource(user,1,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(),result.getMsg());
 
         //RESOURCE_NOT_EXIST
         Mockito.when(resourcesMapper.selectById(1)).thenReturn(getResource());
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        result = resourcesService.updateResource(user,0,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE,null);
+        result = resourcesService.updateResource(user,0,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
 
         //USER_NO_OPERATION_PERM
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(),result.getMsg());
 
@@ -190,7 +186,7 @@ public class ResourcesServiceTest {
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
         }
-        result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF,null);
+        result = resourcesService.updateResource(user, 1, "ResourcesServiceTest1.jar", "ResourcesServiceTest", ResourceType.UDF);
         Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
 
         //SUCCESS
@@ -203,25 +199,25 @@ public class ResourcesServiceTest {
             logger.error(e.getMessage(),e);
         }
 
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest.jar","ResourcesServiceTest",ResourceType.FILE,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest.jar","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
 
         //RESOURCE_EXIST
         Mockito.when(resourcesMapper.queryResourceList("/ResourcesServiceTest1.jar", 0, 0)).thenReturn(getResourceList());
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.FILE,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.FILE);
         logger.info(result.toString());
         Assert.assertEquals(Status.RESOURCE_EXIST.getMsg(),result.getMsg());
         //USER_NOT_EXIST
         Mockito.when(userMapper.selectById(Mockito.anyInt())).thenReturn(null);
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.UDF,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.UDF);
         logger.info(result.toString());
         Assert.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
 
         //TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(null);
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.UDF,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest",ResourceType.UDF);
         logger.info(result.toString());
         Assert.assertEquals(Status.TENANT_NOT_EXIST.getMsg(),result.getMsg());
 
@@ -235,7 +231,7 @@ public class ResourcesServiceTest {
             logger.error(e.getMessage(),e);
         }
 
-        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest1.jar",ResourceType.UDF,null);
+        result = resourcesService.updateResource(user,1,"ResourcesServiceTest1.jar","ResourcesServiceTest1.jar",ResourceType.UDF);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
 

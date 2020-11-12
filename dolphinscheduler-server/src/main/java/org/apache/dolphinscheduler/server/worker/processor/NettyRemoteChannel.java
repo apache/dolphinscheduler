@@ -50,12 +50,6 @@ public class NettyRemoteChannel {
         this.opaque = opaque;
     }
 
-    public NettyRemoteChannel(Channel channel) {
-        this.channel = channel;
-        this.host = ChannelUtils.toAddress(channel);
-        this.opaque = -1;
-    }
-
     public Channel getChannel() {
         return channel;
     }
