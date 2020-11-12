@@ -83,10 +83,10 @@ public class ZKMasterClient extends AbstractZKClient {
 
             // self tolerant
             if (getActiveMasterNum() == 1) {
-                failoverWorker(null, true);
-                failoverMaster(null);
+                removeZKNodePath(null, ZKNodeType.MASTER, true);
+                removeZKNodePath(null, ZKNodeType.WORKER, true);
             }
-
+            registerListener();
         } catch (Exception e) {
             logger.error("master start up exception", e);
         } finally {
@@ -133,9 +133,16 @@ public class ZKMasterClient extends AbstractZKClient {
             mutex = new InterProcessMutex(getZkClient(), failoverPath);
             mutex.acquire();
 
-            String serverHost = getHostByEventDataPath(path);
-            // handle dead server
-            handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
+            String serverHost = null;
+            if(StringUtils.isNotEmpty(path)){
+                serverHost = getHostByEventDataPath(path);
+                if(StringUtils.isEmpty(serverHost)){
+                    logger.error("server down error: unknown path: {}", path);
+                    return;
+                }
+                // handle dead server
+                handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
+            }
             //failover server
             if (failover) {
                 failoverServerWhenDown(serverHost, zkNodeType);
@@ -336,8 +343,11 @@ public class ZKMasterClient extends AbstractZKClient {
 
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
 
+        logger.info("failover process list size:{} ", needFailoverProcessInstanceList.size());
         //updateProcessInstance host is null and insert into command
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
+            logger.info("failover process instance id: {} host:{}",
+                    processInstance.getId(), processInstance.getHost());
             if (Constants.NULL.equals(processInstance.getHost())) {
                 continue;
             }
