@@ -30,7 +30,7 @@
                     :disabled="item ? true : false"
                     v-model="tenantCode"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')">
+                    :placeholder="$t('Please enter tenant code')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -125,6 +125,7 @@
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
+
         if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false

@@ -17,14 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -34,7 +29,6 @@ import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheMan
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,15 +52,9 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
      */
     private final TaskInstanceCacheManager taskInstanceCacheManager;
 
-    /**
-     * processService
-     */
-    private ProcessService processService;
-
-    public TaskResponseProcessor() {
+    public TaskResponseProcessor(){
         this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     /**
@@ -85,26 +73,16 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
 
         taskInstanceCacheManager.cacheTaskInstance(responseCommand);
 
-        ExecutionStatus responseStatus = ExecutionStatus.of(responseCommand.getStatus());
-
         // TaskResponseEvent
         TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
                 responseCommand.getTaskInstanceId(),
-                responseCommand.getVarPool());
-
+                responseCommand.getVarPool(),
+                channel);
         taskResponseService.addResponse(taskResponseEvent);
-
-        while (Stopper.isRunning()) {
-            TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
-
-            if (taskInstance != null && responseStatus.typeIsFinished()) {
-                break;
-            }
-            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-        }
     }
+
 
 }
