@@ -53,7 +53,6 @@ public enum ScriptType {
         }
     }
 
-
     public static ScriptType of(Integer code) {
         if (SCRIPT_TYPE_MAP.containsKey(code)) {
             return SCRIPT_TYPE_MAP.get(code);

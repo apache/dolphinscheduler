@@ -15,14 +15,11 @@
 # limitations under the License.
 #
 
-content=$1
 
-msg=$2
+msg=$1
+content=$2
 
 # Write your specific logic here
-echo $content
-
-echo $msg
 
 # Set the exit code according to your execution result, and alert needs to use it to judge the status of this alarm result
-exit 888
+exit 0
