@@ -16,6 +16,11 @@
  */
 <template>
   <m-list-construction :title="$t('Cron Manage')">
+    <template slot="operation">
+      <span style=" float: right; padding-right:50px">
+        <em class="ans-icon-fail-empty" style="font-size:20px " data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="_close()"></em>
+      </span>
+    </template>
     <template slot="content">
       <m-list></m-list>
     </template>
@@ -27,6 +32,11 @@
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   export default {
     name: 'definition-timing-index',
+    methods :{
+      _close(){
+        this.$router.go(-1)
+      }
+    },
     components: { mList, mListConstruction, mSecondaryMenu }
   }
 </script>

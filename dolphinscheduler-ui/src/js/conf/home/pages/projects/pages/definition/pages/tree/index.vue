@@ -16,6 +16,11 @@
  */
 <template>
   <m-list-construction :title="$t('TreeView')">
+    <template slot="operation">
+      <span style=" float: right; padding-right:50px">
+        <em class="ans-icon-fail-empty" style="font-size:20px " data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="_close()"></em>
+      </span>
+    </template>
     <template slot="conditions"></template>
     <template slot="content">
       <div class="tree-view-index-model">
@@ -101,6 +106,9 @@
     props: {},
     methods: {
       ...mapActions('dag', ['getViewTree']),
+      _close(){
+        this.$router.go(-1)
+      },
       /**
        * get tree data
        */
