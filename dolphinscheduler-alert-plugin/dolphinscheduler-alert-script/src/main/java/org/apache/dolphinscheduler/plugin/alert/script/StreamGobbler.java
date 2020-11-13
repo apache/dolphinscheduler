@@ -34,11 +34,9 @@ public class StreamGobbler extends Thread {
 
     InputStream inputStream;
 
-
     StreamGobbler(InputStream inputStream) {
         this.inputStream = inputStream;
     }
-
 
     public void run() {
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
