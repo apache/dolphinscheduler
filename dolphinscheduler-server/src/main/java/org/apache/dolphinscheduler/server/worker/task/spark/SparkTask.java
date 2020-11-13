@@ -60,19 +60,19 @@ public class SparkTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private final TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext sparkTaskExecutionContext;
 
     public SparkTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
-        this.taskExecutionContext = taskExecutionContext;
+        this.sparkTaskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
 
-        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
+        logger.info("spark task params {}", sparkTaskExecutionContext.getTaskParams());
 
-        sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
+        sparkParameters = JSONUtils.parseObject(sparkTaskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
             logger.error("Spark params is null");
@@ -82,7 +82,7 @@ public class SparkTask extends AbstractYarnTask {
         if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
-        sparkParameters.setQueue(taskExecutionContext.getQueue());
+        sparkParameters.setQueue(sparkTaskExecutionContext.getQueue());
         setMainJarName();
     }
 
@@ -108,11 +108,11 @@ public class SparkTask extends AbstractYarnTask {
         args.addAll(SparkArgsUtils.buildArgs(sparkParameters));
 
         // replace placeholder
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sparkTaskExecutionContext.getDefinedParams()),
+            sparkTaskExecutionContext.getDefinedParams(),
             sparkParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
+            CommandType.of(sparkTaskExecutionContext.getCmdTypeIfComplement()),
+            sparkTaskExecutionContext.getScheduleTime());
 
         String command = null;
 
@@ -120,7 +120,7 @@ public class SparkTask extends AbstractYarnTask {
             command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
         }
 
-        logger.info(String.format("spark task command: [%s]", command));
+        logger.info("spark task command: {}", command);
 
         return command;
     }
