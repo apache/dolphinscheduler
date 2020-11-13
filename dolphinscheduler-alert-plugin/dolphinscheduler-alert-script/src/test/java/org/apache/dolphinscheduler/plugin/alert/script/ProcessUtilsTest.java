@@ -24,14 +24,14 @@ import org.junit.Test;
  */
 public class ProcessUtilsTest {
 
-    private static final String rootPath=System.getProperty("user.dir");
+    private static final String rootPath = System.getProperty("user.dir");
 
-    private static final String shellFilPath=rootPath+"/dolphinscheduler-alert-plugin/dolphinscheduler-alert-script/src/test/script/shell/example.sh";
+    private static final String shellFilPath = rootPath + "/dolphinscheduler-alert-plugin/dolphinscheduler-alert-script/src/test/script/shell/example.sh";
 
-    private String[] cmd={"/bin/sh", "-c", shellFilPath + " " + "testMsg" + " " + "userParams"};
+    private String[] cmd = {"/bin/sh", "-c", shellFilPath + " " + "testMsg" + " " + "userParams"};
 
     @Test
-    public void testExecuteScript(){
+    public void testExecuteScript() {
         ProcessUtils.executeScript(cmd);
     }
 }
