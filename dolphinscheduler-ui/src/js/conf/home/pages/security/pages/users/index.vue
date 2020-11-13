@@ -19,7 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="userList.length">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create User')}}</x-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
         </template>
       </m-conditions>
     </template>
@@ -30,10 +30,18 @@
                 :user-list="userList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!userList.length && total<=0">

@@ -19,10 +19,10 @@
     <template slot="content">
       <div class="clearfix transfer-model" style="width: 660px">
         <div>
-            <x-button-group v-model="checkedValue" size="small">
-                <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
-                <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
-            </x-button-group>
+            <el-button-group>
+                <el-button size="mini" value="fileResource" @click="_ckFile">{{$t('File resources')}}</el-button>
+                <el-button size="mini" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</el-button>
+            </el-button-group>
         </div>
         <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true"  maxHeight="200" :options="fileList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -30,32 +30,6 @@
         <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" maxHeight="200" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <!-- <div class="select-list-box">
-          <div class="tf-header">
-            <div class="title">{{type.name}}{{$t('List')}}</div>
-            <div class="count">（{{cacheSourceList.length}}）</div>
-          </div>
-          <div class="scrollbar tf-content">
-            <ul>
-              <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
-                <span :title="item.name">{{item.name}}</span>
-                <a href="javascript:"></a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="select-oper-box">&nbsp;</div>
-        <div class="select-list-box">
-          <div class="tf-header">
-            <div class="title">{{$t('Selected')}}{{type.name}}</div>
-            <div class="count">（{{cacheTargetList.length}}）</div>
-          </div>
-          <div class="scrollbar tf-content">
-            <ul>
-              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
-            </ul>
-          </div>
-        </div> -->
       </div>
     </template>
   </m-popup>
