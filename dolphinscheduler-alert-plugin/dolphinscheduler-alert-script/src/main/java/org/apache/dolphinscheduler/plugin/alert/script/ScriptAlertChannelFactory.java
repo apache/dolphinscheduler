@@ -45,12 +45,14 @@ public class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
+                .setPlaceholder("please enter your custom parameters, which will be passed to you when calling your script")
                 .build();
         // need check file type and file exist
         InputParam scriptPathParam = InputParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_PATH, ScriptParamsConstants.SCRIPT_PATH)
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
+                .setPlaceholder("please upload the file to the disk directory of the alarm server, and ensure that the path is absolute and has the corresponding access rights")
                 .build();
 
         RadioParam scriptTypeParams = RadioParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TYPE, ScriptParamsConstants.SCRIPT_TYPE)
