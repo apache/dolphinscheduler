@@ -26,7 +26,7 @@ public class OSUtils {
         throw new UnsupportedOperationException("Construct OSUtils");
     }
 
-    public static Boolean isWindows() {
+    static Boolean isWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
 }
