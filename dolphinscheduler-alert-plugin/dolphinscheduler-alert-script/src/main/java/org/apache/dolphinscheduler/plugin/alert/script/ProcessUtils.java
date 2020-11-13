@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,25 +39,21 @@ public class ProcessUtils {
     public static Integer executeScript(String... cmd) {
 
         int exitCode = -1;
+
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         try {
             Process process = processBuilder.start();
-
             InputStream in = process.getErrorStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            StringBuilder result = new StringBuilder();
 
-            StreamGobbler inputStreamGobbler =
-                    new StreamGobbler(process.getInputStream());
-            StreamGobbler errorStreamGobbler =
-                    new StreamGobbler(process.getErrorStream());
+            StreamGobbler inputStreamGobbler = new StreamGobbler(process.getInputStream());
+            StreamGobbler errorStreamGobbler = new StreamGobbler(process.getErrorStream());
 
             inputStreamGobbler.start();
             errorStreamGobbler.start();
             return process.waitFor();
-
         } catch (IOException | InterruptedException e) {
-            logger.error("execute alert script error", e.getMessage());
+            logger.error("execute alert script error {}", e.getMessage());
+            Thread.currentThread().interrupt();
         }
 
         return exitCode;

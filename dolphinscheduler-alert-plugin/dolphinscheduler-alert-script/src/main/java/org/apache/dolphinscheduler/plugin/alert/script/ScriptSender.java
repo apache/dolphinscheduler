@@ -67,6 +67,7 @@ public class ScriptSender {
             return alertResult;
         }
         alertResult.setMessage("send script alert msg error,exitCode is " + exitCode);
+        logger.info("send script alert msg error,exitCode is {}", exitCode);
         return alertResult;
     }
 

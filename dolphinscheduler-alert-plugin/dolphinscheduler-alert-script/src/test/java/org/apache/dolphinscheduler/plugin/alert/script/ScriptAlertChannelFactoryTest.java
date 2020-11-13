@@ -31,7 +31,6 @@ import org.junit.Test;
  */
 public class ScriptAlertChannelFactoryTest {
 
-
     @Test
     public void testGetParams() {
         ScriptAlertChannelFactory scriptAlertChannelFactory = new ScriptAlertChannelFactory();
