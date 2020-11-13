@@ -67,14 +67,7 @@ public class ProcessUtils {
         String cmdstr;
         String[] cmd = commandList.toArray(new String[0]);
         SecurityManager security = System.getSecurityManager();
-        boolean allowAmbiguousCommands = false;
-        if (security == null) {
-            allowAmbiguousCommands = true;
-            String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
-            if (value != null) {
-                allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
-            }
-        }
+        boolean allowAmbiguousCommands = isAllowAmbiguousCommands(security);
         if (allowAmbiguousCommands) {
 
             String executablePath = new File(cmd[0]).getPath();
@@ -110,6 +103,24 @@ public class ProcessUtils {
                 isShellFile(executablePath) ? VERIFICATION_CMD_BAT : VERIFICATION_WIN32, quoteString(executablePath), cmd);
         }
         return cmdstr;
+    }
+
+    /**
+     * check is allow ambiguous commands
+     *
+     * @param security security manager
+     * @return allow ambiguous command flag
+     */
+    private static boolean isAllowAmbiguousCommands(SecurityManager security) {
+        boolean allowAmbiguousCommands = false;
+        if (security == null) {
+            allowAmbiguousCommands = true;
+            String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
+            if (value != null) {
+                allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
+            }
+        }
+        return allowAmbiguousCommands;
     }
 
     /**
@@ -165,8 +176,10 @@ public class ProcessUtils {
      * Lazy Pattern.
      */
     private static class LazyPattern {
-        // Escape-support version:
-        // "(\")((?:\\\\\\1|.)+?)\\1|([^\\s\"]+)";
+        /**
+         * Escape-support version:
+         * "(\")((?:\\\\\\1|.)+?)\\1|([^\\s\"]+)";
+         */
         private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"[^\"]*\"");
     }
 
@@ -234,19 +247,15 @@ public class ProcessUtils {
         int lastPos = arg.length() - 1;
         if (lastPos >= 1 && arg.charAt(0) == '"' && arg.charAt(lastPos) == '"') {
             // The argument has already been quoted.
-            if (noQuotesInside) {
-                if (arg.indexOf('"', 1) != lastPos) {
-                    // There is ["] inside.
-                    throw new IllegalArgumentException(errorMessage);
-                }
-            }
-            return true;
-        }
-        if (noQuotesInside) {
-            if (arg.indexOf('"') >= 0) {
+            if (noQuotesInside && arg.indexOf('"', 1) != lastPos) {
                 // There is ["] inside.
                 throw new IllegalArgumentException(errorMessage);
             }
+            return true;
+        }
+        if (noQuotesInside && arg.indexOf('"') >= 0) {
+            // There is ["] inside.
+            throw new IllegalArgumentException(errorMessage);
         }
         return false;
     }
@@ -292,39 +301,51 @@ public class ProcessUtils {
                         String commandFile = String
                             .format("%s/%s.kill", executePath, appId);
                         String cmd = "yarn application -kill " + appId;
-                        try {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append("#!/bin/sh\n");
-                            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-                            sb.append("cd $BASEDIR\n");
-                            if (CommonUtils.getSystemEnvPath() != null) {
-                                sb.append("source ").append(CommonUtils.getSystemEnvPath()).append("\n");
-                            }
-                            sb.append("\n\n");
-                            sb.append(cmd);
-
-                            File f = new File(commandFile);
-
-                            if (!f.exists()) {
-                                FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
-                            }
-
-                            String runCmd = "sh " + commandFile;
-                            if (StringUtils.isNotEmpty(tenantCode)) {
-                                runCmd = "sudo -u " + tenantCode + " " + runCmd;
-                            }
-
-                            logger.info("kill cmd:{}", runCmd);
-
-                            Runtime.getRuntime().exec(runCmd);
-                        } catch (Exception e) {
-                            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
-                        }
+                        execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
                     }
                 } catch (Exception e) {
                     logger.error(String.format("Get yarn application app id [%s] status failed: [%s]", appId, e.getMessage()));
                 }
             }
+        }
+    }
+
+    /**
+     * build kill command for yarn application
+     *
+     * @param logger      logger
+     * @param tenantCode  tenant code
+     * @param appId       app id
+     * @param commandFile command file
+     * @param cmd         cmd
+     */
+    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("#!/bin/sh\n");
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+            sb.append("cd $BASEDIR\n");
+            if (CommonUtils.getSystemEnvPath() != null) {
+                sb.append("source ").append(CommonUtils.getSystemEnvPath()).append("\n");
+            }
+            sb.append("\n\n");
+            sb.append(cmd);
+
+            File f = new File(commandFile);
+
+            if (!f.exists()) {
+                FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+            }
+
+            String runCmd = "sh " + commandFile;
+            if (StringUtils.isNotEmpty(tenantCode)) {
+                runCmd = "sudo -u " + tenantCode + " " + runCmd;
+            }
+
+            logger.info("kill cmd:{}", runCmd);
+            Runtime.getRuntime().exec(runCmd);
+        } catch (Exception e) {
+            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
         }
     }
 
@@ -360,7 +381,7 @@ public class ProcessUtils {
      * get pids str.
      *
      * @param processId process id
-     * @return pids
+     * @return pids pid String
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
@@ -413,7 +434,7 @@ public class ProcessUtils {
                     logger.error("task instance work dir is empty");
                     throw new RuntimeException("task instance work dir is empty");
                 }
-                if (appIds.size() > 0) {
+                if (CollectionUtils.isNotEmpty(appIds)) {
                     cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
                 }
             }

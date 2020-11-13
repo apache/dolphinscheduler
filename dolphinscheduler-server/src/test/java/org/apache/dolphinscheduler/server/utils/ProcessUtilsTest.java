@@ -59,7 +59,7 @@ public class ProcessUtilsTest {
         when(OSUtils.isMacOS()).thenReturn(true);
         when(OSUtils.exeCmd("pstree -sp " + processId)).thenReturn(null);
         String pidListMac = ProcessUtils.getPidsStr(processId);
-        Assert.assertEquals(pidListMac, "");
+        Assert.assertEquals("", pidListMac);
     }
 
     @Test
@@ -69,18 +69,18 @@ public class ProcessUtilsTest {
         commands.add("-u");
         commands.add("tenantCode");
         //allowAmbiguousCommands false
-        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo -u tenantCode");
+        Assert.assertEquals("sudo -u tenantCode", ProcessUtils.buildCommandStr(commands));
 
         //quota
         commands.clear();
         commands.add("\"sudo\"");
-        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "\"sudo\"");
+        Assert.assertEquals("\"sudo\"", ProcessUtils.buildCommandStr(commands));
 
         //allowAmbiguousCommands true
         commands.clear();
         commands.add("sudo");
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "false");
-        Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "\"sudo\"");
+        Assert.assertEquals("\"sudo\"", ProcessUtils.buildCommandStr(commands));
     }
 
     @Test
@@ -105,6 +105,7 @@ public class ProcessUtilsTest {
         taskExecutionContext.setHost("127.0.0.1:8888");
         taskExecutionContext.setLogPath("/log/1.log");
         ProcessUtils.kill(taskExecutionContext);
+        Assert.assertEquals(1, taskExecutionContext.getProcessId());
     }
 
     @Test
@@ -129,8 +130,9 @@ public class ProcessUtilsTest {
             when(hadoop.getApplicationStatus("application_1598885606600_3677")).thenReturn(running);
         } catch (Exception e) {
             e.printStackTrace();
-
             ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
         }
+
+        Assert.assertNotNull(appIds);
     }
 }
