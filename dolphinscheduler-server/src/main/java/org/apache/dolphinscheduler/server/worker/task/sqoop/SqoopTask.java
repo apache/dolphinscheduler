@@ -45,25 +45,25 @@ public class SqoopTask extends AbstractYarnTask {
     /**
      * taskExecutionContext
      */
-    private final TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext sqoopTaskExecutionContext;
 
     public SqoopTask(TaskExecutionContext taskExecutionContext, Logger logger) {
         super(taskExecutionContext, logger);
-        this.taskExecutionContext = taskExecutionContext;
+        this.sqoopTaskExecutionContext = taskExecutionContext;
     }
 
     @Override
     public void init() {
-        logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
+        logger.info("sqoop task params {}", sqoopTaskExecutionContext.getTaskParams());
         sqoopParameters =
-            JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
+            JSONUtils.parseObject(sqoopTaskExecutionContext.getTaskParams(), SqoopParameters.class);
         //check sqoop task params
         if (null == sqoopParameters) {
-            throw new RuntimeException("Sqoop Task params is null");
+            throw new IllegalArgumentException("Sqoop Task params is null");
         }
 
         if (!sqoopParameters.checkParameters()) {
-            throw new RuntimeException("Sqoop Task params check fail");
+            throw new IllegalArgumentException("Sqoop Task params check fail");
         }
     }
 
@@ -71,13 +71,13 @@ public class SqoopTask extends AbstractYarnTask {
     protected String buildCommand() {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters, taskExecutionContext);
+        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(sqoopTaskExecutionContext.getDefinedParams()),
+            sqoopTaskExecutionContext.getDefinedParams(),
             sqoopParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
+            CommandType.of(sqoopTaskExecutionContext.getCmdTypeIfComplement()),
+            sqoopTaskExecutionContext.getScheduleTime());
 
         if (paramsMap != null) {
             String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));

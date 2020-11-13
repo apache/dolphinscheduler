@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
 public final class SqoopConstants {
 
+    private SqoopConstants() {
+    }
+
     //sqoop general param
     public static final String SQOOP = "sqoop";
     public static final String SQOOP_MR_JOB_NAME = "mapred.job.name";

@@ -51,7 +51,7 @@ public class HdfsSourceGenerator implements ISourceGenerator {
                     hdfsSourceParamsList.add(SqoopConstants.HDFS_EXPORT_DIR);
                     hdfsSourceParamsList.add(sourceHdfsParameter.getExportDir());
                 } else {
-                    throw new Exception("Sqoop hdfs export dir is null");
+                    throw new IllegalArgumentException("Sqoop hdfs export dir is null");
                 }
 
             }
