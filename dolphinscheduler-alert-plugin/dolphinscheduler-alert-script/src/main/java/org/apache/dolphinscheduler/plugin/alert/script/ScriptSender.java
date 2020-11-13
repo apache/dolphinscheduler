@@ -46,7 +46,7 @@ public class ScriptSender {
     public AlertResult sendScriptAlert(String msg) {
         AlertResult alertResult = new AlertResult();
         if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
-            executeShellScript(msg);
+            return executeShellScript(msg);
         }
         return alertResult;
     }
