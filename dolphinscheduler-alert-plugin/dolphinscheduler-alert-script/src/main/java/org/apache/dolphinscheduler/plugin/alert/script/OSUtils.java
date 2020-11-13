@@ -22,6 +22,10 @@ package org.apache.dolphinscheduler.plugin.alert.script;
  */
 public class OSUtils {
 
+    public OSUtils() {
+        throw new UnsupportedOperationException("Construct OSUtils");
+    }
+
     public static Boolean isWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
