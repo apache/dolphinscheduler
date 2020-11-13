@@ -30,21 +30,23 @@ public class ProcessUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
+    private ProcessUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * executeScript
      *
      * @param cmd cmd params
      * @return exit code
      */
-    public static Integer executeScript(String... cmd) {
+    static Integer executeScript(String... cmd) {
 
         int exitCode = -1;
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         try {
             Process process = processBuilder.start();
-            InputStream in = process.getErrorStream();
-
             StreamGobbler inputStreamGobbler = new StreamGobbler(process.getInputStream());
             StreamGobbler errorStreamGobbler = new StreamGobbler(process.getErrorStream());
 

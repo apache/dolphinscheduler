@@ -32,7 +32,7 @@ public class StreamGobbler extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamGobbler.class);
 
-    InputStream inputStream;
+    private InputStream inputStream;
 
     StreamGobbler(InputStream inputStream) {
         this.inputStream = inputStream;

@@ -37,13 +37,13 @@ public class ScriptSender {
 
     private String userParams;
 
-    public ScriptSender(Map<String, String> config) {
+    ScriptSender(Map<String, String> config) {
         scriptPath = config.get(ScriptParamsConstants.NAME_SCRIPT_PATH);
         scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
 
-    public AlertResult sendScriptAlert(String msg) {
+    AlertResult sendScriptAlert(String msg) {
         AlertResult alertResult = new AlertResult();
         if (ScriptType.of(scriptType).equals(ScriptType.SHELL)) {
             return executeShellScript(msg);
@@ -54,7 +54,7 @@ public class ScriptSender {
     private AlertResult executeShellScript(String msg) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
-        if (OSUtils.isWindows()) {
+        if (Boolean.TRUE.equals(OSUtils.isWindows())) {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
