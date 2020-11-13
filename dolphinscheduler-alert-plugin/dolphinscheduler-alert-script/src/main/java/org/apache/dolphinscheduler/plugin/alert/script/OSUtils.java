@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+/**
+ * OSUtils
+ */
 public class OSUtils {
 
     public static Boolean isWindows() {

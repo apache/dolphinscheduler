@@ -22,12 +22,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * ProcessUtils
  */
 public class ProcessUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
+    /**
+     * executeScript
+     *
+     * @param cmd cmd params
+     * @return exit code
+     */
     public static Integer executeScript(String... cmd) {
 
         int exitCode = -1;
@@ -49,7 +59,7 @@ public class ProcessUtils {
             return process.waitFor();
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.error("execute alert script error", e.getMessage());
         }
 
         return exitCode;

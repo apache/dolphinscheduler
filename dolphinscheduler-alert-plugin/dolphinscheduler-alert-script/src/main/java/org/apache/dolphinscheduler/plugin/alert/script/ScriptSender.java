@@ -31,7 +31,6 @@ public class ScriptSender {
 
     private static final Logger logger = LoggerFactory.getLogger(ScriptSender.class);
 
-
     private String scriptPath;
 
     private Integer scriptType;
@@ -43,7 +42,6 @@ public class ScriptSender {
         scriptType = Integer.parseInt(config.get(ScriptParamsConstants.NAME_SCRIPT_TYPE));
         userParams = config.get(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS);
     }
-
 
     public AlertResult sendScriptAlert(String msg) {
         AlertResult alertResult = new AlertResult();

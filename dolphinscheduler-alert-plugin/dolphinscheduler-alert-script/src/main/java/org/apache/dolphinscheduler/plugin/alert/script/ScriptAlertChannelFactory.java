@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
 import org.apache.dolphinscheduler.spi.params.InputParam;
@@ -27,6 +24,9 @@ import org.apache.dolphinscheduler.spi.params.RadioParam;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * ScriptAlertChannelFactory
