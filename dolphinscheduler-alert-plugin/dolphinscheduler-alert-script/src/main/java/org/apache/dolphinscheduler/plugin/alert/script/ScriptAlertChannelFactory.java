@@ -52,12 +52,12 @@ public class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
-                .setPlaceholder("please upload the file to the disk directory of the alarm server, and ensure that the path is absolute and has the corresponding access rights")
+                .setPlaceholder("please upload the file to the disk directory of the alert server, and ensure that the path is absolute and has the corresponding access rights")
                 .build();
 
         RadioParam scriptTypeParams = RadioParam.newBuilder(ScriptParamsConstants.NAME_SCRIPT_TYPE, ScriptParamsConstants.SCRIPT_TYPE)
-                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getDescp(), false))
-                .setValue(ScriptType.SHELL.getDescp())
+                .addParamsOptions(new ParamsOptions(ScriptType.SHELL.getDescp(), ScriptType.SHELL.getCode(), false))
+                .setValue(ScriptType.SHELL.getCode())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
