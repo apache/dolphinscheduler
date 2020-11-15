@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
@@ -63,6 +64,8 @@ public class TaskExecuteThreadTest {
     private Logger taskLogger;
 
     private TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+
+    private AlertClientService alertClientService;
 
     @Before
     public void before() {
@@ -100,8 +103,10 @@ public class TaskExecuteThreadTest {
         PowerMockito.when(SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class))
                 .thenReturn(taskExecutionContextCacheManager);
 
+        alertClientService = PowerMockito.mock(AlertClientService.class);
+
         PowerMockito.mockStatic(TaskManager.class);
-        PowerMockito.when(TaskManager.newTask(taskExecutionContext, taskLogger))
+        PowerMockito.when(TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService))
                 .thenReturn(new SimpleTask(taskExecutionContext, taskLogger));
 
         PowerMockito.mockStatic(JSONUtils.class);
@@ -117,7 +122,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setTaskType("SQL");
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
 
         Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
@@ -129,7 +134,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setStartTime(null);
         taskExecutionContext.setDelayTime(1);
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
 
         Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
