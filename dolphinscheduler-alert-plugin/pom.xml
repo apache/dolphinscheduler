@@ -33,6 +33,7 @@
         <module>dolphinscheduler-alert-email</module>
         <module>dolphinscheduler-alert-wechat</module>
         <module>dolphinscheduler-alert-dingtalk</module>
+        <module>dolphinscheduler-alert-script</module>
     </modules>
 
 
