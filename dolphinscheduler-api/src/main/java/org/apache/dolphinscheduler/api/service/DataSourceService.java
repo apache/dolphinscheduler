@@ -499,7 +499,13 @@ public class DataSourceService extends BaseService {
 
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
-        String jdbcUrl = address + "/" + database;
+        String jdbcUrl;
+        if (DbType.SQLSERVER == type) {
+            jdbcUrl = address + ";databaseName=" + database;
+        } else {
+            jdbcUrl = address + "/" + database;
+        }
+
         if (Constants.ORACLE.equals(type.name())) {
             parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
