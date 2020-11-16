@@ -286,6 +286,7 @@ public class TaskInstanceMapperTest {
                 task.getProcessInstanceId(),
                 "",
                 "",
+                "",
                 0,
                 new int[0],
                 "",
