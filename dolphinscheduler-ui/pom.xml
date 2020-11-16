@@ -76,7 +76,7 @@
               <execution>
                 <id>yarn install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
