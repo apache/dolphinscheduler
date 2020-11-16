@@ -15,6 +15,8 @@ Date: 2020-11-13 17:48:33
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE DATABASE IF NOT EXISTS `dolphinscheduler` DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+use `dolphinscheduler`;
 -- ----------------------------
 -- Table structure for qrtz_blob_triggers
 -- ----------------------------

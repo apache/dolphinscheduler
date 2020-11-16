@@ -14,15 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-export HADOOP_HOME=/opt/soft/hadoop
-export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
-export SPARK_HOME1=/opt/soft/spark1
-export SPARK_HOME2=/opt/soft/spark2
-export PYTHON_HOME=/opt/soft/python
-export JAVA_HOME=/opt/soft/java
-export HIVE_HOME=/opt/soft/hive
-export FLINK_HOME=/opt/soft/flink
-export DATAX_HOME=/opt/soft/datax/bin/datax.py
-
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH:$FLINK_HOME/bin:$DATAX_HOME:$PATH
+export HADOOP_HOME=/home/bigdata/poseidon_2.1.0/compenents/hadoop-3.1.2
+export HADOOP_CONF_DIR=/home/bigdata/poseidon_2.1.0/compenents/hadoop-3.1.2/etc/hadoop
+export SPARK_HOME2=/home/bigdata/poseidon_2.1.0/compenents/spark-2.3.2
+export JAVA_HOME=/home/bigdata/poseidon_2.1.0/compenents/jdk1.8.0_112
+export HIVE_HOME=/home/bigdata/poseidon_2.1.0/compenents/hive-3.1.1
+export FLINK_HOME=/home/bigdata/poseidon_2.1.0/compenents/flink-1.7.2
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME2/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH:$FLINK_HOME/bin

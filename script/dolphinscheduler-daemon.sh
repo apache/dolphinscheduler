@@ -58,8 +58,8 @@ pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
-  HEAP_INITIAL_SIZE=1g
-  HEAP_MAX_SIZE=1g
+  HEAP_INITIAL_SIZE=2g
+  HEAP_MAX_SIZE=2g
   HEAP_NEW_GENERATION__SIZE=500m
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
