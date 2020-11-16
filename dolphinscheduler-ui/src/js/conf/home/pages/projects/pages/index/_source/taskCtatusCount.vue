@@ -57,7 +57,7 @@
   import echarts from 'echarts'
   import store from '@/conf/home/store'
   import mNoData from '@/module/components/noData/noData'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
 
   export default {
     name: 'task-ctatus-count',

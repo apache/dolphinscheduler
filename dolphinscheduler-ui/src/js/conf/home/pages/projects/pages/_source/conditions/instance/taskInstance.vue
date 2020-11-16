@@ -40,8 +40,8 @@
         </x-datepicker>
       </div>
       <div class="list">
-        <x-select style="width: 160px;" @on-change="_onChangeState" :value="searchParams.stateType" >
-          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 160px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down">
+        <x-select style="width: 140px;" @on-change="_onChangeState" :value="searchParams.stateType" >
+          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 140px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down">
           </x-input>
           <x-option
                   v-for="city in stateTypeList"
@@ -58,7 +58,10 @@
         <x-input v-model.trim="searchParams.executorName" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('Executor')"></x-input>
       </div>
       <div class="list">
-        <x-input v-model.trim="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
+        <x-input v-model.trim="searchParams.processInstanceName" @on-enterkey="_ckQuery" style="width: 160px;" size="small" :placeholder="$t('Process Instance')"></x-input>
+      </div>
+      <div class="list">
+        <x-input v-model.trim="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 160px;" size="small" :placeholder="$t('name')"></x-input>
       </div>
     </template>
   </m-conditions>
@@ -68,7 +71,7 @@
   import { stateType } from './common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
-    name: 'instance-conditions',
+    name: 'task-instance-conditions',
     data () {
       return {
         // state(list)
@@ -85,7 +88,8 @@
           // host
           host: '',
           // executor name
-          executorName: ''
+          executorName: '',
+          processInstanceName: ''
         }
       }
     },
