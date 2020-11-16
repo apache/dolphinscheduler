@@ -657,5 +657,8 @@ export default {
   'Batch move': '批量移动',
   Version: '版本',
   'Pre tasks': '前置任务',
+  'Running Memory':'运行内存',
+  'Max Memory':'最大内存',
+  'Min Memory':'最小内存',
   'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建'
 }

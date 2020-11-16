@@ -661,5 +661,8 @@ export default {
   'Batch move': 'Batch move',
   Version: 'Version',
   'Pre tasks': 'Pre tasks',
+  'Running Memory':'Running Memory',
+  'Max Memory':'Max Memory',
+  'Min Memory':'Min Memory',
   'The workflow canvas is abnormal and cannot be saved, please recreate': 'The workflow canvas is abnormal and cannot be saved, please recreate'
 }
