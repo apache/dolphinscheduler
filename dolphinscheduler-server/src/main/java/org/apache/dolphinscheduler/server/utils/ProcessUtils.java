@@ -57,6 +57,8 @@ public class ProcessUtils {
 
     private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
 
+    private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
+
     /**
      * build command line characters.
      *
@@ -115,9 +117,9 @@ public class ProcessUtils {
         boolean allowAmbiguousCommands = false;
         if (security == null) {
             allowAmbiguousCommands = true;
-            String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
+            String value = System.getProperty(LOCAL_PROCESS_EXEC);
             if (value != null) {
-                allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
+                allowAmbiguousCommands = !Constants.STRING_FALSE.equalsIgnoreCase(value);
             }
         }
         return allowAmbiguousCommands;
