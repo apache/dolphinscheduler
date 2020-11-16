@@ -31,6 +31,12 @@ import java.util.List;
  */
 public class SparkArgsUtils {
 
+    private static final String SPARK_CLUSTER = "cluster";
+
+    private static final String SPARK_LOCAL = "local";
+
+    private static final String SPARK_ON_YARN = "yarn";
+
     /**
      * build args
      *
@@ -39,15 +45,15 @@ public class SparkArgsUtils {
      */
     public static List<String> buildArgs(SparkParameters param) {
         List<String> args = new ArrayList<>();
-        String deployMode = "cluster";
+        String deployMode = SPARK_CLUSTER;
 
         args.add(Constants.MASTER);
         if (StringUtils.isNotEmpty(param.getDeployMode())) {
             deployMode = param.getDeployMode();
 
         }
-        if (!"local".equals(deployMode)) {
-            args.add("yarn");
+        if (!SPARK_LOCAL.equals(deployMode)) {
+            args.add(SPARK_ON_YARN);
             args.add(Constants.DEPLOY_MODE);
         }
 

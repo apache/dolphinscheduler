@@ -129,22 +129,26 @@ public class SparkTask extends AbstractYarnTask {
     protected void setMainJarName() {
         // main jar
         ResourceInfo mainJar = sparkParameters.getMainJar();
-        if (mainJar != null) {
-            int resourceId = mainJar.getId();
-            String resourceName;
-            if (resourceId == 0) {
-                resourceName = mainJar.getRes();
-            } else {
-                Resource resource = processService.getResourceById(sparkParameters.getMainJar().getId());
-                if (resource == null) {
-                    logger.error("resource id: {} not exist", resourceId);
-                    throw new RuntimeException(String.format("resource id: %d not exist", resourceId));
-                }
-                resourceName = resource.getFullName().replaceFirst("/", "");
-            }
-            mainJar.setRes(resourceName);
-            sparkParameters.setMainJar(mainJar);
+
+        if (null == mainJar) {
+            throw new RuntimeException("Spark task jar params is null");
         }
+
+        int resourceId = mainJar.getId();
+        String resourceName;
+        if (resourceId == 0) {
+            resourceName = mainJar.getRes();
+        } else {
+            Resource resource = processService.getResourceById(sparkParameters.getMainJar().getId());
+            if (resource == null) {
+                logger.error("resource id: {} not exist", resourceId);
+                throw new RuntimeException(String.format("resource id: %d not exist", resourceId));
+            }
+            resourceName = resource.getFullName().replaceFirst("/", "");
+        }
+        mainJar.setRes(resourceName);
+        sparkParameters.setMainJar(mainJar);
+
     }
 
     @Override
