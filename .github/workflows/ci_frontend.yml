@@ -44,7 +44,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          version: 10
+          version: 8
       - name: Compile
         run: |
           cd dolphinscheduler-ui
