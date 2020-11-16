@@ -746,6 +746,7 @@
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
@@ -758,6 +759,7 @@
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
                         <include>**/common/shell/ShellExecutorTest.java</include>
+                        <include>**/common/task/DataxParametersTest.java</include>
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
