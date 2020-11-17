@@ -523,10 +523,9 @@ public final class Constants {
     public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 10;
 
 
+
     /**
-     * hadoop params constant
-     */
-    /**
+     * hadoop params
      * jar
      */
     public static final String JAR = "jar";
@@ -833,15 +832,15 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
 
 
-    public static final int[] NOT_TERMINATED_STATES = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXECUTION.ordinal(),
-            ExecutionStatus.DELAY_EXECUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITTING_THREAD.ordinal(),
-            ExecutionStatus.WAITTING_DEPEND.ordinal()
+    public static final int[] NOT_TERMINATED_STATES = new int[] {
+        ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+        ExecutionStatus.RUNNING_EXECUTION.ordinal(),
+        ExecutionStatus.DELAY_EXECUTION.ordinal(),
+        ExecutionStatus.READY_PAUSE.ordinal(),
+        ExecutionStatus.READY_STOP.ordinal(),
+        ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+        ExecutionStatus.WAITTING_THREAD.ordinal(),
+        ExecutionStatus.WAITTING_DEPEND.ordinal()
     };
 
     /**
@@ -1009,4 +1008,14 @@ public final class Constants {
      * Network IP gets priority, default inner outer
      */
     public static final String NETWORK_PRIORITY_STRATEGY = "dolphin.scheduler.network.priority.strategy";
+
+    /**
+     * exec shell scripts
+     */
+    public static final String SH = "sh";
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
 }

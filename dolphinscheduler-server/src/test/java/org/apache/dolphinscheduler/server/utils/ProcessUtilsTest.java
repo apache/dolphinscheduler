@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.utils;
 
 import static org.powermock.api.mockito.PowerMockito.when;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -57,7 +58,7 @@ public class ProcessUtilsTest {
 
         PowerMockito.mockStatic(OSUtils.class);
         when(OSUtils.isMacOS()).thenReturn(true);
-        when(OSUtils.exeCmd("pstree -sp " + processId)).thenReturn(null);
+        when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId))).thenReturn(null);
         String pidListMac = ProcessUtils.getPidsStr(processId);
         Assert.assertEquals("", pidListMac);
     }
@@ -96,8 +97,8 @@ public class ProcessUtilsTest {
         taskExecutionContext.setProcessId(1);
         PowerMockito.mockStatic(OSUtils.class);
         try {
-            when(OSUtils.exeCmd("pstree -sp " + 1)).thenReturn("1111");
-            when(OSUtils.exeCmd("pstree -p " + 1)).thenReturn("1111");
+            when(OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, 1))).thenReturn("1111");
+            when(OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, 1))).thenReturn("1111");
             when(OSUtils.exeCmd("sudo kill -9")).thenReturn("1111");
         } catch (Exception e) {
             e.printStackTrace();
