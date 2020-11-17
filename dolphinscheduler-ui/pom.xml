@@ -109,6 +109,16 @@
                 </configuration>
               </execution>
               <execution>
+                <id>npm install yarn</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <arguments>install yarn</arguments>
+                </configuration>
+              </execution>
+              <execution>
                 <id>npm install node-sass --unsafe-perm</id>
                 <goals>
                   <goal>npm</goal>
@@ -119,9 +129,9 @@
                 </configuration>
               </execution>
               <execution>
-                <id>npm install</id>
+                <id>yarn install</id>
                 <goals>
-                  <goal>npm</goal>
+                  <goal>yarn</goal>
                 </goals>
                 <phase>generate-resources</phase>
                 <configuration>
