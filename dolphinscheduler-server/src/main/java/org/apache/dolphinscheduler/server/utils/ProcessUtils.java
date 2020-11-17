@@ -339,7 +339,7 @@ public class ProcessUtils {
                 FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
             }
 
-            String runCmd = "sh " + commandFile;
+            String runCmd = String.format("%s %s", Constants.SH, commandFile);
             if (StringUtils.isNotEmpty(tenantCode)) {
                 runCmd = "sudo -u " + tenantCode + " " + runCmd;
             }
@@ -391,12 +391,12 @@ public class ProcessUtils {
         Matcher mat = null;
         // pstree pid get sub pids
         if (OSUtils.isMacOS()) {
-            String pids = OSUtils.exeCmd("pstree -sp " + processId);
+            String pids = OSUtils.exeCmd(String.format("%s -sp %d", Constants.PSTREE, processId));
             if (null != pids) {
                 mat = MACPATTERN.matcher(pids);
             }
         } else {
-            String pids = OSUtils.exeCmd("pstree -p " + processId);
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", Constants.PSTREE, processId));
             mat = WINDOWSATTERN.matcher(pids);
         }
 
