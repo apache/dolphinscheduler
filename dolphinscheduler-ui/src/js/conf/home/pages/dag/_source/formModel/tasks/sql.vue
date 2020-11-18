@@ -140,381 +140,381 @@
  </div>
 </template>
 <script>
- import _ from 'lodash'
- import i18n from '@/module/i18n'
- import mUdfs from './_source/udfs'
- import mListBox from './_source/listBox'
- import mScriptBox from './_source/scriptBox'
- import mSqlType from './_source/sqlType'
- import mDatasource from './_source/datasource'
- import mLocalParams from './_source/localParams'
- import mStatementList from './_source/statementList'
- import disabledState from '@/module/mixin/disabledState'
- import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
- import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+   import _ from 'lodash'
+   import i18n from '@/module/i18n'
+   import mUdfs from './_source/udfs'
+   import mListBox from './_source/listBox'
+   import mScriptBox from './_source/scriptBox'
+   import mSqlType from './_source/sqlType'
+   import mDatasource from './_source/datasource'
+   import mLocalParams from './_source/localParams'
+   import mStatementList from './_source/statementList'
+   import disabledState from '@/module/mixin/disabledState'
+   import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
+   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
- let editor
+   let editor
 
- export default {
-   name: 'sql',
-   data () {
-     return {
-       // Data source type
-       type: '',
-       // data source
-       datasource: '',
-       // Return to the selected data source
-       rtDatasource: '',
-       // Sql statement
-       sql: '',
-       // Custom parameter
-       localParams: [],
-       // UDF function
-       udfs: '',
-       // Sql type
-       sqlType: '0',
-       // Alert title
-       title: '',
-       // Alert groupId
-       groupId: '',
-       // Form/attachment
-       showType: ['TABLE'],
-       // Sql parameter
-       connParams: '',
-       // Pre statements
-       preStatements: [],
-       // Post statements
-       postStatements: []
-     }
-   },
-   mixins: [disabledState],
-   props: {
-     backfillItem: Object,
-     createNodeId: Number
-   },
-   methods: {
-     setEditorVal() {
-       let self = this
-         let modal = self.$modal.dialog({
-           className: 'scriptModal',
-           closable: false,
-           showMask: true,
-           maskClosable: true,
-           onClose: function() {
+   export default {
+     name: 'sql',
+     data () {
+       return {
+         // Data source type
+         type: '',
+         // data source
+         datasource: '',
+         // Return to the selected data source
+         rtDatasource: '',
+         // Sql statement
+         sql: '',
+         // Custom parameter
+         localParams: [],
+         // UDF function
+         udfs: '',
+         // Sql type
+         sqlType: '0',
+         // Alert title
+         title: '',
+         // Alert groupId
+         groupId: '',
+         // Form/attachment
+         showType: ['TABLE'],
+         // Sql parameter
+         connParams: '',
+         // Pre statements
+         preStatements: [],
+         // Post statements
+         postStatements: []
+       }
+     },
+     mixins: [disabledState],
+     props: {
+       backfillItem: Object,
+       createNodeId: Number
+     },
+     methods: {
+       setEditorVal() {
+         let self = this
+           let modal = self.$modal.dialog({
+             className: 'scriptModal',
+             closable: false,
+             showMask: true,
+             maskClosable: true,
+             onClose: function() {
 
-           },
-           render (h) {
-             return h(mScriptBox, {
-               on: {
-                 getSriptBoxValue (val) {
-                   editor.setValue(val)
+             },
+             render (h) {
+               return h(mScriptBox, {
+                 on: {
+                   getSriptBoxValue (val) {
+                     editor.setValue(val)
+                   },
+                   closeAble () {
+                     // this.$modal.destroy()
+                     modal.remove()
+                   }
                  },
-                 closeAble () {
-                   // this.$modal.destroy()
-                   modal.remove()
+                 props: {
+                   item: editor.getValue()
                  }
-               },
-               props: {
-                 item: editor.getValue()
-               }
-             })
-           }
-         })
-     },
-     /**
-      * return sqlType
-      */
-     _onSqlType (a) {
-       this.sqlType = a
-       if(a==0) {
-         this.showType = ['TABLE']
-       }
-     },
-     /**
-      * return udfs
-      */
-     _onUdfsData (a) {
-       this.udfs = a
-     },
-     /**
-      * return Custom parameter
-      */
-     _onUdpData (a) {
-       this.localParams = a
-     },
-     /**
-      * return data source
-      */
-     _onDsData (o) {
-       this.type = o.type
-       this.rtDatasource = o.datasource
-     },
-     /**
-      * return pre statements
-      */
-     _onPreStatements (a) {
-       this.preStatements = a
-     },
-     /**
-      * return post statements
-      */
-     _onPostStatements (a) {
-       this.postStatements = a
-     },
-     /**
-      * verification
-      */
-     _verification () {
-       if (!editor.getValue()) {
-         this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
-         return false
-       }
-
-       // datasource Subcomponent verification
-       if (!this.$refs.refDs._verifDatasource()) {
-         return false
-       }
-       /*
-       if (this.sqlType==0 && !this.showType.length) {
-         this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
-         return false
-       }*/
-       if (this.sqlType==0 && !this.title) {
-         this.$message.warning(`${i18n.$t('Please enter the title of alert')}`)
-         return false
-       }
-       if (this.sqlType==0 && !this.groupId) {
-         this.$message.warning(`${i18n.$t('Please select the alert group')}`)
-         return false
-       }
-
-       // udfs Subcomponent verification Verification only if the data type is HIVE
-       if (this.type === 'HIVE') {
-         if (!this.$refs.refUdfs._verifUdfs()) {
+               })
+             }
+           })
+       },
+       /**
+        * return sqlType
+        */
+       _onSqlType (a) {
+         this.sqlType = a
+         if(a==0) {
+           this.showType = ['TABLE']
+         }
+       },
+       /**
+        * return udfs
+        */
+       _onUdfsData (a) {
+         this.udfs = a
+       },
+       /**
+        * return Custom parameter
+        */
+       _onUdpData (a) {
+         this.localParams = a
+       },
+       /**
+        * return data source
+        */
+       _onDsData (o) {
+         this.type = o.type
+         this.rtDatasource = o.datasource
+       },
+       /**
+        * return pre statements
+        */
+       _onPreStatements (a) {
+         this.preStatements = a
+       },
+       /**
+        * return post statements
+        */
+       _onPostStatements (a) {
+         this.postStatements = a
+       },
+       /**
+        * verification
+        */
+       _verification () {
+         if (!editor.getValue()) {
+           this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
            return false
          }
-       }
 
-       // localParams Subcomponent verification
-       if (!this.$refs.refLocalParams._verifProp()) {
-         return false
-       }
+         // datasource Subcomponent verification
+         if (!this.$refs.refDs._verifDatasource()) {
+           return false
+         }
+         /*
+         if (this.sqlType==0 && !this.showType.length) {
+           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
+           return false
+         }*/
+         if (this.sqlType==0 && !this.title) {
+           this.$message.warning(`${i18n.$t('Please enter the title of alert')}`)
+           return false
+         }
+         if (this.sqlType==0 && !this.groupId) {
+           this.$message.warning(`${i18n.$t('Please select the alert group')}`)
+           return false
+         }
 
-       // preStatements Subcomponent verification
-       if (!this.$refs.refPreStatements._verifProp()) {
-         return false
-       }
-
-       // postStatements Subcomponent verification
-       if (!this.$refs.refPostStatements._verifProp()) {
-         return false
-       }
-
-       // storage
-       this.$emit('on-params', {
-         type: this.type,
-         datasource: this.rtDatasource,
-         sql: editor.getValue(),
-         udfs: this.udfs,
-         sqlType: this.sqlType,
-         title: this.title,
-         groupId: this.groupId,
-         showType: (() => {
-           /**
-            * Special processing return order TABLE,ATTACHMENT
-            * Handling checkout sequence
-            */
-           let showType = this.showType
-           if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-             return [showType[1], showType[0]].join(',')
-           } else {
-             return showType.join(',')
+         // udfs Subcomponent verification Verification only if the data type is HIVE
+         if (this.type === 'HIVE') {
+           if (!this.$refs.refUdfs._verifUdfs()) {
+             return false
            }
-         })(),
-         localParams: this.localParams,
-         connParams: this.connParams,
-         preStatements: this.preStatements,
-         postStatements: this.postStatements
-       })
-       return true
-     },
-     /**
-      * Processing code highlighting
-      */
-     _handlerEditor () {
-       this._destroyEditor()
+         }
 
-       // editor
-       editor = codemirror('code-sql-mirror', {
-         mode: 'sql',
-         readOnly: this.isDetails
-       })
+         // localParams Subcomponent verification
+         if (!this.$refs.refLocalParams._verifProp()) {
+           return false
+         }
 
-       this.keypress = () => {
-         if (!editor.getOption('readOnly')) {
-           editor.showHint({
-             completeSingle: false
-           })
+         // preStatements Subcomponent verification
+         if (!this.$refs.refPreStatements._verifProp()) {
+           return false
+         }
+
+         // postStatements Subcomponent verification
+         if (!this.$refs.refPostStatements._verifProp()) {
+           return false
+         }
+
+         // storage
+         this.$emit('on-params', {
+           type: this.type,
+           datasource: this.rtDatasource,
+           sql: editor.getValue(),
+           udfs: this.udfs,
+           sqlType: this.sqlType,
+           title: this.title,
+           groupId: this.groupId,
+           showType: (() => {
+             /**
+              * Special processing return order TABLE,ATTACHMENT
+              * Handling checkout sequence
+              */
+             let showType = this.showType
+             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+               return [showType[1], showType[0]].join(',')
+             } else {
+               return showType.join(',')
+             }
+           })(),
+           localParams: this.localParams,
+           connParams: this.connParams,
+           preStatements: this.preStatements,
+           postStatements: this.postStatements
+         })
+         return true
+       },
+       /**
+        * Processing code highlighting
+        */
+       _handlerEditor () {
+         this._destroyEditor()
+
+         // editor
+         editor = codemirror('code-sql-mirror', {
+           mode: 'sql',
+           readOnly: this.isDetails
+         })
+
+         this.keypress = () => {
+           if (!editor.getOption('readOnly')) {
+             editor.showHint({
+               completeSingle: false
+             })
+           }
+         }
+
+         this.changes = () => {
+           this._cacheParams()
+         }
+
+         // Monitor keyboard
+         editor.on('keypress', this.keypress)
+
+         editor.on('changes', this.changes)
+
+         editor.setValue(this.sql)
+
+         return editor
+       },
+       _getReceiver () {
+         let param = {}
+         let current = this.router.history.current
+         if (current.name === 'projects-definition-details') {
+           param.processDefinitionId = current.params.id
+         } else {
+           param.processInstanceId = current.params.id
+         }
+       },
+       _cacheParams () {
+         this.$emit('on-cache-params', {
+           type: this.type,
+           datasource: this.rtDatasource,
+           sql: editor ? editor.getValue() : '',
+           udfs: this.udfs,
+           sqlType: this.sqlType,
+           title: this.title,
+           groupId: this.groupId,
+           showType: (() => {
+
+             let showType = this.showType
+             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+               return [showType[1], showType[0]].join(',')
+             } else {
+               return showType.join(',')
+             }
+           })(),
+           localParams: this.localParams,
+           connParams: this.connParams,
+           preStatements: this.preStatements,
+           postStatements: this.postStatements
+         });
+       },
+       _destroyEditor () {
+          if (editor) {
+           editor.toTextArea() // Uninstall
+           editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+           editor.off($('.code-sql-mirror'), 'changes', this.changes)
          }
        }
-
-       this.changes = () => {
+     },
+     watch: {
+       // Listening to sqlType
+       sqlType (val) {
+         if (val==0) {
+           this.showType = []
+         }
+         if (val != 0) {
+           this.title = ''
+           this.groupId = ''
+         }
+       },
+       // Listening data source
+       type (val) {
+         if (val !== 'HIVE') {
+           this.connParams = ''
+         }
+       },
+       //Watch the cacheParams
+       cacheParams (val) {
          this._cacheParams()
        }
-
-       // Monitor keyboard
-       editor.on('keypress', this.keypress)
-
-       editor.on('changes', this.changes)
-
-       editor.setValue(this.sql)
-
-       return editor
      },
-     _getReceiver () {
-       let param = {}
-       let current = this.router.history.current
-       if (current.name === 'projects-definition-details') {
-         param.processDefinitionId = current.params.id
-       } else {
-         param.processInstanceId = current.params.id
+     created () {
+       let o = this.backfillItem
+
+       // Non-null objects represent backfill
+       if (!_.isEmpty(o)) {
+         // backfill
+         this.type = o.params.type || ''
+         this.datasource = o.params.datasource || ''
+         this.sql = o.params.sql || ''
+         this.udfs = o.params.udfs || ''
+         this.sqlType = o.params.sqlType
+         this.connParams = o.params.connParams || ''
+         this.localParams = o.params.localParams || []
+         if(o.params.showType == '') {
+           this.showType = []
+         } else {
+           this.showType = o.params.showType.split(',') || []
+         }
+         this.preStatements = o.params.preStatements || []
+         this.postStatements = o.params.postStatements || []
+         this.title = o.params.title || ''
+         this.groupId = o.params.groupId || ''
+       }
+       // read tasks from cache
+       if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
+         this.router.history.current.name !== 'definition-create') {
+         this._getReceiver()
        }
      },
-     _cacheParams () {
-       this.$emit('on-cache-params', {
-         type: this.type,
-         datasource: this.rtDatasource,
-         sql: editor ? editor.getValue() : '',
-         udfs: this.udfs,
-         sqlType: this.sqlType,
-         title: this.title,
-         groupId: this.groupId,
-         showType: (() => {
-
-           let showType = this.showType
-           if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-             return [showType[1], showType[0]].join(',')
-           } else {
-             return showType.join(',')
-           }
-         })(),
-         localParams: this.localParams,
-         connParams: this.connParams,
-         preStatements: this.preStatements,
-         postStatements: this.postStatements
-       });
+     mounted () {
+       setTimeout(() => {
+         this._handlerEditor()
+       }, 200)
      },
-     _destroyEditor () {
-        if (editor) {
+     destroyed () {
+       /**
+        * Destroy the editor instance
+        */
+       if (editor) {
          editor.toTextArea() // Uninstall
          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
          editor.off($('.code-sql-mirror'), 'changes', this.changes)
        }
-     }
-   },
-   watch: {
-     // Listening to sqlType
-     sqlType (val) {
-       if (val==0) {
-         this.showType = []
-       }
-       if (val != 0) {
-         this.title = ''
-         this.groupId = ''
+     },
+     computed: {
+       cacheParams () {
+         return {
+           type: this.type,
+           datasource: this.rtDatasource,
+           udfs: this.udfs,
+           sqlType: this.sqlType,
+           title: this.title,
+           groupId: this.groupId,
+           showType: (() => {
+
+             let showType = this.showType
+             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+               return [showType[1], showType[0]].join(',')
+             } else {
+               return showType.join(',')
+             }
+           })(),
+           localParams: this.localParams,
+           connParams: this.connParams,
+           preStatements: this.preStatements,
+           postStatements: this.postStatements
+         }
        }
      },
-     // Listening data source
-     type (val) {
-       if (val !== 'HIVE') {
-         this.connParams = ''
-       }
-     },
-     //Watch the cacheParams
-     cacheParams (val) {
-       this._cacheParams()
-     }
-   },
-   created () {
-     let o = this.backfillItem
-
-     // Non-null objects represent backfill
-     if (!_.isEmpty(o)) {
-       // backfill
-       this.type = o.params.type || ''
-       this.datasource = o.params.datasource || ''
-       this.sql = o.params.sql || ''
-       this.udfs = o.params.udfs || ''
-       this.sqlType = o.params.sqlType
-       this.connParams = o.params.connParams || ''
-       this.localParams = o.params.localParams || []
-       if(o.params.showType == '') {
-         this.showType = []
-       } else {
-         this.showType = o.params.showType.split(',') || []
-       }
-       this.preStatements = o.params.preStatements || []
-       this.postStatements = o.params.postStatements || []
-       this.title = o.params.title || ''
-       this.groupId = o.params.groupId || ''
-     }
-     // read tasks from cache
-     if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
-       this.router.history.current.name !== 'definition-create') {
-       this._getReceiver()
-     }
-   },
-   mounted () {
-     setTimeout(() => {
-       this._handlerEditor()
-     }, 200)
-   },
-   destroyed () {
-     /**
-      * Destroy the editor instance
-      */
-     if (editor) {
-       editor.toTextArea() // Uninstall
-       editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
-       editor.off($('.code-sql-mirror'), 'changes', this.changes)
-     }
-   },
-   computed: {
-     cacheParams () {
-       return {
-         type: this.type,
-         datasource: this.rtDatasource,
-         udfs: this.udfs,
-         sqlType: this.sqlType,
-         title: this.title,
-         groupId: this.groupId,
-         showType: (() => {
-
-           let showType = this.showType
-           if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-             return [showType[1], showType[0]].join(',')
-           } else {
-             return showType.join(',')
-           }
-         })(),
-         localParams: this.localParams,
-         connParams: this.connParams,
-         preStatements: this.preStatements,
-         postStatements: this.postStatements
-       }
-     }
-   },
-   components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
- }
+     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
+   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
- .requiredIcon {
-   color: #ff0000;
-   padding-right: 4px;
- }
- .ans-modal-box-max {
-   position: absolute;
-   right: -12px;
-   top: -16px;
- }
+   .requiredIcon {
+     color: #ff0000;
+     padding-right: 4px;
+   }
+   .ans-modal-box-max {
+     position: absolute;
+     right: -12px;
+     top: -16px;
+   }
 </style>
 
