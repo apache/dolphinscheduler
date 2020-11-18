@@ -76,7 +76,7 @@ public class SqlParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
-     * title
+     * groupId
      */
     private int groupId;
     /**
