@@ -63,7 +63,7 @@
          <x-input
            type="input"
            v-model="groupId"
-           :placeholder="$t('Please enter the title of alert')"
+           :placeholder="$t('Please select the alert group')"
            autocomplete="off">
          </x-input>
        </div>
