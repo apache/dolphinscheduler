@@ -14,23 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- *  spark args utils
+ * spark args utils
  */
 public class SparkArgsUtils {
+
+    private static final String SPARK_CLUSTER = "cluster";
+
+    private static final String SPARK_LOCAL = "local";
+
+    private static final String SPARK_ON_YARN = "yarn";
 
     /**
      * build args
@@ -40,15 +45,15 @@ public class SparkArgsUtils {
      */
     public static List<String> buildArgs(SparkParameters param) {
         List<String> args = new ArrayList<>();
-        String deployMode = "cluster";
+        String deployMode = SPARK_CLUSTER;
 
         args.add(Constants.MASTER);
-        if(StringUtils.isNotEmpty(param.getDeployMode())){
+        if (StringUtils.isNotEmpty(param.getDeployMode())) {
             deployMode = param.getDeployMode();
 
         }
-        if(!"local".equals(deployMode)){
-            args.add("yarn");
+        if (!SPARK_LOCAL.equals(deployMode)) {
+            args.add(SPARK_ON_YARN);
             args.add(Constants.DEPLOY_MODE);
         }
 
@@ -56,7 +61,7 @@ public class SparkArgsUtils {
 
         ProgramType type = param.getProgramType();
         String mainClass = param.getMainClass();
-        if(type != null && type != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)){
+        if (type != null && type != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
             args.add(Constants.MAIN_CLASS);
             args.add(mainClass);
         }
@@ -96,14 +101,14 @@ public class SparkArgsUtils {
         String queue = param.getQueue();
         if (StringUtils.isNotEmpty(others)) {
 
-            if(!others.contains(Constants.SPARK_QUEUE) && StringUtils.isNotEmpty(queue)){
+            if (!others.contains(Constants.SPARK_QUEUE) && StringUtils.isNotEmpty(queue)) {
                 args.add(Constants.SPARK_QUEUE);
                 args.add(queue);
             }
 
             args.add(others);
 
-        }else if (StringUtils.isNotEmpty(queue)) {
+        } else if (StringUtils.isNotEmpty(queue)) {
             args.add(Constants.SPARK_QUEUE);
             args.add(queue);
 
