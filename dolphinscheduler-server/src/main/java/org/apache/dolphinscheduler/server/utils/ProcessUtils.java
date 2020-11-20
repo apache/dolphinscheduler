@@ -345,7 +345,7 @@ public class ProcessUtils {
             }
 
             logger.info("kill cmd:{}", runCmd);
-            Runtime.getRuntime().exec(runCmd);
+            OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
             logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
         }
