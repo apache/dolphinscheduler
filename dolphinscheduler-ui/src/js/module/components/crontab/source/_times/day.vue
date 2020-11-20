@@ -352,8 +352,8 @@
       },
       monthLastWeeksVal (val) {
         if (this.radioDay === 'monthLastWeeks') {
-          this.weekValue = `?`
-          this.dayValue = val
+          this.weekValue = val
+          this.dayValue = `?`
         }
       },
       WkmonthNumWeeksWeekVal (val) {
