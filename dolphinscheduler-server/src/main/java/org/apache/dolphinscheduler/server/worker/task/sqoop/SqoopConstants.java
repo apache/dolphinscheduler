@@ -40,9 +40,11 @@ public final class SqoopConstants {
     public static final String QUERY = "--query";
     public static final String QUERY_CONDITION = "AND \\$CONDITIONS";
     public static final String QUERY_WITHOUT_CONDITION = "WHERE \\$CONDITIONS";
-    public static final String QUOTATION_MARKS = "\"";
     public static final String MAP_COLUMN_HIVE = "--map-column-hive";
     public static final String MAP_COLUMN_JAVA = "--map-column-java";
+    public static final String QUERY_TYPE_SQL = "SQL";
+    public static final String QUERY_TYPE_FORM = "FORM";
+
 
     //sqoop hive source
     public static final String HCATALOG_DATABASE = "--hcatalog-database";

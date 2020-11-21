@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
@@ -28,8 +29,6 @@ import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
-
-import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        LinkedList<String> mysqlTargetParamsList = new LinkedList<>();
+        StringBuilder mysqlTargetSb = new StringBuilder();
 
         try {
             TargetMysqlParameter targetMysqlParameter =
@@ -59,45 +58,47 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                     sqoopTaskExecutionContext.getTargetConnectionParams());
 
                 if (null != baseDataSource) {
-                    mysqlTargetParamsList.add(SqoopConstants.DB_CONNECT);
-                    mysqlTargetParamsList.add(baseDataSource.getJdbcUrl());
-                    mysqlTargetParamsList.add(SqoopConstants.DB_USERNAME);
-                    mysqlTargetParamsList.add(baseDataSource.getUser());
-                    mysqlTargetParamsList.add(SqoopConstants.DB_PWD);
-                    mysqlTargetParamsList.add(baseDataSource.getPassword());
-                    mysqlTargetParamsList.add(SqoopConstants.TABLE);
-                    mysqlTargetParamsList.add(targetMysqlParameter.getTargetTable());
+
+                    mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
+                        .append(Constants.SPACE).append(baseDataSource.getJdbcUrl())
+                        .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
+                        .append(Constants.SPACE).append(baseDataSource.getUser())
+                        .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
+                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getPassword()).append(Constants.DOUBLE_QUOTES)
+                        .append(Constants.SPACE).append(SqoopConstants.TABLE)
+                        .append(Constants.SPACE).append(targetMysqlParameter.getTargetTable());
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getTargetColumns())) {
-                        mysqlTargetParamsList.add(SqoopConstants.COLUMNS);
-                        mysqlTargetParamsList.add(targetMysqlParameter.getTargetColumns());
+                        mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
+                            .append(Constants.SPACE).append(targetMysqlParameter.getTargetColumns());
                     }
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getFieldsTerminated())) {
-                        mysqlTargetParamsList.add(SqoopConstants.FIELDS_TERMINATED_BY);
+                        mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.FIELDS_TERMINATED_BY);
                         if (targetMysqlParameter.getFieldsTerminated().contains("'")) {
-                            mysqlTargetParamsList.add(targetMysqlParameter.getFieldsTerminated());
+                            mysqlTargetSb.append(Constants.SPACE).append(targetMysqlParameter.getFieldsTerminated());
+
                         } else {
-                            mysqlTargetParamsList.add("'" + targetMysqlParameter.getFieldsTerminated() + "'");
+                            mysqlTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetMysqlParameter.getFieldsTerminated()).append(Constants.SINGLE_QUOTES);
                         }
                     }
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getLinesTerminated())) {
-                        mysqlTargetParamsList.add(SqoopConstants.LINES_TERMINATED_BY);
-                        if (targetMysqlParameter.getLinesTerminated().contains("'")) {
-                            mysqlTargetParamsList.add(targetMysqlParameter.getLinesTerminated());
+                        mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.LINES_TERMINATED_BY);
+                        if (targetMysqlParameter.getLinesTerminated().contains(Constants.SINGLE_QUOTES)) {
+                            mysqlTargetSb.append(Constants.SPACE).append(targetMysqlParameter.getLinesTerminated());
                         } else {
-                            mysqlTargetParamsList.add("'" + targetMysqlParameter.getLinesTerminated() + "'");
+                            mysqlTargetSb.append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetMysqlParameter.getLinesTerminated()).append(Constants.SINGLE_QUOTES);
                         }
                     }
 
                     if (targetMysqlParameter.getIsUpdate()
                         && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
                         && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
-                        mysqlTargetParamsList.add(SqoopConstants.UPDATE_KEY);
-                        mysqlTargetParamsList.add(targetMysqlParameter.getTargetUpdateKey());
-                        mysqlTargetParamsList.add(SqoopConstants.UPDATE_MODE);
-                        mysqlTargetParamsList.add(targetMysqlParameter.getTargetUpdateMode());
+                        mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.UPDATE_KEY)
+                            .append(Constants.SPACE).append(targetMysqlParameter.getTargetUpdateKey())
+                            .append(Constants.SPACE).append(SqoopConstants.UPDATE_MODE)
+                            .append(Constants.SPACE).append(targetMysqlParameter.getTargetUpdateMode());
                     }
                 }
             }
@@ -105,6 +106,6 @@ public class MysqlTargetGenerator implements ITargetGenerator {
             logger.error(String.format("Sqoop mysql target params build failed: [%s]", e.getMessage()));
         }
 
-        return String.join(" ", mysqlTargetParamsList);
+        return mysqlTargetSb.toString();
     }
 }

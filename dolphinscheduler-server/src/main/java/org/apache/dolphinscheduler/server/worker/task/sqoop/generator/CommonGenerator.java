@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,17 +37,18 @@ public class CommonGenerator {
 
     public String generate(SqoopParameters sqoopParameters) {
 
-        LinkedList<String> sqoopCommonParamsList = new LinkedList<>();
+        StringBuilder commonSb = new StringBuilder();
 
         try {
             //sqoop task model
-            sqoopCommonParamsList.add(SqoopConstants.SQOOP);
-            sqoopCommonParamsList.add(sqoopParameters.getModelType());
+            commonSb.append(SqoopConstants.SQOOP)
+                .append(Constants.SPACE)
+                .append(sqoopParameters.getModelType());
 
             //sqoop map-reduce job name
-            sqoopCommonParamsList.add(Constants.D);
-            sqoopCommonParamsList.add(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
-                Constants.EQUAL_SIGN, sqoopParameters.getJobName()));
+            commonSb.append(Constants.SPACE).append(Constants.D).append(Constants.SPACE)
+                .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
+                    Constants.EQUAL_SIGN, sqoopParameters.getJobName()));
 
             //hadoop custom param
             List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
@@ -57,8 +57,8 @@ public class CommonGenerator {
                     String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getProp(),
                         Constants.EQUAL_SIGN, hadoopCustomParam.getValue());
 
-                    sqoopCommonParamsList.add(Constants.D);
-                    sqoopCommonParamsList.add(hadoopCustomParamStr);
+                    commonSb.append(Constants.SPACE).append(Constants.D)
+                        .append(Constants.SPACE).append(hadoopCustomParamStr);
                 }
             }
 
@@ -66,20 +66,20 @@ public class CommonGenerator {
             List<Property> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
             if (CollectionUtils.isNotEmpty(sqoopAdvancedParams)) {
                 for (Property sqoopAdvancedParam : sqoopAdvancedParams) {
-                    sqoopCommonParamsList.add(sqoopAdvancedParam.getProp());
-                    sqoopCommonParamsList.add(sqoopAdvancedParam.getValue());
+                    commonSb.append(Constants.SPACE).append(sqoopAdvancedParam.getProp())
+                        .append(Constants.SPACE).append(sqoopAdvancedParam.getValue());
                 }
             }
 
             //sqoop parallelism
             if (sqoopParameters.getConcurrency() > 0) {
-                sqoopCommonParamsList.add(SqoopConstants.SQOOP_PARALLELISM);
-                sqoopCommonParamsList.add(String.valueOf(sqoopParameters.getConcurrency()));
+                commonSb.append(Constants.SPACE).append(SqoopConstants.SQOOP_PARALLELISM)
+                    .append(Constants.SPACE).append(sqoopParameters.getConcurrency());
             }
         } catch (Exception e) {
             logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
         }
 
-        return String.join(" ", sqoopCommonParamsList);
+        return commonSb.toString();
     }
 }

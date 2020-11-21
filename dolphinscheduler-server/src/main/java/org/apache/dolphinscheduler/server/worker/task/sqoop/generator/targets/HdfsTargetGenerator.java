@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHdfsParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -40,7 +41,7 @@ public class HdfsTargetGenerator implements ITargetGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        LinkedList<String> hdfsTargetParamsList = new LinkedList<>();
+        StringBuilder hdfsTargetSb = new StringBuilder();
 
         try {
             TargetHdfsParameter targetHdfsParameter =
@@ -49,39 +50,39 @@ public class HdfsTargetGenerator implements ITargetGenerator {
             if (null != targetHdfsParameter) {
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getTargetPath())) {
-                    hdfsTargetParamsList.add(SqoopConstants.TARGET_DIR);
-                    hdfsTargetParamsList.add(targetHdfsParameter.getTargetPath());
+                    hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.TARGET_DIR)
+                        .append(Constants.SPACE).append(targetHdfsParameter.getTargetPath());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getCompressionCodec())) {
-                    hdfsTargetParamsList.add(SqoopConstants.COMPRESSION_CODEC);
-                    hdfsTargetParamsList.add(targetHdfsParameter.getCompressionCodec());
+                    hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.COMPRESSION_CODEC)
+                        .append(Constants.SPACE).append(targetHdfsParameter.getCompressionCodec());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFileType())) {
-                    hdfsTargetParamsList.add(targetHdfsParameter.getFileType());
+                    hdfsTargetSb.append(Constants.SPACE).append(targetHdfsParameter.getFileType());
                 }
 
                 if (targetHdfsParameter.isDeleteTargetDir()) {
-                    hdfsTargetParamsList.add(SqoopConstants.DELETE_TARGET_DIR);
+                    hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.DELETE_TARGET_DIR);
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())) {
-                    hdfsTargetParamsList.add(SqoopConstants.FIELDS_TERMINATED_BY);
-                    hdfsTargetParamsList.add("'" + targetHdfsParameter.getFieldsTerminated() + "'");
+                    hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.FIELDS_TERMINATED_BY)
+                        .append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetHdfsParameter.getFieldsTerminated()).append(Constants.SINGLE_QUOTES);
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())) {
-                    hdfsTargetParamsList.add(SqoopConstants.LINES_TERMINATED_BY);
-                    hdfsTargetParamsList.add("'" + targetHdfsParameter.getLinesTerminated() + "'");
+                    hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.LINES_TERMINATED_BY)
+                        .append(Constants.SPACE).append(Constants.SINGLE_QUOTES).append(targetHdfsParameter.getLinesTerminated()).append(Constants.SINGLE_QUOTES);
                 }
 
-                hdfsTargetParamsList.add(SqoopConstants.FIELD_NULL_PLACEHOLDER);
+                hdfsTargetSb.append(Constants.SPACE).append(SqoopConstants.FIELD_NULL_PLACEHOLDER);
             }
         } catch (Exception e) {
             logger.error(String.format("Sqoop hdfs target params build failed: [%s]", e.getMessage()));
         }
 
-        return String.join(" ", hdfsTargetParamsList);
+        return hdfsTargetSb.toString();
     }
 }

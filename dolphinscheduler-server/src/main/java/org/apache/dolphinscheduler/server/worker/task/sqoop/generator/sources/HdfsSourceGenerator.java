@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceHdfsParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -24,8 +25,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
-
-import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +39,7 @@ public class HdfsSourceGenerator implements ISourceGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        LinkedList<String> hdfsSourceParamsList = new LinkedList<>();
+        StringBuilder hdfsSourceSb = new StringBuilder();
 
         try {
             SourceHdfsParameter sourceHdfsParameter
@@ -48,8 +47,8 @@ public class HdfsSourceGenerator implements ISourceGenerator {
 
             if (null != sourceHdfsParameter) {
                 if (StringUtils.isNotEmpty(sourceHdfsParameter.getExportDir())) {
-                    hdfsSourceParamsList.add(SqoopConstants.HDFS_EXPORT_DIR);
-                    hdfsSourceParamsList.add(sourceHdfsParameter.getExportDir());
+                    hdfsSourceSb.append(Constants.SPACE).append(SqoopConstants.HDFS_EXPORT_DIR)
+                        .append(Constants.SPACE).append(sourceHdfsParameter.getExportDir());
                 } else {
                     throw new IllegalArgumentException("Sqoop hdfs export dir is null");
                 }
@@ -59,6 +58,6 @@ public class HdfsSourceGenerator implements ISourceGenerator {
             logger.error(String.format("Sqoop hdfs source parmas build failed: [%s]", e.getMessage()));
         }
 
-        return String.join(" ", hdfsSourceParamsList);
+        return hdfsSourceSb.toString();
     }
 }

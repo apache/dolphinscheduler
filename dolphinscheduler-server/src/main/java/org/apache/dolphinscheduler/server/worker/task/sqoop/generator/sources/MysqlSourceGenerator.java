@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.enums.QueryType;
+import org.apache.dolphinscheduler.common.enums.SqoopQueryType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class MysqlSourceGenerator implements ISourceGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        LinkedList<String> mysqlSourceParamsList = new LinkedList<>();
+        StringBuilder mysqlSourceSb = new StringBuilder();
 
         try {
             SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
@@ -59,35 +58,36 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                     sqoopTaskExecutionContext.getSourceConnectionParams());
 
                 if (null != baseDataSource) {
-                    mysqlSourceParamsList.add(SqoopConstants.DB_CONNECT);
-                    mysqlSourceParamsList.add(baseDataSource.getJdbcUrl());
-                    mysqlSourceParamsList.add(SqoopConstants.DB_USERNAME);
-                    mysqlSourceParamsList.add(baseDataSource.getUser());
-                    mysqlSourceParamsList.add(SqoopConstants.DB_PWD);
-                    mysqlSourceParamsList.add(baseDataSource.getPassword());
+
+                    mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
+                        .append(Constants.SPACE).append(baseDataSource.getJdbcUrl())
+                        .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
+                        .append(Constants.SPACE).append(baseDataSource.getUser())
+                        .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
+                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getPassword()).append(Constants.DOUBLE_QUOTES);
 
                     //sqoop table & sql query
-                    if (sourceMysqlParameter.getSrcQueryType() == QueryType.FORM.ordinal()) {
+                    if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
-                            mysqlSourceParamsList.add(SqoopConstants.TABLE);
-                            mysqlSourceParamsList.add(sourceMysqlParameter.getSrcTable());
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.TABLE)
+                                .append(Constants.SPACE).append(sourceMysqlParameter.getSrcTable());
                         }
 
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
-                            mysqlSourceParamsList.add(SqoopConstants.COLUMNS);
-                            mysqlSourceParamsList.add(sourceMysqlParameter.getSrcColumns());
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.COLUMNS)
+                                .append(Constants.SPACE).append(sourceMysqlParameter.getSrcColumns());
                         }
-                    } else if (sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()
+                    } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
                         && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
 
-                        mysqlSourceParamsList.add(SqoopConstants.QUERY);
                         String srcQuery = sourceMysqlParameter.getSrcQuerySql();
-                        mysqlSourceParamsList.add(SqoopConstants.QUOTATION_MARKS + srcQuery);
+                        mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY)
+                            .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(srcQuery);
 
                         if (srcQuery.toLowerCase().contains(SqoopConstants.QUERY_WHERE)) {
-                            mysqlSourceParamsList.add(SqoopConstants.QUERY_CONDITION + SqoopConstants.QUOTATION_MARKS);
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_CONDITION).append(Constants.DOUBLE_QUOTES);
                         } else {
-                            mysqlSourceParamsList.add(SqoopConstants.QUERY_WITHOUT_CONDITION + SqoopConstants.QUOTATION_MARKS);
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.QUERY_WITHOUT_CONDITION).append(Constants.DOUBLE_QUOTES);
                         }
                     }
 
@@ -101,8 +101,8 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            mysqlSourceParamsList.add(SqoopConstants.MAP_COLUMN_HIVE);
-                            mysqlSourceParamsList.add(columnMap.substring(0, columnMap.length() - 1));
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_HIVE)
+                                .append(Constants.SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
 
@@ -116,8 +116,8 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            mysqlSourceParamsList.add(SqoopConstants.MAP_COLUMN_JAVA);
-                            mysqlSourceParamsList.add(columnMap.substring(0, columnMap.length() - 1));
+                            mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_JAVA)
+                                .append(Constants.SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
                 }
@@ -126,6 +126,6 @@ public class MysqlSourceGenerator implements ISourceGenerator {
             logger.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
         }
 
-        return String.join(" ", mysqlSourceParamsList);
+        return mysqlSourceSb.toString();
     }
 }
