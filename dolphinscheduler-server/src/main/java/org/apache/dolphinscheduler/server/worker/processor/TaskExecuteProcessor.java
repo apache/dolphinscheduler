@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -32,22 +33,20 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
+import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.rholder.retry.RetryException;
 
 import io.netty.channel.Channel;
 
@@ -73,7 +72,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
-    public TaskExecuteProcessor(){
+    public TaskExecuteProcessor() {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
@@ -84,12 +83,12 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
-        TaskExecuteRequestCommand taskRequestCommand = JsonSerializer.deserialize(
+        TaskExecuteRequestCommand taskRequestCommand = JSONUtils.parseObject(
                 command.getBody(), TaskExecuteRequestCommand.class);
 
         logger.info("received command : {}", taskRequestCommand);
 
-        if(taskRequestCommand == null){
+        if (taskRequestCommand == null) {
             logger.error("task execute request command is null");
             return;
         }
@@ -97,18 +96,20 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(contextJson, TaskExecutionContext.class);
 
-        if(taskExecutionContext == null){
+        if (taskExecutionContext == null) {
             logger.error("task execution context is null");
             return;
         }
-
-        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
-
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId()));
+
+        taskExecutionContext.setHost(NetUtils.getHost() + ":" + workerConfig.getListenPort());
+        taskExecutionContext.setStartTime(new Date());
+        taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
+        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
@@ -127,27 +128,17 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        if (DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(), taskExecutionContext.getDelayTime() * 60L) > 0) {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-            taskExecutionContext.setStartTime(null);
-        } else {
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            taskExecutionContext.setStartTime(new Date());
-        }
+        this.doAck(taskExecutionContext);
 
-        // tell master the status of this task (RUNNING_EXECUTION or DELAY_EXECUTION)
-        final Command ackCommand = buildAckCommand(taskExecutionContext).convert2Command();
+        // submit task
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
+    }
 
-        try {
-            RetryerUtils.retryCall(() -> {
-                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(),ackCommand);
-                return Boolean.TRUE;
-            });
-            // submit task
-            workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
-        } catch (ExecutionException | RetryException e) {
-            logger.error(e.getMessage(), e);
-        }
+    private void doAck(TaskExecutionContext taskExecutionContext){
+        // tell master that task is in executing
+        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
+        ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),ackCommand.convert2Command(),Event.ACK);
+        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
     }
 
     /**
@@ -162,9 +153,9 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
+        if (taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())) {
             ackCommand.setExecutePath(null);
-        }else{
+        } else {
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
         taskExecutionContext.setLogPath(ackCommand.getLogPath());
@@ -176,7 +167,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
-    private String getExecLocalPath(TaskExecutionContext taskExecutionContext){
+    private String getExecLocalPath(TaskExecutionContext taskExecutionContext) {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),

@@ -65,7 +65,7 @@
           <td>
             <span>{{item.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
           </td>
-          <td><span>{{item.tenantName || '-'}}</span></td>
+          <td><span>{{item.tenantCode || '-'}}</span></td>
           <td><span>{{item.queue || '-'}}</span></td>
           <td>
             <span>{{item.email || '-'}}</span>

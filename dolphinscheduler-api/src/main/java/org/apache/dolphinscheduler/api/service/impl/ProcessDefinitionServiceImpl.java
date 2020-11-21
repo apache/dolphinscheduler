@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -166,7 +167,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                        String processDefinitionJson,
                                                        String desc,
                                                        String locations,
-                                                       String connects) throws JsonProcessingException {
+                                                       String connects)  {
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -229,23 +230,40 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     /**
      * get resource ids
-     *
      * @param processData process data
      * @return resource ids
      */
     private String getResourceIds(ProcessData processData) {
-        return Optional.ofNullable(processData.getTasks())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(taskNode -> TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams()))
-                .filter(Objects::nonNull)
-                .flatMap(parameters -> parameters.getResourceFilesList().stream())
-                .map(ResourceInfo::getId)
-                .distinct()
-                .map(Objects::toString)
-                .collect(Collectors.joining(","));
-    }
+        List<TaskNode> tasks = processData.getTasks();
+        Set<Integer> resourceIds = new HashSet<>();
+        StringBuilder sb = new StringBuilder();
+        if (CollectionUtils.isEmpty(tasks)) {
+            return sb.toString();
+        }
+        for (TaskNode taskNode : tasks) {
+            String taskParameter = taskNode.getParams();
+            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(), taskParameter);
+            if (params == null) {
+                continue;
+            }
+            if (CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
+                Set<Integer> tempSet = params.getResourceFilesList().
+                        stream()
+                        .filter(t -> t.getId() != 0)
+                        .map(ResourceInfo::getId)
+                        .collect(Collectors.toSet());
+                resourceIds.addAll(tempSet);
+            }
+        }
 
+        for (int i : resourceIds) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(i);
+        }
+        return sb.toString();
+    }
     /**
      * query process definition list
      *
@@ -255,7 +273,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      */
     public Map<String, Object> queryProcessDefinitionList(User loginUser, String projectName) {
 
-        HashMap<String, Object> result = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -348,10 +366,15 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param connects connects for nodes
      * @return update result code
      */
-    public Map<String, Object> updateProcessDefinition(User loginUser, String projectName, int id, String name,
-                                                       String processDefinitionJson, String desc,
-                                                       String locations, String connects) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Object> updateProcessDefinition(User loginUser,
+                                                       String projectName,
+                                                       int id,
+                                                       String name,
+                                                       String processDefinitionJson,
+                                                       String desc,
+                                                       String locations,
+                                                       String connects) {
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -462,7 +485,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -676,6 +699,17 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
     /**
      * get export process metadata string
+     * @param processDefinitionId process definition id
+     * @param processDefinition process definition
+     * @return export process metadata string
+     */
+    public String exportProcessMetaDataStr(Integer processDefinitionId, ProcessDefinition processDefinition) {
+        //create workflow json file
+        return JSONUtils.toJsonString(exportProcessMetaData(processDefinitionId, processDefinition));
+    }
+
+    /**
+     * get export process metadata string
      *
      * @param processDefinitionId process definition id
      * @param processDefinition process definition
@@ -758,7 +792,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         String processMetaJson = FileUtils.file2String(file);
         List<ProcessMeta> processMetaList = JSONUtils.toList(processMetaJson, ProcessMeta.class);
 
@@ -853,7 +887,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     processMeta.getProcessDefinitionLocations(),
                     processMeta.getProcessDefinitionConnects());
             putMsg(result, Status.SUCCESS);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             logger.error("import process meta json data: {}", e.getMessage(), e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
         }
@@ -927,7 +961,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         }
 
         //recursive sub-process parameter correction map key for old process id value for new process id
-        Map<Integer, Integer> subProcessIdMap = new HashMap<>();
+        Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
 
         List<Object> subProcessList = StreamUtils.asStream(jsonArray.elements())
                 .filter(elem -> checkTaskHasSubProcess(JSONUtils.parseObject(elem.toString()).path("type").asText()))
@@ -1215,7 +1249,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      */
     public Map<String, Object> queryProcessDefinitionAllByProjectId(Integer projectId) {
 
-        HashMap<String, Object> result = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>(5);
 
         List<ProcessDefinition> resourceList = processDefineMapper.queryAllDefinitionList(projectId);
         result.put(Constants.DATA_LIST, resourceList);
@@ -1425,7 +1459,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                       Integer processId,
                                                       Project targetProject) throws JsonProcessingException {
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
@@ -1441,6 +1475,41 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                     processDefinition.getLocations(),
                     processDefinition.getConnects());
 
+        }
+    }
+
+    /**
+     * copy process definition
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return copy result code
+     */
+    public Map<String, Object> copyProcessDefinition(User loginUser, String projectName, Integer processId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+            return result;
+        } else {
+            return createProcessDefinition(
+                    loginUser,
+                    projectName,
+                    processDefinition.getName() + "_copy_" + System.currentTimeMillis(),
+                    processDefinition.getProcessDefinitionJson(),
+                    processDefinition.getDescription(),
+                    processDefinition.getLocations(),
+                    processDefinition.getConnects());
         }
     }
 

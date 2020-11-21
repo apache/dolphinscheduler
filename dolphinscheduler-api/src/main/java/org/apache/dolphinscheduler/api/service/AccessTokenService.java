@@ -44,7 +44,8 @@ public interface AccessTokenService {
      * @param token token string
      * @return create result code
      */
-    Map<String, Object> createToken(int userId, String expireTime, String token);
+    Map<String, Object> createToken(User loginUser, int userId, String expireTime, String token);
+
 
     /**
      * generate token
@@ -53,7 +54,7 @@ public interface AccessTokenService {
      * @param expireTime token expire time
      * @return token string
      */
-    Map<String, Object> generateToken(int userId, String expireTime);
+    Map<String, Object> generateToken(User loginUser, int userId, String expireTime);
 
     /**
      * delete access token
@@ -73,5 +74,5 @@ public interface AccessTokenService {
      * @param token token string
      * @return update result code
      */
-    Map<String, Object> updateToken(int id, int userId, String expireTime, String token);
+    Map<String, Object> updateToken(User loginUser, int id, int userId, String expireTime, String token);
 }

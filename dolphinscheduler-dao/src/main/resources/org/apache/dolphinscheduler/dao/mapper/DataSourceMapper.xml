@@ -36,7 +36,6 @@
             where user_id=#{userId}
             )
         </if>
-
     </select>
 
     <select id="selectPaging" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
