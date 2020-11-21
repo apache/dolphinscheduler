@@ -147,6 +147,9 @@
         <if test="executorId != 0">
             and instance.executor_id = #{executorId}
         </if>
+        <if test="processInstanceName != null and processInstanceName != ''">
+            and  process.name like concat('%', #{processInstanceName}, '%')
+        </if>
         order by instance.start_time desc
     </select>
 </mapper>

@@ -117,6 +117,8 @@ public class DolphinSchedulerManager {
                     upgradeDao.upgradeDolphinScheduler(schemaDir);
                     if ("1.3.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
+                    } else if ("1.3.2".equals(schemaVersion)) {
+                        upgradeDao.upgradeDolphinSchedulerResourceList();
                     }
                     version = schemaVersion;
                 }

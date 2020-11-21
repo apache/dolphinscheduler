@@ -170,7 +170,6 @@ public class UserMapperTest {
     private Tenant insertOneTenant(){
         Tenant tenant = new Tenant();
         tenant.setTenantCode("dolphin");
-        tenant.setTenantName("dolphin test");
         tenant.setDescription("dolphin user use");
         tenant.setQueue("1");
         tenant.setCreateTime(new Date());
@@ -186,7 +185,6 @@ public class UserMapperTest {
     private Tenant insertOneTenant(Queue queue){
         Tenant tenant = new Tenant();
         tenant.setTenantCode("dolphin");
-        tenant.setTenantName("dolphin test");
         tenant.setDescription("dolphin user use");
         tenant.setQueueId(queue.getId());
         tenant.setQueue(queue.getQueue());

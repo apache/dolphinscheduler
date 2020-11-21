@@ -16,46 +16,34 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.process.ProcessBuilderForWin32;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.slf4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-
-import com.sun.jna.platform.win32.Kernel32;
-import com.sun.jna.platform.win32.WinNT;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
 
 /**
  * abstract command executor
@@ -117,45 +105,24 @@ public abstract class AbstractCommandExecutor {
         // setting up user to run commands
         List<String> command = new LinkedList<>();
 
-        if (OSUtils.isWindows()) {
-            //init process builder
-            ProcessBuilderForWin32 processBuilder = new ProcessBuilderForWin32();
-            // setting up a working directory
-            processBuilder.directory(new File(taskExecutionContext.getExecutePath()));
-            // setting up a username and password
-            processBuilder.user(taskExecutionContext.getTenantCode(), StringUtils.EMPTY);
-            // merge error information to standard output stream
-            processBuilder.redirectErrorStream(true);
+        //init process builder
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        // setting up a working directory
+        processBuilder.directory(new File(taskExecutionContext.getExecutePath()));
+        // merge error information to standard output stream
+        processBuilder.redirectErrorStream(true);
 
-            // setting up user to run commands
-            command.add(commandInterpreter());
-            command.add("/c");
-            command.addAll(commandOptions());
-            command.add(commandFile);
+        // setting up user to run commands
+        command.add("sudo");
+        command.add("-u");
+        command.add(taskExecutionContext.getTenantCode());
+        command.add(commandInterpreter());
+        command.addAll(commandOptions());
+        command.add(commandFile);
 
-            // setting commands
-            processBuilder.command(command);
-            process = processBuilder.start();
-        } else {
-            //init process builder
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            // setting up a working directory
-            processBuilder.directory(new File(taskExecutionContext.getExecutePath()));
-            // merge error information to standard output stream
-            processBuilder.redirectErrorStream(true);
-
-            // setting up user to run commands
-            command.add("sudo");
-            command.add("-u");
-            command.add(taskExecutionContext.getTenantCode());
-            command.add(commandInterpreter());
-            command.addAll(commandOptions());
-            command.add(commandFile);
-
-            // setting commands
-            processBuilder.command(command);
-            process = processBuilder.start();
-        }
+        // setting commands
+        processBuilder.command(command);
+        process = processBuilder.start();
 
         // print command
         printCommand(command);
@@ -238,7 +205,7 @@ public abstract class AbstractCommandExecutor {
     public String getVarPool() {
         return varPool.toString();
     }
-    
+
     /**
      * cancel application
      * @throws Exception exception
@@ -316,20 +283,30 @@ public abstract class AbstractCommandExecutor {
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
-        String cmdStr = ProcessUtils.buildCommandStr(commands);
-        logger.info("task run command:\n{}", cmdStr);
+        String cmdStr;
+
+        try {
+            cmdStr = ProcessUtils.buildCommandStr(commands);
+            logger.info("task run command:\n{}", cmdStr);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     /**
      * clear
      */
     private void clear() {
+
+        List<String> markerList = new ArrayList<>();
+        markerList.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
+
         if (!logBuffer.isEmpty()) {
             // log handle
             logHandler.accept(logBuffer);
-
             logBuffer.clear();
         }
+        logHandler.accept(markerList);
     }
 
     /**
@@ -479,12 +456,13 @@ public abstract class AbstractCommandExecutor {
 
 
     /**
-     * get remain time?s?
+     * get remain time（s）
      *
      * @return remain time
      */
     private long getRemaintime() {
-        long remainTime = DateUtils.getRemainTime(taskExecutionContext.getStartTime(), taskExecutionContext.getTaskTimeout());
+        long usedTime = (System.currentTimeMillis() - taskExecutionContext.getStartTime().getTime()) / 1000;
+        long remainTime = taskExecutionContext.getTaskTimeout() - usedTime;
 
         if (remainTime < 0) {
             throw new RuntimeException("task execution time out");
@@ -506,12 +484,7 @@ public abstract class AbstractCommandExecutor {
             Field f = process.getClass().getDeclaredField(Constants.PID);
             f.setAccessible(true);
 
-            if (OSUtils.isWindows()) {
-                WinNT.HANDLE handle = (WinNT.HANDLE) f.get(process);
-                processId = Kernel32.INSTANCE.GetProcessId(handle);
-            } else {
-                processId = f.getInt(process);
-            }
+            processId = f.getInt(process);
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
         }
