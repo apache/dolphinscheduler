@@ -44,9 +44,7 @@
         order by id asc
     </select>
     <select id="queryUdfFuncPaging" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
-        select
-        id, user_id, func_name, class_name, type, arg_types,
-        database, description, resource_id, resource_name, create_time, update_time
+        select id, user_id, func_name, class_name, type, arg_types, database, description, resource_id, resource_name, create_time, update_time
         from t_ds_udfs
         where 1=1
         <if test="searchVal!= null and searchVal != ''">
