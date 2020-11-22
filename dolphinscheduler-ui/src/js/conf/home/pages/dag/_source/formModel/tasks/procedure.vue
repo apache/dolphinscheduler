@@ -22,20 +22,30 @@
         <m-datasource
                 ref="refDs"
                 @on-dsData="_onDsData"
-                :supportType="['MYSQL','POSTGRESQL','CLICKHOUSE', 'ORACLE', 'SQLSERVER']"
                 :data="{ type:type,datasource:datasource }">
         </m-datasource>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('methods')}}</div>
+
+      <div slot="text">
+        <x-poptip
+          placement="bottom"
+          width="300"
+          trigger="hover"
+          :content="$t('The procedure method script example')">
+          <span type="ghost" slot="reference" >{{$t('SQL Statement')}}<i class="ans-icon-code" /></span>
+        </x-poptip>
+      </div>
       <div slot="content">
         <x-input
-                type="input"
-                :disabled="isDetails"
-                v-model="method"
-                :placeholder="$t('Please enter method(optional)')"
-                autocomplete="off">
+          resize
+          :autosize="{minRows:5}"
+          type="textarea"
+          :disabled="isDetails"
+          v-model="method"
+          :placeholder="$t('Please enter the procedure method')"
+          autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
@@ -103,7 +113,7 @@
 
         // Verification function
         if (!this.method) {
-          this.$message.warning(`${i18n.$t('Please enter method')}`)
+          this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
           return false
         }
 
@@ -111,6 +121,7 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
+
         // storage
         this.$emit('on-params', {
           type: this.type,
