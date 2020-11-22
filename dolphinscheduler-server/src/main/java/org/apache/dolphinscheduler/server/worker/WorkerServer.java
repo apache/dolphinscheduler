@@ -108,7 +108,7 @@ public class WorkerServer {
         // worker registry
         this.workerRegistry.registry();
 
-        //alert server client registry
+        //alert-server client registry
         alertClientService = new AlertClientService(workerConfig.getAlertListenHost(),Constants.ALERT_RPC_PORT);
 
         /**
