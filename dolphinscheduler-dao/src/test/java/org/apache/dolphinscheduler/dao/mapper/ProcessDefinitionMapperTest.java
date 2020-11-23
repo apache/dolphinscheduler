@@ -216,6 +216,66 @@ public class ProcessDefinitionMapperTest {
     }
 
     /**
+     * test queryDefinitionListByTenant
+     */
+    @Test
+    public void testQueryDefinitionListByTenant() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(888);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(999);
+        processDefinition.setUserId(1234);
+        processDefinitionMapper.insert(processDefinition);
+        List<ProcessDefinition> definitions = processDefinitionMapper.queryDefinitionListByTenant(999);
+        Assert.assertNotEquals(definitions.size(), 0);
+    }
+
+    /**
+     * test queryByDefineId
+     */
+    @Test
+    public void testQueryByDefineId() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(4);
+        projectMapper.insert(project);
+
+        Queue queue = new Queue();
+        queue.setQueue("queue");
+        queue.setQueueName("queue name");
+        queueMapper.insert(queue);
+
+        Tenant tenant = new Tenant();
+        tenant.setTenantCode("tenant");
+        tenant.setQueueId(queue.getId());
+        tenant.setDescription("t");
+        tenantMapper.insert(tenant);
+
+        User user = new User();
+        user.setUserName("hello");
+        user.setUserPassword("pwd");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setTenantId(tenant.getId());
+        userMapper.insert(user);
+
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(project.getId());
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setTenantId(tenant.getId());
+        processDefinition.setUserId(user.getId());
+//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
+//
+        processDefinitionMapper.insert(processDefinition);
+        ProcessDefinition definition = processDefinitionMapper.queryByDefineId(333);
+        Assert.assertEquals(definition, null);
+    }
+
+    /**
      * test page
      */
     @Test
