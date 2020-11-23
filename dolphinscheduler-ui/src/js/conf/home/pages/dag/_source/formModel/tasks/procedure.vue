@@ -34,7 +34,7 @@
           width="300"
           trigger="hover"
           :content="$t('The procedure method script example')">
-          <span type="ghost" slot="reference" >{{$t('SQL Statement')}}<i class="ans-icon-code" /></span>
+          <span type="ghost" slot="reference" >{{$t('SQL Statement')}}<em class="ans-icon-code" /></span>
         </x-poptip>
       </div>
       <div slot="content">
