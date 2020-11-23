@@ -102,7 +102,7 @@
         SELECT
             pd.id, pd.name, pd.version, pd.release_state, pd.project_id, pd.user_id, pd.process_definition_json, pd.description,
             pd.global_params, pd.flag, pd.locations, pd.connects, pd.receivers, pd.receivers_cc, pd.create_time, pd.timeout,
-            pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids
+            pd.tenant_id, pd.update_time, pd.modify_by, pd.resource_ids,
             u.user_name,
             p.name AS project_name
         FROM
