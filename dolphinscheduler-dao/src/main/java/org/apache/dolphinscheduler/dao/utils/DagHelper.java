@@ -276,7 +276,7 @@ public class DagHelper {
         }
         for (String dependNodeName : dependList) {
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if (completeTaskList.containsKey(dependNodeName)
+            if (dependNode == null || completeTaskList.containsKey(dependNodeName)
                     || dependNode.isForbidden()
                     || skipTaskNodeList.containsKey(dependNodeName)) {
                 continue;
