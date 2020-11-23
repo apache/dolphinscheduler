@@ -134,33 +134,30 @@ public class ProcessDefinitionMapperTest {
         Assert.assertNotEquals(dataSources.size(), 0);
     }
 
-
+    /**
+     * test verifyByDefineName
+     */
     @Test
     public void testVerifyByDefineName() {
-
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(4);
         projectMapper.insert(project);
-
         Queue queue = new Queue();
         queue.setQueue("queue");
         queue.setQueueName("queue name");
         queueMapper.insert(queue);
-
         Tenant tenant = new Tenant();
         tenant.setTenantCode("tenant");
         tenant.setQueueId(queue.getId());
         tenant.setDescription("t");
         tenantMapper.insert(tenant);
-
         User user = new User();
         user.setUserName("hello");
         user.setUserPassword("pwd");
         user.setUserType(UserType.GENERAL_USER);
         user.setTenantId(tenant.getId());
         userMapper.insert(user);
-
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setName("def 1");
@@ -169,14 +166,9 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setCreateTime(new Date());
         processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-//
         processDefinitionMapper.insert(processDefinition);
-
-
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(10, "xxx");
         Assert.assertEquals(definition, null);
-
     }
 
     /**
