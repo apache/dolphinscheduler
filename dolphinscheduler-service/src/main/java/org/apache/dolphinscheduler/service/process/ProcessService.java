@@ -91,8 +91,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1764,7 +1762,7 @@ public class ProcessService {
      */
     public List<CycleDependency> getCycleDependencies(int masterId, int[] ids, Date scheduledFireTime) throws Exception {
         List<CycleDependency> cycleDependencyList = new ArrayList<CycleDependency>();
-        if (ArrayUtils.isEmpty(ids)) {
+        if (null == ids || ids.length == 0) {
             logger.warn("ids[] is empty!is invalid!");
             return cycleDependencyList;
         }
