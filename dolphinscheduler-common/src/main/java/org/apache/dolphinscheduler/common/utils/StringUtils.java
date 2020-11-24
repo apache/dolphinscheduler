@@ -45,6 +45,10 @@ public class StringUtils {
     }
 
     public static String replaceNRTtoUnderline(String src) {
-        return src.replaceAll("[\n|\r|\t]", "_");
+        if (isBlank(src)) {
+            return src;
+        } else {
+            return src.replaceAll("[\n|\r|\t]", "_");
+        }
     }
 }
