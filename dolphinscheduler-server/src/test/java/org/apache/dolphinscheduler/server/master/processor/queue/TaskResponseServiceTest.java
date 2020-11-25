@@ -89,7 +89,7 @@ public class TaskResponseServiceTest {
     @After
     public void after() {
         try {
-            Thread.sleep(20000);
+            Thread.sleep(60000);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
