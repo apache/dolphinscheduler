@@ -24,6 +24,9 @@ import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.util.Date;
 
 /**
  * sqoop task test
@@ -44,14 +46,12 @@ public class SqoopTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqoopTaskTest.class);
 
-    private ProcessService processService;
-    private ApplicationContext applicationContext;
     private SqoopTask sqoopTask;
 
     @Before
-    public void before() throws Exception{
-        processService = Mockito.mock(ProcessService.class);
-        applicationContext = Mockito.mock(ApplicationContext.class);
+    public void before() {
+        ProcessService processService = Mockito.mock(ProcessService.class);
+        ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
