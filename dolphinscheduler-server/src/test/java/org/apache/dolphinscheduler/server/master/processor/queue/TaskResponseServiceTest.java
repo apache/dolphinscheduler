@@ -88,16 +88,6 @@ public class TaskResponseServiceTest {
 
     @After
     public void after() {
-
-        long startTime = System.currentTimeMillis();
-
-        long maxWaitTime = 3 * 60 * 1000;
-
-        while (taskResponseService.getEventQueue().size() != 0) {
-
-        }
-
-        Assert.assertEquals(0, taskResponseService.getEventQueue().size());
         taskResponseService.stop();
     }
 
