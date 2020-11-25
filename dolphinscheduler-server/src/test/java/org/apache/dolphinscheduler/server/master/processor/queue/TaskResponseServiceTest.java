@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.util.Date;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,10 +84,16 @@ public class TaskResponseServiceTest {
         Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
         taskResponseService.addResponse(ackEvent);
         taskResponseService.addResponse(resultEvent);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @After
     public void after() {
+        Assert.assertEquals(0, taskResponseService.getEventQueue().size());
         taskResponseService.stop();
     }
 
