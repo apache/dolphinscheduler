@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HdfsSourceGenerator implements ISourceGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(HdfsSourceGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {

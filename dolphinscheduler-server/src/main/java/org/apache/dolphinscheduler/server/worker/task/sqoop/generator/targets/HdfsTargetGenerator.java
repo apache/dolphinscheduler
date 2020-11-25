@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HdfsTargetGenerator implements ITargetGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(HdfsTargetGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {

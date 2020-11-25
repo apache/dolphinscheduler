@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MysqlTargetGenerator implements ITargetGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MysqlTargetGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {

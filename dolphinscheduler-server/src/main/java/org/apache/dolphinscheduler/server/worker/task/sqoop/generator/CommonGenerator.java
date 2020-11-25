@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CommonGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CommonGenerator.class);
 
     public String generate(SqoopParameters sqoopParameters) {
 

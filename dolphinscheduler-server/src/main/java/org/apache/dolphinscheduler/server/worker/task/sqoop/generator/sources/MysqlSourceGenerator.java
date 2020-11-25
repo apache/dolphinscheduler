@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MysqlSourceGenerator implements ISourceGenerator {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(MysqlSourceGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
