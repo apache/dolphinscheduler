@@ -93,10 +93,8 @@ public class TaskResponseServiceTest {
 
         long maxWaitTime = 3 * 60 * 1000;
 
-        while (System.currentTimeMillis() - maxWaitTime - startTime < 0) {
-            if (taskResponseService.getEventQueue().size() == 0) {
-                return;
-            }
+        while (taskResponseService.getEventQueue().size() != 0) {
+
         }
 
         Assert.assertEquals(0, taskResponseService.getEventQueue().size());
