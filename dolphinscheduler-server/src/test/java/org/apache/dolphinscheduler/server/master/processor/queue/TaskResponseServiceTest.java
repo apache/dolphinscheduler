@@ -85,7 +85,7 @@ public class TaskResponseServiceTest {
         taskResponseService.addResponse(ackEvent);
         taskResponseService.addResponse(resultEvent);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(10000);
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
