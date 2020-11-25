@@ -42,7 +42,7 @@ public class TaskResponseServiceTest {
     private ProcessService processService;
 
     @InjectMocks
-    TaskResponseService taskResponseService;
+    TaskResponseService taskRspService;
 
     @Mock
     private Channel channel;
@@ -55,7 +55,7 @@ public class TaskResponseServiceTest {
 
     @Before
     public void before() {
-        taskResponseService.start();
+        taskRspService.start();
 
         ackEvent = TaskResponseEvent.newAck(ExecutionStatus.RUNNING_EXECUTION,
             new Date(),
@@ -82,13 +82,21 @@ public class TaskResponseServiceTest {
     public void testAddResponse() {
         Mockito.when(processService.findTaskInstanceById(Mockito.any())).thenReturn(taskInstance);
         Mockito.when(channel.writeAndFlush(Mockito.any())).thenReturn(null);
-        taskResponseService.addResponse(ackEvent);
-        taskResponseService.addResponse(resultEvent);
+        taskRspService.addResponse(ackEvent);
+        taskRspService.addResponse(resultEvent);
     }
 
     @After
     public void after() {
-        taskResponseService.stop();
+
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Assert.assertEquals(0, taskRspService.getEventQueue().size());
+        taskRspService.stop();
+
     }
 
 }
