@@ -21,13 +21,12 @@ import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.common.utils.RetryerUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
@@ -46,7 +45,6 @@ import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import io.netty.channel.Channel;
 
@@ -100,6 +98,12 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
+        // check if the OS user exists
+        if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+            logger.error("tenantCode:{} does not exist",taskExecutionContext.getTenantCode());
+            return;
+        }
+
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskExecutionContext.getProcessDefineId(),
@@ -117,7 +121,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
-            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
+            FileUtils.createWorkDirIfAbsent(execLocalPath);
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.ofNullable(logger), errorLog, ex);
@@ -134,7 +138,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
     }
 
-    private void doAck(TaskExecutionContext taskExecutionContext){
+    private void doAck(TaskExecutionContext taskExecutionContext) {
         // tell master that task is in executing
         TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
         ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),ackCommand.convert2Command(),Event.ACK);
