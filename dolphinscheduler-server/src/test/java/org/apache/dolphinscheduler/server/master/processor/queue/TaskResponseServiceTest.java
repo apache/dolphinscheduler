@@ -88,11 +88,17 @@ public class TaskResponseServiceTest {
 
     @After
     public void after() {
-        try {
-            Thread.sleep(60000);
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
+
+        long startTime = System.currentTimeMillis();
+
+        long maxWaitTime = 3 * 60 * 1000;
+
+        while (System.currentTimeMillis() - maxWaitTime - startTime < 0) {
+            if (taskResponseService.getEventQueue().size() == 0) {
+                return;
+            }
         }
+
         Assert.assertEquals(0, taskResponseService.getEventQueue().size());
         taskResponseService.stop();
     }
