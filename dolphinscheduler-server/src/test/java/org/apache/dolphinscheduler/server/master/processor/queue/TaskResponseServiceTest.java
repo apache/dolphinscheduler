@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.util.Date;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -88,15 +87,7 @@ public class TaskResponseServiceTest {
 
     @After
     public void after() {
-
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Assert.assertEquals(0, taskRspService.getEventQueue().size());
         taskRspService.stop();
-
     }
 
 }
