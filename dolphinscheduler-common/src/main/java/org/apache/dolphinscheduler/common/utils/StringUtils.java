@@ -51,4 +51,8 @@ public class StringUtils {
             return src.replaceAll("[\n|\r|\t]", "_");
         }
     }
+
+    public static String trim(String str) {
+        return str == null ? null : str.trim();
+    }
 }
