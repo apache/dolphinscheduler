@@ -464,7 +464,7 @@ export default {
   LastMonthBegin: '上月初',
   LastMonthEnd: '上月末',
   'Refresh status succeeded': '刷新状态成功',
-  'Queue manage': 'Yarn 队列管理',
+  'Queue manage': '队列管理',
   'Create queue': '创建队列',
   'Edit queue': '编辑队列',
   'Datasource manage': '数据源中心',
