@@ -27,10 +27,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.*;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
@@ -101,6 +98,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         // check if the OS user exists
         if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
             logger.error("tenantCode:{} does not exist",taskExecutionContext.getTenantCode());
+            TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
+            responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
+            responseCommand.setEndTime(new Date());
+            taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
             return;
         }
 
