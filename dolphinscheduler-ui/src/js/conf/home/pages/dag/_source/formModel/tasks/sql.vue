@@ -35,7 +35,7 @@
                   :sql-type="sqlType">
           </m-sql-type>
         </div>
-        <!-- TODO Currently only supports text, not attachments
+        <!--
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
             <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>

@@ -441,7 +441,6 @@ public class SqlTask extends AbstractTask {
      * @param content content
      */
     public void sendAttachment(int groupId, String title, String content) {
-        //TODO Currently only supports text, not attachments
         AlertSendResponseCommand alertSendResponseCommand  = alertClientService.sendAlert(groupId, title, content);
         if (!alertSendResponseCommand.getResStatus()) {
             throw new RuntimeException("send mail failed!");
