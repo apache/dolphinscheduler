@@ -176,48 +176,6 @@ public class FileUtils {
         LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
     }
-    /**
-     * create directory and user
-     *
-     * @param execLocalPath execute local path
-     * @param userName user name
-     * @throws IOException errors
-     */
-    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException {
-        //if work dir exists, first delete
-        File execLocalPathFile = new File(execLocalPath);
-
-        if (execLocalPathFile.exists()) {
-            org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
-        }
-
-        //create work dir
-        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        String mkdirLog = "create dir success " + execLocalPath;
-        LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
-        LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
-
-        //if not exists this user,then create
-        OSUtils.taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
-        try {
-            if (!OSUtils.getUserList().contains(userName)) {
-                boolean isSuccessCreateUser = OSUtils.createUser(userName);
-
-                String infoLog;
-                if (isSuccessCreateUser) {
-                    infoLog = String.format("create user name success %s", userName);
-                } else {
-                    infoLog = String.format("create user name fail %s", userName);
-                }
-                LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
-                LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
-            }
-        } catch (Throwable e) {
-            LoggerUtils.logError(Optional.ofNullable(logger), e);
-            LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
-        }
-        OSUtils.taskLoggerThreadLocal.remove();
-    }
 
     /**
      * write content to file ,if parent path not exists, it will do one's utmost to mkdir
