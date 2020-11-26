@@ -44,6 +44,7 @@ Permissions.prototype = {
           if ($(el).prop('tagName') === 'BUTTON') {
             $(el).attr('disabled', true)
           } else {
+            $(el).css('display', 'none')
             setTimeout(function () { el.parentNode.removeChild(el) }, 100)
           }
         }
