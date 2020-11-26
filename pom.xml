@@ -780,6 +780,7 @@
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
+                        <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>
                         <include>**/common/utils/PropertyUtilsTest.java</include>
                         <include>**/common/utils/SchemaUtilsTest.java</include>
