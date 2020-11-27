@@ -616,6 +616,10 @@ public class ResourcesServiceTest {
         try {
             Mockito.when(hadoopUtils.exists(null)).thenReturn(true);
             Mockito.when(hadoopUtils.catFile(null, 1, 10)).thenReturn(getContent());
+
+            List<String> list = hadoopUtils.catFile(null, 1, 10);
+            Assert.assertNotNull(list);
+
         } catch (IOException e) {
             logger.error("hadoop error", e);
         }
