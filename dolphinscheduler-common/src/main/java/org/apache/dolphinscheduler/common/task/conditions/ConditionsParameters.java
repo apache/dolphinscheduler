@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConditionsParameters extends AbstractParameters {
@@ -43,7 +44,7 @@ public class ConditionsParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        return null;
+        return new ArrayList<>();
     }
 
     public List<DependentTaskModel> getDependTaskList() {

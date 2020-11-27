@@ -227,7 +227,7 @@ export default {
    */
   getAllItems ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/login-user-created-project`, {}, res => {
+      io.get(`projects/created-and-authorized-project`, {}, res => {
         resolve(res)
       }).catch(e => {
         reject(e)
@@ -729,6 +729,18 @@ export default {
     return new Promise((resolve, reject) => {
       io.get(`projects/${state.projectName}/task-instance/list-paging`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Force fail/kill/need_fault_tolerance task success
+   */
+  forceTaskSuccess ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/task-instance/force-success`, payload, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

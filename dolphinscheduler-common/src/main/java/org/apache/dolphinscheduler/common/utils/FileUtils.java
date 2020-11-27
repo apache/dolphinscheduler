@@ -30,13 +30,14 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
 
@@ -217,7 +218,7 @@ public class FileUtils {
                 return false;
             }
             bufferedReader = new BufferedReader(new StringReader(content));
-            bufferedWriter = new BufferedWriter(new FileWriter(distFile));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(distFile), StandardCharsets.UTF_8));
             char[] buf = new char[1024];
             int len;
             while ((len = bufferedReader.read(buf)) != -1) {

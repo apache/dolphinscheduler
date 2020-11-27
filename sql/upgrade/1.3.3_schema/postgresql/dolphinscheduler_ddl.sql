@@ -51,11 +51,47 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_delay_time();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_delay_time();
 
+-- uc_dolphin_T_t_ds_process_instance_A_var_pool
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_instance_A_var_pool() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_instance'
+                            AND COLUMN_NAME ='var_pool')
+      THEN
+         ALTER TABLE t_ds_process_instance ADD COLUMN var_pool text;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_instance_A_var_pool();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_A_var_pool();
+
+-- uc_dolphin_T_t_ds_task_instance_A_var_pool
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_var_pool() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_task_instance'
+                            AND COLUMN_NAME ='var_pool')
+      THEN
+         ALTER TABLE t_ds_task_instance ADD COLUMN var_pool text;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_instance_A_var_pool();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_var_pool();
+
 -- uc_dolphin_T_t_ds_process_definition_A_modify_by
 delimiter d//
 CREATE OR REPLACE FUNCTION ct_dolphin_T_t_ds_process_definition_version() RETURNS void AS $$
 BEGIN
-CREATE TABLE t_ds_process_definition_version (
+CREATE TABLE IF NOT EXISTS t_ds_process_definition_version (
                                                  id int NOT NULL  ,
                                                  process_definition_id int NOT NULL  ,
                                                  version int DEFAULT NULL ,
@@ -100,8 +136,6 @@ $$ LANGUAGE plpgsql;
 
 SELECT uc_dolphin_T_t_ds_resources_un();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_resources_un();
-
-
 
 
 

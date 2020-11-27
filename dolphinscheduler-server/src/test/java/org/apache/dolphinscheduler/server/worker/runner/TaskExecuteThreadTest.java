@@ -119,8 +119,11 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
         taskExecuteThread.run();
+        taskExecutionContext.getCurrentExecutionStatus();
 
-        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
+        taskExecuteThread.run();
+
+        Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
     }
 
     @Test
@@ -132,7 +135,7 @@ public class TaskExecuteThreadTest {
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
         taskExecuteThread.run();
 
-        Assert.assertEquals(ExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
+        Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
     }
 
     private class SimpleTask extends AbstractTask {

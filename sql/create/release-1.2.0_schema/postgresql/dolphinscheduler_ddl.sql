@@ -584,7 +584,6 @@ DROP TABLE IF EXISTS t_ds_tenant;
 CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
-  tenant_name varchar(64) DEFAULT NULL ,
   description varchar(256) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,

@@ -80,12 +80,6 @@ public class  User {
     private String tenantCode;
 
     /**
-     * tenant name
-     */
-    @TableField(exist = false)
-    private String tenantName;
-
-    /**
      * queue name
      */
     @TableField(exist = false)
@@ -203,14 +197,6 @@ public class  User {
         this.alertGroup = alertGroup;
     }
 
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-
     public String getTenantCode() {
         return tenantCode;
     }
@@ -272,7 +258,6 @@ public class  User {
                 ", tenantId=" + tenantId +
                 ", state=" + state +
                 ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
                 ", queueName='" + queueName + '\'' +
                 ", alertGroup='" + alertGroup + '\'' +
                 ", queue='" + queue + '\'' +

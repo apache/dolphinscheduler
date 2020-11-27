@@ -19,7 +19,7 @@
     <div v-show="!msg">
       <div class="data-area" v-spin="isSpin" style="height: 430px;">
         <div class="col-md-7">
-          <div id="task-status-pie" style="height:260px;margin-top: 100px;"></div>
+          <div id="task-status-pie" style="width:100%;height:260px;margin-top: 100px;"></div>
         </div>
         <div class="col-md-5">
           <div class="table-small-model">
@@ -32,8 +32,9 @@
               <tr v-for="(item,$index) in taskCtatusList" :key="$index">
                 <td><span>{{$index+1}}</span></td>
                 <td>
-                  <span>
-                    <a href="javascript:" @click="searchParams.projectId && _goTask(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a>
+                  <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
+                  <span v-else>
+                    <a href="javascript:" @click="searchParams.projectId && _goTask(item.key)">{{item.value}}</a>
                   </span>
                 </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
@@ -53,8 +54,10 @@
   import { mapActions } from 'vuex'
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
+  import echarts from 'echarts'
+  import store from '@/conf/home/store'
   import mNoData from '@/module/components/noData/noData'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
 
   export default {
     name: 'task-ctatus-count',
@@ -62,7 +65,8 @@
       return {
         isSpin: true,
         msg: '',
-        taskCtatusList: []
+        taskCtatusList: [],
+        currentName: ''
       }
     },
     props: {
@@ -115,11 +119,15 @@
             this.isSpin = false
           })
         }
+      },
+      '$store.state.projects.sideBar': function() {
+        echarts.init(document.getElementById('task-status-pie')).resize()
       }
     },
     beforeCreate () {
     },
     created () {
+      this.currentName = this.$router.currentRoute.name
     },
     beforeMount () {
     },
@@ -139,7 +147,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .task-ctatus-count-model {
-
-  }
 </style>

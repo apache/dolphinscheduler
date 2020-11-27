@@ -26,9 +26,6 @@
             <span>{{$t('Tenant Code')}}</span>
           </th>
           <th>
-            <span>{{$t('Tenant Name')}}</span>
-          </th>
-          <th>
             <span>{{$t('Description')}}</span>
           </th>
           <th>
@@ -51,11 +48,6 @@
           <td>
             <span>
               {{item.tenantCode}}
-            </span>
-          </td>
-          <td>
-            <span>
-              {{item.tenantName}}
             </span>
           </td>
           <td>

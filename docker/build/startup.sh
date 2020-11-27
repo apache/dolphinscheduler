@@ -38,13 +38,13 @@ initDatabase() {
     echo "connect ${DATABASE_TYPE} service"
     if [ ${DATABASE_TYPE} = "mysql" ]; then
         v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "select 1" 2>&1)
-        if [ "$(echo '${v}' | grep 'ERROR' | wc -l)" -eq 1 ]; then
+        if [ "$(echo ${v} | grep 'ERROR' | wc -l)" -eq 1 ]; then
             echo "Error: Can't connect to database...${v}"
             exit 1
         fi
     else
         v=$(sudo -u postgres PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
-        if [ "$(echo '${v}' | grep 'FATAL' | wc -l)" -eq 1 ]; then
+        if [ "$(echo ${v} | grep 'FATAL' | wc -l)" -eq 1 ]; then
             echo "Error: Can't connect to database...${v}"
             exit 1
         fi

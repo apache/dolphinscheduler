@@ -43,7 +43,7 @@
     <m-list-box-f v-ps="['GENERAL_USER']">
       <template slot="name">{{$t('Tenant')}}</template>
       <template slot="content">
-        <span class="sp1">{{userInfo.tenantName}}</span>
+        <span class="sp1">{{userInfo.tenantCode}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f v-ps="['GENERAL_USER']">

@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -475,7 +475,7 @@ public class TaskExecutionContext implements Serializable {
 
     public Command toCommand() {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JsonSerializer.serializeToString(this));
+        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(this));
         return requestCommand.convert2Command();
     }
 

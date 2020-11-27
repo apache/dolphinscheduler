@@ -112,8 +112,8 @@
 		</fileSet>
 		<!--server end-->
 
-
-		<!--service end-->
+		
+                <!--service start-->
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
 			<includes>

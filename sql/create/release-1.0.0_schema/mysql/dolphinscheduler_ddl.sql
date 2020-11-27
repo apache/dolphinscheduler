@@ -381,7 +381,6 @@ DROP TABLE IF EXISTS `t_escheduler_tenant`;
 CREATE TABLE `t_escheduler_tenant` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
-  `tenant_name` varchar(64) DEFAULT NULL COMMENT 'tenant name',
   `desc` varchar(256) DEFAULT NULL COMMENT 'description',
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',

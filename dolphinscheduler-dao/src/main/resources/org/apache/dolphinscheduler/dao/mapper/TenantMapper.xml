@@ -34,7 +34,7 @@
         FROM t_ds_tenant t,t_ds_queue q
         WHERE t.queue_id = q.id
         <if test="searchVal != null and searchVal != ''">
-            and  t.tenant_name like concat('%', #{searchVal}, '%')
+            and  t.tenant_code like concat('%', #{searchVal}, '%')
         </if>
         order by  t.update_time desc
     </select>

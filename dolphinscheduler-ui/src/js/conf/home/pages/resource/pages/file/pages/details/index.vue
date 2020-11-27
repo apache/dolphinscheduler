@@ -23,6 +23,9 @@
           <div class="down">
             <em class="ans-icon-download" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile"></em>
             <em>{{size}}</em>
+            &nbsp;&nbsp;
+            <em class="ans-icon-fail-empty" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="close()"></em>
+            &nbsp;&nbsp;
           </div>
         </h2>
         <template v-if="isNoType">
@@ -79,6 +82,9 @@
       ...mapActions('resource', ['getViewResources', 'updateContent']),
       _go () {
         this.$router.push({ name: 'file' })
+      },
+      close () {
+        this.$router.go(-1)
       },
       _downloadFile () {
         downloadFile('/dolphinscheduler/resources/download', {
@@ -232,7 +238,7 @@
         position: absolute;
         right: 0;
         top: 0;
-        >i {
+        >em {
           font-size: 20px;
           color: #2d8cf0;
           cursor: pointer;

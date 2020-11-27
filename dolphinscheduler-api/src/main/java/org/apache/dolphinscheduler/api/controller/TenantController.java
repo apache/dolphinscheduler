@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -72,7 +73,6 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param tenantCode tenant code
-     * @param tenantName tenant name
      * @param queueId queue id
      * @param description description
      * @return create result code
@@ -80,7 +80,6 @@ public class TenantController extends BaseController {
     @ApiOperation(value = "createTenant", notes = "CREATE_TENANT_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "tenantName", value = "TENANT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "description", value = "TENANT_DESC", dataType = "String")
 
@@ -90,12 +89,13 @@ public class TenantController extends BaseController {
     @ApiException(CREATE_TENANT_ERROR)
     public Result createTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "tenantCode") String tenantCode,
-                               @RequestParam(value = "tenantName") String tenantName,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        logger.info("login user {}, create tenant, tenantCode: {}, tenantName: {}, queueId: {}, desc: {}",
-                loginUser.getUserName(), tenantCode, tenantName, queueId, description);
-        Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, tenantName, queueId, description);
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String tenantCodeReplace = StringUtils.replaceNRTtoUnderline(tenantCode);
+        String descReplace = StringUtils.replaceNRTtoUnderline(description);
+        logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}", userReplace, tenantCodeReplace, queueId, descReplace);
+        Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
         return returnDataList(result);
     }
 
@@ -157,7 +157,6 @@ public class TenantController extends BaseController {
      * @param loginUser login user
      * @param id tennat id
      * @param tenantCode tennat code
-     * @param tenantName tennat name
      * @param queueId queue id
      * @param description description
      * @return update result code
@@ -166,7 +165,6 @@ public class TenantController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "ID", value = "TENANT_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "tenantName", value = "TENANT_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "description", value = "TENANT_DESC", type = "String")
 
@@ -177,12 +175,13 @@ public class TenantController extends BaseController {
     public Result updateTenant(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "id") int id,
                                @RequestParam(value = "tenantCode") String tenantCode,
-                               @RequestParam(value = "tenantName") String tenantName,
                                @RequestParam(value = "queueId") int queueId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
-        logger.info("login user {}, updateProcessInstance tenant, tenantCode: {}, tenantName: {}, queueId: {}, description: {}",
-                loginUser.getUserName(), tenantCode, tenantName, queueId, description);
-        Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, tenantName, queueId, description);
+        String userReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String tenantCodeReplace = StringUtils.replaceNRTtoUnderline(tenantCode);
+        String descReplace = StringUtils.replaceNRTtoUnderline(description);
+        logger.info("login user {}, create tenant, tenantCode: {}, queueId: {}, desc: {}", userReplace, tenantCodeReplace, queueId, descReplace);
+        Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
         return returnDataList(result);
     }
 

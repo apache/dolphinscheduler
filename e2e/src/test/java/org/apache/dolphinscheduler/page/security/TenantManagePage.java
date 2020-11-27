@@ -48,14 +48,13 @@ public class TenantManagePage extends PageCommon {
      * @return Whether to enter the specified page after create tenant
      */
     public boolean createTenant() throws InterruptedException {
-        clickElement(TenantManageLocator.TENANT_MANAGE);
+        clickButton(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
         // tenant data
         sendInput(TenantManageLocator.TENANT_INPUT_CODE, tenantManageData.getTenantData("tenantCode"));
-        sendInput(TenantManageLocator.TENANT_INPUT_NAME, tenantManageData.getTenantData("tenantName"));
         sendInput(TenantManageLocator.QUEUE, tenantManageData.getTenantData("queue"));
         sendInput(TenantManageLocator.DESCRIPTION, tenantManageData.getTenantData("description"));
 
