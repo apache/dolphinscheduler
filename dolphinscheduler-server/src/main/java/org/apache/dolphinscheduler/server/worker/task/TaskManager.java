@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;
 import org.apache.dolphinscheduler.server.worker.task.sql.SqlTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopTask;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+
 import org.slf4j.Logger;
 
 /**
@@ -58,7 +59,7 @@ public class TaskManager {
             case PROCEDURE:
                 return new ProcedureTask(taskExecutionContext, logger);
             case SQL:
-                return new SqlTask(taskExecutionContext, logger,alertClientService);
+                return new SqlTask(taskExecutionContext, logger, alertClientService);
             case MR:
                 return new MapReduceTask(taskExecutionContext, logger);
             case SPARK:
