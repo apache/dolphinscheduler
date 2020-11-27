@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.sms;
+package org.apache.dolphinscheduler.plugin.alert.http;
 
-import org.apache.dolphinscheduler.spi.alert.AlertChannel;
-import org.apache.dolphinscheduler.spi.alert.AlertInfo;
-import org.apache.dolphinscheduler.spi.alert.AlertResult;
+public class HttpAlertConstants {
 
 
-/**
- * sms alert channel,use sms message to seed the alertInfo
- */
-public class SMSAlertChannel implements AlertChannel {
-    @Override
-    public AlertResult process(AlertInfo info) {
-        return null;
-    }
+    public static final String URL = "url";
+
+    public static final String HEADER_PARAMS = "headerParams";
+
+    public static final String BODY_PARAMS = "bodyParams";
+
+    public static final String CONTENT_FIELD = "contentField";
+
+    public static final String REQUEST_TYPE = "requestType";
+
 }

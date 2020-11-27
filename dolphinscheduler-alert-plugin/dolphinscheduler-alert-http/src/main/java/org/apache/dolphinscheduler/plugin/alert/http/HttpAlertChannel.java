@@ -15,19 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.sms;
+package org.apache.dolphinscheduler.plugin.alert.http;
 
-import com.google.common.collect.ImmutableList;
-import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
-import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
+import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import org.apache.dolphinscheduler.spi.alert.AlertData;
+import org.apache.dolphinscheduler.spi.alert.AlertInfo;
+import org.apache.dolphinscheduler.spi.alert.AlertResult;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
+
+import java.util.Map;
+
 
 /**
- * sms  alertPlugins
+ * http alert channel,use sms message to seed the alertInfo
  */
-public class SMSAlertPlugin implements DolphinSchedulerPlugin {
-
+public class HttpAlertChannel implements AlertChannel {
     @Override
-    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
-        return ImmutableList.of(new SMSAlertChannelFactory());
+    public AlertResult process(AlertInfo alertInfo) {
+
+        AlertData alertData = alertInfo.getAlertData();
+        String alertParams = alertInfo.getAlertParams();
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(alertParams);
+
+        return new HttpSender(paramsMap).send(alertData.getContent());
     }
 }
