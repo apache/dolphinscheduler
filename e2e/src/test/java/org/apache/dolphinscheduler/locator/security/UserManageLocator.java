@@ -49,16 +49,20 @@ public class UserManageLocator {
 
     public static final By SUBMIT = By.xpath("//div[3]/button[2]/span");
 
+    public static final By USERNAME = By.xpath("//table/tr[2]/td[2]/span");
+
     /**
      * edit user
      */
+    public static final By USER_NAME = By.xpath("//table/tr[2]/td[2]/span");
+
     public static final By EDIT_GENERAL_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[11]/button");
 
     public static final By EDIT_ADMIN_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[3]/td[11]/button");
     /**
      * delete user
      */
-    public static final By DELETE_USER_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[11]/span[2]/button");
+    public static final By DELETE_USER_BUTTON = By.xpath("//table/tr[3]/td[11]/span[2]/button");
 
-    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//div[2]/div/button[2]/span");
+    public static final By CONFIRM_DELETE_USER_BUTTON = By.xpath("//tr[3]/td[11]/span[2]/div/div[2]/div/button[2]/span");
 }

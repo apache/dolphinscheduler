@@ -55,7 +55,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringApplicationContext.class, SpringZKServer.class, CuratorZookeeperClient.class,
         NettyExecutorManager.class, ExecutorDispatcher.class, ZookeeperRegistryCenter.class, TaskPriorityQueueConsumer.class,
-        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class})
+        ZookeeperNodeManager.class, ZookeeperCachedOperator.class, ZookeeperConfig.class, MasterConfig.class,
+        CuratorZookeeperClient.class})
 public class TaskPriorityQueueConsumerTest {
 
 
@@ -77,7 +78,6 @@ public class TaskPriorityQueueConsumerTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         tenant.setTenantCode("journey");
-        tenant.setTenantName("journey");
         tenant.setDescription("journey");
         tenant.setQueueId(1);
         tenant.setCreateTime(new Date());

@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.4-SNAPSHOT</version>
   </parent>
   <artifactId>dolphinscheduler-api</artifactId>
   <name>${project.artifactId}</name>
@@ -162,6 +162,12 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>

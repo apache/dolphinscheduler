@@ -144,6 +144,22 @@
         </div>
       </m-list-box>
     </div>
+    <div class="clearfix list">
+      <div class="text-box">
+        <span>{{$t('Running Memory')}}</span>
+      </div>
+      <div class="cont-box">
+        <span >{{$t('Min Memory')}}</span>
+        <m-select-input v-model="xms" :list="[1,2,3,4]">
+        </m-select-input>
+        <span>&nbsp;&nbsp;&nbsp;G &nbsp;&nbsp;</span>
+        <span >{{$t('Max Memory')}}</span>
+        <m-select-input v-model="xmx" :list="[1,2,3,4]">
+        </m-select-input>
+        <span>&nbsp;&nbsp;&nbsp;G</span>
+      </div>
+    </div>
+
   </div>
 </template>
 <script>
@@ -196,6 +212,10 @@
         // Custom parameter
         localParams: [],
         customConfig: 0,
+        //jvm memory xms
+        xms: 1,
+        //jvm memory xms
+        xmx: 1,
       }
     },
     mixins: [disabledState],
@@ -324,7 +344,9 @@
           this.$emit('on-params', {
             customConfig: this.customConfig,
             json: jsonEditor.getValue(),
-            localParams: this.localParams
+            localParams: this.localParams,
+            xms:+this.xms,
+            xmx:+this.xmx
           })
           return true
         } else {
@@ -358,6 +380,7 @@
             return false
           }
 
+          debugger
           // storage
           this.$emit('on-params', {
             customConfig: this.customConfig,
@@ -370,7 +393,9 @@
             jobSpeedByte: this.jobSpeedByte * 1024,
             jobSpeedRecord: this.jobSpeedRecord,
             preStatements: this.preStatements,
-            postStatements: this.postStatements
+            postStatements: this.postStatements,
+            xms:+this.xms,
+            xmx:+this.xmx
           })
           return true
         }
@@ -445,7 +470,9 @@
           jobSpeedByte: this.jobSpeedByte * 1024,
           jobSpeedRecord: this.jobSpeedRecord,
           preStatements: this.preStatements,
-          postStatements: this.postStatements
+          postStatements: this.postStatements,
+          xms: +this.xms,
+          xmx: +this.xmx,
         });
       },
       _destroyEditor () {
@@ -468,6 +495,10 @@
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
+
+        // set jvm memory
+        this.xms = o.params.xms || 1 ;
+        this.xmx = o.params.xmx || 1 ;
         // backfill
         if(o.params.customConfig == 0) {
           this.customConfig = 0

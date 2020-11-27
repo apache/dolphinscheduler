@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +57,7 @@ public class MasterTaskExecThreadTest {
         this.zookeeperRegistryCenter = PowerMockito.mock(ZookeeperRegistryCenter.class);
         PowerMockito.when(SpringApplicationContext.getBean(ZookeeperRegistryCenter.class))
                 .thenReturn(this.zookeeperRegistryCenter);
-        this.masterTaskExecThread = new MasterTaskExecThread(null);
+        this.masterTaskExecThread = new MasterTaskExecThread(getTaskInstance());
     }
 
     @Test
@@ -113,6 +114,7 @@ public class MasterTaskExecThreadTest {
         taskInstance.setTaskType("SHELL");
         taskInstance.setId(252612);
         taskInstance.setName("C");
+        taskInstance.setTaskJson("{}");
         taskInstance.setProcessInstanceId(10111);
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;

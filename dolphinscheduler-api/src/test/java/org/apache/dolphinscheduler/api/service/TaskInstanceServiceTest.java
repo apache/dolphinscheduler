@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -75,14 +77,10 @@ public class TaskInstanceServiceTest {
     TaskInstanceMapper taskInstanceMapper;
 
     @Mock
-    ProcessInstanceService processInstanceService;
-
-    @Mock
     UsersService usersService;
 
     @Test
     public void queryTaskListPaging() {
-
         String projectName = "project_test1";
         User loginUser = getAdminUser();
         Map<String, Object> result = new HashMap<>();
@@ -91,10 +89,9 @@ public class TaskInstanceServiceTest {
         //project auth fail
         when(projectMapper.queryByName(projectName)).thenReturn(null);
         when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
-        Map<String, Object> proejctAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "",
+        Map<String, Object> proejctAuthFailRes = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "", "",
                 "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
-
 
         //project
         putMsg(result, Status.SUCCESS, projectName);
@@ -111,28 +108,45 @@ public class TaskInstanceServiceTest {
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""), eq(""),
                 eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
         when(processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
 
-        Map<String, Object> successRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+        Map<String, Object> successRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         //executor name empty
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""), eq(""),
                 eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
-        Map<String, Object> executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+        Map<String, Object> executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
                 "", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorEmptyRes.get(Constants.STATUS));
 
         //executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
-        Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
+        Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullRes.get(Constants.STATUS));
+
+        //start/end date null
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
+                "", null, null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.SUCCESS, executorNullDateRes.get(Constants.STATUS));
+
+        //start date error format
+        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""), eq(""),
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), any(), any())).thenReturn(pageReturn);
+        Map<String, Object> executorErrorStartDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
+                "", "error date", null, "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorStartDateRes.get(Constants.STATUS));
+        Map<String, Object> executorErrorEndDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "", "",
+                "", null, "error date", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, executorErrorEndDateRes.get(Constants.STATUS));
     }
 
     /**

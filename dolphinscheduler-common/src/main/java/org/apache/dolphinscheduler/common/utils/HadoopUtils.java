@@ -14,27 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.apache.commons.io.IOUtils;
+import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
@@ -44,7 +48,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * hadoop utils
@@ -102,7 +112,6 @@ public class HadoopUtils implements Closeable {
             logger.error(e.getMessage(), e);
         }
     }
-
 
     /**
      * init hadoop configuration
@@ -168,7 +177,6 @@ public class HadoopUtils implements Closeable {
                 fs = FileSystem.get(configuration);
             }
 
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -196,7 +204,7 @@ public class HadoopUtils implements Closeable {
          */
         String appUrl = "";
 
-        if (StringUtils.isEmpty(rmHaIds)){
+        if (StringUtils.isEmpty(rmHaIds)) {
             //single resourcemanager enabled
             appUrl = appAddress;
             yarnEnabled = true;
@@ -207,7 +215,7 @@ public class HadoopUtils implements Closeable {
             logger.info("application url : {}", appUrl);
         }
 
-        if(StringUtils.isBlank(appUrl)){
+        if (StringUtils.isBlank(appUrl)) {
             throw new Exception("application url is blank");
         }
         return String.format(appUrl, applicationId);
@@ -233,10 +241,10 @@ public class HadoopUtils implements Closeable {
             return new byte[0];
         }
 
-        FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath));
-        return IOUtils.toByteArray(fsDataInputStream);
+        try (FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
+            return IOUtils.toByteArray(fsDataInputStream);
+        }
     }
-
 
     /**
      * cat file on hdfs
@@ -418,25 +426,33 @@ public class HadoopUtils implements Closeable {
         String applicationUrl = getApplicationUrl(applicationId);
         logger.info("applicationUrl={}", applicationUrl);
 
-        String responseContent ;
-		if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
-			responseContent = KerberosHttpClient.get(applicationUrl);
-		} else {
-			responseContent = HttpUtils.get(applicationUrl);
-		}
+        String responseContent;
+        if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false)) {
+            responseContent = KerberosHttpClient.get(applicationUrl);
+        } else {
+            responseContent = HttpUtils.get(applicationUrl);
+        }
         if (responseContent != null) {
             ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+            if (!jsonObject.has("app")) {
+                return ExecutionStatus.FAILURE;
+            }
             result = jsonObject.path("app").path("finalStatus").asText();
+
         } else {
             //may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
             logger.info("jobHistoryUrl={}", jobHistoryUrl);
             responseContent = HttpUtils.get(jobHistoryUrl);
-            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            if (!jsonObject.has("job")){
+            if (null != responseContent) {
+                ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
+                if (!jsonObject.has("job")) {
+                    return ExecutionStatus.FAILURE;
+                }
+                result = jsonObject.path("job").path("state").asText();
+            } else {
                 return ExecutionStatus.FAILURE;
             }
-            result = jsonObject.path("job").path("state").asText();
         }
 
         switch (result) {
@@ -475,7 +491,7 @@ public class HadoopUtils implements Closeable {
     /**
      * hdfs resource dir
      *
-     * @param tenantCode tenant code
+     * @param tenantCode   tenant code
      * @param resourceType resource type
      * @return hdfs resource dir
      */
@@ -519,7 +535,6 @@ public class HadoopUtils implements Closeable {
     public static String getHdfsUdfDir(String tenantCode) {
         return String.format("%s/udfs", getHdfsTenantDir(tenantCode));
     }
-
 
     /**
      * get hdfs file name
@@ -572,7 +587,6 @@ public class HadoopUtils implements Closeable {
         return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
     }
 
-
     /**
      * getAppAddress
      *
@@ -603,7 +617,6 @@ public class HadoopUtils implements Closeable {
         return start + activeRM + end;
     }
 
-
     @Override
     public void close() throws IOException {
         if (fs != null) {
@@ -615,7 +628,6 @@ public class HadoopUtils implements Closeable {
             }
         }
     }
-
 
     /**
      * yarn ha admin utils
@@ -662,7 +674,6 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-
         /**
          * get ResourceManager state
          *
@@ -680,11 +691,12 @@ public class HadoopUtils implements Closeable {
             ObjectNode jsonObject = JSONUtils.parseObject(retStr);
 
             //get ResourceManager state
-            if (!jsonObject.has("clusterInfo")){
+            if (!jsonObject.has("clusterInfo")) {
                 return null;
             }
             return jsonObject.get("clusterInfo").path("haState").asText();
         }
 
     }
+
 }
