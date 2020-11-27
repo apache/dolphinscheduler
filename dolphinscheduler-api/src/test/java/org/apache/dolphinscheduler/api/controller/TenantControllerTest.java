@@ -43,7 +43,6 @@ public class TenantControllerTest extends AbstractControllerTest{
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode","tenantCode");
-        paramsMap.add("tenantName","tenantName");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -84,7 +83,6 @@ public class TenantControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","9");
         paramsMap.add("tenantCode","cxc_te");
-        paramsMap.add("tenantName","tenant_update_2");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -96,7 +94,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -133,7 +131,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TENANT_NAME_EXIST.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -165,7 +163,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
