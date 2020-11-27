@@ -468,7 +468,7 @@ public class ProcessService {
             return;
         }
         Map<String, String> cmdParam = new HashMap<>();
-        cmdParam.put(Constants.CMDPARAM_RECOVERY_WAITTING_THREAD, String.valueOf(processInstance.getId()));
+        cmdParam.put(Constants.CMDPARAM_RECOVERY_WAITING_THREAD, String.valueOf(processInstance.getId()));
         // process instance quit by "waiting thread" state
         if (originCommand == null) {
             Command command = new Command(
@@ -658,9 +658,9 @@ public class ProcessService {
                 // sub process map
                 String pId = cmdParam.get(Constants.CMDPARAM_SUB_PROCESS);
                 processInstanceId = Integer.parseInt(pId);
-            } else if (cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_WAITTING_THREAD)) {
+            } else if (cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_WAITING_THREAD)) {
                 // waiting thread command
-                String pId = cmdParam.get(Constants.CMDPARAM_RECOVERY_WAITTING_THREAD);
+                String pId = cmdParam.get(Constants.CMDPARAM_RECOVERY_WAITING_THREAD);
                 processInstanceId = Integer.parseInt(pId);
             }
             if (processInstanceId == 0) {

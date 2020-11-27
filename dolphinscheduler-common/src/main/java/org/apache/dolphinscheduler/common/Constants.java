@@ -446,7 +446,7 @@ public final class Constants {
 
     public static final String CMDPARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
-    public static final String CMDPARAM_RECOVERY_WAITTING_THREAD = "WaittingThreadInstanceId";
+    public static final String CMDPARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
     public static final String CMDPARAM_SUB_PROCESS = "processInstanceId";
 
