@@ -29,7 +29,6 @@ userManage:
 
 tenantManage:
   tenantCode:  selenium_tenant_code_1
-  tenantName:  selenium_tenant_Name
   queue:  default
   description:  create tenant test
   tenantTitle:  租户管理 - DolphinScheduler

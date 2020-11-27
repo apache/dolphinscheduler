@@ -92,12 +92,23 @@
           <td><span>{{item.retryTimes}}</span></td>
           <td>
             <x-button
+                    v-if="item.state === 'FAILURE' || item.state === 'NEED_FAULT_TOLERANCE' || item.state === 'KILL'"
+                    type="error"
+                    shape="circle"
+                    size="xsmall"
+                    data-toggle="tooltip"
+                    :title="$t('Force success')"
+                    icon="ans-icon-success-solid"
+                    @click="_forceSuccess(item)">
+            </x-button>
+            <x-button
                     type="info"
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('View log')"
                     icon="ans-icon-log"
+                    :disabled="item.taskType==='SUB_PROCESS'? true: false"
                     @click="_refreshLog(item)">
             </x-button>
           </td>
@@ -110,6 +121,7 @@
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import { mapActions } from 'vuex'
 
   export default {
     name: 'list',
@@ -126,6 +138,7 @@
       pageSize: Number
     },
     methods: {
+      ...mapActions('dag', ['forceTaskSuccess']),
       _rtState (code) {
         let o = tasksState[code]
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
@@ -154,6 +167,17 @@
               }
             })
           }
+        })
+      },
+      _forceSuccess (item) {
+        this.forceTaskSuccess({taskInstanceId: item.id}).then(res => {
+          if (res.code === 0) {
+            this.$message.success(res.msg)
+          } else {
+            this.$message.error(res.msg)
+          }
+        }).catch(e => {
+          this.$message.error(e.msg)
         })
       },
       _go (item) {
