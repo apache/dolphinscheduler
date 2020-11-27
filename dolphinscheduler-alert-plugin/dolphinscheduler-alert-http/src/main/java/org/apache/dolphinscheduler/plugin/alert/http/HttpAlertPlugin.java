@@ -15,30 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.sms;
+package org.apache.dolphinscheduler.plugin.alert.http;
 
-import org.apache.dolphinscheduler.spi.alert.AlertChannel;
+import com.google.common.collect.ImmutableList;
+import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
 
 /**
- * sms alert factory
+ * http  alertPlugins
  */
-public class SMSAlertChannelFactory implements AlertChannelFactory {
-    @Override
-    public String getName() {
-        return null;
-    }
+public class HttpAlertPlugin implements DolphinSchedulerPlugin {
 
     @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
-
-    @Override
-    public AlertChannel create() {
-        return null;
+    public Iterable<AlertChannelFactory> getAlertChannelFactorys() {
+        return ImmutableList.of(new HttpAlertChannelFactory());
     }
 }
