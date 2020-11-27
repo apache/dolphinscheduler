@@ -67,7 +67,7 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" >{{$t('Edit')}}</x-button>
+        <el-button type="primary" size="small" round @click="_edit()" >{{$t('Edit')}}</el-button>
       </template>
     </m-list-box-f>
   </div>

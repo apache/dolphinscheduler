@@ -23,7 +23,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch v-model="enable" @on-click="_onSwitch" :disabled="isDetails"></x-switch>
+            <el-switch v-model="enable" size="small" @change="_onSwitch" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -35,10 +35,10 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding-top: 6px;">
-            <x-checkbox-group v-model="strategy">
-              <x-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</x-checkbox>
-              <x-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</x-checkbox>
-            </x-checkbox-group>
+            <el-checkbox-group v-model="strategy" size="small">
+              <el-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</el-checkbox>
+              <el-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</el-checkbox>
+            </el-checkbox-group>
           </div>
         </label>
       </div>
@@ -49,9 +49,9 @@
       </div>
       <div class="cont-box">
         <label class="label-box">
-          <x-input v-model="interval" style="width: 200px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="interval" size="small" style="width: 200px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
         </label>
       </div>
     </div>

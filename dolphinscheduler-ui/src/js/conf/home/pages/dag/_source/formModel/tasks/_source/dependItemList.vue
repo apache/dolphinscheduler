@@ -17,26 +17,26 @@
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.projectId" @on-change="_onChangeProjectId">
-        <x-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.definitionId" @on-change="_onChangeDefinitionId">
-        <x-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.depTasks">
-        <x-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item">
-        </x-option>
-      </x-select>
-      <x-select style="width: 150px;" v-model="el.cycle" :disabled="isDetails" @on-change="_onChangeCycle">
-        <x-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select style="width: 116px;" v-model="el.dateValue" :disabled="isDetails">
-        <x-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.projectId" @change="_onChangeProjectId" size="small">
+        <el-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.definitionId" @change="_onChangeDefinitionId" size="small">
+        <el-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
+      <el-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.depTasks" size="small">
+        <el-option v-for="item in el.depTasksList || []" :key="item" :value="item" :label="item">
+        </el-option>
+      </el-select>
+      <el-select style="width: 150px;" v-model="el.cycle" :disabled="isDetails" @change="_onChangeCycle">
+        <el-option v-for="item in cycleList" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
+      <el-select style="width: 116px;" v-model="el.dateValue" :disabled="isDetails">
+        <el-option v-for="item in el.dateValueList || []" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
           <em class="iconfont ans-icon-success-solid" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
@@ -174,7 +174,7 @@
       /**
        * change process get dependItemList
        */
-      _onChangeProjectId ({ value }) {
+      _onChangeProjectId (value) {
         this._getProcessByProjectId(value).then(definitionList => {
           /*this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item))*/
           let definitionId = definitionList[0].value
@@ -187,7 +187,7 @@
           })
         })
       },
-      _onChangeDefinitionId ({ value }) {
+      _onChangeDefinitionId (value) {
         // get depItem list data
         this._getDependItemList(value).then(depTasksList => {
           let item = this.dependItemList[this.itemIndex]
@@ -197,7 +197,7 @@
           this.$set(this.dependItemList, this.itemIndex, this._rtOldParams(value, item.definitionList, depTasksList, item))
         })
       },
-      _onChangeCycle ({ value }) {
+      _onChangeCycle (value) {
         let list = _.cloneDeep(dateValueList[value])
         this.$set(this.dependItemList[this.itemIndex], 'dateValue', list[0].value)
         this.$set(this.dependItemList[this.itemIndex], 'dateValueList', list)

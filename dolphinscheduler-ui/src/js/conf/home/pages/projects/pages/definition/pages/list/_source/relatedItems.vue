@@ -25,14 +25,14 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <x-select v-model="itemId">
-              <x-option
+            <el-select v-model="itemId" size="small">
+              <el-option
                       v-for="item in itemList"
                       :key="item.id"
                       :value="item.id"
                       :label="item.name">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
       </div>

@@ -19,26 +19,26 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select v-model="programType" :disabled="isDetails" style="width: 110px;">
-          <x-option
+        <el-select v-model="programType" :disabled="isDetails" style="width: 110px;" size="small">
+          <el-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :disabled="isDetails"
                 type="input"
+                size="small"
                 v-model="mainClass"
-                :placeholder="$t('Please enter main class')"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter main class')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -52,27 +52,27 @@
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :autosize="{minRows:2}"
                 :disabled="isDetails"
                 type="textarea"
+                size="small"
                 v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter Command-line parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :disabled="isDetails"
                 :autosize="{minRows:2}"
                 type="textarea"
+                size="small"
                 v-model="others"
-                :placeholder="$t('Please enter other parameters')"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter other parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>

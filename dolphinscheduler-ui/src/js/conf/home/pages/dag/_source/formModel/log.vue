@@ -48,7 +48,7 @@
             </div>
           </div>
           <div class="operation">
-            <x-button type="primary" shape="circle" @click="close"> {{$t('Close')}} </x-button>
+            <el-button type="primary" size="small" round @click="close"> {{$t('Close')}} </el-button>
           </div>
         </div>
       </div>

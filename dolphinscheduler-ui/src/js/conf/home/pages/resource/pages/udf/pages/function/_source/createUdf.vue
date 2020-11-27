@@ -21,61 +21,43 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('type')}}</template>
           <template slot="content">
-            <x-radio-group v-model="type">
-              <x-radio :label="'HIVE'">HIVE UDF</x-radio>
+            <el-radio-group v-model="type" size="mini" style="vertical-align: sub">
+              <el-radio :label="'HIVE'">HIVE UDF</el-radio>
               <!--<v-radio :label="'SPARK'">SPARK UDF</v-radio>-->
-            </x-radio-group>
+            </el-radio-group>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Function Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     maxlength="40"
                     v-model="funcName"
+                    size="small"
                     :placeholder="$t('Please enter a function name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Package Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     maxlength="100"
                     v-model="className"
+                    size="small"
                     :placeholder="$t('Please enter a Package name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
-        <!-- <m-list-box-f>
-          <template slot="name">{{$t('Parameter')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="argTypes"
-                    :placeholder="$t('Please enter a parameter')">
-            </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('Database Name')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="database"
-                    :placeholder="$t('Please enter database name')">
-            </x-input>
-          </template>
-        </m-list-box-f> -->
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
             <treeselect style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
-            <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
+            <el-button type="primary" size="small" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</el-button>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isUpdate">
@@ -99,11 +81,12 @@
         <m-list-box-f>
           <template slot="name">{{$t('Instructions')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
+                    size="small"
                     :placeholder="$t('Please enter a instructions')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
       </div>

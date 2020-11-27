@@ -21,7 +21,7 @@
         <span class="tag-text">{{item}}</span>
         <em class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
       </span>
-      <x-poptip
+      <el-popover
               placement="bottom-start"
               :append-to-body="true"
               :visible-arrow="false"
@@ -57,7 +57,7 @@
                   @keyup.up="_emailKeyup('up')"
                   @keyup.down="_emailKeyup('down')">
         </span>
-      </x-poptip>
+      </el-popover>
     </div>
   </div>
 </template>

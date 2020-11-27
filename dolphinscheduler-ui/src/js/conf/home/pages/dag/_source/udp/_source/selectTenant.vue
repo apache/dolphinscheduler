@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 <template>
-  <x-select
+  <el-select
           :disabled="isDetails"
-          @on-change="_onChange"
+          @change="_onChange"
           v-model="value"
+          size="small"
           style="width: 180px">
-    <x-option
+    <el-option
             v-for="item in itemList"
             :key="item.id"
             :value="item.id"
             :label="item.tenantCode">
-    </x-option>
-  </x-select>
+    </el-option>
+  </el-select>
 </template>
 <script>
   import disabledState from '@/module/mixin/disabledState'
@@ -60,8 +61,8 @@
     },
     methods: {
       _onChange (o) {
-        this.value = o.value
-        this.$emit('tenantSelectEvent', o.value)
+        this.value = o
+        this.$emit('tenantSelectEvent', o)
       }
     },
     watch: {

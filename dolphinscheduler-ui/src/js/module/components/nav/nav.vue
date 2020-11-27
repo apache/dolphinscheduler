@@ -64,9 +64,6 @@
       </div>
     </div>
     <div class="right">
-      <!--<span class="docs">
-        <a :href="docLink">doc</a>
-      </span>-->
       <span class="lang">
         <x-poptip
                 style="width: 80px"

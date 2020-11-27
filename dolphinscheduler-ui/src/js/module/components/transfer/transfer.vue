@@ -23,17 +23,6 @@
             <div class="title">{{type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
           </div>
-          <!--<div class="tf-search">
-            <x-input v-model="searchSourceVal"
-                     @on-enterkey="_sourceQuery"
-                     @on-click-icon="_sourceQuery"
-                     size="small"
-                     placeholder="Please enter keyword"
-                     type="text"
-                     style="width:202px;">
-              <em slot="suffix" class="ans-icon-search"></em>
-            </x-input>
-          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
@@ -49,17 +38,6 @@
             <div class="title">{{$t('Selected')}}{{type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
-          <!--<div class="tf-search">
-            <x-input v-model="searchTargetVal"
-                     @on-enterkey="_targetQuery"
-                     @on-click-icon="_targetQuery"
-                     size="small"
-                     placeholder="Please enter keyword"
-                     type="text"
-                     style="width:202px;">
-              <em slot="suffix" class="ans-icon-search"></em>
-            </x-input>
-          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span>{{item.name}}</span></li>

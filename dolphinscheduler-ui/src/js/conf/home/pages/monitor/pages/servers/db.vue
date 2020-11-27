@@ -59,19 +59,6 @@
             <div class="text-1">{{$t('Threads connections')}}</div>
           </div>
         </div>
-        <!-- <div class="col-md-2">
-            <div class="text-num-model text">
-              <div class="title">
-                <span>{{$t('Max used connections')}}</span>
-              </div>
-              <div class="value-p">
-                <strong :style="{color:color[2]}">{{item.maxUsedConnections}}</strong>
-              </div>
-              <div class="text-1">
-                {{$t('Max used connections')}}
-              </div>
-            </div>
-        </div>-->
         <div class="col-md-3">
           <div class="text-num-model text">
             <div class="title">

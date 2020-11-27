@@ -19,45 +19,47 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
                 style="width: 130px;"
+                size="small"
                 v-model="programType"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Spark Version')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
                 style="width: 130px;"
+                size="small"
                 v-model="sparkVersion"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in sparkVersionList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
-        <x-input
-                :disabled="isDetails"
-                type="input"
-                v-model="mainClass"
-                :placeholder="$t('Please enter main class')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+            :disabled="isDetails"
+            type="input"
+            size="small"
+            v-model="mainClass"
+            :placeholder="$t('Please enter main class')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -71,99 +73,100 @@
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
       <div slot="content">
-        <x-radio-group v-model="deployMode">
-          <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
-          <x-radio :label="'client'" :disabled="isDetails"></x-radio>
-          <x-radio :label="'local'" :disabled="isDetails"></x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="deployMode" size="small">
+          <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'client'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+        </el-radio-group>
       </div>
     </m-list-box>
     <div class="list-box-4p">
       <div class="clearfix list">
         <span class="sp1">{{$t('Driver core number')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="driverCores"
                   :placeholder="$t('Please enter driver core number')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 200px;">
+        </el-input>
         </span>
         <span class="sp1 sp3">{{$t('Driver memory use')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="driverMemory"
                   :placeholder="$t('Please enter driver memory use')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 186px;">
+        </el-input>
         </span>
       </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('Number of Executors')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="numExecutors"
-                  :placeholder="$t('Please enter the number of Executor')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="numExecutors"
+              :placeholder="$t('Please enter the number of Executor')"
+              style="width: 200px;">
+        </el-input>
         </span>
         <span class="sp1 sp3">{{$t('Executor memory')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="executorMemory"
-                  :placeholder="$t('Please enter the Executor memory')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="executorMemory"
+              :placeholder="$t('Please enter the Executor memory')"
+              style="width: 186px;">
+        </el-input>
         </span>
       </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('Executor core number')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="executorCores"
-                  :placeholder="$t('Please enter Executor core number')"
-                  style="width: 200px;"
-                  autocomplete="off">
-          </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="executorCores"
+              :placeholder="$t('Please enter Executor core number')"
+              style="width: 200px;">
+          </el-input>
         </span>
       </div>
     </div>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
-        <x-input
-                :autosize="{minRows:2}"
-                :disabled="isDetails"
-                type="textarea"
-                v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+            :autosize="{minRows:2}"
+            :disabled="isDetails"
+            type="textarea"
+            size="small"
+            v-model="mainArgs"
+            :placeholder="$t('Please enter Command-line parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
-        <x-input
-                :disabled="isDetails"
-                :autosize="{minRows:2}"
-                type="textarea"
-                v-model="others"
-                :placeholder="$t('Please enter other parameters')">
-        </x-input>
+        <el-input
+            :disabled="isDetails"
+            :autosize="{minRows:2}"
+            type="textarea"
+            size="small"
+            v-model="others"
+            :placeholder="$t('Please enter other parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -174,17 +177,6 @@
         </treeselect>
       </div>
     </m-list-box>
-    <!-- <m-list-box>
-      <div slot="text">{{$t('Resources')}}</div>
-      <div slot="content">
-        <m-resources
-                ref="refResources"
-                @on-resourcesData="_onResourcesData"
-                @on-cache-resourcesData="_onCacheResourcesData"
-                :resource-list="resourceList">
-        </m-resources>
-      </div>
-    </m-list-box> -->
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">

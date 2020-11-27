@@ -38,7 +38,7 @@
         <m-list-box-f v-if="auth">
           <template slot="name"><strong>*</strong>{{$t('User')}}</template>
           <template slot="content">
-            <el-select v-model="userId" @on-change="_onChange" size="small">
+            <el-select v-model="userId" @change="_onChange" size="small">
               <el-option
                       v-for="city in userIdList"
                       :key="city.id"

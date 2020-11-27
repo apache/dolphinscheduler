@@ -40,7 +40,7 @@
               <el-button type="primary" size="mini" icon="el-icon-user" @click="_mangeUser(scope.row)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit" @click="_edit(scope.row)" circle></el-button>
+              <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top">
               <el-popconfirm
@@ -171,8 +171,3 @@
     components: { }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .el-button+.el-button {
-    margin-left: 0;
-  }
-</style>

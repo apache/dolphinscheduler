@@ -19,9 +19,9 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small">
-            <x-button type="ghost" @click="_create">{{$t('Create UDF Function')}}</x-button>
-          </x-button-group>
+          <el-button-group>
+            <el-button size="mini" @click="_create">{{$t('Create UDF Function')}}</el-button>
+          </el-button-group>
         </template>
       </m-conditions>
     </template>
@@ -30,7 +30,16 @@
         <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!udfFuncList.length && total<=0">

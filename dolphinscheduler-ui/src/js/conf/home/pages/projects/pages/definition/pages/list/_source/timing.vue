@@ -24,40 +24,43 @@
         {{$t('Start and stop time')}}
       </div>
       <div class="cont">
-        <x-datepicker
-                style="width: 360px;"
-                :panel-num="2"
-                placement="bottom-start"
-                @on-change="_datepicker"
-                :value="scheduleTime"
-                type="daterange"
-                :placeholder="$t('Select date range')"
-                format="YYYY-MM-DD HH:mm:ss">
-        </x-datepicker>
+        <el-date-picker
+            style="width: 360px"
+            v-model="scheduleTime"
+            size="small"
+            @change="_datepicker"
+            type="datetimerange"
+            range-separator="-"
+            :start-placeholder="$t('startDate')"
+            :end-placeholder="$t('endDate')"
+            value-format="yyyy-MM-dd HH:mm:ss">
+          </el-date-picker>
       </div>
     </div>
     <div class="clearfix list">
-      <x-button type="info"  style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</x-button>
+      <el-button type="info"  style="margin-left:20px" size="small" round :loading="spinnerLoading" @click="preview()">{{$t('Execute time')}}</el-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
 
       <div class="cont">
         <template>
-          <x-poptip :ref="'poptip'" placement="bottom-start">
+          <el-popover
+            placement="bottom"
+            trigger="click">
+            <template slot="reference">
+              <el-input
+                      style="width: 360px;"
+                      type="text"
+                      size="small"
+                      readonly
+                      :value="crontab">
+              </el-input>
+            </template>
             <div class="crontab-box">
               <v-crontab v-model="crontab" :locale="i18n"></v-crontab>
             </div>
-            <template slot="reference">
-              <x-input
-                      style="width: 360px;"
-                      type="text"
-                      readonly
-                      :value="crontab"
-                      autocomplete="off">
-              </x-input>
-            </template>
-          </x-poptip>
+          </el-popover>
         </template>
       </div>
     </div>
@@ -73,10 +76,10 @@
         {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
-        <x-radio-group v-model="failureStrategy" style="margin-top: 7px;">
-          <x-radio :label="'CONTINUE'">{{$t('Continue')}}</x-radio>
-          <x-radio :label="'END'">{{$t('End')}}</x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="failureStrategy" style="margin-top: 7px;" size="small">
+          <el-radio :label="'CONTINUE'">{{$t('Continue')}}</el-radio>
+          <el-radio :label="'END'">{{$t('End')}}</el-radio>
+        </el-radio-group>
       </div>
     </div>
     <div class="clearfix list">
@@ -84,16 +87,17 @@
         {{$t('Notification strategy')}}
       </div>
       <div class="cont">
-        <x-select
-                style="width: 200px;"
-                v-model="warningType">
-          <x-option
-                  v-for="city in warningTypeList"
-                  :key="city.id"
-                  :value="city.id"
-                  :label="city.code">
-          </x-option>
-        </x-select>
+        <el-select
+          style="width: 200px;"
+          size="small"
+          v-model="warningType">
+          <el-option
+            v-for="city in warningTypeList"
+            :key="city.id"
+            :value="city.id"
+            :label="city.code">
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div class="clearfix list">
@@ -117,21 +121,22 @@
         {{$t('Notification group')}}
       </div>
       <div class="cont">
-        <x-select
-                style="width: 200px;"
-                :disabled="!notifyGroupList.length"
-                v-model="warningGroupId">
-          <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
-            <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
-          </x-input>
-          <x-option
-                  v-for="city in notifyGroupList"
-                  :key="city.id"
-                  :value="city.id"
-                  :label="city.code">
-          </x-option>
-        </x-select>
+        <el-select
+          style="width: 200px;"
+          size="small"
+          :disabled="!notifyGroupList.length"
+          v-model="warningGroupId">
+          <el-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
+            <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
+            <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
+          </el-input>
+          <el-option
+            v-for="city in notifyGroupList"
+            :key="city.id"
+            :value="city.id"
+            :label="city.code">
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div class="clearfix list">
@@ -151,8 +156,8 @@
       </div>
     </div>
     <div class="submit">
-      <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
+      <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
     </div>
   </div>
 </template>

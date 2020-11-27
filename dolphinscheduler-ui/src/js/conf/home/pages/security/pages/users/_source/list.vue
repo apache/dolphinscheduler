@@ -42,27 +42,27 @@
         </el-table-column>
         <el-table-column :label="$t('Operation')" width="130">
           <template slot-scope="scope">
-            <el-dropdown trigger="click">
-              <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item @click.native="_authProject(scope.row,scope.row.id)">{{$t('Project')}}</el-dropdown-item>
-                <el-dropdown-item @click.native="_authFile(scope.row,scope.row.id)">{{$t('Resources')}}</el-dropdown-item>
-                <el-dropdown-item @click.native="_authDataSource(scope.row,scope.row.id)">{{$t('Datasource')}}</el-dropdown-item>
-                <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.row.id)">{{$t('UDF Function')}}</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
+            <el-tooltip :content="$t('Authorize')" placement="top">
+              <el-dropdown trigger="click">
+                <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item @click.native="_authProject(scope.row,scope.row.id)">{{$t('Project')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authFile(scope.row,scope.row.id)">{{$t('Resources')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authDataSource(scope.row,scope.row.id)">{{$t('Datasource')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.row.id)">{{$t('UDF Function')}}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-edit" @click="_edit(scope.row)" circle></el-button>
+              <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('delete')" placement="top">
-              <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
               <el-popconfirm
                 :confirmButtonText="$t('Confirm')"
                 :cancelButtonText="$t('Cancel')"
                 icon="el-icon-info"
                 iconColor="red"
                 :title="$t('Delete?')"
-                :disabled="scope.row.userType === 'ADMIN_USER'"
                 @onConfirm="_delete(scope.row,scope.row.id)"
               >
                 <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>

@@ -34,12 +34,6 @@
         <treeselect v-model="resourceList" :multiple="true" maxHeight="200" :options="resourceOptions" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <!-- <m-resources
-            ref="refResources"
-            @on-resourcesData="_onResourcesData"
-            @on-cache-resourcesData="_onCacheResourcesData"
-            :resource-list="resourceList">
-        </m-resources> -->
       </div>
     </m-list-box>
 

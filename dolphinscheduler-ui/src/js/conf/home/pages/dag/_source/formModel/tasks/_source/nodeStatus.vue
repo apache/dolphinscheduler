@@ -17,14 +17,14 @@
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
-      <x-select style="width: 150px;" v-model="el.depTasks" :disabled="isDetails">
-        <x-option v-for="item in preNode" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
-      <x-select style="width: 116px;" v-model="el.status" :disabled="isDetails">
-        <x-option v-for="item in nodeStatusList || []" :key="item.value" :value="item.value" :label="item.label">
-        </x-option>
-      </x-select>
+      <el-select style="width: 150px;" v-model="el.depTasks" :disabled="isDetails">
+        <el-option v-for="item in preNode" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
+      <el-select style="width: 116px;" v-model="el.status" :disabled="isDetails">
+        <el-option v-for="item in nodeStatusList || []" :key="item.value" :value="item.value" :label="item.label">
+        </el-option>
+      </el-select>
       <template v-if="isInstance">
         <span class="instance-state">
           <em class="iconfont ans-icon-success-solid" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>

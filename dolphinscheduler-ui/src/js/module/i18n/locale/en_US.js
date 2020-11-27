@@ -247,6 +247,8 @@ export default {
   'Process Instance': 'Process Instance',
   'Task Instance': 'Task Instance',
   'Select date range': 'Select date range',
+  'startDate': 'startDate',
+  'endDate': 'endDate',
   Date: 'Date',
   waiting: 'waiting',
   execution: 'execution',

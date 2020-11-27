@@ -244,6 +244,8 @@ export default {
   'Process Instance': '工作流实例',
   'Task Instance': '任务实例',
   'Select date range': '选择日期区间',
+  'startDate': '开始日期',
+  'endDate': '结束日期',
   Date: '日期',
   waiting: '等待',
   execution: '执行中',

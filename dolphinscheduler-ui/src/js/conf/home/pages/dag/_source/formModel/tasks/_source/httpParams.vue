@@ -20,50 +20,51 @@
          v-for="(item,$index) in httpParamsList"
          :key="item.id"
          @click="_getIndex($index)">
-      <x-input
+      <el-input
         :disabled="isDetails"
         type="text"
+        size="small"
         v-model="httpParamsList[$index].prop"
         :placeholder="$t('prop(required)')"
-        @on-blur="_verifProp()"
+        @blur="_verifProp()"
         :style="inputStyle">
-      </x-input>
-      <x-select
+      </el-input>
+      <el-select
         @change="_handlePositionChanged"
         v-model="httpParamsList[$index].httpParametersType"
         :placeholder="$t('Http Parameters Position')"
         :disabled="isDetails"
         :style="inputStyle"
       >
-        <x-option
+        <el-option
           v-for="position in positionList"
           :key="position.code"
           :value="position.id"
           :label="position.code">
-        </x-option>
-      </x-select>
-      <x-input
+        </el-option>
+      </el-select>
+      <el-input
         :disabled="isDetails"
         type="text"
         v-model="httpParamsList[$index].value"
         :placeholder="$t('value(required)')"
-        @on-blur="_handleValue()"
+        @blur="_handleValue()"
         :style="inputStyle">
-      </x-input>
+      </el-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
+          <em class="el-icon-delete" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (httpParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <em class="ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+          <em class="el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!httpParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
+        <em class="iconfont el-icon-circle-plus-outline" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
     </span>
   </div>

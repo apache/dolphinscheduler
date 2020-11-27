@@ -22,19 +22,20 @@
       </div>
       <div class="cont-box">
         <div class="label-box">
-          <x-select
+          <el-select
                   style="width: 100%;"
+                  size="small"
                   filterable
                   v-model="wdiCurr"
                   :disabled="isDetails"
-                  @on-change="_handleWdiChanged">
-            <x-option
-                    v-for="city in processDefinitionList"
-                    :key="city.code"
-                    :value="city.id"
-                    :label="city.code">
-            </x-option>
-          </x-select>
+                  @change="_handleWdiChanged">
+            <el-option
+                  v-for="city in processDefinitionList"
+                  :key="city.code"
+                  :value="city.id"
+                  :label="city.code">
+            </el-option>
+          </el-select>
         </div>
       </div>
     </div>
@@ -77,7 +78,7 @@
        * The selected process defines the upper component name padding
        */
       _handleWdiChanged (o) {
-        this.$emit('on-set-process-name', this._handleName(o.value))
+        this.$emit('on-set-process-name', this._handleName(o))
       },
       /**
        * Return the name according to the process definition id

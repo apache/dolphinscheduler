@@ -46,25 +46,25 @@
           <m-list-box-f>
             <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
             <template slot="content">
-              <x-input
+              <el-input
                       type="input"
                       v-model="name"
                       :disabled="progress !== 0"
-                      :placeholder="$t('Please enter name')"
-                      autocomplete="off">
-              </x-input>
+                      size="small"
+                      :placeholder="$t('Please enter name')">
+              </el-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
             <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
-              <x-input
+              <el-input
                       type="textarea"
                       v-model="description"
                       :disabled="progress !== 0"
-                      :placeholder="$t('Please enter description')"
-                      autocomplete="off">
-              </x-input>
+                      size="small"
+                      :placeholder="$t('Please enter description')">
+              </el-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
@@ -73,7 +73,7 @@
               <div class="file-update-box">
                 <template v-if="progress === 0">
                   <input name="file" id="file" type="file" class="file-update">
-                  <x-button type="dashed" size="xsmall"> {{$t('Upload')}} </x-button>
+                  <el-button type="dashed" size="mini">{{$t('Upload')}}<i class="el-icon-upload el-icon--right"></i></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>

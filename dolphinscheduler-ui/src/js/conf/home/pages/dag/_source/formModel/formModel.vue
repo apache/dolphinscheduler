@@ -34,15 +34,15 @@
           <div class="text-box"><span>{{$t('Node name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
+              <el-input
                 type="text"
                 v-model="name"
+                size="small"
                 :disabled="isDetails"
                 :placeholder="$t('Please enter name (required)')"
                 maxlength="100"
-                @on-blur="_verifName()"
-                autocomplete="off">
-              </x-input>
+                @blur="_verifName()">
+              </el-input>
             </label>
           </div>
         </div>
@@ -52,10 +52,10 @@
           <div class="text-box"><span>{{$t('Run flag')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-radio-group v-model="runFlag" >
-                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</x-radio>
-                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</x-radio>
-              </x-radio-group>
+              <el-radio-group v-model="runFlag" size="small" style="vertical-align: sub;">
+                <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
+                <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
+              </el-radio-group>
             </label>
           </div>
         </div>
@@ -67,15 +67,13 @@
           </div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
-                resize
-                :autosize="{minRows:2}"
+              <el-input
+                :rows="2"
                 type="textarea"
                 :disabled="isDetails"
                 v-model="description"
-                :placeholder="$t('Please enter description')"
-                autocomplete="off">
-              </x-input>
+                :placeholder="$t('Please enter description')">
+              </el-input>
             </label>
           </div>
         </div>
@@ -100,12 +98,10 @@
             <span>{{$t('Number of failed retries')}}</span>
           </div>
           <div class="cont-box">
-            <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]">
-            </m-select-input>
+            <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]"></m-select-input>
             <span>({{$t('Times')}})</span>
             <span class="text-b">{{$t('Failed retry interval')}}</span>
-            <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]">
-            </m-select-input>
+            <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
@@ -116,8 +112,7 @@
             <span>{{$t('Delay execution time')}}</span>
           </div>
           <div class="cont-box">
-            <m-select-input v-model="delayTime" :list="[0,1,5,10]">
-            </m-select-input>
+            <m-select-input v-model="delayTime" :list="[0,1,5,10]"></m-select-input>
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
@@ -129,16 +124,14 @@
           </div>
           <div class="cont-box">
             <span class="label-box" style="width: 193px;display: inline-block;">
-              <x-select style="width: 157px;" v-model="successNode" :disabled="true">
-              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+              <el-select style="width: 157px;" size="small" v-model="successNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <x-select style="width: 157px;" v-model="successBranch" clearable>
-              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+            <el-select style="width: 157px;" size="small" v-model="successBranch" clearable>
+              <el-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
           </div>
         </div>
         <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
@@ -147,16 +140,14 @@
           </div>
           <div class="cont-box">
             <span class="label-box" style="width: 193px;display: inline-block;">
-              <x-select style="width: 157px;" v-model="failedNode" :disabled="true">
-              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+              <el-select style="width: 157px;" size="mini" v-model="failedNode" :disabled="true">
+                <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+              </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <x-select style="width: 157px;" v-model="failedBranch" clearable>
-              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
-              </x-option>
-            </x-select>
+            <el-select style="width: 157px;" size="mini" v-model="failedBranch" clearable>
+              <el-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
+            </el-select>
           </div>
         </div>
 
@@ -295,8 +286,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" id="cancelBtn"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
+        <el-button type="text" size="small" id="cancelBtn"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>

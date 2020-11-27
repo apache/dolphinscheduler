@@ -36,10 +36,10 @@
           </m-sql-type>
         </div>
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
-            <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
-          </x-checkbox-group>
+          <el-checkbox-group v-model="showType" size="small">
+            <el-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</el-checkbox>
+            <el-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</el-checkbox>
+          </el-checkbox-group>
         </div>
       </div>
     </m-list-box>
@@ -47,12 +47,12 @@
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
-          <x-input
+          <el-input
             type="input"
+            size="small"
             v-model="title"
-            :placeholder="$t('Please enter the title of email')"
-            autocomplete="off">
-          </x-input>
+            :placeholder="$t('Please enter the title of email')">
+          </el-input>
         </div>
       </m-list-box>
       <m-list-box>
@@ -71,13 +71,13 @@
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :disabled="isDetails"
                 type="input"
+                size="small"
                 v-model="connParams"
-                :placeholder="$t('Please enter format') + ' key1=value1;key2=value2...'"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter format') + ' key1=value1;key2=value2...'">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>

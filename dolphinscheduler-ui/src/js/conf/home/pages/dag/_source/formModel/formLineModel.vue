@@ -26,14 +26,14 @@
           <div class="text-box"><span>{{$t('Connection name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
+              <el-input
                 type="text"
+                size="small"
                 v-model="labelName"
                 :disabled="isDetails"
                 :placeholder="$t('Please enter name')"
-                maxlength="100"
-                autocomplete="off">
-              </x-input>
+                maxlength="100">
+              </el-input>
             </label>
           </div>
         </div>
@@ -41,8 +41,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="cancel()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
+        <el-button type="text" size="small" @click="cancel()"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>
