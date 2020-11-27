@@ -499,7 +499,13 @@ public class DataSourceService extends BaseService {
 
         String address = buildAddress(type, host, port, connectType);
         Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
-        String jdbcUrl = address + "/" + database;
+        String jdbcUrl;
+        if (DbType.SQLSERVER == type) {
+            jdbcUrl = address + ";databaseName=" + database;
+        } else {
+            jdbcUrl = address + "/" + database;
+        }
+
         if (Constants.ORACLE.equals(type.name())) {
             parameterMap.put(Constants.ORACLE_DB_CONNECT_TYPE, connectType);
         }
@@ -533,19 +539,17 @@ public class DataSourceService extends BaseService {
                 (type == DbType.HIVE || type == DbType.SPARK)) {
             parameterMap.put(Constants.PRINCIPAL, principal);
         }
-        if (other != null && !"".equals(other)) {
-            Map<String, String> map = JSONUtils.toMap(other);
-            if (map.size() > 0) {
-                StringBuilder otherSb = new StringBuilder();
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
-                }
-                if (!Constants.DB2.equals(type.name())) {
-                    otherSb.deleteCharAt(otherSb.length() - 1);
-                }
-                parameterMap.put(Constants.OTHER, otherSb);
-            }
 
+        Map<String, String> map = JSONUtils.toMap(other);
+        if (map != null) {
+            StringBuilder otherSb = new StringBuilder();
+            for (Map.Entry<String, String> entry: map.entrySet()) {
+                otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
+            }
+            if (!Constants.DB2.equals(type.name())) {
+                otherSb.deleteCharAt(otherSb.length() - 1);
+            }
+            parameterMap.put(Constants.OTHER, otherSb);
         }
 
         if (logger.isDebugEnabled()) {

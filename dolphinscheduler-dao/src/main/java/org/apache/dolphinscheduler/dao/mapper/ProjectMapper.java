@@ -74,4 +74,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
      */
     List<Project> queryProjectExceptUserId(@Param("userId") int userId);
 
+    /**
+     * query project list by userId
+     * @param userId
+     * @return
+     */
+    List<Project> queryProjectCreatedAndAuthorizedByUserId(@Param("userId") int userId);
+
 }

@@ -103,7 +103,7 @@ public class UsersService extends BaseService {
                                           String queue,
                                           int state) throws Exception {
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         //check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
@@ -231,7 +231,7 @@ public class UsersService extends BaseService {
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -253,6 +253,8 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
+     *
+     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -263,7 +265,7 @@ public class UsersService extends BaseService {
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateUser(int userId,
+    public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
                                           String email,
@@ -271,16 +273,17 @@ public class UsersService extends BaseService {
                                           String phone,
                                           String queue,
                                           int state) throws Exception {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
+        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
         User user = userMapper.selectById(userId);
-
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)){
@@ -394,7 +397,7 @@ public class UsersService extends BaseService {
      * @throws Exception exception when operate hdfs
      */
     public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
@@ -434,7 +437,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -484,7 +487,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -581,7 +584,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
@@ -628,7 +631,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -708,7 +711,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -729,7 +732,7 @@ public class UsersService extends BaseService {
      * @return user list
      */
     public Map<String, Object> queryUserList(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -773,7 +776,7 @@ public class UsersService extends BaseService {
      */
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -809,7 +812,7 @@ public class UsersService extends BaseService {
      * @return authorized result code
      */
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -819,24 +822,6 @@ public class UsersService extends BaseService {
         putMsg(result, Status.SUCCESS);
 
         return result;
-    }
-
-    /**
-     * check
-     *
-     * @param result result
-     * @param bool bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
     }
 
     /**

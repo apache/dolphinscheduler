@@ -64,5 +64,9 @@
         from t_ds_project
         where user_id = #{userId}
     </select>
+    <select id="queryProjectCreatedAndAuthorizedByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select * from t_ds_project where id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId})
+    </select>
 
 </mapper>

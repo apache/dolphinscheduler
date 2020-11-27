@@ -30,19 +30,7 @@
                     :disabled="item ? true : false"
                     v-model="tenantCode"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')">
-            </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Tenant Name')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="tenantName"
-                    maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
+                    :placeholder="$t('Please enter tenant code')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -89,7 +77,6 @@
         queueList: [],
         queueId: '',
         tenantCode: '',
-        tenantName: '',
         description: '',
       }
     },
@@ -138,21 +125,18 @@
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
+
         if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
-        if (!this.tenantName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('Please enter name')}`)
-          return false
-        }
+
         return true
       },
       _submit () {
         // 提交
         let param = {
           tenantCode: this.tenantCode,
-          tenantName: this.tenantName,
           queueId: this.queueId,
           description: this.description
         }
@@ -182,7 +166,6 @@
             this.queueId = this.item.queueId
           })
           this.tenantCode = this.item.tenantCode
-          this.tenantName = this.item.tenantName
           this.description = this.item.description
         }
       })
