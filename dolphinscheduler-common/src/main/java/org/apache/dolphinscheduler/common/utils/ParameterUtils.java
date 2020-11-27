@@ -45,7 +45,9 @@ public class ParameterUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParameterUtils.class);
 
-    private static final String DATE_PARSE_PATTERN = "\\$\\[([^0-9\\]]+)]";
+    private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\]]+)]";
+
+    private static final String DATE_START_PATTERN = "^[0-9]";
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
@@ -264,6 +266,9 @@ public class ParameterUtils {
 
         while (matcher.find()) {
             String key = matcher.group(1);
+            if (Pattern.matches(DATE_START_PATTERN, key)) {
+                continue;
+            }
             String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
             assert value != null;
             matcher.appendReplacement(newValue, value);
