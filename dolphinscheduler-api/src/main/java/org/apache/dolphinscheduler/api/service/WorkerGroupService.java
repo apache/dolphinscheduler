@@ -130,7 +130,7 @@ public class WorkerGroupService extends BaseService {
      */
     private List<WorkerGroup> getWorkerGroups(boolean isPaging) {
 
-        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + "/nodes" + "/worker";
+        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
         List<WorkerGroup> workerGroups = new ArrayList<>();
         List<String> workerGroupList;
         try {
