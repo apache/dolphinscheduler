@@ -442,21 +442,21 @@ public final class Constants {
     /**
      * command parameter keys
      */
-    public static final String CMDPARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
+    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
 
-    public static final String CMDPARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
+    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
-    public static final String CMDPARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
+    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS = "processInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
 
-    public static final String CMDPARAM_EMPTY_SUB_PROCESS = "0";
+    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 
-    public static final String CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
-    public static final String CMDPARAM_START_NODE_NAMES = "StartNodeNameList";
+    public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
 
     /**
      * complement data start date
