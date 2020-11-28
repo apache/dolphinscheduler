@@ -24,9 +24,9 @@ import java.util.Set;
 
 public interface WorkFlowLineageMapper {
 
-    public List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectId") int projectId);
+    List<WorkFlowLineage> queryByName(@Param("searchVal") String searchVal, @Param("projectId") int projectId);
 
-    public List<WorkFlowLineage> queryByIds(@Param("ids") Set<Integer> ids, @Param("projectId") int projectId);
+    List<WorkFlowLineage> queryByIds(@Param("ids") Set<Integer> ids, @Param("projectId") int projectId);
 
-    public List<WorkFlowRelation> querySourceTarget(@Param("id") int id);
+    List<WorkFlowRelation> querySourceTarget(@Param("id") int id);
 }

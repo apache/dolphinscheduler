@@ -21,7 +21,6 @@
     <delete id="deleteByUserId">
         delete from t_ds_relation_datasource_user
         where user_id = #{userId}
-
     </delete>
     <delete id="deleteByDatasourceId">
         delete from t_ds_relation_datasource_user
