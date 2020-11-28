@@ -44,7 +44,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkerGroupService extends BaseService {
 
-    private final String noNodeExceptionRegex = "KeeperException$NoNodeException";
+    private static final  String noNodeExceptionRegex = "KeeperException$NoNodeException";
     @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
     @Autowired
