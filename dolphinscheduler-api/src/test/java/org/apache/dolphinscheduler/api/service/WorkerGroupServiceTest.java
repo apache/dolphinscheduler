@@ -115,8 +115,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(zookeeperCachedOperator.getChildrenKeys(workerPath)).thenThrow(new RuntimeException("KeeperException$NoNodeException"));
         Map<String, Object> result = workerGroupService.queryAllGroup();
         Set<String> workerGroups = (Set<String>) result.get(Constants.DATA_LIST);
-        Assert.assertEquals(workerGroups.size(), 1);
-        Assert.assertEquals(workerGroups.toArray()[0], "default");
+        Assert.assertEquals(1, workerGroups.size());
+        Assert.assertEquals("default", workerGroups.toArray()[0]);
     }
 
 }

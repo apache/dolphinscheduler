@@ -38,13 +38,14 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 /**
  * work group service
  */
 @Service
 public class WorkerGroupService extends BaseService {
 
-    private static final  String noNodeExceptionRegex = "KeeperException$NoNodeException";
+    private static final  String NO_NODE_EXCEPTION_REGEX = "KeeperException$NoNodeException";
     @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
     @Autowired
@@ -135,7 +136,7 @@ public class WorkerGroupService extends BaseService {
         try {
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
-            if (e.getMessage().contains(noNodeExceptionRegex)) {
+            if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
                 if (isPaging) {
                     return workerGroups;
                 } else {
