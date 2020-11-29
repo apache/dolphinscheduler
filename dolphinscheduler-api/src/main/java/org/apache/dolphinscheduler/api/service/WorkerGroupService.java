@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -142,7 +144,7 @@ public class WorkerGroupService extends BaseService {
                 } else {
                     //ignore noNodeException return Default
                     WorkerGroup wg = new WorkerGroup();
-                    wg.setName("default");
+                    wg.setName(DEFAULT_WORKER_GROUP);
                     workerGroups.add(wg);
                     return workerGroups;
                 }
