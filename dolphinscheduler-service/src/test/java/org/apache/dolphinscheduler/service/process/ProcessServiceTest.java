@@ -166,6 +166,10 @@ public class ProcessServiceTest {
         command1.setCommandType(CommandType.REPEAT_RUNNING);
         command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"222\"}");
         Assert.assertTrue(processService.verifyIsNeedCreateCommand(command1));
+
+        Command command2 = new Command();
+        command2.setCommandType(CommandType.PAUSE);
+        Assert.assertTrue(processService.verifyIsNeedCreateCommand(command2));
     }
 
     @Test
