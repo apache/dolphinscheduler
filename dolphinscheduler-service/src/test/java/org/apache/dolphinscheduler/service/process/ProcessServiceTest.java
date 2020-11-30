@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_ID;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -26,10 +27,14 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +49,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -53,12 +60,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 @RunWith(MockitoJUnitRunner.class)
 public class ProcessServiceTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
+
     @InjectMocks
     private ProcessService processService;
 
 
     @Mock
     private CommandMapper commandMapper;
+
+
+    @Mock
+    private ErrorCommandMapper errorCommandMapper;
+
+
+    @Mock
+    private ProcessDefinitionMapper processDefineMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -161,6 +178,23 @@ public class ProcessServiceTest {
         Command originCommand = new Command();
         originCommand.setId(id);
         processService.createRecoveryWaitingThreadCommand(originCommand, processInstance);
+
+    }
+
+    @Test
+    public void testHandleCommand() {
+
+        //cannot construct process instance, return null;
+        String host = "127.0.0.1";
+        int validThreadNum = 2;
+        Command command = new Command();
+        command.setProcessDefinitionId(222);
+        command.setCommandType(CommandType.REPEAT_RUNNING);
+        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\"" + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
+        Mockito.when(processDefineMapper.selectById(command.getProcessDefinitionId())).thenReturn(null);
+        ErrorCommand errorCommand = new ErrorCommand(command, "message");
+        Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
+        Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
     }
 }
