@@ -1215,4 +1215,23 @@ public class ProcessDefinitionServiceTest {
                 + "\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
         Assert.assertNotNull(processDefinitionService.exportProcessMetaData(processDefinitionId, processDefinition));
     }
+
+    @Test
+    public void testImportProcessSchedule() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Integer processDefinitionId = 111;
+        String processDefinitionName = "testProcessDefinition";
+        String projectName = "project_test1";
+        Project project = getProject(projectName);
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUNT);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        ProcessMeta processMeta = new ProcessMeta();
+        Assert.assertEquals(0, processDefinitionService.importProcessSchedule(loginUser, projectName, processMeta, processDefinitionName, processDefinitionId));
+    }
+
 }
