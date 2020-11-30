@@ -139,7 +139,7 @@ public class MasterExecThreadTest {
      * with schedule
      */
     @Test
-    public void testParallelWithSchedule() throws ParseException {
+    public void testParallelWithSchedule() {
         try {
             Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(oneSchedulerList());
             Method method = MasterExecThread.class.getDeclaredMethod("executeComplementProcess");
@@ -162,7 +162,7 @@ public class MasterExecThreadTest {
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
             List<String> nodeNames = (List<String>) method.invoke(masterExecThread, JSONUtils.toJsonString(cmdParam));
-            Assert.assertEquals(3,nodeNames.size());
+            Assert.assertEquals(3, nodeNames.size());
         } catch (Exception e) {
             Assert.fail();
         }
