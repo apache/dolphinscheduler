@@ -69,7 +69,6 @@
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-
   export default {
     name: 'create-tenement',
     data () {
@@ -121,17 +120,14 @@
       },
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
-
         if (!this.tenantCode.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
-
         if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
-
         return true
       },
       _submit () {
@@ -144,7 +140,6 @@
         if (this.item) {
           param.id = this.item.id
         }
-
         this.$refs['popup'].spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
           this.$emit('onUpdate')
@@ -172,7 +167,6 @@
       })
     },
     mounted () {
-
     },
     components: { mPopup, mListBoxF }
   }
