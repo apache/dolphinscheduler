@@ -173,12 +173,15 @@ public class ProcessServiceTest {
 
         int id = 123;
         Mockito.when(commandMapper.deleteById(id)).thenReturn(1);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setIsSubProcess(Flag.YES);
+        ProcessInstance subProcessInstance = new ProcessInstance();
+        subProcessInstance.setIsSubProcess(Flag.YES);
         Command originCommand = new Command();
         originCommand.setId(id);
-        processService.createRecoveryWaitingThreadCommand(originCommand, processInstance);
+        processService.createRecoveryWaitingThreadCommand(originCommand, subProcessInstance);
 
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(111);
+        processService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
     }
 
     @Test
@@ -186,7 +189,7 @@ public class ProcessServiceTest {
 
         //cannot construct process instance, return null;
         String host = "127.0.0.1";
-        int validThreadNum = 2;
+        int validThreadNum = 1;
         Command command = new Command();
         command.setProcessDefinitionId(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
@@ -195,6 +198,11 @@ public class ProcessServiceTest {
         ErrorCommand errorCommand = new ErrorCommand(command, "message");
         Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
+
+
+        //there is not enough thread for this command
+        Command command1 = new Command();
+        Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
     }
 }
