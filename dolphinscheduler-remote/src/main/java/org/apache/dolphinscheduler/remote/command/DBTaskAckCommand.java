@@ -28,6 +28,10 @@ public class DBTaskAckCommand implements Serializable {
 
     private int taskInstanceId;
     private int status;
+    
+    public DBTaskAckCommand() {
+    	super();
+    }
 
     public DBTaskAckCommand(int status, int taskInstanceId) {
         this.status = status;

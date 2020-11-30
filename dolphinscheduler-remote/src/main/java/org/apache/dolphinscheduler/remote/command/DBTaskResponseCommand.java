@@ -27,6 +27,10 @@ public class DBTaskResponseCommand implements Serializable {
 
     private int taskInstanceId;
     private int status;
+    
+    public DBTaskResponseCommand() {
+    	super();
+    }
 
     public DBTaskResponseCommand(int status,int taskInstanceId) {
         this.status = status;
