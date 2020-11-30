@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -26,20 +29,36 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * process service test
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessServiceTest {
+
+    @InjectMocks
+    private ProcessService processService;
+
+
+    @Mock
+    private CommandMapper commandMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -89,7 +108,7 @@ public class ProcessServiceTest {
         String endString = "2020-01-10 00:00:00";
         parentInstance.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         parentInstance.setHistoryCmd("COMPLEMENT_DATA,START_FAILURE_TASK_PROCESS");
-        Map<String,String> complementMap = new HashMap<>();
+        Map<String, String> complementMap = new HashMap<>();
         complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE, startString);
         complementMap.put(Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE, endString);
         parentInstance.setCommandParam(JSONUtils.toJsonString(complementMap));
@@ -112,5 +131,36 @@ public class ProcessServiceTest {
                 parentInstance, childInstance, instanceMap, task
         );
         Assert.assertEquals(CommandType.START_FAILURE_TASK_PROCESS, command.getCommandType());
+    }
+
+    @Test
+    public void testVerifyIsNeedCreateCommand() {
+
+        List<Command> commands = new ArrayList<>();
+
+        Command command = new Command();
+        command.setCommandType(CommandType.REPEAT_RUNNING);
+        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\"}");
+        commands.add(command);
+        Mockito.when(commandMapper.selectList(null)).thenReturn(commands);
+        Assert.assertFalse(processService.verifyIsNeedCreateCommand(command));
+
+        Command command1 = new Command();
+        command1.setCommandType(CommandType.REPEAT_RUNNING);
+        command1.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"222\"}");
+        Assert.assertTrue(processService.verifyIsNeedCreateCommand(command1));
+    }
+
+    @Test
+    public void testCreateRecoveryWaitingThreadCommand() {
+
+        int id = 123;
+        Mockito.when(commandMapper.deleteById(id)).thenReturn(1);
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setIsSubProcess(Flag.YES);
+        Command originCommand = new Command();
+        originCommand.setId(id);
+        processService.createRecoveryWaitingThreadCommand(originCommand, processInstance);
+
     }
 }
