@@ -219,7 +219,6 @@ public class ProcessServiceTest {
         Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
-
     }
 
     @Test
