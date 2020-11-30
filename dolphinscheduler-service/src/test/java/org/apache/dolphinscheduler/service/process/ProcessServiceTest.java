@@ -213,18 +213,13 @@ public class ProcessServiceTest {
         Command command = new Command();
         command.setProcessDefinitionId(222);
         command.setCommandType(CommandType.REPEAT_RUNNING);
-        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\"" + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
+        command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
+                + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
         Mockito.when(processDefineMapper.selectById(command.getProcessDefinitionId())).thenReturn(null);
         ErrorCommand errorCommand = new ErrorCommand(command, "message");
         Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
-    }
-
-    @Test
-    public void test() {
-        String host = "127.0.0.1";
-        int validThreadNum = 1;
         //there is not enough thread for this command
         Command command1 = new Command();
         command1.setProcessDefinitionId(123);
@@ -249,6 +244,7 @@ public class ProcessServiceTest {
         List<Integer> list = new ArrayList<>();
 
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
+
     }
 
     @Test
