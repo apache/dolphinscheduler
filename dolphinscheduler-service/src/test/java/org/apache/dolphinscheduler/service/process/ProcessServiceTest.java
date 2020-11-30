@@ -240,9 +240,6 @@ public class ProcessServiceTest {
         processInstance.setId(222);
         Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Mockito.when(processService.findProcessInstanceDetailById(222)).thenReturn(processInstance);
-        List<Integer> list = new ArrayList<>();
-
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
     }
