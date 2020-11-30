@@ -201,6 +201,11 @@ public class ProcessServiceTest {
         recoverCommand.setCommandType(CommandType.REPEAT_RUNNING);
         processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance);
 
+        ProcessInstance subProcessInstance2 = new ProcessInstance();
+        subProcessInstance2.setId(111);
+        subProcessInstance2.setIsSubProcess(Flag.NO);
+        processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance2);
+
     }
 
     @Test
@@ -239,6 +244,17 @@ public class ProcessServiceTest {
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
+        Command command2 = new Command();
+        command2.setProcessDefinitionId(123);
+        command2.setCommandParam("{\"processInstanceId\":222}");
+        command2.setCommandType(CommandType.START_PROCESS);
+        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
+
+        Command command3 = new Command();
+        command3.setProcessDefinitionId(123);
+        command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
+        command3.setCommandType(CommandType.START_PROCESS);
+        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
     }
 
     @Test
