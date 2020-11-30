@@ -31,9 +31,11 @@ import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -76,6 +78,9 @@ public class ProcessServiceTest {
 
     @Mock
     private ProcessDefinitionMapper processDefineMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -216,5 +221,13 @@ public class ProcessServiceTest {
         Command command1 = new Command();
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
+    }
+
+    @Test
+    public void testGetUserById() {
+        User user = new User();
+        user.setId(123);
+        Mockito.when(userMapper.selectById(123)).thenReturn(user);
+        Assert.assertEquals(user, processService.getUserById(123));
     }
 }
