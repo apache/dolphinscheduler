@@ -182,6 +182,15 @@ public class ProcessServiceTest {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(111);
         processService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
+
+        Command recoverCommand = new Command();
+        recoverCommand.setCommandType(CommandType.RECOVER_WAITTING_THREAD);
+        processService.createRecoveryWaitingThreadCommand(recoverCommand, subProcessInstance);
+
+        Command repeatRunningCommand = new Command();
+        recoverCommand.setCommandType(CommandType.REPEAT_RUNNING);
+        processService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance);
+
     }
 
     @Test
@@ -198,7 +207,6 @@ public class ProcessServiceTest {
         ErrorCommand errorCommand = new ErrorCommand(command, "message");
         Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
-
 
         //there is not enough thread for this command
         Command command1 = new Command();
