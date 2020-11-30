@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
@@ -216,8 +215,6 @@ public class ProcessServiceTest {
         command.setCommandParam("{\"" + CMD_PARAM_RECOVER_PROCESS_ID_STRING + "\":\"111\",\""
                 + CMD_PARAM_SUB_PROCESS_DEFINE_ID + "\":\"222\"}");
         Mockito.when(processDefineMapper.selectById(command.getProcessDefinitionId())).thenReturn(null);
-        ErrorCommand errorCommand = new ErrorCommand(command, "message");
-        Mockito.when(errorCommandMapper.insert(errorCommand)).thenReturn(1);
         Assert.assertNull(processService.handleCommand(logger, host, validThreadNum, command));
 
         //there is not enough thread for this command
