@@ -268,4 +268,32 @@ public class ProcessServiceTest {
         Assert.assertEquals("111_222_333", processService.formatTaskAppId(taskInstance));
 
     }
+
+    @Test
+    public void testRecurseFindSubProcessId() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
+                + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\""
+                + ",\"dependence\":{},\"description\":\"\",\"id\":\"tasks-76544\""
+                + ",\"maxRetryTimes\":\"0\",\"name\":\"test\",\"params\":{\"localParams\":[],"
+                + "\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[],\"processDefinitionId\""
+                + ":\"222\"},\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"MEDIUM\",\"timeout\":{\"enable\":false,\"interval\":"
+                + "null,\"strategy\":\"\"},\"type\":\"SHELL\",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],"
+                + "\"tenantId\":4,\"timeout\":0}");
+        int parentId = 111;
+        List<Integer> ids = new ArrayList<>();
+        ProcessDefinition processDefinition2 = new ProcessDefinition();
+        processDefinition2.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\""
+                + ":{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{},"
+                + "\"description\":\"\",\"id\":\"tasks-76544\",\"maxRetryTimes\":\"0\",\"name\":\"test\","
+                + "\"params\":{\"localParams\":[],\"rawScript\":\"echo \\\"123123\\\"\",\"resourceList\":[]},"
+                + "\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":"
+                + "\"MEDIUM\",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":"
+                + "\"SHELL\",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
+        Mockito.when(processDefineMapper.selectById(parentId)).thenReturn(processDefinition);
+        Mockito.when(processDefineMapper.selectById(222)).thenReturn(processDefinition2);
+        processService.recurseFindSubProcessId(parentId, ids);
+
+    }
 }
