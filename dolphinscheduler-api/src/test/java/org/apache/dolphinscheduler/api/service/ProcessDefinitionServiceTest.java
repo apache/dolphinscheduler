@@ -746,6 +746,70 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), "shell-1")).thenReturn(taskInstance);
         Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
         Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+
+    }
+
+    @Test
+    public void testSubProcessViewTree() throws Exception {
+
+        ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setProcessDefinitionJson(SHELL_JSON);
+        List<ProcessInstance> processInstanceList = new ArrayList<>();
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setName("test_instance");
+        processInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setHost("192.168.xx.xx");
+        processInstance.setStartTime(new Date());
+        processInstance.setEndTime(new Date());
+        processInstanceList.add(processInstance);
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setStartTime(new Date());
+        taskInstance.setEndTime(new Date());
+        taskInstance.setTaskType("SUB_PROCESS");
+        taskInstance.setId(1);
+        taskInstance.setName("test_task_instance");
+        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setHost("192.168.xx.xx");
+        taskInstance.setTaskJson("{\n"
+                + "  \"conditionResult\": {\n"
+                + "    \"failedNode\": [\n"
+                + "      \"\"\n"
+                + "    ],\n"
+                + "    \"successNode\": [\n"
+                + "      \"\"\n"
+                + "    ]\n"
+                + "  },\n"
+                + "  \"delayTime\": \"0\",\n"
+                + "  \"dependence\": {},\n"
+                + "  \"description\": \"\",\n"
+                + "  \"id\": \"1\",\n"
+                + "  \"maxRetryTimes\": \"0\",\n"
+                + "  \"name\": \"test_task_instance\",\n"
+                + "  \"params\": {\n"
+                + "    \"processDefinitionId\": \"222\",\n"
+                + "    \"resourceList\": []\n"
+                + "  },\n"
+                + "  \"preTasks\": [],\n"
+                + "  \"retryInterval\": \"1\",\n"
+                + "  \"runFlag\": \"NORMAL\",\n"
+                + "  \"taskInstancePriority\": \"MEDIUM\",\n"
+                + "  \"timeout\": {\n"
+                + "    \"enable\": false,\n"
+                + "    \"interval\": null,\n"
+                + "    \"strategy\": \"\"\n"
+                + "  },\n"
+                + "  \"type\": \"SUB_PROCESS\",\n"
+                + "  \"workerGroup\": \"default\"\n"
+                + "}");
+        //task instance exist
+        Mockito.when(processDefineMapper.selectById(46)).thenReturn(processDefinition);
+        Mockito.when(processInstanceService.queryByProcessDefineId(46, 10)).thenReturn(processInstanceList);
+        Mockito.when(taskInstanceMapper.queryByInstanceIdAndName(processInstance.getId(), "shell-1")).thenReturn(taskInstance);
+        Map<String, Object> taskNotNuLLRes = processDefinitionService.viewTree(46, 10);
+        Assert.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+
     }
 
     @Test
