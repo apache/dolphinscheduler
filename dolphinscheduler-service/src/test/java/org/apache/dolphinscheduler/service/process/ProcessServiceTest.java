@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
@@ -82,6 +83,8 @@ public class ProcessServiceTest {
     private ProcessInstanceMapper processInstanceMapper;
     @Mock
     private UserMapper userMapper;
+    @Mock
+    TaskInstanceMapper taskInstanceMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -245,16 +248,23 @@ public class ProcessServiceTest {
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
         Command command2 = new Command();
+        command2.setCommandParam("{\"ProcessInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
         command2.setProcessDefinitionId(123);
-        command2.setCommandParam("{\"processInstanceId\":222}");
-        command2.setCommandType(CommandType.START_PROCESS);
+        command2.setCommandType(CommandType.RECOVER_SUSPENDED_PROCESS);
+
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command2));
 
         Command command3 = new Command();
         command3.setProcessDefinitionId(123);
         command3.setCommandParam("{\"WaitingThreadInstanceId\":222}");
-        command3.setCommandType(CommandType.START_PROCESS);
+        command3.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command3));
+
+        Command command4 = new Command();
+        command4.setProcessDefinitionId(123);
+        command4.setCommandParam("{\"WaitingThreadInstanceId\":222,\"StartNodeIdList\":\"n1,n2\"}");
+        command4.setCommandType(CommandType.REPEAT_RUNNING);
+        Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command4));
     }
 
     @Test
