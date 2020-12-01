@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -137,8 +138,30 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         } catch (Exception e) {
+            //ignore
         }
     }
+
+    /**
+     * not complement
+     */
+    @Test
+    public void testComplementWithStartNodeList() throws ParseException {
+        try {
+            Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
+                    processDefinitionId, cronTime, CommandType.START_PROCESS,
+                    null, "n1,n2",
+                    null, null, 0,
+                    "", "", RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
+            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            verify(processService, times(1)).createCommand(any(Command.class));
+        } catch (Exception e) {
+            //ignore
+        }
+    }
+
 
     /**
      * date error
@@ -156,6 +179,7 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
             verify(processService, times(0)).createCommand(any(Command.class));
         } catch (Exception e) {
+            //ignore
         }
     }
 
@@ -175,6 +199,7 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(1)).createCommand(any(Command.class));
         } catch (Exception e) {
+            //ignore
         }
     }
 
@@ -194,6 +219,7 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(31)).createCommand(any(Command.class));
         } catch (Exception e) {
+            //ignore
         }
     }
 
@@ -213,9 +239,9 @@ public class ExecutorService2Test {
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
             verify(processService, times(15)).createCommand(any(Command.class));
         } catch (Exception e) {
+            //ignore
         }
     }
-
 
     @Test
     public void testNoMsterServers() throws ParseException {
