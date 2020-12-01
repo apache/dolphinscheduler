@@ -30,7 +30,6 @@
 
     <packaging>dolphinscheduler-plugin</packaging>
 
-
     <dependencies>
 
         <dependency>
