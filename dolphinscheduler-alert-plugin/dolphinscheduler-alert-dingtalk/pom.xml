@@ -27,7 +27,7 @@
 
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
-
+    <packaging>dolphinscheduler-plugin</packaging>
 
     <dependencies>
 
