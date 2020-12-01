@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -138,6 +139,9 @@ public class TaskPriorityQueueConsumer extends Thread {
                 }
                 for (String dispatchFailedTask : failedDispatchTasks) {
                     taskPriorityQueue.put(dispatchFailedTask);
+                }
+                if (failedDispatchTasks.size() > 0 && taskPriorityQueue.size() < 10) {
+                    TimeUnit.SECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {
                 logger.error("dispatcher task error", e);
