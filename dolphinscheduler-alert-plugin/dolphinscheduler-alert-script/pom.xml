@@ -28,6 +28,8 @@
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-alert-script</artifactId>
 
+    <packaging>dolphinscheduler-plugin</packaging>
+
 
     <dependencies>
 

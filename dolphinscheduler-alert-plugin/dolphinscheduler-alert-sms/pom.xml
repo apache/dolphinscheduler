@@ -11,6 +11,8 @@
 
     <artifactId>dolphinscheduler-alert-sms</artifactId>
 
+    <packaging>dolphinscheduler-plugin</packaging>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
