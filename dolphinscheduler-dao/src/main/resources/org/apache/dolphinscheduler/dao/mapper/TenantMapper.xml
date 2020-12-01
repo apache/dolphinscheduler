@@ -29,6 +29,11 @@
       from t_ds_tenant
       where tenant_code = #{tenantCode}
     </select>
+    <select id="queryByTenantName" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+      select *
+      from t_ds_tenant
+      where tenant_name = #{tenantName}
+    </select>
     <select id="queryTenantPaging" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
         SELECT t.*,q.queue_name
         FROM t_ds_tenant t,t_ds_queue q

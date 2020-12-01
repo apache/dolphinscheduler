@@ -95,4 +95,12 @@ public interface TenantService {
      * @return true if tenant code can user, otherwise return false
      */
     Result verifyTenantCode(String tenantCode);
+    
+    /**
+     * verify tenant name
+     *
+     * @param tenantName tenant name
+     * @return true if tenant name can user, otherwise return false
+     */
+    Result verifyTenantName(String tenantName);
 }

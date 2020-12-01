@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_NAME_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -213,7 +214,7 @@ public class TenantController extends BaseController {
      *
      * @param loginUser login user
      * @param tenantCode tenant code
-     * @return true if tenant code can use, otherwise return false
+     * @return true if tenant code can user, otherwise return false
      */
     @ApiOperation(value = "verifyTenantCode", notes = "VERIFY_TENANT_CODE_NOTES")
     @ApiImplicitParams({
@@ -227,6 +228,28 @@ public class TenantController extends BaseController {
         logger.info("login user {}, verfiy tenant code: {}",
                 loginUser.getUserName(), tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
+    }
+    
+    
+    /**
+     * verify tenant name
+     *
+     * @param loginUser login user
+     * @param tenantName tenant Name
+     * @return true if tenant name can user, otherwise return false
+     */
+    @ApiOperation(value = "verifyTenantName", notes = "VERIFY_TENANT_NAME_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "tenantName", value = "TENANT_NAME", required = true, dataType = "String")
+    })
+    @GetMapping(value = "/verify-tenant-name")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(VERIFY_TENANT_NAME_ERROR)
+    public Result verifyTenantName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @RequestParam(value = "tenantName") String tenantName) {
+        logger.info("login user {}, verfiy tenant name: {}",
+                loginUser.getUserName(), tenantName);
+        return tenantService.verifyTenantName(tenantName);
     }
 
 }

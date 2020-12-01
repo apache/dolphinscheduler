@@ -100,8 +100,13 @@ public class TenantServiceImpl extends BaseService implements TenantService {
             return result;
         }
 
-        if (checkTenantExists(tenantCode)) {
+        if (checkTenantCodeExists(tenantCode)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
+            return result;
+        }
+        
+        if (checkTenantNameExists(tenantName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantName);
             return result;
         }
 
@@ -194,7 +199,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
          * if the tenant code is modified, the original resource needs to be copied to the new tenant.
          */
         if (!tenant.getTenantCode().equals(tenantCode)) {
-            if (checkTenantExists(tenantCode)) {
+            if (checkTenantCodeExists(tenantCode)) {
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState()) {
                     String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
@@ -316,8 +321,8 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      */
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
-        if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_NAME_EXIST, tenantCode);
+        if (checkTenantCodeExists(tenantCode)) {
+            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
@@ -330,8 +335,35 @@ public class TenantServiceImpl extends BaseService implements TenantService {
      * @param tenantCode tenant code
      * @return ture if the tenant code exists, otherwise return false
      */
-    private boolean checkTenantExists(String tenantCode) {
+    private boolean checkTenantCodeExists(String tenantCode) {
         List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);
+        return CollectionUtils.isNotEmpty(tenants);
+    }
+    
+    /**
+     * verify tenant name
+     *
+     * @param tenantName tenant name
+     * @return true if tenant name can user, otherwise return false
+     */
+    public Result verifyTenantName(String tenantName) {
+        Result result = new Result();
+        if (checkTenantNameExists(tenantName)) {
+            putMsg(result, Status.TENANT_NAME_EXIST, tenantName);
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+    
+    /**
+     * check tenantName exists
+     *
+     * @param tenantName tenant name
+     * @return ture if the tenant name exists, otherwise return false
+     */
+    private boolean checkTenantNameExists(String tenantName) {
+        List<Tenant> tenants = tenantMapper.queryByTenantName(tenantName);
         return CollectionUtils.isNotEmpty(tenants);
     }
 }
