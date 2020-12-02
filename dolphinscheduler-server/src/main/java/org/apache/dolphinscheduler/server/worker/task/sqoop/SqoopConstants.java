@@ -57,6 +57,7 @@ public final class SqoopConstants {
 
     //sqoop hive
     public static final String HIVE_IMPORT = "--hive-import";
+    public static final String HIVE_DATABASE = "--hive-database";
     public static final String HIVE_TABLE = "--hive-table";
     public static final String CREATE_HIVE_TABLE = "--create-hive-table";
     public static final String HIVE_DROP_IMPORT_DELIMS = "--hive-drop-import-delims";
