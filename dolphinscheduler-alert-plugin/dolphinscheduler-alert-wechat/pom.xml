@@ -27,6 +27,7 @@
 
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-alert-wechat</artifactId>
+    <packaging>dolphinscheduler-plugin</packaging>
      <dependencies>
 
          <dependency>
