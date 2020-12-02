@@ -18,12 +18,11 @@
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-
-import java.util.Date;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Date;
 
 public class TimePlaceholderUtilsTest {
 

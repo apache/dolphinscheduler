@@ -17,33 +17,15 @@
 
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.ADD_STRING;
-import static org.apache.dolphinscheduler.common.Constants.DIVISION_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
-import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.MULTIPLY_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.MULTIPLY_STRING;
-import static org.apache.dolphinscheduler.common.Constants.N;
-import static org.apache.dolphinscheduler.common.Constants.P;
-import static org.apache.dolphinscheduler.common.Constants.RIGHT_BRACE_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_CHAR;
-import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_STRING;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * time place holder utils
