@@ -176,7 +176,7 @@ public class TaskExecuteThread implements Runnable {
                 org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
                 logger.info("exec local path: {} cleared.", execLocalPath);
             } catch (IOException e) {
-                logger.error("delete exec dir failed : " + e.getMessage(), e);
+                logger.error("delete exec dir failed : {}", e.getMessage(), e);
             }
         }
 
