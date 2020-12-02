@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -59,6 +60,18 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue {
     @Override
     public String take() throws Exception {
         return queue.take();
+    }
+
+    /**
+     *
+     * @param timeout
+     * @param unit
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public String poll(long timeout, TimeUnit unit) throws Exception {
+        return queue.poll(timeout,unit);
     }
 
     /**

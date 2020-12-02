@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.service.queue;
 
 
+import java.util.concurrent.TimeUnit;
+
 public interface TaskPriorityQueue {
 
     /**
@@ -33,6 +35,14 @@ public interface TaskPriorityQueue {
      * @throws Exception
      */
     String take()throws Exception;
+
+    /**
+     * @param timeout
+     * @param unit
+     * @return taskInfo
+     * @throws Exception
+     */
+    String poll(long timeout, TimeUnit unit)throws Exception;
 
     /**
      * size

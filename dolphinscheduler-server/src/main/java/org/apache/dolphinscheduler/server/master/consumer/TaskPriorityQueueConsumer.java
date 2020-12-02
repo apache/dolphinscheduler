@@ -59,11 +59,8 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -124,8 +121,10 @@ public class TaskPriorityQueueConsumer extends Thread {
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
                 failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
-                    // if not task , blocking here
-                    String taskPriorityInfo = taskPriorityQueue.take();
+                    String taskPriorityInfo = taskPriorityQueue.poll(Constants.SLEEP_TIME_MILLIS, TimeUnit.MILLISECONDS);
+                    if(Objects.isNull(taskPriorityInfo)){
+                        continue;
+                    }
                     TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
                     boolean dispatchResult = dispatch(taskPriority.getTaskId());
                     if (!dispatchResult) {
