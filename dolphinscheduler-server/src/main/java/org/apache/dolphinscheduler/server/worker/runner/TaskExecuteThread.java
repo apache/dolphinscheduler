@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -146,8 +148,38 @@ public class TaskExecuteThread implements Runnable {
             taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),responseCommand.convert2Command(),Event.RESULT);
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
-
+            clearTaskExecPath();
         }
+    }
+
+    /**
+     * when task finish, clear execute path.
+     */
+    private void clearTaskExecPath() {
+        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
+
+        if (!CommonUtils.isDevelopMode()) {
+            // get exec dir
+            String execLocalPath = taskExecutionContext.getExecutePath();
+
+            if (StringUtils.isEmpty(execLocalPath)) {
+                logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            if ("/".equals(execLocalPath)) {
+                logger.warn("task: {} exec local path is '/'， direct deletion is not allowed", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
+                logger.info("exec local path: {} cleared.", execLocalPath);
+            } catch (IOException e) {
+                logger.error("delete exec dir failed : " + e.getMessage(), e);
+            }
+        }
+
     }
 
     /**

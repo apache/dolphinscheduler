@@ -192,8 +192,6 @@ public class MasterExecThread implements Runnable {
             processService.updateProcessInstance(processInstance);
         }finally {
             taskExecService.shutdown();
-            // post handle
-            postHandle();
         }
     }
 
@@ -377,27 +375,6 @@ public class MasterExecThread implements Runnable {
             }
             if(task.getState().typeIsFailure() && !task.taskCanRetry()){
                 errorTaskList.put(task.getName(), task);
-            }
-        }
-    }
-
-    /**
-     * process post handle
-     */
-    private void postHandle() {
-        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
-
-        if (!CommonUtils.isDevelopMode()) {
-            // get exec dir
-            String execLocalPath = org.apache.dolphinscheduler.common.utils.FileUtils
-                    .getProcessExecDir(processInstance.getProcessDefinition().getProjectId(),
-                            processInstance.getProcessDefinitionId(),
-                            processInstance.getId());
-
-            try {
-                FileUtils.deleteDirectory(new File(execLocalPath));
-            } catch (IOException e) {
-                logger.error("delete exec dir failed ", e);
             }
         }
     }
