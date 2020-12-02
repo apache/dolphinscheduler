@@ -34,6 +34,7 @@
         <module>dolphinscheduler-alert-wechat</module>
         <module>dolphinscheduler-alert-dingtalk</module>
         <module>dolphinscheduler-alert-script</module>
+        <module>dolphinscheduler-alert-http</module>
     </modules>
 
 
