@@ -26,7 +26,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -84,7 +83,7 @@ public class HttpSender {
 
         AlertResult alertResult = new AlertResult();
 
-        getHttpRequest(msg);
+        createHttpRequest(msg);
 
         if (httpRequest == null){
             alertResult.setStatus("false");
@@ -100,7 +99,7 @@ public class HttpSender {
             alertResult.setStatus("true");
             alertResult.setMessage(resp);
         }catch (Exception e) {
-            logger.error("send sms alert msg  exception : {}", e.getMessage());
+            logger.error("send http alert msg  exception : {}", e.getMessage());
             alertResult.setStatus("false");
             alertResult.setMessage("send http request  alert fail.");
         }
@@ -108,7 +107,7 @@ public class HttpSender {
         return alertResult;
     }
 
-    private void getHttpRequest(String msg){
+    private void createHttpRequest(String msg){
 
         if (REQUEST_TYPE_POST.equals(requestType)){
             httpRequest =  new HttpPost(url);

@@ -953,6 +953,10 @@
                         <include>**/plugin/alert/email/ExcelUtilsTest.java</include>
                         <include>**/plugin/alert/email/MailUtilsTest.java</include>
                         <include>**/plugin/alert/email/template/DefaultHTMLTemplateTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertChannelTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
+                        <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/plugin/alert/dingtalk/DingTalkSenderTest.java</include>
                         <include>**/plugin/alert/dingtalk/DingTalkAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/wechat/WeChatSenderTest.java</include>
