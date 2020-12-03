@@ -72,16 +72,13 @@ public class TaskExecuteThreadTest {
         TaskExecuteThread taskExecuteThread = PowerMockito.spy(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/");
 
-
     }
-
 
     @Test
     public void testClearTaskExecPath() {
 
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
         Mockito.when(CommonUtils.isDevelopMode()).thenReturn(false);
-        ;
         taskExecuteThread.clearTaskExecPath();
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn(null);
         taskExecuteThread.clearTaskExecPath();
@@ -96,7 +93,6 @@ public class TaskExecuteThreadTest {
     public void testNotClearTaskExecPath() {
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
         Mockito.when(CommonUtils.isDevelopMode()).thenReturn(true);
-        ;
         taskExecuteThread.clearTaskExecPath();
     }
 }
