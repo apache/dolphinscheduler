@@ -455,7 +455,7 @@
       _startFromForceSuccess (item, index) {
         this._countDownFn({
           id: item.id,
-          executeType: 'START_FROM_FORCED_SUCCESS',
+          executeType: 'RESUME_FROM_FORCED_SUCCESS',
           index: index,
           buttonType: 'forced'
         })
