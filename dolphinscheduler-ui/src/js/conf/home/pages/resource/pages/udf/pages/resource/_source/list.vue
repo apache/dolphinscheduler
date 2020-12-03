@@ -98,7 +98,7 @@
     methods: {
       ...mapActions('resource', ['deleteResource']),
       _downloadFile (item) {
-        downloadFile('/dolphinscheduler/resources/download', {
+        downloadFile('resources/download', {
           id: item.id
         })
       },

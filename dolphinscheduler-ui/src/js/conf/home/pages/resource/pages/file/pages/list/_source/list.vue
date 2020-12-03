@@ -111,7 +111,7 @@
         }
       },
       _downloadFile (item) {
-        downloadFile('/dolphinscheduler/resources/download', {
+        downloadFile('resources/download', {
           id: item.id
         })
       },
