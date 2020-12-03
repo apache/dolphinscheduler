@@ -16,12 +16,12 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import java.util.List;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * upgrade manager
@@ -109,7 +109,7 @@ public class DolphinSchedulerManager {
             }
             // The target version of the upgrade
             String schemaVersion = "";
-            for(String schemaDir : schemaList) {
+			String schemaDir = schemaList.get(schemaList.size() - 1);
                 schemaVersion = schemaDir.split("_")[0];
                 if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
@@ -118,10 +118,9 @@ public class DolphinSchedulerManager {
                     if ("1.3.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                     }
-                    version = schemaVersion;
+				version = schemaVersion;
                 }
-
-            }
+			
         }
 
         // Assign the value of the version field in the version table to the version of the product
