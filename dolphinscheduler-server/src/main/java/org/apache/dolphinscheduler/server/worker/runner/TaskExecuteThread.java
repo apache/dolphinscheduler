@@ -51,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * task scheduler thread
@@ -161,8 +160,7 @@ public class TaskExecuteThread implements Runnable {
     /**
      * when task finish, clear execute path.
      */
-    @VisibleForTesting
-    /*private*/ void clearTaskExecPath() {
+    private void clearTaskExecPath() {
         logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
 
         if (!CommonUtils.isDevelopMode()) {
