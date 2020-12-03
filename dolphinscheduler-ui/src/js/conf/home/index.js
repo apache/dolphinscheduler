@@ -38,7 +38,7 @@ import 'canvg/dist/browser/canvg.min.js'
 import 'font-awesome/css/font-awesome.min.css' 
 
 // Component internationalization
-const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
+const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
 
 i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
