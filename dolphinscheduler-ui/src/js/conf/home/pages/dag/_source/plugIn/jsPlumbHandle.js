@@ -280,10 +280,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     const isTwo = store.state.dag.isDetails
 
     const html = [
-      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="ans-icon-play"></em><span>${i18n.$t('Start')}</span></a>`,
-      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-edit"></em><span>${i18n.$t('Edit')}</span></a>`,
-      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-copy"></em><span>${i18n.$t('Copy')}</span></a>`,
-      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-trash"></em><span>${i18n.$t('Delete')}</span></a>`
+      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="el-icon-video-play"></em><span>${i18n.$t('Start')}</span></a>`,
+      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-edit-outline"></em><span>${i18n.$t('Edit')}</span></a>`,
+      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-copy-document"></em><span>${i18n.$t('Copy')}</span></a>`,
+      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-delete"></em><span>${i18n.$t('Delete')}</span></a>`
     ]
 
     const operationHtml = () => {
@@ -604,10 +604,10 @@ JSP.prototype.copyNodes = function ($id) {
 JSP.prototype.handleEventScreen = function ({ item, is }) {
   let screenOpen = true
   if (is) {
-    item.icon = 'ans-icon-min'
+    item.icon = 'el-icon-full-screen'
     screenOpen = true
   } else {
-    item.icon = 'ans-icon-max'
+    item.icon = 'el-icon-rank'
     screenOpen = false
   }
   const $mainLayoutModel = $('.main-layout-model')

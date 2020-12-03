@@ -21,13 +21,13 @@
       <span class="name">{{$t('Version Info')}}</span>
     </div>
 
-    <div class="table-box" v-if="processDefinitionVersions.length > 0">
-      <el-table :data="processDefinitionVersions" size="mini" style="width: 100%">
+    <div class="table-box" v-if="versionData.processDefinitionVersions.length > 0">
+      <el-table :data="versionData.processDefinitionVersions" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="userName" :label="$t('Version')">
           <template slot-scope="scope">
             <span v-if="scope.row.version">
-              <span v-if="scope.row.version === processDefinition.version" style="color: green"><strong>{{scope.row.version}} {{$t('Current Version')}}</strong></span>
+              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>{{scope.row.version}} {{$t('Current Version')}}</strong></span>
               <span v-else>{{scope.row.version}}</span>
             </span>
             <span v-else>-</span>
@@ -70,18 +70,18 @@
       </el-table>
     </div>
 
-    <div v-if="processDefinitionVersions.length === 0">
+    <div v-if="versionData.processDefinitionVersions.length === 0">
       <m-no-data><!----></m-no-data>
     </div>
 
-    <div v-if="processDefinitionVersions.length > 0">
+    <div v-if="versionData.processDefinitionVersions.length > 0">
       <div class="bottom-box">
         <el-pagination
             style="float:right"
             background
             @current-change="_mVersionGetProcessDefinitionVersionsPage"
             layout="prev, pager, next"
-            :total="total">
+            :total="versionData.total">
           </el-pagination>
         <el-button type="text" size="mini" @click="_close()" style="float:right">{{$t('Cancel')}}</el-button>
       </div>
@@ -110,11 +110,7 @@
       }
     },
     props: {
-      processDefinition: Object,
-      processDefinitionVersions: Array,
-      total: Number,
-      pageNo: Number,
-      pageSize: Number
+      versionData: Object
     },
     methods: {
       /**
@@ -123,7 +119,7 @@
       _mVersionSwitchProcessDefinitionVersion (item) {
         this.$emit('mVersionSwitchProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },
@@ -134,7 +130,7 @@
       _mVersionDeleteProcessDefinitionVersion (item) {
         this.$emit('mVersionDeleteProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },
@@ -146,7 +142,7 @@
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
           pageSize: this.pageSize,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },

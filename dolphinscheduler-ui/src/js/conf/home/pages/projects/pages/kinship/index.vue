@@ -34,13 +34,13 @@
           </el-option>
         </el-select>
         <el-button type="primary"
-                  icon="ans-icon-dot-circle"
+                  icon="fa-dot-circle-o"
                   size="mini"
                   v-tooltip.small.top.start="$t('Reset')"
                   @click="reset"
                   ></el-button>
         <el-button 
-                  icon="ans-icon-eye"
+                  icon="el-icon-view"
                   size="mini"
                   v-tooltip.small.top="$t('Dag label display control')"
                   @click="changeLabel"

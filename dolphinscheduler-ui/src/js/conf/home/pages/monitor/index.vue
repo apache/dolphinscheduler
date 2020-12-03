@@ -26,7 +26,7 @@
   export default {
     name: 'monitor-index',
     mounted() {
-      this.$modal.destroy()
+      
     },
     components: { mSecondaryMenu }
   }

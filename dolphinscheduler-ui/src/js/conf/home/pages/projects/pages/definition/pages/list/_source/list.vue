@@ -118,7 +118,12 @@
     <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 80px;" @click="_batchExport(item)" >{{$t('Export')}}</el-button>
     <span><el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 140px;" @click="_batchCopy(item)" >{{$t('Batch copy')}}</el-button></span>
     <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>
-
+    <el-drawer
+      :visible.sync="drawer"
+      size="35%"
+      :with-header="false">
+      <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
+    </el-drawer>
   </div>
 </template>
 <script>
@@ -136,7 +141,15 @@
       return {
         list: [],
         strSelectIds: '',
-        checkAll: false
+        checkAll: false,
+        drawer: false,
+        versionData: {
+          processDefinition: {},
+          processDefinitionVersions: [],
+          total: null,
+          pageNo: null,
+          pageSize: null
+        }
       }
     },
     props: {
@@ -333,7 +346,69 @@
           this.$message.error(e.msg || '')
         })
       },
-
+      /**
+        * switch version in process definition version list
+        *
+        * @param version the version user want to change
+        * @param processDefinitionId the process definition id
+        * @param fromThis fromThis
+      */
+      mVersionSwitchProcessDefinitionVersion({ version, processDefinitionId, fromThis }) {
+        this.switchProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res=>{
+          this.$message.success($t('Switch Version Successfully'))
+          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
+        * Paging event of process definition versions
+        *
+        * @param pageNo page number
+        * @param pageSize page size
+        * @param processDefinitionId the process definition id of page version
+        * @param fromThis fromThis
+      */
+      mVersionGetProcessDefinitionVersionsPage({ pageNo, pageSize, processDefinitionId, fromThis }) {
+        this.getProcessDefinitionVersionsPage({
+        pageNo: pageNo,
+        pageSize: pageSize,
+        processDefinitionId: processDefinitionId
+       }).then(res=>{
+        this.versionData.processDefinitionVersions = res.data.lists
+        this.versionData.total = res.data.totalCount
+        this.versionData.pageSize = res.data.pageSize
+        this.versionData.pageNo = res.data.currentPage
+       }).catch(e=>{
+        this.$message.error(e.msg || '')
+       })
+      },
+      /**
+        * delete one version of process definition
+        *
+        * @param version the version need to delete
+        * @param processDefinitionId the process definition id user want to delete
+        * @param fromThis fromThis
+      */
+      mVersionDeleteProcessDefinitionVersion({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res=>{
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
       _version (item) {
         let self = this
         this.getProcessDefinitionVersionsPage({
@@ -345,109 +420,14 @@
           let total = res.data.totalCount
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
-          if (this.versionsModel) {
-            this.versionsModel.remove()
-          }
-          this.versionsModel = this.$drawer({
-            direction: 'right',
-            closable: true,
-            showMask: true,
-            escClose: true,
-            render (h) {
-              return h(mVersions, {
-                on: {
-                  /**
-                   * switch version in process definition version list
-                   *
-                   * @param version the version user want to change
-                   * @param processDefinitionId the process definition id
-                   * @param fromThis fromThis
-                   */
-                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-                    self.switchProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success($t('Switch Version Successfully'))
-                      setTimeout(() => {
-                        fromThis.$destroy()
-                        self.versionsModel.remove()
-                      }, 0)
-                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
+          
+          this.versionData.processDefinition = item,
+          this.versionData.processDefinitionVersions = processDefinitionVersions,
+          this.versionData.total = total,
+          this.versionData.pageNo = pageNo,
+          this.versionData.pageSize = pageSize
+          this.drawer = true
 
-                  /**
-                   * Paging event of process definition versions
-                   *
-                   * @param pageNo page number
-                   * @param pageSize page size
-                   * @param processDefinitionId the process definition id of page version
-                   * @param fromThis fromThis
-                   */
-                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
-                    self.getProcessDefinitionVersionsPage({
-                      pageNo: pageNo,
-                      pageSize: pageSize,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      fromThis.processDefinitionVersions = res.data.lists
-                      fromThis.total = res.data.totalCount
-                      fromThis.pageSize = res.data.pageSize
-                      fromThis.pageNo = res.data.currentPage
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * delete one version of process definition
-                   *
-                   * @param version the version need to delete
-                   * @param processDefinitionId the process definition id user want to delete
-                   * @param fromThis fromThis
-                   */
-                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-                    self.deleteProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success(res.msg || '')
-                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
-                        pageNo: 1,
-                        pageSize: 10,
-                        processDefinitionId: processDefinitionId,
-                        fromThis: fromThis
-                      })
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * remove this drawer
-                   *
-                   * @param fromThis
-                   */
-                  close ({ fromThis }) {
-                    setTimeout(() => {
-                      fromThis.$destroy()
-                      self.versionsModel.remove()
-                    }, 0)
-                  }
-                },
-                props: {
-                  processDefinition: item,
-                  processDefinitionVersions: processDefinitionVersions,
-                  total: total,
-                  pageNo: pageNo,
-                  pageSize: pageSize
-                }
-              })
-            }
-          })
         }).catch(e => {
           this.$message.error(e.msg || '')
         })

@@ -26,7 +26,6 @@
   export default {
     name: 'user-index',
     mounted() {
-      this.$modal.destroy()
     },
     components: { mSecondaryMenu }
   }

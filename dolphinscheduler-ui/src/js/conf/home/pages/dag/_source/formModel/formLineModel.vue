@@ -66,9 +66,7 @@
     },
     mixins: [disabledState],
     props: {
-      id: String,
-      sourceId: String,
-      targetId: String
+      lineData: Object
     },
     methods: {
         cancel() {
@@ -77,15 +75,15 @@
             })
         },
         ok() {
-          if($(`#${this.id}`).prev().attr('class')==='jtk-overlay') {
-            $(`#${this.id}`).prev().empty()
+          if($(`#${this.lineData.id}`).prev().attr('class')==='jtk-overlay') {
+            $(`#${this.lineData.id}`).prev().empty()
           }
-          $(`#${this.id}`).text(this.labelName)
+          $(`#${this.lineData.id}`).text(this.labelName)
             this.$emit('addLineInfo', {
               item: {
                 labelName: this.labelName,
-                sourceId: this.sourceId,
-                targetId: this.targetId
+                sourceId: this.lineData.sourceId,
+                targetId: this.lineData.targetId
               },
               fromThis: this
             })
@@ -95,10 +93,10 @@
       
     },
     created () {
-      if($(`#${this.id}`).prev().attr('class').indexOf('jtk-overlay')!==-1) {
-        this.labelName = $(`#${this.id}`).prev().text()
+      if($(`#${this.lineData.id}`).prev().attr('class').indexOf('jtk-overlay')!==-1) {
+        this.labelName = $(`#${this.lineData.id}`).prev().text()
       } else {
-        this.labelName = $(`#${this.id}`).text()
+        this.labelName = $(`#${this.lineData.id}`).text()
       }
     },
     mounted () {

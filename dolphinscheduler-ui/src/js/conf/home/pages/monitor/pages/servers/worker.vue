@@ -57,6 +57,11 @@
           </div>
         </div>
       </div>
+      <el-drawer
+        :visible.sync="drawer"
+        :with-header="false">
+        <zookeeper-directories-popup :zkDirectories = zkDirectories></zookeeper-directories-popup>
+      </el-drawer>
       <div v-if="!workerList.length">
         <m-no-data></m-no-data>
       </div>
@@ -81,29 +86,21 @@
       return {
         isLoading: false,
         workerList: [],
-        color: themeData.color
+        color: themeData.color,
+        drawer: false,
+        zkDirectories: []
       }
     },
     props: {},
     methods: {
       ...mapActions('monitor', ['getWorkerData']),
       _showZkDirectories (item) {
-        let zkDirectories = []
         item.zkDirectories.forEach(zkDirectory => {
-          zkDirectories.push({
+          this.zkDirectories.push({
             zkDirectory: zkDirectory
           })
         })
-        this.$drawer({
-          direction: 'right',
-          render (h) {
-            return h(zookeeperDirectoriesPopup, {
-              props: {
-                zkDirectories: zkDirectories
-              }
-            })
-          }
-        })
+        this.drawer = true
       }
     },
     watch: {},

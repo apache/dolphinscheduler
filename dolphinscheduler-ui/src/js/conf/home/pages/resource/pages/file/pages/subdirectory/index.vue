@@ -172,7 +172,6 @@
       let dir = localStore.getItem('currentDir').split('/')
       dir.shift()
       this.breadList = dir
-      this.$modal.destroy()
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)

@@ -23,85 +23,76 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/home'}" tag="a" active-class="active">
-            <span><em class="ansiconfont ans-icon-home-empty"></em>{{$t('Home')}}</span><strong></strong>
+            <span><em class="fa icon ansiconfont fa-home"></em>{{$t('Home')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/projects'}" tag="a" active-class="active">
-            <span><em class="ansiconfont ans-icon-setting"></em>{{$t('Project Manage')}}</span><strong></strong>
+            <span><em class="ansiconfont el-icon-tickets"></em>{{$t('Project Manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/resource'}" tag="a" active-class="active">
-            <span><em class="ansiconfont ans-icon-folder-empty"></em>{{$t('Resources manage')}}</span><strong></strong>
+            <span><em class="ansiconfont el-icon-folder"></em>{{$t('Resources manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><em class="ansiconfont ans-icon-database"></em>{{$t('Datasource manage')}}</span><strong></strong>
+            <span><em class="ansiconfont fa fa-database"></em>{{$t('Datasource manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/monitor'}" tag="a" active-class="active">
-            <span><em class="ansiconfont ans-icon-monitor"></em>{{$t('Monitor')}}</span><strong></strong>
+            <span><em class="ansiconfont el-icon-monitor"></em>{{$t('Monitor')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
-            <span><em class="ansiconfont ans-icon-shield"></em>{{$t('Security')}}</span><strong></strong>
+            <span><em class="ansiconfont fa fa-shield"></em>{{$t('Security')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
     </div>
     <div class="right">
       <span class="lang">
-        <x-poptip
-                style="width: 80px"
-                trigger="click">
-        <div class="lrns-list">
-          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList" :key="$index"><span>{{item.name}}</span></a>
-        </div>
-        <div class="login-model" slot="reference">
-          <span>{{activeLocale.name}}</span>
-          <em class="ans-icon-arrow-down"></em>
-        </div>
-      </x-poptip>
+        <el-dropdown @command="_toggleLanguage">
+          <span class="el-dropdown-link">
+            {{activeLocale.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :command="item.code" v-for="(item,$index) in localeList" :key="$index">{{item.name}}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </span>
-      <x-poptip
-              ref="login"
-              trigger="click"
-              v-model="isLogin"
-              placement="bottom-end">
-        <div class="lrns-list">
-          <a href="javascript:" @click="_goAccount">
-            <em class="ans-icon-user-empty"></em>
+      <el-dropdown @command="_toggleUser">
+        <span class="el-dropdown-link">
+          <i class="el-icon-user-solid"></i>{{userInfo.userName}}<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="user">
+            <em class="el-icon-user"></em>
             <span>{{$t('User Information')}}</span>
-          </a>
-          <a href="javascript:" @click="_signOut">
-            <em class="ans-icon-off"></em>
+          </el-dropdown-item>
+          <el-dropdown-item  command="logout">
+            <em class="el-icon-switch-button"></em>
             <span>{{$t('Logout')}}</span>
-          </a>
-        </div>
-        <div class="login-model" slot="reference">
-          <em class="ans-icon-user-solid"></em>
-          <span>{{userInfo.userName}}</span>
-          <em class="ans-icon-arrow-down"></em>
-        </div>
-      </x-poptip>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
     <div class="file-update-model" @click="_toggleArchive" v-if="isUpdate">
       <div class="icon-cloud">
-        <em class="ans ans-icon-upload"></em>
+        <em class="ans el-icon-upload"></em>
       </div>
       <div class="progress-box">
         <m-progress-bar :value="progress" text-placement="bottom"></m-progress-bar>
@@ -109,35 +100,35 @@
     </div>
     <div class="adaptive-m-nav">
       <div class="m-nav-box ">
-        <a href="javascript:" @click="mIsNav = !mIsNav"><em class="ans-icon-database"></em></a>
+        <a href="javascript:" @click="mIsNav = !mIsNav"><em class="fa fa-database"></em></a>
       </div>
       <div class="m-title-box">
         <div class="logo-m"></div>
       </div>
       <div class="m-user-box">
-        <a href="javascript:" @click="_goAccount"><em class="ans-icon-user-empty"></em></a>
+        <a href="javascript:" @click="_goAccount"><em class="el-icon-user"></em></a>
       </div>
       <transition name="slide-fade">
         <div class="m-nav-list" v-if="mIsNav">
           <ul @click="mIsNav = false">
             <router-link :to="{ path: '/home'}" tag="li" active-class="active">
-              <em class="ans-icon-home-empty"></em>
+              <em class="fa icon fa-home"></em>
               <span>{{$t('Home')}}</span>
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
-              <em class="ans-icon-setting"></em>
+              <em class="el-icon-tickets"></em>
               <span>{{$t('Project manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
-              <em class="ans-icon-folder-empty"></em>
+              <em class="el-icon-folder"></em>
               <span>{{$t('Resources manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
-              <em class="ans-icon-database"></em>
+              <em class="fa fa-database"></em>
               <span>{{$t('Datasource manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
-              <em class="ans-icon-shield"></em>
+              <em class="fa fa-shield"></em>
               <span>{{$t('Security')}}</span>
             </router-link>
           </ul>
@@ -156,7 +147,6 @@
   import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
   import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
-
   import { findLocale, localeList } from '@/module/i18n/config'
 
   export default {
@@ -190,6 +180,16 @@
       _goAccount () {
         this.isLogin = false
         this.$router.push({ name: 'account' })
+      },
+      /**
+       * _toggle User
+       */
+      _toggleUser(command) {
+        if(command==='user') {
+          this._goAccount()
+        } else {
+          this._signOut()
+        }
       },
       /**
        * Upload (for the time being)
@@ -355,6 +355,7 @@
        * Language switching
        */
       _toggleLanguage (language) {
+        console.log(language)
         cookies.set('language', language, { path: '/' })
         setTimeout(() => {
           window.location.reload()
@@ -388,6 +389,13 @@
         position: relative;
         top: 12px;
       }
+    }
+    .el-dropdown {
+      color: #fff;
+      font-size: 14px;
+      vertical-align: middle;
+      line-height: 60px;
+      margin-right: 25px;
     }
     .logo-box {
       position: absolute;

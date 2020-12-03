@@ -28,7 +28,6 @@
   export default {
     name: 'account-index',
     mounted() {
-      this.$modal.destroy()
     },
     components: { mListConstruction, mInfo }
   }

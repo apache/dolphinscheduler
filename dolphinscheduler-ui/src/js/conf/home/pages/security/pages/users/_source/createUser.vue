@@ -61,8 +61,8 @@
           <template slot="content">
             <el-select v-model="queueName" style="width: 100%;" size="small">
               <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
-                <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
-                <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
+                <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
+                <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="queueName!=''"></em>
               </el-input>
               <el-option
                       v-for="city in queueList"

@@ -138,7 +138,6 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)

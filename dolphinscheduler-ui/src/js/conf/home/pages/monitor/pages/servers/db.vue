@@ -30,8 +30,8 @@
             </div>
             <div class="value-p">
               <span class="state">
-                <em class="ans-icon-success-solid success" v-if="item.state"></em>
-                <em class="ans-icon-fail-solid error" v-else></em>
+                <em class="el-icon-success success" v-if="item.state"></em>
+                <em class="el-icon-error error" v-else></em>
               </span>
             </div>
             <div class="text-1">{{$t('Health status')}}</div>

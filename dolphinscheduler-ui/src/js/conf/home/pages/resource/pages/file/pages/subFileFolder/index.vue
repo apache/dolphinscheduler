@@ -115,7 +115,6 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     destroyed () {
     },

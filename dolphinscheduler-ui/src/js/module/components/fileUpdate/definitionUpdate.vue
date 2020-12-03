@@ -29,12 +29,12 @@
              @dragleave.prevent="dragOver = false"
              id="file-update-model">
           <div class="tooltip-info">
-            <em class="fa ans-icon-notice-solid"></em>
+            <em class="fa el-icon-warning"></em>
             <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
           <div class="update-popup" v-if="dragOver">
             <div class="icon-box">
-              <em class="ans ans-icon-upload"></em>
+              <em class="ans el-icon-upload"></em>
             </div>
             <p class="p1">
               <span>{{$t('Drag area upload')}}</span>

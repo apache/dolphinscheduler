@@ -23,7 +23,7 @@
           <textarea id="code-python-mirror" name="code-python-mirror" style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="ans-icon-max" @click="setEditorVal"></em>
+            <em class="el-icon-rank" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -115,8 +115,7 @@
                     editor.setValue(val)
                   },
                   closeAble () {
-                    // this.$modal.destroy()
-                    modal.remove()
+                    
                   }
                 },
                 props: {

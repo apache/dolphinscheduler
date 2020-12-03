@@ -28,7 +28,7 @@
       </div>
     </m-list-box>
     <a class="ans-modal-box-close">
-      <em class="ans-icon-min" @click="closeModal"></em>
+      <em class="el-icon-full-screen" @click="closeModal"></em>
     </a>
   </div>
 </template>
