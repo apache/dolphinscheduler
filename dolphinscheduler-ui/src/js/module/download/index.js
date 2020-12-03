@@ -16,12 +16,14 @@
  */
 
 import i18n from '@/module/i18n'
+import { resolveURL } from '@/module/io'
+
 /**
  * download file
  */
 const downloadFile = ($url, $obj) => {
   const param = {
-    url: $url,
+    url: resolveURL($url),
     obj: $obj
   }
 
