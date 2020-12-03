@@ -33,7 +33,7 @@ export default {
   'View history': 'View history',
   'View log': 'View log',
   'Force success': 'Force success',
-  'Start From Force Success': 'Start From Force Success',
+  'Resume From Forced Success': 'Resume From Forced Success',
   'Enter this child node': 'Enter this child node',
   'Node name': 'Node name',
   'Run flag': 'Run flag',
