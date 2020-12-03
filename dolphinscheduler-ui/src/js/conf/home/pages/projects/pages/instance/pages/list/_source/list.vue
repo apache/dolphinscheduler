@@ -129,8 +129,8 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('Start From Force Success')"
-                        @click="_startFromForceSuccess(item,$index)"
+                        :title="$t('Resume From Forced Success')"
+                        @click="_resumeFromForcedSuccess(item,$index)"
                         icon="ans-icon-notice-empty"
                         :disabled="item.state !== 'FORCED_SUCCESS'"></x-button>
               <x-button type="error"
@@ -227,7 +227,7 @@
                       disabled="true">
               </x-button>
 
-              <!--Start from forced success-->
+              <!--Resume from forced success-->
               <x-button
                       v-show="buttonType === 'forced'"
                       type="success"
@@ -449,10 +449,10 @@
         }
       },
       /**
-       * Start from force success
-       * @param START_FROM_FORCED_SUCCESS
+       * Resume from forced success
+       * @param RESUME_FROM_FORCED_SUCCESS
        */
-      _startFromForceSuccess (item, index) {
+      _resumeFromForcedSuccess (item, index) {
         this._countDownFn({
           id: item.id,
           executeType: 'RESUME_FROM_FORCED_SUCCESS',
