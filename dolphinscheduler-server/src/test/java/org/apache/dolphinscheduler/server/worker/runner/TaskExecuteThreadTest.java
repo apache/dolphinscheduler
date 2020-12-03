@@ -39,6 +39,7 @@ import org.springframework.context.ApplicationContext;
 @PrepareForTest({TaskExecuteThread.class})
 public class TaskExecuteThreadTest {
 
+    TaskExecutionContext taskExecutionContext;
 
     TaskCallbackService taskCallbackService;
 
@@ -50,7 +51,7 @@ public class TaskExecuteThreadTest {
 
     @Before
     public void init() throws Exception {
-
+        taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
         taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
         applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
@@ -62,7 +63,6 @@ public class TaskExecuteThreadTest {
     @Test
     public void testTaskClearExecPath() throws Exception {
         processService = mock(ProcessService.class);
-
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
@@ -77,128 +77,42 @@ public class TaskExecuteThreadTest {
     @Test
     public void testClearTaskExecPath() {
 
-        String taskJson = "{\n"
-                + "  \"conditionResult\": {\n"
-                + "    \"failedNode\": [\n"
-                + "      \"\"\n"
-                + "    ],\n"
-                + "    \"successNode\": [\n"
-                + "      \"\"\n"
-                + "    ]\n"
-                + "  },\n"
-                + "  \"delayTime\": 0,\n"
-                + "  \"depList\": [\n"
-                + "    \"testlog1\"\n"
-                + "  ],\n"
-                + "  \"dependence\": {},\n"
-                + "  \"desc\": null,\n"
-                + "  \"extras\": null,\n"
-                + "  \"id\": \"tasks-31779\",\n"
-                + "  \"loc\": null,\n"
-                + "  \"maxRetryTimes\": 0,\n"
-                + "  \"name\": \"testlog2\",\n"
-                + "  \"params\": {\n"
-                + "    \"localParams\": [],\n"
-                + "    \"rawScript\": \"echo \\\"123123\\\"\",\n"
-                + "    \"resourceList\": []\n"
-                + "  },\n"
-                + "  \"preTasks\": [\n"
-                + "    \"testlog1\"\n"
-                + "  ],\n"
-                + "  \"retryInterval\": 1,\n"
-                + "  \"runFlag\": \"NORMAL\",\n"
-                + "  \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "  \"timeout\": {\n"
-                + "    \"enable\": false,\n"
-                + "    \"interval\": null,\n"
-                + "    \"strategy\": \"\"\n"
-                + "  },\n"
-                + "  \"type\": \"SHELL\",\n"
-                + "  \"workerGroup\": \"default\",\n"
-                + "  \"workerGroupId\": null\n"
-                + "}";
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskJson(taskJson);
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
-
+        Mockito.when(CommonUtils.isDevelopMode()).thenReturn(false);
+        Mockito.when(taskExecutionContext.getTaskJson()).thenThrow(new RuntimeException("测试异常后finally执行"));
         try {
             taskExecuteThread.run();
-        } catch (Exception ignore) {
-            //ignore
+        } catch (Exception ignored) {
+            //ignored
         }
-        Mockito.when(CommonUtils.isDevelopMode()).thenReturn(false);
 
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn(null);
         try {
             taskExecuteThread.run();
-        } catch (Exception ignore) {
-            //ignore
+        } catch (Exception ignored) {
+            //ignored
         }
+
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/");
         try {
             taskExecuteThread.run();
-        } catch (Exception ignore) {
-            //ignore
+        } catch (Exception ignored) {
+            //ignored
         }
+
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/data/test-testClearTaskExecPath");
         try {
             taskExecuteThread.run();
-        } catch (Exception ignore) {
-            //ignore
+        } catch (Exception ignored) {
+            //ignored
         }
 
     }
 
     @Test
     public void testNotClearTaskExecPath() {
-        String taskJson = "{\n"
-                + "  \"conditionResult\": {\n"
-                + "    \"failedNode\": [\n"
-                + "      \"\"\n"
-                + "    ],\n"
-                + "    \"successNode\": [\n"
-                + "      \"\"\n"
-                + "    ]\n"
-                + "  },\n"
-                + "  \"delayTime\": 0,\n"
-                + "  \"depList\": [\n"
-                + "    \"testlog1\"\n"
-                + "  ],\n"
-                + "  \"dependence\": {},\n"
-                + "  \"desc\": null,\n"
-                + "  \"extras\": null,\n"
-                + "  \"id\": \"tasks-31779\",\n"
-                + "  \"loc\": null,\n"
-                + "  \"maxRetryTimes\": 0,\n"
-                + "  \"name\": \"testlog2\",\n"
-                + "  \"params\": {\n"
-                + "    \"localParams\": [],\n"
-                + "    \"rawScript\": \"echo \\\"123123\\\"\",\n"
-                + "    \"resourceList\": []\n"
-                + "  },\n"
-                + "  \"preTasks\": [\n"
-                + "    \"testlog1\"\n"
-                + "  ],\n"
-                + "  \"retryInterval\": 1,\n"
-                + "  \"runFlag\": \"NORMAL\",\n"
-                + "  \"taskInstancePriority\": \"MEDIUM\",\n"
-                + "  \"timeout\": {\n"
-                + "    \"enable\": false,\n"
-                + "    \"interval\": null,\n"
-                + "    \"strategy\": \"\"\n"
-                + "  },\n"
-                + "  \"type\": \"SHELL\",\n"
-                + "  \"workerGroup\": \"default\",\n"
-                + "  \"workerGroupId\": null\n"
-                + "}";
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskJson(taskJson);
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
         Mockito.when(CommonUtils.isDevelopMode()).thenReturn(true);
-        try {
-            taskExecuteThread.run();
-        } catch (Exception ignore) {
-            //ignore
-        }
+        taskExecuteThread.run();
     }
 }
