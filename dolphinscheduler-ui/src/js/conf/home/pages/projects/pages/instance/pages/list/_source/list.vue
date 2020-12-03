@@ -55,12 +55,12 @@
           <th scope="col" style="min-width: 135px">
             <span>{{$t('Executor')}}</span>
           </th>
-          <th scope="col" style="min-width: 100px">
-            <div style="width: 100px">
+          <th scope="col" style="min-width: 80px">
+            <div style="width: 80px">
               <span>{{$t('host')}}</span>
             </div>
           </th>
-          <th scope="col" style="min-width: 210px">
+          <th scope="col" style="min-width: 240px">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -99,7 +99,7 @@
             <span v-if="item.host" style="word-break: break-all">{{item.host}}</span>
             <span v-else>-</span>
           </td>
-          <td style="z-index: inherit;">
+          <td style="z-index: inherit; min-width: 240px">
             <div v-show="item.disabled">
               <x-button type="info"
                         shape="circle"
@@ -125,6 +125,14 @@
                         @click="_restore(item,$index)"
                         icon="ans-icon-fail-empty"
                         :disabled="item.state !== 'FAILURE'"></x-button>
+              <x-button type="success"
+                        shape="circle"
+                        size="xsmall"
+                        data-toggle="tooltip"
+                        :title="$t('Start From Force Success')"
+                        @click="_startFromForceSuccess(item,$index)"
+                        icon="ans-icon-notice-empty"
+                        :disabled="item.state !== 'FORCED_SUCCESS'"></x-button>
               <x-button type="error"
                         shape="circle"
                         size="xsmall"
@@ -216,6 +224,24 @@
                       shape="circle"
                       size="xsmall"
                       icon="ans-icon-fail-empty"
+                      disabled="true">
+              </x-button>
+
+              <!--Start from forced success-->
+              <x-button
+                      v-show="buttonType === 'forced'"
+                      type="success"
+                      shape="circle"
+                      size="xsmall"
+                      disabled="true">
+                {{item.count}}
+              </x-button>
+              <x-button
+                      v-show="buttonType !== 'forced'"
+                      type="success"
+                      shape="circle"
+                      size="xsmall"
+                      icon="ans-icon-notice-empty"
                       disabled="true">
               </x-button>
 
@@ -423,6 +449,18 @@
         }
       },
       /**
+       * Start from force success
+       * @param START_FROM_FORCED_SUCCESS
+       */
+      _startFromForceSuccess (item, index) {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'START_FROM_FORCED_SUCCESS',
+          index: index,
+          buttonType: 'forced'
+        })
+      },
+      /**
        * pause
        * @param PAUSE
        */
@@ -570,6 +608,7 @@
       }
     },
     created () {
+
     },
     mounted () {
     },
