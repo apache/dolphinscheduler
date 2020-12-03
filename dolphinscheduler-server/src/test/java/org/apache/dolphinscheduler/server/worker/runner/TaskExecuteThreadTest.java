@@ -17,29 +17,86 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
+
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationContext;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({TaskExecuteThread.class})
 public class TaskExecuteThreadTest {
+
+    TaskExecutionContext taskExecutionContext;
+
+    TaskCallbackService taskCallbackService;
+
+    ApplicationContext applicationContext;
+
+    TaskExecutionContextCacheManagerImpl taskExecutionContextCacheManager;
+
+    private ProcessService processService;
+
+    @Before
+    public void init() throws Exception {
+        taskExecutionContext = PowerMockito.mock(TaskExecutionContext.class);
+        taskCallbackService = PowerMockito.mock(TaskCallbackService.class);
+        applicationContext = PowerMockito.mock(ApplicationContext.class);
+        SpringApplicationContext springApplicationContext = new SpringApplicationContext();
+        springApplicationContext.setApplicationContext(applicationContext);
+        taskExecutionContextCacheManager = new TaskExecutionContextCacheManagerImpl();
+        Mockito.when(applicationContext.getBean(TaskExecutionContextCacheManagerImpl.class)).thenReturn(taskExecutionContextCacheManager);
+    }
 
     @Test
     public void testTaskClearExecPath() throws Exception {
-        ProcessService processService = Mockito.mock(ProcessService.class);
+        processService = mock(ProcessService.class);
         ApplicationContext applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
-
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         TaskCallbackService taskCallbackService = Mockito.mock(TaskCallbackService.class);
         TaskExecuteThread taskExecuteThread = PowerMockito.spy(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/");
-        PowerMockito.when(taskExecuteThread, "clearTaskExecPath");
+
+
+    }
+
+
+    @Test
+    public void testClearTaskExecPath() {
+
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
+        Mockito.when(CommonUtils.isDevelopMode()).thenReturn(false);
+        ;
+        taskExecuteThread.clearTaskExecPath();
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn(null);
+        taskExecuteThread.clearTaskExecPath();
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/");
+        taskExecuteThread.clearTaskExecPath();
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/data/test-testClearTaskExecPath");
+        taskExecuteThread.clearTaskExecPath();
+
+    }
+
+    @Test
+    public void testNotClearTaskExecPath() {
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
+        Mockito.when(CommonUtils.isDevelopMode()).thenReturn(true);
+        ;
+        taskExecuteThread.clearTaskExecPath();
     }
 }

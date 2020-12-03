@@ -18,6 +18,8 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.annotations.VisibleForTesting;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -155,7 +157,8 @@ public class TaskExecuteThread implements Runnable {
     /**
      * when task finish, clear execute path.
      */
-    private void clearTaskExecPath() {
+    @VisibleForTesting
+    /*private*/ void clearTaskExecPath() {
         logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
 
         if (!CommonUtils.isDevelopMode()) {
