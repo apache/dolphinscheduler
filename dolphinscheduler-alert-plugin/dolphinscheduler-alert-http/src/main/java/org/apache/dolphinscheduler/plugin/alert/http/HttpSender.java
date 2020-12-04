@@ -44,22 +44,33 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HttpSender {
 
     public static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
+
+    private String url;
+
+    private final String headerParams;
+
+    private final String bodyParams;
+
+    private final String contentField;
+
+    private final String requestType;
+
+    private HttpRequestBase httpRequest;
+
+
     private static final String URL_SPLICE_CHAR = "?";
+
     /**
      * request type post
      */
     private static final String REQUEST_TYPE_POST = "POST";
+
     /**
      * request type get
      */
     private static final String REQUEST_TYPE_GET = "GET";
+
     private static final String DEFAULT_CHARSET = "utf-8";
-    private final String headerParams;
-    private final String bodyParams;
-    private final String contentField;
-    private final String requestType;
-    private String url;
-    private HttpRequestBase httpRequest;
 
     public HttpSender(Map<String, String> paramsMap) {
 

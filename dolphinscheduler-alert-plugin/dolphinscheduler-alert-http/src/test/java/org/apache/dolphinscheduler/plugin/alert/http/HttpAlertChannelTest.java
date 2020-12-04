@@ -63,7 +63,6 @@ public class HttpAlertChannelTest {
 
     /**
      * create params
-     * @return
      */
     private String getParams() {
 
@@ -101,6 +100,5 @@ public class HttpAlertChannelTest {
 
         return JSONUtils.toJsonString(paramsList);
     }
-
 
 }
