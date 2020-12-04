@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.shell;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /** 
@@ -78,7 +78,7 @@ public abstract class AbstractShell {
   /**
    * If or not script finished executing
    */
-  private volatile AtomicBoolean completed;
+  private AtomicBoolean completed;
   
   public AbstractShell() {
     this(0L);
@@ -202,7 +202,7 @@ public abstract class AbstractShell {
       } catch (InterruptedException ie) {
         logger.warn("Interrupted while reading the error and in stream", ie);
       }
-      completed.set(true);
+      completed.compareAndSet(false,true);
       //the timeout thread handling
       //taken care in finally block
       if (exitCode != 0 || errMsg.length() > 0) {

@@ -16,6 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.shell.ShellExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,24 +36,8 @@ import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.shell.ShellExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
 
 /**
  * os utils
