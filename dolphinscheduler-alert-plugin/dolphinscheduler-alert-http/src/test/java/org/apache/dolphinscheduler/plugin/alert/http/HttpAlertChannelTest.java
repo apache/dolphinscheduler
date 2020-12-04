@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.spi.alert.AlertData;
@@ -47,7 +48,6 @@ public class HttpAlertChannelTest {
         Assert.assertEquals("Request types are not supported", alertResult.getMessage());
     }
 
-
     @Test
     public void processTest2() {
 
@@ -74,12 +74,10 @@ public class HttpAlertChannelTest {
                 .setValue("{\"Content-Type\":\"application/json\"}")
                 .build();
 
-
         InputParam bodyParams = InputParam.newBuilder("bodyParams", "bodyParams")
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .setValue("{\"number\":\"13457654323\"}")
                 .build();
-
 
         InputParam content = InputParam.newBuilder("contentField", "contentField")
                 .setValue("content")

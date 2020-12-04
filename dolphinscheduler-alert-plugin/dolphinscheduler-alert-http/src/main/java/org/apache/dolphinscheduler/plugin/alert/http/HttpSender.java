@@ -81,7 +81,6 @@ public class HttpSender {
         requestType = paramsMap.get(HttpAlertConstants.REQUEST_TYPE);
     }
 
-
     public AlertResult send(String msg) {
 
         AlertResult alertResult = new AlertResult();
@@ -139,7 +138,6 @@ public class HttpSender {
         }
     }
 
-
     /**
      * set header params
      */
@@ -164,6 +162,5 @@ public class HttpSender {
         objectNode.put(contentField, msg);
         return objectNode.toString();
     }
-
 
 }
