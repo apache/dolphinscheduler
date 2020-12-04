@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.Map;
 
-
 /**
  * http alert channel,use sms message to seed the alertInfo
  */
