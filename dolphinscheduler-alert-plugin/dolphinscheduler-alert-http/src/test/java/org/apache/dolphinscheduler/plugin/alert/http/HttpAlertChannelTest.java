@@ -61,7 +61,11 @@ public class HttpAlertChannelTest {
         Assert.assertEquals("true", alertResult.getStatus());
     }
 
-    public String getParams() {
+    /**
+     * create params
+     * @return
+     */
+    private String getParams() {
 
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam urlParam = InputParam.newBuilder("url", "url")
