@@ -212,6 +212,5 @@ zookeeper-3.4.14.jar
 guava-retrying-2.0.0.jar
 presto-jdbc-0.238.1.jar
 HikariCP-java6-2.3.13.jar
-mchange-commons-java-0.2.11.jar
-c3p0-0.9.5.2.jar
+
 
