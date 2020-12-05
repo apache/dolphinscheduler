@@ -61,9 +61,9 @@
                     <groupId>c3p0</groupId>
                 </exclusion>
                 <exclusion>
-					<groupId>com.mchange</groupId>
-					<artifactId>mchange-commons-java</artifactId>
-				</exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>mchange-commons-java</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
