@@ -445,8 +445,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     oshi-core 3.5.0: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.5.0, EPL 1.0
     junit 4.12: https://mvnrepository.com/artifact/junit/junit/4.12, EPL 1.0
     h2-1.4.200 https://github.com/h2database/h2database/blob/master/LICENSE.txt, MPL 2.0 or EPL 1.0
-    mchange-commons-java 0.2.11: https://mvnrepository.com/artifact/com.mchange/mchange-commons-java/0.2.11, EPL 1.0
-    c3p0 0.9.5.2: https://mvnrepository.com/artifact/com.mchange/c3p0/0.9.5.2, EPL 1.0
 
 ========================================================================
 MIT licenses
