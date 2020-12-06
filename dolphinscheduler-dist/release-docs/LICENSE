@@ -385,7 +385,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     xml-apis 1.4.01: https://mvnrepository.com/artifact/xml-apis/xml-apis/1.4.01, Apache 2.0 and W3C
     zookeeper 3.4.14: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.4.14, Apache 2.0
     presto-jdbc 0.238.1 https://mvnrepository.com/artifact/com.facebook.presto/presto-jdbc/0.238.1
-    HikariCP-java6 2.3.13: https://mvnrepository.com/artifact/com.zaxxer/HikariCP-java6/2.3.13, Apache 2.0
 
 ========================================================================
 BSD licenses
