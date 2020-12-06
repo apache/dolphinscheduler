@@ -110,7 +110,6 @@ public class DolphinSchedulerManager {
             
             // The target version of the upgrade
             String schemaVersion = "";
-            
             String schemaDir = schemaList.get(schemaList.size() - 1);
             schemaVersion = schemaDir.split("_")[0];
             if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
