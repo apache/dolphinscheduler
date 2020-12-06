@@ -18,7 +18,7 @@
   <el-select
           style="width: 157px;"
           :disabled="isDetails"
-          size="mini"
+          size="small"
           @change="_onChange"
           v-model="value">
       <el-input

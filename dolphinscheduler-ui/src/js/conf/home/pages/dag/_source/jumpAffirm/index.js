@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import Vue from 'vue'
+import { Message } from 'element-ui';
 import mAffirm from './jumpAffirm'
 import store from '@/conf/home/store'
 import router from '@/conf/home/router'
@@ -81,34 +81,18 @@ Affirm.paramVerification = (name) => {
  * Pop-up judgment
  */
 Affirm.isPop = (fn) => {
-  Vue.$modal.dialog({
-    closable: false,
-    showMask: true,
-    escClose: true,
-    className: 'v-modal-custom',
-    transitionName: 'opacityp',
-    render (h) {
-      return h(mAffirm, {
-        on: {
-          ok () {
-            // save
-            findComponentDownward($root, 'dag-chart')._save('affirm').then(() => {
-              fn()
-              Vue.$modal.destroy()
-            }).catch(() => {
-              fn()
-              Vue.$modal.destroy()
-            })
-          },
-          close () {
-            fn()
-            Vue.$modal.destroy()
-          }
-        },
-        props: {
-        }
-      })
-    }
+  Vue.prototype.$confirm($t('Whether to save the DAG graph'), '', {
+    confirmButtonText: $t('Save'),
+    cancelButtonText: $t('Cancel'),
+    type: 'warning'
+  }).then(() => {
+    findComponentDownward($root, 'dag-chart')._save('affirm').then(() => {
+      fn()
+    }).catch(() => {
+      fn()
+    })
+  }).catch(() => {
+    fn()         
   })
 }
 

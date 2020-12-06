@@ -41,21 +41,21 @@
         <span class="label-wrapper" slot="reference" >
           <!--@keydown.tab="_emailTab"-->
           <input
-                  class="email-input"
-                  ref="emailInput"
-                  :style="{width:emailWidth + 'px'}"
-                  type="text"
-                  v-model="email"
-                  :disabled="disabled"
-                  :placeholder="$t('Please enter email')"
-                  @blur="_emailEnter"
-                  @keydown.tab="_emailTab"
-                  @keyup.delete="_emailDelete"
-                  @keyup.enter="_emailEnter"
-                  @keyup.space="_emailEnter"
-                  @keyup.186="_emailEnter"
-                  @keyup.up="_emailKeyup('up')"
-                  @keyup.down="_emailKeyup('down')">
+              class="email-input"
+              ref="emailInput"
+              :style="{width:emailWidth + 'px'}"
+              type="text"
+              v-model="email"
+              :disabled="disabled"
+              :placeholder="$t('Please enter email')"
+              @blur="_emailEnter"
+              @keydown.tab="_emailTab"
+              @keyup.delete="_emailDelete"
+              @keyup.enter="_emailEnter"
+              @keyup.space="_emailEnter"
+              @keyup.186="_emailEnter"
+              @keyup.up="_emailKeyup('up')"
+              @keyup.down="_emailKeyup('down')">
         </span>
       </el-popover>
     </div>

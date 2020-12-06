@@ -124,6 +124,12 @@
       :with-header="false">
       <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
     </el-drawer>
+    <el-dialog
+      title="提示"
+      :visible.sync="startDialog"
+      width="65%">
+      <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -149,7 +155,9 @@
           total: null,
           pageNo: null,
           pageSize: null
-        }
+        },
+        startDialog: false,
+        startData: {}
       }
     },
     props: {
@@ -180,33 +188,18 @@
       _start (item) {
         this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionId: item.id }).then(res => {
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mStart, {
-                on: {
-                  onUpdate () {
-                    self._onUpdate()
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: item
-                }
-              })
-            }
-          })
+        this.startData = item
+        this.startDialog = true
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+      onUpdateStart () {
+        this._onUpdate()
+        this.startDialog = false
+      },
+      closeStart () {
+        this.startDialog = false
       },
       /**
        * get emial
@@ -566,6 +559,6 @@
     },
     mounted () {
     },
-    components: { mVersions }
+    components: { mVersions, mStart }
   }
 </script>

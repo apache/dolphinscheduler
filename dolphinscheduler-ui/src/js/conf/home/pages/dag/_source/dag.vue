@@ -155,9 +155,8 @@
       <el-drawer
         :visible.sync="nodeDrawer"
         size="50%"
-        :wrapperClosable="false"
         :with-header="false">
-        <m-form-model :nodeData = nodeData @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+        <m-form-model v-if="nodeDrawer" :nodeData = nodeData @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"
@@ -166,6 +165,19 @@
         :with-header="false">
         <m-form-line-model :lineData = lineData @addLineInfo="addLineInfo" @cancel="cancel"></m-form-line-model>
       </el-drawer>
+      <el-drawer
+        :visible.sync="udpDrawer"
+        size="50%"
+        :wrapperClosable="false"
+        :with-header="false">
+        <m-udp></m-udp>
+      </el-drawer>
+      <el-dialog
+        :title="$t('Set the DAG diagram name')"
+        :visible.sync="dialogVisible"
+        width="45%">
+        <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -231,7 +243,9 @@
           sourceId: '',
           targetId: ''
         },
-        lineDrawer: false
+        lineDrawer: false,
+        udpDrawer: false,
+        dialogVisible: false,
       }
     },
     mixins: [disabledState],
@@ -431,7 +445,12 @@
                  * @param saveEditDAGChart => Process definition editing
                  */
                 this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
-                  this.$message.success(res.msg)
+                  // this.$message.success(res.msg)
+                  this.$message({
+                    message: res.msg,
+                    type: 'success',
+                    offset: 80
+                  })
                   this.spinnerLoading = false
                   // Jump process definition
                   if (this.type === 'instance') {
@@ -491,33 +510,12 @@
         }
         return true
       },
-      /**
-       * Global parameter
-       * @param Promise
-       */
-      _udpTopFloorPop () {
-        return new Promise((resolve, reject) => {
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mUdp, {
-                on: {
-                  onUdp () {
-                    modal.remove()
-                    resolve()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                }
-              })
-            }
-          })
-        })
+      onUdpDialog () {
+        this._save()
+        this.dialogVisible = false
+      },
+      closeDialog () {
+        this.dialogVisible = false
       },
       /**
        * Save chart
@@ -528,11 +526,7 @@
           this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
-
-        // Global parameters (optional)
-        this._udpTopFloorPop().then(() => {
-          return this._save()
-        })
+        this.dialogVisible = true
       },
       /**
        * Return to the previous child node
@@ -674,7 +668,9 @@
         this.nodeData.preNode = preNode
         this.nodeData.rearList = rearList
         this.nodeData.instanceId = this.$route.params.id
+        
         this.nodeDrawer = true
+        
       },
       removeEventModelById ($id) {
         if(eventModel && this.taskId == $id){
@@ -817,7 +813,7 @@
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
     },
-    components: { mVersions, mFormModel, mFormLineModel }
+    components: { mVersions, mFormModel, mFormLineModel, mUdp }
   }
 </script>
 

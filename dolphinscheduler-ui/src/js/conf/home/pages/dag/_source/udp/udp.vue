@@ -17,10 +17,6 @@
 <template>
   <div class="udp-model">
     <div class="scrollbar contpi-boxt">
-      <div class="title">
-        <span>{{$t('Set the DAG diagram name')}}</span>
-      </div>
-
       <div>
         <el-input
                 type="text"

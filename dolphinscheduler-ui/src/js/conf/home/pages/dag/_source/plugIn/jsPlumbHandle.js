@@ -370,7 +370,6 @@ JSP.prototype.tasksDblclick = function (e) {
   // Untie event
   if (this.config.isDblclick) {
     const id = $(e.currentTarget.offsetParent).attr('id')
-
     findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({
       id: id,
       type: $(`#${id}`).attr('data-tasks-type')

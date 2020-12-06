@@ -199,7 +199,7 @@
       }
     },
     props: {
-      item: Object,
+      startData: Object,
       startNodeList: {
         type: String,
         default: ''
@@ -213,7 +213,7 @@
       _start () {
         this.spinnerLoading = true
         let param = {
-          processDefinitionId: this.item.id,
+          processDefinitionId: this.startData.id,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
@@ -233,7 +233,7 @@
         }
         this.store.dispatch('dag/processStart', param).then(res => {
           this.$message.success(res.msg)
-          this.$emit('onUpdate')
+          this.$emit('onUpdateStart')
           setTimeout(() => {
             this.spinnerLoading = false
             this.close()
@@ -252,7 +252,7 @@
         })
       },
       _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.item.id }).then(res => {
+        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
           this.receivers = res.receivers && res.receivers.split(',') || []
           this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
         })
@@ -261,7 +261,7 @@
         this._start()
       },
       close () {
-        this.$emit('close')
+        this.$emit('closeStart')
       }
     },
     watch: {
@@ -271,7 +271,7 @@
     },
     created () {
       this.warningType = this.warningTypeList[0].id
-      this.workflowName = this.item.name
+      this.workflowName = this.startData.name
 
       this._getReceiver()
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
@@ -293,7 +293,7 @@
           this.warningGroupId = ''
         })
       })
-      this.workflowName = this.item.name
+      this.workflowName = this.startData.name
     },
     computed: {},
     components: { mEmail, mPriority, mWorkerGroups }

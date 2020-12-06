@@ -16,9 +16,6 @@
  */
 <template>
   <div class="datasource-popup-model">
-    <div class="top-p">
-      <span>{{item ? `${$t('Edit')}` : `${$t('Create')}`}}{{`${$t('Datasource')}`}}</span>
-    </div>
     <div class="content-p">
       <div class="create-datasource-model">
         <m-list-box-f>

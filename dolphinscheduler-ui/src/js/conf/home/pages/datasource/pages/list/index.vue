@@ -20,6 +20,13 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button size="mini" @click="_create('')">{{$t('Create Datasource')}}</el-button>
+          <el-dialog
+            :title="item ?($t('Edit')+$t('Datasource')) : ($t('Create')+$t('Datasource'))"
+            :visible.sync="dialogVisible"
+            width="65%"
+            :append-to-body="true">
+            <m-create-data-source :item="item" @onUpdate="onUpdate" @close="close"></m-create-data-source>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -74,8 +81,11 @@
           // Number of pages
           pageNo: 1,
           // Search value
-          searchVal: ''
-        }
+          searchVal: '',
+          
+        },
+        dialogVisible: false,
+        item: {},
       }
     },
     mixins: [listUrlParamHandle],
@@ -86,30 +96,15 @@
        * create data source
        */
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateDataSource, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.dialogVisible = true
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.dialogVisible = false
+      },
+      close () {
+        this.dialogVisible = false
       },
       /**
        * page
@@ -160,6 +155,6 @@
     },
     mounted () {
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData, mCreateDataSource }
   }
 </script>

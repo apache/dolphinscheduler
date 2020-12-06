@@ -140,12 +140,12 @@
           </div>
           <div class="cont-box">
             <span class="label-box" style="width: 193px;display: inline-block;">
-              <el-select style="width: 157px;" size="mini" v-model="failedNode" :disabled="true">
+              <el-select style="width: 157px;" size="small" v-model="failedNode" :disabled="true">
                 <el-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label"></el-option>
               </el-select>
             </span>
             <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
-            <el-select style="width: 157px;" size="mini" v-model="failedBranch" clearable>
+            <el-select style="width: 157px;" size="small" v-model="failedBranch" clearable>
               <el-option v-for="item in nodeData.rearList" :key="item.value" :value="item.value" :label="item.label"></el-option>
             </el-select>
           </div>
@@ -278,7 +278,7 @@
         </m-conditions>
         <!-- Pre-tasks in workflow -->
         <m-pre-tasks
-          v-if="['SHELL', 'SUB_PROCESS'].indexOf(taskType) > -1"
+          v-if="['SHELL', 'SUB_PROCESS'].indexOf(nodeData.taskType) > -1"
           @on-pre-tasks="_onPreTasks"
           ref="PRE_TASK"
           :backfill-item="backfillItem"></m-pre-tasks>
