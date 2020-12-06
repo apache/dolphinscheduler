@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
