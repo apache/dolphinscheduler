@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -247,8 +248,8 @@ public abstract class AbstractCommandExecutor {
         if (processId != 0 && process.isAlive()) {
             try {
                 // sudo -u user command to run command
-                String cmd = String.format("sudo kill %d", processId);
-
+                String cmd = String.format("kill %d", processId);
+                cmd = OSUtils.getCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("soft kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -267,8 +268,8 @@ public abstract class AbstractCommandExecutor {
     private void hardKill(int processId) {
         if (processId != 0 && process.isAlive()) {
             try {
-                String cmd = String.format("sudo kill -9 %d", processId);
-
+                String cmd = String.format("kill -9 %d", processId);
+                cmd = OSUtils.getCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);

@@ -382,6 +382,10 @@ public class OSUtils {
         return null;
     }
 
+    public static String getCmd(String tenantCode, String command) {
+        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command ;
+    }
+
     /**
      * Execute the corresponding command of Linux or Windows
      *
