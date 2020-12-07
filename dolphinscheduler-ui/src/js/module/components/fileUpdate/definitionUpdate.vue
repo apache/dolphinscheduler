@@ -20,6 +20,7 @@
           :ok-text="$t('Upload')"
           :nameText="$t('File Upload')"
           @ok="_ok"
+          @close="close"
           :disabled="progress === 0 ? false : true">
     <template slot="content">
       <form name="files" enctype="multipart/form-data" method="post">
@@ -142,10 +143,10 @@
           io.post(`projects/import-definition`, res => {
             this.$message.success(res.msg)
             resolve()
-            self.$emit('onUpdate')
+            self.$emit('onUpdateDefinition')
           }, e => {
             reject(e)
-            self.$emit('close')
+            self.$emit('closeDefinition')
             this.$message.error(e.msg || '')
           }, {
             data: formData,
@@ -156,7 +157,7 @@
               // Total attachment size
               let total = progressEvent.total
               self.progress = Math.floor(100 * loaded / total)
-              self.$emit('onProgress', self.progress)
+              self.$emit('onProgressDefinition', self.progress)
             }
           })
         })
@@ -166,7 +167,10 @@
        */
       _ckArchive () {
         $('.update-file-modal').hide()
-        this.$emit('onArchive')
+        this.$emit('onArchiveDefinition')
+      },
+      close() {
+        this.$emit('closeDefinition')
       },
       /**
        * Drag and drop upload

@@ -52,7 +52,7 @@
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" :disabled="_rtDisb(scope.row)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Rename')" placement="top">
-              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row)" circle></el-button></span>
+              <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
             </el-tooltip>
             <el-tooltip :content="$t('Download')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-download" @click="_downloadFile(scope.row)" :disabled="scope.row.directory? true: false" circle></el-button></span>
@@ -73,6 +73,11 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="renameDialog"
+      width="45%">
+      <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -87,7 +92,10 @@
     name: 'file-manage-list',
     data () {
       return {
-        list: []
+        list: [],
+        renameDialog: false,
+        item: {},
+        index: null
       }
     },
     props: {
@@ -129,31 +137,20 @@
         })
       },
       _rename (item, i) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mRename, {
-              on: {
-                onUpDate (item) {
-                  self.$set(self.list, i, item)
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.index = i
+        this.renameDialog = true
       },
+
+      onUpDate(item) {
+        this.$set(this.list, this.index, item)
+        this.renameDialog = false
+      },
+
+      close() {
+        this.renameDialog = false
+      },
+
       _rtDisb ({ alias, size }) {
         let i = alias.lastIndexOf('.')
         let a = alias.substring(i, alias.length)
@@ -179,6 +176,6 @@
     mounted () {
       this.list = this.fileResourcesList
     },
-    components: { }
+    components: { mRename }
   }
 </script>

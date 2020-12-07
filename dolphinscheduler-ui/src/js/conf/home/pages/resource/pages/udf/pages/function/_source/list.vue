@@ -59,6 +59,11 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="createUdfDialog"
+      width="60%">
+      <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -70,7 +75,9 @@
     data () {
       return {
         list: [],
-        spinnerLoading: false
+        spinnerLoading: false,
+        createUdfDialog: false,
+        item: {}
       }
     },
     props: {
@@ -94,31 +101,15 @@
         })
       },
       _edit (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          width: '800px',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateUdf, {
-              on: {
-                onUpdate () {
-                  self.$emit('on-update')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.createUdfDialog = true
+      },
+      onUpdate () {
+        this.$emit('on-update')
+        this.createUdfDialog = false
+      },
+      close () {
+        this.createUdfDialog = false
       }
     },
     watch: {
@@ -134,6 +125,6 @@
     mounted () {
       this.list = this.udfFuncList
     },
-    components: { }
+    components: { mCreateUdf }
   }
 </script>

@@ -135,6 +135,18 @@
         </div>
       </transition>
     </div>
+
+    <el-dialog
+      :visible.sync="definitionUpdateDialog"
+      width="40%">
+      <m-definition-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-definition-update>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="fileUpdateDialog"
+      width="40%">
+      <m-file-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-file-update>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -168,7 +180,10 @@
         // Selected language
         activeLocale: '',
         // Environmental variable
-        docLink: ''
+        docLink: '',
+        type: '',
+        definitionUpdateDialog: false,
+        fileUpdateDialog: false,
       }
     },
 
@@ -199,66 +214,49 @@
           this._toggleArchive()
           return
         }
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'update-file-modal',
-          transitionName: 'opacityp',
-          render (h) {
-            if(type === 'DEFINITION'){
-              return h(mDefinitionUpdate, {
-                on: {
-                  onProgress (val) {
-                    self.progress = val
-                  },
-                  onUpdate () {
-                    findComponentDownward(self.$root, `definition-list-index`)._updateList()
-                    self.isUpdate = false
-                    self.progress = 0
-                    modal.remove()
-                  },
-                  onArchive () {
-                    self.isUpdate = true
-                  },
-                  close () {
-                    self.progress = 0
-                    modal.remove()
-                  }
-                },
-                props: {
-                  type: type
-                }
-              })
-            }else{
-              return h(mFileUpdate, {
-                on: {
-                  onProgress (val) {
-                    self.progress = val
-                  },
-                  onUpdate () {
-                    findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
-                    self.isUpdate = false
-                    self.progress = 0
-                    modal.remove()
-                  },
-                  onArchive () {
-                    self.isUpdate = true
-                  },
-                  close () {
-                    self.progress = 0
-                    modal.remove()
-                  }
-                },
-                props: {
-                  type: type
-                }
-              })
-            }
-          }
-        })
+        this.type = type
+       if(this.type==='DEFINITION') {
+         this.definitionUpdateDialog = true
+       } else {
+         this.fileUpdateDialog = true
+       }
       },
+      onProgressDefinition (val) {
+        this.progress = val
+      },
+      onUpdateDefinition () {
+        findComponentDownward(self.$root, `definition-list-index`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.definitionUpdateDialog = false
+      },
+
+      onArchiveDefinition () {
+        this.isUpdate = true
+      },
+
+      closeDefinition () {
+        this.progress = 0
+        this.definitionUpdateDialog = false
+      },
+
+      onProgressFileUpdate (val) {
+        this.progress = val
+      },
+      onUpdateFileUpdate () {
+        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileUpdateDialog = false
+      },
+      onArchiveFileUpdate () {
+        this.isUpdate = true
+      },
+      closeFileUpdate () {
+        this.progress = 0
+        this.fileUpdateDialog = false
+      },
+
       _fileChildUpdate (type,data) {
         if (this.progress) {
           this._toggleArchive()
@@ -550,9 +548,6 @@
       }
     }
     .file-update-model {
-      position: absolute;
-      right: 160px;
-      top: 18px;
       cursor: pointer;
       .progress-box {
         width: 240px;

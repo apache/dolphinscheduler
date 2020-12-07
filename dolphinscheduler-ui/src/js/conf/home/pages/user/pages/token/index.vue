@@ -20,6 +20,11 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button size="mini" @click="_create('')">{{$t('Create token')}}</el-button>
+          <el-dialog
+            :visible.sync="createTokenDialog"
+            width="50%">
+            <m-create-token :item="item" @onUpdate="onUpdate" @close="close"></m-create-token>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -76,7 +81,8 @@
           pageNo: 1,
           searchVal: ''
         },
-        isLeft: true
+        isLeft: true,
+        createTokenDialog: false
       }
     },
     mixins: [listUrlParamHandle],
@@ -103,31 +109,18 @@
         this._debounceGET()
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateToken, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.createTokenDialog = true
       },
+      onUpdate () {
+        this._debounceGET('false')
+        this.createTokenDialog = false
+      },
+
+      close () {
+        this.createTokenDialog = false
+      },
+
       _getList (flag) {
         if(sessionStorage.getItem('isLeft')==0) {
           this.isLeft = false
@@ -163,6 +156,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)
     },
-    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData, mCreateToken }
   }
 </script>

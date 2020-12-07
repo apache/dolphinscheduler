@@ -22,6 +22,11 @@
           <el-button-group>
             <el-button size="mini" @click="_create">{{$t('Create UDF Function')}}</el-button>
           </el-button-group>
+          <el-dialog
+            :visible.sync="createUdfDialog"
+            width="60%">
+            <m-create-udf @onUpdate="onUpdate" @close="close"></m-create-udf>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -73,7 +78,8 @@
           pageNo: 1,
           searchVal: ''
         },
-        isLeft: true
+        isLeft: true,
+        createUdfDialog: false
       }
     },
     mixins: [listUrlParamHandle],
@@ -91,30 +97,17 @@
         this.searchParams.pageSize = val
       },
       _create () {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateUdf, {
-              on: {
-                onUpdate () {
-                  self._updateList()
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-              }
-            })
-          }
-        })
+        this.createUdfDialog = true
       },
+      onUpdate () {
+        this._updateList()
+        this.createUdfDialog = false
+      },
+
+      close () {
+        this.createUdfDialog = false
+      },
+
       _updateList () {
         this._debounceGET()
       },

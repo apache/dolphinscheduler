@@ -599,7 +599,6 @@
        * @param Object id
        */
       _createLineLabel({id, sourceId, targetId}) {
-        // $('#jsPlumb_2_50').text('111')
         this.lineData.id = id
         this.lineData.sourceId = sourceId
         this.lineData.targetId = targetId

@@ -19,7 +19,8 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit User') : $t('Create User')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
@@ -274,6 +275,9 @@
           this.$message.error(e.msg || '')
           this.$refs['popup'].spinnerLoading = false
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

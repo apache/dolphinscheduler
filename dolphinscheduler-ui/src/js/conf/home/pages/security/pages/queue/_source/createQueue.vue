@@ -19,7 +19,8 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit queue') : $t('Create queue')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
@@ -137,6 +138,9 @@
             reject(e)
           })
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {

@@ -19,7 +19,8 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit token') : $t('Create token')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-token-model">
         <m-list-box-f>
@@ -149,6 +150,9 @@
       },
       _onChange () {
         this.token = ''
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

@@ -20,6 +20,11 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group" v-if="isADMIN">
           <el-button size="mini" @click="_create('')">{{$t('Create alarm group')}}</el-button>
+          <el-dialog
+            :visible.sync="createWarningDialog"
+            width="60%">
+            <m-create-warning :item="item" @onUpdate="onUpdate" @close="close"></m-create-warning>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -30,7 +35,6 @@
                 :alertgroup-list="alertgroupList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
           <el-pagination
@@ -77,7 +81,9 @@
           searchVal: ''
         },
         isLeft: true,
-        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
+        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER',
+        createWarningDialog: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -104,31 +110,19 @@
         this._create(item)
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateWarning, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.createWarningDialog = true
       },
+
+      onUpdate () {
+        this._debounceGET('false')
+        this.createWarningDialog = false
+      },
+
+      close () {
+        this.createWarningDialog = false
+      },
+
       _getList (flag) {
         if(sessionStorage.getItem('isLeft')==0) {
           this.isLeft = false
@@ -164,6 +158,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateWarning }
   }
 </script>

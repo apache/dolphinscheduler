@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" :asyn-loading="true">
+  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" @close="close" :asyn-loading="true">
     <template slot="content">
       <div class="resource-rename-model">
         <m-list-box-f>
@@ -102,6 +102,9 @@
             resolve()
           }
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

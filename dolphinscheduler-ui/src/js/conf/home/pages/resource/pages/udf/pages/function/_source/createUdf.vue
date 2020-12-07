@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
+  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
@@ -287,6 +287,9 @@
             })
           }
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

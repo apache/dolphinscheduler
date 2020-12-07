@@ -19,7 +19,8 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit alarm group') : $t('Create alarm group')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
@@ -130,6 +131,9 @@
           this.$message.error(e.msg || '')
           this.$refs['popup'].spinnerLoading = false
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},
