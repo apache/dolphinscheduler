@@ -25,10 +25,10 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
@@ -45,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -53,7 +55,6 @@ import java.util.concurrent.ExecutorService;
 public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
-
 
     /**
      *  thread executor service
@@ -86,9 +87,24 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         logger.info("received command : {}", taskRequestCommand);
 
-        String contextJson = taskRequestCommand.getTaskExecutionContext();
+        if (taskRequestCommand == null) {
+            logger.error("task execute request command is null");
+            return;
+        }
 
+        String contextJson = taskRequestCommand.getTaskExecutionContext();
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
+
+        if (taskExecutionContext == null) {
+            logger.error("task execution context is null");
+            return;
+        }
+        // custom logger
+        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskInstanceId()));
+
         taskExecutionContext.setHost(OSUtils.getHost() + ":" + workerConfig.getListenPort());
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(getTaskLogPath(taskExecutionContext));
@@ -97,18 +113,23 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         String execLocalPath = getExecLocalPath(taskExecutionContext);
         logger.info("task instance  local execute path : {} ", execLocalPath);
 
+        FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
-        } catch (Exception ex){
-            logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
+        } catch (Throwable ex) {
+            String errorLog = String.format("create execLocalPath : %s", execLocalPath);
+            LoggerUtils.logError(Optional.ofNullable(logger), errorLog, ex);
+            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog, ex);
         }
+        FileUtils.taskLoggerThreadLocal.remove();
+
         taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
         this.doAck(taskExecutionContext);
 
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
     }
 
     private void doAck(TaskExecutionContext taskExecutionContext){

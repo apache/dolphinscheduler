@@ -78,7 +78,7 @@ public abstract class AbstractShell {
   /**
    * If or not script finished executing
    */
-  private volatile AtomicBoolean completed;
+  private AtomicBoolean completed;
   
   public AbstractShell() {
     this(0L);
@@ -128,7 +128,7 @@ public abstract class AbstractShell {
   /**
    * Run a command   actual work
    */
-  private void runCommand() throws IOException { 
+  private void runCommand() throws IOException {
     ProcessBuilder builder = new ProcessBuilder(getExecString());
     Timer timeOutTimer = null;
     ShellTimeoutTimerTask timeoutTimerTask = null;
@@ -153,11 +153,11 @@ public abstract class AbstractShell {
       timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
     }
     final BufferedReader errReader = 
-            new BufferedReader(new InputStreamReader(process
-                                                     .getErrorStream()));
-    BufferedReader inReader = 
-            new BufferedReader(new InputStreamReader(process
-                                                     .getInputStream()));
+            new BufferedReader(
+                    new InputStreamReader(process.getErrorStream()));
+    BufferedReader inReader =
+            new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
     final StringBuilder errMsg = new StringBuilder();
     
     // read error and input streams as this would free up the buffers
@@ -177,23 +177,35 @@ public abstract class AbstractShell {
         }
       }
     };
+    Thread inThread = new Thread() {
+      @Override
+      public void run() {
+        try {
+          parseExecResult(inReader);
+        } catch (IOException ioe) {
+          logger.warn("Error reading the in stream", ioe);
+        }
+        super.run();
+      }
+    };
     try {
       errThread.start();
+      inThread.start();
     } catch (IllegalStateException ise) { }
     try {
       // parse the output
-      parseExecResult(inReader);
-      exitCode  = process.waitFor();
+      exitCode = process.waitFor();
       try {
-        // make sure that the error thread exits
+        // make sure that the error and in thread exits
         errThread.join();
+        inThread.join();
       } catch (InterruptedException ie) {
-        logger.warn("Interrupted while reading the error stream", ie);
+        logger.warn("Interrupted while reading the error and in stream", ie);
       }
-      completed.set(true);
+      completed.compareAndSet(false,true);
       //the timeout thread handling
       //taken care in finally block
-      if (exitCode != 0) {
+      if (exitCode != 0 || errMsg.length() > 0) {
         throw new ExitCodeException(exitCode, errMsg.toString());
       }
     } catch (InterruptedException ie) {
