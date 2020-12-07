@@ -62,9 +62,9 @@
       _ok () {
         if(this._verification()) {
             if(this.tmp) {
-                this.$emit('onBatchMove',this.itemId)
+              this.$emit('onBatchMove',this.itemId)
             } else {
-                this.$emit('onBatchCopy',this.itemId)
+              this.$emit('onBatchCopy',this.itemId)
             }
         }
       },

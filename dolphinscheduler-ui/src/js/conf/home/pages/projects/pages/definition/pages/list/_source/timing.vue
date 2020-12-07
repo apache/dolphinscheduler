@@ -16,9 +16,6 @@
  */
 <template>
   <div class="timing-process-model">
-    <div class="title-box">
-      <span>{{$t('Set parameters before timing')}}</span>
-    </div>
     <div class="clearfix list">
       <div class="text">
         {{$t('Start and stop time')}}
@@ -157,7 +154,7 @@
     </div>
     <div class="submit">
       <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
-      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (timingData.item.crontab ? $t('Edit') : $t('Create'))}} </el-button>
     </div>
   </div>
 </template>
@@ -196,10 +193,7 @@
       }
     },
     props: {
-      item: Object,
-      receiversD: Array,
-      receiversCcD: Array,
-      type: String
+      timingData: Object
     },
     methods: {
       _datepicker (val) {
@@ -242,19 +236,19 @@
           let msg = ''
 
           // edit
-          if (this.item.crontab) {
+          if (this.timingData.item.crontab) {
             api = 'dag/updateSchedule'
-            searchParams.id = this.item.id
+            searchParams.id = this.timingData.item.id
             msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
-            searchParams.processDefinitionId = this.item.id
+            searchParams.processDefinitionId = this.timingData.item.id
             msg = `${i18n.$t('Create')}${i18n.$t('success')}`
           }
 
           this.store.dispatch(api, searchParams).then(res => {
             this.$message.success(msg)
-            this.$emit('onUpdate')
+            this.$emit('onUpdateTiming')
           }).catch(e => {
             this.$message.error(e.msg || '')
           })
@@ -299,7 +293,7 @@
         this._timing()
       },
       close () {
-        this.$emit('close')
+        this.$emit('closeTiming')
       },
       preview () {
         this._preview()
@@ -308,7 +302,7 @@
     watch: {
     },
     created () {
-      if(this.item.workerGroup===undefined) {
+      if(this.timingData.item.workerGroup===undefined) {
         let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
         if (stateWorkerGroupsList.length) {
           this.workerGroup = stateWorkerGroupsList[0].id
@@ -320,12 +314,12 @@
           })
         }
       } else {
-        this.workerGroup = this.item.workerGroup
+        this.workerGroup = this.timingData.item.workerGroup
       }
-      if(this.item.crontab !== null){
-        this.crontab = this.item.crontab
+      if(this.timingData.item.crontab !== null){
+        this.crontab = this.timingData.item.crontab
       }
-      if(this.type == 'timing') {
+      if(this.timingData.type == 'timing') {
         let date = new Date()
         let year = date.getFullYear()
         let month = date.getMonth() + 1
@@ -344,13 +338,13 @@
         this.crontab = '0 0 * * * ? *'
         this.scheduleTime = times
       }
-      this.receivers = _.cloneDeep(this.receiversD)
-      this.receiversCc = _.cloneDeep(this.receiversCcD)
+      this.receivers = _.cloneDeep(this.timingData.receiversD)
+      this.receiversCc = _.cloneDeep(this.timingData.receiversCcD)
     },
     mounted () {
-      let item = this.item
+      let item = this.timingData.item
       // Determine whether to echo
-      if (this.item.crontab) {
+      if (this.timingData.item.crontab) {
         this.crontab = item.crontab
         this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
         this.failureStrategy = item.failureStrategy

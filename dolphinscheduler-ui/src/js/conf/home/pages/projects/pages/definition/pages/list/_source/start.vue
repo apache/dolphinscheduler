@@ -16,9 +16,6 @@
  */
 <template>
   <div class="start-process-model">
-    <div class="title-box">
-      <span>{{$t('Please set the parameters before starting')}}</span>
-    </div>
     <div class="clearfix list">
       <div class="text">
         {{$t('Process Name')}}

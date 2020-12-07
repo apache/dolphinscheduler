@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 import Vue from 'vue'
-import { Message } from 'element-ui';
-import mAffirm from './jumpAffirm'
 import store from '@/conf/home/store'
 import router from '@/conf/home/router'
 import { uuid, findComponentDownward } from '@/module/util/'

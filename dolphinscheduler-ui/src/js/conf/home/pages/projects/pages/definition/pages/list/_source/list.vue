@@ -125,10 +125,22 @@
       <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
     </el-drawer>
     <el-dialog
-      title="提示"
+      :title="$t('Please set the parameters before starting')"
       :visible.sync="startDialog"
       width="65%">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+    </el-dialog>
+    <el-dialog
+      :title="$t('Set parameters before timing')"
+      :visible.sync="timingDialog"
+      width="65%">
+      <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
+    </el-dialog>
+    <el-dialog
+      title="提示"
+      :visible.sync="relatedItemsDialog"
+      width="30%">
+      <m-related-items :tmp="tmp" @onBatchCopy="onBatchCopy" @onBatchMove="onBatchMove" @closeRelatedItems="closeRelatedItems"></m-related-items>
     </el-dialog>
   </div>
 </template>
@@ -157,7 +169,16 @@
           pageSize: null
         },
         startDialog: false,
-        startData: {}
+        startData: {},
+        timingDialog: false,
+        timingData: {
+          item: {},
+          receiversD: [],
+          receiversCcD: [],
+          type: ''
+        },
+        relatedItemsDialog: false,
+        tmp: false
       }
     },
     props: {
@@ -220,33 +241,19 @@
       _timing (item) {
         let self = this
         this._getReceiver(item.id).then(res => {
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTiming, {
-                on: {
-                  onUpdate () {
-                    self._onUpdate()
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: item,
-                  receiversD: res.receivers,
-                  receiversCcD: res.receiversCc,
-                  type: 'timing'
-                }
-              })
-            }
-          })
+          this.timingData.item = item,
+          this.timingData.receiversD = res.receivers,
+          this.timingData.receiversCcD = res.receiversCc,
+          this.timingData.type = 'timing'
+          this.timingDialog = true
         })
+      },
+      onUpdateTiming () {
+        this._onUpdate()
+        this.timingDialog = false
+      },
+      closeTiming () {
+        this.timingDialog = false
       },
       /**
        * Timing manage
@@ -307,7 +314,7 @@
         }).then(res => {
           this.strSelectIds = ''
           this.$message.success(res.msg)
-          $('body').find('.tooltip.fade.top.in').remove()
+          // $('body').find('.tooltip.fade.top.in').remove()
           this._onUpdate()
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -444,59 +451,26 @@
        * Batch Copy
        */
       _batchCopy () {
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mRelatedItems, {
-                on: {
-                  onBatchCopy (item) {
-                    self._copyProcess({id: self.strSelectIds,projectId: item})
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  tmp: false
-                }
-              })
-            }
-          })
+        this.relatedItemsDialog= true
+        this.tmp = false
+      },
+      onBatchCopy (item) {
+        this._copyProcess({id: this.strSelectIds,projectId: item})
+        this.relatedItemsDialog = false
+      },
+      closeRelatedItems () {
+        this.relatedItemsDialog = false
       },
       /**
        * _batchMove
        */
       _batchMove() {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mRelatedItems, {
-              on: {
-                onBatchMove (item) {
-                  self._moveProcess({id: self.strSelectIds,projectId: item})
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                tmp: true
-              }
-            })
-          }
-        })
+        this.tmp = true
+        this.relatedItemsDialog = true
+      },
+      onBatchMove (item) {
+        this._moveProcess({id: this.strSelectIds,projectId: item})
+        this.relatedItemsDialog = false
       },
       /**
        * Edit state
@@ -559,6 +533,6 @@
     },
     mounted () {
     },
-    components: { mVersions, mStart }
+    components: { mVersions, mStart, mTiming, mRelatedItems }
   }
 </script>

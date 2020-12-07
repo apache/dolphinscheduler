@@ -20,6 +20,11 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <el-button size="mini" @click="_create('')">{{$t('Create Project')}}</el-button>
+          <el-dialog
+            :visible.sync="createProjectDialog"
+            width="40%">
+            <m-create-project :item="item" @_onUpdate="_onUpdate"></m-create-project>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -69,7 +74,9 @@
           pageSize: 10,
           pageNo: 1,
           searchVal: ''
-        }
+        },
+        createProjectDialog: false,
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -91,29 +98,11 @@
         this.searchParams.pageSize = val
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateProject, {
-              on: {
-                onUpdate () {
-                  self._debounceGET()
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.createProjectDialog = true
+        this.item = item
       },
       _onUpdate () {
+        this.createProjectDialog = false
         this._debounceGET()
       },
       _getList (flag) {

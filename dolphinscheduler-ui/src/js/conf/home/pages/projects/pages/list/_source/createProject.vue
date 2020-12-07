@@ -83,8 +83,12 @@
         this.$refs['popup'].spinnerLoading = true
 
         this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
+          this.$emit('_onUpdate')
+          this.$message({
+            message: res.msg,
+            type: 'success',
+            offset: 70
+          });
           setTimeout(() => {
             this.$refs['popup'].spinnerLoading = false
           }, 800)
