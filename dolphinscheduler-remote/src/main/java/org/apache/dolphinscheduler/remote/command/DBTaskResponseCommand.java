@@ -29,7 +29,7 @@ public class DBTaskResponseCommand implements Serializable {
     private int status;
     
     public DBTaskResponseCommand() {
-    	super();
+        super();
     }
 
     public DBTaskResponseCommand(int status,int taskInstanceId) {
