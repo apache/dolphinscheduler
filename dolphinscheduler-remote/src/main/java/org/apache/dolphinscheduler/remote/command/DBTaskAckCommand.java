@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -25,49 +26,49 @@ import java.io.Serializable;
  */
 public class DBTaskAckCommand implements Serializable {
 
-	private int taskInstanceId;
-	private int status;
+    private int taskInstanceId;
+    private int status;
 
     public DBTaskAckCommand() {
         super();
     }
 
-	public DBTaskAckCommand(int status, int taskInstanceId) {
-		this.status = status;
-		this.taskInstanceId = taskInstanceId;
-	}
+    public DBTaskAckCommand(int status, int taskInstanceId) {
+        this.status = status;
+        this.taskInstanceId = taskInstanceId;
+    }
 
-	public int getTaskInstanceId() {
-		return taskInstanceId;
-	}
+    public int getTaskInstanceId() {
+        return taskInstanceId;
+    }
 
-	public void setTaskInstanceId(int taskInstanceId) {
-		this.taskInstanceId = taskInstanceId;
-	}
+    public void setTaskInstanceId(int taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	/**
-	 * package response command
-	 *
-	 * @return command
-	 */
-	public Command convert2Command() {
-		Command command = new Command();
-		command.setType(CommandType.DB_TASK_ACK);
-		byte[] body = JSONUtils.toJsonByteArray(this);
-		command.setBody(body);
-		return command;
-	}
+    /**
+     * package response command
+     *
+     * @return command
+     */
+    public Command convert2Command() {
+        Command command = new Command();
+        command.setType(CommandType.DB_TASK_ACK);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
+    }
 
-	@Override
-	public String toString() {
-		return "DBTaskAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
-	}
+    @Override
+    public String toString() {
+        return "DBTaskAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
+    }
 }
