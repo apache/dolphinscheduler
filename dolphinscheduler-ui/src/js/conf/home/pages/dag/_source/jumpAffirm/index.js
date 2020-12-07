@@ -80,8 +80,8 @@ Affirm.paramVerification = (name) => {
  */
 Affirm.isPop = (fn) => {
   Vue.prototype.$confirm($t('Whether to save the DAG graph'), '', {
-    confirmButtonText: $t('Save'),
-    cancelButtonText: $t('Cancel'),
+    confirmButtonText: `$t('Save')`,
+    cancelButtonText: `$t('Cancel')`,
     type: 'warning'
   }).then(() => {
     findComponentDownward($root, 'dag-chart')._save('affirm').then(() => {
