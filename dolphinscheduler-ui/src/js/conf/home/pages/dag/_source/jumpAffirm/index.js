@@ -16,6 +16,7 @@
  */
 import Vue from 'vue'
 import store from '@/conf/home/store'
+import i18n from '@/module/i18n'
 import router from '@/conf/home/router'
 import { uuid, findComponentDownward } from '@/module/util/'
 
@@ -79,9 +80,9 @@ Affirm.paramVerification = (name) => {
  * Pop-up judgment
  */
 Affirm.isPop = (fn) => {
-  Vue.prototype.$confirm($t('Whether to save the DAG graph'), '', {
-    confirmButtonText: `$t('Save')`,
-    cancelButtonText: `$t('Cancel')`,
+  Vue.prototype.$confirm(`${i18n.$t('Whether to save the DAG graph')}`, '', {
+    confirmButtonText: `${i18n.$t('Save')}`,
+    cancelButtonText: `${i18n.$t('Cancel')}`,
     type: 'warning'
   }).then(() => {
     findComponentDownward($root, 'dag-chart')._save('affirm').then(() => {
