@@ -97,6 +97,12 @@
       </template>
     </div>
     <m-spin :is-spin="isLoading"></m-spin>
+    <el-dialog
+      :title="$t('Set parameters before timing')"
+      :visible.sync="timingDialog"
+      width="65%">
+      <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -115,7 +121,13 @@
         total: null,
         pageNo: 1,
         pageSize: 10,
-        list: []
+        list: [],
+        timingDialog: false,
+        timingData: {
+          item: {},
+          receiversD: [],
+          receiversCcD: []
+        }
       }
     },
     props: {
@@ -234,43 +246,28 @@
        * timing
        */
       _editTiming (item) {
-        let self = this
         this._getReceiver(item.processDefinitionId).then(res => {
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTiming, {
-                on: {
-                  onUpdate () {
-                    self.pageNo = 1
-                    self._getScheduleList('false')
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: item,
-                  receiversD: res.receivers,
-                  receiversCcD: res.receiversCc
-                }
-              })
-            }
-          })
+          this.timingData.item = item
+          this.timingData.receiversD = res.receivers
+          this.timingData.receiversCcD = res.receiversCc
+          this.timingDialog = true
         })
-      }
+      },
+      onUpdateTiming () {
+        this.pageNo = 1
+        this._getScheduleList('false')
+        this.timingDialog = false
+      },
+      closeTiming () {
+        this.timingDialog = false
+      },
     },
     watch: {},
     created () {
       this._getScheduleList()
     },
     mounted () {},
-    components: { mSpin, mNoData }
+    components: { mSpin, mNoData, mTiming }
   }
 </script>
 

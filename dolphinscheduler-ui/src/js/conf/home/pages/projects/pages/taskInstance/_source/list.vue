@@ -72,6 +72,11 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="logDialog"
+      width="30%">
+      <m-log :logData="logData" @ok="ok" @close="close"></m-log>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -86,7 +91,13 @@
       return {
         list: [],
         isAuth: Permissions.getAuth(),
-        backfillItem: {}
+        backfillItem: {},
+        logDialog: false,
+        logData: {
+          item: {},
+          source: '',
+          logId: null
+        }
       }
     },
     props: {
@@ -101,31 +112,17 @@
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       _refreshLog (item) {
-        let self = this
-        let instance = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mLog, {
-              on: {
-                ok () {
-                },
-                close () {
-                  instance.remove()
-                }
-              },
-              props: {
-                self: self,
-                source: 'list',
-                logId: item.id
-              }
-            })
-          }
-        })
+        this.logData.item = item
+        this.logData.source = 'list'
+        this.logData.logId = item.id
+        this.logDialog = true
       },
+      ok () {},
+
+      close () {
+        this.logDialog = false
+      },
+
       _forceSuccess (item) {
         this.forceTaskSuccess({taskInstanceId: item.id}).then(res => {
           if (res.code === 0) {
@@ -154,6 +151,6 @@
     mounted () {
       this.list = this.taskInstanceList
     },
-    components: { }
+    components: { mLog}
   }
 </script>

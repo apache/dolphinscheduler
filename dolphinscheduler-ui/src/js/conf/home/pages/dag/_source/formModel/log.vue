@@ -16,14 +16,14 @@
  */
 <template>
   <span class="log-model">
-    <span  v-if="stateId && item.type !== 'SUB_PROCESS'">
+    <span  v-if="stateId && logData.item.type !== 'SUB_PROCESS'">
       <slot name="history"></slot>
       <span @click="_ckLog">
         <slot name="log" ></slot>
       </span>
     </span>
     <transition name="fade">
-      <div v-show="isLog || source === 'list'" class="log-pop">
+      <div v-show="isLog || logData.source === 'list'" class="log-pop">
         <div class="log-box" >
           <div class="title">
             <span>{{$t('View log')}}</span>
@@ -79,7 +79,7 @@
         store,
         router,
         isLog: false,
-        stateId: $(`#${this.item.id}`).attr('data-state-id') || null,
+        stateId: $(`#${this.logData.item.id}`).attr('data-state-id') || null,
         isScreen: false,
         loadingIndex: 0,
         isData: true,
@@ -87,15 +87,7 @@
       }
     },
     props: {
-      item: {
-        type: Object,
-        default: {}
-      },
-      source: {
-        type: String,
-        default: 'from'
-      },
-      logId: Number
+      logData: Object
     },
     methods: {
       _refreshLog () {
@@ -169,7 +161,7 @@
        */
       _downloadLog () {
         downloadFile('/log/download-log', {
-          taskInstanceId: this.stateId || this.logId
+          taskInstanceId: this.stateId || this.logData.logId
         })
       },
       /**
@@ -230,7 +222,7 @@
     watch: {},
     created () {
       // Source is a task instance
-      if (this.source === 'list') {
+      if (this.logData.source === 'list') {
         this.$message.info(`${i18n.$t('Loading Log...')}`)
         this._ckLog()
       }
@@ -243,7 +235,7 @@
     computed: {
       _rtParam () {
         return {
-          taskInstanceId: this.stateId || this.logId,
+          taskInstanceId: this.stateId || this.logData.logId,
           skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
           limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
         }
