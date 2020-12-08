@@ -85,7 +85,7 @@ jackson-datatype-jdk8-2.9.10.jar
 jackson-datatype-jsr310-2.9.10.jar
 jackson-jaxrs-1.9.13.jar
 jackson-mapper-asl-1.9.13.jar
-jackson-module-parameter-names-2.9.8.jar
+jackson-module-parameter-names-2.9.10.jar
 jackson-xc-1.9.13.jar
 jamon-runtime-2.3.1.jar
 java-xmlbuilder-0.4.jar
