@@ -14,23 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.common.enums;
 
-package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+public enum  SqoopJobType {
+    CUSTOM(0, "CUSTOM"),
+    TEMPLATE(1, "TEMPLATE");
 
-/**
- * Source Generator Interface
- */
-public interface ISourceGenerator {
+    SqoopJobType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
 
-    /**
-     * generate the source script
-     *
-     * @param sqoopParameters      sqoopParameters
-     * @param taskExecutionContext taskExecutionContext
-     * @return source script
-     */
-    String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext);
+    @EnumValue
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }

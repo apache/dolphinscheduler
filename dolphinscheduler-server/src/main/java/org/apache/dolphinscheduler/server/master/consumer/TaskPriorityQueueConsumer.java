@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.enums.SqoopJobType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -275,29 +277,32 @@ public class TaskPriorityQueueConsumer extends Thread{
 
 
     /**
-     * set datax task relation
+     * set sqoop task relation
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
      * @param taskNode taskNode
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
         SqoopParameters sqoopParameters = JSONObject.parseObject(taskNode.getParams(), SqoopParameters.class);
 
-        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
-        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+        // sqoop job type is template set task relation
+        if (sqoopParameters.getJobType().equals(SqoopJobType.TEMPLATE.getDescp())) {
+            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+            TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
-        DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
-        DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
+            DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
+            DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
 
-        if (dataSource != null){
-            sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
-            sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-            sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
-        }
+            if (dataSource != null){
+                sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
+                sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+                sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+            }
 
-        if (dataTarget != null){
-            sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
-            sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-            sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            if (dataTarget != null){
+                sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
+                sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+                sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            }
         }
     }
 
