@@ -77,10 +77,10 @@ htrace-core-3.1.0-incubating.jar
 httpclient-4.4.1.jar
 httpcore-4.4.1.jar
 httpmime-4.5.7.jar
-jackson-annotations-2.9.8.jar
-jackson-core-2.9.8.jar
+jackson-annotations-2.9.10.jar
+jackson-core-2.9.10.jar
 jackson-core-asl-1.9.13.jar
-jackson-databind-2.9.8.jar
+jackson-databind-2.9.10.jar
 jackson-datatype-jdk8-2.9.8.jar
 jackson-datatype-jsr310-2.9.8.jar
 jackson-jaxrs-1.9.13.jar
@@ -161,8 +161,8 @@ parquet-hadoop-bundle-1.8.1.jar
 poi-3.17.jar
 postgresql-42.1.4.jar
 protobuf-java-2.5.0.jar
-quartz-2.2.3.jar
-quartz-jobs-2.2.3.jar
+quartz-2.3.0.jar
+quartz-jobs-2.3.0.jar
 slf4j-api-1.7.5.jar
 snakeyaml-1.23.jar
 snappy-0.2.jar
