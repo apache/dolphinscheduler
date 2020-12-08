@@ -38,6 +38,10 @@ public class TaskExecutionContext implements Serializable {
      */
     private int taskInstanceId;
 
+    /**
+     * Is it pre-generated data
+     */
+    private boolean preData;
 
     /**
      * task name
@@ -503,25 +507,33 @@ public class TaskExecutionContext implements Serializable {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
     }
 
+    public boolean getPreData() {
+        return preData;
+    }
+
+    public void setPreData(boolean preData) {
+        this.preData = preData;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", currentExecutionStatus=" + currentExecutionStatus
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", startTime=" + startTime
-                + ", taskType='" + taskType + '\''
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", taskJson='" + taskJson + '\''
-                + ", processId=" + processId
-                + ", appIds='" + appIds + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", scheduleTime=" + scheduleTime
-                + ", globalParams='" + globalParams + '\''
-                + ", executorId=" + executorId
+            + "taskInstanceId=" + taskInstanceId
+            + ", taskName='" + taskName + '\''
+            + ", currentExecutionStatus=" + currentExecutionStatus
+            + ", firstSubmitTime=" + firstSubmitTime
+            + ", startTime=" + startTime
+            + ", taskType='" + taskType + '\''
+            + ", host='" + host + '\''
+            + ", executePath='" + executePath + '\''
+            + ", logPath='" + logPath + '\''
+            + ", taskJson='" + taskJson + '\''
+            + ", processId=" + processId
+            + ", appIds='" + appIds + '\''
+            + ", processInstanceId=" + processInstanceId
+            + ", scheduleTime=" + scheduleTime
+            + ", globalParams='" + globalParams + '\''
+            + ", executorId=" + executorId
                 + ", cmdTypeIfComplement=" + cmdTypeIfComplement
                 + ", tenantCode='" + tenantCode + '\''
                 + ", queue='" + queue + '\''
