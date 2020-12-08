@@ -291,8 +291,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jackson-core 2.9.10: https://github.com/FasterXML/jackson-core, Apache 2.0
     jackson-core-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl/1.9.13, Apache 2.0
     jackson-databind 2.9.10: https://github.com/FasterXML/jackson-databind, Apache 2.0
-    jackson-datatype-jdk8 2.9.10: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.10, Apache 2.0
-    jackson-datatype-jsr310 2.9.10: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.9.10, Apache 2.0
+    jackson-datatype-jdk8 2.9.8: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.9.8, Apache 2.0
+    jackson-datatype-jsr310 2.9.8: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.9.8, Apache 2.0
     jackson-jaxrs 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-jaxrs/1.9.13, Apache 2.0 and LGPL 2.1
     jackson-mapper-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl/1.9.13, Apache 2.0
     jackson-module-parameter-names 2.9.10: https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-parameter-names/2.9.10, Apache 2.0
