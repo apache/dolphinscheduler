@@ -244,6 +244,7 @@
         this.progress = val
       },
       onUpdateDefinition () {
+        let self = this
         findComponentDownward(self.$root, `definition-list-index`)._updateList()
         this.isUpdate = false
         this.progress = 0
@@ -263,7 +264,8 @@
         this.progress = val
       },
       onUpdateFileUpdate () {
-        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
         this.isUpdate = false
         this.progress = 0
         this.fileUpdateDialog = false
@@ -290,7 +292,8 @@
         this.progress = val
       },
       onUpdateFileChildUpdate () {
-        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList(data)
         this.isUpdate = false
         this.progress = 0
         this.fileChildUpdateDialog = false
@@ -318,7 +321,8 @@
         this.progress = val
       },
       onUpdateResourceChildUpdate () {
-        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList(data)
         this.isUpdate = false
         this.progress = 0
         this.resourceChildUpdateDialog = false
