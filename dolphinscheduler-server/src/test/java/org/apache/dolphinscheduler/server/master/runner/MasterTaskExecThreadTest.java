@@ -120,4 +120,10 @@ public class MasterTaskExecThreadTest {
         return taskInstance;
     }
 
+    @Test
+    public void testGetTaskInstance() {
+        TaskInstance taskInstance =  masterTaskExecThread.getTaskInstance();
+        Assert.assertNotNull(taskInstance);
+    }
+
 }
