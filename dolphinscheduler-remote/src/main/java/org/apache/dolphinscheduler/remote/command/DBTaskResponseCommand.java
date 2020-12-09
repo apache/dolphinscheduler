@@ -28,6 +28,12 @@ public class DBTaskResponseCommand implements Serializable {
     private int taskInstanceId;
     private int status;
 
+    /**
+     * don't delete this construct method
+     */
+    public DBTaskResponseCommand(){
+
+    }
     public DBTaskResponseCommand(int status,int taskInstanceId) {
         this.status = status;
         this.taskInstanceId = taskInstanceId;
