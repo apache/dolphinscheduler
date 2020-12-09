@@ -104,22 +104,15 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @return kill result
      */
     private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
-        List appIds = Collections.EMPTY_LIST;
+        List<String> appIds = Collections.emptyList();
         try {
             int taskInstanceId = killCommand.getTaskInstanceId();
             TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-
-            if (taskExecutionContext.getPreData()) {
+            Integer processId = taskExecutionContext.getProcessId();
+            if (processId.equals(0)) {
                 taskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
                 return Pair.of(true, appIds);
-            }
-
-            Integer processId = taskExecutionContext.getProcessId();
-
-            if (processId.equals(0)) {
-                logger.error("process kill failed, process id :{}, task id:{}", processId, taskInstanceId);
-                return Pair.of(false, appIds);
             }
 
             String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));

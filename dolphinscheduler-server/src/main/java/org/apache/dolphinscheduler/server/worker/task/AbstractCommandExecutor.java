@@ -174,9 +174,8 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskExecutionContext.setProcessId(processId);
-        taskExecutionContext.setPreData(false);
         boolean updateTaskExecutionContextStatus = taskExecutionContextCacheManager.updateTaskExecutionContext(taskExecutionContext);
-        if (Boolean.FALSE == updateTaskExecutionContextStatus) {
+        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_KILL);
         }

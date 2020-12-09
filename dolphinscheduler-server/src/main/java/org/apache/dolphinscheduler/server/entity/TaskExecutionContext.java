@@ -39,11 +39,6 @@ public class TaskExecutionContext implements Serializable {
     private int taskInstanceId;
 
     /**
-     * Is it pre-generated data
-     */
-    private boolean preData;
-
-    /**
      * task name
      */
     private String taskName;
@@ -505,14 +500,6 @@ public class TaskExecutionContext implements Serializable {
 
     public void setSqoopTaskExecutionContext(SqoopTaskExecutionContext sqoopTaskExecutionContext) {
         this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
-    }
-
-    public boolean getPreData() {
-        return preData;
-    }
-
-    public void setPreData(boolean preData) {
-        this.preData = preData;
     }
 
     @Override
