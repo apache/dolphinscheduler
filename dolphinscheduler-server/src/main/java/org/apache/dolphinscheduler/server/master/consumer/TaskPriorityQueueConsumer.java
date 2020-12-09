@@ -142,7 +142,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                 }
                 // If there are tasks in a cycle that cannot find the worker group,
                 // sleep for 1 second
-                if (failedDispatchTasks.size() > 0 && taskPriorityQueue.size() <= fetchTaskNum) {
+                if (!failedDispatchTasks.isEmpty()  && taskPriorityQueue.size() <= fetchTaskNum) {
                     TimeUnit.SECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {
