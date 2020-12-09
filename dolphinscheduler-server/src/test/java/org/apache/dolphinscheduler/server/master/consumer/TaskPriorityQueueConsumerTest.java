@@ -649,14 +649,11 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        Stopper.stop();
-
         taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
 
         taskPriorityQueueConsumer.run();
-
-        taskPriorityQueue = null;
         TimeUnit.SECONDS.sleep(10);
+
     }
 
     @After
