@@ -756,7 +756,7 @@
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
-                        <include>**/api/utils/FileUtilsTest.java</include>
+                        <!--<include>**/api/utils/FileUtilsTest.java</include> -->
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/ResultTest.java</include>
@@ -915,6 +915,20 @@
                     <dataFile>target/jacoco.exec</dataFile>
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>jacoco-initialize</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>pre-unit-test</id>
                         <goals>
