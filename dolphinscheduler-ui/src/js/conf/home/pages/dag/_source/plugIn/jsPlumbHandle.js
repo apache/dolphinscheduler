@@ -17,7 +17,6 @@
 import 'jquery-ui/ui/widgets/draggable'
 import 'jquery-ui/ui/widgets/droppable'
 import 'jquery-ui/ui/widgets/resizable'
-import Vue from 'vue'
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
@@ -34,7 +33,6 @@ import {
   rtTargetarrArr,
   computeScale
 } from './util'
-import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
 import multiDrag from './multiDrag'
 
 const JSP = function () {
