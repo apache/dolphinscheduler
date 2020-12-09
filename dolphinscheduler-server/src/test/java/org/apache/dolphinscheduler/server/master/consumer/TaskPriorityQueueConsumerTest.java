@@ -42,8 +42,10 @@ import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -384,7 +386,9 @@ public class TaskPriorityQueueConsumerTest {
 
         taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
 
-        Thread.sleep(10000);
+        TimeUnit.SECONDS.sleep(10);
+
+        Assert.assertNotNull(taskInstance);
 
     }
 
