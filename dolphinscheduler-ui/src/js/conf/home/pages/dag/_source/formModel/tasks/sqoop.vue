@@ -773,21 +773,14 @@
       _getTargetTypeList(data){
         switch(data){
           case 'MYSQL':
-            if (this.srcQueryType === "1") {
-              this.targetTypeList = [
-                {
-                  code: "HDFS"
-                }]
-            } else {
-              this.targetTypeList = [
-                {
-                  code: "HIVE"
-                },
-                {
-                  code: "HDFS"
-                }
-              ]
-            }
+            this.targetTypeList = [
+              {
+                code: "HIVE"
+              },
+              {
+                code: "HDFS"
+              }
+            ]
             break;
           case 'HDFS':
             this.targetTypeList = [
