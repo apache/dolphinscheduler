@@ -921,7 +921,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>jacoco-site</id>
                         <phase>test</phase>
@@ -935,7 +934,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>post-unit-test</id>
                         <phase>test</phase>
@@ -943,7 +941,6 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>pre-integration-test</id>
                         <phase>pre-integration-test</phase>
@@ -951,7 +948,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>post-integration-test</id>
                         <phase>post-integration-test</phase>
