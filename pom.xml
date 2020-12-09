@@ -912,19 +912,12 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>default-prepare-agent</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>jacoco-initialize</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-site</id>
+                        <id>report</id>
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
