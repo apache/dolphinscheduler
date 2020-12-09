@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-v-ps<template>
+<template>
   <div class="list-model">
     <div class="table-box">
       <table class="fixed">
