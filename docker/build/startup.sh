@@ -22,24 +22,32 @@ DOLPHINSCHEDULER_BIN=${DOLPHINSCHEDULER_HOME}/bin
 DOLPHINSCHEDULER_SCRIPT=${DOLPHINSCHEDULER_HOME}/script
 DOLPHINSCHEDULER_LOGS=${DOLPHINSCHEDULER_HOME}/logs
 
-# start postgresql
-initPostgreSQL() {
-    echo "test postgresql service"
-    while ! nc -z ${POSTGRESQL_HOST} ${POSTGRESQL_PORT}; do
+# start database
+initDatabase() {
+    echo "test ${DATABASE_TYPE} service"
+    while ! nc -z ${DATABASE_HOST} ${DATABASE_PORT}; do
         counter=$((counter+1))
         if [ $counter == 30 ]; then
-            echo "Error: Couldn't connect to postgresql."
+            echo "Error: Couldn't connect to ${DATABASE_TYPE}."
             exit 1
         fi
-        echo "Trying to connect to postgresql at ${POSTGRESQL_HOST}:${POSTGRESQL_PORT}. Attempt $counter."
+        echo "Trying to connect to ${DATABASE_TYPE} at ${DATABASE_HOST}:${DATABASE_PORT}. Attempt $counter."
         sleep 5
     done
 
-    echo "connect postgresql service"
-    v=$(sudo -u postgres PGPASSWORD=${POSTGRESQL_PASSWORD} psql -h ${POSTGRESQL_HOST} -p ${POSTGRESQL_PORT} -U ${POSTGRESQL_USERNAME} -d dolphinscheduler -tAc "select 1")
-    if [ "$(echo '${v}' | grep 'FATAL' | wc -l)" -eq 1 ]; then
-        echo "Error: Can't connect to database...${v}"
-        exit 1
+    echo "connect ${DATABASE_TYPE} service"
+    if [ ${DATABASE_TYPE} = "mysql" ]; then
+        v=$(mysql -h${DATABASE_HOST} -P${DATABASE_PORT} -u${DATABASE_USERNAME} --password=${DATABASE_PASSWORD} -D ${DATABASE_DATABASE} -e "select 1" 2>&1)
+        if [ "$(echo ${v} | grep 'ERROR' | wc -l)" -eq 1 ]; then
+            echo "Error: Can't connect to database...${v}"
+            exit 1
+        fi
+    else
+        v=$(sudo -u postgres PGPASSWORD=${DATABASE_PASSWORD} psql -h ${DATABASE_HOST} -p ${DATABASE_PORT} -U ${DATABASE_USERNAME} -d ${DATABASE_DATABASE} -tAc "select 1")
+        if [ "$(echo ${v} | grep 'FATAL' | wc -l)" -eq 1 ]; then
+            echo "Error: Can't connect to database...${v}"
+            exit 1
+        fi
     fi
 
     echo "import sql data"
@@ -123,7 +131,7 @@ LOGFILE=/var/log/nginx/access.log
 case "$1" in
     (all)
         initZK
-        initPostgreSQL
+        initDatabase
         initMasterServer
         initWorkerServer
         initApiServer
@@ -134,25 +142,25 @@ case "$1" in
     ;;
     (master-server)
         initZK
-        initPostgreSQL
+        initDatabase
         initMasterServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-master.log
     ;;
     (worker-server)
         initZK
-        initPostgreSQL
+        initDatabase
         initWorkerServer
         initLoggerServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
     ;;
     (api-server)
         initZK
-        initPostgreSQL
+        initDatabase
         initApiServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
     ;;
     (alert-server)
-        initPostgreSQL
+        initDatabase
         initAlertServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-alert.log
     ;;
