@@ -67,7 +67,7 @@
       <span class="lang">
         <el-dropdown @command="_toggleLanguage">
           <span class="el-dropdown-link">
-            {{activeLocale.name}}<i class="el-icon-arrow-down el-icon-right"></i>
+            {{activeLocale.name}}<em class="el-icon-arrow-down el-icon-right"></em>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item :command="item.code" v-for="(item,$index) in localeList" :key="$index">{{item.name}}</el-dropdown-item>
@@ -76,7 +76,7 @@
       </span>
       <el-dropdown @command="_toggleUser">
         <span class="el-dropdown-link">
-          <i class="el-icon-user-solid"></i>{{userInfo.userName}}<i class="el-icon-arrow-down el-icon-right"></i>
+          <em class="el-icon-user-solid"></em>{{userInfo.userName}}<em class="el-icon-arrow-down el-icon-right"></em>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="user">

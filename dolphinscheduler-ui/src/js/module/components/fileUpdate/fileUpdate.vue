@@ -74,7 +74,7 @@
               <div class="file-update-box">
                 <template v-if="progress === 0">
                   <input name="file" id="file" type="file" class="file-update">
-                  <el-button type="dashed" size="mini">{{$t('Upload')}}<i class="el-icon-upload el-icon-right"></i></el-button>
+                  <el-button type="dashed" size="mini">{{$t('Upload')}}<em class="el-icon-upload el-icon-right"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>

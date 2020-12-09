@@ -30,7 +30,7 @@
             </el-input>
             <div class="p1" style="position: absolute;">
               <input name="file" id="file" type="file" class="file-update" v-if="!progress">
-              <el-button type="dashed" size="small" :disabled="progress !== 0">{{$t('Upload')}}<i class="el-icon-upload el-icon-right"></i></el-button>
+              <el-button type="dashed" size="small" :disabled="progress !== 0">{{$t('Upload')}}<em class="el-icon-upload el-icon-right"></em></el-button>
             </div>
           </div>
         </li>
