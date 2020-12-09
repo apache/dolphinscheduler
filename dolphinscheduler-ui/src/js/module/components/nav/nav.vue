@@ -67,7 +67,7 @@
       <span class="lang">
         <el-dropdown @command="_toggleLanguage">
           <span class="el-dropdown-link">
-            {{activeLocale.name}}<i class="el-icon-arrow-down el-icon--right"></i>
+            {{activeLocale.name}}<i class="el-icon-arrow-down el-icon-right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item :command="item.code" v-for="(item,$index) in localeList" :key="$index">{{item.name}}</el-dropdown-item>
@@ -76,7 +76,7 @@
       </span>
       <el-dropdown @command="_toggleUser">
         <span class="el-dropdown-link">
-          <i class="el-icon-user-solid"></i>{{userInfo.userName}}<i class="el-icon-arrow-down el-icon--right"></i>
+          <i class="el-icon-user-solid"></i>{{userInfo.userName}}<i class="el-icon-arrow-down el-icon-right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="user">
@@ -138,24 +138,28 @@
 
     <el-dialog
       :visible.sync="definitionUpdateDialog"
+      append-to-body="true"
       width="40%">
       <m-definition-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-definition-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileUpdateDialog"
+      append-to-body="true"
       width="40%">
-      <m-file-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-file-update>
+      <m-file-update :type="type" @onProgressFileUpdate="onProgressFileUpdate" @onUpdateFileUpdate="onUpdateFileUpdate" @onArchiveDefinition="onArchiveFileUpdate" @closeFileUpdate="closeFileUpdate"></m-file-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileChildUpdateDialog"
+      append-to-body="true"
       width="40%">
       <m-file-child-update :type="type" :id="id" @onProgressFileChildUpdate="onProgressFileChildUpdate" @onUpdateFileChildUpdate="onUpdateFileChildUpdate" @onArchiveFileChildUpdate="onArchiveFileChildUpdate" @closeFileChildUpdate="closeFileChildUpdate"></m-file-child-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="resourceChildUpdateDialog"
+      append-to-body="true"
       width="40%">
       <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateFileChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeFileChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
