@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,11 +119,11 @@ public class TaskPriorityQueueConsumer extends Thread {
 
     @Override
     public void run() {
-        int failedDispatchTasks = 0;
+        List<String> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()) {
             try {
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
-                failedDispatchTasks = 0;
+                failedDispatchTasks.clear();
                 for (int i = 0; i < fetchTaskNum; i++) {
                     if (taskPriorityQueue.size() <= 0) {
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -133,16 +134,22 @@ public class TaskPriorityQueueConsumer extends Thread {
                     TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
                     boolean dispatchResult = dispatch(taskPriority.getTaskId());
                     if (!dispatchResult) {
-                        taskPriorityQueue.put(taskPriorityInfo);
-                        ++failedDispatchTasks;
+                        failedDispatchTasks.add(taskPriorityInfo);
                     }
                 }
-                // If there are tasks in a cycle that cannot find the worker group,
-                // sleep for 1 second
-                if (failedDispatchTasks > 0 && taskPriorityQueue.size() <= fetchTaskNum) {
-                    TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                if (!failedDispatchTasks.isEmpty()) {
+                    for (String dispatchFailedTask : failedDispatchTasks) {
+                        taskPriorityQueue.put(dispatchFailedTask);
+                    }
+                    // If there are tasks in a cycle that cannot find the worker group,
+                    // sleep for 1 second
+                    if (taskPriorityQueue.size() <= fetchTaskNum) {
+                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                    }
                 }
+
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.error("dispatcher task error", e);
             }
         }
