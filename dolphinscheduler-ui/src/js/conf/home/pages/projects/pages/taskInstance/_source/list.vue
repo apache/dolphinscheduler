@@ -75,7 +75,7 @@
     <el-dialog
       :visible.sync="logDialog"
       width="30%">
-      <m-log :logData="logData" @ok="ok" @close="close"></m-log>
+      <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>
 </template>
@@ -93,11 +93,9 @@
         isAuth: Permissions.getAuth(),
         backfillItem: {},
         logDialog: false,
-        logData: {
-          item: {},
-          source: '',
-          logId: null
-        }
+        item: {},
+        source: '',
+        logId: null
       }
     },
     props: {
@@ -112,9 +110,9 @@
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       _refreshLog (item) {
-        this.logData.item = item
-        this.logData.source = 'list'
-        this.logData.logId = item.id
+        this.item = item
+        this.source = 'list'
+        this.logId = item.id
         this.logDialog = true
       },
       ok () {},

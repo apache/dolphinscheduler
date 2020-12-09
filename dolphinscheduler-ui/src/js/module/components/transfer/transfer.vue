@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="transferData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
         <div class="select-list-box">
           <div class="tf-header">
-            <div class="title">{{type.name}}{{$t('List')}}</div>
+            <div class="title">{{transferData.type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
           </div>
           <div class="scrollbar tf-content">
@@ -35,7 +35,7 @@
         <div class="select-oper-box">&nbsp;</div>
         <div class="select-list-box">
           <div class="tf-header">
-            <div class="title">{{$t('Selected')}}{{type.name}}</div>
+            <div class="title">{{$t('Selected')}}{{transferData.type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
           <div class="scrollbar tf-content">
@@ -50,6 +50,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import i18n from '@/module/i18n'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
@@ -57,25 +58,32 @@
     name: 'transfer',
     data () {
       return {
-        sourceList: this.sourceListPrs,
-        targetList: this.targetListPrs,
-        cacheSourceList: this.sourceListPrs,
-        cacheTargetList: this.targetListPrs,
+        sourceList: this.transferData.sourceListPrs,
+        targetList: this.transferData.targetListPrs,
+        cacheSourceList: this.transferData.sourceListPrs,
+        cacheTargetList: this.transferData.targetListPrs,
         searchSourceVal: '',
         searchTargetVal: ''
       }
     },
     props: {
-      sourceListPrs: Array,
-      targetListPrs: Array,
-      type: Object
+      transferData: Object
     },
     methods: {
       _ok () {
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
+          if(this.transferData.type.name === `${i18n.$t('Managing Users')}`) {
+            this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
+          } else if(this.transferData.type.name === `${i18n.$t('Project')}`) {
+            this.$emit('onUpdateAuthProject', _.map(this.targetList, v => v.id).join(','))
+          } else if(this.transferData.type.name === `${i18n.$t('Datasource')}`) {
+            this.$emit('onUpdateAuthDataSource', _.map(this.targetList, v => v.id).join(','))
+          } else if(this.transferData.type.name === `${i18n.$t('UDF Function')}`) {
+            this.$emit('onUpdateAuthUdfFunc', _.map(this.targetList, v => v.id).join(','))
+          }
+          
         }, 800)
       },
       _sourceQuery () {
@@ -105,7 +113,21 @@
         if (i2 !== -1) {
           this.cacheTargetList.splice(i2, 1)
         }
+      },
+      close () {
+        if(this.transferData.type.name === `${i18n.$t('Managing Users')}`) {
+          this.$emit('close')
+        } else if(this.transferData.type.name === `${i18n.$t('Project')}`) {
+          this.$emit('closeAuthProject')
+        } else if(this.transferData.type.name === `${i18n.$t('Datasource')}`) {
+          this.$emit('closeAuthDataSource')
+        } else if(this.transferData.type.name === `${i18n.$t('UDF Function')}`) {
+          this.$emit('closeAuthUdfFunc')
+        }
+        
       }
+    },
+    mounted() {
     },
     watch: {
       searchSourceVal (val) {

@@ -48,6 +48,12 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -84,7 +90,9 @@
           }
         },
         allNoResources: [],
-        noRes: []
+        noRes: [],
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -99,31 +107,11 @@
         this.localParams = a
       },
       setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
-
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
+      },
+      getSriptBoxValue (val) {
+        editor.setValue(val)
       },
       /**
        * return resourceList
@@ -355,7 +343,7 @@
       editor.toTextArea() // Uninstall
       editor.off($('.code-python-mirror'), 'keypress', this.keypress)
     },
-    components: { mLocalParams, mListBox, mResources,Treeselect }
+    components: { mLocalParams, mListBox, mResources,Treeselect, mScriptBox }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

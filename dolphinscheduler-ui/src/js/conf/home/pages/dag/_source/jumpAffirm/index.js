@@ -93,7 +93,7 @@ Affirm.isPop = (fn) => {
   }).catch(() => {
     fn()         
   })
-}
+} 
 
 /**
  * Whether the external setting pops up

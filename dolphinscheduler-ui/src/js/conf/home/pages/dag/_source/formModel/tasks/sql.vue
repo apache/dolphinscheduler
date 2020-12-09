@@ -136,6 +136,12 @@
         </m-statement-list>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -185,7 +191,9 @@
         // recipients
         receivers: [],
         // copy to
-        receiversCc: []
+        receiversCc: [],
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -195,31 +203,11 @@
     },
     methods: {
       setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
-
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
+      },
+      getSriptBoxValue (val) {
+        editor.setValue(val)
       },
       /**
        * return sqlType
@@ -518,7 +506,7 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

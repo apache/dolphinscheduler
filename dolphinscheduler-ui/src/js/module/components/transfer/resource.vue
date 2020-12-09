@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="resourceData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model" style="width: 660px">
         <div>
@@ -48,19 +48,19 @@
       return {
         valueConsistsOf: 'LEAF_PRIORITY',
         checkedValue: 'fileResource',
-        sourceList: this.fileSourceList,
-        targetList: this.fileTargetList,
-        cacheSourceList: this.fileSourceList,
-        cacheTargetList: this.fileTargetList,
+        sourceList: this.resourceData.fileSourceList,
+        targetList: this.resourceData.fileTargetList,
+        cacheSourceList: this.resourceData.fileSourceList,
+        cacheTargetList: this.resourceData.fileTargetList,
 
-        fileSource: this.fileSourceList,
+        fileSource: this.resourceData.fileSourceList,
         fileList: [],
         udfList: [],
         selectFileSource: [],
         selectUdfSource: [],
-        fileTarget: this.fileTargetList,
-        udfSource: this.udfSourceList,
-        udfTarget: this.udfTargetList,
+        fileTarget: this.resourceData.fileTargetList,
+        udfSource: this.resourceData.udfSourceList,
+        udfTarget: this.resourceData.udfTargetList,
         searchSourceVal: '',
         searchTargetVal: '',
         // define default value
@@ -73,11 +73,7 @@
       }
     },
     props: {
-      type: Object,
-      fileSourceList: Array,
-      udfSourceList: Array,
-      fileTargetList: Array,
-      udfTargetList: Array,
+      resourceData: Object
     },
     created() {
       let file = this.fileSourceList
@@ -86,8 +82,8 @@
       this.diGuiTree(udf)
       this.fileList = file
       this.udfList = udf
-      this.selectFileSource = this.fileTargetList
-      this.selectUdfSource = this.udfTargetList
+      this.selectFileSource = this.resourceData.fileTargetList
+      this.selectUdfSource = this.resourceData.udfTargetList
     },
     methods: {
       /*
@@ -153,7 +149,7 @@
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(selAllSource, v => v).join(','))
+          this.$emit('onUpdateAuthResource', _.map(selAllSource, v => v).join(','))
         }, 800)
       },
       _ckFile() {
@@ -223,6 +219,10 @@
           item.isDisabled =true
         }
         delete item.children
+      },
+      close() {
+        console.log(888)
+        this.$emit('closeAuthResource')
       }
     },
     watch: {

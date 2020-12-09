@@ -93,21 +93,15 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
       JSP.handleEventScreen({ item, is })
       break
     case 'download':
-      v.$modal.dialog({
-        width: 350,
-        closable: false,
-        showMask: true,
-        maskClosable: true,
-        title: i18n.$t('Download'),
-        content: i18n.$t('Please confirm whether the workflow has been saved before downloading'),
-        ok: {
-          handle (e) {
-            DownChart.download({
-              dagThis: self.dag
-            })
-          }
-        },
-        cancel: {}
+      Vue.prototype.$confirm(`${i18n.$t('Please confirm whether the workflow has been saved before downloading')}`, `${i18n.$t('Download')}`, {
+        confirmButtonText: `${i18n.$t('Confirm')}`,
+        cancelButtonText: `${i18n.$t('Cancel')}`,
+        type: 'warning'
+      }).then(() => {
+        DownChart.download({
+          dagThis: self.dag
+        })
+      }).catch(() => {        
       })
       break
   }

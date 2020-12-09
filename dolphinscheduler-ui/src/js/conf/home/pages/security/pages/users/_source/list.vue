@@ -46,10 +46,10 @@
               <el-dropdown trigger="click">
                 <el-button type="warning" size="mini" icon="el-icon-user" circle></el-button>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item @click.native="_authProject(scope.row,scope.row.id)">{{$t('Project')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authFile(scope.row,scope.row.id)">{{$t('Resources')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authDataSource(scope.row,scope.row.id)">{{$t('Datasource')}}</el-dropdown-item>
-                  <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.row.id)">{{$t('UDF Function')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authProject(scope.row,scope.$index)">{{$t('Project')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authFile(scope.row,scope.$index)">{{$t('Resources')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authDataSource(scope.row,scope.$index)">{{$t('Datasource')}}</el-dropdown-item>
+                  <el-dropdown-item @click.native="_authUdfFunc(scope.row,scope.$index)">{{$t('UDF Function')}}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-tooltip>
@@ -72,6 +72,29 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="authProjectDialog"
+      width="50%">
+      <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="authDataSourceDialog"
+      width="50%">
+      <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="authUdfFuncDialog"
+      width="50%">
+      <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="resourceDialog"
+      width="50%">
+      <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -85,7 +108,28 @@
     name: 'user-list',
     data () {
       return {
-        list: []
+        list: [],
+        authProjectDialog: false,
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: ''
+          }
+        },
+        item: {},
+        authDataSourceDialog: false,
+        authUdfFuncDialog: false,
+        resourceData: {
+          fileSourceList: [],
+          udfSourceList: [],
+          fileTargetList: [],
+          udfTargetList: [],
+          type: {
+            name: ''
+          }
+        },
+        resourceDialog: false
       }
     },
     props: {
@@ -126,39 +170,25 @@
               name: v.name
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (projectIds) {
-                    self._grantAuthorization('users/grant-project', {
-                      userId: item.id,
-                      projectIds: projectIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: `${i18n.$t('Project')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name  = `${i18n.$t('Project')}`
+          this.authProjectDialog = true
         })
       },
+      onUpdateAuthProject (projectIds) {
+        this._grantAuthorization('users/grant-project', {
+          userId: this.item.id,
+          projectIds: projectIds
+        })
+        this.authProjectDialog = false
+      },
+
+      closeAuthProject () {
+        this.authProjectDialog = false
+      },
+
       /*
         getAllLeaf
        */
@@ -182,13 +212,6 @@
           type: 'file',
           category: 'resources'
         }).then(data => {
-          // let sourceListPrs = _.map(data[0], v => {
-          //   return {
-          //     id: v.id,
-          //     name: v.alias,
-          //     type: v.type
-          //   }
-          // })
           let fileSourceList = []
           let udfSourceList = []
           data[0].forEach((value,index,array)=>{
@@ -222,43 +245,28 @@
           udfTargetList = _.map(udfTargetList, v => {
             return v.id
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mResource, {
-                on: {
-                  onUpdate (resourceIds) {
-                    self._grantAuthorization('users/grant-file', {
-                      userId: item.id,
-                      resourceIds: resourceIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  // sourceListPrs: sourceListPrs,
-                  // targetListPrs: targetListPrs,
-                  fileSourceList: fileSourceList,
-                  udfSourceList: udfSourceList,
-                  fileTargetList: fileTargetList,
-                  udfTargetList: udfTargetList,
-                  type: {
-                    name: `${i18n.$t('Resources')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.resourceData.fileSourceList = fileSourceList
+          this.resourceData.udfSourceList = udfSourceList
+          this.resourceData.fileTargetList = fileTargetList
+          this.resourceData.udfTargetList = udfTargetList
+          this.resourceData.type.name  = `${i18n.$t('Resources')}`
+          this.resourceDialog = true
         })
       },
+
+      onUpdateAuthResource (resourceIds) {
+        this._grantAuthorization('users/grant-file', {
+          userId: this.item.id,
+          resourceIds: resourceIds
+        })
+        this.resourceDialog = false
+      },
+
+      closeAuthResource () {
+        this.resourceDialog = false
+      },
+
       _authDataSource (item, i) {
         this.getAuthList({
           id: item.id,
@@ -277,39 +285,24 @@
               name: v.name
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (datasourceIds) {
-                    self._grantAuthorization('users/grant-datasource', {
-                      userId: item.id,
-                      datasourceIds: datasourceIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: `${i18n.$t('Datasource')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name  = `${i18n.$t('Datasource')}`
+          this.authDataSourceDialog = true
         })
       },
+      onUpdateAuthDataSource (datasourceIds) {
+        this._grantAuthorization('users/grant-datasource', {
+          userId: this.item.id,
+          datasourceIds: datasourceIds
+        })
+        this.authDataSourceDialog = false
+      },
+      closeAuthDataSource () {
+        this.authDataSourceDialog = false
+      },
+
       _authUdfFunc (item, i) {
         this.getAuthList({
           id: item.id,
@@ -328,39 +321,25 @@
               name: v.funcName
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (udfIds) {
-                    self._grantAuthorization('users/grant-udf-func', {
-                      userId: item.id,
-                      udfIds: udfIds
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: 'UDF Function'
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name  = `${i18n.$t('UDF Function')}`
+          this.authUdfFuncDialog = true
         })
       },
+      onUpdateAuthUdfFunc (udfIds) {
+        this._grantAuthorization('users/grant-udf-func', {
+          userId: this.item.id,
+          udfIds: udfIds
+        })
+        this.authUdfFuncDialog = false
+      },
+
+      closeAuthUdfFunc () {
+        this.authUdfFuncDialog = false
+      },
+
       _grantAuthorization (api, param) {
         this.grantAuthorization({
           api: api,
@@ -385,7 +364,7 @@
     },
     mounted () {
     },
-    components: { }
+    components: { mTransfer, mResource }
   }
 </script>
 

@@ -147,6 +147,18 @@
       width="40%">
       <m-file-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-file-update>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="fileChildUpdateDialog"
+      width="40%">
+      <m-file-child-update :type="type" :id="id" @onProgressFileChildUpdate="onProgressFileChildUpdate" @onUpdateFileChildUpdate="onUpdateFileChildUpdate" @onArchiveFileChildUpdate="onArchiveFileChildUpdate" @closeFileChildUpdate="closeFileChildUpdate"></m-file-child-update>
+    </el-dialog>
+
+    <el-dialog
+      :visible.sync="resourceChildUpdateDialog"
+      width="40%">
+      <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateFileChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeFileChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -184,6 +196,9 @@
         type: '',
         definitionUpdateDialog: false,
         fileUpdateDialog: false,
+        fileChildUpdateDialog: false,
+        id: null,
+        resourceChildUpdateDialog: false
       }
     },
 
@@ -262,80 +277,54 @@
           this._toggleArchive()
           return
         }
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'update-file-modal',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mFileChildUpdate, {
-              on: {
-                onProgress (val) {
-                  self.progress = val
-                },
-                onUpdate () {
-                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
-                  self.isUpdate = false
-                  self.progress = 0
-                  modal.remove()
-                },
-                onArchive () {
-                  self.isUpdate = true
-                },
-                close () {
-                  self.progress = 0
-                  modal.remove()
-                }
-              },
-              props: {
-                type: type,
-                id: data
-              }
-            })
-          }
-        })
+        this.type = true
+        this.id = data
+        this.fileChildUpdateDialog = true
       },
+
+      onProgressFileChildUpdate (val) {
+        this.progress = val
+      },
+      onUpdateFileChildUpdate () {
+        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+        this.isUpdate = false
+        this.progress = 0
+        this.fileChildUpdateDialog = false
+      },
+
+      onArchiveFileChildUpdate () {
+        this.isUpdate = true
+      },
+
+      closeFileChildUpdate () {
+        this.progress = 0
+        this.fileChildUpdateDialog = false
+      },
+
       _resourceChildUpdate (type,data) {
         if (this.progress) {
           this._toggleArchive()
           return
         }
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'update-file-modal',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mResourceChildUpdate, {
-              on: {
-                onProgress (val) {
-                  self.progress = val
-                },
-                onUpdate () {
-                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
-                  self.isUpdate = false
-                  self.progress = 0
-                  modal.remove()
-                },
-                onArchive () {
-                  self.isUpdate = true
-                },
-                close () {
-                  self.progress = 0
-                  modal.remove()
-                }
-              },
-              props: {
-                type: type,
-                id: data
-              }
-            })
-          }
-        })
+        this.type = type
+        this.id = data
+        this.resourceChildUpdateDialog = true
+      },
+      onProgressResourceChildUpdate (val) {
+        this.progress = val
+      },
+      onUpdateResourceChildUpdate () {
+        findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList(data)
+        this.isUpdate = false
+        this.progress = 0
+        this.resourceChildUpdateDialog = false
+      },
+      onArchiveResourceChildUpdate () {
+        this.isUpdate = true
+      },
+      closeResourceChildUpdate () {
+        this.progress = 0
+        this.resourceChildUpdateDialog = false
       },
       /**
        * Upload popup layer display
@@ -368,7 +357,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar, mDefinitionUpdate }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate }
   }
 </script>
 

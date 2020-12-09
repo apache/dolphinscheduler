@@ -48,7 +48,7 @@
     },
     mixins: [disabledState],
     props: {
-      item: String
+      jsonItem: String
     },
     methods: {
       /**
@@ -62,7 +62,7 @@
           readOnly: this.isDetails
         })
         editor.on("change",function(){
-          self.$emit('getSriptBoxValue',editor.getValue())
+          self.$emit('getJsonBoxValue',editor.getValue())
         })
 
         this.keypress = () => {
@@ -83,7 +83,7 @@
     },
     watch: {},
     created () {
-      let o = this.item
+      let o = this.jsonItem
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {

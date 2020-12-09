@@ -310,35 +310,7 @@ JSP.prototype.tasksContextmenu = function (event) {
         const name = store.state.dag.name
         const id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
-          const modal = Vue.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mStart, {
-                on: {
-                  onUpdate () {
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: {
-                    id: id,
-                    name: name
-                  },
-                  startNodeList: $name,
-                  sourceType: 'contextmenu'
-                }
-              })
-            }
-          })
-        }).catch(e => {
-          Vue.$message.error(e.msg || '')
+          this.dag.startRunning({id: id,name: name},$name,'contextmenu')
         })
       })
     }

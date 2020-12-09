@@ -37,7 +37,7 @@
         <el-table-column :label="$t('Operation')" width="130">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Managing Users')" placement="top">
-              <el-button type="primary" size="mini" icon="el-icon-user" @click="_mangeUser(scope.row)" circle></el-button>
+              <el-button type="primary" size="mini" icon="el-icon-user" @click="_mangeUser(scope.row, scope.$index)" circle></el-button>
             </el-tooltip>
             <el-tooltip :content="$t('Edit')" placement="top">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
@@ -58,6 +58,11 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="transferDialog"
+      width="40%">
+      <m-transfer :transferData="transferData" @onUpdate="onUpdate" @close="close"></m-transfer>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -70,7 +75,16 @@
     name: 'user-list',
     data () {
       return {
-        list: []
+        list: [],
+        transferDialog: false,
+        item: {},
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: `${i18n.$t('Managing Users')}`
+          }
+        }
       }
     },
     props: {
@@ -111,39 +125,23 @@
               name: v.userName
             }
           })
-          let self = this
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mTransfer, {
-                on: {
-                  onUpdate (userIds) {
-                    self._grantAuthorization('alert-group/grant-user', {
-                      userIds: userIds,
-                      alertgroupId: item.id
-                    })
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
-                  type: {
-                    name: `${i18n.$t('Managing Users')}`
-                  }
-                }
-              })
-            }
-          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferDialog = true
         })
       },
+      onUpdate (userIds) {
+        this._grantAuthorization('alert-group/grant-user', {
+          userIds: userIds,
+          alertgroupId: this.item.id
+        })
+        this.transferDialog = false
+      },
+      close () {
+        this.transferDialog = false
+      },
+
       _grantAuthorization (api, param) {
         this.grantAuthorization({
           api: api,
@@ -168,6 +166,6 @@
     },
     mounted () {
     },
-    components: { }
+    components: { mTransfer }
   }
 </script>

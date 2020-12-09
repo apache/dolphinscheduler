@@ -126,9 +126,6 @@
               name="code-json-mirror"
               style="opacity: 0;">
             </textarea>
-            <a class="ans-modal-box-max">
-              <em class="el-icon-rank" @click="setJsonEditorVal"></em>
-            </a>
           </div>
         </div>
       </m-list-box>
@@ -159,7 +156,12 @@
         <span>&nbsp;&nbsp;&nbsp;G</span>
       </div>
     </div>
-
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -216,6 +218,8 @@
         xms: 1,
         //jvm memory xms
         xmx: 1,
+        scriptBoxDialog: false,
+        item: '',
       }
     },
     mixins: [disabledState],
@@ -225,57 +229,11 @@
     },
     methods: {
       setEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  editor.setValue(val)
-                },
-                closeAble () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: editor.getValue()
-              }
-            })
-          }
-        })
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
       },
-      setJsonEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  jsonEditor.setValue(val)
-                },
-                closeAble () {
-                }
-              },
-              props: {
-                item: jsonEditor.getValue()
-              }
-            })
-          }
-        })
+      getSriptBoxValue (val) {
+        editor.setValue(val)
       },
       _onSwitch (is) {
         if(is) {
@@ -563,7 +521,7 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput }
+    components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput, mScriptBox }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

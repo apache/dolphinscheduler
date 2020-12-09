@@ -39,7 +39,7 @@
       left: 0;
       top: 0;
       height: 60px;
-      z-index: 10000;
+      z-index: 1000;
     }
     .m-bottom {
       position: absolute;

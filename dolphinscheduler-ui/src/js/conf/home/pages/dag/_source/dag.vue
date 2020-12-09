@@ -178,6 +178,13 @@
         width="45%">
         <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
+
+      <el-dialog
+      :title="$t('Please set the parameters before starting')"
+      :visible.sync="startDialog"
+      width="65%">
+      <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+    </el-dialog>
     </div>
   </div>
 </template>
@@ -197,6 +204,7 @@
   import disabledState from '@/module/mixin/disabledState'
   import { mapActions, mapState, mapMutations } from 'vuex'
   import mVersions from '../../projects/pages/definition/pages/list/_source/versions'
+  import mStart from '../../projects/pages/definition/pages/list/_source/start'
 
   let eventModel
 
@@ -246,6 +254,10 @@
         lineDrawer: false,
         udpDrawer: false,
         dialogVisible: false,
+        startDialog: false,
+        startData: {},
+        startNodeList: '',
+        sourceType: ''
       }
     },
     mixins: [disabledState],
@@ -256,7 +268,18 @@
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState', 'switchProcessDefinitionVersion', 'getProcessDefinitionVersionsPage', 'deleteProcessDefinitionVersion']),
       ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
-
+      startRunning(item,startNodeList,sourceType) {
+        this.startData = item
+        this.startNodeList.startNodeList
+        this.sourceType = sourceType
+        this.startDialog = true
+      },
+      onUpdateStart() {
+        this.startDialog = false
+      },
+      closeStart() {
+        this.startDialog = false
+      },
       // DAG automatic layout
       dagAutomaticLayout() {
         if(this.store.state.dag.isEditDag) {
@@ -812,7 +835,7 @@
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
     },
-    components: { mVersions, mFormModel, mFormLineModel, mUdp }
+    components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart }
   }
 </script>
 
