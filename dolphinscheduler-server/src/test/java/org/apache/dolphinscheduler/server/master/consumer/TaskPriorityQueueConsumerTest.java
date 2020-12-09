@@ -21,14 +21,17 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -44,7 +47,9 @@ import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -522,7 +527,7 @@ public class TaskPriorityQueueConsumerTest {
                 + "\"id\":\"tasks-55201\","
                 + "\"maxRetryTimes\":0,"
                 + "\"name\":\"测试任务\","
-                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
+                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[{\\\"id\\\":123},{\\\"res\\\":\\\"/data/file\\\"}]}\","
                 + "\"preTasks\":\"[]\","
                 + "\"retryInterval\":1,"
                 + "\"runFlag\":\"NORMAL\","
@@ -532,6 +537,7 @@ public class TaskPriorityQueueConsumerTest {
                 + "\\\"strategy\\\":\\\"\\\"}\","
                 + "\"type\":\"SHELL\","
                 + "\"workerGroup\":\"NoWorkGroup\"}");
+
         taskInstance.setProcessInstancePriority(Priority.MEDIUM);
         taskInstance.setWorkerGroup("NoWorkGroup");
         taskInstance.setExecutorId(2);
@@ -539,8 +545,63 @@ public class TaskPriorityQueueConsumerTest {
         TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
         Map<String, String>  map = taskPriorityQueueConsumer.getResourceFullNames(taskNode);
+
+        List<Resource> resourcesList = new ArrayList<Resource>();
+        Resource resource = new Resource();
+        resource.setFileName("fileName");
+        resourcesList.add(resource);
+
+        Mockito.doReturn(resourcesList).when(processService).listResourceByIds(new Integer[]{123});
+        Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(), ResourceType.FILE);
         Assert.assertNotNull(map);
 
+    }
+
+    @Test
+    public void testVerifyTenantIsNull() throws Exception {
+        Tenant tenant = null;
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(1);
+
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        taskInstance.setProcessInstance(processInstance);
+
+        boolean res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
+        Assert.assertTrue(res);
+
+        tenant = new Tenant();
+        tenant.setId(1);
+        tenant.setTenantCode("journey");
+        tenant.setDescription("journey");
+        tenant.setQueueId(1);
+        tenant.setCreateTime(new Date());
+        tenant.setUpdateTime(new Date());
+        res = taskPriorityQueueConsumer.verifyTenantIsNull(tenant,taskInstance);
+        Assert.assertFalse(res);
+
+    }
+
+    @Test
+    public void testSetDataxTaskRelation() throws Exception {
+
+        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+        TaskNode taskNode = new TaskNode();
+        taskNode.setParams("{\"dataSource\":1,\"dataTarget\":1}");
+        DataSource dataSource = new DataSource();
+        dataSource.setId(1);
+        dataSource.setConnectionParams("");
+        dataSource.setType(DbType.MYSQL);
+        Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
+
+        taskPriorityQueueConsumer.setDataxTaskRelation(dataxTaskExecutionContext,taskNode);
+
+        Assert.assertEquals(1,dataxTaskExecutionContext.getDataSourceId());
+        Assert.assertEquals(1,dataxTaskExecutionContext.getDataTargetId());
     }
 
     @After

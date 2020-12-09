@@ -274,7 +274,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
      * @param taskNode                  taskNode
      */
-    private void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
+    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
         DataxParameters dataxParameters = JSONUtils.parseObject(taskNode.getParams(), DataxParameters.class);
 
         DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
@@ -377,7 +377,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @param taskInstance taskInstance
      * @return result
      */
-    private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
+    protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if (tenant == null) {
             logger.error("tenant not exists,process instance id : {},task instance id : {}",
                 taskInstance.getProcessInstance().getId(),
