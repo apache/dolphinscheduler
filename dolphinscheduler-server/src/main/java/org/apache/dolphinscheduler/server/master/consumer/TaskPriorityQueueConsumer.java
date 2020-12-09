@@ -140,10 +140,13 @@ public class TaskPriorityQueueConsumer extends Thread {
                 for (String dispatchFailedTask : failedDispatchTasks) {
                     taskPriorityQueue.put(dispatchFailedTask);
                 }
-                if (failedDispatchTasks.size() > 0 && taskPriorityQueue.size() < 10) {
+                // If there are tasks in a cycle that cannot find the worker group,
+                // sleep for 1 second
+                if (failedDispatchTasks.size() > 0 && taskPriorityQueue.size() <= fetchTaskNum) {
                     TimeUnit.SECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 logger.error("dispatcher task error", e);
             }
         }
