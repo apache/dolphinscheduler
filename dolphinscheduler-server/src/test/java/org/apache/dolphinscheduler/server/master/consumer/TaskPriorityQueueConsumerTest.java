@@ -604,7 +604,6 @@ public class TaskPriorityQueueConsumerTest {
         Assert.assertEquals(1,dataxTaskExecutionContext.getDataTargetId());
     }
 
-
     @Test
     public void testRun() throws Exception {
         TaskInstance taskInstance = new TaskInstance();
@@ -654,11 +653,10 @@ public class TaskPriorityQueueConsumerTest {
 
         taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
 
-        taskPriorityQueue.put("x_1_2_1_NoWorkGroup");
-
-        TimeUnit.SECONDS.sleep(10);
         taskPriorityQueueConsumer.run();
 
+        taskPriorityQueue = null;
+        TimeUnit.SECONDS.sleep(10);
     }
 
     @After
