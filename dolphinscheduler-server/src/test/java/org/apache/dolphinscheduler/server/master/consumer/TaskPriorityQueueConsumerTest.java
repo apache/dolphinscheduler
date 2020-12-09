@@ -604,6 +604,63 @@ public class TaskPriorityQueueConsumerTest {
         Assert.assertEquals(1,dataxTaskExecutionContext.getDataTargetId());
     }
 
+
+    @Test
+    public void testRun() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
+                + "\"conditionsTask\":false,"
+                + "\"depList\":[],"
+                + "\"dependence\":\"{}\","
+                + "\"forbidden\":false,"
+                + "\"id\":\"tasks-55201\","
+                + "\"maxRetryTimes\":0,"
+                + "\"name\":\"测试任务\","
+                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
+                + "\"preTasks\":\"[]\","
+                + "\"retryInterval\":1,"
+                + "\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"MEDIUM\","
+                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+                + "\"timeout\":\"{\\\"enable\\\":false,"
+                + "\\\"strategy\\\":\\\"\\\"}\","
+                + "\"type\":\"SHELL\","
+                + "\"workerGroup\":\"NoWorkGroup\"}");
+        taskInstance.setProcessInstancePriority(Priority.MEDIUM);
+        taskInstance.setWorkerGroup("NoWorkGroup");
+        taskInstance.setExecutorId(2);
+
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setTenantId(1);
+        processInstance.setCommandType(CommandType.START_PROCESS);
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setUserId(2);
+        processDefinition.setProjectId(1);
+        taskInstance.setProcessDefine(processDefinition);
+
+        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
+        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+
+        Stopper.stop();
+
+        taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
+
+        taskPriorityQueue.put("x_1_2_1_NoWorkGroup");
+
+        TimeUnit.SECONDS.sleep(10);
+        taskPriorityQueueConsumer.run();
+
+    }
+
     @After
     public void close() {
         Stopper.stop();
