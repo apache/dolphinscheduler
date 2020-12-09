@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import Vue from 'vue'
-let v = new Vue()
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
