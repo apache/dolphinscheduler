@@ -149,7 +149,6 @@ public class TaskPriorityQueueConsumer extends Thread {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
                 logger.error("dispatcher task error", e);
             }
         }
