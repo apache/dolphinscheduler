@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.task.procedure;
+package org.apache.dolphinscheduler.server.worker.task.processdure;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.server.worker.task.processdure.ProcedureTask;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
