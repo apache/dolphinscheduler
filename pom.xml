@@ -854,6 +854,7 @@
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/cache/TaskExecutionContextCacheManagerTest.java</include>
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
