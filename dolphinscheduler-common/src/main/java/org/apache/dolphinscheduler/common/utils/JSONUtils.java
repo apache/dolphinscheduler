@@ -70,7 +70,6 @@ public class JSONUtils {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .configure(ALLOW_UNQUOTED_FIELD_NAMES,true)
-            .enable(ALLOW_UNQUOTED_FIELD_NAMES)
             .setTimeZone(TimeZone.getDefault());
 
     private JSONUtils() {
