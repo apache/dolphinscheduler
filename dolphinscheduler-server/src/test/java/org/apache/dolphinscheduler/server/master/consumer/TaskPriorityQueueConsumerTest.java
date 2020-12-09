@@ -122,6 +122,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setExecutorId(2);
 
         ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
         processInstance.setTenantId(1);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
@@ -132,9 +133,13 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
+        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+
         taskPriorityQueue.put("2_1_2_1_default");
 
-        Thread.sleep(10000);
+        TimeUnit.SECONDS.sleep(10);
+
+        Assert.assertNotNull(taskInstance);
     }
 
     @Test
