@@ -154,7 +154,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private boolean dispatch(int taskInstanceId) {
+    protected boolean dispatch(int taskInstanceId) {
         boolean result = false;
         try {
             TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
@@ -390,7 +390,7 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * get resource map key is full name and value is tenantCode
      */
-    private Map<String, String> getResourceFullNames(TaskNode taskNode) {
+    protected Map<String, String> getResourceFullNames(TaskNode taskNode) {
         Map<String, String> resourceMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 

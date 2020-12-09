@@ -21,12 +21,15 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -42,6 +45,7 @@ import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -188,7 +192,8 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
 
-        Thread.sleep(10000);
+        TimeUnit.SECONDS.sleep(10);
+        Assert.assertNotNull(taskInstance);
     }
 
     @Test
@@ -248,7 +253,8 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
         Mockito.doReturn(dataSource).when(processService).findDataSourceById(80);
-        Thread.sleep(10000);
+        TimeUnit.SECONDS.sleep(10);
+        Assert.assertNotNull(taskInstance);
     }
 
     @Test
@@ -314,7 +320,8 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
         Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
-        Thread.sleep(10000);
+        TimeUnit.SECONDS.sleep(10);
+        Assert.assertNotNull(taskInstance);
     }
 
     @Test
@@ -341,7 +348,8 @@ public class TaskPriorityQueueConsumerTest {
 
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        taskPriorityQueueConsumer.taskInstanceIsFinalState(1);
+        Boolean state = taskPriorityQueueConsumer.taskInstanceIsFinalState(1);
+        Assert.assertNotNull(state);
     }
 
     @Test
@@ -394,6 +402,144 @@ public class TaskPriorityQueueConsumerTest {
         TimeUnit.SECONDS.sleep(10);
 
         Assert.assertNotNull(taskInstance);
+
+    }
+
+    @Test
+    public void testDispatch() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
+                + "\"conditionsTask\":false,"
+                + "\"depList\":[],"
+                + "\"dependence\":\"{}\","
+                + "\"forbidden\":false,"
+                + "\"id\":\"tasks-55201\","
+                + "\"maxRetryTimes\":0,"
+                + "\"name\":\"测试任务\","
+                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
+                + "\"preTasks\":\"[]\","
+                + "\"retryInterval\":1,"
+                + "\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"MEDIUM\","
+                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+                + "\"timeout\":\"{\\\"enable\\\":false,"
+                + "\\\"strategy\\\":\\\"\\\"}\","
+                + "\"type\":\"SHELL\","
+                + "\"workerGroup\":\"NoWorkGroup\"}");
+        taskInstance.setProcessInstancePriority(Priority.MEDIUM);
+        taskInstance.setWorkerGroup("NoWorkGroup");
+        taskInstance.setExecutorId(2);
+
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setTenantId(1);
+        processInstance.setCommandType(CommandType.START_PROCESS);
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setUserId(2);
+        processDefinition.setProjectId(1);
+        taskInstance.setProcessDefine(processDefinition);
+
+        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
+        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+
+        boolean res  = taskPriorityQueueConsumer.dispatch(1);
+
+        Assert.assertFalse(res);
+    }
+
+    @Test
+    public void testGetTaskExecutionContext() throws Exception {
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
+                + "\"conditionsTask\":false,"
+                + "\"depList\":[],"
+                + "\"dependence\":\"{}\","
+                + "\"forbidden\":false,"
+                + "\"id\":\"tasks-55201\","
+                + "\"maxRetryTimes\":0,"
+                + "\"name\":\"测试任务\","
+                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
+                + "\"preTasks\":\"[]\","
+                + "\"retryInterval\":1,"
+                + "\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"MEDIUM\","
+                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+                + "\"timeout\":\"{\\\"enable\\\":false,"
+                + "\\\"strategy\\\":\\\"\\\"}\","
+                + "\"type\":\"SHELL\","
+                + "\"workerGroup\":\"NoWorkGroup\"}");
+        taskInstance.setProcessInstancePriority(Priority.MEDIUM);
+        taskInstance.setWorkerGroup("NoWorkGroup");
+        taskInstance.setExecutorId(2);
+
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setTenantId(1);
+        processInstance.setCommandType(CommandType.START_PROCESS);
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setState(ExecutionStatus.DELAY_EXECUTION);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setUserId(2);
+        processDefinition.setProjectId(1);
+        taskInstance.setProcessDefine(processDefinition);
+
+        Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
+        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
+
+        TaskExecutionContext taskExecutionContext  = taskPriorityQueueConsumer.getTaskExecutionContext(1);
+
+        Assert.assertNotNull(taskExecutionContext);
+    }
+
+    @Test
+    public void testGetResourceFullNames() throws Exception {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setProcessDefinitionId(1);
+        taskInstance.setProcessInstanceId(1);
+        taskInstance.setState(ExecutionStatus.KILL);
+        taskInstance.setTaskJson("{\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],\\\"failedNode\\\":[\\\"\\\"]}\","
+                + "\"conditionsTask\":false,"
+                + "\"depList\":[],"
+                + "\"dependence\":\"{}\","
+                + "\"forbidden\":false,"
+                + "\"id\":\"tasks-55201\","
+                + "\"maxRetryTimes\":0,"
+                + "\"name\":\"测试任务\","
+                + "\"params\":\"{\\\"rawScript\\\":\\\"echo \\\\\\\"测试任务\\\\\\\"\\\",\\\"localParams\\\":[],\\\"resourceList\\\":[]}\","
+                + "\"preTasks\":\"[]\","
+                + "\"retryInterval\":1,"
+                + "\"runFlag\":\"NORMAL\","
+                + "\"taskInstancePriority\":\"MEDIUM\","
+                + "\"taskTimeoutParameter\":{\"enable\":false,\"interval\":0},"
+                + "\"timeout\":\"{\\\"enable\\\":false,"
+                + "\\\"strategy\\\":\\\"\\\"}\","
+                + "\"type\":\"SHELL\","
+                + "\"workerGroup\":\"NoWorkGroup\"}");
+        taskInstance.setProcessInstancePriority(Priority.MEDIUM);
+        taskInstance.setWorkerGroup("NoWorkGroup");
+        taskInstance.setExecutorId(2);
+        // task node
+        TaskNode taskNode = JSONUtils.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+
+        Map<String, String>  map = taskPriorityQueueConsumer.getResourceFullNames(taskNode);
+        Assert.assertNotNull(map);
 
     }
 
