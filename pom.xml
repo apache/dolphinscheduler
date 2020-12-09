@@ -847,14 +847,12 @@
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
-                        <include>**/server/worker/processor/TaskKillProcessorTest.java</include>
                         <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
-                        <include>**/server/worker/cache/TaskExecutionContextCacheManagerTest.java</include>
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
@@ -912,12 +910,13 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>jacoco-initialize</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>report</id>
+                        <id>jacoco-site</id>
                         <phase>test</phase>
                         <goals>
                             <goal>report</goal>
