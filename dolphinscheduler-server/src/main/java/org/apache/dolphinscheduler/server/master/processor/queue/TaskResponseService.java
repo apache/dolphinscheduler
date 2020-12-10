@@ -138,8 +138,9 @@ public class TaskResponseService {
             case ACK:
                 try {
                     TaskInstance taskInstance = processService.findTaskInstanceById(taskResponseEvent.getTaskInstanceId());
-                    if (taskInstance != null && !taskInstance.getState().typeIsFinished()) {
-                        processService.changeTaskState(taskInstance, taskResponseEvent.getState(),
+                    if (taskInstance != null) {
+                        ExecutionStatus status = taskInstance.getState().typeIsFinished() ? taskInstance.getState() : taskResponseEvent.getState();
+                        processService.changeTaskState(taskInstance, status,
                             taskResponseEvent.getStartTime(),
                             taskResponseEvent.getWorkerAddress(),
                             taskResponseEvent.getExecutePath(),
