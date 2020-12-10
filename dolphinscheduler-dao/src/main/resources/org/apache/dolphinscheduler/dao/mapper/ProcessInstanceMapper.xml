@@ -93,7 +93,6 @@
         instance.run_times, instance.recovery, instance.host
         from t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_id = define.id
-        where 1=1
         and instance.is_sub_process=0
         and define.project_id = #{projectId}
         <if test="processDefinitionId != 0">
