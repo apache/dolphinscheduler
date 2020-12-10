@@ -43,7 +43,7 @@
       <div class="cont">
         <template>
           <el-popover
-            placement="bottom"
+            placement="bottom-start"
             trigger="click">
             <template slot="reference">
               <el-input
