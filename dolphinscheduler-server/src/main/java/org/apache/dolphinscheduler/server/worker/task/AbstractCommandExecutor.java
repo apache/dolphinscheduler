@@ -179,6 +179,7 @@ public abstract class AbstractCommandExecutor {
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
         }
 
         // print process id
