@@ -32,6 +32,8 @@ import org.springframework.context.annotation.FilterType;
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
+
+    System.out.println("java版本号:" + System.getProperty("java.version"));
     SpringApplication.run(ApiApplicationServer.class, args);
   }
 
