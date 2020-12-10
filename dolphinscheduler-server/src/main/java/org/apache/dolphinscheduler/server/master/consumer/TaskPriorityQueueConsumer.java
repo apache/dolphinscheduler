@@ -233,7 +233,6 @@ public class TaskPriorityQueueConsumer extends Thread {
         // SQL task
         if (taskType == TaskType.SQL) {
             setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
-
         }
 
         // DATAX task
@@ -283,19 +282,19 @@ public class TaskPriorityQueueConsumer extends Thread {
     protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
         DataxParameters dataxParameters = JSONUtils.parseObject(taskNode.getParams(), DataxParameters.class);
 
-        DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
-        DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
+        DataSource dbSource = processService.findDataSourceById(dataxParameters.getDataSource());
+        DataSource dbTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
 
-        if (dataSource != null) {
+        if (dbSource != null) {
             dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-            dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-            dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+            dataxTaskExecutionContext.setSourcetype(dbSource.getType().getCode());
+            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
         }
 
-        if (dataTarget != null) {
+        if (dbTarget != null) {
             dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            dataxTaskExecutionContext.setTargetType(dbTarget.getType().getCode());
+            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
         }
     }
 
@@ -397,7 +396,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * get resource map key is full name and value is tenantCode
      */
     protected Map<String, String> getResourceFullNames(TaskNode taskNode) {
-        Map<String, String> resourceMap = new HashMap<>();
+        Map<String, String> resourcesMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
@@ -409,7 +408,7 @@ public class TaskPriorityQueueConsumer extends Thread {
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
 
                     oldVersionResources.forEach(
-                        (t) -> resourceMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
+                        (t) -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
                     );
                 }
 
@@ -422,12 +421,12 @@ public class TaskPriorityQueueConsumer extends Thread {
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
                     resources.forEach(
-                        (t) -> resourceMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
+                        (t) -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
                     );
                 }
             }
         }
 
-        return resourceMap;
+        return resourcesMap;
     }
 }
