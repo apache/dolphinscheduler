@@ -63,6 +63,7 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      ZOOKEEPER_ROOT: /dolphinscheduler
       DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
       DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
     healthcheck:
@@ -162,6 +163,7 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      ZOOKEEPER_ROOT: /dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
       interval: 30s
@@ -198,6 +200,7 @@ services:
       DATABASE_PASSWORD: root
       DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+      ZOOKEEPER_ROOT: /dolphinscheduler
       DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE: "HDFS"
       DOLPHINSCHEDULER_FS_DEFAULTFS: "file:///data/dolphinscheduler"
     healthcheck:

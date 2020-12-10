@@ -38,9 +38,9 @@ export DATABASE_PARAMS=${DATABASE_PARAMS:-"characterEncoding=utf8"}
 #============================================================================
 export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
 export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
-export RESOURCE_STORAGE_TYPE=${DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE:-"HDFS"}
+export DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE=${DOLPHINSCHEDULER_RESOURCE_STORAGE_TYPE:-"HDFS"}
 export RESOURCE_UPLOAD_PATH=${RESOURCE_UPLOAD_PATH:-"/ds"}
-export FS_DEFAULT_FS=${DOLPHINSCHEDULER_FS_DEFAULT_FS:-"file:///data/dolphinscheduler"}
+export DOLPHINSCHEDULER_FS_DEFAULTFS=${DOLPHINSCHEDULER_FS_DEFAULTFS:-"file:///data/dolphinscheduler"}
 export FS_S3A_ENDPOINT=${FS_S3A_ENDPOINT:-"s3.xxx.amazonaws.com"}
 export FS_S3A_ACCESS_KEY=${FS_S3A_ACCESS_KEY:-"xxxxxxx"}
 export FS_S3A_SECRET_KEY=${FS_S3A_SECRET_KEY:-"xxxxxxx"}
