@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -26,7 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import java.util.Date;
 
 /**
- * subflow task exec thread
+ *  subflow task exec thread
  */
 public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
@@ -37,10 +36,9 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * sub process task exec thread
-     *
-     * @param taskInstance task instance
+     * @param taskInstance      task instance
      */
-    public SubProcessTaskExecThread(TaskInstance taskInstance) {
+    public SubProcessTaskExecThread(TaskInstance taskInstance){
         super(taskInstance);
     }
 
@@ -48,11 +46,11 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean submitWaitComplete() {
 
         Boolean result = false;
-        try {
+        try{
             // submit task instance
             this.taskInstance = submit();
 
-            if (taskInstance == null) {
+            if(taskInstance == null){
                 logger.error("sub work flow submit task instance to mysql and queue failed , please check and fix it");
                 return result;
             }
@@ -61,22 +59,21 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
 
             // at the end of the subflow , the task state is changed to the subflow state
-            if (subProcessInstance != null) {
-                if (subProcessInstance.getState() == ExecutionStatus.STOP) {
+            if(subProcessInstance != null){
+                if(subProcessInstance.getState() == ExecutionStatus.STOP){
                     this.taskInstance.setState(ExecutionStatus.KILL);
-                } else {
+                }else{
                     this.taskInstance.setState(subProcessInstance.getState());
                 }
             }
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
             logger.info("subflow task :{} id:{}, process id:{}, exec thread completed ",
-                    this.taskInstance.getName(), taskInstance.getId(), processInstance.getId());
+                    this.taskInstance.getName(),taskInstance.getId(), processInstance.getId() );
             result = true;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("exception: ", e);
+        }catch (Exception e){
+            logger.error("exception: ",e);
             if (null != taskInstance) {
                 logger.error("wait task quit failed, instance id:{}, task id:{}",
                         processInstance.getId(), taskInstance.getId());
@@ -85,12 +82,14 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
         return result;
     }
 
+
     /**
-     * set task instance state
+     *  set task instance state
+     * @return
      */
-    private boolean setTaskInstanceState() {
+    private boolean setTaskInstanceState(){
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
+        if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
             return false;
         }
 
@@ -101,12 +100,12 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     * updateProcessInstance parent state
+     *  updateProcessInstance parent state
      */
-    private void updateParentProcessState() {
+    private void updateParentProcessState(){
         ProcessInstance parentProcessInstance = processService.findProcessInstanceById(this.processInstance.getId());
 
-        if (parentProcessInstance == null) {
+        if(parentProcessInstance == null){
             logger.error("parent work flow instance is null ,  please check it! work flow id {}", processInstance.getId());
             return;
         }
@@ -115,6 +114,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * wait task quit
+     * @throws InterruptedException
      */
     private void waitTaskQuit() throws InterruptedException {
 
@@ -131,7 +131,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             // waiting for subflow process instance establishment
             if (subProcessInstance == null) {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                if (!setTaskInstanceState()) {
+                if(!setTaskInstanceState()){
                     continue;
                 }
             }
@@ -141,13 +141,13 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                 handleTimeoutFailed();
             }
             updateParentProcessState();
-            if (subProcessInstance.getState().typeIsFinished()) {
+            if (subProcessInstance.getState().typeIsFinished()){
                 break;
             }
-            if (this.processInstance.getState() == ExecutionStatus.READY_PAUSE) {
+            if(this.processInstance.getState() == ExecutionStatus.READY_PAUSE){
                 // parent process "ready to pause" , child process "pause"
                 pauseSubProcess();
-            } else if (this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP) {
+            }else if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
                 // parent Process "Ready to Cancel" , subflow "Cancel"
                 stopSubProcess();
             }
@@ -159,8 +159,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      * stop sub process
      */
     private void stopSubProcess() {
-        if (subProcessInstance.getState() == ExecutionStatus.STOP
-                || subProcessInstance.getState() == ExecutionStatus.READY_STOP) {
+        if(subProcessInstance.getState() == ExecutionStatus.STOP ||
+                subProcessInstance.getState() == ExecutionStatus.READY_STOP){
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
@@ -171,8 +171,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      * pause sub process
      */
     private void pauseSubProcess() {
-        if (subProcessInstance.getState() == ExecutionStatus.PAUSE
-                || subProcessInstance.getState() == ExecutionStatus.READY_PAUSE) {
+        if(subProcessInstance.getState() == ExecutionStatus.PAUSE ||
+                subProcessInstance.getState() == ExecutionStatus.READY_PAUSE){
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
