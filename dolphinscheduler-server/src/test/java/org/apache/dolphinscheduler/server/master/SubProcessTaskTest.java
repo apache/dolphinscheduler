@@ -161,8 +161,12 @@ public class SubProcessTaskTest {
     public void testSubmitWaitComplete() throws Exception {
         TaskInstance taskInstance = testBasicInit(ExecutionStatus.FAILURE);
         SubProcessTaskExecThread taskExecThread = new SubProcessTaskExecThread(taskInstance);
-        taskExecThread.submitWaitComplete();
-        taskExecThread.call();
-        Assert.assertEquals(ExecutionStatus.FAILURE, taskExecThread.getTaskInstance().getState());
+        Exception errorInfo = null;
+        try {
+            taskExecThread.submitWaitComplete();
+        } catch (Exception e) {
+            errorInfo = e;
+        }
+        Assert.assertNotNull(errorInfo);
     }
 }
