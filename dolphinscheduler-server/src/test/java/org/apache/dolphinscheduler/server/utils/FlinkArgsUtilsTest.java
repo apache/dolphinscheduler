@@ -46,9 +46,9 @@ public class FlinkArgsUtilsTest {
     public ProgramType programType = ProgramType.JAVA;
     public String mainClass = "com.test";
     public ResourceInfo mainJar = null;
-    public String mainArgs = "testArgs";
+    public String mainArgs = "testArgs --input file:///home";
     public String queue = "queue1";
-    public String others = "--input file:///home";
+    public String others = "-p 4";
     public String flinkVersion = "<1.10";
 
 
@@ -109,20 +109,20 @@ public class FlinkArgsUtilsTest {
         assertEquals("-ytm", result.get(10));
         assertEquals(result.get(11),taskManagerMemory);
 
-        assertEquals("-d", result.get(12));
+        assertEquals("-yqu", result.get(12));
+        assertEquals(result.get(13),queue);
 
-        assertEquals("-c", result.get(13));
-        assertEquals(result.get(14),mainClass);
+        assertEquals("-d", result.get(14));
 
-        assertEquals(result.get(15),mainJar.getRes());
-        assertEquals(result.get(16),mainArgs);
+        assertEquals(result.get(15),others);
 
-        assertEquals("--qu", result.get(17));
-        assertEquals(result.get(18),queue);
+        assertEquals("-c", result.get(16));
+        assertEquals(result.get(17),mainClass);
 
-        assertEquals(result.get(19),others);
+        assertEquals(result.get(18),mainJar.getRes());
+        assertEquals(result.get(19),mainArgs);
 
-        //Others param without --qu
+        //Others param without -yqu
         FlinkParameters param1 = new FlinkParameters();
         param1.setQueue(queue);
         param1.setDeployMode(mode);
