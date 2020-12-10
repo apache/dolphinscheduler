@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Before;
@@ -233,8 +232,7 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\",\"database\":\"dolphinscheduler_qiaozhanwei\",\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\",\"user\":\"root\",\"password\":\"root@123\"}");
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
-
-        Mockito.when(processService.findDataSourceById(1)).thenReturn(dataSource);
+        Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);
         Thread.sleep(10000);
     }
 

@@ -14,20 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
-public enum QueryType {
+public enum SqoopQueryType {
 
-    FORM,
-    SQL;
+    FORM(0, "SQOOP_QUERY_FORM"),
+    SQL(1, "SQOOP_QUERY_SQL");
 
-    public static QueryType getEnum(int value){
-        for (QueryType e:QueryType.values()) {
-            if(e.ordinal() == value) {
-                return e;
-            }
-        }
-        //For values out of enum scope
-        return null;
+    private final Integer code;
+
+    private final String desc;
+
+    SqoopQueryType(Integer code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

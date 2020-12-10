@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -24,7 +26,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -35,8 +36,6 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
-import org.apache.commons.collections.MapUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +48,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.alibaba.fastjson.JSONObject;
 
 /**
  * task scheduler thread
@@ -83,15 +80,22 @@ public class TaskExecuteThread implements Runnable {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     /**
-     * constructor
-     *
+     * task logger
+     */
+    private Logger taskLogger;
+
+    /**
+     *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService) {
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
+            , TaskCallbackService taskCallbackService
+            , Logger taskLogger) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskLogger = taskLogger;
     }
 
     @Override
@@ -120,14 +124,7 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            // custom logger
-            Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskExecutionContext.getProcessDefineId(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
-
-            task = TaskManager.newTask(taskExecutionContext,
-                    taskLogger);
+            task = TaskManager.newTask(taskExecutionContext, taskLogger);
 
             // task init
             task.init();
