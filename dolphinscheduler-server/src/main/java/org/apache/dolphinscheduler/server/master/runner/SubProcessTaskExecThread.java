@@ -159,7 +159,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      * stop sub process
      */
     private void stopSubProcess() {
-        if (subProcessInstance.getState() == ExecutionStatus.STOP ||  subProcessInstance.getState() == ExecutionStatus.READY_STOP) {
+        if (subProcessInstance.getState() == ExecutionStatus.STOP
+                || subProcessInstance.getState() == ExecutionStatus.READY_STOP) {
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
@@ -170,7 +171,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      * pause sub process
      */
     private void pauseSubProcess() {
-        if (subProcessInstance.getState() == ExecutionStatus.PAUSE || subProcessInstance.getState() == ExecutionStatus.READY_PAUSE) {
+        if (subProcessInstance.getState() == ExecutionStatus.PAUSE
+                || subProcessInstance.getState() == ExecutionStatus.READY_PAUSE) {
             return;
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
