@@ -38,6 +38,10 @@ public class AlertClientService {
 
     private volatile boolean isRunning;
 
+    private String host;
+
+    private int port;
+
     /**
      * request time out
      */
@@ -53,12 +57,34 @@ public class AlertClientService {
     }
 
     /**
+     * alert client
+     */
+    public AlertClientService(String host, int port) {
+        this.clientConfig = new NettyClientConfig();
+        this.client = new NettyRemotingClient(clientConfig);
+        this.isRunning = true;
+        this.host = host;
+        this.port = port;
+    }
+
+    /**
      * close
      */
     public void close() {
         this.client.close();
         this.isRunning = false;
         logger.info("alter client closed");
+    }
+
+    /**
+     * alert sync send data
+     * @param groupId
+     * @param title
+     * @param content
+     * @return
+     */
+    public AlertSendResponseCommand sendAlert(int groupId, String title,  String content) {
+        return this.sendAlert(this.host,this.port,groupId,title,content);
     }
 
     /**

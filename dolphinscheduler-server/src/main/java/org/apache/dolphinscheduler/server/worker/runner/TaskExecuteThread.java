@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -37,6 +38,7 @@ import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContext
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
+import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import org.apache.commons.collections.MapUtils;
@@ -54,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.rholder.retry.RetryException;
-
 
 /**
  *  task scheduler thread
@@ -92,17 +93,23 @@ public class TaskExecuteThread implements Runnable {
     private Logger taskLogger;
 
     /**
+     * alert client server
+     */
+    private AlertClientService alertClientService;
+
+    /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
     public TaskExecuteThread(TaskExecutionContext taskExecutionContext
             , TaskCallbackService taskCallbackService
-            , Logger taskLogger) {
+            , Logger taskLogger, AlertClientService alertClientService) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
         this.taskLogger = taskLogger;
+        this.alertClientService = alertClientService;
     }
 
     @Override
@@ -140,7 +147,7 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            task = TaskManager.newTask(taskExecutionContext, taskLogger);
+            task = TaskManager.newTask(taskExecutionContext, taskLogger, alertClientService);
 
             // task init
             task.init();
@@ -201,10 +208,10 @@ public class TaskExecuteThread implements Runnable {
         // the default timeout is the maximum value of the integer
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         TaskTimeoutParameter taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
-        if (taskTimeoutParameter.getEnable()){
+        if (taskTimeoutParameter.getEnable()) {
             // get timeout strategy
             taskExecutionContext.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy().getCode());
-            switch (taskTimeoutParameter.getStrategy()){
+            switch (taskTimeoutParameter.getStrategy()) {
                 case WARN:
                     break;
                 case FAILED:
@@ -225,20 +232,18 @@ public class TaskExecuteThread implements Runnable {
         }
     }
 
-
     /**
      *  kill task
      */
-    public void kill(){
-        if (task != null){
+    public void kill() {
+        if (task != null) {
             try {
                 task.cancelApplication(true);
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error(e.getMessage(),e);
             }
         }
     }
-
 
     /**
      * download resource file
@@ -250,7 +255,7 @@ public class TaskExecuteThread implements Runnable {
     private void downloadResource(String execLocalPath,
                                   Map<String,String> projectRes,
                                   Logger logger) throws Exception {
-        if (MapUtils.isEmpty(projectRes)){
+        if (MapUtils.isEmpty(projectRes)) {
             return;
         }
 
@@ -267,7 +272,7 @@ public class TaskExecuteThread implements Runnable {
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
-                }catch (Exception e){
+                } catch (Exception e) {
                     logger.error(e.getMessage(),e);
                     throw new RuntimeException(e.getMessage());
                 }

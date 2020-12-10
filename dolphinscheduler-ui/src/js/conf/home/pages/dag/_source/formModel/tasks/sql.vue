@@ -35,12 +35,14 @@
                   :sql-type="sqlType">
           </m-sql-type>
         </div>
+        <!--
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
             <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
             <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
           </x-checkbox-group>
         </div>
+        -->
       </div>
     </m-list-box>
     <template v-if="sqlType==0">
@@ -50,21 +52,21 @@
           <x-input
             type="input"
             v-model="title"
-            :placeholder="$t('Please enter the title of email')"
+            :placeholder="$t('Please enter the title of alert')"
             autocomplete="off">
           </x-input>
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
+        <!-- TODO Wait for the alarm group/instance page to be developed and add specific content -->
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('AlertGroup')}}</div>
         <div slot="content">
-          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
-        </div>
-      </m-list-box>
-      <m-list-box>
-        <div slot="text">{{$t('Cc')}}</div>
-        <div slot="content">
-          <m-email ref="refCc" v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+          <x-input
+            type="input"
+            v-model="groupId"
+            :placeholder="$t('Please select the alert group')"
+            autocomplete="off">
+          </x-input>
         </div>
       </m-list-box>
     </template>
@@ -174,6 +176,8 @@
         sqlType: '0',
         // Email title
         title: '',
+        // Alert groupId
+        groupId: '',
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
@@ -181,11 +185,7 @@
         // Pre statements
         preStatements: [],
         // Post statements
-        postStatements: [],
-        // recipients
-        receivers: [],
-        // copy to
-        receiversCc: []
+        postStatements: []
       }
     },
     mixins: [disabledState],
@@ -275,24 +275,18 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
+        /*
         if (this.sqlType==0 && !this.showType.length) {
           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
           return false
         }
+         */
         if (this.sqlType==0 && !this.title) {
-          this.$message.warning(`${i18n.$t('Mail subject required')}`)
+          this.$message.warning(`${i18n.$t('Please enter the title of alert')}`)
           return false
         }
-        if (this.sqlType==0 && !this.receivers.length) {
-          this.$message.warning(`${i18n.$t('Recipient required')}`)
-          return false
-        }
-        // receivers Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refEmail._manualEmail()) {
-          return false
-        }
-        // receiversCc Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType==0 && !this.groupId) {
+          this.$message.warning(`${i18n.$t('Please select the alert group')}`)
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -325,8 +319,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
+          groupId: this.groupId,
           showType: (() => {
             /**
              * Special processing return order TABLE,ATTACHMENT
@@ -387,10 +380,7 @@
         } else {
           param.processInstanceId = current.params.id
         }
-        this.store.dispatch('dag/getReceiver', param).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
-        })
+
       },
       _cacheParams () {
         this.$emit('on-cache-params', {
@@ -400,8 +390,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
+          groupId: this.groupId,
           showType: (() => {
 
             let showType = this.showType
@@ -433,8 +422,7 @@
         }
         if (val != 0) {
           this.title = ''
-          this.receivers = []
-          this.receiversCc = []
+          this.groupId = ''
         }
       },
       // Listening data source
@@ -469,8 +457,7 @@
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''
-        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
-        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+        this.groupId = o.params.groupId || ''
       }
       // read tasks from cache
       if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
@@ -501,8 +488,7 @@
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
+          groupId: this.groupId,
           showType: (() => {
 
             let showType = this.showType
