@@ -64,26 +64,26 @@
         <el-table-column :label="$t('Operation')" width="240" fixed="right">
           <template slot-scope="scope">
             <div v-show="scope.row.disabled">
-              <el-tooltip :content="$t('Edit')" placement="top">
+              <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
                 <span>
                   <el-button type="primary" size="mini" icon="el-icon-edit-outline" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'" @click="_reEdit(scope.row)" circle></el-button>
                 </span>
               </el-tooltip>
-              <el-tooltip :content="$t('Rerun')" placement="top">
+              <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
                 <span><el-button type="primary" size="mini" :disabled="scope.row.state !== 'SUCCESS' && scope.row.state !== 'PAUSE' && scope.row.state !== 'FAILURE' && scope.row.state !== 'STOP'"  icon="el-icon-refresh" @click="_reRun(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="$t('Recovery Failed')" placement="top">
+              <el-tooltip :content="$t('Recovery Failed')" placement="top" :enterable="false">
                 <span>
                   <el-button type="success" size="mini" icon="el-icon-circle-close" :disabled="scope.row.state !== 'FAILURE'" @click="_restore(scope.row,scope.$index)" circle></el-button>
                 </span>
               </el-tooltip>
-              <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top">
+              <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
                 <span><el-button type="warning" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state != 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top">
+              <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
                 <span><el-button type="error" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
-              <el-tooltip :content="$t('delete')" placement="top">
+              <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
                 <el-button type="danger" size="mini" icon="el-icon-delete" circle></el-button>
                 <el-popconfirm
                   :confirmButtonText="$t('Confirm')"
@@ -95,7 +95,7 @@
                   <el-button type="danger" size="mini" icon="el-icon-delete" :disabled="scope.row.releaseState === 'ONLINE'" circle slot="reference"></el-button>
                 </el-popconfirm>
               </el-tooltip>
-              <el-tooltip :content="$t('Gantt')" placement="top">
+              <el-tooltip :content="$t('Gantt')" placement="top" :enterable="false">
                 <span><el-button type="primary" size="mini" icon="el-icon-s-operation" @click="_gantt(scope.row)" circle></el-button></span>
               </el-tooltip>
             </div>
@@ -110,7 +110,7 @@
               </el-button>
 
               <!--Rerun-->
-              <el-tooltip :content="$t('Rerun')" placement="top">
+              <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
                 <span>
                   <el-button
                     v-show="buttonType === 'run'"
@@ -207,7 +207,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-tooltip :content="$t('delete')" placement="top">
+    <el-tooltip :content="$t('delete')" placement="top" :enterable="false">
       <el-popconfirm
         :confirmButtonText="$t('Confirm')"
         :cancelButtonText="$t('Cancel')"

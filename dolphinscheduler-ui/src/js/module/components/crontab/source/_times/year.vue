@@ -27,9 +27,9 @@
           <el-radio label="intervalYear">
             <span class="text">{{$t('每隔')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-            <span class="text">{{$t('年执行 从')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('年执行 从')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-            <span class="text">{{$t('年开始')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('年开始')}}</span>
           </el-radio>
         </div>
         <div class="list-box">
@@ -49,9 +49,9 @@
           <el-radio label="cycleYear">
             <span class="text">{{$t('周期从')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-            <span class="text">{{$t('到')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('到')}}</span>
             <m-input-number :min="2019" :max="2030" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-            <span class="text">{{$t('年')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('年')}}</span>
           </el-radio>
         </div>
       </el-radio-group>

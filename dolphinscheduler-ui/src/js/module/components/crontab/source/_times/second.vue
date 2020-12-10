@@ -27,9 +27,9 @@
           <el-radio label="intervalSecond">
             <span class="text">{{$t('每隔')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-            <span class="text">{{$t('秒执行 从')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('秒执行 从')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-            <span class="text">{{$t('秒开始')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('秒开始')}}</span>
           </el-radio>
         </div>
         <div class="list-box">
@@ -49,9 +49,9 @@
           <el-radio label="cycleSecond">
             <span class="text">{{$t('周期从')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-            <span class="text">{{$t('到')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('到')}}</span>
             <m-input-number :min="0" :max="59" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-            <span class="text">{{$t('秒')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('秒')}}</span>
           </el-radio>
         </div>
       </el-radio-group>

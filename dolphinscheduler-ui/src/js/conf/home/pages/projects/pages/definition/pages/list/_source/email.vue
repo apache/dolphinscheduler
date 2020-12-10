@@ -299,6 +299,8 @@
 <style lang="scss" rel="stylesheet/scss">
   .email-model {
     width: 100%;
+    border: 1px solid #dcdfe6;
+    border-radius: 5px;
     .input-element {
       min-height: 32px;
       padding: 1px 8px;

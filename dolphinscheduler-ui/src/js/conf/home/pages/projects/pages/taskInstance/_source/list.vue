@@ -59,12 +59,12 @@
         <el-table-column :label="$t('Operation')" width="80" fixed="right">
           <template slot-scope="scope">
             <div>
-              <el-tooltip :content="$t('Force success')" placement="top">
+              <el-tooltip :content="$t('Force success')" placement="top" :enterable="false">
                 <span>
                   <el-button type="primary" size="mini" icon="el-icon-success" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_forceSuccess(scope.row)" circle></el-button>
                 </span>
               </el-tooltip>
-              <el-tooltip :content="$t('View log')" placement="top">
+              <el-tooltip :content="$t('View log')" placement="top" :enterable="false">
                 <span><el-button type="primary" size="mini" :disabled="scope.row.taskType==='SUB_PROCESS'? true: false"  icon="el-icon-tickets" @click="_refreshLog(scope.row)" circle></el-button></span>
               </el-tooltip>
             </div>

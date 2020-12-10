@@ -161,7 +161,7 @@
 <style lang="scss">
   @import "index";
   .v-crontab {
-    width: 640px;
+    width: 780px;
     border:1px solid #e4e7ed;
     background: #fff;
     border-radius: 4px;

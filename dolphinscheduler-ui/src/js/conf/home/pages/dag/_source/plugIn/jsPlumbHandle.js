@@ -297,7 +297,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     $contextmenu.css({
       left: $left,
       top: $top,
-      visibility: 'visible'
+      visibility: 'visible',
     })
     // Action bar
     $contextmenu.html('').append(operationHtml)

@@ -100,7 +100,6 @@
   .input-number-model {
     display: inline-block;
     button{
-      background: #f5f7fa;
       padding: 6px 10px;
       position: relative;
       .bt-text {
