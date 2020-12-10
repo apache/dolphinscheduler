@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +34,15 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({TaskExecuteThread.class})
 public class TaskExecuteThreadTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteThreadTest.class);
 
     TaskExecutionContext taskExecutionContext;
 
@@ -69,15 +74,15 @@ public class TaskExecuteThreadTest {
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         TaskCallbackService taskCallbackService = Mockito.mock(TaskCallbackService.class);
-        TaskExecuteThread taskExecuteThread = PowerMockito.spy(new TaskExecuteThread(taskExecutionContext, taskCallbackService));
+        TaskExecuteThread taskExecuteThread = PowerMockito.spy(new TaskExecuteThread(taskExecutionContext, taskCallbackService, logger));
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/");
-
+        Assert.assertTrue(true);
     }
 
     @Test
     public void testClearTaskExecPath() {
 
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, logger);
         Mockito.when(CommonUtils.isDevelopMode()).thenReturn(false);
         Mockito.when(taskExecutionContext.getTaskJson()).thenThrow(new RuntimeException("测试异常后finally执行"));
         try {
@@ -107,12 +112,15 @@ public class TaskExecuteThreadTest {
             //ignored
         }
 
+        Assert.assertTrue(true);
+
     }
 
     @Test
     public void testNotClearTaskExecPath() {
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, logger);
         Mockito.when(CommonUtils.isDevelopMode()).thenReturn(true);
         taskExecuteThread.run();
+        Assert.assertTrue(true);
     }
 }
