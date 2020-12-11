@@ -747,7 +747,6 @@
        * query the process definition pagination version
        */
       _version (item) {
-        let self = this
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,

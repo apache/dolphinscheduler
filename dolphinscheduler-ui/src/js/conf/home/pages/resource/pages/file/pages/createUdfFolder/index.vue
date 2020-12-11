@@ -60,11 +60,9 @@
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import { folderList } from '../_source/common'
-  import { handlerSuffix } from '../details/_source/utils'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mSpin from '@/module/components/spin/spin'
   import mConditions from '@/module/components/conditions/conditions'
-  import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {

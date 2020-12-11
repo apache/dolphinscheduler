@@ -163,7 +163,6 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import dayjs from 'dayjs'
   import mEmail from './email.vue'
   import store from '@/conf/home/store'

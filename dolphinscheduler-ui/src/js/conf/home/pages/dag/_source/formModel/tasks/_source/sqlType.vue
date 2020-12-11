@@ -32,7 +32,6 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import { sqlTypeList } from './commcon'
   import disabledState from '@/module/mixin/disabledState'
   export default {

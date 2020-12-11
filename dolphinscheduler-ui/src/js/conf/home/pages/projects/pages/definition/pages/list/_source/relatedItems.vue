@@ -40,7 +40,6 @@
   </m-popup>
 </template>
 <script>
-  import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'

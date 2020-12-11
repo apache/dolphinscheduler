@@ -31,7 +31,6 @@
 </template>
 <script>
   import _ from 'lodash'
-  import i18n from '@/module/i18n'
   import mListBox from './listBox'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'

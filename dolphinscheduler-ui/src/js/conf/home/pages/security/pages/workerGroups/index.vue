@@ -53,7 +53,6 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateWorker from './_source/createWorker'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'

@@ -724,11 +724,9 @@
           this.failedBranch = o.conditionResult.failedNode[0]
         }
         // If the workergroup has been deleted, set the default workergroup
-        var hasMatch = false
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
           var workerGroup = this.store.state.security.workerGroupsListAll[i].id
           if (o.workerGroup === workerGroup) {
-            hasMatch = true
             break
           }
         }
