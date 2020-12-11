@@ -19,45 +19,48 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit token') : $t('Create token')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-token-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Expiration time')}}</template>
           <template slot="content">
-            <x-datepicker
-                    :disabled-date="disabledDate"
-                    v-model="expireTime"
-                    @on-change="_onChange"
-                    format="YYYY-MM-DD HH:mm:ss"
-                    :panelNum="1">
-            </x-datepicker>
+            <el-date-picker
+                type="datetime"
+                :picker-options="pickerOptions"
+                v-model="expireTime"
+                @on-change="_onChange"
+                format="yyyy-MM-dd HH:mm:ss"
+                size="small">
+            </el-date-picker>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="auth">
           <template slot="name"><strong>*</strong>{{$t('User')}}</template>
           <template slot="content">
-            <x-select v-model="userId" @on-change="_onChange">
-              <x-option
+            <el-select v-model="userId" @change="_onChange" size="small">
+              <el-option
                       v-for="city in userIdList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.userName">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">Token</template>
           <template slot="content">
-            <x-input
+            <el-input
                     readonly
                     style="width: 306px;"
                     type="input"
+                    size="small"
                     v-model="token"
                     :placeholder="$t('Please enter token')">
-            </x-input>
-            <x-button type="ghost" @click="_generateToken" :loading="tokenLoading">{{$t('Generate token')}}</x-button>
+            </el-input>
+            <el-button size="small" @click="_generateToken" :loading="tokenLoading">{{$t('Generate token')}}</el-button>
           </template>
         </m-list-box-f>
       </div>
@@ -84,7 +87,12 @@
         token: '',
         userIdList: [],
         tokenLoading: false,
-        auth: !Permissions.getAuth()
+        auth: !Permissions.getAuth(),
+        pickerOptions: {
+          disabledDate(time) {
+              return time.getTime() < Date.now() - 8.64e7  //当前时间以后可以选择当前时间
+          },
+        }
       }
     },
     props: {
@@ -142,6 +150,9 @@
       },
       _onChange () {
         this.token = ''
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

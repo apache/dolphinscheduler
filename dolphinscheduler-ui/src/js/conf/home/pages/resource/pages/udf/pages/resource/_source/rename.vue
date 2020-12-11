@@ -15,30 +15,30 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" :asyn-loading="true">
+  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" @close="close" :asyn-loading="true">
     <template slot="content">
       <div class="resource-rename-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -102,6 +102,9 @@
             resolve()
           }
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

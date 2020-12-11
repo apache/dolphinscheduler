@@ -25,7 +25,6 @@
   export default {
     name: 'security-index',
     mounted() {
-      this.$modal.destroy()
     },
     components: { mSecondaryMenu }
   }

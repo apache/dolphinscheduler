@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="resourceData.type.name + $t('Authorize')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model" style="width: 660px">
         <div>
-            <x-button-group v-model="checkedValue" size="small">
-                <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
-                <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
-            </x-button-group>
+            <el-button-group>
+                <el-button size="mini" value="fileResource" @click="_ckFile">{{$t('File resources')}}</el-button>
+                <el-button size="mini" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</el-button>
+            </el-button-group>
         </div>
         <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true"  maxHeight="200" :options="fileList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
@@ -30,32 +30,6 @@
         <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" maxHeight="200" :options="udfList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <!-- <div class="select-list-box">
-          <div class="tf-header">
-            <div class="title">{{type.name}}{{$t('List')}}</div>
-            <div class="count">（{{cacheSourceList.length}}）</div>
-          </div>
-          <div class="scrollbar tf-content">
-            <ul>
-              <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
-                <span :title="item.name">{{item.name}}</span>
-                <a href="javascript:"></a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="select-oper-box">&nbsp;</div>
-        <div class="select-list-box">
-          <div class="tf-header">
-            <div class="title">{{$t('Selected')}}{{type.name}}</div>
-            <div class="count">（{{cacheTargetList.length}}）</div>
-          </div>
-          <div class="scrollbar tf-content">
-            <ul>
-              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
-            </ul>
-          </div>
-        </div> -->
       </div>
     </template>
   </m-popup>
@@ -74,19 +48,19 @@
       return {
         valueConsistsOf: 'LEAF_PRIORITY',
         checkedValue: 'fileResource',
-        sourceList: this.fileSourceList,
-        targetList: this.fileTargetList,
-        cacheSourceList: this.fileSourceList,
-        cacheTargetList: this.fileTargetList,
+        sourceList: this.resourceData.fileSourceList,
+        targetList: this.resourceData.fileTargetList,
+        cacheSourceList: this.resourceData.fileSourceList,
+        cacheTargetList: this.resourceData.fileTargetList,
 
-        fileSource: this.fileSourceList,
+        fileSource: this.resourceData.fileSourceList,
         fileList: [],
         udfList: [],
         selectFileSource: [],
         selectUdfSource: [],
-        fileTarget: this.fileTargetList,
-        udfSource: this.udfSourceList,
-        udfTarget: this.udfTargetList,
+        fileTarget: this.resourceData.fileTargetList,
+        udfSource: this.resourceData.udfSourceList,
+        udfTarget: this.resourceData.udfTargetList,
         searchSourceVal: '',
         searchTargetVal: '',
         // define default value
@@ -99,11 +73,7 @@
       }
     },
     props: {
-      type: Object,
-      fileSourceList: Array,
-      udfSourceList: Array,
-      fileTargetList: Array,
-      udfTargetList: Array,
+      resourceData: Object
     },
     created() {
       let file = this.fileSourceList
@@ -112,8 +82,8 @@
       this.diGuiTree(udf)
       this.fileList = file
       this.udfList = udf
-      this.selectFileSource = this.fileTargetList
-      this.selectUdfSource = this.udfTargetList
+      this.selectFileSource = this.resourceData.fileTargetList
+      this.selectUdfSource = this.resourceData.udfTargetList
     },
     methods: {
       /*
@@ -179,7 +149,7 @@
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(selAllSource, v => v).join(','))
+          this.$emit('onUpdateAuthResource', _.map(selAllSource, v => v).join(','))
         }, 800)
       },
       _ckFile() {
@@ -249,6 +219,10 @@
           item.isDisabled =true
         }
         delete item.children
+      },
+      close() {
+        console.log(888)
+        this.$emit('closeAuthResource')
       }
     },
     watch: {
