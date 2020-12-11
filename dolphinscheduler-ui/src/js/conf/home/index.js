@@ -35,7 +35,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
-import 'font-awesome/css/font-awesome.min.css' 
+import 'font-awesome/css/font-awesome.min.css'
 
 // Component internationalization
 const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}

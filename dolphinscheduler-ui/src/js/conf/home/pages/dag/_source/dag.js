@@ -21,7 +21,7 @@ import { jsPlumb } from 'jsplumb'
 import JSP from './plugIn/jsPlumbHandle'
 import DownChart from './plugIn/downChart'
 import store from '@/conf/home/store'
-import dagre from "dagre"
+import dagre from 'dagre'
 
 /**
  * Prototype method
@@ -52,7 +52,7 @@ Dag.prototype.setConfig = function (o) {
  */
 Dag.prototype.create = function () {
   const self = this
-  let plumbIns = jsPlumb.getInstance()
+  const plumbIns = jsPlumb.getInstance()
   plumbIns.reset()
   plumbIns.ready(() => {
     JSP.init({
@@ -77,7 +77,7 @@ Dag.prototype.create = function () {
  * Action event on the right side of the toolbar
  */
 Dag.prototype.toolbarEvent = function ({ item, code, is }) {
-  let self = this
+  const self = this
   switch (code) {
     case 'pointer':
       JSP.handleEventPointer(is)
@@ -100,7 +100,7 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
         DownChart.download({
           dagThis: self.dag
         })
-      }).catch(() => {        
+      }).catch(() => {
       })
       break
   }
@@ -123,7 +123,7 @@ Dag.prototype.backfill = function (arg) {
 
     for (const i in store.state.dag.connects) {
       const connect = store.state.dag.connects[i]
-      g.setEdge(connect['endPointSourceId'], connect['endPointTargetId'])
+      g.setEdge(connect.endPointSourceId, connect.endPointTargetId)
     }
     dagre.layout(g)
 
@@ -159,7 +159,7 @@ Dag.prototype.backfill = function (arg) {
       })
     })
   } else {
-    let plumbIns = jsPlumb.getInstance()
+    const plumbIns = jsPlumb.getInstance()
     plumbIns.reset()
     plumbIns.ready(() => {
       JSP.init({

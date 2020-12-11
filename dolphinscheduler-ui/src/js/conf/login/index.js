@@ -27,10 +27,9 @@ import i18n from '@/module/i18n'
 
 import 'sass/conf/login/index.scss'
 import 'bootstrap/dist/js/bootstrap.min.js'
-import 'font-awesome/css/font-awesome.min.css' 
+import 'font-awesome/css/font-awesome.min.css'
 
 i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
-
 
 Vue.config.devtools = true
 Vue.config.productionTip = true

@@ -86,7 +86,7 @@ JSP.prototype.init = function ({ dag, instance, options }) {
     if (this.config.isClick) {
       this.connectClick(e)
     } else {
-      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId})
+      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({ id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId })
     }
   })
 
@@ -206,8 +206,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       taskType: v.type,
       runFlag: v.runFlag,
       nodenumber: locations[v.id].nodenumber,
-      successNode: v.conditionResult === undefined? '' : v.conditionResult.successNode[0],
-      failedNode: v.conditionResult === undefined? '' : v.conditionResult.failedNode[0]
+      successNode: v.conditionResult === undefined ? '' : v.conditionResult.successNode[0],
+      failedNode: v.conditionResult === undefined ? '' : v.conditionResult.failedNode[0]
     }))
 
     // contextmenu event
@@ -297,7 +297,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     $contextmenu.css({
       left: $left,
       top: $top,
-      visibility: 'visible',
+      visibility: 'visible'
     })
     // Action bar
     $contextmenu.html('').append(operationHtml)
@@ -308,7 +308,7 @@ JSP.prototype.tasksContextmenu = function (event) {
         const name = store.state.dag.name
         const id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
-          this.dag.startRunning({id: id,name: name},$name,'contextmenu')
+          this.dag.startRunning({ id: id, name: name }, $name, 'contextmenu')
         })
       })
     }
@@ -468,7 +468,7 @@ JSP.prototype.removeNodes = function ($id) {
 
   // callback onRemoveNodes event
   this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
-  let connects = []
+  const connects = []
   _.map(this.JspInstance.getConnections(), v => {
     connects.push({
       endPointSourceId: v.sourceId,
@@ -627,7 +627,7 @@ JSP.prototype.saveStore = function () {
         tasks.push(tasksParam)
       }
     })
-    if(store.state.dag.connects.length ===this.JspInstance.getConnections().length) {
+    if (store.state.dag.connects.length === this.JspInstance.getConnections().length) {
       _.map(store.state.dag.connects, u => {
         connects.push({
           endPointSourceId: u.endPointSourceId,
@@ -635,7 +635,7 @@ JSP.prototype.saveStore = function () {
           label: u.label
         })
       })
-    } else if(store.state.dag.connects.length>0 && store.state.dag.connects.length < this.JspInstance.getConnections().length) {
+    } else if (store.state.dag.connects.length > 0 && store.state.dag.connects.length < this.JspInstance.getConnections().length) {
       _.map(this.JspInstance.getConnections(), v => {
         connects.push({
           endPointSourceId: v.sourceId,
@@ -645,12 +645,12 @@ JSP.prototype.saveStore = function () {
       })
       _.map(store.state.dag.connects, u => {
         _.map(connects, v => {
-          if(u.label && u.endPointSourceId === v.endPointSourceId && u.endPointTargetId===v.endPointTargetId) {
+          if (u.label && u.endPointSourceId === v.endPointSourceId && u.endPointTargetId === v.endPointTargetId) {
             v.label = u.label
           }
         })
       })
-    } else if(store.state.dag.connects.length===0) {
+    } else if (store.state.dag.connects.length === 0) {
       _.map(this.JspInstance.getConnections(), v => {
         connects.push({
           endPointSourceId: v.sourceId,
@@ -659,7 +659,7 @@ JSP.prototype.saveStore = function () {
         })
       })
     }
-    
+
     _.map(tasksAll(), v => {
       locations[v.id] = {
         name: v.name,
@@ -752,7 +752,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
     _.map(connects, v => {
       let sourceId = v.endPointSourceId.split('-')
       let targetId = v.endPointTargetId.split('-')
-      let labels = v.label
+      const labels = v.label
       if (sourceId.length === 4 && targetId.length === 4) {
         sourceId = `${sourceId[0]}-${sourceId[1]}-${sourceId[2]}`
         targetId = `${targetId[0]}-${targetId[1]}-${targetId[2]}`
@@ -760,24 +760,24 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         sourceId = v.endPointSourceId
         targetId = v.endPointTargetId
       }
-      
-      if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-successnode') === $(`#${targetId}`).find('.name-p').text()) {
+
+      if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-successnode') === $(`#${targetId}`).find('.name-p').text()) {
         this.JspInstance.connect({
           source: sourceId,
           target: targetId,
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: labels} ]]
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
         })
-      } else if($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
+      } else if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
         this.JspInstance.connect({
           source: sourceId,
           target: targetId,
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#252d39' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: labels} ]]
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
         })
       } else {
         this.JspInstance.connect({
@@ -785,8 +785,8 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
           target: targetId,
           type: 'basic',
           paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-          HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3},
-          overlays:[["Label", { label: labels} ]]
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
         })
       }
     })
