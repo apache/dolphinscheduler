@@ -97,8 +97,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
-  import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Treeselect from '@riophae/vue-treeselect'
@@ -413,7 +411,7 @@
     },
     destroyed () {
     },
-    components: { mLocalParams, mListBox, mResources, mScriptBox, Treeselect }
+    components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

@@ -53,7 +53,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
 
@@ -166,7 +165,7 @@
       clearInterval(this.setIntervalP)
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 

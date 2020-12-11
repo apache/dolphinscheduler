@@ -58,7 +58,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import { findComponentDownward } from '@/module/util/'
 
@@ -152,7 +151,7 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 

@@ -70,7 +70,6 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
-  import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -123,7 +122,7 @@
     },
     mounted () {
     },
-    components: { mListConstruction, mSpin, mNoData }
+    components: { mListConstruction, mSpin }
   }
 
 </script>

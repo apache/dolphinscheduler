@@ -61,7 +61,6 @@
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
   import mScriptBox from './_source/scriptBox'
-  import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -348,7 +347,7 @@
       editor.toTextArea() // Uninstall
       editor.off($('.code-python-mirror'), 'keypress', this.keypress)
     },
-    components: { mLocalParams, mListBox, mResources, Treeselect, mScriptBox }
+    components: { mLocalParams, mListBox, Treeselect, mScriptBox }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>
