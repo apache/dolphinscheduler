@@ -147,7 +147,9 @@
         this.dependTaskList = _.cloneDeep(o.dependence.dependTaskList) || []
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
-        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState))
+        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
+          v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState
+        }))
       }
     },
     mounted () {
