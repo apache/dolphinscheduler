@@ -384,7 +384,7 @@
                   let state = dom.find('.state-p')
                   let depState = ''
                   taskList.forEach(item => {
-                    if (item.name == v1.name) {
+                    if (item.name === v1.name) {
                       depState = item.state
                     }
                   })
@@ -511,7 +511,7 @@
       },
       _closeDAG () {
         let $name = this.$route.name
-        if ($name && $name.indexOf('definition') != -1) {
+        if ($name && $name.indexOf('definition') !== -1) {
           this.$router.push({ name: 'projects-definition-list' })
         } else {
           this.$router.push({ name: 'projects-instance-list' })
@@ -521,7 +521,7 @@
         let tasks = value
         let bool = true
         tasks.map(v => {
-          if (v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] == '' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] == '' || v.conditionResult.failedNode[0] == null)) {
+          if (v.type === 'CONDITIONS' && (v.conditionResult.successNode[0] === '' || v.conditionResult.successNode[0] === null || v.conditionResult.failedNode[0] === '' || v.conditionResult.failedNode[0] === null)) {
             bool = false
             return false
           }
@@ -694,7 +694,7 @@
         this.nodeDrawer = true
       },
       removeEventModelById ($id) {
-        if (eventModel && this.taskId == $id) {
+        if (eventModel && this.taskId === $id) {
           eventModel.remove()
         }
       },

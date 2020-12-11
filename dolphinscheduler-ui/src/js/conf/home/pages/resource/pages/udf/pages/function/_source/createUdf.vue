@@ -217,7 +217,7 @@
             this.filterEmptyDirectory(item.children)
           }
         }
-        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length == 0) || (!/\.jar$/.test(n.name) && n.children.length > 0)))
+        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length === 0) || (!/\.jar$/.test(n.name) && n.children.length > 0)))
       },
       // filterJarFile
       filterJarFile (array) {

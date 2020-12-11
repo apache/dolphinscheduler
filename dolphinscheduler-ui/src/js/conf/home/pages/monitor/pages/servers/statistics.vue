@@ -106,10 +106,10 @@
         let error = 0
         _.forEach(res.data, (v, i) => {
           let key = _.keys(v)
-          if (key[0] == 'errorCount') {
+          if (key[0] === 'errorCount') {
             error = error + v.errorCount
           }
-          if (key[1] == 'normalCount') {
+          if (key[1] === 'normalCount') {
             normal = normal + v.normalCount
           }
         }

@@ -186,7 +186,7 @@
           this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
           return false
         }
-        if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length == 0) {
+        if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length === 0) {
           this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
           return false
         }
@@ -201,7 +201,7 @@
         let master = this.master
         let masterUrl = this.masterUrl
 
-        if (this.deployMode == 'local') {
+        if (this.deployMode === 'local') {
           master = 'local'
           masterUrl = ''
           deployMode = 'client'
@@ -246,12 +246,12 @@
       },
       searchTree (element, id) {
         // 根据id查找节点
-        if (element.id == id) {
+        if (element.id === id) {
           return element
-        } else if (element.children != null) {
+        } else if (element.children !== null) {
           var i
           var result = null
-          for (i = 0; result == null && i < element.children.length; i++) {
+          for (i = 0; result === null && i < element.children.length; i++) {
             result = this.searchTree(element.children[i], id)
           }
           return result
@@ -280,7 +280,7 @@
           if (diffSet.length > 0) {
             diffSet.forEach(item => {
               backResource.forEach(item1 => {
-                if (item == item1.id || item == item1.res) {
+                if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -314,9 +314,9 @@
       },
       master: {
         handler (code) {
-          if (code == 'spark://') {
+          if (code === 'spark://') {
             this.masterUrlState = true
-          } else if (code == 'mesos://') {
+          } else if (code === 'mesos://') {
             this.masterUrlState = true
           } else {
             this.masterUrlState = false
@@ -344,7 +344,7 @@
         let result = []
         resourceIdArr.forEach(item => {
           this.allNoResources.forEach(item1 => {
-            if (item.id == item1.id) {
+            if (item.id === item1.id) {
               // resultBool = true
               result.push(item1)
             }

@@ -114,7 +114,7 @@
        */
       _getList (flag) {
         this.isLoading = !flag
-        if (this.searchParams.pageNo == undefined) {
+        if (this.searchParams.pageNo === undefined) {
           this.$router.push({ path: '/projects/index' })
           return false
         }
@@ -132,7 +132,7 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
-        if (sessionStorage.getItem('isLeft') == 0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true

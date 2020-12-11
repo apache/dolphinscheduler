@@ -522,7 +522,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch != '' && this.successBranch != null && this.successBranch == this.failedBranch) {
+        if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -538,9 +538,9 @@
       },
       _verifWorkGroup () {
         let item = this.store.state.security.workerGroupsListAll.find(item => {
-          return item.id == this.workerGroup
+          return item.id === this.workerGroup
         })
-        if (item == undefined) {
+        if (item === undefined) {
           this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
           return false
         }
@@ -601,7 +601,7 @@
             let currentConnects = plumbIns.getAllConnections()
             let len = currentConnects.length
             for (let i = 0; i < len; i++) {
-              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId == targetId) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
                 plumbIns.deleteConnection(currentConnects[i])
                 i -= 1
                 len -= 1
@@ -727,12 +727,12 @@
         var hasMatch = false
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
           var workerGroup = this.store.state.security.workerGroupsListAll[i].id
-          if (o.workerGroup == workerGroup) {
+          if (o.workerGroup === workerGroup) {
             hasMatch = true
             break
           }
         }
-        if (o.workerGroup == undefined) {
+        if (o.workerGroup === undefined) {
           this.store.dispatch('dag/getTaskInstanceList', {
             pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
           }).then(res => {

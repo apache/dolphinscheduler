@@ -153,7 +153,7 @@
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
-        httpCheckConditionList: cookies.get('language') == 'en_US' ? [{ code: 'STATUS_CODE_DEFAULT', value: 'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM', value: 'Custom response code' }, { code: 'BODY_CONTAINS', value: 'Content includes' }, { code: 'BODY_NOT_CONTAINS', value: 'Content does not contain' }] : [{ code: 'STATUS_CODE_DEFAULT', value: '默认响应码200' }, { code: 'STATUS_CODE_CUSTOM', value: '自定义响应码' }, { code: 'BODY_CONTAINS', value: '内容包含' }, { code: 'BODY_NOT_CONTAINS', value: '内容不包含' }]
+        httpCheckConditionList: cookies.get('language') === 'en_US' ? [{ code: 'STATUS_CODE_DEFAULT', value: 'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM', value: 'Custom response code' }, { code: 'BODY_CONTAINS', value: 'Content includes' }, { code: 'BODY_NOT_CONTAINS', value: 'Content does not contain' }] : [{ code: 'STATUS_CODE_DEFAULT', value: '默认响应码200' }, { code: 'STATUS_CODE_CUSTOM', value: '自定义响应码' }, { code: 'BODY_CONTAINS', value: '内容包含' }, { code: 'BODY_NOT_CONTAINS', value: '内容不包含' }]
       }
     },
     props: {
@@ -243,7 +243,7 @@
         this.condition = o.params.condition || ''
         this.connectTimeout = o.params.connectTimeout
         this.socketTimeout = o.params.socketTimeout
-        if (this.connectTimeout != 60000 || this.socketTimeout != 60000) {
+        if (this.connectTimeout !== 60000 || this.socketTimeout !== 60000) {
           this.timeoutSettings = true
         }
         // backfill localParams

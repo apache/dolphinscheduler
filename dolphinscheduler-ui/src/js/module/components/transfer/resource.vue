@@ -90,7 +90,7 @@
       */
       getParent (data2, nodeId2) {
         var arrRes = []
-        if (data2.length == 0) {
+        if (data2.length === 0) {
           if (nodeId2) {
             arrRes.unshift(data2)
           }
@@ -99,7 +99,7 @@
         let rev = (data, nodeId) => {
           for (var i = 0, length = data.length; i < length; i++) {
             let node = data[i]
-            if (node.id == nodeId) {
+            if (node.id === nodeId) {
               arrRes.unshift(node)
               rev(data2, node.pid)
               break
@@ -180,7 +180,7 @@
         if (i2 !== -1) {
           this.cacheSourceList.splice(i2, 1)
         }
-        if (this.checkedValue == 'fileResource') {
+        if (this.checkedValue === 'fileResource') {
           this.fileTarget = this.targetList
           this.fileSource = this.sourceList
         } else {
@@ -198,7 +198,7 @@
         if (i2 !== -1) {
           this.cacheTargetList.splice(i2, 1)
         }
-        if (this.checkedValue == 'fileResource') {
+        if (this.checkedValue === 'fileResource') {
           this.fileSource = this.sourceList
           this.fileTarget = this.targetList
         } else {

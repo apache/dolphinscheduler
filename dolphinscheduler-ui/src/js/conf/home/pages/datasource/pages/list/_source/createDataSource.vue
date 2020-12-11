@@ -329,7 +329,7 @@
           return false
         }
 
-        if (!this.database && this.showdDatabase == false) {
+        if (!this.database && this.showdDatabase === false) {
           this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
@@ -451,16 +451,16 @@
     },
     watch: {
       type (value) {
-        if (value == 'POSTGRESQL') {
+        if (value === 'POSTGRESQL') {
           this.showdDatabase = true
         } else {
           this.showdDatabase = false
         }
 
-        if (value == 'ORACLE' && !this.item.id) {
+        if (value === 'ORACLE' && !this.item.id) {
           this.showConnectType = true
           this.connectType = 'ORACLE_SERVICE_NAME'
-        } else if (value == 'ORACLE' && this.item.id) {
+        } else if (value === 'ORACLE' && this.item.id) {
           this.showConnectType = true
         } else {
           this.showConnectType = false
@@ -471,7 +471,7 @@
         return new Promise((resolve, reject) => {
           this.store.dispatch('datasource/getKerberosStartupState').then(res => {
             this.isShowPrincipal = res
-            if ((value == 'HIVE' || value == 'SPARK') && this.isShowPrincipal == true) {
+            if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
               this.showPrincipal = false
             } else {
               this.showPrincipal = true
