@@ -20,23 +20,14 @@
     <m-list-box>
       <div slot="text">{{$t('Custom Job')}}</div>
       <div slot="content">
-        <x-switch
-          v-model="isCustomTask"
-          @on-click="_onSwitch"
-          :disabled="isDetails"
-        >
-        </x-switch>
+        <el-switch size="small" v-model="isCustomTask" @change="_onSwitch" :disabled="isDetails"></el-switch>
       </div>
     </m-list-box>
     <m-list-box v-show="isCustomTask">
       <div slot="text">{{$t('Custom Script')}}</div>
       <div slot="content">
         <div class="from-mirror">
-          <textarea
-            id="code-shell-mirror"
-            name="code-shell-mirror"
-            style="opacity: 0;">
-          </textarea>
+          <textarea id="code-shell-mirror" name="code-shell-mirror" style="opacity: 0;"></textarea>
         </div>
       </div>
     </m-list-box>
@@ -44,29 +35,25 @@
       <m-list-box>
         <div slot="text">{{$t('Sqoop Job Name')}}</div>
         <div slot="content">
-          <x-input
-            :disabled="isDetails"
-            type="text"
-            v-model="jobName"
-            :placeholder="$t('Please enter Job Name(required)')">
-          </x-input>
+          <el-input :disabled="isDetails" size="small" type="text" v-model="jobName" :placeholder="$t('Please enter Job Name(required)')"></el-input>
         </div>
       </m-list-box>
       <m-list-box>
         <div slot="text">{{$t('Direct')}}</div>
         <div slot="content">
-          <x-select
+          <el-select
             style="width: 130px;"
+            size="small"
             v-model="modelType"
             :disabled="isDetails"
-            @on-change="_handleModelTypeChange">
-            <x-option
+            @change="_handleModelTypeChange">
+            <el-option
               v-for="city in modelTypeList"
               :key="city.code"
               :value="city.code"
               :label="city.code">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </m-list-box>
       <m-list-box>
@@ -100,18 +87,19 @@
         <m-list-box>
           <div slot="text">{{$t('Type')}}</div>
           <div slot="content">
-            <x-select
+            <el-select
               style="width: 130px;"
+              size="small"
               v-model="sourceType"
               :disabled="isDetails"
-              @on-change="_handleSourceTypeChange">
-              <x-option
+              @change="_handleSourceTypeChange">
+              <el-option
                 v-for="city in sourceTypeList"
                 :key="city.code"
                 :value="city.code"
                 :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </div>
         </m-list-box>
 
@@ -134,10 +122,10 @@
           <m-list-box>
             <div slot="text">{{$t('ModelType')}}</div>
             <div slot="content">
-              <x-radio-group v-model="srcQueryType" @on-change="_handleQueryType">
-                <x-radio label="0">{{$t('Form')}}</x-radio>
-                <x-radio label="1">SQL</x-radio>
-              </x-radio-group>
+              <el-radio-group v-model="srcQueryType" size="small" @change="_handleQueryType" style="vertical-align: sub;">
+                <el-radio label="0">{{$t('Form')}}</el-radio>
+                <el-radio label="1">SQL</el-radio>
+              </el-radio-group>
             </div>
           </m-list-box>
 
@@ -146,34 +134,36 @@
             <m-list-box>
               <div slot="text">{{$t('Table')}}</div>
               <div slot="content">
-                <x-input
+                <el-input
                   :disabled="isDetails"
                   type="text"
+                  size="small"
                   v-model="sourceMysqlParams.srcTable"
                   :placeholder="$t('Please enter Mysql Table(required)')">
-                </x-input>
+                </el-input>
               </div>
             </m-list-box>
 
             <m-list-box>
               <div slot="text">{{$t('ColumnType')}}</div>
               <div slot="content">
-                <x-radio-group v-model="sourceMysqlParams.srcColumnType">
-                  <x-radio label="0">{{$t('All Columns')}}</x-radio>
-                  <x-radio label="1">{{$t('Some Columns')}}</x-radio>
-                </x-radio-group>
+                <el-radio-group v-model="sourceMysqlParams.srcColumnType" size="small" style="vertical-align: sub;">
+                  <el-radio label="0">{{$t('All Columns')}}</el-radio>
+                  <el-radio label="1">{{$t('Some Columns')}}</el-radio>
+                </el-radio-group>
               </div>
             </m-list-box>
 
             <m-list-box v-if="sourceMysqlParams.srcColumnType=='1'">
               <div slot="text">{{$t('Column')}}</div>
               <div slot="content">
-                <x-input
+                <el-input
                   :disabled="isDetails"
                   type="text"
+                  size="small"
                   v-model="sourceMysqlParams.srcColumns"
                   :placeholder="$t('Please enter Columns (Comma separated)')">
-                </x-input>
+                </el-input>
               </div>
             </m-list-box>
           </template>
@@ -184,45 +174,49 @@
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hiveDatabase"
               :placeholder="$t('Please enter Hive Database(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hiveTable"
               :placeholder="$t('Please enter Hive Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Keys')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hivePartitionKey"
               :placeholder="$t('Please enter Hive Partition Keys')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Values')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHiveParams.hivePartitionValue"
               :placeholder="$t('Please enter Hive Partition Values')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </template>
@@ -231,12 +225,13 @@
         <m-list-box>
           <div slot="text">{{$t('Export Dir')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="sourceHdfsParams.exportDir"
               :placeholder="$t('Please enter Export Dir(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </template>
@@ -251,7 +246,7 @@
                   style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="ans-icon-max" @click="setEditorVal"></em>
+            <em class="el-icon-rank" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -290,91 +285,97 @@
       <m-list-box>
         <div slot="text">{{$t('Type')}}</div>
         <div slot="content">
-          <x-select
+          <el-select
             style="width: 130px;"
+            size="small"
             v-model="targetType"
             :disabled="isDetails">
-            <x-option
+            <el-option
               v-for="city in targetTypeList"
               :key="city.code"
               :value="city.code"
               :label="city.code">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </m-list-box>
       <div v-show="targetType==='HIVE'">
         <m-list-box>
           <div slot="text">{{$t('Database')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hiveDatabase"
               :placeholder="$t('Please enter Hive Database(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hiveTable"
               :placeholder="$t('Please enter Hive Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('CreateHiveTable')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.createHiveTable"></x-switch>
+            <el-switch v-model="targetHiveParams.createHiveTable" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('DropDelimiter')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.dropDelimiter"></x-switch>
+            <el-switch v-model="targetHiveParams.dropDelimiter" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('OverWriteSrc')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHiveParams.hiveOverWrite"></x-switch>
+            <el-switch v-model="targetHiveParams.hiveOverWrite" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('ReplaceDelimiter')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.replaceDelimiter"
               :placeholder="$t('Please enter Replace Delimiter')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Keys')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hivePartitionKey"
               :placeholder="$t('Please enter Hive Partition Keys')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Hive partition Values')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHiveParams.hivePartitionValue"
               :placeholder="$t('Please enter Hive Partition Values')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </div>
@@ -382,62 +383,65 @@
         <m-list-box>
           <div slot="text">{{$t('Target Dir')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.targetPath"
               :placeholder="$t('Please enter Target Dir(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('DeleteTargetDir')}}</div>
           <div slot="content">
-            <x-switch v-model="targetHdfsParams.deleteTargetDir"></x-switch>
+            <el-switch v-model="targetHdfsParams.deleteTargetDir" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('CompressionCodec')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.compressionCodec">
-              <x-radio label="snappy">snappy</x-radio>
-              <x-radio label="lzo">lzo</x-radio>
-              <x-radio label="gzip">gzip</x-radio>
-              <x-radio label="">no</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetHdfsParams.compressionCodec" size="small">
+              <el-radio label="snappy">snappy</el-radio>
+              <el-radio label="lzo">lzo</el-radio>
+              <el-radio label="gzip">gzip</el-radio>
+              <el-radio label="">no</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FileType')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.fileType">
-              <x-radio label="--as-avrodatafile">avro</x-radio>
-              <x-radio label="--as-sequencefile">sequence</x-radio>
-              <x-radio label="--as-textfile">text</x-radio>
-              <x-radio label="--as-parquetfile">parquet</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetHdfsParams.fileType" size="small">
+              <el-radio label="--as-avrodatafile">avro</el-radio>
+              <el-radio label="--as-sequencefile">sequence</el-radio>
+              <el-radio label="--as-textfile">text</el-radio>
+              <el-radio label="--as-parquetfile">parquet</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.fieldsTerminated"
               :placeholder="$t('Please enter Fields Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('LinesTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetHdfsParams.linesTerminated"
               :placeholder="$t('Please enter Lines Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
       </div>
@@ -458,71 +462,76 @@
         <m-list-box>
           <div slot="text">{{$t('Table')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetTable"
               :placeholder="$t('Please enter Mysql Table(required)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('Column')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetColumns"
               :placeholder="$t('Please enter Columns (Comma separated)')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.fieldsTerminated"
               :placeholder="$t('Please enter Fields Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('LinesTerminated')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.linesTerminated"
               :placeholder="$t('Please enter Lines Terminated')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box>
           <div slot="text">{{$t('IsUpdate')}}</div>
           <div slot="content">
-            <x-switch v-model="targetMysqlParams.isUpdate"></x-switch>
+            <el-switch v-model="targetMysqlParams.isUpdate" size="small"></el-switch>
           </div>
         </m-list-box>
         <m-list-box v-show="targetMysqlParams.isUpdate">
           <div slot="text">{{$t('UpdateKey')}}</div>
           <div slot="content">
-            <x-input
+            <el-input
               :disabled="isDetails"
               type="text"
+              size="small"
               v-model="targetMysqlParams.targetUpdateKey"
               :placeholder="$t('Please enter Update Key')">
-            </x-input>
+            </el-input>
           </div>
         </m-list-box>
         <m-list-box v-show="targetMysqlParams.isUpdate">
           <div slot="text">{{$t('UpdateMode')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetMysqlParams.targetUpdateMode">
-              <x-radio label="updateonly">{{$t('OnlyUpdate')}}</x-radio>
-              <x-radio label="allowinsert">{{$t('AllowInsert')}}</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="targetMysqlParams.targetUpdateMode" size="small">
+              <el-radio label="updateonly">{{$t('OnlyUpdate')}}</el-radio>
+              <el-radio label="allowinsert">{{$t('AllowInsert')}}</el-radio>
+            </el-radio-group>
           </div>
         </m-list-box>
 
@@ -530,13 +539,13 @@
       <m-list-box>
         <div slot="text">{{$t('Concurrency')}}</div>
         <div slot="content">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="text"
+            size="small"
             v-model="concurrency"
             :placeholder="$t('Please enter Concurrency')">
-
-          </x-input>
+          </el-input>
         </div>
       </m-list-box>
     </template>
@@ -551,6 +560,12 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -696,8 +711,9 @@
           replaceDelimiter:"",
           hivePartitionKey:"",
           hivePartitionValue:""
-
-        }
+        },
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -706,32 +722,11 @@
     },
     methods: {
       setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
-
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    // this.$modal.destroy()
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
+      },
+      getSriptBoxValue (val) {
+        editor.setValue(val)
       },
       _handleQueryType(o){
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
@@ -740,7 +735,7 @@
       },
 
       _handleModelTypeChange(a){
-        this._getSourceTypeList(a.label)
+        this._getSourceTypeList(a)
         this.sourceType = this.sourceTypeList[0].code
         this._handleSourceTypeChange({label: this.sourceType, value: this.sourceType})
       },
@@ -1267,7 +1262,7 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams}
+    components: { mListBox, mDatasource, mLocalParams, mScriptBox}
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

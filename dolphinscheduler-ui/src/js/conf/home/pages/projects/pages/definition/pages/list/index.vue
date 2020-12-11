@@ -20,8 +20,8 @@
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
-            <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
-            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Import process')}}</x-button>
+            <el-button size="mini"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</el-button>
+            <el-button size="mini"  @click="_uploading">{{$t('Import process')}}</el-button>
           </template>
         </m-conditions>
       </template>
@@ -29,7 +29,16 @@
         <template v-if="processListP.length || total>0">
           <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
           <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+            <el-pagination
+              background
+              @current-change="_page"
+              @size-change="_pageSize"
+              :page-size="searchParams.pageSize"
+              :current-page.sync="searchParams.pageNo"
+              :page-sizes="[10, 30, 50]"
+              layout="sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
           </div>
         </template>
         <template v-if="!processListP.length && total<=0">
@@ -138,7 +147,7 @@
       localStore.removeItem('subProcessId')
     },
     mounted() {
-      this.$modal.destroy()
+      
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)

@@ -18,33 +18,33 @@
   <div class="home-main index-model">
     <div class="project-kinship-content">
       <div class="search-bar">
-        <x-select filterable clearable
+        <el-select filterable clearable
                   :placeholder="$t('Process Name')"
-                  @on-change="onChange"
+                  @change="onChange"
                   :style="inputFocusStyle"
                   v-tooltip="tooltipOption(currentItemName)"
                   size="small">
-          <x-option
+          <el-option
             v-for="work in workList"
             :key="work.id"
             :value="work.id"
             :label="work.name"
             v-tooltip="tooltipOption(work.name)"
             >
-          </x-option>
-        </x-select>
-        <x-button type="primary"
-                  icon="ans-icon-dot-circle"
-                  size="small"
+          </el-option>
+        </el-select>
+        <el-button type="primary"
+                  icon="fa-dot-circle-o"
+                  size="mini"
                   v-tooltip.small.top.start="$t('Reset')"
                   @click="reset"
-                  ></x-button>
-        <x-button type="ghost"
-                  icon="ans-icon-eye"
-                  size="small"
+                  ></el-button>
+        <el-button 
+                  icon="el-icon-view"
+                  size="mini"
                   v-tooltip.small.top="$t('Dag label display control')"
                   @click="changeLabel"
-                  ></x-button>
+                  ></el-button>
       </div>
       <graph-grid v-if="!isLoading && !!locations.length" :isShowLabel="isShowLabel"></graph-grid>
       <template v-if="!isLoading && !locations.length">

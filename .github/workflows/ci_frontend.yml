@@ -52,7 +52,6 @@ jobs:
           npm install
           npm run lint
           npm run build
-
   License-check:
     runs-on: ubuntu-latest
     steps:

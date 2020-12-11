@@ -27,8 +27,8 @@
               <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
             </div>
             <div class="submit-c">
-              <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Return')}} </x-button>
-              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Save')}} </x-button>
+              <el-button type="text" @click="close()" :disabled="disabled" size="small"> {{$t('Return')}} </el-button>
+              <el-button type="primary" :loading="spinnerLoading" @click="ok()" round size="small">{{spinnerLoading ? 'Loading...' : $t('Save')}} </el-button>
             </div>
           </template>
           <m-no-data :msg="msg" v-if="msg"></m-no-data>

@@ -19,31 +19,32 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit queue') : $t('Create queue')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="queueName"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="mini"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Queue value')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="queue"
                     maxlength="60"
-                    :placeholder="$t('Please enter queue value')"
-                    autocomplete="off">
-            </x-input>
+                    size="mini"
+                    :placeholder="$t('Please enter queue value')">
+            </el-input>
           </template>
         </m-list-box-f>
 
@@ -137,6 +138,9 @@
             reject(e)
           })
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {

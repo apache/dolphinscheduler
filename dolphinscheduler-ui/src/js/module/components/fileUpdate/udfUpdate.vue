@@ -20,33 +20,31 @@
       <ul>
         <li>
           <div class="update-pbx">
-            <x-input
+            <el-input
                     type="input"
                     size="small"
                     v-model="udfName"
                     :disabled="progress !== 0"
                     style="width: 535px"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    :placeholder="$t('Please enter name')">
+            </el-input>
             <div class="p1" style="position: absolute;">
               <input name="file" id="file" type="file" class="file-update" v-if="!progress">
-              <x-button type="dashed" size="small" :disabled="progress !== 0"> {{$t('Upload')}} </x-button>
+              <el-button type="dashed" size="small" :disabled="progress !== 0">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
             </div>
           </div>
         </li>
         <li>
-          <x-input
+          <el-input
                   type="textarea"
                   size="small"
                   v-model="udfDesc"
                   :disabled="progress !== 0"
-                  :placeholder="$t('Please enter description')"
-                  autocomplete="off">
-          </x-input>
+                  :placeholder="$t('Please enter description')">
+          </el-input>
         </li>
         <li style="margin-top: -4px;margin-bottom: 8px;">
-          <x-button type="success" size="xsmall" long @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `Loading... (${progress}%)` : $t('Upload UDF Resources')}}</x-button>
+          <el-button type="success" size="mini" @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `Loading... (${progress}%)` : $t('Upload UDF Resources')}}</el-button>
         </li>
       </ul>
     </div>

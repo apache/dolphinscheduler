@@ -23,10 +23,10 @@
     <div class="conditions-box">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
-          </x-button-group>
+          <el-button-group size="small" >
+            <el-button size="mini" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</el-button>
+            <el-button size="mini" @click="_uploading">{{$t('Upload UDF Resources')}}</el-button>
+          </el-button-group>
         </template>
       </m-conditions>
       </div>
@@ -35,7 +35,16 @@
         <m-list @on-update="_onUpdate" :udf-resources-list="udfResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!udfResourcesList.length && total<=0">
@@ -164,7 +173,6 @@
       let dir = localStore.getItem('currentDir').split('/')
       dir.shift()
       this.breadList = dir
-      this.$modal.destroy()
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)

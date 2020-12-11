@@ -26,14 +26,14 @@
           <div class="text-box"><span>{{$t('Connection name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <x-input
+              <el-input
                 type="text"
+                size="small"
                 v-model="labelName"
                 :disabled="isDetails"
                 :placeholder="$t('Please enter name')"
-                maxlength="100"
-                autocomplete="off">
-              </x-input>
+                maxlength="100">
+              </el-input>
             </label>
           </div>
         </div>
@@ -41,8 +41,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="cancel()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
+        <el-button type="text" size="small" @click="cancel()"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </el-button>
       </div>
     </div>
   </div>
@@ -66,9 +66,7 @@
     },
     mixins: [disabledState],
     props: {
-      id: String,
-      sourceId: String,
-      targetId: String
+      lineData: Object
     },
     methods: {
         cancel() {
@@ -77,15 +75,15 @@
             })
         },
         ok() {
-          if($(`#${this.id}`).prev().attr('class')==='jtk-overlay') {
-            $(`#${this.id}`).prev().empty()
+          if($(`#${this.lineData.id}`).prev().attr('class')==='jtk-overlay') {
+            $(`#${this.lineData.id}`).prev().empty()
           }
-          $(`#${this.id}`).text(this.labelName)
+          $(`#${this.lineData.id}`).text(this.labelName)
             this.$emit('addLineInfo', {
               item: {
                 labelName: this.labelName,
-                sourceId: this.sourceId,
-                targetId: this.targetId
+                sourceId: this.lineData.sourceId,
+                targetId: this.lineData.targetId
               },
               fromThis: this
             })
@@ -95,10 +93,10 @@
       
     },
     created () {
-      if($(`#${this.id}`).prev().attr('class').indexOf('jtk-overlay')!==-1) {
-        this.labelName = $(`#${this.id}`).prev().text()
+      if($(`#${this.lineData.id}`).prev().attr('class').indexOf('jtk-overlay')!==-1) {
+        this.labelName = $(`#${this.lineData.id}`).prev().text()
       } else {
-        this.labelName = $(`#${this.id}`).text()
+        this.labelName = $(`#${this.lineData.id}`).text()
       }
     },
     mounted () {

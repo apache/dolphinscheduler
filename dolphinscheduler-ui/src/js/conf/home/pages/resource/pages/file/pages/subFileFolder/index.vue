@@ -21,47 +21,34 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Folder Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
                     style="width: 300px;"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
-        <!-- <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Folder Format')}}</template>
-          <template slot="content">
-            <x-select v-model="type" style="width: 100px;">
-              <x-option
-                      v-for="item in folderList"
-                      :key="item.value"
-                      :value="item.value"
-                      :label="item.label">
-              </x-option>
-            </x-select>
-          </template>
-        </m-list-box-f> -->
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
                     style="width: 430px;"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <div class="submit">
-              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
-              <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </x-button>
+              <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Create')}} </el-button>
+              <el-button type="text" size="mini" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </el-button>
             </div>
           </template>
         </m-list-box-f>
@@ -128,7 +115,6 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     destroyed () {
     },

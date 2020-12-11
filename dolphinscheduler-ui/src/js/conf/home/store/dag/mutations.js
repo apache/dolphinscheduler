@@ -140,9 +140,9 @@ export default {
       y: parseInt(dom.css('top'), 10)
     })
   },
-  addConnects(state, payload) {
+  addConnects (state, payload) {
     state.connects = _.map(state.connects, v => {
-      if(v.endPointSourceId===payload.sourceId && v.endPointTargetId===payload.targetId) {
+      if (v.endPointSourceId === payload.sourceId && v.endPointTargetId === payload.targetId) {
         v.label = payload.labelName
       }
       return v

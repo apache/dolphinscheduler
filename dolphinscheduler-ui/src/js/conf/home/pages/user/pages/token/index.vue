@@ -19,7 +19,12 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create token')}}</x-button>
+          <el-button size="mini" @click="_create('')">{{$t('Create token')}}</el-button>
+          <el-dialog
+            :visible.sync="createTokenDialog"
+            width="50%">
+            <m-create-token :item="item" @onUpdate="onUpdate" @close="close"></m-create-token>
+          </el-dialog>
         </template>
       </m-conditions>
     </template>
@@ -31,10 +36,18 @@
                 :token-list="tokenList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
-
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!tokenList.length && total<=0">
@@ -68,7 +81,8 @@
           pageNo: 1,
           searchVal: ''
         },
-        isLeft: true
+        isLeft: true,
+        createTokenDialog: false
       }
     },
     mixins: [listUrlParamHandle],
@@ -95,31 +109,18 @@
         this._debounceGET()
       },
       _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateToken, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
+        this.item = item
+        this.createTokenDialog = true
       },
+      onUpdate () {
+        this._debounceGET('false')
+        this.createTokenDialog = false
+      },
+
+      close () {
+        this.createTokenDialog = false
+      },
+
       _getList (flag) {
         if(sessionStorage.getItem('isLeft')==0) {
           this.isLeft = false
@@ -151,11 +152,10 @@
     created () {
     },
     mounted () {
-      this.$modal.destroy()
     },
     beforeDestroy () {
       sessionStorage.setItem('isLeft',1)
     },
-    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData, mCreateToken }
   }
 </script>

@@ -25,7 +25,7 @@ export default {
   name: 'home',
   components: { mProjectHome, mListConstruction },
   mounted() {
-    this.$modal.destroy()
+    
   },
 }
 </script>
