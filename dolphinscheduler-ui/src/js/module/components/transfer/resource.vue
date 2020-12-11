@@ -37,7 +37,6 @@
 <script>
   import _ from 'lodash'
   import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
@@ -239,7 +238,7 @@
         this._targetQuery()
       }
     },
-    components: { mPopup, mListBoxF, Treeselect }
+    components: { mPopup, Treeselect }
   }
 </script>
 

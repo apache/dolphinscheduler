@@ -28,7 +28,6 @@
 </template>
 <script>
   import mList from './_source/list'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   export default {
     name: 'definition-timing-index',
@@ -37,6 +36,6 @@
         this.$router.go(-1)
       }
     },
-    components: { mList, mListConstruction, mSecondaryMenu }
+    components: { mList, mListConstruction }
   }
 </script>

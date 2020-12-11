@@ -153,7 +153,6 @@
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import { isJson } from '@/module/util/util'
-  import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -492,7 +491,7 @@
 
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mListBoxF }
   }
 </script>
 

@@ -61,8 +61,6 @@
   import { mapActions } from 'vuex'
   import { folderList } from '../_source/common'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -117,7 +115,7 @@
     destroyed () {
     },
     computed: {},
-    components: { mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mListBoxF }
   }
 </script>
 

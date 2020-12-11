@@ -53,7 +53,6 @@
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/processInstance'
 
@@ -201,7 +200,7 @@
       clearInterval(this.setIntervalP)
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 

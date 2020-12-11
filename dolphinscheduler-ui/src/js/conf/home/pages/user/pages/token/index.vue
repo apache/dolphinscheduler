@@ -66,7 +66,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -156,6 +155,6 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData, mCreateToken }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData, mCreateToken }
   }
 </script>

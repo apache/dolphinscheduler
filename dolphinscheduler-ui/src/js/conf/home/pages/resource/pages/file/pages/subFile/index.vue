@@ -83,8 +83,6 @@
   import { handlerSuffix } from '../details/_source/utils'
   import codemirror from '../_source/codemirror'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/module/components/conditions/conditions'
   import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -181,7 +179,7 @@
       editor.off($('.code-create-mirror'), 'keypress', this.keypress)
     },
     computed: {},
-    components: { mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mListBoxF }
   }
 </script>
 

@@ -52,7 +52,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
     name: 'transfer',
@@ -143,7 +142,7 @@
         this._targetQuery()
       }
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopup }
   }
 </script>
 

@@ -60,8 +60,6 @@
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -115,7 +113,7 @@
     destroyed () {
     },
     computed: {},
-    components: { mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mListBoxF }
   }
 </script>
 

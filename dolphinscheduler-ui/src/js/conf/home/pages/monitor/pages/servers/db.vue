@@ -80,11 +80,9 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'servers-mysql',
@@ -112,7 +110,7 @@
         })
     },
     mounted () {},
-    components: { mList, mListConstruction, mSpin, mNoData }
+    components: { mSpin, mNoData }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
