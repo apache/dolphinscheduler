@@ -63,7 +63,7 @@
         </el-radio-group>
       </div>
     </m-list-box>
-    <m-list-box>
+    <m-list-box v-if="deployMode === 'cluster'">
       <div slot="text">{{$t('Flink Version')}}</div>
       <div slot="content">
         <el-select
@@ -80,7 +80,7 @@
         </el-select>
       </div>
     </m-list-box>
-    <div class="list-box-4p">
+    <div class="list-box-4p" v-if="deployMode === 'cluster'">
       <div class="clearfix list">
         <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
         <span class="sp2">
