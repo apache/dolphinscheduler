@@ -19,11 +19,7 @@ package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.SqoopJobType;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -34,7 +30,6 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -53,6 +48,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -118,8 +114,15 @@ public class TaskPriorityQueueConsumer extends Thread{
                         failedDispatchTasks.add(taskPriorityInfo);
                     }
                 }
-                for(String dispatchFailedTask : failedDispatchTasks){
-                    taskPriorityQueue.put(dispatchFailedTask);
+                if (!failedDispatchTasks.isEmpty()) {
+                    for (String dispatchFailedTask : failedDispatchTasks) {
+                        taskPriorityQueue.put(dispatchFailedTask);
+                    }
+                    // If there are tasks in a cycle that cannot find the worker group,
+                    // sleep for 1 second
+                    if (taskPriorityQueue.size() <= failedDispatchTasks.size()) {
+                        TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
+                    }
                 }
             }catch (Exception e){
                 logger.error("dispatcher task error",e);
@@ -134,7 +137,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskInstanceId taskInstanceId
      * @return result
      */
-    private boolean dispatch(int taskInstanceId){
+    protected boolean dispatch(int taskInstanceId) {
         boolean result = false;
         try {
             TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
@@ -255,8 +258,8 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param dataxTaskExecutionContext dataxTaskExecutionContext
      * @param taskNode taskNode
      */
-    private void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
-        DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+    protected void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
+        DataxParameters dataxParameters = JSONUtils.parseObject(taskNode.getParams(), DataxParameters.class);
 
         DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
         DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
@@ -371,8 +374,8 @@ public class TaskPriorityQueueConsumer extends Thread{
     /**
      * get resource map key is full name and value is tenantCode
      */
-    private Map<String,String> getResourceFullNames(TaskNode taskNode) {
-        Map<String,String> resourceMap = new HashMap<>();
+    protected Map<String, String> getResourceFullNames(TaskNode taskNode) {
+        Map<String, String> resourceMap = new HashMap<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
