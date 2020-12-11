@@ -19,43 +19,45 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit Tenant') : $t('Create Tenant')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Tenant Code')}}</template>
           <template slot="content">
-            <x-input
-                    type="input"
-                    :disabled="item ? true : false"
-                    v-model="tenantCode"
-                    maxlength="60"
-                    :placeholder="$t('Please enter tenant code')">
-            </x-input>
+            <el-input
+                type="input"
+                :disabled="item ? true : false"
+                v-model="tenantCode"
+                maxlength="60"
+                size="small"
+                :placeholder="$t('Please enter tenant code')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Queue')}}</template>
           <template slot="content">
-            <x-select v-model="queueId">
-              <x-option
+            <el-select v-model="queueId" size="small">
+              <el-option
                       v-for="city in queueList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -150,6 +152,9 @@
           this.$message.error(e.msg || '')
           this.$refs['popup'].spinnerLoading = false
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {

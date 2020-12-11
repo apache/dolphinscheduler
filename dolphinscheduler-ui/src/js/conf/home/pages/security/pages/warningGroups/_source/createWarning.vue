@@ -19,41 +19,44 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit alarm group') : $t('Create alarm group')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="groupName"
                     maxlength="60"
+                    size="small"
                     :placeholder="$t('Please enter group name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Group Type')}}</template>
           <template slot="content">
-            <x-select v-model="groupType">
-              <x-option
+            <el-select v-model="groupType" size="small">
+              <el-option
                       v-for="city in options"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Remarks')}}</template>
           <template slot="content">
-            <x-input
-                    type="textarea"
-                    v-model="description"
-                    :placeholder="$t('Please enter description')">
-            </x-input>
+            <el-input
+                type="textarea"
+                v-model="description"
+                size="small"
+                :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -128,6 +131,9 @@
           this.$message.error(e.msg || '')
           this.$refs['popup'].spinnerLoading = false
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

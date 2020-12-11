@@ -19,87 +19,88 @@
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
           :nameText="item ? $t('Edit User') : $t('Create User')"
-          @ok="_ok">
+          @ok="_ok"
+          @close="close">
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="userName"
                     maxlength="60"
                     :placeholder="$t('Please enter user name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="router.history.current.name !== 'account'">
           <template slot="name"><strong>*</strong>{{$t('Password')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="password"
                     v-model="userPassword"
                     :placeholder="$t('Please enter your password')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
           <template slot="name"><strong>*</strong>{{$t('Tenant')}}</template>
           <template slot="content">
-            <x-select v-model="tenantId" style="width: 100%;">
-              <x-option
+            <el-select v-model="tenantId" style="width: 100%;" size="small">
+              <el-option
                       v-for="city in tenantList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
           <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
-            <x-select v-model="queueName" style="width: 100%;">
-              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
-                <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
-                <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
-              </x-input>
-              <x-option
+            <el-select v-model="queueName" style="width: 100%;" size="small">
+              <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" @on-click-icon.stop="queueName = ''">
+                <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
+                <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="queueName!=''"></em>
+              </el-input>
+              <el-option
                       v-for="city in queueList"
                       :key="city.id"
                       :value="city.id"
                       :label="city.code">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Email')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="email"
                     :placeholder="$t('Please enter email')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Phone')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="phone"
                     :placeholder="$t('Please enter phone number')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f style="line-height: 38px;">
           <template slot="name">{{$t('State')}}</template>
           <template slot="content">
-            <x-radio-group v-model="userState" >
-              <x-radio :label="'1'">{{$t('Enable')}}</x-radio>
-              <x-radio :label="'0'">{{$t('Disable')}}</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="userState" size="small">
+              <el-radio :label="'1'">{{$t('Enable')}}</el-radio>
+              <el-radio :label="'0'">{{$t('Disable')}}</el-radio>
+            </el-radio-group>
           </template>
         </m-list-box-f>
       </div>
@@ -274,6 +275,9 @@
           this.$message.error(e.msg || '')
           this.$refs['popup'].spinnerLoading = false
         })
+      },
+      close() {
+        this.$emit('close')
       }
     },
     watch: {},

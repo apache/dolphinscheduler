@@ -490,6 +490,7 @@ MIT licenses
     clipboard 2.0.1: https://github.com/zenorocha/clipboard.js MIT
     codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
     dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
+    element-ui 2.13.2: https://github.com/ElemeFE/element MIT
     html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
     jquery 3.3.1: https://github.com/jquery/jquery MIT
     jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT

@@ -22,21 +22,22 @@
       </div>
       <div class="cont-box">
         <div class="label-box">
-          <x-select
+          <el-select
               ref="preTasksSelector"
               style="width: 100%;"
               filterable
               multiple
+              size="small"
               v-model="preTasks"
               :disabled="isDetails"
               :id="preTasksSelectorId">
-            <x-option
+            <el-option
                 v-for="task in preTaskList"
                 :key="task.id"
                 :value="task.id"
                 :label="task.name">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </div>
     </div>

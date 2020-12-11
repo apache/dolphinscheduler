@@ -19,30 +19,32 @@
     <m-list-box>
       <div slot="text">{{$t('Http Url')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
           :autosize="{minRows:2}"
           :disabled="isDetails"
           type="textarea"
+          size="small"
           v-model="url"
           :placeholder="$t('Please Enter Http Url')"
           autocomplete="off">
-        </x-input>
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Http Method')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
           style="width: 150px;"
+          size="small"
           v-model="httpMethod"
           :disabled="isDetails">
-          <x-option
+          <el-option
             v-for="city in httpMethodList"
             :key="city.code"
             :value="city.code"
             :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
@@ -59,30 +61,31 @@
     <m-list-box>
       <div slot="text">{{$t('Http Check Condition')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
           style="width: 230px;"
+          size="small"
           v-model="httpCheckCondition"
           :disabled="isDetails">
-          <x-option
+          <el-option
             v-for="city in httpCheckConditionList"
             :key="city.code"
             :value="city.code"
             :label="city.value">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Http Condition')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
           :autosize="{minRows:2}"
           :disabled="isDetails"
           type="textarea"
+          size="small"
           v-model="condition"
-          :placeholder="$t('Please Enter Http Condition')"
-          autocomplete="off">
-        </x-input>
+          :placeholder="$t('Please Enter Http Condition')">
+        </el-input>
       </div>
     </m-list-box>
 
@@ -92,10 +95,7 @@
       <div slot="content">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch
-              v-model="timeoutSettings"
-              :disabled="isDetails"
-            ></x-switch>
+            <el-switch size="small" v-model="timeoutSettings" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -107,12 +107,12 @@
       </div>
       <div class="cont-box">
         <span  class="label-box"  style="width: 193px;display: inline-block;" >
-          <x-input v-model='connectTimeout' maxlength="7" />
+          <el-input size="small" v-model='connectTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
         <span class="text-b">{{$t('Socket Timeout')}}</span>
         <span  class="label-box" style="width: 193px;display: inline-block;" >
-          <x-input v-model='socketTimeout' maxlength="7" />
+          <el-input size="small" v-model='socketTimeout' maxlength="7"></el-input>
         </span>
         <span>{{$t('ms')}}</span>
       </div>

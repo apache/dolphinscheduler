@@ -30,8 +30,8 @@
             </div>
             <div class="value-p">
               <span class="state">
-                <em class="ans-icon-success-solid success" v-if="item.state"></em>
-                <em class="ans-icon-fail-solid error" v-else></em>
+                <em class="el-icon-success success" v-if="item.state"></em>
+                <em class="el-icon-error error" v-else></em>
               </span>
             </div>
             <div class="text-1">{{$t('Health status')}}</div>
@@ -59,19 +59,6 @@
             <div class="text-1">{{$t('Threads connections')}}</div>
           </div>
         </div>
-        <!-- <div class="col-md-2">
-            <div class="text-num-model text">
-              <div class="title">
-                <span>{{$t('Max used connections')}}</span>
-              </div>
-              <div class="value-p">
-                <strong :style="{color:color[2]}">{{item.maxUsedConnections}}</strong>
-              </div>
-              <div class="text-1">
-                {{$t('Max used connections')}}
-              </div>
-            </div>
-        </div>-->
         <div class="col-md-3">
           <div class="text-num-model text">
             <div class="title">

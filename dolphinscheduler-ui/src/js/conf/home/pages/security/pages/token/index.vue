@@ -22,7 +22,6 @@
   export default {
     name: 'token-index',
     mounted() {
-      this.$modal.destroy()
     },
     components: { mToken }
   }

@@ -25,23 +25,25 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
+                    size="mini"
                     :placeholder="$t('Please enter group name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>IP</template>
           <template slot="content">
-            <x-input
+            <el-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
+                    size="mini"
                     v-model="ipList"
                     :placeholder="$t('Please enter the IP address separated by commas')">
-            </x-input>
+            </el-input>
             <div class="ipt-tip">
               <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
             </div>
