@@ -73,7 +73,6 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mGauge from './_source/gauge'
-  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
@@ -121,7 +120,7 @@
         this.isLoading = true
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
+    components: { mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

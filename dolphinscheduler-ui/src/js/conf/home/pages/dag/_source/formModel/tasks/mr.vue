@@ -100,7 +100,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
-  import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
@@ -406,7 +405,7 @@
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, mResources, Treeselect }
+    components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
 

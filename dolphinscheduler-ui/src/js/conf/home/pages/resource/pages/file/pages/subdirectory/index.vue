@@ -66,7 +66,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'resource-list-index-FILE',
@@ -176,7 +175,7 @@
     beforeDestroy () {
       sessionStorage.setItem('isLeft', 1)
     },
-    components: { mListConstruction, mConditions, mList, mSpin, mNoData }
+    components: { mConditions, mList, mSpin, mNoData }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">
