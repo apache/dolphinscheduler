@@ -78,7 +78,7 @@
                 </span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
-                <span><el-button type="warning" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state != 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
+                <span><el-button type="warning" size="mini" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'STOP'"  :icon="scope.row.state === 'STOP' ? 'el-icon-video-play' : 'el-icon-close'" @click="_stop(scope.row,scope.$index)" circle></el-button></span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')" placement="top" :enterable="false">
                 <span><el-button type="error" size="mini" :icon="scope.row.state === 'PAUSE' ? 'el-icon-video-play' : 'el-icon-video-pause'" :disabled="scope.row.state !== 'RUNNING_EXECUTION' && scope.row.state !== 'PAUSE'" @click="_suspend(scope.row,scope.$index)" circle></el-button></span>
@@ -154,7 +154,7 @@
               <span>
                 <el-button
                   style="padding: 0 3px"
-                  v-show="(scope.row.state === 'PAUSE' || scope.row.state == 'STOP') && buttonType === 'suspend'"
+                  v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType === 'suspend'"
                   type="warning"
                   size="mini"
                   circle
@@ -165,7 +165,7 @@
 
               <!--Recovery Suspend-->
               <el-button
-                  v-show="(scope.row.state === 'PAUSE' || scope.row.state == 'STOP') && buttonType !== 'suspend'"
+                  v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType !== 'suspend'"
                   type="warning"
                   size="mini"
                   circle
@@ -312,7 +312,7 @@
        * @param STOP
        */
       _stop (item, index) {
-        if (item.state == 'STOP') {
+        if (item.state === 'STOP') {
           this._countDownFn({
             id: item.id,
             executeType: 'RECOVER_SUSPENDED_PROCESS',

@@ -61,7 +61,7 @@
     },
     created () {
       this.$nextTick(() => {
-        if (this.sqlType != 0) {
+        if (this.sqlType !== 0) {
           this.sqlTypeId = this.sqlType
         } else {
           this.sqlTypeId = this.sqlTypeList[0].id

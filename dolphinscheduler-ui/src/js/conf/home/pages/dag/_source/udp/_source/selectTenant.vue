@@ -51,7 +51,7 @@
     },
     mounted () {
       let result = this.itemList.some(item => {
-        if (item.id == this.value) {
+        if (item.id === this.value) {
           return true
         }
       })

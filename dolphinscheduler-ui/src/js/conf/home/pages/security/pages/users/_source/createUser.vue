@@ -175,7 +175,7 @@
           return false
         }
         // password
-        if (this.userPassword != '' && this.item) {
+        if (this.userPassword !== '' && this.item) {
           if (!regPassword.test(this.userPassword)) {
             this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
@@ -247,7 +247,7 @@
 
         let queueCode = ''
         // get queue code
-        if (this.queueName != '') {
+        if (this.queueName !== '') {
           queueCode = this.queueList.length > 0 ? _.find(this.queueList, ['id', this.queueName]).code : ''
         }
         let param = {

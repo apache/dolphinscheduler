@@ -112,14 +112,14 @@
         this._debounceGET()
       },
       _getList (flag) {
-        if (sessionStorage.getItem('isLeft') == 0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
         this.getUdfFuncListP(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length == 0) {
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
             this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.udfFuncList = []

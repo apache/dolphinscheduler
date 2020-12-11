@@ -214,7 +214,7 @@
        */
       _onSqlType (a) {
         this.sqlType = a
-        if (a == 0) {
+        if (a === 0) {
           this.showType = ['TABLE']
         }
       },
@@ -262,24 +262,24 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType == 0 && !this.showType.length) {
+        if (this.sqlType === 0 && !this.showType.length) {
           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
           return false
         }
-        if (this.sqlType == 0 && !this.title) {
+        if (this.sqlType === 0 && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType == 0 && !this.receivers.length) {
+        if (this.sqlType === 0 && !this.receivers.length) {
           this.$message.warning(`${i18n.$t('Recipient required')}`)
           return false
         }
         // receivers Subcomponent verification
-        if (this.sqlType == 0 && !this.$refs.refEmail._manualEmail()) {
+        if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
           return false
         }
         // receiversCc Subcomponent verification
-        if (this.sqlType == 0 && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -414,10 +414,10 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val == 0) {
+        if (val === 0) {
           this.showType = []
         }
-        if (val != 0) {
+        if (val !== 0) {
           this.title = ''
           this.receivers = []
           this.receiversCc = []
@@ -447,7 +447,7 @@
         this.sqlType = o.params.sqlType
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        if (o.params.showType == '') {
+        if (o.params.showType === '') {
           this.showType = []
         } else {
           this.showType = o.params.showType.split(',') || []

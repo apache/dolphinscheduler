@@ -228,7 +228,7 @@
             failureStrategy: this.failureStrategy,
             warningType: this.warningType,
             processInstancePriority: this.processInstancePriority,
-            warningGroupId: this.warningGroupId == '' ? 0 : this.warningGroupId,
+            warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || '',
             workerGroup: this.workerGroup
@@ -319,7 +319,7 @@
       if (this.timingData.item.crontab !== null) {
         this.crontab = this.timingData.item.crontab
       }
-      if (this.timingData.type == 'timing') {
+      if (this.timingData.type === 'timing') {
         let date = new Date()
         let year = date.getFullYear()
         let month = date.getMonth() + 1
