@@ -1,0 +1,7 @@
+/_test_/
+/build/
+/dist/
+/node/
+/node_modules/
+/target/
+/*.js
