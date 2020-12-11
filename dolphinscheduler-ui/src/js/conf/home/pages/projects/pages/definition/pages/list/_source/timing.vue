@@ -265,7 +265,6 @@
               crontab: this.crontab
             })
           }
-          let msg = ''
 
           this.store.dispatch(api, searchParams).then(res => {
             if (res.length) {

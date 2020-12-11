@@ -48,10 +48,6 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import i18n from '@/module/i18n'
-  import JSP from './../plugIn/jsPlumbHandle'
   import disabledState from '@/module/mixin/disabledState'
 
   export default {

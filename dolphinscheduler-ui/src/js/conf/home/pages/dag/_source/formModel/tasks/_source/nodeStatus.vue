@@ -45,7 +45,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { cycleList, dateValueList, nodeStatusList } from './commcon'
+  import { cycleList, nodeStatusList } from './commcon'
   import disabledState from '@/module/mixin/disabledState'
   export default {
     name: 'node-status',
@@ -159,7 +159,6 @@
       this.isInstance = this.router.history.current.name === 'projects-instance-details'
       // get processlist
       this._getProjectList().then(() => {
-        let projectId = this.projectList[0].value
         if (!this.dependItemList.length) {
           this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
         } else {
