@@ -35,7 +35,10 @@ plugins:
 rules:
   vue/script-indent: ['error', 2, { 'baseIndent': 1, 'switchCase': 1 }]
   vue/no-unused-components: 'off'
+  vue/no-mutating-props: 'off'
+  no-prototype-builtins: 'off'
   no-mixed-operators: 'off'
+  no-extend-native: 'off'
   prefer-const: 'off'
 overrides:
   - { 'files': ['*.vue'], 'rules': { 'indent': 'off' }}
