@@ -28,7 +28,7 @@
         <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
         <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
         <el-table-column :label="$t('State')">
-          {{state == 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
+          {{state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
@@ -196,7 +196,7 @@
         let result = []
         let getLeaf = (data) => {
           data.forEach(item => {
-            if (item.children.length == 0) {
+            if (item.children.length === 0) {
               result.push(item)
             } else {
               getLeaf(item.children)
@@ -215,7 +215,7 @@
           let fileSourceList = []
           let udfSourceList = []
           data[0].forEach((value, index, array) => {
-            if (value.type == 'FILE') {
+            if (value.type === 'FILE') {
               fileSourceList.push(value)
             } else {
               udfSourceList.push(value)
@@ -233,7 +233,7 @@
             }
           })
           data[1].forEach((value, index, array) => {
-            if (value.type == 'FILE') {
+            if (value.type === 'FILE') {
               fileTargetList.push(value)
             } else {
               udfTargetList.push(value)

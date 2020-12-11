@@ -190,12 +190,12 @@
       },
       searchTree (element, id) {
         // 根据id查找节点
-        if (element.id == id) {
+        if (element.id === id) {
           return element
-        } else if (element.children != null) {
+        } else if (element.children !== null) {
           var i
           var result = null
-          for (i = 0; result == null && i < element.children.length; i++) {
+          for (i = 0; result === null && i < element.children.length; i++) {
             result = this.searchTree(element.children[i], id)
           }
           return result
@@ -224,7 +224,7 @@
           if (diffSet.length > 0) {
             diffSet.forEach(item => {
               backResource.forEach(item1 => {
-                if (item == item1.id || item == item1.res) {
+                if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -324,7 +324,7 @@
         let result = []
         resourceIdArr.forEach(item => {
           this.allNoResources.forEach(item1 => {
-            if (item.id == item1.id) {
+            if (item.id === item1.id) {
               // resultBool = true
               result.push(item1)
             }
@@ -358,7 +358,7 @@
         this.mainClass = o.params.mainClass || ''
         if (o.params.mainJar.res) {
           this.marjarId(o.params.mainJar.res)
-        } else if (o.params.mainJar.res == '') {
+        } else if (o.params.mainJar.res === '') {
           this.mainJar = ''
         } else {
           this.mainJar = o.params.mainJar.id || ''

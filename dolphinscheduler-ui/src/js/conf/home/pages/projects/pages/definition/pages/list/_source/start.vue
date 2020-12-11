@@ -214,7 +214,7 @@
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
-          warningGroupId: this.warningGroupId == '' ? 0 : this.warningGroupId,
+          warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
           execType: this.execType ? 'COMPLEMENT_DATA' : null,
           startNodeList: this.startNodeList,
           taskDependType: this.taskDependType,

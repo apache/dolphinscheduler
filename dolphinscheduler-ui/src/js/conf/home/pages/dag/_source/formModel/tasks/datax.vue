@@ -453,7 +453,7 @@
         this.xms = o.params.xms || 1
         this.xmx = o.params.xmx || 1
         // backfill
-        if (o.params.customConfig == 0) {
+        if (o.params.customConfig === 0) {
           this.customConfig = 0
           this.enable = false
           this.dsType = o.params.dsType || ''

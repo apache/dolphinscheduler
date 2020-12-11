@@ -1170,10 +1170,10 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val == 0) {
+        if (val === 0) {
           this.showType = []
         }
-        if (val != 0) {
+        if (val !== 0) {
           this.title = ''
           this.receivers = []
           this.receiversCc = []

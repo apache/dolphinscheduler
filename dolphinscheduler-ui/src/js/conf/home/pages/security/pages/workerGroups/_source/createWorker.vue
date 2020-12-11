@@ -83,7 +83,7 @@
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         let valdata = ips.split(',')
         for (let i = 0; i < valdata.length; i++) {
-          if (reg.test(valdata[i]) == false) {
+          if (reg.test(valdata[i]) === false) {
             return false
           }
         }
