@@ -78,7 +78,7 @@
         queueList: [],
         queueId: '',
         tenantCode: '',
-        description: '',
+        description: ''
       }
     },
     props: {
@@ -93,7 +93,7 @@
             return
           }
           // Verify username
-          this.store.dispatch(`security/verifyName`, {
+          this.store.dispatch('security/verifyName', {
             type: 'tenant',
             tenantCode: this.tenantCode
           }).then(res => {
@@ -121,7 +121,7 @@
       },
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
-        if (!this.tenantCode.replace(/\s*/g,"")) {
+        if (!this.tenantCode.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
@@ -141,19 +141,19 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },

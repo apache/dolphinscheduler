@@ -27,7 +27,7 @@
 
   export default {
     name: 'account-index',
-    mounted() {
+    mounted () {
     },
     components: { mListConstruction, mInfo }
   }

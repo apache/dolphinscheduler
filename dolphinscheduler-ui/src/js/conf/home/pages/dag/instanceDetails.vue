@@ -43,8 +43,8 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
-      ...mapActions('dag', ['getProcessList','getProjectList', 'getResourcesList', 'getInstancedetail','getResourcesListJar']),
-      ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
+      ...mapActions('dag', ['getProcessList', 'getProjectList', 'getResourcesList', 'getInstancedetail', 'getResourcesListJar']),
+      ...mapActions('security', ['getTenantList', 'getWorkerGroupsAll']),
       /**
        * init
        */
@@ -101,7 +101,7 @@
       }
     },
     watch: {
-      '$route': {
+      $route: {
         deep: true,
         handler () {
           this.init()

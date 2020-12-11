@@ -138,7 +138,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization','getResourceList']),
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList']),
       _delete (item, i) {
         this.deleteUser({
           id: item.id
@@ -173,7 +173,7 @@
           this.item = item
           this.transferData.sourceListPrs = sourceListPrs
           this.transferData.targetListPrs = targetListPrs
-          this.transferData.type.name  = `${i18n.$t('Project')}`
+          this.transferData.type.name = `${i18n.$t('Project')}`
           this.authProjectDialog = true
         })
       },
@@ -194,9 +194,9 @@
        */
       getAllLeaf (data) {
         let result = []
-        let getLeaf = (data)=> {
+        let getLeaf = (data) => {
           data.forEach(item => {
-            if (item.children.length==0) {
+            if (item.children.length == 0) {
               result.push(item)
             } else {
               getLeaf(item.children)
@@ -214,10 +214,10 @@
         }).then(data => {
           let fileSourceList = []
           let udfSourceList = []
-          data[0].forEach((value,index,array)=>{
-            if(value.type =='FILE'){
+          data[0].forEach((value, index, array) => {
+            if (value.type == 'FILE') {
               fileSourceList.push(value)
-            } else{
+            } else {
               udfSourceList.push(value)
             }
           })
@@ -225,17 +225,17 @@
           let udfTargetList = []
 
           let pathId = []
-          data[1].forEach(v=>{
+          data[1].forEach(v => {
             let arr = []
             arr[0] = v
-            if(this.getAllLeaf(arr).length>0) {
+            if (this.getAllLeaf(arr).length > 0) {
               pathId.push(this.getAllLeaf(arr)[0])
             }
           })
-          data[1].forEach((value,index,array)=>{
-            if(value.type =='FILE'){
+          data[1].forEach((value, index, array) => {
+            if (value.type == 'FILE') {
               fileTargetList.push(value)
-            } else{
+            } else {
               udfTargetList.push(value)
             }
           })
@@ -250,7 +250,7 @@
           this.resourceData.udfSourceList = udfSourceList
           this.resourceData.fileTargetList = fileTargetList
           this.resourceData.udfTargetList = udfTargetList
-          this.resourceData.type.name  = `${i18n.$t('Resources')}`
+          this.resourceData.type.name = `${i18n.$t('Resources')}`
           this.resourceDialog = true
         })
       },
@@ -288,7 +288,7 @@
           this.item = item
           this.transferData.sourceListPrs = sourceListPrs
           this.transferData.targetListPrs = targetListPrs
-          this.transferData.type.name  = `${i18n.$t('Datasource')}`
+          this.transferData.type.name = `${i18n.$t('Datasource')}`
           this.authDataSourceDialog = true
         })
       },
@@ -324,7 +324,7 @@
           this.item = item
           this.transferData.sourceListPrs = sourceListPrs
           this.transferData.targetListPrs = targetListPrs
-          this.transferData.type.name  = `${i18n.$t('UDF Function')}`
+          this.transferData.type.name = `${i18n.$t('UDF Function')}`
           this.authUdfFuncDialog = true
         })
       },

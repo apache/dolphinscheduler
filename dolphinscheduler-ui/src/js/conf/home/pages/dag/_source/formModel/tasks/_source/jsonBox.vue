@@ -43,7 +43,7 @@
     data () {
       return {
         // script
-        rawScript: '',
+        rawScript: ''
       }
     },
     mixins: [disabledState],
@@ -56,13 +56,13 @@
        */
       _handlerEditor () {
         // editor
-        let self =this
+        let self = this
         editor = codemirror('code-shell-mirror1', {
           mode: 'shell',
           readOnly: this.isDetails
         })
-        editor.on("change",function(){
-          self.$emit('getJsonBoxValue',editor.getValue())
+        editor.on('change', function () {
+          self.$emit('getJsonBoxValue', editor.getValue())
         })
 
         this.keypress = () => {
@@ -79,7 +79,7 @@
         editor.setValue(this.rawScript)
 
         return editor
-      },
+      }
     },
     watch: {},
     created () {

@@ -342,8 +342,8 @@
         successBranch: '',
         failedBranch: '',
         conditionResult: {
-          'successNode': [],
-          'failedNode': []
+          successNode: [],
+          failedNode: []
         },
         // dependence
         dependence: {},
@@ -369,7 +369,7 @@
         taskInstancePriority: 'MEDIUM',
         // worker group id
         workerGroup: 'default',
-        stateList:[
+        stateList: [
           {
             value: 'success',
             label: `${i18n.$t('success')}`
@@ -381,8 +381,8 @@
         ],
         // preTasks
         preTaskIdsInWorkflow: [],
-        preTasksToAdd: [],    // pre-taskIds to add, used in jsplumb connects
-        preTasksToDelete: [], // pre-taskIds to delete, used in jsplumb connects
+        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
+        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
       }
     },
     /**
@@ -463,12 +463,12 @@
           }
           this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
             this.$emit('onSubProcess', {
-            subProcessId: res.data.subProcessInstanceId,
-            fromThis: this
-          })
-        }).catch(e => {
+              subProcessId: res.data.subProcessInstanceId,
+              fromThis: this
+            })
+          }).catch(e => {
             this.$message.error(e.msg || '')
-        })
+          })
         } else {
           this.$emit('onSubProcess', {
             subProcessId: this.backfillItem.params.processDefinitionId,
@@ -522,7 +522,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
+        if (this.successBranch != '' && this.successBranch != null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -536,13 +536,13 @@
         }
         return true
       },
-      _verifWorkGroup() {
+      _verifWorkGroup () {
         let item = this.store.state.security.workerGroupsListAll.find(item => {
-          return item.id == this.workerGroup;
-        });
-        if(item==undefined) {
+          return item.id == this.workerGroup
+        })
+        if (item == undefined) {
           this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
-          return false;
+          return false
         }
         return true
       },
@@ -555,30 +555,29 @@
           return
         }
         // verif workGroup
-        if(!this._verifWorkGroup()) {
+        if (!this._verifWorkGroup()) {
           return
         }
         // Verify task alarm parameters
         if (this.nodeData.taskType === 'DEPENDENT') {
-          if (!this.$refs['dependentTimeout']._verification()) {
+          if (!this.$refs.dependentTimeout._verification()) {
             return
           }
         } else {
-          if (!this.$refs['timeout']._verification()) {
+          if (!this.$refs.timeout._verification()) {
             return
           }
         }
-        
+
         // Verify node parameters
         if (!this.$refs[this.nodeData.taskType]._verification()) {
           return
         }
         // Verify preTasks and update dag-things
-        if (this.$refs['PRE_TASK']) {
-          if (!this.$refs['PRE_TASK']._verification()) {
+        if (this.$refs.PRE_TASK) {
+          if (!this.$refs.PRE_TASK._verification()) {
             return
-          }
-          else {
+          } else {
             // Sync data-targetarr
             $(`#${this.nodeData.id}`).attr(
               'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
@@ -594,7 +593,7 @@
                 target: targetId,
                 type: 'basic',
                 paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-                HoverPaintStyle: {stroke: '#ccc', strokeWidth: 3}
+                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
               })
             })
 
@@ -680,7 +679,7 @@
           fromThis: this
         })
       }
-    }, 
+    },
     watch: {
       /**
        * Watch the item change, cache the value it changes
@@ -695,7 +694,7 @@
       // Backfill data
       let taskList = this.store.state.dag.tasks
 
-      //fillback use cacheTasks
+      // fillback use cacheTasks
       let cacheTasks = this.store.state.dag.cacheTasks
       let o = {}
       if (cacheTasks[this.nodeData.id]) {
@@ -720,21 +719,21 @@
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
         this.delayTime = o.delayTime
-        if(o.conditionResult) {
+        if (o.conditionResult) {
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
         }
-          // If the workergroup has been deleted, set the default workergroup
-        var hasMatch = false;
+        // If the workergroup has been deleted, set the default workergroup
+        var hasMatch = false
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
           var workerGroup = this.store.state.security.workerGroupsListAll[i].id
           if (o.workerGroup == workerGroup) {
-            hasMatch = true;
-            break;
+            hasMatch = true
+            break
           }
         }
-        if(o.workerGroup == undefined) {
-          this.store.dispatch('dag/getTaskInstanceList',{
+        if (o.workerGroup == undefined) {
+          this.store.dispatch('dag/getTaskInstanceList', {
             pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
           }).then(res => {
             this.workerGroup = res.totalList[0].workerGroup
@@ -746,7 +745,6 @@
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
-
       } else {
         this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
       }
@@ -765,10 +763,10 @@
     },
     mounted () {
       let self = this
-      $("#cancelBtn").mousedown(function(event){
-        event.preventDefault();
+      $('#cancelBtn').mousedown(function (event) {
+        event.preventDefault()
         self.close()
-      });
+      })
     },
     updated () {
     },
@@ -784,7 +782,7 @@
         return this.nodeData.taskType === 'SUB_PROCESS' && this.name
       },
 
-      //Define the item model
+      // Define the item model
       _item () {
         return {
           type: this.nodeData.taskType,
@@ -826,7 +824,7 @@
       mDependentTimeout,
       mPriority,
       mWorkerGroups,
-      mPreTasks,
+      mPreTasks
     }
   }
 </script>

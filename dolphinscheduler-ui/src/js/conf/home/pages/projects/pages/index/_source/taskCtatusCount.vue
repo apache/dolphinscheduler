@@ -78,7 +78,7 @@
         this.$router.push({
           name: 'task-instance',
           query: {
-            stateType: _.find(stateType, ['label', name])['code'],
+            stateType: _.find(stateType, ['label', name]).code,
             startDate: this.searchParams.startDate,
             endDate: this.searchParams.endDate
           }
@@ -88,7 +88,7 @@
         let data = res.data.taskCountDtos
         this.taskCtatusList = _.map(data, v => {
           return {
-            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            key: _.find(stateType, ['code', v.taskStateType]).label,
             value: v.count,
             type: 'type'
           }
@@ -105,7 +105,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {
@@ -120,7 +120,7 @@
           })
         }
       },
-      '$store.state.projects.sideBar': function() {
+      '$store.state.projects.sideBar': function () {
         echarts.init(document.getElementById('task-status-pie')).resize()
       }
     },

@@ -218,8 +218,8 @@
       /**
        * _toggle User
        */
-      _toggleUser(command) {
-        if(command==='user') {
+      _toggleUser (command) {
+        if (command === 'user') {
           this._goAccount()
         } else {
           this._signOut()
@@ -234,18 +234,18 @@
           return
         }
         this.type = type
-       if(this.type==='DEFINITION') {
-         this.definitionUpdateDialog = true
-       } else {
-         this.fileUpdateDialog = true
-       }
+        if (this.type === 'DEFINITION') {
+          this.definitionUpdateDialog = true
+        } else {
+          this.fileUpdateDialog = true
+        }
       },
       onProgressDefinition (val) {
         this.progress = val
       },
       onUpdateDefinition () {
         let self = this
-        findComponentDownward(self.$root, `definition-list-index`)._updateList()
+        findComponentDownward(self.$root, 'definition-list-index')._updateList()
         this.isUpdate = false
         this.progress = 0
         this.definitionUpdateDialog = false
@@ -278,7 +278,7 @@
         this.fileUpdateDialog = false
       },
 
-      _fileChildUpdate (type,data) {
+      _fileChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
           return
@@ -308,7 +308,7 @@
         this.fileChildUpdateDialog = false
       },
 
-      _resourceChildUpdate (type,data) {
+      _resourceChildUpdate (type, data) {
         if (this.progress) {
           this._toggleArchive()
           return

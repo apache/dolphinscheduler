@@ -21,7 +21,7 @@
   import mToken from '@/conf/home/pages/user/pages/token'
   export default {
     name: 'token-index',
-    mounted() {
+    mounted () {
     },
     components: { mToken }
   }

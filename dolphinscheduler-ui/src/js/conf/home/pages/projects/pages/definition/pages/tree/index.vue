@@ -106,7 +106,7 @@
     props: {},
     methods: {
       ...mapActions('dag', ['getViewTree']),
-      _close(){
+      _close () {
         this.$router.go(-1)
       },
       /**
@@ -264,6 +264,5 @@
       }
     }
   }
-
 
 </style>

@@ -107,15 +107,15 @@
         this._debounceGET()
       },
       _getList (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') == 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.udfResourcesList = []
             this.udfResourcesList = res.totalList
@@ -139,7 +139,7 @@
     mounted () {
     },
     beforeDestroy () {
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }

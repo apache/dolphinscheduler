@@ -91,7 +91,7 @@
   import mLocalParams from '../formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Affirm from '../jumpAffirm'
-  import FormTenant from "./_source/selectTenant";
+  import FormTenant from './_source/selectTenant'
 
   export default {
     name: 'udp',
@@ -134,7 +134,7 @@
         }
         return true
       },
-      _accuStore(){
+      _accuStore () {
         this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
@@ -210,10 +210,9 @@
           this.tenantId = dag.tenantId
         }
       })
-
     },
     mounted () {},
-    components: {FormTenant, mLocalParams }
+    components: { FormTenant, mLocalParams }
   }
 </script>
 

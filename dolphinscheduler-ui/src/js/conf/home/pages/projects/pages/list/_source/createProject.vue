@@ -80,7 +80,7 @@
           param.projectId = this.item.id
         }
 
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
         this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
           this.$emit('_onUpdate')
@@ -88,13 +88,13 @@
             message: res.msg,
             type: 'success',
             offset: 70
-          });
+          })
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       _verification () {

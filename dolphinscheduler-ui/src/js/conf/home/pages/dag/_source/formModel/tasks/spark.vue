@@ -242,7 +242,7 @@
         sparkVersion: 'SPARK2',
         // Spark version(LIst)
         sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }],
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
@@ -259,10 +259,10 @@
       /**
        * getResourceId
        */
-      marjarId(name) {
-        this.store.dispatch('dag/getResourceId',{
+      marjarId (name) {
+        this.store.dispatch('dag/getResourceId', {
           type: 'FILE',
-          fullName: '/'+name
+          fullName: '/' + name
         }).then(res => {
           this.mainJar = res.id
         }).catch(e => {
@@ -287,55 +287,55 @@
       _onCacheResourcesData (a) {
         this.cacheResourceList = a
       },
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            this.operationTree(item) : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
         })
       },
-      operationTree(item) {
-        if(item.dirctory) {
-          item.isDisabled =true
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
         }
         delete item.children
       },
-      searchTree(element, id) {
+      searchTree (element, id) {
         // 根据id查找节点
         if (element.id == id) {
-          return element;
+          return element
         } else if (element.children != null) {
-          var i;
-          var result = null;
+          var i
+          var result = null
           for (i = 0; result == null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id);
+            result = this.searchTree(element.children[i], id)
           }
-          return result;
+          return result
         }
-        return null;
+        return null
       },
-      dataProcess(backResource) {
+      dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.mainJarList.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item=>{
+          resourceIdArr = isResourceId.map(item => {
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
+          }
+          let diffSet = this.resourceList.diff(resourceIdArr)
           let optionsCmp = []
-          if(diffSet.length>0) {
-            diffSet.forEach(item=>{
-              backResource.forEach(item1=>{
-                if(item==item1.id || item==item1.res) {
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item == item1.id || item == item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -344,15 +344,15 @@
           let noResources = [{
             id: -1,
             name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
             children: []
           }]
-          if(optionsCmp.length>0) {
+          if (optionsCmp.length > 0) {
             this.allNoResources = optionsCmp
-            optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
             })
-            optionsCmp.forEach(item=>{
+            optionsCmp.forEach(item => {
               item.isNew = true
             })
             noResources[0].children = optionsCmp
@@ -380,7 +380,7 @@
         }
 
         // noRes
-        if (this.noRes.length>0) {
+        if (this.noRes.length > 0) {
           this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
@@ -419,7 +419,7 @@
           return false
         }
         // Process resourcelist
-        let dataProcessing= _.map(this.resourceList, v => {
+        let dataProcessing = _.map(this.resourceList, v => {
           return {
             id: v
           }
@@ -454,7 +454,7 @@
           this.mainClass = ''
         }
       },
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
         this.$emit('on-cache-params', val)
       }
@@ -463,24 +463,24 @@
       cacheParams () {
         let isResourceId = []
         let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.mainJarList.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item=>{
-            return {id: item.id,name: item.name,res: item.fullName}
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
           })
         }
         let result = []
-        resourceIdArr.forEach(item=>{
-          this.allNoResources.forEach(item1=>{
-            if(item.id==item1.id) {
+        resourceIdArr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id == item1.id) {
               // resultBool = true
-             result.push(item1)
+              result.push(item1)
             }
           })
         })
@@ -506,65 +506,65 @@
       }
     },
     created () {
-        let item = this.store.state.dag.resourcesListS
-        let items = this.store.state.dag.resourcesListJar
-        this.diGuiTree(item)
-        this.diGuiTree(items)
-        this.mainJarList = item
-        this.mainJarLists = items
-        let o = this.backfillItem
+      let item = this.store.state.dag.resourcesListS
+      let items = this.store.state.dag.resourcesListJar
+      this.diGuiTree(item)
+      this.diGuiTree(items)
+      this.mainJarList = item
+      this.mainJarLists = items
+      let o = this.backfillItem
 
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.mainClass = o.params.mainClass || ''
-          if(o.params.mainJar.res) {
-            this.marjarId(o.params.mainJar.res)
-          } else if(o.params.mainJar.res=='') {
-            this.mainJar = ''
-          } else {
-            this.mainJar = o.params.mainJar.id || ''
-          }
-          this.deployMode = o.params.deployMode || ''
-          this.driverCores = o.params.driverCores || 1
-          this.driverMemory = o.params.driverMemory || '512M'
-          this.numExecutors = o.params.numExecutors || 2
-          this.executorMemory = o.params.executorMemory || '2G'
-          this.executorCores = o.params.executorCores || 2
-          this.mainArgs = o.params.mainArgs || ''
-          this.others = o.params.others
-          this.programType = o.params.programType || 'SCALA'
-          this.sparkVersion = o.params.sparkVersion || 'SPARK2'
-
-          // backfill resourceList
-          let backResource = o.params.resourceList || []
-          let resourceList = o.params.resourceList || []
-          if (resourceList.length) {
-            _.map(resourceList, v => {
-              if(!v.id) {
-                this.store.dispatch('dag/getResourceId',{
-                  type: 'FILE',
-                  fullName: '/'+v.res
-                }).then(res => {
-                  this.resourceList.push(res.id)
-                  this.dataProcess(backResource)
-                }).catch(e => {
-                  this.resourceList.push(v.res)
-                  this.dataProcess(backResource)
-                })
-              } else {
-                this.resourceList.push(v.id)
-                this.dataProcess(backResource)
-              }
-            })
-            this.cacheResourceList = resourceList
-          }
-
-          // backfill localParams
-          let localParams = o.params.localParams || []
-          if (localParams.length) {
-            this.localParams = localParams
-          }
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.mainClass = o.params.mainClass || ''
+        if (o.params.mainJar.res) {
+          this.marjarId(o.params.mainJar.res)
+        } else if (o.params.mainJar.res == '') {
+          this.mainJar = ''
+        } else {
+          this.mainJar = o.params.mainJar.id || ''
         }
+        this.deployMode = o.params.deployMode || ''
+        this.driverCores = o.params.driverCores || 1
+        this.driverMemory = o.params.driverMemory || '512M'
+        this.numExecutors = o.params.numExecutors || 2
+        this.executorMemory = o.params.executorMemory || '2G'
+        this.executorCores = o.params.executorCores || 2
+        this.mainArgs = o.params.mainArgs || ''
+        this.others = o.params.others
+        this.programType = o.params.programType || 'SCALA'
+        this.sparkVersion = o.params.sparkVersion || 'SPARK2'
+
+        // backfill resourceList
+        let backResource = o.params.resourceList || []
+        let resourceList = o.params.resourceList || []
+        if (resourceList.length) {
+          _.map(resourceList, v => {
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
+                type: 'FILE',
+                fullName: '/' + v.res
+              }).then(res => {
+                this.resourceList.push(res.id)
+                this.dataProcess(backResource)
+              }).catch(e => {
+                this.resourceList.push(v.res)
+                this.dataProcess(backResource)
+              })
+            } else {
+              this.resourceList.push(v.id)
+              this.dataProcess(backResource)
+            }
+          })
+          this.cacheResourceList = resourceList
+        }
+
+        // backfill localParams
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
+      }
     },
     mounted () {
 

@@ -123,31 +123,31 @@
        * submit
        */
       _ok () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            fullName: this.currentDir+'/'+this.name,
+            fullName: this.currentDir + '/' + this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
-            if(isLt1024M) {
+            if (isLt1024M) {
               this._formDataUpdate().then(res => {
                 setTimeout(() => {
-                  this.$refs['popup'].spinnerLoading = false
+                  this.$refs.popup.spinnerLoading = false
                 }, 800)
               }).catch(e => {
-                this.$refs['popup'].spinnerLoading = false
+                this.$refs.popup.spinnerLoading = false
               })
             } else {
               this.$message.warning(`${i18n.$t('Upload File Size')}`)
-              this.$refs['popup'].spinnerLoading = false
+              this.$refs.popup.spinnerLoading = false
             }
           }).catch(e => {
             this.$message.error(e.msg || '')
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           })
         } else {
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
       },
       /**
@@ -177,7 +177,7 @@
           formData.append('pid', this.pid)
           formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
-          io.post(`resources/create`, res => {
+          io.post('resources/create', res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateResourceChildUpdate')

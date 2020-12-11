@@ -56,35 +56,35 @@
       }
     },
     props: {
-        tmp: Boolean
+      tmp: Boolean
     },
     methods: {
       _ok () {
-        if(this._verification()) {
-            if(this.tmp) {
-              this.$emit('onBatchMove',this.itemId)
-            } else {
-              this.$emit('onBatchCopy',this.itemId)
-            }
+        if (this._verification()) {
+          if (this.tmp) {
+            this.$emit('onBatchMove', this.itemId)
+          } else {
+            this.$emit('onBatchCopy', this.itemId)
+          }
         }
       },
-      _verification() {
-        if(!this.itemId) {
-            this.$message.warning(`${i18n.$t('Project name is required')}`)
-            return false
+      _verification () {
+        if (!this.itemId) {
+          this.$message.warning(`${i18n.$t('Project name is required')}`)
+          return false
         }
         return true
       }
-      
+
     },
     watch: {
     },
     created () {
-        this.store.dispatch('dag/getAllItems', {}).then(res => {
-            if(res.data.length> 0) {
-                this.itemList = res.data
-            }
-        })
+      this.store.dispatch('dag/getAllItems', {}).then(res => {
+        if (res.data.length > 0) {
+          this.itemList = res.data
+        }
+      })
     },
     mounted () {
 

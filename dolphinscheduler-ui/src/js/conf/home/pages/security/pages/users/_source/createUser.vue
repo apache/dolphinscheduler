@@ -146,7 +146,7 @@
             return
           }
           // Verify username
-          this.store.dispatch(`security/verifyName`, {
+          this.store.dispatch('security/verifyName', {
             type: 'user',
             userName: this.userName
           }).then(res => {
@@ -162,26 +162,26 @@
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 
-        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
-        
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
+
         let userNameLength = this.userName.length
         // user name
-        if (userNameLength<3 || userNameLength>39) {
+        if (userNameLength < 3 || userNameLength > 39) {
           this.$message.warning(`${i18n.$t('User name length is between 3 and 39')}`)
           return false
         }
-        if (!this.userName.replace(/\s*/g,"")) {
+        if (!this.userName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
         }
         // password
-        if (this.userPassword!='' && this.item) {
-          if(!regPassword.test(this.userPassword)) {
+        if (this.userPassword != '' && this.item) {
+          if (!regPassword.test(this.userPassword)) {
             this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
-        } else if(!this.item){
-          if(!regPassword.test(this.userPassword)) {
+        } else if (!this.item) {
+          if (!regPassword.test(this.userPassword)) {
             this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
@@ -210,7 +210,6 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
-
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -244,11 +243,11 @@
         })
       },
       _submit () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
-        let queueCode = '';
-        //get queue code
-        if (this.queueName != ''){
+        let queueCode = ''
+        // get queue code
+        if (this.queueName != '') {
           queueCode = this.queueList.length > 0 ? _.find(this.queueList, ['id', this.queueName]).code : ''
         }
         let param = {
@@ -267,16 +266,16 @@
 
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
           this.$emit('onUpdate', param)
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },
@@ -293,7 +292,7 @@
             this.userState = this.item.state + '' || '1'
             this.tenantId = this.item.tenantId
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
+              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id || ''
             })
           }
         })
@@ -305,7 +304,7 @@
           this.phone = this.item.phone
           this.userState = this.state + '' || '1'
           this.tenantId = this.item.tenantId
-          if(this.queueList.length>0) {
+          if (this.queueList.length > 0) {
             this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
           } else {
             this.queueName = ''
