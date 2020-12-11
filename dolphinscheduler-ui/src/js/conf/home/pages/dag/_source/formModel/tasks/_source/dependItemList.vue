@@ -74,7 +74,7 @@
     props: {
       dependItemList: Array,
       index: Number,
-      dependTaskList:Array
+      dependTaskList: Array
     },
     model: {
       prop: 'dependItemList',
@@ -109,7 +109,7 @@
        * remove task
        */
       _remove (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i,1)
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -176,14 +176,14 @@
        */
       _onChangeProjectId (value) {
         this._getProcessByProjectId(value).then(definitionList => {
-          /*this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item))*/
+          /* this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item)) */
           let definitionId = definitionList[0].value
           this._getDependItemList(definitionId).then(depTasksList => {
             let item = this.dependItemList[this.itemIndex]
             // init set depTasks All
             item.depTasks = 'ALL'
             // set dependItemList item data
-            this.$set(this.dependItemList, this.itemIndex, this._cpOldParams(value,definitionId, definitionList,depTasksList, item))
+            this.$set(this.dependItemList, this.itemIndex, this._cpOldParams(value, definitionId, definitionList, depTasksList, item))
           })
         })
       },
@@ -212,7 +212,7 @@
           depTasksList: depTasksList,
           cycle: 'day',
           dateValue: 'today',
-          dateValueList: _.cloneDeep(dateValueList['day']),
+          dateValueList: _.cloneDeep(dateValueList.day),
           state: ''
         }
       },
@@ -231,7 +231,7 @@
         }
       },
 
-      _cpOldParams (value,definitionId, definitionList,depTasksList, item) {
+      _cpOldParams (value, definitionId, definitionList, depTasksList, item) {
         return {
           projectId: value,
           definitionList: definitionList,

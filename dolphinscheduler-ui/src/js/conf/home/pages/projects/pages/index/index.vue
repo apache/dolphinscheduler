@@ -85,7 +85,7 @@
           startDate: '',
           endDate: ''
         },
-        dataTime: [],
+        dataTime: []
       }
     },
     props: {

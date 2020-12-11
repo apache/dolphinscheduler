@@ -93,7 +93,7 @@
           }
 
           // Verify username
-          this.store.dispatch(`security/verifyName`, {
+          this.store.dispatch('security/verifyName', {
             type: 'alertgroup',
             groupName: this.groupName
           }).then(res => {
@@ -105,7 +105,7 @@
       },
       _verification () {
         // group name
-        if (!this.groupName.replace(/\s*/g,"")) {
+        if (!this.groupName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
@@ -120,19 +120,19 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },

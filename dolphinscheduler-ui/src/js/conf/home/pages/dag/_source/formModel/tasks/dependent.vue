@@ -97,9 +97,9 @@
         $('body').find('.tooltip.fade.top.in').remove()
       },
       _onDeleteAll (i) {
-        this.dependTaskList.map((item,i)=>{
-          if(item.dependItemList.length === 0){
-            this.dependTaskList.splice(i,1)
+        this.dependTaskList.map((item, i) => {
+          if (item.dependItemList.length === 0) {
+            this.dependTaskList.splice(i, 1)
           }
         })
         // this._deleteDep(i)
@@ -107,7 +107,7 @@
       _setGlobalRelation () {
         this.relation = this.relation === 'AND' ? 'OR' : 'AND'
       },
-      getDependTaskList(i){
+      getDependTaskList (i) {
         // console.log('getDependTaskList',i)
       },
       _setRelation (i) {

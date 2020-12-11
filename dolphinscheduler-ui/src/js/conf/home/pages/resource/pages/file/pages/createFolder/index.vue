@@ -94,7 +94,7 @@
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ path: `/resource/file`})
+              this.$router.push({ path: '/resource/file' })
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
@@ -109,7 +109,7 @@
         }
 
         return true
-      },
+      }
     },
     watch: {},
     created () {

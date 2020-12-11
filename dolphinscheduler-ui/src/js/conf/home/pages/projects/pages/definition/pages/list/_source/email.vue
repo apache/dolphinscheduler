@@ -100,7 +100,7 @@
         if (this.email === '') {
           return true
         }
-        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
+        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, '')
 
         let email = this.email
 

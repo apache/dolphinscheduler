@@ -76,7 +76,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {

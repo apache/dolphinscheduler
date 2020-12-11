@@ -91,7 +91,7 @@
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ path: `/resource/udf`})
+              this.$router.push({ path: '/resource/udf' })
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
@@ -106,7 +106,7 @@
         }
 
         return true
-      },
+      }
     },
     watch: {},
     created () {

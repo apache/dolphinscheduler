@@ -49,13 +49,13 @@
       prop: 'value',
       event: 'tenantSelectEvent'
     },
-    mounted() {
-      let result = this.itemList.some(item=>{
-        if(item.id == this.value) {
+    mounted () {
+      let result = this.itemList.some(item => {
+        if (item.id == this.value) {
           return true
         }
-			})
-      if(!result) {
+      })
+      if (!result) {
         this.value = 'default'
       }
     },

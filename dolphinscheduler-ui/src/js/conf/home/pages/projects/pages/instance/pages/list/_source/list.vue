@@ -162,7 +162,7 @@
                   {{scope.row.count}}
                 </el-button>
               </span>
-              
+
               <!--Recovery Suspend-->
               <el-button
                   v-show="(scope.row.state === 'PAUSE' || scope.row.state == 'STOP') && buttonType !== 'suspend'"
@@ -312,7 +312,7 @@
        * @param STOP
        */
       _stop (item, index) {
-        if(item.state == 'STOP') {
+        if (item.state == 'STOP') {
           this._countDownFn({
             id: item.id,
             executeType: 'RECOVER_SUSPENDED_PROCESS',
@@ -443,7 +443,7 @@
       // },
       _arrDelChange (v) {
         let arr = []
-        arr = _.map(v, 'id');
+        arr = _.map(v, 'id')
         console.log(arr)
         this.strDelete = _.join(arr, ',')
       },
