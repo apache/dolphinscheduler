@@ -141,7 +141,7 @@
     computed: {
       ...mapState('kinship', ['locations', 'workList']),
       inputFocusStyle () {
-        return `width:280px`
+        return 'width:280px'
       }
     },
     mounted () {

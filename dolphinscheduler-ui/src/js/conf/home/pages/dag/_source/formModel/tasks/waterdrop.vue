@@ -112,7 +112,7 @@
         // script
         rawScript: '',
         // waterdrop script
-        baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh',
+        baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh', // eslint-disable-line
         // resourceNameVal
         resourceNameVal: [],
         // Custom parameter

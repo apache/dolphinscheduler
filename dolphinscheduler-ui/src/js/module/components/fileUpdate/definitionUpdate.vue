@@ -109,7 +109,6 @@
       _ok () {
         this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
-          name: this.name
           this._formDataUpdate().then(res => {
             setTimeout(() => {
               this.$refs.popup.spinnerLoading = false

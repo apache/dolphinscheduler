@@ -241,9 +241,9 @@
       _timing (item) {
         let self = this
         this._getReceiver(item.id).then(res => {
-          this.timingData.item = item,
-          this.timingData.receiversD = res.receivers,
-          this.timingData.receiversCcD = res.receiversCc,
+          this.timingData.item = item
+          this.timingData.receiversD = res.receivers
+          this.timingData.receiversCcD = res.receiversCc
           this.timingData.type = 'timing'
           this.timingDialog = true
         })
@@ -421,10 +421,10 @@
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
 
-          this.versionData.processDefinition = item,
-          this.versionData.processDefinitionVersions = processDefinitionVersions,
-          this.versionData.total = total,
-          this.versionData.pageNo = pageNo,
+          this.versionData.processDefinition = item
+          this.versionData.processDefinitionVersions = processDefinitionVersions
+          this.versionData.total = total
+          this.versionData.pageNo = pageNo
           this.versionData.pageSize = pageSize
           this.drawer = true
         }).catch(e => {

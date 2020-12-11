@@ -89,7 +89,7 @@
     props: {
       item: {
         type: Object,
-        default: {}
+        default: Object
       },
       source: {
         type: String,

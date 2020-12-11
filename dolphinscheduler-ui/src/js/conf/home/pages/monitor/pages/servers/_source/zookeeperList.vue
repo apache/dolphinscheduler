@@ -49,11 +49,6 @@
 <script>
   export default {
     name: 'zookeeper-list',
-    data () {
-      return {
-        list: []
-      }
-    },
     props: {
       list: Array
     }

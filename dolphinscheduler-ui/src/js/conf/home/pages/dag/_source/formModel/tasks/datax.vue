@@ -335,7 +335,6 @@
             return false
           }
 
-          debugger
           // storage
           this.$emit('on-params', {
             customConfig: this.customConfig,

@@ -35,6 +35,7 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import store from '@/conf/home/store'
   import { runningType } from '@/conf/home/pages/dag/_source/config'
   import { warningTypeList } from '@/conf/home/pages/projects/pages/definition/pages/list/_source/util'

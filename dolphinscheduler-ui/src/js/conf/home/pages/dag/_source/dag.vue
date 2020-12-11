@@ -203,8 +203,8 @@
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
   import { mapActions, mapState, mapMutations } from 'vuex'
-  import mVersions from '../../projects/pages/definition/pages/list/_source/versions'
   import mStart from '../../projects/pages/definition/pages/list/_source/start'
+  import mVersions from '../../projects/pages/definition/pages/list/_source/versions'
 
   let eventModel
 
@@ -270,7 +270,7 @@
       ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
       startRunning (item, startNodeList, sourceType) {
         this.startData = item
-        this.startNodeList.startNodeList
+        this.startNodeList = startNodeList
         this.sourceType = sourceType
         this.startDialog = true
       },

@@ -355,13 +355,13 @@
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
             this.warningGroupId = item.warningGroupId
           })
-        }).catch(() => this.warningGroupId = '')
+        }).catch(() => { this.warningGroupId = '' })
       } else {
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             this.warningGroupId = ''
           })
-        }).catch(() => this.warningGroupId = '')
+        }).catch(() => { this.warningGroupId = '' })
       }
     },
     components: { vCrontab, mEmail, mPriority, mWorkerGroups }

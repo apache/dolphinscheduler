@@ -161,7 +161,7 @@
       :visible.sync="resourceChildUpdateDialog"
       append-to-body="true"
       width="40%">
-      <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateFileChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeFileChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
+      <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
   </div>
 </template>
@@ -293,7 +293,7 @@
       },
       onUpdateFileChildUpdate () {
         let self = this
-        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList(data)
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
         this.isUpdate = false
         this.progress = 0
         this.fileChildUpdateDialog = false
@@ -322,7 +322,7 @@
       },
       onUpdateResourceChildUpdate () {
         let self = this
-        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList(data)
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
         this.isUpdate = false
         this.progress = 0
         this.resourceChildUpdateDialog = false
