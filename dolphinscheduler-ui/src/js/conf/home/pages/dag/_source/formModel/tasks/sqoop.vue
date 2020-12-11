@@ -342,6 +342,17 @@
           </div>
         </m-list-box>
         <m-list-box>
+          <div slot="text">{{$t('Hive Target Dir')}}</div>
+          <div slot="content">
+            <x-input
+              :disabled="isDetails"
+              type="text"
+              v-model="targetHiveParams.hiveTargetDir"
+              :placeholder="$t('Please enter hive target dir')">
+            </x-input>
+          </div>
+        </m-list-box>
+        <m-list-box>
           <div slot="text">{{$t('ReplaceDelimiter')}}</div>
           <div slot="content">
             <x-input
@@ -690,9 +701,9 @@
           dropDelimiter:false,
           hiveOverWrite:true,
           replaceDelimiter:"",
+          hiveTargetDir:"",
           hivePartitionKey:"",
           hivePartitionValue:""
-
         }
       }
     },
