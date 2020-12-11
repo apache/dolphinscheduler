@@ -58,11 +58,11 @@ services:
     - 12345:12345
     environment:
       TZ: Asia/Shanghai
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
@@ -120,11 +120,11 @@ services:
       ENTERPRISE_WECHAT_SECRET: ""
       ENTERPRISE_WECHAT_AGENT_ID: ""
       ENTERPRISE_WECHAT_USERS: ""
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
       interval: 30
@@ -153,11 +153,11 @@ services:
       MASTER_TASK_COMMIT_INTERVAL: "1000"
       MASTER_MAX_CPULOAD_AVG: "100"
       MASTER_RESERVED_MEMORY: "0.1"
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
@@ -188,11 +188,11 @@ services:
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]

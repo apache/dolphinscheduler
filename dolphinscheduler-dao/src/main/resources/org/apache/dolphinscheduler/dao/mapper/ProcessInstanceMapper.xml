@@ -66,11 +66,12 @@
     </select>
 
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select instance.*
+        select instance.id, instance.process_definition_id, instance.command_type, instance.executor_id,
+        instance.name, instance.state, instance.schedule_time, instance.start_time, instance.end_time,
+        instance.run_times, instance.recovery, instance.host
         from t_ds_process_instance instance
         join t_ds_process_definition define ON instance.process_definition_id = define.id
-        where 1=1
-        and instance.is_sub_process=0
+        where instance.is_sub_process=0
         and define.project_id = #{projectId}
         <if test="processDefinitionId != 0">
             and instance.process_definition_id = #{processDefinitionId}
