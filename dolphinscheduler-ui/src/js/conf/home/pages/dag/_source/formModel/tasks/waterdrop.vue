@@ -312,6 +312,18 @@
         this.resourceNameVal = val
         this.$emit('on-cache-params', val)
       },
+      resourceIdArr (arr) {
+        let result = []
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
+              // resultBool = true
+              result.push(item1)
+            }
+          })
+        })
+        this.noRes = result
+      },
       master: {
         handler (code) {
           if (code === 'spark://') {
@@ -326,7 +338,7 @@
       }
     },
     computed: {
-      cacheParams () {
+      resourceIdArr () {
         let isResourceId = []
         let resourceIdArr = []
         if (this.resourceList.length > 0) {
@@ -341,18 +353,11 @@
             return { id: item.id, name: item.name, res: item.fullName }
           })
         }
-        let result = []
-        resourceIdArr.forEach(item => {
-          this.allNoResources.forEach(item1 => {
-            if (item.id === item1.id) {
-              // resultBool = true
-              result.push(item1)
-            }
-          })
-        })
-        this.noRes = result
+        return resourceIdArr
+      },
+      cacheParams () {
         return {
-          resourceList: resourceIdArr,
+          resourceList: this.resourceIdArr,
           localParams: this.localParams,
           deployMode: this.deployMode,
           master: this.master,
