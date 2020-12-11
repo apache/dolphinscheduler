@@ -55,11 +55,9 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import { mapActions, mapState } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
-  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import graphGrid from './_source/graphGrid.vue'
 
   export default {

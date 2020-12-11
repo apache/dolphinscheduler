@@ -372,7 +372,6 @@
           this.host = res.host
 
           // When in Editpage, Prevent default value overwrite backfill value
-          let that = this
           setTimeout(() => {
             this.port = res.port
           }, 0)

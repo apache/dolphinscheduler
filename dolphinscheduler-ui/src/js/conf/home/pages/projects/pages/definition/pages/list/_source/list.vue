@@ -239,7 +239,6 @@
        * timing
        */
       _timing (item) {
-        let self = this
         this._getReceiver(item.id).then(res => {
           this.timingData.item = item
           this.timingData.receiversD = res.receivers
@@ -410,7 +409,6 @@
         })
       },
       _version (item) {
-        let self = this
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,

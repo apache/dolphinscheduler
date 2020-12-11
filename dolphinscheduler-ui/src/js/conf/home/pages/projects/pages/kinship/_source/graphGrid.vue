@@ -19,7 +19,7 @@
 </template>
 <script>
   import echarts from 'echarts'
-  import { mapActions, mapState, mapMutations } from 'vuex'
+  import { mapState } from 'vuex'
   import graphGridOption from './graphGridOption'
 
   export default {
