@@ -89,12 +89,12 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('resource', ['getResourcesListP','getResourceId']),
+      ...mapActions('resource', ['getResourcesListP', 'getResourceId']),
       /**
        * File Upload
        */
       _uploading () {
-        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE',this.searchParams.id)
+        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE', this.searchParams.id)
       },
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -107,15 +107,15 @@
         this.searchParams.pageSize = val
       },
       _getList (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') == 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.fileResourcesList = res.totalList
             this.total = res.total
@@ -131,20 +131,20 @@
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate () {
+      _onUpdate () {
         this.searchParams.id = this.$route.params.id
         this._debounceGET()
       },
-      _ckOperation(index) {
-        let breadName =''
+      _ckOperation (index) {
+        let breadName = ''
         this.breadList.forEach((item, i) => {
-          if(i<=index) {
-            breadName = breadName+'/'+item
+          if (i <= index) {
+            breadName = breadName + '/' + item
           }
         })
         this.transferApi(breadName)
       },
-      transferApi(api) {
+      transferApi (api) {
         this.getResourceId({
           type: 'FILE',
           fullName: api
@@ -174,7 +174,7 @@
       this.breadList = dir
     },
     beforeDestroy () {
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }

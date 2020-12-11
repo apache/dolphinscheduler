@@ -119,11 +119,11 @@
         udfResourceList: [],
         isUpdate: false,
         upDisabled: false,
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
-        },
+        }
       }
     },
     props: {
@@ -131,19 +131,19 @@
     },
     methods: {
       _ok () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
           this._verifyUdfFuncName().then(res => {
             this._createUdfFunc().then()
           }).then(res => {
             setTimeout(() => {
-              this.$refs['popup'].spinnerLoading = false
+              this.$refs.popup.spinnerLoading = false
             }, 800)
           }).catch(e => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           })
         } else {
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
       },
       _createUdfFunc () {
@@ -166,7 +166,7 @@
             param.id = id
           }
           // api
-          this.store.dispatch(`resource/${id ? `updateUdfFunc` : `createUdfFunc`}`, param).then(res => {
+          this.store.dispatch(`resource/${id ? 'updateUdfFunc' : 'createUdfFunc'}`, param).then(res => {
             this.$emit('onUpdate', param)
             this.$message.success(res.msg)
             resolve()
@@ -183,8 +183,8 @@
         this.upDisabled = true
       },
       // selTree
-      selTree(node) {
-        this.$refs.assignment.receivedValue(node.id,node.fullName)
+      selTree (node) {
+        this.$refs.assignment.receivedValue(node.id, node.fullName)
       },
       /**
        * get udf resources
@@ -197,13 +197,13 @@
             item = this.filterEmptyDirectory(item)
             let item1 = _.cloneDeep(res.data)
             this.diGuiTree(item)
-            
+
             this.diGuiTree(this.filterJarFile(item1))
-            item1 = item1.filter( item => {
-              if(item.dirctory) {
+            item1 = item1.filter(item => {
+              if (item.dirctory) {
                 return item
               }
-            });
+            })
             this.udfResourceList = item
             this.udfResourceDirList = item1
             resolve()
@@ -211,13 +211,13 @@
         })
       },
       // filterEmptyDirectory
-      filterEmptyDirectory(array) {
+      filterEmptyDirectory (array) {
         for (const item of array) {
           if (item.children) {
             this.filterEmptyDirectory(item.children)
           }
         }
-        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length==0) || (!/\.jar$/.test(n.name) && n.children.length>0)))
+        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length == 0) || (!/\.jar$/.test(n.name) && n.children.length > 0)))
       },
       // filterJarFile
       filterJarFile (array) {
@@ -229,10 +229,10 @@
         return array.filter(n => !/\.jar$/.test(n.name))
       },
       // diGuiTree
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? delete item.children : this.diGuiTree(item.children)
         })
       },
       /**
@@ -288,7 +288,7 @@
           }
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },

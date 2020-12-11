@@ -88,7 +88,7 @@
         }, 1)
       },
       _onBlur () {
-        let val = $(this.$refs['input'].$el).find('input')[0].value
+        let val = $(this.$refs.input.$el).find('input')[0].value
         if (this._validation(val)) {
           this.$emit('valueEvent', val)
           this._setIconState(val)

@@ -74,26 +74,26 @@
         stateList: [
           {
             label: `${this.$t('none')}`,
-            code: ``
+            code: ''
           },
           {
             label: `${this.$t('success')}`,
-            code: `成功`
+            code: '成功'
           },
           {
             label: `${this.$t('waiting')}`,
-            code: `等待`
+            code: '等待'
           },
           {
             label: `${this.$t('execution')}`,
-            code: `执行中`
+            code: '执行中'
           },
           {
             label: `${this.$t('finish')}`,
-            code: `完成`
+            code: '完成'
           }, {
             label: `${this.$t('failed')}`,
-            code: `失败`
+            code: '失败'
           }
         ],
         searchParams: {
@@ -105,7 +105,7 @@
           startDate: '',
           endDate: ''
         },
-        dataTime: [],
+        dataTime: []
       }
     },
     props: {},
@@ -118,7 +118,7 @@
        */
       _onChangeStartStop (val) {
         this.searchParams.startDate = val[0]
-        this.searchParams.endDate = val[1] 
+        this.searchParams.endDate = val[1]
       },
       /**
        * change state

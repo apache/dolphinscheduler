@@ -20,7 +20,7 @@
 <script>
   export default {
     name: 'file-manage-index',
-    mounted() {
-    },
+    mounted () {
+    }
   }
 </script>

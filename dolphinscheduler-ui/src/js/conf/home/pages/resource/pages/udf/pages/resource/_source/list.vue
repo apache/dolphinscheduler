@@ -111,7 +111,7 @@
       },
       _go (item) {
         localStore.setItem('file', `${item.alias}|${item.size}`)
-        if(item.directory) {
+        if (item.directory) {
           localStore.setItem('currentDir', `${item.fullName}`)
           this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
         }

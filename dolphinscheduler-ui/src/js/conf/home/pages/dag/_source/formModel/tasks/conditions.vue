@@ -99,9 +99,9 @@
         $('body').find('.tooltip.fade.top.in').remove()
       },
       _onDeleteAll (i) {
-        this.dependTaskList.map((item,i)=>{
-          if(item.dependItemList.length === 0){
-            this.dependTaskList.splice(i,1)
+        this.dependTaskList.map((item, i) => {
+          if (item.dependItemList.length === 0) {
+            this.dependTaskList.splice(i, 1)
           }
         })
         // this._deleteDep(i)
@@ -109,7 +109,7 @@
       _setGlobalRelation () {
         this.relation = this.relation === 'AND' ? 'OR' : 'AND'
       },
-      getDependTaskList(i){
+      getDependTaskList (i) {
         // console.log('getDependTaskList',i)
       },
       _setRelation (i) {
@@ -143,7 +143,7 @@
     created () {
       let o = this.backfillItem
       let dependentResult = $(`#${o.id}`).data('dependent-result') || {}
-      
+
       // Does not represent an empty object backfill
       if (!_.isEmpty(o)) {
         this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
@@ -151,11 +151,11 @@
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
         _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
-          $(`#${o.id}`).siblings().each(function(){
-            if(v1.depTasks == $(this).text()) {
+          $(`#${o.id}`).siblings().each(function () {
+            if (v1.depTasks == $(this).text()) {
               v1.state = $(this).attr('data-dependent-depstate')
             }
-          });
+          })
         }))
       }
     },

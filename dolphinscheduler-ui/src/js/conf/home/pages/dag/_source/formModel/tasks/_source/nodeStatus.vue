@@ -64,7 +64,7 @@
     props: {
       dependItemList: Array,
       index: Number,
-      dependTaskList:Array,
+      dependTaskList: Array,
       preNode: Array
     },
     model: {
@@ -78,7 +78,7 @@
       _add () {
         // btn loading
         this.isLoading = true
-            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
 
         // remove tooltip
         this._removeTip()
@@ -87,7 +87,7 @@
        * remove task
        */
       _remove (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i,1)
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -137,7 +137,7 @@
           status: ''
         }
       },
-      _rtOldParams (value,depTasksList, item) {
+      _rtOldParams (value, depTasksList, item) {
         return {
           depTasks: '',
           status: ''

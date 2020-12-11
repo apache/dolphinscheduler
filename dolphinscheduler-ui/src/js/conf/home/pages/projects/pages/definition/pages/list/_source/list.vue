@@ -190,8 +190,8 @@
       ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
       ...mapActions('security', ['getWorkerGroupsAll']),
 
-      selectable(row,index) {
-        if(row.releaseState === 'ONLINE') {
+      selectable (row, index) {
+        if (row.releaseState === 'ONLINE') {
           return false
         } else {
           return true
@@ -209,8 +209,8 @@
       _start (item) {
         this.getWorkerGroupsAll()
         this.getStartCheck({ processDefinitionId: item.id }).then(res => {
-        this.startData = item
-        this.startDialog = true
+          this.startData = item
+          this.startDialog = true
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -353,11 +353,11 @@
         * @param processDefinitionId the process definition id
         * @param fromThis fromThis
       */
-      mVersionSwitchProcessDefinitionVersion({ version, processDefinitionId, fromThis }) {
+      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
         this.switchProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
-        }).then(res=>{
+        }).then(res => {
           this.$message.success($t('Switch Version Successfully'))
           this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
         }).catch(e => {
@@ -372,19 +372,19 @@
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-      mVersionGetProcessDefinitionVersionsPage({ pageNo, pageSize, processDefinitionId, fromThis }) {
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
         this.getProcessDefinitionVersionsPage({
-        pageNo: pageNo,
-        pageSize: pageSize,
-        processDefinitionId: processDefinitionId
-       }).then(res=>{
-        this.versionData.processDefinitionVersions = res.data.lists
-        this.versionData.total = res.data.totalCount
-        this.versionData.pageSize = res.data.pageSize
-        this.versionData.pageNo = res.data.currentPage
-       }).catch(e=>{
-        this.$message.error(e.msg || '')
-       })
+          pageNo: pageNo,
+          pageSize: pageSize,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.versionData.processDefinitionVersions = res.data.lists
+          this.versionData.total = res.data.totalCount
+          this.versionData.pageSize = res.data.pageSize
+          this.versionData.pageNo = res.data.currentPage
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       },
       /**
         * delete one version of process definition
@@ -393,11 +393,11 @@
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-      mVersionDeleteProcessDefinitionVersion({ version, processDefinitionId, fromThis }) {
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
         this.deleteProcessDefinitionVersion({
           version: version,
           processDefinitionId: processDefinitionId
-        }).then(res=>{
+        }).then(res => {
           this.$message.success(res.msg || '')
           this.mVersionGetProcessDefinitionVersionsPage({
             pageNo: 1,
@@ -420,14 +420,13 @@
           let total = res.data.totalCount
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
-          
+
           this.versionData.processDefinition = item,
           this.versionData.processDefinitionVersions = processDefinitionVersions,
           this.versionData.total = total,
           this.versionData.pageNo = pageNo,
           this.versionData.pageSize = pageSize
           this.drawer = true
-
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
@@ -436,7 +435,7 @@
       _batchExport () {
         this.exportDefinition({
           processDefinitionIds: this.strSelectIds,
-          fileName: "process_"+new Date().getTime()
+          fileName: 'process_' + new Date().getTime()
         }).then(res => {
           this._onUpdate()
           this.checkAll = false
@@ -451,11 +450,11 @@
        * Batch Copy
        */
       _batchCopy () {
-        this.relatedItemsDialog= true
+        this.relatedItemsDialog = true
         this.tmp = false
       },
       onBatchCopy (item) {
-        this._copyProcess({id: this.strSelectIds,projectId: item})
+        this._copyProcess({ id: this.strSelectIds, projectId: item })
         this.relatedItemsDialog = false
       },
       closeRelatedItems () {
@@ -464,12 +463,12 @@
       /**
        * _batchMove
        */
-      _batchMove() {
+      _batchMove () {
         this.tmp = true
         this.relatedItemsDialog = true
       },
       onBatchMove (item) {
-        this._moveProcess({id: this.strSelectIds,projectId: item})
+        this._moveProcess({ id: this.strSelectIds, projectId: item })
         this.relatedItemsDialog = false
       },
       /**
@@ -492,7 +491,7 @@
        */
       _arrDelChange (v) {
         let arr = []
-        arr = _.map(v, 'id');
+        arr = _.map(v, 'id')
         this.strSelectIds = _.join(arr, ',')
       },
       /**

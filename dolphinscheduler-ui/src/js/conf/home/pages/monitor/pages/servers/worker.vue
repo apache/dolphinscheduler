@@ -112,7 +112,7 @@
       this.getWorkerData().then(res => {
         this.workerList = _.map(res, (v, i) => {
           return _.assign(v, {
-            id: v.host + "_" + v.id,
+            id: v.host + '_' + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })
