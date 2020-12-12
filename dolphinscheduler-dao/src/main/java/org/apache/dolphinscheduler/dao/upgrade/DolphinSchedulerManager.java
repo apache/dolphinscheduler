@@ -78,6 +78,13 @@ public class DolphinSchedulerManager {
 
         logger.info("Start initializing the DolphinScheduler manager table structure");
         upgradeDao.initSchema();
+        //create directories in the sql/create to store the multiple upgrade mirrors
+        try {
+            UpgradeDao.createMirrorDirs();
+        }
+        catch (Exception e) {
+            logger.info("Copying directories Failed");
+        }
     }
 
 
@@ -91,7 +98,7 @@ public class DolphinSchedulerManager {
         List<String> schemaList = SchemaUtils.getAllSchemaList();
         if(schemaList == null || schemaList.size() == 0) {
             logger.info("There is no schema to upgrade!");
-        }else {
+        } else {
 
             String version = "";
             // Gets the version of the current system
@@ -107,18 +114,36 @@ public class DolphinSchedulerManager {
                 logger.error("Unable to determine current software version, so cannot upgrade");
                 throw new RuntimeException("Unable to determine current software version, so cannot upgrade");
             }
-            
-            // The target version of the upgrade
-            String schemaVersion = "";
-            String schemaDir = schemaList.get(schemaList.size() - 1);
-            schemaVersion = schemaDir.split("_")[0];
-            if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
-                logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
-                logger.info("Begin upgrading DolphinScheduler's table structure");
-                upgradeDao.upgradeDolphinScheduler(schemaDir);
-                if ("1.3.0".equals(schemaVersion)) {
-                    upgradeDao.upgradeDolphinSchedulerWorkerGroup();
+
+            String closestMirror = "";
+            //iterate sql/create/mirrors directory and find closest mirror to current version
+            List<String> mirrorList = UpgradeDao.getAllMirrorList();
+            if (mirrorList == null || mirrorList.isEmpty()) {
+                logger.info("There are no upgrade mirrors!");
+            } else {
+                for (String mirrorDir : mirrorList) {
+                    closestMirror = mirrorDir.split("_")[0];
+                    if (UpgradeDao.isClosestMirror(closestMirror, version)) {
+                        logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, closestMirror);
+                        logger.info("Begin upgrading DolphinScheduler's table structure");
+                        upgradeDao.upgradeDolphinScheduler(mirrorDir);
+                        String schemaVersion = "";
+                        for (String schemaDir : schemaList) {
+                            schemaVersion = schemaDir.split("_")[0];
+                            if (SchemaUtils.isAGreatVersion(schemaVersion, closestMirror)) {
+                                logger.info("upgrade DolphinScheduler metadata version from {} to {}", closestMirror, schemaVersion);
+                                logger.info("Begin upgrading DolphinScheduler's table structure");
+                                upgradeDao.upgradeDolphinScheduler(schemaDir);
+                                if ("1.3.0".equals(schemaVersion)) {
+                                    upgradeDao.upgradeDolphinSchedulerWorkerGroup();
+                                }
+                            }
+                            closestMirror = schemaVersion;
+                        }
+                    }
+                    version = closestMirror;
                 }
+
             }
 
         }

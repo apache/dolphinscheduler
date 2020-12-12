@@ -33,7 +33,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class UpgradeDao extends AbstractBaseDao {
@@ -200,6 +204,84 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
         }
 
+    }
+    
+    /**
+     * createMirrorDirs
+     * creates upgrade mirror directories in sql/create/mirrors
+     */
+    public static void createMirrorDirs() throws IOException {
+        String dirStr = rootDir + "/sql/create/mirrors";
+        File mirrorDir = new File(dirStr);
+        // Gets a list of all upgrades
+        List<String> schemaList = SchemaUtils.getAllSchemaList();
+        if (schemaList == null || schemaList.isEmpty()) {
+            logger.info("There is no upgrade mirrors!");
+        } else {
+            for (String schemaStr : schemaList) {
+                String version = schemaStr.split("_")[0];
+                String schemaStrDir = rootDir + "/sql/upgrade/" + schemaStr;
+                File schemaDir = new File(schemaStrDir);
+                if (version.endsWith("0")) {
+                    org.apache.commons.io.FileUtils.copyDirectoryToDirectory(schemaDir, mirrorDir);
+                }
+            }
+        }
+    }
+
+    /**
+     * getAllMirrorLists
+     * gets all mirrors in the sql/create/mirrors direstory
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static List<String> getAllMirrorList() {
+        List<String> mirrorDirList = new ArrayList<>();
+        File[] mirrorDirArr = FileUtils.getAllDir("sql/create/mirrors");
+        if (mirrorDirArr == null || mirrorDirArr.length == 0) {
+            logger.info("There are no upgrade mirrors!");
+            return null;
+        } else {
+            for (File file : mirrorDirArr) {
+                mirrorDirList.add(file.getName());
+            }
+            Collections.sort(mirrorDirList, new Comparator() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    try {
+                        String dir1 = String.valueOf(o1);
+                        String dir2 = String.valueOf(o2);
+                        String version1 = dir1.split("_")[0];
+                        String version2 = dir2.split("_")[0];
+                        if (version1.equals(version2)) {
+                            return 0;
+                        }
+                        
+                        if (SchemaUtils.isAGreatVersion(version1, version2)) {
+                            return 1;
+                        }
+                        
+                        return -1;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage(), e);
+                    }
+                }
+            });
+            return mirrorDirList;
+        }
+    }
+
+    public static boolean isClosestMirror(String closestMirror, String version) {
+        if (StringUtils.isEmpty(closestMirror) || StringUtils.isEmpty(version)) {
+            logger.info("Closest mirror and Version are empty!");
+            return false;
+        }
+        
+        String[] versionArr = version.split("\\.");
+        String highClose = versionArr[0] + "." + Integer.parseInt(versionArr[1]) + 1 + "." + 0;
+        String lowClose = versionArr[0] + "." + (versionArr[1]) + "." + 0;
+        
+        return (closestMirror.equals(highClose) || closestMirror.equals(lowClose));
     }
 
     /**
