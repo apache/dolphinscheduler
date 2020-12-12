@@ -47,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
 
 /**
@@ -160,12 +161,18 @@ public abstract class AbstractCommandExecutor {
      * @return CommandExecuteResult
      * @throws Exception if error throws Exception
      */
-    public CommandExecuteResult run(String execCommand) throws Exception{
+    public CommandExecuteResult run(String execCommand) throws Exception {
 
         CommandExecuteResult result = new CommandExecuteResult();
 
-
+        int taskInstanceId = taskExecutionContext.getTaskInstanceId();
+        // If the task has been killed, then the task in the cache is null
+        if (null == taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
         if (StringUtils.isEmpty(execCommand)) {
+            taskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             return result;
         }
 
@@ -187,7 +194,12 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskExecutionContext.setProcessId(processId);
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+        boolean updateTaskExecutionContextStatus = taskExecutionContextCacheManager.updateTaskExecutionContext(taskExecutionContext);
+        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
+            ProcessUtils.kill(taskExecutionContext);
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
 
         // print process id
         logger.info("process start, process id is: {}", processId);
