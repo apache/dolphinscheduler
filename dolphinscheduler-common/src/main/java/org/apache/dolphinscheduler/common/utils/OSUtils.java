@@ -382,8 +382,14 @@ public class OSUtils {
         return null;
     }
 
+    /**
+     *  get sudo command
+     * @param tenantCode tenantCode
+     * @param command command
+     * @return result of sudo execute command
+     */
     public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command ;
+        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
     }
 
     /**
