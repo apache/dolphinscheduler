@@ -23,14 +23,13 @@
       <div class="list">
         <label>{{$t('User Name')}}</label>
         <div>
-          <x-input
-                  size="large"
+          <el-input
                   type="text"
                   v-model.trim="userName"
                   :placeholder="$t('Please enter user name')"
                   maxlength="60"
-                  @on-enterkey="_ok">
-          </x-input>
+                  @keyup.enter.native="_ok">
+          </el-input>
         </div>
         <p class="error" v-if="isUserPassword">
           {{userNameText}}
@@ -39,21 +38,20 @@
       <div class="list">
         <label>{{$t('Password')}}</label>
         <div>
-          <x-input
+          <el-input
                   type="password"
-                  size="large"
                   v-model="userPassword"
                   :placeholder="$t('Please enter your password')"
                   maxlength="20"
-                  @on-enterkey="_ok">
-          </x-input>
+                  @keyup.enter.native="_ok">
+          </el-input>
         </div>
         <p class="error" v-if="isUserPassword">
           {{userPasswordText}}
         </p>
       </div>
       <div class="list" style="margin-top: 10px;">
-        <x-button type="primary" shape="circle" size="large" :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </x-button>
+        <el-button style="width: 365px" type="primary" round :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </el-button>
       </div>
     </div>
   </div>

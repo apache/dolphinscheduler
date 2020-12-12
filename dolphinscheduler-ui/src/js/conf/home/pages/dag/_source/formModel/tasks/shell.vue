@@ -26,7 +26,7 @@
             style="opacity: 0">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="ans-icon-max" @click="setEditorVal"></em>
+            <em class="el-icon-rank" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -39,17 +39,6 @@
         </treeselect>
       </div>
     </m-list-box>
-    <!-- <m-list-box>
-      <div slot="text">{{$t('Resources')}}</div>
-      <div slot="content">
-        <m-resources
-                ref="refResources"
-                @on-resourcesData="_onResourcesData"
-                @on-cache-resourcesData="_onCacheResourcesData"
-                :resource-list="resourceList">
-        </m-resources>
-      </div>
-    </m-list-box> -->
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -61,6 +50,12 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      modal-append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -98,7 +93,9 @@
           }
         },
         allNoResources: [],
-        noRes: []
+        noRes: [],
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -113,32 +110,15 @@
         this.localParams = a
       },
       setEditorVal() {
-        let self = this
-          let modal = self.$modal.dialog({
-            className: 'scriptModal',
-            closable: false,
-            showMask: true,
-            maskClosable: true,
-            onClose: function() {
-
-            },
-            render (h) {
-              return h(mScriptBox, {
-                on: {
-                  getSriptBoxValue (val) {
-                    editor.setValue(val)
-                  },
-                  closeAble () {
-                    // this.$modal.destroy()
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: editor.getValue()
-                }
-              })
-            }
-          })
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
+      },
+      getSriptBoxValue (val) {
+        editor.setValue(val)
+        // this.scriptBoxDialog = false
+      },
+      closeAble () {
+        // this.scriptBoxDialog = false            
       },
       /**
        * return resourceList

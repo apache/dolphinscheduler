@@ -27,9 +27,6 @@
         </div>
       </div>
     </m-list-box>
-    <a class="ans-modal-box-close">
-      <em class="ans-icon-min" @click="closeModal"></em>
-    </a>
   </div>
 </template>
 <script>
@@ -83,10 +80,6 @@
 
         return editor
       },
-      closeModal() {
-        let self = this
-        self.$emit('closeAble')
-      }
     },
     watch: {},
     created () {

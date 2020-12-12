@@ -16,139 +16,136 @@
  */
 <template>
   <div class="datasource-popup-model">
-    <div class="top-p">
-      <span>{{item ? `${$t('Edit')}` : `${$t('Create')}`}}{{`${$t('Datasource')}`}}</span>
-    </div>
     <div class="content-p">
       <div class="create-datasource-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
-          <template slot="content">
-              <x-select style="width: 100%;" v-model="type">
-                <x-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
-                </x-option>
-              </x-select>
+          <template slot="content" size="small">
+              <el-select style="width: 100%;" v-model="type">
+                <el-option v-for="item in datasourceTypeList" :key="item.value" :value="item.value" :label="item.label">
+                </el-option>
+              </el-select>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Datasource Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
-                    :placeholder="$t('Please enter datasource name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter datasource name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="note"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('IP')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="host"
                     maxlength="60"
-                    :placeholder="$t('Please enter IP')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter IP')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Port')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="port"
-                    :placeholder="$t('Please enter port')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter port')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
           <template slot="name"><strong>*</strong>Principal</template>
           <template slot="content">
-            <x-input
+            <el-input
               type="input"
               v-model="principal"
-              :placeholder="$t('Please enter Principal')"
-              autocomplete="off">
-            </x-input>
+              size="small"
+              :placeholder="$t('Please enter Principal')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="userName"
                     maxlength="60"
-                    :placeholder="$t('Please enter user name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter user name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Password')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="password"
                     v-model="password"
-                    :placeholder="$t('Please enter your password')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter your password')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong :class="{hidden:showdDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="database"
                     maxlength="60"
-                    :placeholder="$t('Please enter database name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter database name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="showConnectType">
           <template slot="name"><strong>*</strong>{{$t('Oracle Connect Type')}}</template>
           <template slot="content">
-            <x-radio-group v-model="connectType" size="small">
-              <x-radio :label="'ORACLE_SERVICE_NAME'">{{$t('Oracle Service Name')}}</x-radio>
-              <x-radio :label="'ORACLE_SID'">{{$t('Oracle SID')}}</x-radio>
-            </x-radio-group>
+            <el-radio-group v-model="connectType" size="small" style="vertical-align: sub;">
+              <el-radio :label="'ORACLE_SERVICE_NAME'">{{$t('Oracle Service Name')}}</el-radio>
+              <el-radio :label="'ORACLE_SID'">{{$t('Oracle SID')}}</el-radio>
+            </el-radio-group>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('jdbc connect parameters')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="other"
                     :autosize="{minRows:2}"
-                    :placeholder="_rtOtherPlaceholder()"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="_rtOtherPlaceholder()">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
     </div>
     <div class="bottom-p">
-      <x-button type="text" @click="_close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="success" shape="circle" @click="_testConnect()" :loading="testLoading">{{testLoading ? 'Loading...' : $t('Test Connect')}}</x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? 'Loading...' :item ? `${$t('Edit')}` : `${$t('Submit')}`}} </x-button>
+      <el-button type="text" ize="mini" @click="_close()"> {{$t('Cancel')}} </el-button>
+      <el-button type="success" size="mini" round @click="_testConnect()" :loading="testLoading">{{testLoading ? 'Loading...' : $t('Test Connect')}}</el-button>
+      <el-button type="primary" size="mini" round :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? 'Loading...' :item ? `${$t('Edit')}` : `${$t('Submit')}`}} </el-button>
     </div>
   </div>
 </template>

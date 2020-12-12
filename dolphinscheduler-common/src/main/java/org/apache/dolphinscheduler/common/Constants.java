@@ -442,21 +442,21 @@ public final class Constants {
     /**
      * command parameter keys
      */
-    public static final String CMDPARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
+    public static final String CMD_PARAM_RECOVER_PROCESS_ID_STRING = "ProcessInstanceId";
 
-    public static final String CMDPARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
+    public static final String CMD_PARAM_RECOVERY_START_NODE_STRING = "StartNodeIdList";
 
-    public static final String CMDPARAM_RECOVERY_WAITTING_THREAD = "WaittingThreadInstanceId";
+    public static final String CMD_PARAM_RECOVERY_WAITING_THREAD = "WaitingThreadInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS = "processInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS = "processInstanceId";
 
-    public static final String CMDPARAM_EMPTY_SUB_PROCESS = "0";
+    public static final String CMD_PARAM_EMPTY_SUB_PROCESS = "0";
 
-    public static final String CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
+    public static final String CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID = "parentProcessInstanceId";
 
-    public static final String CMDPARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
+    public static final String CMD_PARAM_SUB_PROCESS_DEFINE_ID = "processDefinitionId";
 
-    public static final String CMDPARAM_START_NODE_NAMES = "StartNodeNameList";
+    public static final String CMD_PARAM_START_NODE_NAMES = "StartNodeNameList";
 
     /**
      * complement data start date
@@ -602,12 +602,6 @@ public final class Constants {
      * --queue QUEUE
      */
     public static final String SPARK_QUEUE = "--queue";
-
-
-    /**
-     * --queue --qu
-     */
-    public static final String FLINK_QUEUE = "--qu";
 
 
     /**
@@ -838,6 +832,7 @@ public final class Constants {
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
     public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_QUEUE = "-yqu";
     public static final String FLINK_TASK_MANAGE = "-yn";
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";

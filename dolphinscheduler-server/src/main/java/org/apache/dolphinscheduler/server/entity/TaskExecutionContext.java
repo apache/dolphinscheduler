@@ -38,7 +38,6 @@ public class TaskExecutionContext implements Serializable {
      */
     private int taskInstanceId;
 
-
     /**
      * task name
      */
@@ -506,22 +505,22 @@ public class TaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "TaskExecutionContext{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", currentExecutionStatus=" + currentExecutionStatus
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", startTime=" + startTime
-                + ", taskType='" + taskType + '\''
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", taskJson='" + taskJson + '\''
-                + ", processId=" + processId
-                + ", appIds='" + appIds + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", scheduleTime=" + scheduleTime
-                + ", globalParams='" + globalParams + '\''
-                + ", executorId=" + executorId
+            + "taskInstanceId=" + taskInstanceId
+            + ", taskName='" + taskName + '\''
+            + ", currentExecutionStatus=" + currentExecutionStatus
+            + ", firstSubmitTime=" + firstSubmitTime
+            + ", startTime=" + startTime
+            + ", taskType='" + taskType + '\''
+            + ", host='" + host + '\''
+            + ", executePath='" + executePath + '\''
+            + ", logPath='" + logPath + '\''
+            + ", taskJson='" + taskJson + '\''
+            + ", processId=" + processId
+            + ", appIds='" + appIds + '\''
+            + ", processInstanceId=" + processInstanceId
+            + ", scheduleTime=" + scheduleTime
+            + ", globalParams='" + globalParams + '\''
+            + ", executorId=" + executorId
                 + ", cmdTypeIfComplement=" + cmdTypeIfComplement
                 + ", tenantCode='" + tenantCode + '\''
                 + ", queue='" + queue + '\''

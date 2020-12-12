@@ -64,8 +64,8 @@
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
-        <quartz.version>2.2.3</quartz.version>
-        <jackson.version>2.9.8</jackson.version>
+        <quartz.version>2.3.0</quartz.version>
+        <jackson.version>2.9.10</jackson.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
@@ -766,9 +766,6 @@
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>
-                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
                         <include>**/common/utils/CollectionUtilsTest.java</include>
                         <include>**/common/utils/CommonUtilsTest.java</include>
                         <include>**/common/utils/DateUtilsTest.java</include>
@@ -780,6 +777,7 @@
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
+                        <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>
                         <include>**/common/utils/PropertyUtilsTest.java</include>
                         <include>**/common/utils/SchemaUtilsTest.java</include>
@@ -840,7 +838,7 @@
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/HostTest.java</include>
-                        <!--<include>**/server/utils/FlinkArgsUtilsTest.java</include>-->
+                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>

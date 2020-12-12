@@ -19,9 +19,9 @@
     <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
       <span class="tag-wrapper" v-for="(item,$index) in activeList" :key="$index" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
-        <em class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
+        <em class="remove-tag el-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
       </span>
-      <x-poptip
+      <el-popover
               placement="bottom-start"
               :append-to-body="true"
               :visible-arrow="false"
@@ -41,23 +41,23 @@
         <span class="label-wrapper" slot="reference" >
           <!--@keydown.tab="_emailTab"-->
           <input
-                  class="email-input"
-                  ref="emailInput"
-                  :style="{width:emailWidth + 'px'}"
-                  type="text"
-                  v-model="email"
-                  :disabled="disabled"
-                  :placeholder="$t('Please enter email')"
-                  @blur="_emailEnter"
-                  @keydown.tab="_emailTab"
-                  @keyup.delete="_emailDelete"
-                  @keyup.enter="_emailEnter"
-                  @keyup.space="_emailEnter"
-                  @keyup.186="_emailEnter"
-                  @keyup.up="_emailKeyup('up')"
-                  @keyup.down="_emailKeyup('down')">
+              class="email-input"
+              ref="emailInput"
+              :style="{width:emailWidth + 'px'}"
+              type="text"
+              v-model="email"
+              :disabled="disabled"
+              :placeholder="$t('Please enter email')"
+              @blur="_emailEnter"
+              @keydown.tab="_emailTab"
+              @keyup.delete="_emailDelete"
+              @keyup.enter="_emailEnter"
+              @keyup.space="_emailEnter"
+              @keyup.186="_emailEnter"
+              @keyup.up="_emailKeyup('up')"
+              @keyup.down="_emailKeyup('down')">
         </span>
-      </x-poptip>
+      </el-popover>
     </div>
   </div>
 </template>
@@ -299,6 +299,8 @@
 <style lang="scss" rel="stylesheet/scss">
   .email-model {
     width: 100%;
+    border: 1px solid #dcdfe6;
+    border-radius: 5px;
     .input-element {
       min-height: 32px;
       padding: 1px 8px;

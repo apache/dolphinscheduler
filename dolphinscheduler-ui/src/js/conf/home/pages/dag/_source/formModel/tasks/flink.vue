@@ -19,30 +19,31 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
                 style="width: 130px;"
+                size="small"
                 v-model="programType"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
 
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
-        <x-input
-                :disabled="isDetails"
-                type="input"
-                v-model="mainClass"
-                :placeholder="$t('Please enter main class')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="mainClass"
+          :placeholder="$t('Please enter main class')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -56,76 +57,77 @@
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
       <div slot="content">
-        <x-radio-group v-model="deployMode">
-          <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
-          <x-radio :label="'local'" :disabled="isDetails"></x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="deployMode" size="small">
+          <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+        </el-radio-group>
       </div>
     </m-list-box>
-    <m-list-box>
+    <m-list-box v-if="deployMode === 'cluster'">
       <div slot="text">{{$t('Flink Version')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
           style="width: 100px;"
+          size="small"
           v-model="flinkVersion"
           :disabled="isDetails">
-          <x-option
+          <el-option
             v-for="version in flinkVersionList"
             :key="version.code"
             :value="version.code"
             :label="version.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
-    <div class="list-box-4p">
+    <div class="list-box-4p" v-if="deployMode === 'cluster'">
       <div class="clearfix list">
         <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="input"
+            size="small"
             v-model="jobManagerMemory"
             :placeholder="$t('Please enter jobManager memory')"
-            style="width: 200px;"
-            autocomplete="off">
-        </x-input>
+            style="width: 200px;">
+        </el-input>
         </span>
         <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="input"
+            size="small"
             v-model="taskManagerMemory"
             :placeholder="$t('Please enter the taskManager memory')"
-            style="width: 186px;"
-            autocomplete="off">
-        </x-input>
+            style="width: 186px;">
+        </el-input>
         </span>
       </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('slot')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="slot"
                   :placeholder="$t('Please enter solt number')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 200px;">
+        </el-input>
         </span>
         <div v-if="flinkVersion !== '>=1.10'">
         <span class="sp1 sp3">{{$t('taskManager')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="taskManager"
                   :placeholder="$t('Please enter taskManager number')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 186px;">
+        </el-input>
         </span>
         </div>
       </div>
@@ -133,26 +135,27 @@
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :autosize="{minRows:2}"
                 :disabled="isDetails"
                 type="textarea"
+                size="small"
                 v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter Command-line parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :disabled="isDetails"
                 :autosize="{minRows:2}"
                 type="textarea"
+                size="small"
                 v-model="others"
                 :placeholder="$t('Please enter other parameters')">
-        </x-input>
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -167,10 +170,10 @@
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
-                ref="refLocalParams"
-                @on-local-params="_onLocalParams"
-                :udp-list="localParams"
-                :hide="false">
+            ref="refLocalParams"
+            @on-local-params="_onLocalParams"
+            :udp-list="localParams"
+            :hide="false">
         </m-local-params>
       </div>
     </m-list-box>

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -64,22 +65,22 @@ public abstract class AbstractCommandExecutor {
 
     protected StringBuilder varPool = new StringBuilder();
     /**
-     *  process
+     * process
      */
     private Process process;
 
     /**
-     *  log handler
+     * log handler
      */
     protected Consumer<List<String>> logHandler;
 
     /**
-     *  logger
+     * logger
      */
     protected Logger logger;
 
     /**
-     *  log list
+     * log list
      */
     protected final List<String> logBuffer;
 
@@ -147,7 +148,14 @@ public abstract class AbstractCommandExecutor {
 
         CommandExecuteResult result = new CommandExecuteResult();
 
+        int taskInstanceId = taskExecutionContext.getTaskInstanceId();
+        // If the task has been killed, then the task in the cache is null
+        if (null == taskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
         if (StringUtils.isEmpty(execCommand)) {
+            taskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
             return result;
         }
 
@@ -168,7 +176,12 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskExecutionContext.setProcessId(processId);
-        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+        boolean updateTaskExecutionContextStatus = taskExecutionContextCacheManager.updateTaskExecutionContext(taskExecutionContext);
+        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
+            ProcessUtils.kill(taskExecutionContext);
+            result.setExitStatusCode(EXIT_CODE_KILL);
+            return result;
+        }
 
         // print process id
         logger.info("process start, process id is: {}", processId);
@@ -180,9 +193,9 @@ public abstract class AbstractCommandExecutor {
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-                taskExecutionContext.getExecutePath(),
-                processId
-                , result.getExitStatusCode());
+            taskExecutionContext.getExecutePath(),
+            processId
+            , result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
@@ -212,6 +225,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * cancel application
+     *
      * @throws Exception exception
      */
     public void cancelApplication() throws Exception {
@@ -242,6 +256,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * soft kill
+     *
      * @param processId process id
      * @return process is alive
      * @throws InterruptedException interrupted exception
@@ -266,6 +281,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * hard kill
+     *
      * @param processId process id
      */
     private void hardKill(int processId) {
@@ -284,6 +300,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * print command
+     *
      * @param commands process builder
      */
     private void printCommand(List<String> commands) {
@@ -315,6 +332,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * get the standard output of the process
+     *
      * @param process process
      */
     private void parseProcessOutput(Process process) {
@@ -341,7 +359,7 @@ public abstract class AbstractCommandExecutor {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                 } finally {
                     clear();
                     close(inReader);
@@ -363,9 +381,9 @@ public abstract class AbstractCommandExecutor {
             for (String appId : appIds) {
                 while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
-                            || applicationStatus.equals(ExecutionStatus.KILL)) {
+                        || applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
                     }
 
@@ -376,7 +394,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()), e);
             result = false;
         }
         return result;
@@ -412,6 +430,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * convert file to list
+     *
      * @param filename file name
      * @return line list
      */
@@ -431,13 +450,13 @@ public abstract class AbstractCommandExecutor {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
+            logger.error(String.format("read file: %s failed : ", filename), e);
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    logger.error(e.getMessage(),e);
+                    logger.error(e.getMessage(), e);
                 }
             }
 
@@ -447,6 +466,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * find app id
+     *
      * @param line line
      * @return appid
      */
@@ -498,7 +518,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * when log buffer siz or flush time reach condition , then flush
      *
-     * @param lastFlushTime  last flush time
+     * @param lastFlushTime last flush time
      * @return last flush time
      */
     private long flush(long lastFlushTime) {

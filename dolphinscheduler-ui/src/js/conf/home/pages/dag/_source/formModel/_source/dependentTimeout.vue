@@ -23,7 +23,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch v-model="enable" @on-click="_onSwitch(0, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="enable" size="small" @change="_onSwitch(0, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -35,7 +35,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding: 5px 0;">
-            <x-switch v-model="waitStartTimeout.enable" @on-click="_onSwitch(1, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="waitStartTimeout.enable" size="small" @change="_onSwitch(1, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -46,22 +46,22 @@
           <span class="text-box">
             <span>{{$t('Timeout period')}}</span>
           </span>
-          <x-input v-model="waitStartTimeout.interval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitStartTimeout.interval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Check interval')}}</span>
           </span>
-          <x-input v-model="waitStartTimeout.checkInterval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitStartTimeout.checkInterval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Timeout strategy')}}</span>
           </span>
           <div style="padding-top: 6px;">
-            <x-checkbox-group v-model="waitStartTimeout.strategy">
-              <x-checkbox label="FAILED" :disabled="true">{{$t('Timeout failure')}}</x-checkbox>
-            </x-checkbox-group>
+            <el-checkbox-group size="small" v-model="waitStartTimeout.strategy">
+              <el-checkbox label="FAILED" :disabled="true">{{$t('Timeout failure')}}</el-checkbox>
+            </el-checkbox-group>
           </div>
         </label>
       </div>
@@ -73,7 +73,7 @@
       <div class="cont-box">
         <label class="label-box">
           <div style="padding: 5px 0;">
-            <x-switch v-model="waitCompleteTimeout.enable" @on-click="_onSwitch(2, $event)" :disabled="isDetails"></x-switch>
+            <el-switch v-model="waitCompleteTimeout.enable" size="small" @change="_onSwitch(2, $event)" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -84,17 +84,17 @@
           <span class="text-box">
             <span>{{$t('Timeout period')}}</span>
           </span>
-          <x-input v-model="waitCompleteTimeout.interval" style="width: 100px;" :disabled="isDetails" maxlength="9">
+          <el-input v-model="waitCompleteTimeout.interval" size="small" style="width: 100px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
           <span class="text-box">
             <span>{{$t('Timeout strategy')}}</span>
           </span>
           <div style="padding-top: 6px;">
-            <x-checkbox-group v-model="waitCompleteTimeout.strategy">
-              <x-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</x-checkbox>
-              <x-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</x-checkbox>
-            </x-checkbox-group>
+            <el-checkbox-group size="small" v-model="waitCompleteTimeout.strategy">
+              <el-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</el-checkbox>
+              <el-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</el-checkbox>
+            </el-checkbox-group>
           </div>
         </label>
       </div>

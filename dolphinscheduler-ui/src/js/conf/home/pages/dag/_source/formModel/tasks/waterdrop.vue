@@ -21,22 +21,22 @@
       <div class="clearfix list">
         <span class="sp1">{{$t('Deploy Mode')}}</span>
         <span class="sp2">
-          <x-radio-group v-model="deployMode">
-            <x-radio :label="'client'" :disabled="isDetails"></x-radio>
-            <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
-            <x-radio :label="'local'" :disabled="isDetails"></x-radio>
-          </x-radio-group>
+          <el-radio-group size="small" v-model="deployMode">
+            <el-radio :label="'client'" :disabled="isDetails"></el-radio>
+            <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+            <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+          </el-radio-group>
         </span>
         <span class="sp1 sp3">{{$t('Queue')}}</span>
         <span class="sp4">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="input"
+            size="small"
             v-model="queue"
             :placeholder="$t('Please enter queue value')"
-            style="width: 60%;"
-            autocomplete="off">
-        </x-input>
+            style="width: 60%;">
+        </el-input>
         </span>
       </div>
     </div>
@@ -45,27 +45,28 @@
       <div class="clearfix list">
         <span class="sp1">{{$t('Master')}}</span>
         <span class="sp4">
-          <x-select
+          <el-select
             style="width: 130px;"
+            size="small"
             v-model="master"
             :disabled="isDetails">
-          <x-option
-            v-for="city in masterType"
-            :key="city.code"
-            :value="city.code"
-            :label="city.code">
-          </x-option>
-          </x-select>
+            <el-option
+              v-for="city in masterType"
+              :key="city.code"
+              :value="city.code"
+              :label="city.code">
+            </el-option>
+          </el-select>
         </span>
         <span v-if="masterUrlState">
-          <x-input
+          <el-input
             :disabled="isDetails"
             type="input"
+            size="small"
             v-model="masterUrl"
             :placeholder="$t('Please Enter Url')"
-            style="width: 60%;"
-            autocomplete="off">
-        </x-input>
+            style="width: 60%;">
+        </el-input>
         </span>
       </div>
     </div>
