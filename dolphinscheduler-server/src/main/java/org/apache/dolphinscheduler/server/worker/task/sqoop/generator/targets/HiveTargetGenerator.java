@@ -68,6 +68,11 @@ public class HiveTargetGenerator implements ITargetGenerator {
                         .append(Constants.SPACE).append(SqoopConstants.DELETE_TARGET_DIR);
                 }
 
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.TARGET_DIR)
+                            .append(Constants.SPACE).append(targetHiveParameter.getHiveTargetDir());
+                }
+
                 if (StringUtils.isNotEmpty(targetHiveParameter.getReplaceDelimiter())) {
                     hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_DELIMS_REPLACEMENT)
                         .append(Constants.SPACE).append(targetHiveParameter.getReplaceDelimiter());

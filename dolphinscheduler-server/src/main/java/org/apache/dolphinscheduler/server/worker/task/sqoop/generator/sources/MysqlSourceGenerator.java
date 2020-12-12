@@ -97,7 +97,10 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                     if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
                         StringBuilder columnMap = new StringBuilder();
                         for (Property item : mapColumnHive) {
-                            columnMap.append(item.getProp()).append(Constants.EQUAL_SIGN).append(item.getValue()).append(Constants.COMMA);
+                            if (!item.getProp().isEmpty()) {
+                                columnMap.append(item.getProp()).append(Constants.EQUAL_SIGN)
+                                        .append(item.getValue()).append(Constants.COMMA);
+                            }
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
@@ -110,14 +113,17 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                     List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
                     if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
-                        StringBuilder columnMap = new StringBuilder();
+                        StringBuilder columnJavaMap = new StringBuilder();
                         for (Property item : mapColumnJava) {
-                            columnMap.append(item.getProp()).append(Constants.EQUAL_SIGN).append(item.getValue()).append(Constants.COMMA);
+                            if (!item.getProp().isEmpty()) {
+                                columnJavaMap.append(item.getProp()).append(Constants.EQUAL_SIGN)
+                                        .append(item.getValue()).append(Constants.COMMA);
+                            }
                         }
 
-                        if (StringUtils.isNotEmpty(columnMap.toString())) {
+                        if (StringUtils.isNotEmpty(columnJavaMap.toString())) {
                             mysqlSourceSb.append(Constants.SPACE).append(SqoopConstants.MAP_COLUMN_JAVA)
-                                .append(Constants.SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+                                .append(Constants.SPACE).append(columnJavaMap.substring(0, columnJavaMap.length() - 1));
                         }
                     }
                 }

@@ -53,13 +53,14 @@ public class CommonGenerator {
             //hadoop custom param
             List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
             if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
+                StringBuilder hadoopCustomParamStr = new StringBuilder();
                 for (Property hadoopCustomParam : hadoopCustomParams) {
-                    String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getProp(),
-                        Constants.EQUAL_SIGN, hadoopCustomParam.getValue());
-
-                    commonSb.append(Constants.SPACE).append(Constants.D)
-                        .append(Constants.SPACE).append(hadoopCustomParamStr);
+                    hadoopCustomParamStr.append(Constants.D)
+                            .append(Constants.SPACE).append(hadoopCustomParam.getProp())
+                            .append(Constants.EQUAL_SIGN).append(hadoopCustomParam.getValue())
+                            .append(Constants.SPACE);
                 }
+                commonSb.append(Constants.SPACE).append(hadoopCustomParamStr.substring(0, hadoopCustomParamStr.length() - 1));
             }
 
             //sqoop custom params
