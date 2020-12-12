@@ -382,7 +382,7 @@ public class OSUtils {
         return null;
     }
 
-    public static String getCmd(String tenantCode, String command) {
+    public static String getSudoCmd(String tenantCode, String command) {
         return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command ;
     }
 

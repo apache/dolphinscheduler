@@ -14,37 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task;
+
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.slf4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.common.Constants.EXIT_CODE_SUCCESS;
+import org.slf4j.Logger;
 
 /**
  * abstract command executor
@@ -87,8 +94,8 @@ public abstract class AbstractCommandExecutor {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   TaskExecutionContext taskExecutionContext ,
-                                   Logger logger){
+                                   TaskExecutionContext taskExecutionContext,
+                                   Logger logger) {
         this.logHandler = logHandler;
         this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
@@ -136,10 +143,9 @@ public abstract class AbstractCommandExecutor {
      * @return CommandExecuteResult
      * @throws Exception if error throws Exception
      */
-    public CommandExecuteResult run(String execCommand) throws Exception{
+    public CommandExecuteResult run(String execCommand) throws Exception {
 
         CommandExecuteResult result = new CommandExecuteResult();
-
 
         if (StringUtils.isEmpty(execCommand)) {
             return result;
@@ -155,7 +161,6 @@ public abstract class AbstractCommandExecutor {
 
         // parse process output
         parseProcessOutput(process);
-
 
         Integer processId = getProcessId(process);
 
@@ -174,7 +179,6 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
                 taskExecutionContext.getExecutePath(),
                 processId
@@ -190,7 +194,7 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(process.exitValue());
 
             // if yarn task , yarn state is final state
-            if (process.exitValue() == 0){
+            if (process.exitValue() == 0) {
                 result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
             }
         } else {
@@ -198,7 +202,6 @@ public abstract class AbstractCommandExecutor {
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
-
 
         return result;
     }
@@ -249,7 +252,7 @@ public abstract class AbstractCommandExecutor {
             try {
                 // sudo -u user command to run command
                 String cmd = String.format("kill %d", processId);
-                cmd = OSUtils.getCmd(taskExecutionContext.getTenantCode(), cmd);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("soft kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -269,7 +272,7 @@ public abstract class AbstractCommandExecutor {
         if (processId != 0 && process.isAlive()) {
             try {
                 String cmd = String.format("kill -9 %d", processId);
-                cmd = OSUtils.getCmd(taskExecutionContext.getTenantCode(), cmd);
+                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
@@ -317,7 +320,7 @@ public abstract class AbstractCommandExecutor {
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable(){
+        parseProcessOutputExecutorService.submit(new Runnable() {
             @Override
             public void run() {
                 BufferedReader inReader = null;
@@ -358,15 +361,15 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
-                while(Stopper.isRunning()){
+                while (Stopper.isRunning()) {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
                     logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
-                    if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
-                            applicationStatus.equals(ExecutionStatus.KILL)) {
+                    if (applicationStatus.equals(ExecutionStatus.FAILURE)
+                            || applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
                     }
 
-                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)) {
                         break;
                     }
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -414,9 +417,9 @@ public abstract class AbstractCommandExecutor {
      */
     private List<String> convertFile2List(String filename) {
         List lineList = new ArrayList<String>(100);
-        File file=new File(filename);
+        File file = new File(filename);
 
-        if (!file.exists()){
+        if (!file.exists()) {
             return lineList;
         }
 
@@ -430,7 +433,7 @@ public abstract class AbstractCommandExecutor {
         } catch (Exception e) {
             logger.error(String.format("read file: %s failed : ",filename),e);
         } finally {
-            if(br != null){
+            if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
@@ -454,7 +457,6 @@ public abstract class AbstractCommandExecutor {
         }
         return null;
     }
-
 
     /**
      * get remain time（s）
@@ -533,7 +535,10 @@ public abstract class AbstractCommandExecutor {
     protected List<String> commandOptions() {
         return Collections.emptyList();
     }
+
     protected abstract String buildCommandFilePath();
+
     protected abstract String commandInterpreter();
+
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }

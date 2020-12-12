@@ -30,15 +30,15 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
@@ -340,7 +340,7 @@ public class ProcessUtils {
             }
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
-            runCmd = OSUtils.getCmd(tenantCode, runCmd);
+            runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
             logger.info("kill cmd:{}", runCmd);
             OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
@@ -363,7 +363,7 @@ public class ProcessUtils {
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getCmd(taskExecutionContext.getTenantCode(), cmd);
+            cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
             logger.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
