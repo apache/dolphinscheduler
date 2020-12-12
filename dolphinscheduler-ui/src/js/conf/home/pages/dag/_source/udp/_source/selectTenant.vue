@@ -18,7 +18,7 @@
   <el-select
           :disabled="isDetails"
           @change="_onChange"
-          v-model="value"
+          v-model="selectedValue"
           size="small"
           style="width: 180px">
     <el-option
@@ -35,6 +35,7 @@
     name: 'form-tenant',
     data () {
       return {
+        selectedValue: this.value,
         itemList: []
       }
     },
@@ -56,16 +57,18 @@
         }
       })
       if (!result) {
-        this.value = 'default'
+        this.selectedValue = 'default'
       }
     },
     methods: {
       _onChange (o) {
-        this.value = o
         this.$emit('tenantSelectEvent', o)
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
       let stateTenantAllList = this.store.state.security.tenantAllList || []
