@@ -18,7 +18,7 @@
   <el-select
           :disabled="isDetails"
           @change="_onChange"
-          v-model="value"
+          v-model="selectedValue"
           size="small"
           style="width: 180px">
     <el-option
@@ -35,6 +35,7 @@
     name: 'form-worker-group',
     data () {
       return {
+        selectedValue: this.value,
         workerGroupsList: []
       }
     },
@@ -51,11 +52,13 @@
     },
     methods: {
       _onChange (o) {
-        this.value = o
         this.$emit('workerGroupsEvent', o)
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []

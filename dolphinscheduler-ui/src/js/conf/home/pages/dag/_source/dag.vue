@@ -156,7 +156,7 @@
         :visible.sync="nodeDrawer"
         size="50%"
         :with-header="false">
-        <m-form-model v-if="nodeDrawer" :nodeData = nodeData @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+        <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"
@@ -626,6 +626,16 @@
         this.lineData.sourceId = sourceId
         this.lineData.targetId = targetId
         this.lineDrawer = true
+      },
+
+      seeHistory (taskName) {
+        this.nodeData.self.$router.push({
+          name: 'task-instance',
+          query: {
+            processInstanceId: this.nodeData.self.$route.params.id,
+            taskName: taskName
+          }
+        })
       },
 
       addTaskInfo ({ item, fromThis }) {

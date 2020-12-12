@@ -93,7 +93,7 @@
       },
       type (a) {
         // The props parameter needs to be changed due to the scene.
-        this.udfs = ''
+        this.$emit('on-udfsData', '')
         if (a === 'HIVE') {
           this._getUdfList()
         } else {

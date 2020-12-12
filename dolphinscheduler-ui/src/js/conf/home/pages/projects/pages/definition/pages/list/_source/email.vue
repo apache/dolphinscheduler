@@ -17,7 +17,7 @@
 <template>
   <div class="ans-input email-model">
     <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
-      <span class="tag-wrapper" v-for="(item,$index) in activeList" :key="$index" :class="activeIndex === $index ? 'active' : ''">
+      <span class="tag-wrapper" v-for="(item,$index) in activeListL" :key="$index" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
         <em class="remove-tag el-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
       </span>
@@ -74,6 +74,7 @@
         tagModel: false,
         email: '',
         activeIndex: null,
+        activeListL: _.cloneDeep(this.activeList),
         emailList: [],
         index: 0,
         emailWidth: 100,
@@ -105,13 +106,13 @@
         let email = this.email
 
         let is = (n) => {
-          return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === n)
+          return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === n)
         }
 
         if (isEmial(email)) {
           if (!is(email)) {
             this.emailWidth = 0
-            this.activeList.push(email)
+            this.activeListL.push(email)
             this.email = ''
             this._handlerEmailWitch()
             return true
@@ -132,7 +133,7 @@
           this.emailList = []
           this.isEmail = false
         } else {
-          let a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList))
+          let a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL))
           let b = a.concat(emailList)
           let list = fuzzyQuery(b, val)
           this.emailList = _.uniqWith(list.length && list, _.isEqual)
@@ -161,11 +162,11 @@
         if (!this.isCn) {
           this.emailWidth = 0
           if (_.isInteger(this.activeIndex)) {
-            this.activeList.pop()
+            this.activeListL.pop()
             this.activeIndex = null
           } else {
             if (!this.email) {
-              this.activeIndex = this.activeList.length - 1
+              this.activeIndex = this.activeListL.length - 1
             }
           }
           this._handlerEmailWitch()
@@ -176,7 +177,7 @@
        */
       _del (i) {
         this.emailWidth = 0
-        this.activeList.splice(i, 1)
+        this.activeListL.splice(i, 1)
         this._handlerEmailWitch()
       },
       /**
@@ -221,14 +222,14 @@
         this.email = ''
 
         // Non-existing data
-        if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === item).length) {
+        if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === item).length) {
           this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           return
         }
         // Width initialization
         this.emailWidth = 0
         // Insert data
-        this.activeList.push(item)
+        this.activeListL.push(item)
         // Calculated width
         this._handlerEmailWitch()
         // Check mailbox index initialization
@@ -264,7 +265,12 @@
         this.activeIndex = null
       },
       activeList (val) {
-        this.$emit('valueEvent', val)
+        this.activeListL = _.cloneDeep(val)
+      },
+      activeListL (val) {
+        if (!_.isEqual(val, this.activeList)) {
+          this.$emit('valueEvent', val)
+        }
       }
     },
     created () {

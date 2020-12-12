@@ -34,7 +34,6 @@ plugins:
   - vue
 rules:
   vue/script-indent: ['error', 2, { 'baseIndent': 1, 'switchCase': 1 }]
-  vue/no-mutating-props: 'off'
   prefer-promise-reject-errors: 'off'
   no-prototype-builtins: 'off'
   no-mixed-operators: 'off'
