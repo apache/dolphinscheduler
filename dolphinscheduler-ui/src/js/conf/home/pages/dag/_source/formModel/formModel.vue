@@ -438,13 +438,7 @@
        * Jump to task instance
        */
       _seeHistory () {
-        this.nodeData.self.$router.push({
-          name: 'task-instance',
-          query: {
-            processInstanceId: this.nodeData.self.$route.params.id,
-            taskName: this.backfillItem.name
-          }
-        })
+        this.$emit('seeHistory', this.backfillItem.name)
       },
       /**
        * Enter the child node to judge the process instance or the process definition
