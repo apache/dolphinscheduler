@@ -1172,33 +1172,6 @@ public class ProcessService {
     }
 
     /**
-     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskInstanceId}_${task executed by ip1},${ip2}...
-     * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
-     *
-     * @param taskInstance taskInstance
-     * @return task zk queue str
-     */
-    public String taskZkInfo(TaskInstance taskInstance) {
-
-        String taskWorkerGroup = getTaskWorkerGroup(taskInstance);
-        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
-        if (processInstance == null) {
-            logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder(100);
-
-        sb.append(processInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
-            .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
-            .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
-            .append(taskInstance.getId()).append(Constants.UNDERLINE)
-            .append(taskInstance.getWorkerGroup());
-
-        return sb.toString();
-    }
-
-    /**
      * get submit task instance state by the work process state
      * cannot modify the task state when running/kill/submit success, or this
      * task instance is already exists in task queue .
@@ -1219,7 +1192,6 @@ public class ProcessService {
             state == ExecutionStatus.RUNNING_EXECUTION
                 || state == ExecutionStatus.DELAY_EXECUTION
                 || state == ExecutionStatus.KILL
-                || checkTaskExistsInTaskQueue(taskInstance)
         ) {
             return state;
         }
@@ -1256,22 +1228,6 @@ public class ProcessService {
             }
         }
         return true;
-    }
-
-    /**
-     * check the task instance existing in queue
-     *
-     * @param taskInstance taskInstance
-     * @return whether taskinstance exists queue
-     */
-    public boolean checkTaskExistsInTaskQueue(TaskInstance taskInstance) {
-        if (taskInstance.isSubProcess()) {
-            return false;
-        }
-
-        String taskZkInfo = taskZkInfo(taskInstance);
-
-        return false;
     }
 
     /**
