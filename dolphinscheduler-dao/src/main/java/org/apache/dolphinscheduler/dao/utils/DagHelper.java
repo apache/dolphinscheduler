@@ -398,6 +398,9 @@ public class DagHelper {
                                         DAG<String, TaskNode, TaskNodeRelation> dag,
                                         Map<String, TaskInstance> completeTaskList,
                                         Map<String, TaskNode> skipTaskNodeList) {
+        if (!dag.containsNode(skipNodeName)) {
+            return;
+        }
         skipTaskNodeList.putIfAbsent(skipNodeName, dag.getNode(skipNodeName));
         Collection<String> postNodeList = dag.getSubsequentNodes(skipNodeName);
         for (String post : postNodeList) {
