@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
-import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
-import static org.apache.dolphinscheduler.common.utils.DateUtils.add;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_DATE;
+import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
+import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
+import static org.apache.commons.lang.time.DateUtils.addDays;
+
 
 /**
  * business time utils
@@ -58,23 +58,20 @@ public class BusinessTimeUtils {
             case REPEAT_RUNNING:
             case SCHEDULER:
             default:
-                businessDate = add(new Date(), Calendar.DAY_OF_MONTH, -1);
+                businessDate = addDays(new Date(), -1);
                 if (runTime != null) {
                     /**
                      * If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
                      */
-                    businessDate = add(runTime, Calendar.DAY_OF_MONTH, -1);
+                    businessDate = addDays(runTime, -1);
                 }
                 break;
         }
-        Date businessCurrentDate = add(businessDate, Calendar.DAY_OF_MONTH, 1);
+        Date businessCurrentDate = addDays(businessDate, 1);
         Map<String, String> result = new HashMap<>();
-        result.put(Constants.PARAMETER_CURRENT_DATE, DateUtils.format(businessCurrentDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_BUSINESS_DATE, DateUtils.format(businessDate, PARAMETER_FORMAT_DATE));
-        result.put(Constants.PARAMETER_DATETIME, DateUtils.format(businessCurrentDate, PARAMETER_FORMAT_TIME));
-        if (runTime != null) {
-            result.put(Constants.PARAMETER_SHECDULE_TIME, runTime.toString());
-        }
+        result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
+        result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
+        result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
         return result;
     }
 }
