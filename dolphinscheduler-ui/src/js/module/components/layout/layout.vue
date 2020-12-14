@@ -47,7 +47,7 @@
       left: 0px;
       width: 100%;
       min-height: calc(100% - 60px);
-      
+
     }
   }
 </style>

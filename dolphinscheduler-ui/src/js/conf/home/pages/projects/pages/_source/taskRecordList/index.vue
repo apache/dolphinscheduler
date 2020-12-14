@@ -51,7 +51,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -119,6 +118,6 @@
     },
     mounted () {
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
   }
 </script>

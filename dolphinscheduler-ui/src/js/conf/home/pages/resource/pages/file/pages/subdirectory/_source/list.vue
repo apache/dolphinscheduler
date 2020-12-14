@@ -110,7 +110,7 @@
       },
       _go (item) {
         localStore.setItem('file', `${item.alias}|${item.size}`)
-        if(item.directory) {
+        if (item.directory) {
           localStore.setItem('currentDir', `${item.fullName}`)
           this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
         } else {
@@ -141,12 +141,12 @@
         this.renameDialog = true
       },
 
-      onUpDate(item) {
+      onUpDate (item) {
         this.$set(this.list, this.index, item)
         this.renameDialog = false
       },
 
-      close() {
+      close () {
         this.renameDialog = false
       },
 
@@ -168,7 +168,7 @@
         setTimeout(() => {
           this.list = a
         })
-      },
+      }
       // Listening for routing changes
       // '$route': {
       //   deep: false,

@@ -16,7 +16,7 @@
  */
 <template>
   <div class="priority-model">
-    <el-select @change="_onChange" size="small" v-model="value" style="width: 130px;" :disabled="isDetails">
+    <el-select @change="_onChange" size="small" v-model="selectedValue" style="width: 130px;" :disabled="isDetails">
     <el-option
       v-for="item in priorityList"
       :key="item.code"
@@ -38,6 +38,7 @@
     name: 'priority',
     data () {
       return {
+        selectedValue: this.value,
         priorityList: [
           {
             code: 'HIGHEST',
@@ -84,8 +85,12 @@
         return `<em class="${o.unicode}" style="color:${o.color}"></em>`
       },
       _onChange (o) {
-        this.value = o
         this.$emit('priorityEvent', o)
+      }
+    },
+    watch: {
+      value (val) {
+        this.selectedValue = val
       }
     },
     created () {

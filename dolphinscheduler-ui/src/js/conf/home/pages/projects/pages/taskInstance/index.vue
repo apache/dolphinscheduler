@@ -53,7 +53,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
 
@@ -106,7 +105,7 @@
       _page (val) {
         this.searchParams.pageNo = val
       },
-      _pageSize(val) {
+      _pageSize (val) {
         this.searchParams.pageSize = val
       },
       /**
@@ -114,8 +113,8 @@
        */
       _getList (flag) {
         this.isLoading = !flag
-        if(this.searchParams.pageNo == undefined) {
-          this.$router.push({ path: `/projects/index` })
+        if (this.searchParams.pageNo === undefined) {
+          this.$router.push({ path: '/projects/index' })
           return false
         }
         this.getTaskInstanceList(this.searchParams).then(res => {
@@ -132,15 +131,15 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this._getList(flag)
       }, 100, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       })
     },
     watch: {
@@ -164,9 +163,9 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 

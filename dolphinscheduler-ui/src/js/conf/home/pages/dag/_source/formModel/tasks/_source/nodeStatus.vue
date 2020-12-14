@@ -45,7 +45,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { cycleList, dateValueList, nodeStatusList } from './commcon'
+  import { cycleList, nodeStatusList } from './commcon'
   import disabledState from '@/module/mixin/disabledState'
   export default {
     name: 'node-status',
@@ -64,7 +64,7 @@
     props: {
       dependItemList: Array,
       index: Number,
-      dependTaskList:Array,
+      dependTaskList: Array,
       preNode: Array
     },
     model: {
@@ -78,7 +78,7 @@
       _add () {
         // btn loading
         this.isLoading = true
-            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
 
         // remove tooltip
         this._removeTip()
@@ -87,7 +87,6 @@
        * remove task
        */
       _remove (i) {
-        this.dependTaskList[this.index].dependItemList.splice(i,1)
         this._removeTip()
         if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
@@ -137,7 +136,7 @@
           status: ''
         }
       },
-      _rtOldParams (value,depTasksList, item) {
+      _rtOldParams (value, depTasksList, item) {
         return {
           depTasks: '',
           status: ''
@@ -159,7 +158,6 @@
       this.isInstance = this.router.history.current.name === 'projects-instance-details'
       // get processlist
       this._getProjectList().then(() => {
-        let projectId = this.projectList[0].value
         if (!this.dependItemList.length) {
           this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
         } else {

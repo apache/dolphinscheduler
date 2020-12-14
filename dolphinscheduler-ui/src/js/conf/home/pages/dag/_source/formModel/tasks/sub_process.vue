@@ -97,7 +97,7 @@
     created () {
       let processListS = _.cloneDeep(this.store.state.dag.processListS)
       let id = null
-      if(this.router.history.current.name==='projects-instance-details') {
+      if (this.router.history.current.name === 'projects-instance-details') {
         id = this.router.history.current.query.id || null
       } else {
         id = this.router.history.current.params.id || null
@@ -119,7 +119,7 @@
         this.wdiCurr = o.params.processDefinitionId
       } else {
         if (this.processDefinitionList.length) {
-          this.wdiCurr = this.processDefinitionList[0]['id']
+          this.wdiCurr = this.processDefinitionList[0].id
           this.$emit('on-set-process-name', this._handleName(this.wdiCurr))
         }
       }

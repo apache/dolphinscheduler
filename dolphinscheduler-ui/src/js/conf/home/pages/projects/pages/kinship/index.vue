@@ -39,7 +39,7 @@
                   v-tooltip.small.top.start="$t('Reset')"
                   @click="reset"
                   ></el-button>
-        <el-button 
+        <el-button
                   icon="el-icon-view"
                   size="mini"
                   v-tooltip.small.top="$t('Dag label display control')"
@@ -55,14 +55,10 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import { mapActions, mapState } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
-  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import graphGrid from './_source/graphGrid.vue'
-
-
 
   export default {
     name: 'projects-kinship-index',
@@ -71,12 +67,12 @@
       return {
         isLoading: true,
         isShowLabel: true,
-        currentItemName: '',
+        currentItemName: ''
       }
     },
     props: {},
     methods: {
-      ...mapActions('kinship', ['getWorkFlowList','getWorkFlowDAG']),
+      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG']),
       /**
        * init
        */
@@ -86,7 +82,7 @@
         Promise.all([
           // get process definition
           this.getWorkFlowList(),
-          this.getWorkFlowDAG(),
+          this.getWorkFlowDAG()
         ]).then((data) => {
           this.isLoading = false
         }).catch(() => {
@@ -96,38 +92,38 @@
       /**
        * reset
        */
-      reset() {
-        this.isLoading = true;
+      reset () {
+        this.isLoading = true
         this.$nextTick(() => {
-          this.isLoading = false;
+          this.isLoading = false
         })
       },
-      async onChange(item) {
-        const { value, label } = item || {};
-        this.isLoading = true;
-        this.currentItemName = label;
+      async onChange (item) {
+        const { value, label } = item || {}
+        this.isLoading = true
+        this.currentItemName = label
         try {
-          await this.getWorkFlowDAG(value);
+          await this.getWorkFlowDAG(value)
         } catch (error) {
           this.$message.error(error.msg || '')
         }
-        this.isLoading = false;
+        this.isLoading = false
       },
-      tooltipOption(text) {
+      tooltipOption (text) {
         return {
           text,
           maxWidth: '500px',
           placement: 'top',
           theme: 'dark',
           triggerEvent: 'mouseenter',
-          large: false,
+          large: false
         }
       },
-      changeLabel() {
-        this.isLoading = true;
-        this.isShowLabel = !this.isShowLabel;
+      changeLabel () {
+        this.isLoading = true
+        this.isShowLabel = !this.isShowLabel
         this.$nextTick(() => {
-          this.isLoading = false;
+          this.isLoading = false
         })
       }
     },
@@ -142,9 +138,9 @@
     },
     computed: {
       ...mapState('kinship', ['locations', 'workList']),
-      inputFocusStyle() {
-        return `width:280px`
-      },
+      inputFocusStyle () {
+        return 'width:280px'
+      }
     },
     mounted () {
     }

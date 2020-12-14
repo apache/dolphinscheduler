@@ -25,7 +25,7 @@
               v-for="city in udfsList"
               :key="city.id"
               :value="city.id"
-              :label="city.code"> 
+              :label="city.code">
       </el-option>
     </el-select>
   </div>
@@ -93,7 +93,7 @@
       },
       type (a) {
         // The props parameter needs to be changed due to the scene.
-        this.udfs = ''
+        this.$emit('on-udfsData', '')
         if (a === 'HIVE') {
           this._getUdfList()
         } else {

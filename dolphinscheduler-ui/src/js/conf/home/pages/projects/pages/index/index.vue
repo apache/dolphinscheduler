@@ -68,12 +68,9 @@
 <script>
   import dayjs from 'dayjs'
   import mDefineUserCount from './_source/defineUserCount'
-  import mCommandStateCount from './_source/commandStateCount'
   import mTaskStatusCount from './_source/taskStatusCount'
   import mProcessStateCount from './_source/processStateCount'
-  import mQueueCount from './_source/queueCount'
   import localStore from '@/module/util/localStorage'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -85,7 +82,7 @@
           startDate: '',
           endDate: ''
         },
-        dataTime: [],
+        dataTime: []
       }
     },
     props: {
@@ -103,13 +100,10 @@
       this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
     },
     components: {
-      mSecondaryMenu,
       mListConstruction,
       mDefineUserCount,
-      mCommandStateCount,
       mTaskStatusCount,
-      mProcessStateCount,
-      mQueueCount
+      mProcessStateCount
     }
   }
 </script>

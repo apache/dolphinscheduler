@@ -130,8 +130,8 @@
 
         this._getViewResources()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * down
@@ -143,8 +143,8 @@
 
         this._getViewResources()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * off handle

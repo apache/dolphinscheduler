@@ -82,13 +82,13 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
-              sessionStorage.setItem('isLeft',1);
-              if (res.data.hasOwnProperty("sessionId")) {
-                let sessionId=res.data.sessionId
-                sessionStorage.setItem("sessionId", sessionId)
-                cookies.set('sessionId', sessionId,{ path: '/' })
+              sessionStorage.setItem('isLeft', 1)
+              if (res.data.hasOwnProperty('sessionId')) {
+                let sessionId = res.data.sessionId
+                sessionStorage.setItem('sessionId', sessionId)
+                cookies.set('sessionId', sessionId, { path: '/' })
               }
-              
+
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
@@ -118,7 +118,7 @@
       },
       _gLogin () {
         return new Promise((resolve, reject) => {
-          io.post(`login`, {
+          io.post('login', {
             userName: this.userName,
             userPassword: this.userPassword
           }, res => {

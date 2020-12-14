@@ -122,7 +122,7 @@
       },
 
       _forceSuccess (item) {
-        this.forceTaskSuccess({taskInstanceId: item.id}).then(res => {
+        this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
           if (res.code === 0) {
             this.$message.success(res.msg)
           } else {
@@ -134,7 +134,7 @@
       },
       _go (item) {
         this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
-      },
+      }
     },
     watch: {
       taskInstanceList (a) {
@@ -149,6 +149,6 @@
     mounted () {
       this.list = this.taskInstanceList
     },
-    components: { mLog}
+    components: { mLog }
   }
 </script>

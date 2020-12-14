@@ -24,7 +24,7 @@
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   export default {
     name: 'security-index',
-    mounted() {
+    mounted () {
     },
     components: { mSecondaryMenu }
   }

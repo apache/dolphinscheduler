@@ -89,9 +89,9 @@
         tokenLoading: false,
         auth: !Permissions.getAuth(),
         pickerOptions: {
-          disabledDate(time) {
-              return time.getTime() < Date.now() - 8.64e7  //当前时间以后可以选择当前时间
-          },
+          disabledDate (time) {
+            return time.getTime() < Date.now() - 8.64e7 // 当前时间以后可以选择当前时间
+          }
         }
       }
     },
@@ -120,21 +120,21 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       _generateToken () {
         this.tokenLoading = true
-        this.store.dispatch(`user/generateToken`, {
+        this.store.dispatch('user/generateToken', {
           userId: this.userId,
           expireTime: this.expireTime
         }).then(res => {
@@ -151,7 +151,7 @@
       _onChange () {
         this.token = ''
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },
@@ -167,7 +167,7 @@
         }
       }
       if (this.auth) {
-        this.store.dispatch(`security/getUsersAll`).then(res => {
+        this.store.dispatch('security/getUsersAll').then(res => {
           this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
           d(this.userIdList[0].id)
         })

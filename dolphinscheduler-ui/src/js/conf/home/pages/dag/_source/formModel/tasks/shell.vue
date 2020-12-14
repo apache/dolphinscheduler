@@ -63,7 +63,6 @@
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
   import mScriptBox from './_source/scriptBox'
-  import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Treeselect from '@riophae/vue-treeselect'
@@ -87,7 +86,7 @@
         cacheResourceList: [],
         // define options
         options: [],
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
@@ -109,7 +108,7 @@
       _onLocalParams (a) {
         this.localParams = a
       },
-      setEditorVal() {
+      setEditorVal () {
         this.item = editor.getValue()
         this.scriptBoxDialog = true
       },
@@ -118,7 +117,7 @@
         // this.scriptBoxDialog = false
       },
       closeAble () {
-        // this.scriptBoxDialog = false            
+        // this.scriptBoxDialog = false
       },
       /**
        * return resourceList
@@ -148,12 +147,12 @@
           return false
         }
         // noRes
-        if (this.noRes.length>0) {
+        if (this.noRes.length > 0) {
           this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
         // Process resourcelist
-        let dataProcessing= _.map(this.resourceList, v => {
+        let dataProcessing = _.map(this.resourceList, v => {
           return {
             id: v
           }
@@ -190,55 +189,55 @@
 
         return editor
       },
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            this.operationTree(item) : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
         })
       },
-      operationTree(item) {
-        if(item.dirctory) {
-          item.isDisabled =true
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
         }
         delete item.children
       },
-      searchTree(element, id) {
+      searchTree (element, id) {
         // 根据id查找节点
-        if (element.id == id) {
-          return element;
-        } else if (element.children != null) {
-          var i;
-          var result = null;
-          for (i = 0; result == null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id);
+        if (element.id === id) {
+          return element
+        } else if (element.children !== null) {
+          var i
+          var result = null
+          for (i = 0; result === null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id)
           }
-          return result;
+          return result
         }
-        return null;
+        return null
       },
-      dataProcess(backResource) {
+      dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.options.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.options.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item=>{
+          resourceIdArr = isResourceId.map(item => {
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
+          }
+          let diffSet = this.resourceList.diff(resourceIdArr)
           let optionsCmp = []
-          if(diffSet.length>0) {
-            diffSet.forEach(item=>{
-              backResource.forEach(item1=>{
-                if(item==item1.id || item==item1.res) {
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -247,15 +246,15 @@
           let noResources = [{
             id: -1,
             name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
             children: []
           }]
-          if(optionsCmp.length>0) {
+          if (optionsCmp.length > 0) {
             this.allNoResources = optionsCmp
-            optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
             })
-            optionsCmp.forEach(item=>{
+            optionsCmp.forEach(item => {
               item.isNew = true
             })
             noResources[0].children = optionsCmp
@@ -265,39 +264,44 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
-      }
-    },
-    computed: {
-      cacheParams () {
-        let isResourceId = []
-        let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.options.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
-              }
-            })
-          })
-          resourceIdArr = isResourceId.map(item=>{
-            return {id: item.id,name: item.name,res: item.fullName}
-          })
-        }
+        this.$emit('on-cache-params', val)
+      },
+      resourceIdArr (arr) {
         let result = []
-        resourceIdArr.forEach(item=>{
-          this.allNoResources.forEach(item1=>{
-            if(item.id==item1.id) {
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
               // resultBool = true
-             result.push(item1)
+              result.push(item1)
             }
           })
         })
         this.noRes = result
+      }
+    },
+    computed: {
+      resourceIdArr () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.options.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
+              }
+            })
+          })
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
+          })
+        }
+        return resourceIdArr
+      },
+      cacheParams () {
         return {
-          resourceList: resourceIdArr,
+          resourceList: this.resourceIdArr,
           localParams: this.localParams
         }
       }
@@ -307,7 +311,7 @@
       this.diGuiTree(item)
       this.options = item
       let o = this.backfillItem
-      
+
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.rawScript = o.params.rawScript || ''
@@ -316,11 +320,11 @@
         let backResource = o.params.resourceList || []
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-           _.map(resourceList, v => {
-            if(!v.id) {
-              this.store.dispatch('dag/getResourceId',{
+          _.map(resourceList, v => {
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
                 type: 'FILE',
-                fullName: '/'+v.res
+                fullName: '/' + v.res
               }).then(res => {
                 this.resourceList.push(res.id)
                 this.dataProcess(backResource)
@@ -335,7 +339,7 @@
           })
           this.cacheResourceList = resourceList
         }
-        
+
         // backfill localParams
         let localParams = o.params.localParams || []
         if (localParams.length) {
@@ -354,7 +358,7 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
-    components: { mLocalParams, mListBox, mResources, mScriptBox, Treeselect }
+    components: { mLocalParams, mListBox, mScriptBox, Treeselect }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

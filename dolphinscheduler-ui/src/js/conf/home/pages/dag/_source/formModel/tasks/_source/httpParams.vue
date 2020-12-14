@@ -83,7 +83,7 @@
         // Current execution index
         httpParamsIndex: null,
         // 参数位置的下拉框
-        positionList:positionList
+        positionList: positionList
       }
     },
     mixins: [disabledState],
@@ -142,7 +142,7 @@
           if (!v.prop) {
             flag = false
           }
-          if(v.value === ''){
+          if (v.value === '') {
             this.$message.warning(`${i18n.$t('value is empty')}`)
             return false
           }
@@ -173,7 +173,7 @@
           }
         })
         if (!flag) {
-            this.$message.warning(`${i18n.$t('value is empty')}`)
+          this.$message.warning(`${i18n.$t('value is empty')}`)
           return false
         }
         this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
@@ -191,7 +191,7 @@
     },
     computed: {
       inputStyle () {
-        return "width:30%"
+        return 'width:30%'
       }
     },
     mounted () {
@@ -240,4 +240,3 @@
     }
   }
 </style>
-

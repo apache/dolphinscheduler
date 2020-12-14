@@ -47,8 +47,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
-  import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -111,7 +109,7 @@
     destroyed () {
     },
     computed: {},
-    components: { mConditions, mSecondaryMenu, mListConstruction, mSpin, mNoData }
+    components: { mListConstruction, mSpin, mNoData }
   }
 </script>
 
