@@ -80,8 +80,8 @@
       ...mapActions('resource', ['getViewResources', 'updateContent']),
       ok () {
         if (this._validation()) {
-            this.spinnerLoading = true
-            this.updateContent({
+          this.spinnerLoading = true
+          this.updateContent({
             id: this.$route.params.id,
             content: editor.getValue()
           }).then(res => {
@@ -97,7 +97,7 @@
         }
       },
       _validation () {
-        if (editor.doc.size>3000) {
+        if (editor.doc.size > 3000) {
           this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
           return false
         }

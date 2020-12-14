@@ -107,18 +107,17 @@
        * submit
        */
       _ok () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
-          name: this.name
           this._formDataUpdate().then(res => {
             setTimeout(() => {
-              this.$refs['popup'].spinnerLoading = false
+              this.$refs.popup.spinnerLoading = false
             }, 800)
           }).catch(e => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           })
         } else {
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
       },
       /**
@@ -139,8 +138,8 @@
           let self = this
           let formData = new FormData()
           formData.append('file', this.file)
-          formData.append('projectName',this.store.state.dag.projectName)
-          io.post(`projects/import-definition`, res => {
+          formData.append('projectName', this.store.state.dag.projectName)
+          io.post('projects/import-definition', res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdateDefinition')
@@ -169,7 +168,7 @@
         $('.update-file-modal').hide()
         this.$emit('onArchiveDefinition')
       },
-      close() {
+      close () {
         this.$emit('closeDefinition')
       },
       /**

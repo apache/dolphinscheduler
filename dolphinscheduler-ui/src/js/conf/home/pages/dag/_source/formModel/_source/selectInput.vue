@@ -20,7 +20,7 @@
           :disabled="isDetails"
           size="small"
           @change="_onChange"
-          v-model="value">
+          v-model="selectedValue">
       <el-input
               ref="input"
               slot="trigger"
@@ -53,6 +53,7 @@
     name: 'form-select-input',
     data () {
       return {
+        selectedValue: this.value,
         isIconState: false,
         isInput: true
       }
@@ -88,7 +89,7 @@
         }, 1)
       },
       _onBlur () {
-        let val = $(this.$refs['input'].$el).find('input')[0].value
+        let val = $(this.$refs.input.$el).find('input')[0].value
         if (this._validation(val)) {
           this.$emit('valueEvent', val)
           this._setIconState(val)
@@ -107,9 +108,12 @@
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
-      this._setIconState(this.value)
+      this._setIconState(this.selectedValue)
     },
     mounted () {
     },

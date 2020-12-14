@@ -13,7 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 <template>
   <div class="update-udf-model">
     <div class="update-udf-box">
@@ -94,7 +94,7 @@
       _verifyName () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/resourceVerifyName', {
-            fullName: '/'+this.currentDir+'/'+this.udfName,
+            fullName: '/' + this.currentDir + '/' + this.udfName,
             type: 'UDF'
           }).then(res => {
             resolve()
@@ -104,7 +104,7 @@
           })
         })
       },
-      receivedValue(pid,name) {
+      receivedValue (pid, name) {
         this.pid = pid
         this.currentDir = name
       },
@@ -119,7 +119,7 @@
         formData.append('description', this.udfDesc)
         this.spinnerLoading = true
         this.$emit('on-update-present', false)
-        io.post(`resources/create`, res => {
+        io.post('resources/create', res => {
           this.$message.success(res.msg)
           this.spinnerLoading = false
           this.progress = 0

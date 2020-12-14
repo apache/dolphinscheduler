@@ -83,8 +83,6 @@
   import { handlerSuffix } from '../details/_source/utils'
   import codemirror from '../_source/codemirror'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/module/components/conditions/conditions'
   import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -121,7 +119,7 @@
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}`})
+              this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}` })
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
@@ -138,7 +136,7 @@
           this.$message.warning(`${i18n.$t('Please enter the resource content')}`)
           return false
         }
-        if (editor.doc.size>3000) {
+        if (editor.doc.size > 3000) {
           this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
           return false
         }
@@ -181,7 +179,7 @@
       editor.off($('.code-create-mirror'), 'keypress', this.keypress)
     },
     computed: {},
-    components: { mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mListBoxF }
   }
 </script>
 

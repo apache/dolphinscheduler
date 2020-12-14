@@ -67,7 +67,7 @@
    */
   const handerTextareaSize = (isH = 0) => {
     $('body').find('.tooltip.fade.top.in').remove()
-    return $('.textarea-ft').css({ 'height': `${$('.content-log-box').height() - isH}px` })
+    return $('.textarea-ft').css({ height: `${$('.content-log-box').height() - isH}px` })
   }
 
   let content = ''
@@ -89,7 +89,7 @@
     props: {
       item: {
         type: Object,
-        default: {}
+        default: Object
       },
       source: {
         type: String,
@@ -179,8 +179,8 @@
         this.loadingIndex = this.loadingIndex - 1
         this._ckLog()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * down
@@ -189,8 +189,8 @@
         this.loadingIndex = this.loadingIndex + 1
         this._ckLog()
       }, 1000, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       }),
       /**
        * Monitor scroll bar

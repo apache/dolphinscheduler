@@ -228,7 +228,7 @@
             failureStrategy: this.failureStrategy,
             warningType: this.warningType,
             processInstancePriority: this.processInstancePriority,
-            warningGroupId: this.warningGroupId =='' ? 0 : this.warningGroupId,
+            warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || '',
             workerGroup: this.workerGroup
@@ -256,37 +256,36 @@
       },
 
       _preview () {
-              if (this._verification()) {
-                let api = 'dag/previewSchedule'
-                let searchParams = {
-                  schedule: JSON.stringify({
-                    startTime: this.scheduleTime[0],
-                    endTime: this.scheduleTime[1],
-                    crontab: this.crontab
-                  })
-                }
-                let msg = ''
+        if (this._verification()) {
+          let api = 'dag/previewSchedule'
+          let searchParams = {
+            schedule: JSON.stringify({
+              startTime: this.scheduleTime[0],
+              endTime: this.scheduleTime[1],
+              crontab: this.crontab
+            })
+          }
 
-                this.store.dispatch(api, searchParams).then(res => {
-                  if (res.length) {
-                    this.previewTimes = res
-                  } else {
-                    this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
-                  }
-                })
-              }
-            },
+          this.store.dispatch(api, searchParams).then(res => {
+            if (res.length) {
+              this.previewTimes = res
+            } else {
+              this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
+            }
+          })
+        }
+      },
 
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-            this.store.dispatch('dag/getNotifyGroupList').then(res => {
-              this.notifyGroupList = res
-              if (this.notifyGroupList.length) {
-                resolve()
-              } else {
-                reject(new Error(0))
-              }
-            })
+          this.store.dispatch('dag/getNotifyGroupList').then(res => {
+            this.notifyGroupList = res
+            if (this.notifyGroupList.length) {
+              resolve()
+            } else {
+              reject(new Error(0))
+            }
+          })
         })
       },
       ok () {
@@ -302,7 +301,7 @@
     watch: {
     },
     created () {
-      if(this.timingData.item.workerGroup===undefined) {
+      if (this.timingData.item.workerGroup === undefined) {
         let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
         if (stateWorkerGroupsList.length) {
           this.workerGroup = stateWorkerGroupsList[0].id
@@ -316,22 +315,22 @@
       } else {
         this.workerGroup = this.timingData.item.workerGroup
       }
-      if(this.timingData.item.crontab !== null){
+      if (this.timingData.item.crontab !== null) {
         this.crontab = this.timingData.item.crontab
       }
-      if(this.timingData.type == 'timing') {
+      if (this.timingData.type === 'timing') {
         let date = new Date()
         let year = date.getFullYear()
         let month = date.getMonth() + 1
         let day = date.getDate()
         if (month < 10) {
-            month = "0" + month;
+          month = '0' + month
         }
         if (day < 10) {
-            day = "0" + day;
+          day = '0' + day
         }
-        let startDate = year + "-" + month + "-" + day + ' ' + '00:00:00'
-        let endDate = (year+100) + "-" + month + "-" + day + ' ' + '00:00:00'
+        let startDate = year + '-' + month + '-' + day + ' ' + '00:00:00'
+        let endDate = (year + 100) + '-' + month + '-' + day + ' ' + '00:00:00'
         let times = []
         times[0] = startDate
         times[1] = endDate
@@ -355,13 +354,13 @@
             // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
             this.warningGroupId = item.warningGroupId
           })
-        }).catch(() => this.warningGroupId = '')
+        }).catch(() => { this.warningGroupId = '' })
       } else {
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             this.warningGroupId = ''
           })
-        }).catch(() => this.warningGroupId = '')
+        }).catch(() => { this.warningGroupId = '' })
       }
     },
     components: { vCrontab, mEmail, mPriority, mWorkerGroups }
@@ -419,10 +418,10 @@
     }
   }
   .x-date-packer-panel .x-date-packer-day .lattice label.bg-hover {
-    background: #00BFFF!important; 
+    background: #00BFFF!important;
     margin-top: -4px;
   }
   .x-date-packer-panel .x-date-packer-day .lattice em:hover {
-    background: #0098e1!important; 
+    background: #0098e1!important;
   }
 </style>

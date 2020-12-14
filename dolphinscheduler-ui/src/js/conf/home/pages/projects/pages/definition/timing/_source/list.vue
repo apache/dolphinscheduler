@@ -133,7 +133,7 @@
     props: {
     },
     methods: {
-      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver','deleteTiming']),
+      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver', 'deleteTiming']),
       /**
        * delete
        */
@@ -260,7 +260,7 @@
       },
       closeTiming () {
         this.timingDialog = false
-      },
+      }
     },
     watch: {},
     created () {

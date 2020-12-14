@@ -957,7 +957,7 @@
                         <exclude>**/*.txt</exclude>
                         <exclude>**/docs/**</exclude>
                         <exclude>**/*.babelrc</exclude>
-                        <exclude>**/*.eslintrc</exclude>
+                        <exclude>**/*.eslint*</exclude>
                         <exclude>**/.mvn/jvm.config</exclude>
                         <exclude>**/.mvn/wrapper/**</exclude>
                     </excludes>

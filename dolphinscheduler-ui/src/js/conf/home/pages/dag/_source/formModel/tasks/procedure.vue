@@ -122,9 +122,9 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this.$emit('on-cache-params', val)
       }
     },
     computed: {

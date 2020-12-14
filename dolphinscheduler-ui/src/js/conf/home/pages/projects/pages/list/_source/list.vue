@@ -90,7 +90,7 @@
         this.setProjectName(item.name)
         localStore.setItem('projectName', `${item.name}`)
         localStore.setItem('projectId', `${item.id}`)
-        this.$router.push({ path: `/projects/index` })
+        this.$router.push({ path: '/projects/index' })
       },
       /**
        * Delete Project
@@ -113,7 +113,7 @@
        */
       _edit (item) {
         findComponentDownward(this.$root, 'projects-list')._create(item)
-      },
+      }
 
     },
     watch: {

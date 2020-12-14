@@ -82,7 +82,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -106,7 +105,7 @@
     props: {},
     methods: {
       ...mapActions('dag', ['getViewTree']),
-      _close(){
+      _close () {
         this.$router.go(-1)
       },
       /**
@@ -203,7 +202,7 @@
     },
     mounted () {
     },
-    components: { mSpin, mSecondaryMenu, mListConstruction, mNoData }
+    components: { mSpin, mListConstruction, mNoData }
   }
 </script>
 
@@ -264,6 +263,5 @@
       }
     }
   }
-
 
 </style>
