@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.shell;
 
+package org.apache.dolphinscheduler.server.worker.task.shell;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.slf4j.Logger;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -42,6 +41,8 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
 
 /**
  * shell task
@@ -59,22 +60,23 @@ public class ShellTask extends AbstractTask {
   private ShellCommandExecutor shellCommandExecutor;
 
   /**
-   *  taskExecutionContext
+   * taskExecutionContext
    */
   private TaskExecutionContext taskExecutionContext;
 
   /**
    * constructor
+   *
    * @param taskExecutionContext taskExecutionContext
-   * @param logger    logger
+   * @param logger               logger
    */
   public ShellTask(TaskExecutionContext taskExecutionContext, Logger logger) {
     super(taskExecutionContext, logger);
 
     this.taskExecutionContext = taskExecutionContext;
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskExecutionContext,
-            logger);
+        taskExecutionContext,
+        logger);
   }
 
   @Override
@@ -111,14 +113,15 @@ public class ShellTask extends AbstractTask {
 
   /**
    * create command
+   *
    * @return file name
    * @throws Exception exception
    */
   private String buildCommand() throws Exception {
     // generate scripts
     String fileName = String.format("%s/%s_node.%s",
-            taskExecutionContext.getExecutePath(),
-            taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
+        taskExecutionContext.getExecutePath(),
+        taskExecutionContext.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
 
     Path path = new File(fileName).toPath();
 
@@ -127,18 +130,13 @@ public class ShellTask extends AbstractTask {
     }
 
     String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-    /**
-     *  combining local and global parameters
-     */
+    // combining local and global parameters
     Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
-            taskExecutionContext.getDefinedParams(),
-            shellParameters.getLocalParametersMap(),
-            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-            taskExecutionContext.getScheduleTime());
-    if (paramsMap != null){
-      script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
-    // new
+        taskExecutionContext.getDefinedParams(),
+        shellParameters.getLocalParametersMap(),
+        CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+        taskExecutionContext.getScheduleTime());
+
     // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
     if (paramsMap != null) {
       if (taskExecutionContext.getScheduleTime() != null) {
