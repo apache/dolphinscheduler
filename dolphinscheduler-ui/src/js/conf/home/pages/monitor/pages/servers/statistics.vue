@@ -67,14 +67,14 @@
 </template>
 
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
-  import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-      name: 'statistics',
+    name: 'statistics',
     data () {
       return {
         isLoading: false,
@@ -83,12 +83,12 @@
         color: themeData.color
       }
     },
-    props:{},
+    props: {},
     methods: {
-      //...mapActions('monitor', ['getDatabaseData'])
+      // ...mapActions('monitor', ['getDatabaseData'])
       // ...mapActions('projects', ['getCommandStateCount']),
       ...mapActions('projects', ['getQueueCount']),
-      ...mapActions('projects', ['getCommandStateCount']),
+      ...mapActions('projects', ['getCommandStateCount'])
     },
     watch: {},
     created () {
@@ -98,31 +98,31 @@
         this.isLoading = false
       }).catch(() => {
         this.isLoading = false
-       })
+      })
 
       this.getCommandStateCount().then(res => {
         let normal = 0
         let error = 0
         _.forEach(res.data, (v, i) => {
           let key = _.keys(v)
-          if(key[0] == 'errorCount') {
+          if (key[0] === 'errorCount') {
             error = error + v.errorCount
           }
-          if(key[1] == 'normalCount'){
+          if (key[1] === 'normalCount') {
             normal = normal + v.normalCount
           }
-          }
+        }
         )
         this.commandCountData = {
-          'normalCount': normal,
-          'errorCount' : error
+          normalCount: normal,
+          errorCount: error
         }
-      }).catch( () => {
+      }).catch(() => {
       })
     },
     mounted () {
     },
-    components: { mListConstruction, mSpin, mNoData }
+    components: { mListConstruction, mSpin }
   }
 
 </script>

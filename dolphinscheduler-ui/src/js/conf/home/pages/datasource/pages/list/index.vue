@@ -81,11 +81,11 @@
           // Number of pages
           pageNo: 1,
           // Search value
-          searchVal: '',
-          
+          searchVal: ''
+
         },
         dialogVisible: false,
-        item: {},
+        item: {}
       }
     },
     mixins: [listUrlParamHandle],
@@ -128,8 +128,8 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getDatasourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.datasourcesList = []
             this.datasourcesList = res.totalList
@@ -142,7 +142,7 @@
       },
       _onUpdate () {
         this._debounceGET('false')
-      },
+      }
     },
     watch: {
       // router

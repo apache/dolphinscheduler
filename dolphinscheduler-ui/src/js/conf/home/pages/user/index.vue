@@ -25,7 +25,7 @@
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   export default {
     name: 'user-index',
-    mounted() {
+    mounted () {
     },
     components: { mSecondaryMenu }
   }

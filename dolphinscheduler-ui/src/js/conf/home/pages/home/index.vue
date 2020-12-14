@@ -19,13 +19,12 @@
 </template>
 
 <script>
-import mProjectHome from '@/conf/home/pages/projects/pages/index'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
-export default {
-  name: 'home',
-  components: { mProjectHome, mListConstruction },
-  mounted() {
-    
-  },
-}
+  import mProjectHome from '@/conf/home/pages/projects/pages/index'
+  export default {
+    name: 'home',
+    components: { mProjectHome },
+    mounted () {
+
+    }
+  }
 </script>

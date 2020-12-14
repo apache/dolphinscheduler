@@ -90,26 +90,26 @@
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }
 
         let $catch = (e) => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
 
         if (this.item) {
-          this.$refs['popup'].spinnerLoading = true
-          this.store.dispatch(`security/updateQueueQ`, param).then(res => {
+          this.$refs.popup.spinnerLoading = true
+          this.store.dispatch('security/updateQueueQ', param).then(res => {
             $then(res)
           }).catch(e => {
             $catch(e)
           })
         } else {
           this._verifyName(param).then(() => {
-            this.$refs['popup'].spinnerLoading = true
-            this.store.dispatch(`security/createQueueQ`, param).then(res => {
+            this.$refs.popup.spinnerLoading = true
+            this.store.dispatch('security/createQueueQ', param).then(res => {
               $then(res)
             }).catch(e => {
               $catch(e)
@@ -120,11 +120,11 @@
         }
       },
       _verification () {
-        if (!this.queueName.replace(/\s*/g,"")) {
+        if (!this.queueName.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.queue.replace(/\s*/g,"")) {
+        if (!this.queue.replace(/\s*/g, '')) {
           this.$message.warning(`${i18n.$t('Please enter queue value')}`)
           return false
         }
@@ -132,14 +132,14 @@
       },
       _verifyName (param) {
         return new Promise((resolve, reject) => {
-          this.store.dispatch(`security/verifyQueueQ`, param).then(res => {
+          this.store.dispatch('security/verifyQueueQ', param).then(res => {
             resolve()
           }).catch(e => {
             reject(e)
           })
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },

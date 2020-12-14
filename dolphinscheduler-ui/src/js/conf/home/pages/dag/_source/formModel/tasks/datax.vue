@@ -214,12 +214,12 @@
         // Custom parameter
         localParams: [],
         customConfig: 0,
-        //jvm memory xms
+        // jvm memory xms
         xms: 1,
-        //jvm memory xms
+        // jvm memory xms
         xmx: 1,
         scriptBoxDialog: false,
-        item: '',
+        item: ''
       }
     },
     mixins: [disabledState],
@@ -228,7 +228,7 @@
       createNodeId: Number
     },
     methods: {
-      setEditorVal() {
+      setEditorVal () {
         this.item = editor.getValue()
         this.scriptBoxDialog = true
       },
@@ -236,7 +236,7 @@
         editor.setValue(val)
       },
       _onSwitch (is) {
-        if(is) {
+        if (is) {
           this.customConfig = 1
           setTimeout(() => {
             this._handlerJsonEditor()
@@ -284,7 +284,7 @@
        * verification
        */
       _verification () {
-        if(this.customConfig) {
+        if (this.customConfig) {
           if (!jsonEditor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
             return false
@@ -300,8 +300,8 @@
             customConfig: this.customConfig,
             json: jsonEditor.getValue(),
             localParams: this.localParams,
-            xms:+this.xms,
-            xmx:+this.xmx
+            xms: +this.xms,
+            xmx: +this.xmx
           })
           return true
         } else {
@@ -335,7 +335,6 @@
             return false
           }
 
-          debugger
           // storage
           this.$emit('on-params', {
             customConfig: this.customConfig,
@@ -349,8 +348,8 @@
             jobSpeedRecord: this.jobSpeedRecord,
             preStatements: this.preStatements,
             postStatements: this.postStatements,
-            xms:+this.xms,
-            xmx:+this.xmx
+            xms: +this.xms,
+            xmx: +this.xmx
           })
           return true
         }
@@ -420,25 +419,25 @@
           dataSource: this.rtDatasource,
           dtType: this.dtType,
           dataTarget: this.rtDatatarget,
-          sql: editor?editor.getValue():'',
+          sql: editor ? editor.getValue() : '',
           targetTable: this.targetTable,
           jobSpeedByte: this.jobSpeedByte * 1024,
           jobSpeedRecord: this.jobSpeedRecord,
           preStatements: this.preStatements,
           postStatements: this.postStatements,
           xms: +this.xms,
-          xmx: +this.xmx,
-        });
+          xmx: +this.xmx
+        })
       },
       _destroyEditor () {
-         if (editor) {
+        if (editor) {
           editor.toTextArea() // Uninstall
           editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
           editor.off($('.code-sql-mirror'), 'changes', this.changes)
         }
       },
       _destroyJsonEditor () {
-         if (jsonEditor) {
+        if (jsonEditor) {
           jsonEditor.toTextArea() // Uninstall
           jsonEditor.off($('.code-json-mirror'), 'keypress', this.keypress)
           jsonEditor.off($('.code-json-mirror'), 'changes', this.changes)
@@ -450,12 +449,11 @@
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
-
         // set jvm memory
-        this.xms = o.params.xms || 1 ;
-        this.xmx = o.params.xmx || 1 ;
+        this.xms = o.params.xms || 1
+        this.xmx = o.params.xmx || 1
         // backfill
-        if(o.params.customConfig == 0) {
+        if (o.params.customConfig === 0) {
           this.customConfig = 0
           this.enable = false
           this.dsType = o.params.dsType || ''
@@ -477,7 +475,7 @@
       }
     },
     mounted () {
-      if(this.customConfig) {
+      if (this.customConfig) {
         setTimeout(() => {
           this._handlerJsonEditor()
         }, 200)
@@ -501,9 +499,9 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
-        this._cacheParams();
+        this._cacheParams()
       }
     },
     computed: {

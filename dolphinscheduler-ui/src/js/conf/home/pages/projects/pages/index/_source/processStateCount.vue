@@ -53,7 +53,6 @@
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
   import echarts from 'echarts'
-  import store from '@/conf/home/store'
   import mNoData from '@/module/components/noData/noData'
   import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
   export default {
@@ -75,7 +74,7 @@
         this.$router.push({
           name: 'projects-instance-list',
           query: {
-            stateType: _.find(stateType, ['label', name])['code'],
+            stateType: _.find(stateType, ['label', name]).code,
             startDate: this.searchParams.startDate,
             endDate: this.searchParams.endDate
           }
@@ -85,11 +84,11 @@
         let data = res.data.taskCountDtos
         this.processStateList = _.map(data, v => {
           return {
-            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            key: _.find(stateType, ['code', v.taskStateType]).label,
             value: v.count
           }
         })
-        const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })  
+        const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
         myChart.echart.setOption(pie)
         // 首页不允许跳转
         if (this.searchParams.projectId) {
@@ -100,7 +99,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {
@@ -115,7 +114,7 @@
           })
         }
       },
-      '$store.state.projects.sideBar': function() {
+      '$store.state.projects.sideBar': function () {
         echarts.init(document.getElementById('process-state-pie')).resize()
       }
     },

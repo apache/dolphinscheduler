@@ -58,7 +58,7 @@ function jsonp (url, opts, fn) {
   var id = opts.name || (prefix + (count++))
 
   var param = opts.param || 'callback'
-  var timeout = opts.timeout != null ? opts.timeout : 60000
+  var timeout = opts.timeout !== null ? opts.timeout : 60000
   var enc = encodeURIComponent
   /* istanbul ignore next */
   var target = document.getElementsByTagName('script')[0] || document.head

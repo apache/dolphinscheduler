@@ -53,7 +53,6 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateWorker from './_source/createWorker'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
@@ -100,8 +99,8 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getWorkerGroups(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.workerGroupList = []
             this.workerGroupList = res.totalList

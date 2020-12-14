@@ -71,7 +71,7 @@
       return {
         yearValue: '*',
         radioYear: 'everyYear',
-        selectYearList: selectList['year'],
+        selectYearList: selectList.year,
         intervalPerformVal: 1,
         intervalStartVal: 2019,
         specificYearVal: [],

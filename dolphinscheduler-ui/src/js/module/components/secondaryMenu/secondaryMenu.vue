@@ -83,10 +83,10 @@
       },
       _toggleMenu () {
         this.isTogHide = !this.isTogHide
-        if(this.isTogHide) {
-          sessionStorage.setItem('isLeft',0)
+        if (this.isTogHide) {
+          sessionStorage.setItem('isLeft', 0)
         } else {
-          sessionStorage.setItem('isLeft',1)
+          sessionStorage.setItem('isLeft', 1)
         }
       }
     },

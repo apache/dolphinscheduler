@@ -85,7 +85,7 @@
            style="width: 200px;"
            size="small"
            v-model="warningGroupId"
-          :disabled="!notifyGroupList.length">           
+          :disabled="!notifyGroupList.length">
           <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
             <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
             <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
@@ -163,7 +163,6 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import dayjs from 'dayjs'
   import mEmail from './email.vue'
   import store from '@/conf/home/store'
@@ -214,7 +213,7 @@
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
-          warningGroupId: this.warningGroupId=='' ? 0 : this.warningGroupId,
+          warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
           execType: this.execType ? 'COMPLEMENT_DATA' : null,
           startNodeList: this.startNodeList,
           taskDependType: this.taskDependType,
@@ -242,10 +241,10 @@
       },
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-            this.store.dispatch('dag/getNotifyGroupList').then(res => {
-              this.notifyGroupList = res
-              resolve()
-            })
+          this.store.dispatch('dag/getNotifyGroupList').then(res => {
+            this.notifyGroupList = res
+            resolve()
+          })
         })
       },
       _getReceiver () {
@@ -277,7 +276,7 @@
       } else {
         this.store.dispatch('security/getWorkerGroupsAll').then(res => {
           this.$nextTick(() => {
-            if(res.length>0) {
+            if (res.length > 0) {
               this.workerGroup = res[0].id
             }
           })

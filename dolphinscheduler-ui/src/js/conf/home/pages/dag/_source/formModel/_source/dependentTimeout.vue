@@ -143,21 +143,21 @@
         if (p === 2 || p === 0) {
           this.waitCompleteTimeout.strategy = is ? ['WARN'] : []
           this.waitCompleteTimeout.interval = is ? 30 : null
-        }        
+        }
       },
       _verification () {
         // Verification timeout policy
-        if (this.enable 
-          && (this.waitCompleteTimeout.enable && !this.waitCompleteTimeout.strategy.length)
-          || (this.waitStartTimeout.enable && !this.waitStartTimeout.strategy.length)) {
+        if (this.enable &&
+          (this.waitCompleteTimeout.enable && !this.waitCompleteTimeout.strategy.length) ||
+          (this.waitStartTimeout.enable && !this.waitStartTimeout.strategy.length)) {
           this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
           return false
         }
         // Verify timeout duration Non 0 positive integer
         const reg = /^[1-9]\d*$/
-        if (this.enable 
-          && (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval))
-          || (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
+        if (this.enable &&
+          (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval)) ||
+          (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
           this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }
@@ -175,16 +175,16 @@
           },
           waitCompleteTimeout: {
             strategy: (() => {
-            // Handling checkout sequence
-            let strategy = this.waitCompleteTimeout.strategy
-            if (strategy.length === 2 && strategy[0] === 'FAILED') {
-              return [strategy[1], strategy[0]].join(',')
-            } else {
-              return strategy.join(',')
-            }
-          })(),
-          interval: parseInt(this.waitCompleteTimeout.interval),
-          enable: this.waitCompleteTimeout.enable
+              // Handling checkout sequence
+              let strategy = this.waitCompleteTimeout.strategy
+              if (strategy.length === 2 && strategy[0] === 'FAILED') {
+                return [strategy[1], strategy[0]].join(',')
+              } else {
+                return strategy.join(',')
+              }
+            })(),
+            interval: parseInt(this.waitCompleteTimeout.interval),
+            enable: this.waitCompleteTimeout.enable
           }
         })
         return true

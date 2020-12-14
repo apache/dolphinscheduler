@@ -25,7 +25,7 @@
   export default {
     name: 'resource-index',
     components: { mSecondaryMenu },
-    mounted() {
-    },
+    mounted () {
+    }
   }
 </script>

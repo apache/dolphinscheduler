@@ -89,7 +89,6 @@
       </div>
     </m-list-box>
 
-
     <m-list-box  >
       <div slot="text">{{$t('Timeout Settings')}}</div>
       <div slot="content">
@@ -144,8 +143,8 @@
     data () {
       return {
         timeoutSettings: false,
-        connectTimeout : 60000 ,
-        socketTimeout :  60000 ,
+        connectTimeout: 60000,
+        socketTimeout: 60000,
 
         url: '',
         condition: '',
@@ -154,7 +153,7 @@
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
-        httpCheckConditionList: cookies.get('language') == 'en_US'? [{ code: 'STATUS_CODE_DEFAULT',value:'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM',value:'Custom response code' }, { code: 'BODY_CONTAINS',value:'Content includes' }, { code: 'BODY_NOT_CONTAINS',value:'Content does not contain' }]:[{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
+        httpCheckConditionList: cookies.get('language') === 'en_US' ? [{ code: 'STATUS_CODE_DEFAULT', value: 'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM', value: 'Custom response code' }, { code: 'BODY_CONTAINS', value: 'Content includes' }, { code: 'BODY_NOT_CONTAINS', value: 'Content does not contain' }] : [{ code: 'STATUS_CODE_DEFAULT', value: '默认响应码200' }, { code: 'STATUS_CODE_CUSTOM', value: '自定义响应码' }, { code: 'BODY_CONTAINS', value: '内容包含' }, { code: 'BODY_NOT_CONTAINS', value: '内容不包含' }]
       }
     },
     props: {
@@ -205,8 +204,8 @@
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
           condition: this.condition,
-          connectTimeout : this.connectTimeout ,
-          socketTimeout : this.socketTimeout
+          connectTimeout: this.connectTimeout,
+          socketTimeout: this.socketTimeout
         })
         return true
       }
@@ -220,8 +219,8 @@
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
           condition: this.condition,
-          connectTimeout : this.connectTimeout ,
-          socketTimeout : this.socketTimeout
+          connectTimeout: this.connectTimeout,
+          socketTimeout: this.socketTimeout
         }
       }
     },
@@ -231,32 +230,32 @@
        * @param val
        */
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this.$emit('on-cache-params', val)
       }
     },
     created () {
-        let o = this.backfillItem
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.url = o.params.url || ''
-          this.httpMethod = o.params.httpMethod || 'GET'
-          this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
-          this.condition = o.params.condition || ''
-          this.connectTimeout = o.params.connectTimeout
-          this.socketTimeout = o.params.socketTimeout
-          if(this.connectTimeout != 60000 || this.socketTimeout != 60000 ){
-            this.timeoutSettings = true
-          }
-          // backfill localParams
-          let localParams = o.params.localParams || []
-          if (localParams.length) {
-            this.localParams = localParams
-          }
-          let httpParams = o.params.httpParams || []
-          if (httpParams.length) {
-            this.httpParams = httpParams
-          }
+      let o = this.backfillItem
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.url = o.params.url || ''
+        this.httpMethod = o.params.httpMethod || 'GET'
+        this.httpCheckCondition = o.params.httpCheckCondition || 'DEFAULT'
+        this.condition = o.params.condition || ''
+        this.connectTimeout = o.params.connectTimeout
+        this.socketTimeout = o.params.socketTimeout
+        if (this.connectTimeout !== 60000 || this.socketTimeout !== 60000) {
+          this.timeoutSettings = true
         }
+        // backfill localParams
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
+        let httpParams = o.params.httpParams || []
+        if (httpParams.length) {
+          this.httpParams = httpParams
+        }
+      }
     },
     mounted () {
     },

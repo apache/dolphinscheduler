@@ -35,10 +35,11 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import store from '@/conf/home/store'
   import { runningType } from '@/conf/home/pages/dag/_source/config'
   import { warningTypeList } from '@/conf/home/pages/projects/pages/definition/pages/list/_source/util'
- 
+
   export default {
     name: 'starting-params-dag-index',
     data () {
@@ -69,16 +70,16 @@
         return '-'
       },
       _rtWorkerGroupName (id) {
-        let o =  _.filter(this.workerGroupList, v => v.id === id)
+        let o = _.filter(this.workerGroupList, v => v.id === id)
         if (o && o.length) {
           return o[0].name
         }
         return '-'
       },
       _getNotifyGroupList () {
-          this.store.dispatch('dag/getNotifyGroupList').then(res => {
-            this.notifyGroupList = res
-          })
+        this.store.dispatch('dag/getNotifyGroupList').then(res => {
+          this.notifyGroupList = res
+        })
       },
       _getWorkerGroupList () {
         let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
@@ -92,7 +93,7 @@
       }
     },
     watch: {
-      '$route': {
+      $route: {
         deep: true,
         handler () {
           this.isActive = false

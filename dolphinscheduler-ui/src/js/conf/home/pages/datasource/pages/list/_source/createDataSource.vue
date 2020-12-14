@@ -152,8 +152,7 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import {isJson} from '@/module/util/util'
-  import mPopup from '@/module/components/popup/popup'
+  import { isJson } from '@/module/util/util'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
@@ -176,7 +175,7 @@
         // data storage name
         database: '',
         // principal
-        principal:'',
+        principal: '',
         // database username
         userName: '',
         // Database password
@@ -190,8 +189,8 @@
         showPrincipal: true,
         showdDatabase: false,
         showConnectType: false,
-        isShowPrincipal:true,
-        prePortMapper:{},
+        isShowPrincipal: true,
+        prePortMapper: {},
         datasourceTypeList: [
           {
             value: 'MYSQL',
@@ -329,7 +328,7 @@
           return false
         }
 
-        if (!this.database && this.showdDatabase == false) {
+        if (!this.database && this.showdDatabase === false) {
           this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
@@ -352,7 +351,7 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.store.dispatch(`datasource/${this.item ? `updateDatasource` : `createDatasources`}`, param).then(res => {
+        this.store.dispatch(`datasource/${this.item ? 'updateDatasource' : 'createDatasources'}`, param).then(res => {
           this.$message.success(res.msg)
           this.spinnerLoading = false
           this.$emit('onUpdate')
@@ -364,18 +363,17 @@
       /**
        * Get modified data
        */
-      _getEditDatasource() {
-        this.store.dispatch('datasource/getEditDatasource', {id: this.item.id}).then(res => {
+      _getEditDatasource () {
+        this.store.dispatch('datasource/getEditDatasource', { id: this.item.id }).then(res => {
           this.type = res.type
           this.name = res.name
           this.note = res.note
           this.host = res.host
 
-          //When in Editpage, Prevent default value overwrite backfill value
-          let that = this;
+          // When in Editpage, Prevent default value overwrite backfill value
           setTimeout(() => {
             this.port = res.port
-          },0)
+          }, 0)
 
           this.principal = res.principal
           this.database = res.database
@@ -390,24 +388,22 @@
       /**
        * Set default port for each type.
        */
-      _setDefaultValues(value) {
-
-        //Default type is MYSQL
+      _setDefaultValues (value) {
+        // Default type is MYSQL
         let type = this.type || 'MYSQL'
 
         let defaultPort = this._getDefaultPort(type)
 
-        //Backfill the previous input from memcache
+        // Backfill the previous input from memcache
         let mapperPort = this.prePortMapper[type]
 
         this.port = mapperPort || defaultPort
-
       },
 
       /**
        * Get default port by type
        */
-      _getDefaultPort(type) {
+      _getDefaultPort (type) {
         var defaultPort = ''
         switch (type) {
           case 'MYSQL':
@@ -439,10 +435,9 @@
             break
           default:
             break
-
         }
         return defaultPort
-      },
+      }
     },
     created () {
       // Backfill
@@ -451,33 +446,32 @@
       }
 
       this._setDefaultValues()
-
     },
     watch: {
-      type(value){
-        if(value == 'POSTGRESQL') {
-          this.showdDatabase = true;
+      type (value) {
+        if (value === 'POSTGRESQL') {
+          this.showdDatabase = true
         } else {
-          this.showdDatabase = false;
+          this.showdDatabase = false
         }
 
-        if (value== 'ORACLE' && !this.item.id) {
-          this.showConnectType = true;
+        if (value === 'ORACLE' && !this.item.id) {
+          this.showConnectType = true
           this.connectType = 'ORACLE_SERVICE_NAME'
-        } else if(value== 'ORACLE' && this.item.id) {
-          this.showConnectType = true;
+        } else if (value === 'ORACLE' && this.item.id) {
+          this.showConnectType = true
         } else {
-          this.showConnectType = false;
+          this.showConnectType = false
         }
-        //Set default port for each type datasource
+        // Set default port for each type datasource
         this._setDefaultValues(value)
 
         return new Promise((resolve, reject) => {
           this.store.dispatch('datasource/getKerberosStartupState').then(res => {
-            this.isShowPrincipal=res
-            if((value =='HIVE'||value == 'SPARK')&&this.isShowPrincipal== true){
+            this.isShowPrincipal = res
+            if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
               this.showPrincipal = false
-            }else{
+            } else {
               this.showPrincipal = true
             }
           }).catch(e => {
@@ -490,14 +484,14 @@
        * Cache the previous input port for each type datasource
        * @param value
        */
-      port(value){
+      port (value) {
         this.prePortMapper[this.type] = value
       }
     },
 
     mounted () {
     },
-    components: { mPopup, mListBoxF }
+    components: { mListBoxF }
   }
 </script>
 
@@ -538,6 +532,5 @@
       margin-left: 0px !important;
     }
   }
-
 
 </style>

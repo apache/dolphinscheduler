@@ -60,11 +60,7 @@
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import { folderList } from '../_source/common'
-  import { handlerSuffix } from '../details/_source/utils'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/module/components/conditions/conditions'
-  import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -94,7 +90,7 @@
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ path: `/resource/file`})
+              this.$router.push({ path: '/resource/file' })
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
@@ -109,7 +105,7 @@
         }
 
         return true
-      },
+      }
     },
     watch: {},
     created () {
@@ -119,7 +115,7 @@
     destroyed () {
     },
     computed: {},
-    components: { mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mListBoxF }
   }
 </script>
 

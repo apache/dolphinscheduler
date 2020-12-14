@@ -97,9 +97,10 @@
         $('body').find('.tooltip.fade.top.in').remove()
       },
       _onDeleteAll (i) {
-        this.dependTaskList.map((item,i)=>{
-          if(item.dependItemList.length === 0){
-            this.dependTaskList.splice(i,1)
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
+        this.dependTaskList.map((item, i) => {
+          if (item.dependItemList.length === 0) {
+            this.dependTaskList.splice(i, 1)
           }
         })
         // this._deleteDep(i)
@@ -107,7 +108,7 @@
       _setGlobalRelation () {
         this.relation = this.relation === 'AND' ? 'OR' : 'AND'
       },
-      getDependTaskList(i){
+      getDependTaskList (i) {
         // console.log('getDependTaskList',i)
       },
       _setRelation (i) {
@@ -147,7 +148,9 @@
         this.dependTaskList = _.cloneDeep(o.dependence.dependTaskList) || []
         let defaultState = this.isDetails ? 'WAITING' : ''
         // Process instance return status display matches by key
-        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState))
+        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
+          v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState
+        }))
       }
     },
     mounted () {

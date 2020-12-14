@@ -67,12 +67,12 @@
       _ok (fn) {
         this._verification().then(res => {
           if (this.name === this.item.alias) {
-            return new Promise((resolve,reject) => {
-              this.description === this.item.description ? reject({msg:'内容未修改'}) : resolve()
+            return new Promise((resolve, reject) => {
+              this.description === this.item.description ? reject({ msg: '内容未修改' }) : resolve()
             })
-          }else{
+          } else {
             return this.store.dispatch('resource/resourceVerifyName', {
-              fullName: localStore.getItem('currentDir')+'/'+this.name,
+              fullName: localStore.getItem('currentDir') + '/' + this.name,
               type: 'FILE'
             })
           }
@@ -101,10 +101,9 @@
           } else {
             resolve()
           }
-
         })
       },
-      close() {
+      close () {
         this.$emit('close')
       }
     },

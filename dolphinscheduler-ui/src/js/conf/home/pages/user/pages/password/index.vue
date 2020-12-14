@@ -27,7 +27,7 @@
 
   export default {
     name: 'password-index',
-    mounted() {
+    mounted () {
     },
     components: { mListConstruction, mInfo }
   }

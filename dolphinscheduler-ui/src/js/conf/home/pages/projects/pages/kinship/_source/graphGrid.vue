@@ -19,7 +19,7 @@
 </template>
 <script>
   import echarts from 'echarts'
-  import { mapActions, mapState, mapMutations } from 'vuex'
+  import { mapState } from 'vuex'
   import graphGridOption from './graphGridOption'
 
   export default {
@@ -35,7 +35,7 @@
     },
     methods: {
       init () {
-      },
+      }
     },
     created () {
     },
@@ -43,14 +43,14 @@
       const graphGrid = echarts.init(this.$refs['graph-grid'])
       graphGrid.setOption(graphGridOption(this.locations, this.connects, this.sourceWorkFlowId, this.isShowLabel), true)
       graphGrid.on('click', (params) => {
-      // Jump to the definition page
-        this.$router.push({ path: `/projects/definition/list/${params.data.id}`})
-      });
+        // Jump to the definition page
+        this.$router.push({ path: `/projects/definition/list/${params.data.id}` })
+      })
     },
     components: {},
     computed: {
       ...mapState('kinship', ['locations', 'connects', 'sourceWorkFlowId'])
-    },
+    }
   }
 </script>
 

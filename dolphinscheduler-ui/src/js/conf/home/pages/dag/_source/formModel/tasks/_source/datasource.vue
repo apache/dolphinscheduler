@@ -128,7 +128,7 @@
         this.$emit('on-dsData', {
           type: this.type,
           datasource: val
-        });
+        })
       }
     },
     created () {
