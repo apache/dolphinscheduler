@@ -130,9 +130,7 @@ public class ShellTask extends AbstractTask {
         }
 
         String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-        /**
-         *  combining local and global parameters
-         */
+        // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
             taskExecutionContext.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
