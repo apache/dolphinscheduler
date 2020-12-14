@@ -41,23 +41,15 @@ const visibility = {
    */
   change (callback) {
     if (visibility.isSupported()) {
-      document.addEventListener(visibilityChange, (evt) => {
-        callback(evt, document[hidden])
-      }, false)
+      document.addEventListener(visibilityChange, evt => callback(evt, document[hidden]), false)
     } else {
       // fallback
-      var onFocus = (evt) => {
-        callback(evt, false)
-      }
-      var onBlur = (evt) => {
-        callback(evt, true)
-      }
       if (document.addEventListener) {
-        window.addEventListener('focus', onFocus, false)
-        window.addEventListener('blur', onBlur, false)
+        window.addEventListener('focus', evt => callback(evt, false), false)
+        window.addEventListener('blur', evt => callback(evt, true), false)
       } else {
-        document.attachEvent('onfocusin', onFocus)
-        document.attachEvent('onfocusout', onBlur)
+        document.attachEvent('onfocusin', evt => callback(evt, false))
+        document.attachEvent('onfocusout', evt => callback(evt, true))
       }
     }
   },
