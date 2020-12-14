@@ -27,6 +27,7 @@ import store from './store'
 import i18n from '@/module/i18n'
 import { sync } from 'vuex-router-sync'
 import Chart from '@/module/ana-charts'
+import visibility from '@/module/visibility'
 import '@/module/filter/formatDate'
 import themeData from '@/module/echarts/themeData.json'
 import Permissions from '@/module/permissions'
@@ -70,6 +71,11 @@ Permissions.request().then(res => {
     mounted () {
       document.addEventListener('click', (e) => {
         $('#contextmenu').css('visibility', 'hidden')
+      })
+      visibility.change((evt, hidden) => {
+        if (hidden === false) {
+          this.$router.go(0)
+        }
       })
     },
     methods: {
