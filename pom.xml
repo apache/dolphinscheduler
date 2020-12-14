@@ -960,6 +960,10 @@
                         <include>**/plugin/alert/script/ProcessUtilsTest.java</include>
                         <include>**/plugin/alert/script/ScriptAlertChannelFactoryTest.java</include>
                         <include>**/plugin/alert/script/ScriptSenderTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertChannelFactoryTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertChannelTest.java</include>
+                        <include>**/plugin/alert/http/HttpAlertPluginTest.java</include>
+                        <include>**/plugin/alert/http/HttpSenderTest.java</include>
                         <include>**/spi/params/PluginParamsTransferTest.java</include>
                         <!--<include>**/alert/plugin/EmailAlertPluginTest.java</include>-->
                         <include>**/alert/plugin/AlertPluginManagerTest.java</include>
