@@ -76,7 +76,6 @@
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
         </include>
-        ,
         from t_ds_project p,t_ds_relation_project_user rel
         where p.id = rel.project_id and rel.user_id= #{userId}
     </select>
