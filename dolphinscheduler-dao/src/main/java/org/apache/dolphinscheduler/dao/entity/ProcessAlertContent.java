@@ -37,6 +37,8 @@ public class ProcessAlertContent implements Serializable {
     private int processId;
     @JsonProperty("processName")
     private String processName;
+    @JsonProperty("projectName")
+    private String projectName;
     @JsonProperty("processType")
     private CommandType processType;
     @JsonProperty("processState")
@@ -81,6 +83,7 @@ public class ProcessAlertContent implements Serializable {
     private ProcessAlertContent(Builder builder) {
         this.processId = builder.processId;
         this.processName = builder.processName;
+        this.projectName = builder.projectName;
         this.processType = builder.processType;
         this.recovery = builder.recovery;
         this.processState = builder.processState;
@@ -110,6 +113,7 @@ public class ProcessAlertContent implements Serializable {
 
         private int processId;
         private String processName;
+        private String projectName;
         private CommandType processType;
         private Flag recovery;
         private ExecutionStatus processState;
@@ -136,6 +140,11 @@ public class ProcessAlertContent implements Serializable {
 
         public Builder processName(String processName) {
             this.processName = processName;
+            return this;
+        }
+
+        public Builder projectName(String projectName) {
+            this.projectName = projectName;
             return this;
         }
 

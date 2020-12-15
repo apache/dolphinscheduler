@@ -671,6 +671,12 @@ public class ProcessService {
             processDefinition = processDefineMapper.selectById(processInstance.getProcessDefinitionId());
             processInstance.setProcessDefinition(processDefinition);
 
+            //fill send message project name
+            if (processDefinition != null && processDefinition.getProjectId() != 0) {
+                Project project = projectMapper.queryDetailById(processDefinition.getProjectId());
+                processDefinition.setProjectName(project == null ? "" : project.getName());
+            }
+
             //reset command parameter
             if (processInstance.getCommandParam() != null) {
                 Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());

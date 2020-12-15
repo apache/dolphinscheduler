@@ -102,6 +102,7 @@ public class AlertManager {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
                     .processId(processInstance.getId())
                     .processName(processInstance.getName())
+                    .projectName(determineProjectName(processInstance.getProcessDefinition()))
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
                     .recovery(processInstance.getRecovery())
@@ -122,6 +123,7 @@ public class AlertManager {
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
                         .processId(processInstance.getId())
                         .processName(processInstance.getName())
+                        .projectName(determineProjectName(processInstance.getProcessDefinition()))
                         .taskId(task.getId())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
@@ -153,6 +155,7 @@ public class AlertManager {
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
                     .processName(processInstance.getName())
+                    .projectName(determineProjectName(processInstance.getProcessDefinition()))
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
                     .retryTimes(taskInstance.getRetryTimes())
@@ -251,5 +254,15 @@ public class AlertManager {
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    }
+
+    /**
+     * determine send message project name
+     *
+     * @param processDefinition process definition
+     * @return project name
+     */
+    private String determineProjectName(ProcessDefinition processDefinition) {
+        return processDefinition == null ? "" : processDefinition.getProjectName();
     }
 }
