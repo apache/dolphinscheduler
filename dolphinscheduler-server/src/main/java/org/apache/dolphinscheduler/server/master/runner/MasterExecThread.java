@@ -52,7 +52,6 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  * master exec thread,split dag
  */
 public class MasterExecThread implements Runnable {
-
     /**
      * logger of MasterExecThread
      */
@@ -1021,7 +1020,7 @@ public class MasterExecThread implements Runnable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("submit standby task error",e);
         }
     }
 
