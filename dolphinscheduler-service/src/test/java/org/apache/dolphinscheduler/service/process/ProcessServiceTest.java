@@ -26,18 +26,8 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtilsTest;
 
 import java.util.ArrayList;
@@ -85,6 +75,8 @@ public class ProcessServiceTest {
     private UserMapper userMapper;
     @Mock
     TaskInstanceMapper taskInstanceMapper;
+    @Mock
+    ProjectMapper projectMapper;
 
     @Test
     public void testCreateSubCommand() {
@@ -234,6 +226,8 @@ public class ProcessServiceTest {
         processDefinition.setId(123);
         processDefinition.setName("test");
         processDefinition.setVersion(1);
+        processDefinition.setProjectId(1);
+        processDefinition.setProjectName("projectName");
         processDefinition.setProcessDefinitionJson("{\"globalParams\":[],\"tasks\":[{\"conditionResult\":"
                 + "{\"failedNode\":[\"\"],\"successNode\":[\"\"]},\"delayTime\":\"0\",\"dependence\":{}"
                 + ",\"description\":\"\",\"id\":\"tasks-3011\",\"maxRetryTimes\":\"0\",\"name\":\"tsssss\""
@@ -241,10 +235,16 @@ public class ProcessServiceTest {
                 + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
                 + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
                 + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
+        Project project = new Project();
+        project.setId(1);
+        project.setName("projectName");
+        project.setUserId(1);
+
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
         Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
+        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(project);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
         Command command2 = new Command();
