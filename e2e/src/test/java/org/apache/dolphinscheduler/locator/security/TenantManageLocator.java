@@ -27,15 +27,15 @@ public class TenantManageLocator{
 
     public static final By TENANT_INPUT_CODE = By.xpath("//div[2]/div/div/div[2]/div/input");
 
-    public static final By TENANT_INPUT_NAME = By.xpath("//div[2]/div[2]/div/input");
-
     public static final By QUEUE = By.xpath("//textarea");
 
     public static final By DESCRIPTION = By.xpath("//textarea");
 
     public static final By SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 
-    public static final By DELETE_TENANT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[8]/span/button");
+    public static final By DELETE_TENANT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[7]/span/button");
 
     public static final By CONFIRM_DELETE_TENANT_BUTTON = By.xpath("//div[2]/div/button[2]/span");
+
+    public static final By TENANT_CODE_FIRST = By.xpath("//table/tr[2]/td[2]/span");
 }

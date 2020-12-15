@@ -49,6 +49,9 @@ public class WorkerConfig {
     @Value("${worker.listen.port: 1234}")
     private int listenPort;
 
+    @Value("${worker.weight:100}")
+    private int weight;
+
     public int getListenPort() {
         return listenPort;
     }
@@ -106,5 +109,14 @@ public class WorkerConfig {
 
     public void setWorkerMaxCpuloadAvg(int workerMaxCpuloadAvg) {
         this.workerMaxCpuloadAvg = workerMaxCpuloadAvg;
+    }
+
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }

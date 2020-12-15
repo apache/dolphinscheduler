@@ -19,51 +19,53 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
                 style="width: 130px;"
+                size="small"
                 v-model="programType"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in programTypeList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Spark Version')}}</div>
       <div slot="content">
-        <x-select
+        <el-select
                 style="width: 130px;"
+                size="small"
                 v-model="sparkVersion"
                 :disabled="isDetails">
-          <x-option
+          <el-option
                   v-for="city in sparkVersionList"
                   :key="city.code"
                   :value="city.code"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
-        <x-input
-                :disabled="isDetails"
-                type="input"
-                v-model="mainClass"
-                :placeholder="$t('Please enter main class')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+            :disabled="isDetails"
+            type="input"
+            size="small"
+            v-model="mainClass"
+            :placeholder="$t('Please enter main class')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
-        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
+        <treeselect v-model="mainJar" maxHeight="200" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :disabled="isDetails" :placeholder="$t('Please enter main jar package')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -71,120 +73,110 @@
     <m-list-box>
       <div slot="text">{{$t('Deploy Mode')}}</div>
       <div slot="content">
-        <x-radio-group v-model="deployMode">
-          <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
-          <x-radio :label="'client'" :disabled="isDetails"></x-radio>
-          <x-radio :label="'local'" :disabled="isDetails"></x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="deployMode" size="small">
+          <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'client'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+        </el-radio-group>
       </div>
     </m-list-box>
     <div class="list-box-4p">
       <div class="clearfix list">
         <span class="sp1">{{$t('Driver core number')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="driverCores"
                   :placeholder="$t('Please enter driver core number')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 200px;">
+        </el-input>
         </span>
         <span class="sp1 sp3">{{$t('Driver memory use')}}</span>
         <span class="sp2">
-          <x-input
+          <el-input
                   :disabled="isDetails"
                   type="input"
+                  size="small"
                   v-model="driverMemory"
                   :placeholder="$t('Please enter driver memory use')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
+                  style="width: 186px;">
+        </el-input>
         </span>
       </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('Number of Executors')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="numExecutors"
-                  :placeholder="$t('Please enter the number of Executor')"
-                  style="width: 200px;"
-                  autocomplete="off">
-        </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="numExecutors"
+              :placeholder="$t('Please enter the number of Executor')"
+              style="width: 200px;">
+        </el-input>
         </span>
         <span class="sp1 sp3">{{$t('Executor memory')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="executorMemory"
-                  :placeholder="$t('Please enter the Executor memory')"
-                  style="width: 186px;"
-                  autocomplete="off">
-        </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="executorMemory"
+              :placeholder="$t('Please enter the Executor memory')"
+              style="width: 186px;">
+        </el-input>
         </span>
       </div>
       <div class="clearfix list">
         <span class="sp1">{{$t('Executor core number')}}</span>
         <span class="sp2">
-          <x-input
-                  :disabled="isDetails"
-                  type="input"
-                  v-model="executorCores"
-                  :placeholder="$t('Please enter Executor core number')"
-                  style="width: 200px;"
-                  autocomplete="off">
-          </x-input>
+          <el-input
+              :disabled="isDetails"
+              type="input"
+              size="small"
+              v-model="executorCores"
+              :placeholder="$t('Please enter Executor core number')"
+              style="width: 200px;">
+          </el-input>
         </span>
       </div>
     </div>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
-        <x-input
-                :autosize="{minRows:2}"
-                :disabled="isDetails"
-                type="textarea"
-                v-model="mainArgs"
-                :placeholder="$t('Please enter Command-line parameters')"
-                autocomplete="off">
-        </x-input>
+        <el-input
+            :autosize="{minRows:2}"
+            :disabled="isDetails"
+            type="textarea"
+            size="small"
+            v-model="mainArgs"
+            :placeholder="$t('Please enter Command-line parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
-        <x-input
-                :disabled="isDetails"
-                :autosize="{minRows:2}"
-                type="textarea"
-                v-model="others"
-                :placeholder="$t('Please enter other parameters')">
-        </x-input>
+        <el-input
+            :disabled="isDetails"
+            :autosize="{minRows:2}"
+            type="textarea"
+            size="small"
+            v-model="others"
+            :placeholder="$t('Please enter other parameters')">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
+        <treeselect v-model="resourceList" :multiple="true" maxHeight="200" :options="mainJarList" :normalizer="normalizer" :value-consists-of="valueConsistsOf" :disabled="isDetails" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
     </m-list-box>
-    <!-- <m-list-box>
-      <div slot="text">{{$t('Resources')}}</div>
-      <div slot="content">
-        <m-resources
-                ref="refResources"
-                @on-resourcesData="_onResourcesData"
-                @on-cache-resourcesData="_onCacheResourcesData"
-                :resource-list="resourceList">
-        </m-resources>
-      </div>
-    </m-list-box> -->
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -203,7 +195,6 @@
   import i18n from '@/module/i18n'
   import mLocalParams from './_source/localParams'
   import mListBox from './_source/listBox'
-  import mResources from './_source/resources'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
@@ -250,7 +241,7 @@
         sparkVersion: 'SPARK2',
         // Spark version(LIst)
         sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }],
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
@@ -267,10 +258,10 @@
       /**
        * getResourceId
        */
-      marjarId(name) {
-        this.store.dispatch('dag/getResourceId',{
+      marjarId (name) {
+        this.store.dispatch('dag/getResourceId', {
           type: 'FILE',
-          fullName: '/'+name
+          fullName: '/' + name
         }).then(res => {
           this.mainJar = res.id
         }).catch(e => {
@@ -295,55 +286,55 @@
       _onCacheResourcesData (a) {
         this.cacheResourceList = a
       },
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            this.operationTree(item) : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
         })
       },
-      operationTree(item) {
-        if(item.dirctory) {
-          item.isDisabled =true
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
         }
         delete item.children
       },
-      searchTree(element, id) {
+      searchTree (element, id) {
         // 根据id查找节点
-        if (element.id == id) {
-          return element;
-        } else if (element.children != null) {
-          var i;
-          var result = null;
-          for (i = 0; result == null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id);
+        if (element.id === id) {
+          return element
+        } else if (element.children !== null) {
+          var i
+          var result = null
+          for (i = 0; result === null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id)
           }
-          return result;
+          return result
         }
-        return null;
+        return null
       },
-      dataProcess(backResource) {
+      dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.mainJarList.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item=>{
+          resourceIdArr = isResourceId.map(item => {
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
+          }
+          let diffSet = this.resourceList.diff(resourceIdArr)
           let optionsCmp = []
-          if(diffSet.length>0) {
-            diffSet.forEach(item=>{
-              backResource.forEach(item1=>{
-                if(item==item1.id || item==item1.res) {
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -352,15 +343,15 @@
           let noResources = [{
             id: -1,
             name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
             children: []
           }]
-          if(optionsCmp.length>0) {
+          if (optionsCmp.length > 0) {
             this.allNoResources = optionsCmp
-            optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
             })
-            optionsCmp.forEach(item=>{
+            optionsCmp.forEach(item => {
               item.isNew = true
             })
             noResources[0].children = optionsCmp
@@ -388,7 +379,7 @@
         }
 
         // noRes
-        if (this.noRes.length>0) {
+        if (this.noRes.length > 0) {
           this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
@@ -427,7 +418,7 @@
           return false
         }
         // Process resourcelist
-        let dataProcessing= _.map(this.resourceList, v => {
+        let dataProcessing = _.map(this.resourceList, v => {
           return {
             id: v
           }
@@ -462,44 +453,49 @@
           this.mainClass = ''
         }
       },
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
         this.$emit('on-cache-params', val)
-      }
-    },
-    computed: {
-      cacheParams () {
-        let isResourceId = []
-        let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.mainJarList.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
-              }
-            })
-          })
-          resourceIdArr = isResourceId.map(item=>{
-            return {id: item.id,name: item.name,res: item.fullName}
-          })
-        }
+      },
+      resourceIdArr (arr) {
         let result = []
-        resourceIdArr.forEach(item=>{
-          this.allNoResources.forEach(item1=>{
-            if(item.id==item1.id) {
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
               // resultBool = true
-             result.push(item1)
+              result.push(item1)
             }
           })
         })
         this.noRes = result
+      }
+    },
+    computed: {
+      resourceIdArr () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
+              }
+            })
+          })
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
+          })
+        }
+        return resourceIdArr
+      },
+      cacheParams () {
         return {
           mainClass: this.mainClass,
           mainJar: {
             id: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: resourceIdArr,
+          resourceList: this.resourceIdArr,
           localParams: this.localParams,
           driverCores: this.driverCores,
           driverMemory: this.driverMemory,
@@ -514,70 +510,70 @@
       }
     },
     created () {
-        let item = this.store.state.dag.resourcesListS
-        let items = this.store.state.dag.resourcesListJar
-        this.diGuiTree(item)
-        this.diGuiTree(items)
-        this.mainJarList = item
-        this.mainJarLists = items
-        let o = this.backfillItem
+      let item = this.store.state.dag.resourcesListS
+      let items = this.store.state.dag.resourcesListJar
+      this.diGuiTree(item)
+      this.diGuiTree(items)
+      this.mainJarList = item
+      this.mainJarLists = items
+      let o = this.backfillItem
 
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.mainClass = o.params.mainClass || ''
-          if(o.params.mainJar.res) {
-            this.marjarId(o.params.mainJar.res)
-          } else if(o.params.mainJar.res=='') {
-            this.mainJar = ''
-          } else {
-            this.mainJar = o.params.mainJar.id || ''
-          }
-          this.deployMode = o.params.deployMode || ''
-          this.driverCores = o.params.driverCores || 1
-          this.driverMemory = o.params.driverMemory || '512M'
-          this.numExecutors = o.params.numExecutors || 2
-          this.executorMemory = o.params.executorMemory || '2G'
-          this.executorCores = o.params.executorCores || 2
-          this.mainArgs = o.params.mainArgs || ''
-          this.others = o.params.others
-          this.programType = o.params.programType || 'SCALA'
-          this.sparkVersion = o.params.sparkVersion || 'SPARK2'
-
-          // backfill resourceList
-          let backResource = o.params.resourceList || []
-          let resourceList = o.params.resourceList || []
-          if (resourceList.length) {
-            _.map(resourceList, v => {
-              if(!v.id) {
-                this.store.dispatch('dag/getResourceId',{
-                  type: 'FILE',
-                  fullName: '/'+v.res
-                }).then(res => {
-                  this.resourceList.push(res.id)
-                  this.dataProcess(backResource)
-                }).catch(e => {
-                  this.resourceList.push(v.res)
-                  this.dataProcess(backResource)
-                })
-              } else {
-                this.resourceList.push(v.id)
-                this.dataProcess(backResource)
-              }
-            })
-            this.cacheResourceList = resourceList
-          }
-
-          // backfill localParams
-          let localParams = o.params.localParams || []
-          if (localParams.length) {
-            this.localParams = localParams
-          }
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.mainClass = o.params.mainClass || ''
+        if (o.params.mainJar.res) {
+          this.marjarId(o.params.mainJar.res)
+        } else if (o.params.mainJar.res === '') {
+          this.mainJar = ''
+        } else {
+          this.mainJar = o.params.mainJar.id || ''
         }
+        this.deployMode = o.params.deployMode || ''
+        this.driverCores = o.params.driverCores || 1
+        this.driverMemory = o.params.driverMemory || '512M'
+        this.numExecutors = o.params.numExecutors || 2
+        this.executorMemory = o.params.executorMemory || '2G'
+        this.executorCores = o.params.executorCores || 2
+        this.mainArgs = o.params.mainArgs || ''
+        this.others = o.params.others
+        this.programType = o.params.programType || 'SCALA'
+        this.sparkVersion = o.params.sparkVersion || 'SPARK2'
+
+        // backfill resourceList
+        let backResource = o.params.resourceList || []
+        let resourceList = o.params.resourceList || []
+        if (resourceList.length) {
+          _.map(resourceList, v => {
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
+                type: 'FILE',
+                fullName: '/' + v.res
+              }).then(res => {
+                this.resourceList.push(res.id)
+                this.dataProcess(backResource)
+              }).catch(e => {
+                this.resourceList.push(v.res)
+                this.dataProcess(backResource)
+              })
+            } else {
+              this.resourceList.push(v.id)
+              this.dataProcess(backResource)
+            }
+          })
+          this.cacheResourceList = resourceList
+        }
+
+        // backfill localParams
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
+      }
     },
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, mResources, Treeselect }
+    components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
 

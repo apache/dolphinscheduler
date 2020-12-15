@@ -14,18 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.*;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * log client
@@ -38,8 +45,10 @@ public class LogClientService {
 
     private final NettyRemotingClient client;
 
+    private volatile boolean isRunning;
+
     /**
-     *  request time out
+     * request time out
      */
     private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
@@ -50,18 +59,21 @@ public class LogClientService {
         this.clientConfig = new NettyClientConfig();
         this.clientConfig.setWorkerThreads(4);
         this.client = new NettyRemotingClient(clientConfig);
+        this.isRunning = true;
     }
 
     /**
      * close
      */
-    public void close()  {
+    public void close() {
         this.client.close();
+        this.isRunning = false;
         logger.info("logger client closed");
     }
 
     /**
      * roll view log
+     *
      * @param host host
      * @param port port
      * @param path path
@@ -69,7 +81,7 @@ public class LogClientService {
      * @param limit limit
      * @return log content
      */
-    public String rollViewLog(String host, int port, String path,int skipLineNum,int limit) {
+    public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
         logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         String result = "";
@@ -77,8 +89,8 @@ public class LogClientService {
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if(response != null){
-                RollViewLogResponseCommand rollReviewLog = JsonSerializer.deserialize(
+            if (response != null) {
+                RollViewLogResponseCommand rollReviewLog = JSONUtils.parseObject(
                         response.getBody(), RollViewLogResponseCommand.class);
                 return rollReviewLog.getMsg();
             }
@@ -92,6 +104,7 @@ public class LogClientService {
 
     /**
      * view log
+     *
      * @param host host
      * @param port port
      * @param path path
@@ -105,8 +118,8 @@ public class LogClientService {
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if(response != null){
-                ViewLogResponseCommand viewLog = JsonSerializer.deserialize(
+            if (response != null) {
+                ViewLogResponseCommand viewLog = JSONUtils.parseObject(
                         response.getBody(), ViewLogResponseCommand.class);
                 return viewLog.getMsg();
             }
@@ -120,6 +133,7 @@ public class LogClientService {
 
     /**
      * get log size
+     *
      * @param host host
      * @param port port
      * @param path log path
@@ -133,8 +147,8 @@ public class LogClientService {
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if(response != null){
-                GetLogBytesResponseCommand getLog = JsonSerializer.deserialize(
+            if (response != null) {
+                GetLogBytesResponseCommand getLog = JSONUtils.parseObject(
                         response.getBody(), GetLogBytesResponseCommand.class);
                 return getLog.getData();
             }
@@ -146,9 +160,9 @@ public class LogClientService {
         return result;
     }
 
-
     /**
      * remove task log
+     *
      * @param host host
      * @param port port
      * @param path path
@@ -162,8 +176,8 @@ public class LogClientService {
         try {
             Command command = request.convert2Command();
             Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if(response != null){
-                RemoveTaskLogResponseCommand taskLogResponse = JsonSerializer.deserialize(
+            if (response != null) {
+                RemoveTaskLogResponseCommand taskLogResponse = JSONUtils.parseObject(
                         response.getBody(), RemoveTaskLogResponseCommand.class);
                 return taskLogResponse.getStatus();
             }
@@ -173,5 +187,9 @@ public class LogClientService {
             this.client.closeChannel(address);
         }
         return result;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 }

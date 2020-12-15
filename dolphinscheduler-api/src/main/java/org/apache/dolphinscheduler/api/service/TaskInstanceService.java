@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.service;
 
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -32,11 +30,20 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
-import java.util.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * task instance service
@@ -62,7 +69,6 @@ public class TaskInstanceService extends BaseService {
     @Autowired
     UsersService usersService;
 
-
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
@@ -79,11 +85,11 @@ public class TaskInstanceService extends BaseService {
      * @param pageSize page size
      * @return task list page
      */
-    public Map<String,Object> queryTaskListPaging(User loginUser, String projectName,
-                                                  Integer processInstanceId, String taskName, String executorName, String startDate,
-                                                  String endDate, String searchVal, ExecutionStatus stateType,String host,
-                                                  Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+    public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
+                                                   Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
+                                                   String endDate, String searchVal, ExecutionStatus stateType, String host,
+                                                   Integer pageNo, Integer pageSize) {
+        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
 
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
@@ -93,23 +99,23 @@ public class TaskInstanceService extends BaseService {
         }
 
         int[] statusArray = null;
-        if(stateType != null){
+        if (stateType != null) {
             statusArray = new int[]{stateType.ordinal()};
         }
 
         Date start = null;
         Date end = null;
-        try {
-            if(StringUtils.isNotEmpty(startDate)){
-                start = DateUtils.getScheduleDate(startDate);
+        if (StringUtils.isNotEmpty(startDate)) {
+            start = DateUtils.getScheduleDate(startDate);
+            if (start == null) {
+                return generateInvalidParamRes(result, "startDate");
             }
-            if(StringUtils.isNotEmpty( endDate)){
-                end = DateUtils.getScheduleDate(endDate);
+        }
+        if (StringUtils.isNotEmpty(endDate)) {
+            end = DateUtils.getScheduleDate(endDate);
+            if (end == null) {
+                return generateInvalidParamRes(result, "endDate");
             }
-        } catch (Exception e) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-            result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
-            return result;
         }
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
@@ -117,25 +123,37 @@ public class TaskInstanceService extends BaseService {
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end
+                page, project.getId(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
 
-        for(TaskInstance taskInstance : taskInstanceList){
+        for (TaskInstance taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(), taskInstance.getEndTime()));
             User executor = usersService.queryUser(taskInstance.getExecutorId());
             if (null != executor) {
                 taskInstance.setExecutorName(executor.getUserName());
             }
         }
-        pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
-        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));
+        pageInfo.setTotalCount((int) taskInstanceIPage.getTotal());
+        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /***
+     * generate {@link org.apache.dolphinscheduler.api.enums.Status#REQUEST_PARAMS_NOT_VALID_ERROR} res with  param name
+     * @param result exist result map
+     * @param params invalid params name
+     * @return update result map
+     */
+    private Map<String, Object> generateInvalidParamRes(Map<String, Object> result, String params) {
+        result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+        result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), params));
         return result;
     }
 }

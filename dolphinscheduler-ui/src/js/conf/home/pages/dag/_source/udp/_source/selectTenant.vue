@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 <template>
-  <x-select
+  <el-select
           :disabled="isDetails"
-          @on-change="_onChange"
-          v-model="value"
+          @change="_onChange"
+          v-model="selectedValue"
+          size="small"
           style="width: 180px">
-    <x-option
+    <el-option
             v-for="item in itemList"
             :key="item.id"
             :value="item.id"
-            :label="item.tenantName">
-    </x-option>
-  </x-select>
+            :label="item.tenantCode">
+    </el-option>
+  </el-select>
 </template>
 <script>
   import disabledState from '@/module/mixin/disabledState'
@@ -34,6 +35,7 @@
     name: 'form-tenant',
     data () {
       return {
+        selectedValue: this.value,
         itemList: []
       }
     },
@@ -48,23 +50,25 @@
       prop: 'value',
       event: 'tenantSelectEvent'
     },
-    mounted() {
-      let result = this.itemList.some(item=>{
-        if(item.id == this.value) {
+    mounted () {
+      let result = this.itemList.some(item => {
+        if (item.id === this.value) {
           return true
         }
-			})
-      if(!result) {
-        this.value = 'default'
+      })
+      if (!result) {
+        this.selectedValue = 'default'
       }
     },
     methods: {
       _onChange (o) {
-        this.value = o.value
-        this.$emit('tenantSelectEvent', o.value)
+        this.$emit('tenantSelectEvent', o)
       }
     },
     watch: {
+      value (val) {
+        this.selectedValue = val
+      }
     },
     created () {
       let stateTenantAllList = this.store.state.security.tenantAllList || []

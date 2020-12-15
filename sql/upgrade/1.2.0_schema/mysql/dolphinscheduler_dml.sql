@@ -23,3 +23,4 @@ UPDATE QRTZ_JOB_DETAILS SET SCHED_NAME='DolphinScheduler' WHERE SCHED_NAME='Easy
 UPDATE QRTZ_JOB_DETAILS SET JOB_CLASS_NAME='org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob' WHERE JOB_CLASS_NAME='cn.escheduler.server.quartz.ProcessScheduleJob';
 UPDATE QRTZ_LOCKS SET SCHED_NAME='DolphinScheduler' WHERE SCHED_NAME='EasyScheduler';
 UPDATE QRTZ_SCHEDULER_STATE SET SCHED_NAME='DolphinScheduler' WHERE SCHED_NAME='EasyScheduler';
+UPDATE t_ds_user SET phone = '' WHERE phone = 'xx';

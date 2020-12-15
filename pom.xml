@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -59,19 +59,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <curator.version>4.3.0</curator.version>
-        <spring.version>5.1.5.RELEASE</spring.version>
-        <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
+        <spring.version>5.1.18.RELEASE</spring.version>
+        <spring.boot.version>2.1.17.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
-        <quartz.version>2.2.3</quartz.version>
-        <jackson.version>2.9.8</jackson.version>
+        <quartz.version>2.3.0</quartz.version>
+        <jackson.version>2.9.10</jackson.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
-        <druid.version>1.1.14</druid.version>
+        <druid.version>1.1.22</druid.version>
         <h2.version>1.4.200</h2.version>
-        <commons.codec.version>1.6</commons.codec.version>
+        <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
@@ -94,6 +94,7 @@
         <oshi.core.version>3.5.0</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
+        <presto.jdbc.version>0.238.1</presto.jdbc.version>
         <jsp-2.1.version>6.1.14</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
@@ -498,6 +499,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.facebook.presto</groupId>
+                <artifactId>presto-jdbc</artifactId>
+                <version>${presto.jdbc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>net.jcip</groupId>
                 <artifactId>jcip-annotations</artifactId>
                 <version>${jcip.version}</version>
@@ -702,6 +709,8 @@
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <!--<include>**/alert/utils/MailUtilsTest.java</include>-->
                         <include>**/alert/plugin/EmailAlertPluginTest.java</include>
+                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/controller/TenantControllerTest.java</include>
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <includeDataxTaskTest>**/api/enums/testGetEnum.java</includeDataxTaskTest>
@@ -716,12 +725,13 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
-                        <!--<include>**/api/service/DataSourceServiceTest.java</include>-->
+                        <include>**/api/service/DataSourceServiceTest.java</include>
                         <include>**/api/service/ExecutorService2Test.java</include>
                         <include>**/api/service/ExecutorServiceTest.java</include>
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
+                        <include>**/api/service/ProcessDefinitionVersionServiceTest.java</include>
                         <include>**/api/service/ProcessInstanceServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
@@ -736,6 +746,7 @@
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/WorkFlowLineageServiceTest.java</include>
                         <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
+                        <include>**/api/controller/TaskInstanceControllerTest.java</include>
                         <include>**/api/controller/WorkFlowLineageControllerTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
@@ -748,15 +759,13 @@
                         <include>**/common/os/OshiTest.java</include>
                         <include>**/common/os/OSUtilsTest.java</include>
                         <include>**/common/shell/ShellExecutorTest.java</include>
+                        <include>**/common/task/DataxParametersTest.java</include>
                         <include>**/common/task/EntityTestUtils.java</include>
                         <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/HttpParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/common/threadutils/ThreadPoolExecutorsTest.java</include>
                         <include>**/common/threadutils/ThreadUtilsTest.java</include>
-                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
-                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
                         <include>**/common/utils/CollectionUtilsTest.java</include>
                         <include>**/common/utils/CommonUtilsTest.java</include>
                         <include>**/common/utils/DateUtilsTest.java</include>
@@ -768,6 +777,7 @@
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
+                        <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>
                         <include>**/common/utils/PropertyUtilsTest.java</include>
                         <include>**/common/utils/SchemaUtilsTest.java</include>
@@ -776,25 +786,30 @@
                         <include>**/common/utils/StringTest.java</include>
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
+                        <include>**/common/utils/VarPoolUtilsTest.java</include>
                         <include>**/common/utils/HadoopUtilsTest.java</include>
                         <include>**/common/utils/HttpUtilsTest.java</include>
+                        <include>**/common/utils/KerberosHttpClientTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
                         <include>**/common/utils/HadoopUtils.java</include>
                         <include>**/common/utils/RetryerUtilsTest.java</include>
                         <include>**/common/plugin/FilePluginManagerTest</include>
                         <include>**/common/plugin/PluginClassLoaderTest</include>
+                        <include>**/common/enums/ExecutionStatusTest</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/mapper/ConnectionFactoryTest.java</include>
                         <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/entity/UdfFuncTest.java</include>
                         <include>**/remote/JsonSerializerTest.java</include>
                         <include>**/remote/RemoveTaskLogResponseCommandTest.java</include>
                         <include>**/remote/RemoveTaskLogRequestCommandTest.java</include>
-                        <!--<include>**/remote/NettyRemotingClientTest.java</include>-->
+                        <include>**/remote/NettyRemotingClientTest.java</include>
+                        <include>**/remote/NettyUtilTest.java</include>
                         <include>**/remote/ResponseFutureTest.java</include>
-                        <!--<include>**/server/log/LoggerServerTest.java</include>-->
+                        <include>**/server/log/LoggerServerTest.java</include>
                         <include>**/server/entity/SQLTaskExecutionContextTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
@@ -807,17 +822,24 @@
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
-                        <!--<include>**/server/master/register/MasterRegistryTest.java</include>-->
+                        <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RoundRobinHostManagerTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
                         <include>**/server/master/DependentTaskTest.java</include>
-                        <!--<include>**/server/master/ConditionsTaskTest.java</include>-->
+                        <include>**/server/master/ConditionsTaskTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/server/master/ParamsTest.java</include>
+                        <include>**/server/master/SubProcessTaskTest.java</include>
+                        <include>**/server/master/processor/TaskAckProcessorTest.java</include>
+                        <include>**/server/master/processor/TaskKillResponseProcessorTest.java</include>
+                        <include>**/server/master/processor/queue/TaskResponseServiceTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/server/utils/ExecutionContextTestUtils.java</include>
-                        <!--<include>**/server/utils/FlinkArgsUtilsTest.java</include>-->
+                        <include>**/server/utils/HostTest.java</include>
+                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
+                        <include>**/server/utils/LogUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
@@ -831,8 +853,11 @@
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
+                        <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>
+                        <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/zk/CuratorZookeeperClientTest.java</include>
@@ -841,6 +866,7 @@
                         <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
                         <!--<iTaskUpdateQueueConsumerThreadnclude>**/dao/mapper/ErrorCommandMapperTest.java</iTaskUpdateQueueConsumerThreadnclude>-->
                         <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessDefinitionVersionMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
                         <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
                         <include>**/dao/mapper/ProjectMapperTest.java</include>
@@ -931,7 +957,7 @@
                         <exclude>**/*.txt</exclude>
                         <exclude>**/docs/**</exclude>
                         <exclude>**/*.babelrc</exclude>
-                        <exclude>**/*.eslintrc</exclude>
+                        <exclude>**/*.eslint*</exclude>
                         <exclude>**/.mvn/jvm.config</exclude>
                         <exclude>**/.mvn/wrapper/**</exclude>
                     </excludes>

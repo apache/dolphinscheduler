@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -251,6 +253,8 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
+     *
+     * @param loginUser
      * @param userId user id
      * @param userName user name
      * @param userPassword user password
@@ -261,7 +265,7 @@ public class UsersService extends BaseService {
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateUser(int userId,
+    public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
                                           String email,
@@ -272,13 +276,14 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
+        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
         User user = userMapper.selectById(userId);
-
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)){
@@ -820,24 +825,6 @@ public class UsersService extends BaseService {
     }
 
     /**
-     * check
-     *
-     * @param result result
-     * @param bool bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @param tenantId tenant id
      * @return true if tenant exists, otherwise return false
      */
@@ -917,10 +904,11 @@ public class UsersService extends BaseService {
      * @param repeatPassword repeat password
      * @param email          email
      * @return register result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
 
         //check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
@@ -934,10 +922,100 @@ public class UsersService extends BaseService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-
-        createUser(userName, userPassword, email, 1, "", "", 0);
+        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, user);
         return result;
     }
 
+    /**
+     * activate user, only system admin have permission, change user state code 0 to 1
+     *
+     * @param loginUser login user
+     * @param userName  user name
+     * @return create result code
+     */
+    public Map<String, Object> activateUser(User loginUser, String userName) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        if (!CheckUtils.checkUserName(userName)){
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        User user = userMapper.queryByUserNameAccurately(userName);
+
+        if (user == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userName);
+            return result;
+        }
+
+        if (user.getState() != Flag.NO.ordinal()) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            return result;
+        }
+
+        user.setState(Flag.YES.ordinal());
+        Date now = new Date();
+        user.setUpdateTime(now);
+        userMapper.updateById(user);
+        User responseUser = userMapper.queryByUserNameAccurately(userName);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, responseUser);
+        return result;
+    }
+
+    /**
+     * activate user, only system admin have permission, change users state code 0 to 1
+     *
+     * @param loginUser login user
+     * @param userNames user name
+     * @return create result code
+     */
+    public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        int totalSuccess = 0;
+        List<String> successUserNames = new ArrayList<>();
+        Map<String, Object> successRes = new HashMap<>();
+        int totalFailed = 0;
+        List<Map<String, String>> failedInfo = new ArrayList<>();
+        Map<String, Object> failedRes = new HashMap<>();
+        for (String userName : userNames) {
+            Map<String, Object> tmpResult = activateUser(loginUser, userName);
+            if (tmpResult.get(Constants.STATUS) != Status.SUCCESS) {
+                totalFailed++;
+                Map<String, String> failedBody = new HashMap<>();
+                failedBody.put("userName", userName);
+                Status status = (Status) tmpResult.get(Constants.STATUS);
+                String errorMessage = MessageFormat.format(status.getMsg(), userName);
+                failedBody.put("msg", errorMessage);
+                failedInfo.add(failedBody);
+            } else {
+                totalSuccess++;
+                successUserNames.add(userName);
+            }
+        }
+        successRes.put("sum", totalSuccess);
+        successRes.put("userName", successUserNames);
+        failedRes.put("sum", totalFailed);
+        failedRes.put("info", failedInfo);
+        Map<String, Object> res = new HashMap<>();
+        res.put("success", successRes);
+        res.put("failed", failedRes);
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, res);
+        return result;
+    }
 }

@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.apache.dolphinscheduler</groupId>
 		<artifactId>dolphinscheduler</artifactId>
-		<version>1.3.2-SNAPSHOT</version>
+		<version>1.3.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>dolphinscheduler-common</artifactId>
 	<name>dolphinscheduler-common</name>
@@ -578,6 +578,11 @@
 					<groupId>com.microsoft.azure</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.facebook.presto</groupId>
+			<artifactId>presto-jdbc</artifactId>
 		</dependency>
 
         <dependency>

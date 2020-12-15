@@ -238,6 +238,10 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`worker-server`的保留内存，默认值 `0.1`。
 
+**`WORKER_WEIGHT`**
+
+配置`worker-server`的权重，默认之`100`。
+
 **`WORKER_LISTEN_PORT`**
 
 配置`worker-server`的端口，默认值 `1234`。

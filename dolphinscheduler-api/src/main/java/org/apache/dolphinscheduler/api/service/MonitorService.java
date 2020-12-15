@@ -56,7 +56,7 @@ public class MonitorService extends BaseService {
    * @return data base state
    */
   public Map<String,Object> queryDatabaseState(User loginUser) {
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
 
@@ -75,7 +75,7 @@ public class MonitorService extends BaseService {
    */
   public Map<String,Object> queryMaster(User loginUser) {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     List<Server> masterServers = getServerListFromZK(true);
     result.put(Constants.DATA_LIST, masterServers);
@@ -91,7 +91,7 @@ public class MonitorService extends BaseService {
    * @return zookeeper information list
    */
   public Map<String,Object> queryZookeeperState(User loginUser) {
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
 
     List<ZookeeperRecord> zookeeperRecordList = zookeeperMonitor.zookeeperInfoList();
 
@@ -111,7 +111,7 @@ public class MonitorService extends BaseService {
    */
   public Map<String,Object> queryWorker(User loginUser) {
 
-    Map<String, Object> result = new HashMap<>(5);
+    Map<String, Object> result = new HashMap<>();
     List<WorkerServerModel> workerServers = getServerListFromZK(false)
             .stream()
             .map((Server server) -> {

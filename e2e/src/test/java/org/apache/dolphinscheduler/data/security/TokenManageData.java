@@ -16,9 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
-public class TokenManageData {
-    public static final String TOKEN_MANAGE = "令牌管理 - DolphinScheduler";
-    public static final String DATE = "2038-06-10 00:00:00";
+import org.apache.dolphinscheduler.util.YmlReader;
 
-
+public class TokenManageData  {
+    public String getTokenData(String param) {
+        YmlReader ymlReader = new YmlReader();
+        String tokenData = ymlReader.getDataYml("testData/security_zh_cn", "tokenManage", param);
+        return  tokenData;
+    }
 }

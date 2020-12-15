@@ -59,7 +59,7 @@ public class QueueService extends BaseService {
      * @return queue list
      */
     public Map<String, Object> queryList(User loginUser) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -81,7 +81,7 @@ public class QueueService extends BaseService {
      * @return queue list
      */
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -110,7 +110,7 @@ public class QueueService extends BaseService {
      * @return create result
      */
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
@@ -159,7 +159,7 @@ public class QueueService extends BaseService {
      * @return update result code
      */
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         if (checkAdmin(loginUser, result)) {
             return result;
         }
