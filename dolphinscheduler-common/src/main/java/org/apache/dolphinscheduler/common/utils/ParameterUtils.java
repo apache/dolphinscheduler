@@ -111,7 +111,9 @@ public class ParameterUtils {
         }
 
         // replace variable ${} form,refers to the replacement of system variables and custom variables
-        parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        if (!parameterMap.isEmpty()) {
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         if (cronTime != null) {
