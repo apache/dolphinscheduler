@@ -256,7 +256,6 @@ public class ProcessServiceTest {
         processInstance.setId(222);
         Mockito.when(processDefineMapper.selectById(command1.getProcessDefinitionId())).thenReturn(processDefinition);
         Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
-        Mockito.when(projectMapper.queryDetailById(1)).thenReturn(project);
         Assert.assertNotNull(processService.handleCommand(logger, host, validThreadNum, command1));
 
         Command command2 = new Command();
