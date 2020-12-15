@@ -1004,7 +1004,8 @@ public class MasterExecThread implements Runnable {
     private void submitStandByTask(){
 
         try {
-            for (int i=0;i<readyToSubmitTaskQueue.size();i++) {
+            int length = readyToSubmitTaskQueue.size();
+            for (int i=0;i<length;i++) {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
                 DependResult dependResult = getDependResultForTask(task);
                 if(DependResult.SUCCESS == dependResult){
