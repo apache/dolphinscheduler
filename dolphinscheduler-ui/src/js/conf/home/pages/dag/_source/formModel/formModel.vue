@@ -609,14 +609,9 @@
           fromThis: this
         })
       }
-    }, 
+    },
     watch: {
-      /**
-       * Watch the item change, cache the value it changes
-       **/
-      _item (val) {
-        this._cacheItem()
-      }
+
     },
     created () {
       // Unbind copy and paste events
