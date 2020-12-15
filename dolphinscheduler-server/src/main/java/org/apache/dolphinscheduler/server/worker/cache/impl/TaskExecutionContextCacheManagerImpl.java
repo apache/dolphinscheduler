@@ -59,10 +59,17 @@ public class TaskExecutionContextCacheManagerImpl implements TaskExecutionContex
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     @Override
     public void removeByTaskInstanceId(Integer taskInstanceId) {
         taskExecutionContextCache.remove(taskInstanceId);
+    }
+
+    @Override
+    public boolean updateTaskExecutionContext(TaskExecutionContext taskExecutionContext) {
+        taskExecutionContextCache.computeIfPresent(taskExecutionContext.getTaskInstanceId(), (k, v) -> taskExecutionContext);
+        return taskExecutionContextCache.containsKey(taskExecutionContext.getTaskInstanceId());
     }
 }
