@@ -247,10 +247,6 @@ public class ProcessServiceTest {
                 + ",\"preTasks\":[],\"retryInterval\":\"1\",\"runFlag\":\"NORMAL\",\"taskInstancePriority\":\"MEDIUM\""
                 + ",\"timeout\":{\"enable\":false,\"interval\":null,\"strategy\":\"\"},\"type\":\"SHELL\""
                 + ",\"waitStartTimeout\":{},\"workerGroup\":\"default\"}],\"tenantId\":4,\"timeout\":0}");
-        Project project = new Project();
-        project.setId(1);
-        project.setName("projectName");
-        project.setUserId(1);
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(222);
