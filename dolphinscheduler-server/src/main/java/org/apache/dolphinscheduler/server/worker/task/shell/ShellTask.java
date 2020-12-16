@@ -138,8 +138,8 @@ public class ShellTask extends AbstractTask {
         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
         taskExecutionContext.getScheduleTime());
     // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if (taskExecutionContext.getScheduleTime() != null) {
-      if (null == paramsMap) {
+    if (taskExecutionContext.getScheduleTime() != null && CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+      if (paramsMap == null) {
         paramsMap = new HashMap<>();
       }
       String dateTime = DateUtils.format(DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1), Constants.PARAMETER_FORMAT_TIME);
