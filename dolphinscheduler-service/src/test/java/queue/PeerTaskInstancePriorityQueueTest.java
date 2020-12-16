@@ -20,14 +20,8 @@ package queue;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
-import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
 
 /**
  * Task instances priority queue implementation
