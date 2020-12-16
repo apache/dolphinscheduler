@@ -35,8 +35,6 @@ import java.util.PriorityQueue;
  */
 public class PeerTaskInstancePriorityQueueTest {
 
-
-
     @Test
     public void testPut() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
@@ -56,6 +54,19 @@ public class PeerTaskInstancePriorityQueueTest {
 
     }
 
+    @Test
+    public void testTake() throws Exception {
+        PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
+        int peekBeforeLength = queue.size();
+        queue.take();
+        Assert.assertTrue(queue.size() < peekBeforeLength);
+    }
+
+    /**
+     * get queue
+     * @return queue
+     * @throws Exception
+     */
     private PeerTaskInstancePriorityQueue getPeerTaskInstancePriorityQueue() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
         TaskInstance taskInstanceHigPriority = createTaskInstance("high",Priority.HIGH);
@@ -64,6 +75,13 @@ public class PeerTaskInstancePriorityQueueTest {
         queue.put(taskInstanceMediumPriority);
         return queue;
     }
+
+    /**
+     * create task instance
+     * @param name
+     * @param priority
+     * @return
+     */
     private TaskInstance createTaskInstance(String name, Priority priority){
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setName(name);
