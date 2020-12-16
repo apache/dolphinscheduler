@@ -150,9 +150,8 @@ public class ShellTask extends AbstractTask {
             p.setProp(Constants.PARAMETER_DATETIME);
             paramsMap.put(Constants.PARAMETER_DATETIME, p);
         }
-        if (null != paramsMap) {
-            script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-        }
+
+        script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
 
         shellParameters.setRawScript(script);
 
