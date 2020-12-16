@@ -67,7 +67,7 @@ public class TaskPriorityQueueConsumer extends Thread{
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue taskPriorityQueue;
+    private TaskPriorityQueue<String> taskPriorityQueue;
 
     /**
      * processService
