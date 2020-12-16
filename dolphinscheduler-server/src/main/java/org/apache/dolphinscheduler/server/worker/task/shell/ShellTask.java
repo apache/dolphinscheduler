@@ -41,6 +41,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -138,11 +139,15 @@ public class ShellTask extends AbstractTask {
         CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
         taskExecutionContext.getScheduleTime());
     // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if (taskExecutionContext.getScheduleTime() != null && CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+    if (taskExecutionContext.getScheduleTime() != null) {
       if (paramsMap == null) {
         paramsMap = new HashMap<>();
       }
-      String dateTime = DateUtils.format(DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1), Constants.PARAMETER_FORMAT_TIME);
+      Date date = taskExecutionContext.getScheduleTime();
+      if (CommandType.COMPLEMENT_DATA.getCode() == taskExecutionContext.getCmdTypeIfComplement()) {
+        date = DateUtils.add(taskExecutionContext.getScheduleTime(), DAY_OF_MONTH, 1);
+      }
+      String dateTime = DateUtils.format(date, Constants.PARAMETER_FORMAT_TIME);
       Property p = new Property();
       p.setValue(dateTime);
       p.setProp(Constants.PARAMETER_DATETIME);
