@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.service.queue;
 
 
-public interface TaskPriorityQueue {
+public interface TaskPriorityQueue<T> {
 
     /**
      * put task info
@@ -25,14 +25,14 @@ public interface TaskPriorityQueue {
      * @param taskInfo taskInfo
      * @throws Exception
      */
-    void put(String taskInfo) throws Exception;
+    void put(T taskInfo) throws Exception;
 
     /**
      * take taskInfo
      * @return taskInfo
      * @throws Exception
      */
-    String take()throws Exception;
+    T take()throws Exception;
 
     /**
      * size
