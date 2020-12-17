@@ -27,8 +27,10 @@
         <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
         <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
         <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
-        <el-table-column :label="$t('State')">
-          {{state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
+        <el-table-column  :label="$t('State')">
+          <template slot-scope="scope">
+            <span>{{scope.row.state === 1? `${$t('Enable')}` : `${$t('Disable')}`}}</span>
+          </template>
         </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
