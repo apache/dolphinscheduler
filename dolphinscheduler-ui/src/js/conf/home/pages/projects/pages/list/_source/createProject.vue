@@ -21,24 +21,24 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="projectName"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -80,17 +80,21 @@
           param.projectId = this.item.id
         }
 
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
         this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
+          this.$emit('_onUpdate')
+          this.$message({
+            message: res.msg,
+            type: 'success',
+            offset: 70
+          })
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       },
       _verification () {

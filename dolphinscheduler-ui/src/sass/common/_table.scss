@@ -171,3 +171,12 @@
     }
   }
 }
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+  background-color: #ddecff;
+}
+.el-table th>.cell {
+  color: #555;
+}
+.el-table td div {
+  color: #666;
+}
