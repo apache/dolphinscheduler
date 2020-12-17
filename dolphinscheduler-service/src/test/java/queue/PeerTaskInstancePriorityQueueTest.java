@@ -37,7 +37,7 @@ public class PeerTaskInstancePriorityQueueTest {
         TaskInstance taskInstanceMediumPriority = createTaskInstance("high", Priority.MEDIUM);
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
-        Assert.assertEquals(queue.size(), 2);
+        Assert.assertEquals(2,queue.size());
     }
 
     @Test

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -42,9 +43,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * put task instance to priority queue
      *
      * @param taskInstance taskInstance
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    public void put(TaskInstance taskInstance) throws Exception {
+    public void put(TaskInstance taskInstance) throws TaskPriorityQueueException {
         queue.add(taskInstance);
     }
 
@@ -52,10 +53,10 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * take task info
      *
      * @return task instance
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
     @Override
-    public TaskInstance take() throws Exception {
+    public TaskInstance take() throws TaskPriorityQueueException {
         return queue.poll();
     }
 
@@ -63,9 +64,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * peek taskInfo
      *
      * @return task instance
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    public TaskInstance peek() throws Exception {
+    public TaskInstance peek() throws TaskPriorityQueueException {
         return queue.peek();
     }
 
@@ -93,9 +94,9 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      *
      * @param taskInstance task instance
      * @return true if remove success
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    public boolean remove(TaskInstance taskInstance) throws Exception {
+    public boolean remove(TaskInstance taskInstance) throws TaskPriorityQueueException {
         return queue.remove(taskInstance);
     }
 
@@ -104,7 +105,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      *
      * @return Iterator
      */
-    public Iterator iterator() {
+    public Iterator<TaskInstance> iterator() {
         return queue.iterator();
     }
 

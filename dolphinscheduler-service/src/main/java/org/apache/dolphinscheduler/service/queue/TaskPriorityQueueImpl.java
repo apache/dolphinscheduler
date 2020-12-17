@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.springframework.stereotype.Service;
 
 
@@ -48,10 +49,10 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
      * put task takePriorityInfo
      *
      * @param taskPriorityInfo takePriorityInfo
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(String taskPriorityInfo) throws Exception {
+    public void put(String taskPriorityInfo) throws TaskPriorityQueueException {
         queue.put(taskPriorityInfo);
     }
 
@@ -59,10 +60,10 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
      * take taskInfo
      *
      * @return taskInfo
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
     @Override
-    public String take() throws Exception {
+    public String take() throws TaskPriorityQueueException, InterruptedException {
         return queue.take();
     }
 
@@ -70,10 +71,10 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
      * queue size
      *
      * @return size
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
     @Override
-    public int size() throws Exception {
+    public int size() throws TaskPriorityQueueException {
         return queue.size();
     }
 
