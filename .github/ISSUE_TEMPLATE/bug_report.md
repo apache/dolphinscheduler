@@ -7,9 +7,8 @@ assignees: ''
 
 ---
 
-*For better global communication, please give priority to using English description, thx! *
+**For better global communication, Please describe it in English. If you feel the description in English is not clear, then you can append description in Chinese, thx! **
 
-*Please review https://dolphinscheduler.apache.org/en-us/docs/development/issue.html when describe an issue.*
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -29,7 +28,7 @@ If applicable, add screenshots to help explain your problem.
 
 
 **Which version of Dolphin Scheduler:**
- -[1.1.0-preview]
+ -[1.1.0]
 
 **Additional context**
 Add any other context about the problem here.
