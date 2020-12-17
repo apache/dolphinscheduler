@@ -67,7 +67,6 @@ public class DBTaskResponseCommand implements Serializable {
         return command;
     }
 
-
     @Override
     public String toString() {
         return "DBTaskResponseCommand{"
