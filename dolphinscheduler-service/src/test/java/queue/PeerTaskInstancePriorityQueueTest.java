@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package queue;
 
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -73,8 +75,8 @@ public class PeerTaskInstancePriorityQueueTest {
     /**
      * create task instance
      *
-     * @param name
-     * @param priority
+     * @param name      name
+     * @param priority  priority
      * @return
      */
     private TaskInstance createTaskInstance(String name, Priority priority) {
@@ -83,6 +85,5 @@ public class PeerTaskInstancePriorityQueueTest {
         taskInstance.setTaskInstancePriority(priority);
         return taskInstance;
     }
-
 
 }
