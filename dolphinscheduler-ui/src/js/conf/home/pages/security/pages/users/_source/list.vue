@@ -25,7 +25,7 @@
             <span>{{scope.row.userType === 'GENERAL_USER'? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="tenantName" :label="$t('Tenant')" width="160"></el-table-column>
+        <el-table-column prop="tenantCode" :label="$t('Tenant')" width="160"></el-table-column>
         <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
         <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
         <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
