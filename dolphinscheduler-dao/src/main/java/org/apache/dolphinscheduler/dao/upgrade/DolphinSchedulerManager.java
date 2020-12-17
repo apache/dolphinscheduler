@@ -78,13 +78,7 @@ public class DolphinSchedulerManager {
 
         logger.info("Start initializing the DolphinScheduler manager table structure");
         upgradeDao.initSchema();
-        //create directories in the sql/create to store the multiple upgrade mirrors
-        try {
-            UpgradeDao.createMirrorDirs();
-        }
-        catch (Exception e) {
-            logger.info("Copying directories Failed");
-        }
+
     }
 
 
@@ -122,7 +116,8 @@ public class DolphinSchedulerManager {
                 logger.info("There are no upgrade mirrors!");
             } else {
                 for (String mirrorDir : mirrorList) {
-                    closestMirror = mirrorDir.split("_")[0];
+                    String closestM = mirrorDir.split("_")[0];
+                    closestMirror = closestM.split("-")[1];
                     if (UpgradeDao.isClosestMirror(closestMirror, version)) {
                         logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, closestMirror);
                         logger.info("Begin upgrading DolphinScheduler's table structure");

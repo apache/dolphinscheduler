@@ -205,29 +205,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         }
 
     }
-    
-    /**
-     * createMirrorDirs
-     * creates upgrade mirror directories in sql/create/mirrors
-     */
-    public static void createMirrorDirs() throws IOException {
-        String dirStr = rootDir + "/sql/create/mirrors";
-        File mirrorDir = new File(dirStr);
-        // Gets a list of all upgrades
-        List<String> schemaList = SchemaUtils.getAllSchemaList();
-        if (schemaList == null || schemaList.isEmpty()) {
-            logger.info("There is no upgrade mirrors!");
-        } else {
-            for (String schemaStr : schemaList) {
-                String version = schemaStr.split("_")[0];
-                String schemaStrDir = rootDir + "/sql/upgrade/" + schemaStr;
-                File schemaDir = new File(schemaStrDir);
-                if (version.endsWith("0")) {
-                    org.apache.commons.io.FileUtils.copyDirectoryToDirectory(schemaDir, mirrorDir);
-                }
-            }
-        }
-    }
 
     /**
      * getAllMirrorLists
@@ -237,13 +214,15 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     @SuppressWarnings("unchecked")
     public static List<String> getAllMirrorList() {
         List<String> mirrorDirList = new ArrayList<>();
-        File[] mirrorDirArr = FileUtils.getAllDir("sql/create/mirrors");
+        File[] mirrorDirArr = FileUtils.getAllDir("sql/create");
         if (mirrorDirArr == null || mirrorDirArr.length == 0) {
             logger.info("There are no upgrade mirrors!");
             return null;
         } else {
             for (File file : mirrorDirArr) {
-                mirrorDirList.add(file.getName());
+                if (file.getName().startsWith("m")) {
+                    mirrorDirList.add(file.getName());
+                }
             }
             Collections.sort(mirrorDirList, new Comparator() {
                 @Override
@@ -251,8 +230,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                     try {
                         String dir1 = String.valueOf(o1);
                         String dir2 = String.valueOf(o2);
-                        String version1 = dir1.split("_")[0];
-                        String version2 = dir2.split("_")[0];
+                        String v1 = dir1.split("_")[0];
+                        String version1 = v1.split("-")[1];
+                        String v2 = dir2.split("_")[0];
+                        String version2 = v2.split("-")[1];
                         if (version1.equals(version2)) {
                             return 0;
                         }
@@ -276,11 +257,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.info("Closest mirror and Version are empty!");
             return false;
         }
-        
+
         String[] versionArr = version.split("\\.");
         String highClose = versionArr[0] + "." + Integer.parseInt(versionArr[1]) + 1 + "." + 0;
         String lowClose = versionArr[0] + "." + (versionArr[1]) + "." + 0;
-        
+
         return (closestMirror.equals(highClose) || closestMirror.equals(lowClose));
     }
 
