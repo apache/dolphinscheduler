@@ -16,7 +16,6 @@
  */
 package queue;
 
-
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;

@@ -14,16 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.queue;
 
-
-import org.springframework.stereotype.Service;
+import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
+import org.springframework.stereotype.Service;
+
+
+
 
 /**
  * A singleton of a task queue implemented with zookeeper
