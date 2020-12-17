@@ -20,7 +20,7 @@ module.exports = jsonp
  * Callback index.
  */
 
-var count = 0
+let count = 0
 
 /**
  * Noop function.
@@ -51,19 +51,19 @@ function jsonp (url, opts, fn) {
   }
   if (!opts) opts = {}
 
-  var prefix = opts.prefix || '__jp'
+  let prefix = opts.prefix || '__jp'
 
   // use the callback name that was passed if one was provided.
   // otherwise generate a unique name by incrementing our counter.
-  var id = opts.name || (prefix + (count++))
+  let id = opts.name || (prefix + (count++))
 
-  var param = opts.param || 'callback'
-  var timeout = opts.timeout != null ? opts.timeout : 60000
-  var enc = encodeURIComponent
+  let param = opts.param || 'callback'
+  let timeout = opts.timeout !== null ? opts.timeout : 60000
+  let enc = encodeURIComponent
   /* istanbul ignore next */
-  var target = document.getElementsByTagName('script')[0] || document.head
-  var script
-  var timer
+  let target = document.getElementsByTagName('script')[0] || document.head
+  let script
+  let timer
   /* istanbul ignore else */
   if (timeout) {
     timer = setTimeout(
@@ -102,7 +102,7 @@ function jsonp (url, opts, fn) {
   url = url.replace('?&', '?')
 
   // debug('jsonp req "%s"', url);
-  var handler = ({ type }) => {
+  let handler = ({ type }) => {
     /* istanbul ignore else */
     if (type === 'error') {
       cleanup()

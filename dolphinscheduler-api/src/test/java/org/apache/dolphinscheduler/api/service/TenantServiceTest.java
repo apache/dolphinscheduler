@@ -73,8 +73,6 @@ public class TenantServiceTest {
 
     private static final String tenantCode = "TenantServiceTest";
 
-    private static final String tenantName = "TenantServiceTest";
-
     @Test
     public void testCreateTenant() {
 
@@ -83,17 +81,17 @@ public class TenantServiceTest {
         try {
             //check tenantCode
             Map<String, Object> result =
-                    tenantService.createTenant(getLoginUser(), "%!1111", tenantName, 1, "TenantServiceTest");
+                    tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.VERIFY_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
-            result = tenantService.createTenant(loginUser, tenantCode, tenantName, 1, "TenantServiceTest");
+            result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // success
-            result = tenantService.createTenant(loginUser, "test", "test", 1, "TenantServiceTest");
+            result = tenantService.createTenant(loginUser, "test", 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -126,11 +124,11 @@ public class TenantServiceTest {
         try {
             // id not exist
             Map<String, Object> result =
-                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, tenantName, 1, "desc");
+                    tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, "desc");
             logger.info(result.toString());
             // success
             Assert.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
-            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, "TenantServiceTest001", 1, "desc");
+            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, "desc");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
@@ -236,7 +234,6 @@ public class TenantServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(id);
         tenant.setTenantCode(tenantCode);
-        tenant.setTenantName(tenantName);
         return tenant;
     }
 

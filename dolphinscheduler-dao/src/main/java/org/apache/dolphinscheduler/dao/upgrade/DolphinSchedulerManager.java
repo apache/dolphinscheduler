@@ -135,6 +135,7 @@ public class DolphinSchedulerManager {
                             }
                             closestMirror = schemaVersion;
                         }
+
                     }
                     version = closestMirror;
                 }

@@ -22,21 +22,22 @@
       </div>
       <div class="cont-box">
         <div class="label-box">
-          <x-select
+          <el-select
               ref="preTasksSelector"
               style="width: 100%;"
               filterable
               multiple
+              size="small"
               v-model="preTasks"
               :disabled="isDetails"
               :id="preTasksSelectorId">
-            <x-option
+            <el-option
                 v-for="task in preTaskList"
                 :key="task.id"
                 :value="task.id"
                 :label="task.name">
-            </x-option>
-          </x-select>
+            </el-option>
+          </el-select>
         </div>
       </div>
     </div>
@@ -52,15 +53,15 @@
     },
     data () {
       return {
-        preTasksSelectorId: '_preTasksSelectorId',  // Refresh target vue-component by changing id
+        preTasksSelectorId: '_preTasksSelectorId', // Refresh target vue-component by changing id
         preTasks: [],
-        preTasksOld: [],
+        preTasksOld: []
       }
     },
     mounted () {
-      this.preTasks = this.backfillItem['preTasks'] || this.preTasks
+      this.preTasks = this.backfillItem.preTasks || this.preTasks
       this.preTasksOld = this.preTasks
-    
+
       // Refresh target vue-component by changing id
       this.$nextTick(() => {
         this.preTasksSelectorId = 'preTasksSelectorId'
@@ -68,7 +69,7 @@
     },
     computed: {
       preTaskList: function () {
-        let currentTaskId = this.backfillItem['id'] || this.id
+        let currentTaskId = this.backfillItem.id || this.id
         let cacheTasks = Object.assign({}, this.store.state.dag.tasks)
         let keys = Object.keys(cacheTasks)
         for (let i = 0; i < keys.length; i++) {
@@ -91,7 +92,7 @@
       // preTaskIds used to delete connection
       preTasksToDelete: function () {
         return this.preTasksOld.filter(taskId => this.preTasks.indexOf(taskId) === -1)
-      },
+      }
     },
     methods: {
       // Pass data to parent-level to process dag
@@ -99,7 +100,7 @@
         this.$emit('on-pre-tasks', {
           preTasks: this.preTasks,
           preTasksToAdd: this.preTasksToAdd,
-          preTasksToDelete: this.preTasksToDelete,
+          preTasksToDelete: this.preTasksToDelete
         })
         return true
       }

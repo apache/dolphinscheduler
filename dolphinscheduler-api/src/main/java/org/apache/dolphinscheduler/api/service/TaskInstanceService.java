@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.service;
 
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -69,7 +69,6 @@ public class TaskInstanceService extends BaseService {
     @Autowired
     UsersService usersService;
 
-
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
@@ -87,7 +86,7 @@ public class TaskInstanceService extends BaseService {
      * @return task list page
      */
     public Map<String, Object> queryTaskListPaging(User loginUser, String projectName,
-                                                   Integer processInstanceId, String taskName, String executorName, String startDate,
+                                                   Integer processInstanceId, String processInstanceName, String taskName, String executorName, String startDate,
                                                    String endDate, String searchVal, ExecutionStatus stateType, String host,
                                                    Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
@@ -124,7 +123,7 @@ public class TaskInstanceService extends BaseService {
         int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end
+                page, project.getId(), processInstanceId, processInstanceName, searchVal, taskName, executorId, statusArray, host, start, end
         );
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
