@@ -67,11 +67,12 @@ public class DBTaskResponseCommand implements Serializable {
         return command;
     }
 
+
     @Override
     public String toString() {
         return "DBTaskResponseCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", status=" + status
-                + '}';
+            + "taskInstanceId=" + taskInstanceId
+            + ", status=" + status
+            + '}';
     }
 }
