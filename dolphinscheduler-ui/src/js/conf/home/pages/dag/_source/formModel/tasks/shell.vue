@@ -206,8 +206,8 @@
         if (element.id === id) {
           return element
         } else if (element.children !== null) {
-          var i
-          var result = null
+          let i
+          let result = null
           for (i = 0; result === null && i < element.children.length; i++) {
             result = this.searchTree(element.children[i], id)
           }

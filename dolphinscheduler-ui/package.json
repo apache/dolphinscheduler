@@ -8,7 +8,8 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
     "clean": "rimraf dist",
     "start": "npm run dev",
-    "lint": "eslint ./src --ext .js,.vue --fix",
+    "lint": "eslint --ext .js,.vue ./src",
+    "lint:fix": "eslint --ext .js,.vue --fix ./src",
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {

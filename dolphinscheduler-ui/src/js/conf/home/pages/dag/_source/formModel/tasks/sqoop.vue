@@ -854,7 +854,7 @@
        * stringify the source params
        */
       _handleSourceParams () {
-        var params = null
+        let params = null
         switch (this.sourceType) {
           case 'MYSQL':
             this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === '1' && editor
@@ -881,7 +881,7 @@
        * stringify the target params
        */
       _handleTargetParams () {
-        var params = null
+        let params = null
         switch (this.targetType) {
           case 'HIVE':
             params = JSON.stringify(this.targetHiveParams)
