@@ -39,5 +39,6 @@ rules:
   no-mixed-operators: 'off'
   no-extend-native: 'off'
   prefer-const: 'off'
+  no-var: 'error'
 overrides:
   - { 'files': ['*.vue'], 'rules': { 'indent': 'off' }}

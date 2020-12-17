@@ -404,7 +404,7 @@
        * Get default port by type
        */
       _getDefaultPort (type) {
-        var defaultPort = ''
+        let defaultPort = ''
         switch (type) {
           case 'MYSQL':
             defaultPort = '3306'
