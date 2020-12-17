@@ -50,6 +50,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * take task info
+     *
      * @return task instance
      * @throws Exception
      */
@@ -79,6 +80,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * whether contains the task instance
+     *
      * @param taskInstance task instance
      * @return true is contains
      */
@@ -88,6 +90,7 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * remove task
+     *
      * @param taskInstance task instance
      * @return true if remove success
      * @throws Exception
@@ -98,9 +101,10 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
 
     /**
      * get iterator
+     *
      * @return Iterator
      */
-    public Iterator iterator(){
+    public Iterator iterator() {
         return queue.iterator();
     }
 

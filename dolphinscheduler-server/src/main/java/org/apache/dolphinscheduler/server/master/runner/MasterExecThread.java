@@ -179,8 +179,8 @@ public class MasterExecThread implements Runnable {
     /**
      * constructor of MasterExecThread
      *
-     * @param processInstance processInstance
-     * @param processService processService
+     * @param processInstance     processInstance
+     * @param processService      processService
      * @param nettyRemotingClient nettyRemotingClient
      */
     public MasterExecThread(ProcessInstance processInstance
@@ -484,7 +484,7 @@ public class MasterExecThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param nodeName node name
+     * @param nodeName        node name
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
@@ -805,9 +805,9 @@ public class MasterExecThread implements Runnable {
 
         boolean result = false;
 
-        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
-            TaskInstance task =  iter.next();
-            if(task.getState().typeIsFailure()){
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
+            TaskInstance task = iter.next();
+            if (task.getState().typeIsFailure()) {
                 result = true;
                 break;
             }
@@ -899,9 +899,9 @@ public class MasterExecThread implements Runnable {
      *
      * @return Boolean whether has retry task in standby
      */
-    private boolean hasRetryTaskInStandBy(){
-        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
-            if(iter.next().getState().typeIsFailure()){
+    private boolean hasRetryTaskInStandBy() {
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
+            if (iter.next().getState().typeIsFailure()) {
                 return true;
             }
         }
@@ -1091,26 +1091,26 @@ public class MasterExecThread implements Runnable {
     /**
      * handling the list of tasks to be submitted
      */
-    private void submitStandByTask(){
+    private void submitStandByTask() {
         try {
             int length = readyToSubmitTaskQueue.size();
-            for (int i=0;i<length;i++) {
+            for (int i = 0; i < length; i++) {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
                 DependResult dependResult = getDependResultForTask(task);
-                if(DependResult.SUCCESS == dependResult){
-                    if(retryTaskIntervalOverTime(task)){
+                if (DependResult.SUCCESS == dependResult) {
+                    if (retryTaskIntervalOverTime(task)) {
                         submitTaskExec(task);
                         removeTaskFromStandbyList(task);
                     }
-                }else if(DependResult.FAILED == dependResult){
+                } else if (DependResult.FAILED == dependResult) {
                     // if the dependency fails, the current node is not submitted and the state changes to failure.
                     dependFailedTask.put(task.getName(), task);
                     removeTaskFromStandbyList(task);
-                    logger.info("task {},id:{} depend result : {}",task.getName(), task.getId(), dependResult);
+                    logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
                 }
             }
         } catch (Exception e) {
-            logger.error("submit standby task error",e);
+            logger.error("submit standby task error", e);
         }
     }
 
@@ -1199,9 +1199,9 @@ public class MasterExecThread implements Runnable {
      * generate flow dag
      *
      * @param processDefinitionJson process definition json
-     * @param startNodeNameList start node name list
-     * @param recoveryNodeNameList recovery node name list
-     * @param depNodeType depend node type
+     * @param startNodeNameList     start node name list
+     * @param recoveryNodeNameList  recovery node name list
+     * @param depNodeType           depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */

@@ -29,10 +29,11 @@ public interface TaskPriorityQueue<T> {
 
     /**
      * take taskInfo
+     *
      * @return taskInfo
      * @throws Exception
      */
-    T take()throws Exception;
+    T take() throws Exception;
 
     /**
      * size

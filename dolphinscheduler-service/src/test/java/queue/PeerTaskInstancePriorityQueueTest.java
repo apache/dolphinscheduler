@@ -32,11 +32,11 @@ public class PeerTaskInstancePriorityQueueTest {
     @Test
     public void testPut() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
-        TaskInstance taskInstanceHigPriority = createTaskInstance("high",Priority.HIGH);
-        TaskInstance taskInstanceMediumPriority = createTaskInstance("high",Priority.MEDIUM);
+        TaskInstance taskInstanceHigPriority = createTaskInstance("high", Priority.HIGH);
+        TaskInstance taskInstanceMediumPriority = createTaskInstance("high", Priority.MEDIUM);
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
-        Assert.assertEquals(queue.size(),2);
+        Assert.assertEquals(queue.size(), 2);
     }
 
     @Test
@@ -58,13 +58,14 @@ public class PeerTaskInstancePriorityQueueTest {
 
     /**
      * get queue
+     *
      * @return queue
      * @throws Exception
      */
     private PeerTaskInstancePriorityQueue getPeerTaskInstancePriorityQueue() throws Exception {
         PeerTaskInstancePriorityQueue queue = new PeerTaskInstancePriorityQueue();
-        TaskInstance taskInstanceHigPriority = createTaskInstance("high",Priority.HIGH);
-        TaskInstance taskInstanceMediumPriority = createTaskInstance("high",Priority.MEDIUM);
+        TaskInstance taskInstanceHigPriority = createTaskInstance("high", Priority.HIGH);
+        TaskInstance taskInstanceMediumPriority = createTaskInstance("high", Priority.MEDIUM);
         queue.put(taskInstanceHigPriority);
         queue.put(taskInstanceMediumPriority);
         return queue;
@@ -72,11 +73,12 @@ public class PeerTaskInstancePriorityQueueTest {
 
     /**
      * create task instance
+     *
      * @param name
      * @param priority
      * @return
      */
-    private TaskInstance createTaskInstance(String name, Priority priority){
+    private TaskInstance createTaskInstance(String name, Priority priority) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setName(name);
         taskInstance.setTaskInstancePriority(priority);

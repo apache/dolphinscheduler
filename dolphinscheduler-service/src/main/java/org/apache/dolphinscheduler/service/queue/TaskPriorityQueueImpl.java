@@ -54,6 +54,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
 
     /**
      * take taskInfo
+     *
      * @return taskInfo
      * @throws Exception
      */
@@ -64,6 +65,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
 
     /**
      * queue size
+     *
      * @return size
      * @throws Exception
      */
@@ -75,10 +77,11 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
     /**
      * TaskInfoComparator
      */
-    private class TaskInfoComparator implements Comparator<String>{
+    private class TaskInfoComparator implements Comparator<String> {
 
         /**
          * compare o1 o2
+         *
          * @param o1 o1
          * @param o2 o2
          * @return compare result
@@ -88,15 +91,15 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
             String s1 = o1;
             String s2 = o2;
             String[] s1Array = s1.split(UNDERLINE);
-            if(s1Array.length > TASK_INFO_LENGTH){
+            if (s1Array.length > TASK_INFO_LENGTH) {
                 // warning: if this length > 5, need to be changed
-                s1 = s1.substring(0, s1.lastIndexOf(UNDERLINE) );
+                s1 = s1.substring(0, s1.lastIndexOf(UNDERLINE));
             }
 
             String[] s2Array = s2.split(UNDERLINE);
-            if(s2Array.length > TASK_INFO_LENGTH){
+            if (s2Array.length > TASK_INFO_LENGTH) {
                 // warning: if this length > 5, need to be changed
-                s2 = s2.substring(0, s2.lastIndexOf(UNDERLINE) );
+                s2 = s2.substring(0, s2.lastIndexOf(UNDERLINE));
             }
 
             return s1.compareTo(s2);
