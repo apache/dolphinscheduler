@@ -21,7 +21,9 @@
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
         <el-table-column :label="$t('User Type')">
-          {{userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
+          <template slot-scope="scope">
+            <span>{{scope.row.userType === 'GENERAL_USER'? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="tenantName" :label="$t('Tenant')" width="160"></el-table-column>
         <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
