@@ -578,7 +578,7 @@
 
             // Update JSP connections
             let plumbIns = JSP.JspInstance
-            var targetId = this.nodeData.id
+            let targetId = this.nodeData.id
 
             // Update new connections
             this.preTasksToAdd.map(sourceId => {
@@ -719,7 +719,7 @@
         }
         // If the workergroup has been deleted, set the default workergroup
         for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-          var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          let workerGroup = this.store.state.security.workerGroupsListAll[i].id
           if (o.workerGroup === workerGroup) {
             break
           }
