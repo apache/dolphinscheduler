@@ -20,12 +20,12 @@ package org.apache.dolphinscheduler.service.queue;
 import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
 import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
+
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 import org.springframework.stereotype.Service;
-
 
 
 
