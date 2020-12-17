@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.remote.command;
 
+package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -29,12 +29,10 @@ public class DBTaskAckCommand implements Serializable {
     private int taskInstanceId;
     private int status;
 
-    /**
-     * don't delete this construct method
-     */
-    public DBTaskAckCommand(){
-
+    public DBTaskAckCommand() {
+        super();
     }
+
     public DBTaskAckCommand(int status, int taskInstanceId) {
         this.status = status;
         this.taskInstanceId = taskInstanceId;
@@ -69,12 +67,8 @@ public class DBTaskAckCommand implements Serializable {
         return command;
     }
 
-
     @Override
     public String toString() {
-        return "DBTaskAckCommand{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", status=" + status +
-                '}';
+        return "DBTaskAckCommand{" + "taskInstanceId=" + taskInstanceId + ", status=" + status + '}';
     }
 }

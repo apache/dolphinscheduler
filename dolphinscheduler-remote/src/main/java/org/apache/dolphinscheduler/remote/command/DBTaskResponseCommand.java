@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -21,20 +22,18 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.io.Serializable;
 
 /**
- *  db task final result response command
+ * db task final result response command
  */
 public class DBTaskResponseCommand implements Serializable {
 
     private int taskInstanceId;
     private int status;
 
-    /**
-     * don't delete this construct method
-     */
-    public DBTaskResponseCommand(){
-
+    public DBTaskResponseCommand() {
+        super();
     }
-    public DBTaskResponseCommand(int status,int taskInstanceId) {
+
+    public DBTaskResponseCommand(int status, int taskInstanceId) {
         this.status = status;
         this.taskInstanceId = taskInstanceId;
     }
@@ -57,9 +56,10 @@ public class DBTaskResponseCommand implements Serializable {
 
     /**
      * package response command
+     *
      * @return command
      */
-    public Command convert2Command(){
+    public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.DB_TASK_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);
@@ -69,9 +69,9 @@ public class DBTaskResponseCommand implements Serializable {
 
     @Override
     public String toString() {
-        return "DBTaskResponseCommand{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", status=" + status +
-                '}';
+        return "DBTaskResponseCommand{"
+                + "taskInstanceId=" + taskInstanceId
+                + ", status=" + status
+                + '}';
     }
 }
