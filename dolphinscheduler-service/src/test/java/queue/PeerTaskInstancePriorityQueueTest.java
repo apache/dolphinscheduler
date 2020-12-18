@@ -45,7 +45,7 @@ public class PeerTaskInstancePriorityQueueTest {
         PeerTaskInstancePriorityQueue queue = getPeerTaskInstancePriorityQueue();
         int peekBeforeLength = queue.size();
         queue.peek();
-        Assert.assertTrue(peekBeforeLength == queue.size());
+        Assert.assertEquals(peekBeforeLength,queue.size());
 
     }
 

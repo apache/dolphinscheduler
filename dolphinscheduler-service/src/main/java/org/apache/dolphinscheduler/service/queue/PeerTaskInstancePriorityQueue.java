@@ -64,9 +64,8 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      * peek taskInfo
      *
      * @return task instance
-     * @throws TaskPriorityQueueException
      */
-    public TaskInstance peek() throws TaskPriorityQueueException {
+    public TaskInstance peek() {
         return queue.peek();
     }
 
@@ -94,9 +93,8 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
      *
      * @param taskInstance task instance
      * @return true if remove success
-     * @throws TaskPriorityQueueException
      */
-    public boolean remove(TaskInstance taskInstance) throws TaskPriorityQueueException {
+    public boolean remove(TaskInstance taskInstance) {
         return queue.remove(taskInstance);
     }
 
