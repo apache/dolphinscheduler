@@ -117,7 +117,7 @@ public class TaskExecuteThread implements Runnable {
             if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
                 String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
                 taskLogger.error(errorLog);
-                throw new RuntimeException(errorLog);
+                throw new Exception(errorLog);
             }
 
             // task node
