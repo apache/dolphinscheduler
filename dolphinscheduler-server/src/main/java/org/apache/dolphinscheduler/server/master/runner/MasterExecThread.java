@@ -55,6 +55,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
+import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 
 import org.apache.commons.io.FileUtils;
 
@@ -120,9 +121,9 @@ public class MasterExecThread implements Runnable {
     private Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
 
     /**
-     * ready to submit task list
+     * ready to submit task queue
      */
-    private Map<String, TaskInstance> readyToSubmitTaskList = new ConcurrentHashMap<>();
+    private PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
     /**
      * depend failed task map
@@ -178,8 +179,8 @@ public class MasterExecThread implements Runnable {
     /**
      * constructor of MasterExecThread
      *
-     * @param processInstance processInstance
-     * @param processService processService
+     * @param processInstance     processInstance
+     * @param processService      processService
      * @param nettyRemotingClient nettyRemotingClient
      */
     public MasterExecThread(ProcessInstance processInstance
@@ -483,7 +484,7 @@ public class MasterExecThread implements Runnable {
      * encapsulation task
      *
      * @param processInstance process instance
-     * @param nodeName node name
+     * @param nodeName        node name
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
@@ -563,7 +564,7 @@ public class MasterExecThread implements Runnable {
         // if previous node success , post node submit
         for (TaskInstance task : taskInstances) {
 
-            if (readyToSubmitTaskList.containsKey(task.getName())) {
+            if (readyToSubmitTaskQueue.contains(task)) {
                 continue;
             }
 
@@ -699,7 +700,7 @@ public class MasterExecThread implements Runnable {
                 return true;
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
-                return readyToSubmitTaskList.size() == 0 || activeTaskNode.size() == 0;
+                return readyToSubmitTaskQueue.size() == 0 || activeTaskNode.size() == 0;
             }
         }
         return false;
@@ -731,7 +732,7 @@ public class MasterExecThread implements Runnable {
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if (CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
-                || readyToSubmitTaskList.size() > 0) {
+                || readyToSubmitTaskQueue.size() > 0) {
             return ExecutionStatus.PAUSE;
         } else {
             return ExecutionStatus.SUCCESS;
@@ -782,7 +783,7 @@ public class MasterExecThread implements Runnable {
         // success
         if (state == ExecutionStatus.RUNNING_EXECUTION) {
             List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
-            if (readyToSubmitTaskList.size() > 0) {
+            if (readyToSubmitTaskQueue.size() > 0) {
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXECUTION;
             } else if (CollectionUtils.isNotEmpty(killTasks)) {
@@ -804,8 +805,8 @@ public class MasterExecThread implements Runnable {
 
         boolean result = false;
 
-        for (String taskName : readyToSubmitTaskList.keySet()) {
-            TaskInstance task = readyToSubmitTaskList.get(taskName);
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
+            TaskInstance task = iter.next();
             if (task.getState().typeIsFailure()) {
                 result = true;
                 break;
@@ -872,7 +873,11 @@ public class MasterExecThread implements Runnable {
      */
     private void addTaskToStandByList(TaskInstance taskInstance) {
         logger.info("add task to stand by list: {}", taskInstance.getName());
-        readyToSubmitTaskList.putIfAbsent(taskInstance.getName(), taskInstance);
+        try {
+            readyToSubmitTaskQueue.put(taskInstance);
+        } catch (Exception e) {
+            logger.error("add task instance to readyToSubmitTaskQueue error");
+        }
     }
 
     /**
@@ -882,7 +887,11 @@ public class MasterExecThread implements Runnable {
      */
     private void removeTaskFromStandbyList(TaskInstance taskInstance) {
         logger.info("remove task from stand by list: {}", taskInstance.getName());
-        readyToSubmitTaskList.remove(taskInstance.getName());
+        try {
+            readyToSubmitTaskQueue.remove(taskInstance);
+        } catch (Exception e) {
+            logger.error("remove task instance from readyToSubmitTaskQueue error");
+        }
     }
 
     /**
@@ -891,8 +900,8 @@ public class MasterExecThread implements Runnable {
      * @return Boolean whether has retry task in standby
      */
     private boolean hasRetryTaskInStandBy() {
-        for (Map.Entry<String, TaskInstance> entry : readyToSubmitTaskList.entrySet()) {
-            if (entry.getValue().getState().typeIsFailure()) {
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
+            if (iter.next().getState().typeIsFailure()) {
                 return true;
             }
         }
@@ -1083,20 +1092,25 @@ public class MasterExecThread implements Runnable {
      * handling the list of tasks to be submitted
      */
     private void submitStandByTask() {
-        for (Map.Entry<String, TaskInstance> entry : readyToSubmitTaskList.entrySet()) {
-            TaskInstance task = entry.getValue();
-            DependResult dependResult = getDependResultForTask(task);
-            if (DependResult.SUCCESS == dependResult) {
-                if (retryTaskIntervalOverTime(task)) {
-                    submitTaskExec(task);
+        try {
+            int length = readyToSubmitTaskQueue.size();
+            for (int i = 0; i < length; i++) {
+                TaskInstance task = readyToSubmitTaskQueue.peek();
+                DependResult dependResult = getDependResultForTask(task);
+                if (DependResult.SUCCESS == dependResult) {
+                    if (retryTaskIntervalOverTime(task)) {
+                        submitTaskExec(task);
+                        removeTaskFromStandbyList(task);
+                    }
+                } else if (DependResult.FAILED == dependResult) {
+                    // if the dependency fails, the current node is not submitted and the state changes to failure.
+                    dependFailedTask.put(task.getName(), task);
                     removeTaskFromStandbyList(task);
+                    logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
                 }
-            } else if (DependResult.FAILED == dependResult) {
-                // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTask.put(entry.getKey(), task);
-                removeTaskFromStandbyList(task);
-                logger.info("task {},id:{} depend result : {}", task.getName(), task.getId(), dependResult);
             }
+        } catch (Exception e) {
+            logger.error("submit standby task error", e);
         }
     }
 
@@ -1185,9 +1199,9 @@ public class MasterExecThread implements Runnable {
      * generate flow dag
      *
      * @param processDefinitionJson process definition json
-     * @param startNodeNameList start node name list
-     * @param recoveryNodeNameList recovery node name list
-     * @param depNodeType depend node type
+     * @param startNodeNameList     start node name list
+     * @param recoveryNodeNameList  recovery node name list
+     * @param depNodeType           depend node type
      * @return ProcessDag           process dag
      * @throws Exception exception
      */
