@@ -115,8 +115,8 @@ public class TaskExecuteThreadTest {
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
 
         List<String> osUserList = new ArrayList<String>() {{
-            add("test");
-        }};
+                add("test");
+            }};
         PowerMockito.mockStatic(OSUtils.class);
         PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }
