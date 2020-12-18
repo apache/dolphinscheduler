@@ -15,37 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.queue;
-
-import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
+package org.apache.dolphinscheduler.service.exceptions;
 
 /**
- * task priority queue
- * @param <T>
+ * task priority queue exception
  */
-public interface TaskPriorityQueue<T> {
+public class TaskPriorityQueueException extends Exception {
 
     /**
-     * put task info
+     * Construct a new runtime exception with the detail message
      *
-     * @param taskInfo taskInfo
-     * @throws TaskPriorityQueueException
+     * @param message message
      */
-    void put(T taskInfo) throws TaskPriorityQueueException;
+    public TaskPriorityQueueException(String message) {
+        super(message);
+    }
 
     /**
-     * take taskInfo
+     * Construct a new runtime exception with the detail message and cause
      *
-     * @return taskInfo
-     * @throws TaskPriorityQueueException
+     * @param message   message
+     * @param cause     cause
      */
-    T take() throws TaskPriorityQueueException, InterruptedException;
+    public TaskPriorityQueueException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    /**
-     * size
-     *
-     * @return size
-     * @throws TaskPriorityQueueException
-     */
-    int size() throws TaskPriorityQueueException;
 }
