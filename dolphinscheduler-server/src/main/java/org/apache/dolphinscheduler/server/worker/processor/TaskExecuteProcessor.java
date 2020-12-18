@@ -99,15 +99,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
-        // check if the OS user exists
-        if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
-            logger.error("tenantCode:{} does not exist",taskExecutionContext.getTenantCode());
-            TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
-            responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
-            responseCommand.setEndTime(new Date());
-            taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
-            return;
-        }
 
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
@@ -119,6 +110,18 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+
+        // check if the OS user exists
+        if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+            TaskExecuteResponseCommand responseCommand = new TaskExecuteResponseCommand(taskExecutionContext.getTaskInstanceId());
+            responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
+            responseCommand.setEndTime(new Date());
+            taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            String errorLog = String.format("tenantCode: %s does not exist", taskExecutionContext.getTenantCode());
+            LoggerUtils.logError(Optional.ofNullable(logger), errorLog);
+            LoggerUtils.logError(Optional.ofNullable(taskLogger), errorLog);
+            return;
+        }
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
