@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -113,8 +114,11 @@ public class TaskExecuteThreadTest {
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
 
+        List<String> osUserList = new ArrayList<String>() {{
+            add("test");
+        }};
         PowerMockito.mockStatic(OSUtils.class);
-        PowerMockito.when(OSUtils.getUserList()).thenReturn(new ArrayList<String>(){{add("test");}});
+        PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }
 
     @Test
