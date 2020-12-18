@@ -81,8 +81,8 @@ public class JSONUtilsTest {
         String jsonStr = "{\"a\":\"b\",\"b\":\"d\"}";
 
         ObjectNode objectNode = JSONUtils.createObjectNode();
-        objectNode.put("a","b");
-        objectNode.put("b","d");
+        objectNode.put("a", "b");
+        objectNode.put("b", "d");
         String s = JSONUtils.toJsonString(objectNode);
         Assert.assertEquals(s, jsonStr);
     }
@@ -251,7 +251,7 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void parseObjectToClassTest(){
+    public void parseObjectToClassTest() {
         String a = "{\"taskInstanceId\":15,\"status\":7}";
 
         TaskCommand c = JSONUtils.parseObject(a, TaskCommand.class);
@@ -263,13 +263,15 @@ public class JSONUtilsTest {
         private int taskInstanceId;
         private int status;
 
-        public TaskCommand(){}
-        public TaskCommand(int taskInstanceId,int status) {
+        public TaskCommand() {
+        }
+
+        public TaskCommand(int taskInstanceId, int status) {
             this.taskInstanceId = taskInstanceId;
             this.status = status;
         }
 
-        public TaskCommand(String status,String taskInstanceId) {
+        public TaskCommand(String status, String taskInstanceId) {
             this.taskInstanceId = Integer.valueOf(taskInstanceId);
             this.status = Integer.valueOf(status);
         }
