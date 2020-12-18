@@ -25,7 +25,16 @@
           <m-list :process-instance-list="processInstanceList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+            <el-pagination
+              background
+              @current-change="_page"
+              @size-change="_pageSize"
+              :page-size="searchParams.pageSize"
+              :current-page.sync="searchParams.pageNo"
+              :page-sizes="[10, 30, 50]"
+              layout="sizes, prev, pager, next, jumper"
+              :total="total">
+            </el-pagination>
           </div>
         </template>
         <template v-if="!processInstanceList.length && total<=0">
@@ -44,7 +53,6 @@
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/processInstance'
 
@@ -99,7 +107,7 @@
         setUrlParams(this.searchParams)
         this._debounceGET()
       },
-      _pageSize(val) {
+      _pageSize (val) {
         this.searchParams.pageSize = val
         setUrlParams(this.searchParams)
         this._debounceGET()
@@ -110,8 +118,8 @@
       _getProcessInstanceListP (flag) {
         this.isLoading = !flag
         this.getProcessInstance(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.processInstanceList = []
             this.processInstanceList = res.totalList
@@ -139,15 +147,15 @@
        * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
-        if(sessionStorage.getItem('isLeft')==0) {
+        if (sessionStorage.getItem('isLeft') === 0) {
           this.isLeft = false
         } else {
           this.isLeft = true
         }
         this._getProcessInstanceListP(flag)
       }, 100, {
-        'leading': false,
-        'trailing': true
+        leading: false,
+        trailing: true
       })
     },
     watch: {
@@ -160,7 +168,7 @@
           this.searchParams.pageNo = !_.isEmpty(a.query) && a.query.pageNo || 1
         }
       },
-      'searchParams': {
+      searchParams: {
         deep: true,
         handler () {
           this._debounceGET()
@@ -182,7 +190,6 @@
       }
     },
     mounted () {
-      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
@@ -191,9 +198,9 @@
     beforeDestroy () {
       // Destruction wheel
       clearInterval(this.setIntervalP)
-      sessionStorage.setItem('isLeft',1)
+      sessionStorage.setItem('isLeft', 1)
     },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
   }
 </script>
 

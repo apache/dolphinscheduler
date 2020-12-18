@@ -60,7 +60,7 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                 if (null != baseDataSource) {
 
                     mysqlTargetSb.append(Constants.SPACE).append(SqoopConstants.DB_CONNECT)
-                        .append(Constants.SPACE).append(baseDataSource.getJdbcUrl())
+                        .append(Constants.SPACE).append(Constants.DOUBLE_QUOTES).append(baseDataSource.getJdbcUrl()).append(Constants.DOUBLE_QUOTES)
                         .append(Constants.SPACE).append(SqoopConstants.DB_USERNAME)
                         .append(Constants.SPACE).append(baseDataSource.getUser())
                         .append(Constants.SPACE).append(SqoopConstants.DB_PWD)
