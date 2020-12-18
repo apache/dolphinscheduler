@@ -295,10 +295,12 @@ public class JSONUtilsTest {
 
         @Override
         public String toString() {
-            return "DBTaskAckCommand{" +
-                    "taskInstanceId=" + taskInstanceId +
-                    ", status=" + status +
-                    '}';
+            return "DBTaskAckCommand{"
+                    + "taskInstanceId="
+                    + taskInstanceId
+                    + ", status="
+                    + status
+                    + '}';
         }
     }
 }
