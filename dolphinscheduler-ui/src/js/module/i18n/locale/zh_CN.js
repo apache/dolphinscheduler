@@ -33,6 +33,7 @@ export default {
   'View history': '查看历史',
   'View log': '查看日志',
   'Force success': '强制成功',
+  'Resume From Forced Success': '从强制成功处继续',
   'Enter this child node': '进入该子节点',
   'Node name': '节点名称',
   'Please enter name (required)': '请输入名称(必填)',
