@@ -151,9 +151,7 @@
        */
       _close () {
         // flag Whether to delete a node this.$destroy()
-        this.$emit('close', {
-          fromThis: this
-        })
+        this.$emit('closeVersion')
       }
     },
     created () {

@@ -122,7 +122,7 @@
       :visible.sync="drawer"
       size="35%"
       :with-header="false">
-      <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
+      <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
@@ -428,6 +428,10 @@
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+
+      closeVersion () {
+        this.drawer = false
       },
 
       _batchExport () {
