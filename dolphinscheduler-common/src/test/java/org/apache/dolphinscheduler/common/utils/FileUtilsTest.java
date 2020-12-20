@@ -67,9 +67,9 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testCreateWorkDirAndUserIfAbsent() {
+    public void testCreateWorkDirIfAbsent() {
         try {
-            FileUtils.createWorkDirAndUserIfAbsent("/tmp/createWorkDirAndUserIfAbsent", "test123");
+            FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
             Assert.assertTrue(true);
         } catch (Exception e) {
             Assert.assertTrue(false);
