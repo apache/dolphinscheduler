@@ -85,6 +85,9 @@ public class ProcessUtils {
     } else {
       String executablePath;
       try {
+        /**
+         *  根据命令参数获取执行路径
+         */
         executablePath = getExecutablePath(cmd[0]);
       } catch (IllegalArgumentException e) {
 
