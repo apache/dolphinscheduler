@@ -84,14 +84,14 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testForceSingleTaskSuccess() throws Exception {
+    public void testForceTaskSuccess() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskInstanceId","104");
 
         Map<String, Object> mockResult = new HashMap<>(5);
         mockResult.put(Constants.STATUS, Status.SUCCESS);
         mockResult.put(Constants.MSG, Status.SUCCESS.getMsg());
-        when(taskInstanceService.forceSingleTaskSuccess(any(User.class), anyString(), anyInt())).thenReturn(mockResult);
+        when(taskInstanceService.forceTaskSuccess(any(User.class), anyString(), anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success","test")
                 .header(SESSION_ID, sessionId)

@@ -216,7 +216,7 @@ public class TaskInstanceServiceTest {
     }
 
     @Test
-    public void forceSingleTaskSuccess() {
+    public void forceTaskSuccess() {
         User user = getAdminUser();
         String projectName = "test";
         Project project = getProject(projectName);
@@ -231,31 +231,31 @@ public class TaskInstanceServiceTest {
         Map<String, Object> mockFailure = new HashMap<>(5);
         putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectName);
         when(projectService.checkProjectAndAuth(user, project, projectName)).thenReturn(mockFailure);
-        Map<String, Object> authFailRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Map<String, Object> authFailRes = taskInstanceService.forceTaskSuccess(user, projectName, taskId);
         Assert.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
 
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectName)).thenReturn(mockSuccess);
         when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
-        Map<String, Object> taskNotFoundRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectName, taskId);
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
 
         // test task instance state error
         task.setState(ExecutionStatus.SUCCESS);
         when(taskInstanceMapper.selectById(1)).thenReturn(task);
-        Map<String, Object> taskStateErrorRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Map<String, Object> taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectName, taskId);
         Assert.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
 
         // test error
         task.setState(ExecutionStatus.FAILURE);
         when(taskInstanceMapper.updateById(task)).thenReturn(0);
-        Map<String, Object> errorRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Map<String, Object> errorRes = taskInstanceService.forceTaskSuccess(user, projectName, taskId);
         Assert.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
 
         // test success
         task.setState(ExecutionStatus.FAILURE);
         when(taskInstanceMapper.updateById(task)).thenReturn(1);
-        Map<String, Object> successRes = taskInstanceService.forceSingleTaskSuccess(user, projectName, taskId);
+        Map<String, Object> successRes = taskInstanceService.forceTaskSuccess(user, projectName, taskId);
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 }
