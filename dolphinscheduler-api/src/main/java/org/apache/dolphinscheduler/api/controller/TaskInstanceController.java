@@ -145,12 +145,9 @@ public class TaskInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     public Result<Object> forceTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                         @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
-        String userNameReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        String projectNameReplace = StringUtils.replaceNRTtoUnderline(projectName);
-        logger.info("force task success, login user: {}, project:{}, task instance id:{}",
-                userNameReplace, projectNameReplace, taskInstanceId);
+                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                           @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
+        logger.info("force task success, project: {}, task instance id: {}", projectName, taskInstanceId);
         Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectName, taskInstanceId);
         return returnDataList(result);
     }
