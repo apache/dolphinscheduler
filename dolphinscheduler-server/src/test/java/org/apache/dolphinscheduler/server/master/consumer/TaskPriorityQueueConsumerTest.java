@@ -73,7 +73,7 @@ public class TaskPriorityQueueConsumerTest {
 
 
     @Autowired
-    private TaskPriorityQueue taskPriorityQueue;
+    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
     @Autowired
     private TaskPriorityQueueConsumer taskPriorityQueueConsumer;
@@ -405,7 +405,8 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
 
@@ -654,7 +655,8 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        taskPriorityQueue.put(taskPriority);
 
         taskPriorityQueueConsumer.run();
 

@@ -151,14 +151,18 @@ public class TaskPriority implements Comparable<TaskPriority> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TaskPriority that = (TaskPriority) o;
-        return processInstancePriority == that.processInstancePriority &&
-                processInstanceId == that.processInstanceId &&
-                taskInstancePriority == that.taskInstancePriority &&
-                taskId == that.taskId &&
-                Objects.equals(groupName, that.groupName);
+        return processInstancePriority == that.processInstancePriority
+                &&  processInstanceId == that.processInstanceId
+                && taskInstancePriority == that.taskInstancePriority
+                && taskId == that.taskId
+                && Objects.equals(groupName, that.groupName);
     }
 
     @Override

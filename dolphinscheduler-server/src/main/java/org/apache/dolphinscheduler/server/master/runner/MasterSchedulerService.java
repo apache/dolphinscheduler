@@ -133,7 +133,7 @@ public class MasterSchedulerService extends Thread {
                 if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
                     scheduleProcess();
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 logger.error("master scheduler thread error", e);
             }
         }
