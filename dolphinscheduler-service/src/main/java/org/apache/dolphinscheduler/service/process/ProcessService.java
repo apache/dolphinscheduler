@@ -1426,7 +1426,7 @@ public class ProcessService {
         for (int i = 0; i < states.length; i++) {
             statesArray[i] = states[i].ordinal();
         }
-        return taskInstanceMapper.queryTaskByPIdAndStatusAndType(processInstanceId, statesArray, taskType.toString());
+        return taskInstanceMapper.queryTaskByProcessIdAndStateAndType(processInstanceId, statesArray, taskType.toString());
     }
 
     /**
@@ -1443,9 +1443,9 @@ public class ProcessService {
             statesArray[i] = states[i].ordinal();
         }
         if (taskType == null) {
-            return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, statesArray, null);
+            return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStateAndType(taskId, statesArray, null);
         }
-        return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(taskId, statesArray, taskType.toString());
+        return taskInstanceMapper.queryTaskBySubProcessTaskIdAndStateAndType(taskId, statesArray, taskType.toString());
     }
 
     /**

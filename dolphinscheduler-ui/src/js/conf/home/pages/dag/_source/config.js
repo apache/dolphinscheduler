@@ -133,6 +133,10 @@ const runningType = [
   {
     desc: `${i18n.$t('Recovery waiting thread')}`,
     code: 'RECOVER_WAITTING_THREAD'
+  },
+  {
+    desc: `${i18n.$t('Resume from forced success')}`,
+    code: 'RESUME_FROM_FORCED_SUCCESS'
   }
 ]
 

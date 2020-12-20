@@ -130,28 +130,28 @@ public class TaskInstanceController extends BaseController {
     }
 
     /**
-     * change one single task instance's state from FAILURE to FORCED_SUCCESS
+     * change one task instance's state from FAILURE to FORCED_SUCCESS
      *
      * @param loginUser      login user
      * @param projectName    project name
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    @ApiOperation(value = "force-success", notes = "FORCE_SINGLE_TASK_SUCCESS")
+    @ApiOperation(value = "force-success", notes = "FORCE_TASK_SUCCESS")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
     })
     @PostMapping(value = "/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    public Result<Object> forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Object> forceTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                          @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
         String userNameReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         String projectNameReplace = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("force task success, login user: {}, project:{}, task instance id:{}",
                 userNameReplace, projectNameReplace, taskInstanceId);
-        Map<String, Object> result = taskInstanceService.forceSingleTaskSuccess(loginUser, projectName, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceTaskSuccess(loginUser, projectName, taskInstanceId);
         return returnDataList(result);
     }
 

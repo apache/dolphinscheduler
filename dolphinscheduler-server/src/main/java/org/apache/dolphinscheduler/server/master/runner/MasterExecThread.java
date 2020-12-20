@@ -1115,9 +1115,9 @@ public class MasterExecThread implements Runnable {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
                 // stop tasks which is retrying if forced success happens
                 if (task.taskCanRetry()) {
-                    TaskInstance tmpTask = processService.findTaskInstanceById(task.getId());
-                    if (tmpTask != null && tmpTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
-                        task.setState(tmpTask.getState());
+                    TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
+                    if (retryTask != null && retryTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                        task.setState(retryTask.getState());
                         logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
                         removeTaskFromStandbyList(task);
                         completeTaskList.put(task.getName(), task);

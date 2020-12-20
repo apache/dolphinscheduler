@@ -79,7 +79,7 @@
               </el-tooltip>
               <el-tooltip :content="$t('Resume From Forced Success')" placement="top" :enterable="false">
                 <span>
-                  <el-button type="success" size="mini" icon="el-icon-stopwatch" :disabled="scope.row.state !== 'FORCED_SUCCESS'" @click="_resumeFromForcedSuccess(scope.row,scope.$index)" circle></el-button>
+                  <el-button type="success" size="mini" icon="el-icon-stopwatch" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_resumeFromForcedSuccess(scope.row,scope.$index)" circle></el-button>
                 </span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">

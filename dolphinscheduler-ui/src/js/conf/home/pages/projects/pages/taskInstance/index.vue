@@ -23,7 +23,7 @@
 
       <template slot="content">
         <template v-if="taskInstanceList.length">
-          <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+          <m-list :task-instance-list="taskInstanceList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
             <el-pagination
@@ -125,6 +125,12 @@
         }).catch(e => {
           this.isLoading = false
         })
+      },
+      /**
+       * update
+       */
+      _onUpdate () {
+        this._debounceGET()
       },
       /**
        * Anti shake request interface

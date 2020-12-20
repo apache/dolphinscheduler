@@ -146,14 +146,14 @@ public class TaskInstanceService extends BaseService {
     }
 
     /**
-     * change one single task instance's state from failure to forced success
+     * change one task instance's state from failure to forced success
      *
      * @param loginUser      login user
      * @param projectName    project name
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    public Map<String, Object> forceSingleTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
+    public Map<String, Object> forceTaskSuccess(User loginUser, String projectName, Integer taskInstanceId) {
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
 
@@ -182,8 +182,7 @@ public class TaskInstanceService extends BaseService {
         int changedNum = taskInstanceMapper.updateById(task);
         if (changedNum > 0) {
             putMsg(result, Status.SUCCESS);
-        }
-        else {
+        } else {
             putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
         }
 
