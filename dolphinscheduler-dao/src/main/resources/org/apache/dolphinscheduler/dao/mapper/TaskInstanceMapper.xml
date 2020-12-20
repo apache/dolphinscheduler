@@ -152,7 +152,7 @@
         </if>
         order by instance.start_time desc
     </select>
-    <select id="queryTaskByPIdAndStatusAndType" resultType="java.lang.Integer">
+    <select id="queryTaskByProcessIdAndStateAndType" resultType="java.lang.Integer">
         select id from t_ds_task_instance
         where process_instance_id = #{processInstanceId}
         and task_type = #{taskType}
@@ -162,7 +162,7 @@
         </foreach>
         and flag = 1
     </select>
-    <select id="queryTaskBySubProcessTaskIdAndStatusAndType" resultType="java.lang.Integer">
+    <select id="queryTaskBySubProcessTaskIdAndStateAndType" resultType="java.lang.Integer">
         select id from t_ds_task_instance
         where process_instance_id =
         (select process_instance_id from t_ds_relation_process_instance where parent_task_instance_id = #{subProcessTaskId})

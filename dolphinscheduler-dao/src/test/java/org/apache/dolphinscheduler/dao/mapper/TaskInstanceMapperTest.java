@@ -320,7 +320,7 @@ public class TaskInstanceMapperTest {
     }
 
     @Test
-    public void testQueryTaskByPIdAndStatusAndType() {
+    public void testQueryTaskByProcessIdAndStateAndType() {
         // insert three task instances with the same process instance id
         List<TaskInstance> taskList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -329,7 +329,7 @@ public class TaskInstanceMapperTest {
         }
 
         // test query result
-        List<Integer> resultArray = taskInstanceMapper.queryTaskByPIdAndStatusAndType(66,
+        List<Integer> resultArray = taskInstanceMapper.queryTaskByProcessIdAndStateAndType(66,
             new int[] {ExecutionStatus.FAILURE.ordinal(), ExecutionStatus.KILL.ordinal(), ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()},
             TaskType.SUB_PROCESS.toString());
         Assert.assertEquals(3, resultArray.size());
@@ -341,7 +341,7 @@ public class TaskInstanceMapperTest {
     }
 
     @Test
-    public void testQueryTaskBySubProcessTaskIdAndStatusAndType() {
+    public void testQueryTaskBySubProcessTaskIdAndStateAndType() {
         TaskInstance parentTask = insertOne("parent-task", 66, ExecutionStatus.FAILURE, TaskType.SUB_PROCESS.toString());
 
         ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
@@ -354,7 +354,7 @@ public class TaskInstanceMapperTest {
         TaskInstance subTask2 = insertOne("sub2", 67, ExecutionStatus.FORCED_SUCCESS, TaskType.SHELL.toString());
 
         // test query result
-        List<Integer> resultList = taskInstanceMapper.queryTaskBySubProcessTaskIdAndStatusAndType(parentTask.getId(),
+        List<Integer> resultList = taskInstanceMapper.queryTaskBySubProcessTaskIdAndStateAndType(parentTask.getId(),
             new int[] {ExecutionStatus.FORCED_SUCCESS.ordinal()},
             null);
 
