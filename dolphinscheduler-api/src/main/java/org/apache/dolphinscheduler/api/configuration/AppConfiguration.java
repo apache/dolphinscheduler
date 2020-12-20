@@ -77,7 +77,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     //i18n
     registry.addInterceptor(localeChangeInterceptor());
 
-    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
+    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "/swagger-ui.html", "*.html", "/ui/**");
   }
 
 
@@ -85,6 +85,7 @@ public class AppConfiguration implements WebMvcConfigurer {
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
+    registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
   }
