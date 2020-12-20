@@ -158,13 +158,12 @@ public class FileUtils {
     }
 
     /**
-     * create directory and user
+     * create directory if absent
      *
      * @param execLocalPath execute local path
-     * @param userName user name
      * @throws IOException errors
      */
-    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException {
+    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
         //if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
@@ -177,27 +176,6 @@ public class FileUtils {
         String mkdirLog = "create dir success " + execLocalPath;
         LoggerUtils.logInfo(Optional.ofNullable(logger), mkdirLog);
         LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), mkdirLog);
-
-        //if not exists this user,then create
-        OSUtils.taskLoggerThreadLocal.set(taskLoggerThreadLocal.get());
-        try {
-            if (!OSUtils.getUserList().contains(userName)) {
-                boolean isSuccessCreateUser = OSUtils.createUser(userName);
-
-                String infoLog;
-                if (isSuccessCreateUser) {
-                    infoLog = String.format("create user name success %s", userName);
-                } else {
-                    infoLog = String.format("create user name fail %s", userName);
-                }
-                LoggerUtils.logInfo(Optional.ofNullable(logger), infoLog);
-                LoggerUtils.logInfo(Optional.ofNullable(taskLoggerThreadLocal.get()), infoLog);
-            }
-        } catch (Throwable e) {
-            LoggerUtils.logError(Optional.ofNullable(logger), e);
-            LoggerUtils.logError(Optional.ofNullable(taskLoggerThreadLocal.get()), e);
-        }
-        OSUtils.taskLoggerThreadLocal.remove();
     }
 
     /**
