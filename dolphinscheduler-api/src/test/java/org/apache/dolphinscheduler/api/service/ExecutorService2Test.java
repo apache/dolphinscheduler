@@ -18,19 +18,24 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -82,11 +87,15 @@ public class ExecutorService2Test {
 
     private int processDefinitionId = 1;
 
+    private int processInstanceId = 1;
+
     private int tenantId = 1;
 
     private int userId = 1;
 
     private ProcessDefinition processDefinition = new ProcessDefinition();
+
+    private ProcessInstance processInstance = new ProcessInstance();
 
     private User loginUser = new User();
 
@@ -107,6 +116,13 @@ public class ExecutorService2Test {
         processDefinition.setTenantId(tenantId);
         processDefinition.setUserId(userId);
 
+        // processInstance
+        processInstance.setId(processInstanceId);
+        processInstance.setProcessDefinitionId(processDefinitionId);
+        processInstance.setState(ExecutionStatus.FAILURE);
+        processInstance.setExecutorId(userId);
+        processInstance.setTenantId(tenantId);
+
         // project
         project.setName(projectName);
 
@@ -120,6 +136,8 @@ public class ExecutorService2Test {
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processService.createCommand(any(Command.class))).thenReturn(1);
         Mockito.when(monitorService.getServerListFromZK(true)).thenReturn(getMasterServersList());
+        Mockito.when(processService.findProcessInstanceDetailById(processInstanceId)).thenReturn(processInstance);
+        Mockito.when(processService.findProcessDefineById(processDefinitionId)).thenReturn(processDefinition);
     }
 
     /**
@@ -255,6 +273,39 @@ public class ExecutorService2Test {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 110);
         Assert.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
+    }
+
+    @Test
+    public void testExecute() {
+        List<Integer> mockRes = new ArrayList<>();
+        mockRes.add(1);
+        mockRes.add(2);
+        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class)))
+            .thenReturn(true);
+
+        // check execute type error
+        processInstance.setState(ExecutionStatus.SUCCESS);
+        Map<String, Object> checkExeTypeRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
+        Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, checkExeTypeRes.get(Constants.STATUS));
+
+        // no valid forced success task
+        processInstance.setState(ExecutionStatus.FAILURE);
+        Map<String, Object> noValidTaskRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
+        Assert.assertEquals(Status.NO_VALID_FORCED_SUCCESS_TASK, noValidTaskRes.get(Constants.STATUS));
+
+        // have forced success in sub-process
+        Mockito.when(processService.findTaskIdByInstanceStatusAndType(anyInt(), any(ExecutionStatus[].class), any(TaskType.class)))
+            .thenReturn(mockRes);
+        Mockito.when(processService.haveForcedSuccessInSubProcess(anyInt()))
+            .thenReturn(true);
+        Map<String, Object> successRes1 = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
+        Assert.assertEquals(Status.SUCCESS, successRes1.get(Constants.STATUS));
+
+        // test success
+        Mockito.when(processService.findTaskIdByInstanceState(processInstanceId, ExecutionStatus.FORCED_SUCCESS)).thenReturn(mockRes);
+        Map<String, Object> successRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        verify(processService, times(2)).createCommand(any(Command.class));
     }
 
     private List<Server> getMasterServersList() {
