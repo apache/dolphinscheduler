@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -184,7 +185,7 @@ public abstract class AbstractTask {
             // task recor flat : if true , start up qianfan
             if (TaskRecordDao.getTaskRecordFlag()
                     && TaskType.typeIsNormalTask(taskExecutionContext.getTaskType())){
-                AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskExecutionContext.getTaskParams(), getCurTaskParamsClass());
+                AbstractParameters params = TaskParametersUtils.getParameters(taskExecutionContext.getTaskType(), taskExecutionContext.getTaskParams());
 
                 // replace placeholder
                 Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
@@ -213,53 +214,6 @@ public abstract class AbstractTask {
     }
 
 
-
-
-    /**
-     * get current task parameter class
-     * @return Task Params Class
-     */
-    private Class getCurTaskParamsClass(){
-        Class paramsClass = null;
-        // get task type
-        TaskType taskType = TaskType.valueOf(taskExecutionContext.getTaskType());
-        switch (taskType){
-            case SHELL:
-                paramsClass = ShellParameters.class;
-                break;
-            case SQL:
-                paramsClass = SqlParameters.class;
-                break;
-            case PROCEDURE:
-                paramsClass = ProcedureParameters.class;
-                break;
-            case MR:
-                paramsClass = MapreduceParameters.class;
-                break;
-            case SPARK:
-                paramsClass = SparkParameters.class;
-                break;
-            case FLINK:
-                paramsClass = FlinkParameters.class;
-                break;
-            case PYTHON:
-                paramsClass = PythonParameters.class;
-                break;
-            case DATAX:
-                paramsClass = DataxParameters.class;
-                break;
-            case SQOOP:
-                paramsClass = SqoopParameters.class;
-                break;
-            case CONDITIONS:
-                paramsClass = ConditionsParameters.class;
-                break;
-            default:
-                logger.error("not support this task type: {}", taskType);
-                throw new IllegalArgumentException("not support this task type");
-        }
-        return paramsClass;
-    }
 
     /**
      * get exit status according to exitCode
