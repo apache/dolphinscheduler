@@ -52,6 +52,9 @@ public class ProcessUtils {
    */
   private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
 
+  /**
+   * Expression of PID recognition in Windows scene
+   */
   private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
 
   /**
@@ -85,9 +88,6 @@ public class ProcessUtils {
     } else {
       String executablePath;
       try {
-        /**
-         *  根据命令参数获取执行路径
-         */
         executablePath = getExecutablePath(cmd[0]);
       } catch (IllegalArgumentException e) {
 
