@@ -43,7 +43,7 @@
     <m-list-box-f v-ps="['GENERAL_USER']">
       <template slot="name">{{$t('Tenant')}}</template>
       <template slot="content">
-        <span class="sp1">{{userInfo.tenantName}}</span>
+        <span class="sp1">{{userInfo.tenantCode}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f v-ps="['GENERAL_USER']">
@@ -67,7 +67,12 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" >{{$t('Edit')}}</x-button>
+        <el-button type="primary" size="small" round @click="_edit()" >{{$t('Edit')}}</el-button>
+        <el-dialog
+          :visible.sync="createUserDialog"
+          width="50%">
+          <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>
+        </el-dialog>
       </template>
     </m-list-box-f>
   </div>
@@ -80,7 +85,10 @@
   export default {
     name: 'user-info',
     data () {
-      return {}
+      return {
+        createUserDialog: false,
+        item: {}
+      }
     },
     props: {},
     methods: {
@@ -89,35 +97,21 @@
        * edit
        */
       _edit () {
-        let item = this.userInfo
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateUser, {
-              on: {
-                onUpdate (param) {
-                  self.setUserInfo({
-                    userName: param.userName,
-                    userPassword: param.userPassword,
-                    email: param.email,
-                    phone: param.phone
-                  })
-                  modal.remove()
-                },
-                close () {
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
+        this.item = this.userInfo
+        this.createUserDialog = true
+      },
+      onUpdate (param) {
+        this.setUserInfo({
+          userName: param.userName,
+          userPassword: param.userPassword,
+          email: param.email,
+          phone: param.phone
         })
+        this.createUserDialog = false
+      },
+
+      close () {
+        this.createUserDialog = false
       }
     },
     watch: {},
@@ -128,7 +122,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mListBoxF }
+    components: { mListBoxF, mCreateUser }
   }
 </script>
 

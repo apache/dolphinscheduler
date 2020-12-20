@@ -14,19 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.datax;
 
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -39,6 +33,13 @@ import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * DataxTask Tester.
@@ -58,7 +60,13 @@ public class DataxTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataxTaskTest.class);
 
-    private static final String CONNECTION_PARAMS = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}";
+    private static final String CONNECTION_PARAMS = " {\n"
+                                                    + "    \"user\":\"root\",\n"
+                                                    + "    \"password\":\"123456\",\n"
+                                                    + "    \"address\":\"jdbc:mysql://127.0.0.1:3306\",\n"
+                                                    + "    \"database\":\"test\",\n"
+                                                    + "    \"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"\n"
+                                                    + "}";
 
     private DataxTask dataxTask;
 
@@ -69,7 +77,7 @@ public class DataxTaskTest {
     private ApplicationContext applicationContext;
 
     private TaskExecutionContext taskExecutionContext;
-    private TaskProps props = new TaskProps();
+    private final TaskProps props = new TaskProps();
 
     @Before
     public void before()
@@ -97,12 +105,40 @@ public class DataxTaskTest {
         props.setTaskTimeout(0);
         if (customConfig == 1) {
             props.setTaskParams(
-                    "{\"customConfig\":1, \"localParams\":[{\"prop\":\"test\",\"value\":\"38294729\"}],\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"${test}\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
+                    "{\n"
+                            + "    \"customConfig\":1,\n"
+                            + "    \"localParams\":[\n"
+                            + "        {\n"
+                            + "            \"prop\":\"test\",\n"
+                            + "            \"value\":\"38294729\"\n"
+                            + "        }\n"
+                            + "    ],\n"
+                            + "    \"json\":\""
+                            + "{\"job\":{\"setting\":{\"speed\":{\"byte\":1048576},\"errorLimit\":{\"record\":0,\"percentage\":0.02}},\"content\":["
+                            + "{\"reader\":{\"name\":\"rdbmsreader\",\"parameter\":{\"username\":\"xxx\",\"password\":\"${test}\",\"column\":[\"id\",\"name\"],\"splitPk\":\"pk\",\""
+                            + "connection\":[{\"querySql\":[\"SELECT * from dual\"],\"jdbcUrl\":[\"jdbc:dm://ip:port/database\"]}],\"fetchSize\":1024,\"where\":\"1 = 1\"}},\""
+                            + "writer\":{\"name\":\"streamwriter\",\"parameter\":{\"print\":true}}}]}}\"\n"
+                            + "}");
 
-//                    "{\"customConfig\":1,\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"xxx\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
         } else {
             props.setTaskParams(
-                    "{\"customConfig\":0,\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"dataSource\":1,\"dsType\":\"MYSQL\",\"dataTarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
+                    "{\n"
+                            + "    \"customConfig\":0,\n"
+                            + "    \"targetTable\":\"test\",\n"
+                            + "    \"postStatements\":[\n"
+                            + "        \"delete from test\"\n"
+                            + "    ],\n"
+                            + "    \"jobSpeedByte\":0,\n"
+                            + "    \"jobSpeedRecord\":1000,\n"
+                            + "    \"dtType\":\"MYSQL\",\n"
+                            + "    \"dataSource\":1,\n"
+                            + "    \"dsType\":\"MYSQL\",\n"
+                            + "    \"dataTarget\":2,\n"
+                            + "    \"sql\":\"select 1 as test from dual\",\n"
+                            + "    \"preStatements\":[\n"
+                            + "        \"delete from test\"\n"
+                            + "    ]\n"
+                            + "}");
         }
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
@@ -113,7 +149,6 @@ public class DataxTaskTest {
         Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
-
 
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         dataxTaskExecutionContext.setSourcetype(0);
@@ -126,7 +161,6 @@ public class DataxTaskTest {
         dataxTask.init();
         props.setCmdTypeIfComplement(START_PROCESS);
 
-
         Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
         Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
@@ -137,7 +171,6 @@ public class DataxTaskTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
         dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
@@ -405,4 +438,23 @@ public class DataxTaskTest {
         }
     }
 
+    @Test
+    public void testLoadJvmEnv()   {
+        DataxTask dataxTask = new DataxTask(null,null);
+        DataxParameters dataxParameters = new DataxParameters();
+        dataxParameters.setXms(0);
+        dataxParameters.setXmx(-100);
+
+        String actual =  dataxTask.loadJvmEnv(dataxParameters);
+
+        String except = " --jvm=\"-Xms1G -Xmx1G\" ";
+        Assert.assertEquals(except,actual);
+
+        dataxParameters.setXms(13);
+        dataxParameters.setXmx(14);
+        actual =  dataxTask.loadJvmEnv(dataxParameters);
+        except = " --jvm=\"-Xms13G -Xmx14G\" ";
+        Assert.assertEquals(except,actual);
+
+    }
 }

@@ -49,10 +49,10 @@ public class WorkflowDefineLocator {
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");
 
     //click stop run type
-    public static final By CLICK_STOP_RUN_TYPE = By.xpath("//label[2]/span/input");
+    public static final By CLICK_STOP_RUN_TYPE = By.xpath("//label[2]/span[1]/input");
 
     //click normal run type
-    public static final By CLICK_NORMAL_RUN_TYPE = By.xpath("//span/input");
+    public static final By CLICK_NORMAL_RUN_TYPE = By.xpath("//label[1]/span[1]/input");
 
     //input shell task description
     public static final By INPUT_SHELL_TASK_DESCRIPTION = By.xpath("//label/div/textarea");
@@ -120,12 +120,22 @@ public class WorkflowDefineLocator {
     //click submit button
     public static final By CLICK_SUBMIT_BUTTON = By.xpath("//div[3]/div/button[2]/span");
 
+    //copy task
+    public static final By MOUSE_RIGHT_CLICK = By.xpath("//div[2]/div[2]/div/div/div/div/div[2]");
+    public static final By COPY_TASK = By.xpath("//a[3]/span");
+
+    //click line
+    public static final By CLICK_LINE = By.xpath("//a[@id='line']/button/i");
+
+    public static final By LINE_SOURCES_TASK = By.xpath("//div[@id='canvas']/div[1]/div[2]");
+
+    public static final By LINE_TARGET_TASK = By.xpath("//div[@id='canvas']/div[2]/div[2]");
 
     /**
      * save workflow
      */
     //click save workflow button
-    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//div[2]/div[1]/div[2]/button[2]");
+    public static final By CLICK_SAVE_WORKFLOW_BUTTON = By.xpath("//div[2]/div[1]/div[2]/button[2]/span");
 
     //input  workflow name
     public static final By INPUT_WORKFLOW_NAME = By.xpath("//input");
@@ -169,26 +179,29 @@ public class WorkflowDefineLocator {
     //scroll to element bottom
     public static final By SCROLL_BOTTOM = By.xpath("//span/a/em");
 
+    public static final By WORKFLOW_NAME = By.xpath("//table/tr[2]/td[3]/span/a");
+
     /**
      * online workflow
      */
+    public static final By WORKFLOW_STATE = By.xpath("//table/tr[2]/td[4]/span");
+
+
     // click online workflow button
-    public static final By CLICK_ONLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
+    public static final By CLICK_ONLINE_WORKFLOW_BUTTON = By.xpath("//button[@title['data-original-title']='上线']");
 
     /**
      * offline workflow
      */
     // click offline workflow button
-    public static final By CLICK_OFFLINE_WORKFLOW_BUTTON = By.xpath("//div[1]/div/table/tr[2]/td[10]/button[4]");
-
+    public static final By CLICK_OFFLINE_WORKFLOW_BUTTON = By.xpath("//button[@title['data-original-title']='下线']");
 
     /**
      * delete workflow
      */
     //click delete workflow button
-    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[10]/span/button");
+    public static final By DELETE_WORKFLOW_BOTTOM = By.xpath("//table/tr[2]/td[10]/span/button");
 
     //click confirm delete workflow button
     public static final By CONFIRM_DELETE_WORKFLOW_BOTTOM = By.xpath("//div[2]/div/button[2]/span");
-    
 }

@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
@@ -52,7 +53,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={DependencyConfig.class, SpringZKServer.class, WorkerRegistry.class,
-        ZookeeperNodeManager.class, ZookeeperRegistryCenter.class, WorkerConfig.class,
+        ZookeeperNodeManager.class, ZookeeperRegistryCenter.class, WorkerConfig.class, CuratorZookeeperClient.class,
         ZookeeperCachedOperator.class, ZookeeperConfig.class, SpringApplicationContext.class, NettyExecutorManager.class})
 public class NettyExecutorManagerTest {
 

@@ -297,4 +297,3 @@ delimiter ;
 CALL ac_dolphin_T_t_ds_user_A_state;
 DROP PROCEDURE ac_dolphin_T_t_ds_user_A_state;
 
-

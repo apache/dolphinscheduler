@@ -131,6 +131,7 @@ public class Command {
             WarningType warningType,
             int warningGroupId,
             Date scheduleTime,
+            String workerGroup,
             Priority processInstancePriority) {
         this.commandType = commandType;
         this.executorId = executorId;
@@ -143,6 +144,7 @@ public class Command {
         this.failureStrategy = failureStrategy;
         this.startTime = new Date();
         this.updateTime = new Date();
+        this.workerGroup = workerGroup;
         this.processInstancePriority = processInstancePriority;
     }
 
