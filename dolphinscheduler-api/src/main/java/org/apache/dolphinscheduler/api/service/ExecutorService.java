@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -283,6 +284,13 @@ public class ExecutorService extends BaseService {
                     result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE, ExecutionStatus.READY_PAUSE);
                 }
                 break;
+            case RESUME_FROM_FORCED_SUCCESS:
+                if (!this.checkValidForcedSuccessTask(processInstanceId)) {
+                    putMsg(result, Status.NO_VALID_FORCED_SUCCESS_TASK, processInstance.getName());
+                } else {
+                    result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.RESUME_FROM_FORCED_SUCCESS);
+                }
+                break;
             default:
                 logger.error("unknown execute type : {}", executeType);
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
@@ -330,6 +338,7 @@ public class ExecutorService extends BaseService {
                 }
                 break;
             case START_FAILURE_TASK_PROCESS:
+            case RESUME_FROM_FORCED_SUCCESS:
                 if (executionStatus.typeIsFailure()) {
                     checkResult = true;
                 }
@@ -610,4 +619,26 @@ public class ExecutorService extends BaseService {
         return null;
     }
 
+    /**
+     * check if the process instance contains valid forced success task
+     *
+     * @param processInstanceId
+     * @return
+     */
+    private boolean checkValidForcedSuccessTask(int processInstanceId) {
+        List<Integer> forcedSuccessList = processService.findTaskIdByInstanceState(processInstanceId, ExecutionStatus.FORCED_SUCCESS);
+        if (forcedSuccessList != null && !forcedSuccessList.isEmpty()) {
+            return true;
+        }
+
+        List<Integer> failedSubList = processService.findTaskIdByInstanceStatusAndType(processInstanceId,
+                new ExecutionStatus[]{ExecutionStatus.FAILURE, ExecutionStatus.KILL, ExecutionStatus.NEED_FAULT_TOLERANCE},
+                TaskType.SUB_PROCESS);
+        for (int i = 0; i < failedSubList.size(); i++) {
+            if (processService.haveForcedSuccessInSubProcess(failedSubList.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

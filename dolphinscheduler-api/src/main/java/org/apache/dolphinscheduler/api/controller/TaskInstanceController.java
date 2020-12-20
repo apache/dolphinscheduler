@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -125,6 +127,32 @@ public class TaskInstanceController extends BaseController {
         Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
         return returnDataListPaging(result);
+    }
+
+    /**
+     * change one single task instance's state from FAILURE to FORCED_SUCCESS
+     *
+     * @param loginUser      login user
+     * @param projectName    project name
+     * @param taskInstanceId task instance id
+     * @return the result code and msg
+     */
+    @ApiOperation(value = "force-success", notes = "FORCE_SINGLE_TASK_SUCCESS")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskInstanceId", value = "TASK_INSTANCE_ID", required = true, dataType = "Int", example = "12")
+    })
+    @PostMapping(value = "/force-success")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(FORCE_TASK_SUCCESS_ERROR)
+    public Result<Object> forceSingleTaskSuccess(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                         @RequestParam(value = "taskInstanceId") Integer taskInstanceId) {
+        String userNameReplace = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String projectNameReplace = StringUtils.replaceNRTtoUnderline(projectName);
+        logger.info("force task success, login user: {}, project:{}, task instance id:{}",
+                userNameReplace, projectNameReplace, taskInstanceId);
+        Map<String, Object> result = taskInstanceService.forceSingleTaskSuccess(loginUser, projectName, taskInstanceId);
+        return returnDataList(result);
     }
 
 }
