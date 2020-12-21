@@ -28,7 +28,7 @@
               <a href="javascript:">
                 <em class="fa icon" :class="item.icon"></em>
                 <span>{{item.name}}</span>
-                <em class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></em>
+                <em class="fa angle" :class="item.isOpen ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" v-if="item.children.length"></em>
               </a>
             </div>
           </router-link>
@@ -38,7 +38,7 @@
             <a href="javascript:">
               <em class="fa icon" :class="item.icon"></em>
               <span>{{item.name}}</span>
-              <em class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></em>
+              <em class="fa angle" :class="item.isOpen ? 'el-icon-arrow-down' : 'el-icon-arrow-right'" v-if="item.children.length"></em>
             </a>
           </div>
         </template>
@@ -83,10 +83,10 @@
       },
       _toggleMenu () {
         this.isTogHide = !this.isTogHide
-        if(this.isTogHide) {
-          sessionStorage.setItem('isLeft',0)
+        if (this.isTogHide) {
+          sessionStorage.setItem('isLeft', 0)
         } else {
-          sessionStorage.setItem('isLeft',1)
+          sessionStorage.setItem('isLeft', 1)
         }
       }
     },
@@ -156,7 +156,7 @@
           >.angle {
             position: absolute;
             right: 12px;
-            top: 3px;
+            top: 12px;
           }
 
         }

@@ -14,20 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
 
-public enum QueryType {
+package org.apache.dolphinscheduler.service.exceptions;
 
-    FORM,
-    SQL;
+/**
+ * task priority queue exception
+ */
+public class TaskPriorityQueueException extends Exception {
 
-    public static QueryType getEnum(int value){
-        for (QueryType e:QueryType.values()) {
-            if(e.ordinal() == value) {
-                return e;
-            }
-        }
-        //For values out of enum scope
-        return null;
+    /**
+     * Construct a new runtime exception with the detail message
+     *
+     * @param message message
+     */
+    public TaskPriorityQueueException(String message) {
+        super(message);
     }
+
+    /**
+     * Construct a new runtime exception with the detail message and cause
+     *
+     * @param message   message
+     * @param cause     cause
+     */
+    public TaskPriorityQueueException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }

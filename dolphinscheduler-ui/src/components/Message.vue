@@ -19,10 +19,10 @@
 </template>
 
 <script>
-export default {
-  name: 'message',
-  props: [
-    'msg'
-  ]
-}
+  export default {
+    name: 'message',
+    props: [
+      'msg'
+    ]
+  }
 </script>
