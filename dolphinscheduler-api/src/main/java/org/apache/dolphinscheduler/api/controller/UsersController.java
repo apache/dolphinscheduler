@@ -72,9 +72,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/create")
@@ -105,8 +105,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String")
     })
     @GetMapping(value = "/list-paging")
@@ -114,8 +114,8 @@ public class UsersController extends BaseController {
     @ApiException(QUERY_USER_LIST_PAGING_ERROR)
     public Result queryUserList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("pageNo") Integer pageNo,
-                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                @RequestParam("pageSize") Integer pageSize) {
+                                @RequestParam("pageSize") Integer pageSize,
+                                @RequestParam(value = "searchVal", required = false) String searchVal) {
         logger.info("login user {}, list user paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
@@ -147,9 +147,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/update")
