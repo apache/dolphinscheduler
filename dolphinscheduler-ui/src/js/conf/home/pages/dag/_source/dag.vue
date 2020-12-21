@@ -754,6 +754,29 @@
       },
 
       /**
+       * delete one version of process definition
+       *
+       * @param version the version need to delete
+       * @param processDefinitionId the process definition id user want to delete
+       * @param fromThis fromThis
+       */
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * query the process definition pagination version
        */
       _version (item) {
