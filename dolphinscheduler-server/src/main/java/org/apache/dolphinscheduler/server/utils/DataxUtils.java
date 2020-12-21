@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 
@@ -25,7 +25,9 @@ import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
 import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import com.alibaba.druid.sql.parser.SQLStatementParser;
 
-
+/**
+ * dataX utils
+ */
 public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_MYSQL = "mysqlreader";
@@ -44,6 +46,11 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_SQLSERVER = "sqlserverwriter";
 
+    /**
+     * get dataX reader plugin name
+     * @param dbType dbType
+     * @return reader
+     */
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
             case MYSQL:
@@ -59,6 +66,11 @@ public class DataxUtils {
         }
     }
 
+    /**
+     * get dataX writer plugin name
+     * @param dbType dbType
+     * @return write
+     */
     public static String getWriterPluginName(DbType dbType) {
         switch (dbType) {
             case MYSQL:
@@ -74,6 +86,12 @@ public class DataxUtils {
         }
     }
 
+    /**
+     * get SQLStatementParser
+     * @param dbType dbType
+     * @param sql sql
+     * @return SQLStatementParser
+     */
     public static SQLStatementParser getSqlStatementParser(DbType dbType, String sql) {
         switch (dbType) {
             case MYSQL:
@@ -89,19 +107,31 @@ public class DataxUtils {
         }
     }
 
+    /**
+     * convert columns
+     * @param dbType dbType
+     * @param columns columns
+     * @return columns
+     */
     public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
         if (columns == null) {
             return null;
         }
 
         String[] toColumns = new String[columns.length];
-        for (int i = 0; i < columns.length; i++ ) {
+        for (int i = 0; i < columns.length; i++) {
             toColumns[i] = doConvertKeywordsColumn(dbType, columns[i]);
         }
 
         return toColumns;
     }
 
+    /**
+     * convert column
+     * @param dbType dbType
+     * @param column column
+     * @return column
+     */
     public static String doConvertKeywordsColumn(DbType dbType, String column) {
         if (column == null) {
             return column;
@@ -116,11 +146,9 @@ public class DataxUtils {
             case MYSQL:
                 return String.format("`%s`", column);
             case POSTGRESQL:
-                return String.format("\"%s\"", column);
             case ORACLE:
-                return String.format("\"%s\"", column);
             case SQLSERVER:
-                return String.format("`%s`", column);
+                return String.format("\"%s\"", column);
             default:
                 return column;
         }
