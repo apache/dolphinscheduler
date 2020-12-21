@@ -66,11 +66,13 @@ public class ParameterUtils {
         }
         Date cronTime;
         if (parameterMap != null && !parameterMap.isEmpty()) {
+            // replace variable ${} form,refers to the replacement of system variables and custom variables
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
+        if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
             //Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
-            // replace variable ${} form,refers to the replacement of system variables and custom variables
-            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         } else {
             cronTime = new Date();
         }
