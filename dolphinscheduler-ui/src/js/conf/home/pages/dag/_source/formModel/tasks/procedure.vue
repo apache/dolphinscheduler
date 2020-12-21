@@ -39,11 +39,12 @@
       </div>
       <div slot="content">
         <el-input
-            type="input"
-            size="small"
+            resize
+            :autosize="{minRows:5}"
+            type="textarea"
             :disabled="isDetails"
             v-model="method"
-            :placeholder="$t('Please enter method(optional)')">
+            :placeholder="$t('Please enter the procedure method')">
         </el-input>
       </div>
     </m-list-box>
