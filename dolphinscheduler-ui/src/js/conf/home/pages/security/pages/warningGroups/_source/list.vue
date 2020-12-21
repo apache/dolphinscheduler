@@ -21,15 +21,17 @@
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="groupName" :label="$t('Group Name')"></el-table-column>
         <el-table-column :label="$t('Group Type')" width="100">
-          {{groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}
+          <template slot-scope="scope">
+            {{scope.row.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}
+          </template>
         </el-table-column>
         <el-table-column prop="description" :label="$t('Remarks')" width="200"></el-table-column>
-        <el-table-column :label="$t('Create Time')" min-width="120">
+        <el-table-column :label="$t('Create Time')" width="140">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" min-width="120">
+        <el-table-column :label="$t('Update Time')" width="140">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>

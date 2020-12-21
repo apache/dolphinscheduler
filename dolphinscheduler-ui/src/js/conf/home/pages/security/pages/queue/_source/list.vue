@@ -31,7 +31,7 @@
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="130">
+        <el-table-column :label="$t('Operation')" width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Edit')" placement="top">
               <el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button>
