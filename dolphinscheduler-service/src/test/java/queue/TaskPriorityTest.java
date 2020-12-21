@@ -18,6 +18,7 @@
 package queue;
 
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
+
 import org.junit.Assert;
 import org.junit.Test;
 
