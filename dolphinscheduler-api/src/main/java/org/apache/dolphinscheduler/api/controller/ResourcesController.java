@@ -109,7 +109,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/directory/create")
@@ -142,7 +142,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/create")
@@ -226,7 +226,7 @@ public class ResourcesController extends BaseController {
     @ApiOperation(value = "queryResourceListPaging", notes = "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int"),
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType = "int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
@@ -342,7 +342,7 @@ public class ResourcesController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType = "ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int")
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = false, dataType = "Int", example = "10")
     })
     @GetMapping(value = "/queryResource")
     @ResponseStatus(HttpStatus.OK)
@@ -405,7 +405,7 @@ public class ResourcesController extends BaseController {
             @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataType = "String"),
             @ApiImplicitParam(name = "description", value = "RESOURCE_DESC", dataType = "String"),
             @ApiImplicitParam(name = "content", value = "CONTENT", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int"),
+            @ApiImplicitParam(name = "pid", value = "RESOURCE_PID", required = true, dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "currentDir", value = "RESOURCE_CURRENTDIR", required = true, dataType = "String")
     })
     @PostMapping(value = "/online-create")

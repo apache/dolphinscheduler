@@ -176,7 +176,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule setScheduleState, project name: {}, id: {}",
                 loginUser.getUserName(), projectName, id);
@@ -199,7 +199,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule offline, project name: {}, process definition id: {}",
                 loginUser.getUserName(), projectName, id);
