@@ -39,7 +39,7 @@
         </el-table-column>
         <el-table-column :label="$t('Submit Time')" width="135">
           <template slot-scope="scope">
-            <span v-if="scope.row.scheduleTime">{{scope.row.scheduleTime | formatDate}}</span>
+            <span v-if="scope.row.submitTime">{{scope.row.submitTime | formatDate}}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
