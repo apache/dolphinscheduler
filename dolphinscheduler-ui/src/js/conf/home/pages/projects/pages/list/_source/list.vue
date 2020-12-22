@@ -32,7 +32,11 @@
         <el-table-column prop="userName" :label="$t('Owned Users')"></el-table-column>
         <el-table-column prop="defCount" :label="$t('Process Define Count')"></el-table-column>
         <el-table-column prop="instRunningCount" :label="$t('Process Instance Running Count')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" width="200"></el-table-column>
+        <el-table-column :label="$t('Description')" width="200">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
