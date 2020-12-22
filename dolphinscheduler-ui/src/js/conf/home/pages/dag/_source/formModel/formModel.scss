@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.form-model-model {
+.form-model-wrapper {
   width: 720px;
   position: relative;
   .title-box {
@@ -76,7 +76,7 @@
     padding-bottom: 60px;
   }
 }
-.from-model {
+.form-model {
   padding-top: 26px;
   >div {
     clear: both;
