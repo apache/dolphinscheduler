@@ -73,15 +73,21 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private final TaskCallbackService taskCallbackService;
 
     /**
-     *  alert client service
+     * taskExecutionContextCacheManager
+     */
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+
+    /**
+     * alert client service
      */
     private AlertClientService alertClientService;
 
     public TaskExecuteProcessor() {
-    /**
-     * taskExecutionContextCacheManager
-     */
-    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
+        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+    }
 
     public TaskExecuteProcessor(AlertClientService alertClientService) {
         this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
@@ -170,6 +176,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     /**
      * build ack command
+     *
      * @param taskExecutionContext taskExecutionContext
      * @return TaskExecuteAckCommand
      */

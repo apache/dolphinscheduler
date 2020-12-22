@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.utils;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -101,16 +100,16 @@ public class AlertManager {
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .processId(processInstance.getId())
-                    .processName(processInstance.getName())
-                    .processType(processInstance.getCommandType())
-                    .processState(processInstance.getState())
-                    .recovery(processInstance.getRecovery())
-                    .runTimes(processInstance.getRunTimes())
-                    .processStartTime(processInstance.getStartTime())
-                    .processEndTime(processInstance.getEndTime())
-                    .processHost(processInstance.getHost())
-                    .build();
+                .processId(processInstance.getId())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .recovery(processInstance.getRecovery())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processEndTime(processInstance.getEndTime())
+                .processHost(processInstance.getHost())
+                .build();
             successTaskList.add(processAlertContent);
             res = JSONUtils.toJsonString(successTaskList);
         } else if (processInstance.getState().typeIsFailure()) {
@@ -121,17 +120,17 @@ public class AlertManager {
                     continue;
                 }
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                        .processId(processInstance.getId())
-                        .processName(processInstance.getName())
-                        .taskId(task.getId())
-                        .taskName(task.getName())
-                        .taskType(task.getTaskType())
-                        .taskState(task.getState())
-                        .taskStartTime(task.getStartTime())
-                        .taskEndTime(task.getEndTime())
-                        .taskHost(task.getHost())
-                        .logPath(task.getLogPath())
-                        .build();
+                    .processId(processInstance.getId())
+                    .processName(processInstance.getName())
+                    .taskId(task.getId())
+                    .taskName(task.getName())
+                    .taskType(task.getTaskType())
+                    .taskState(task.getState())
+                    .taskStartTime(task.getStartTime())
+                    .taskEndTime(task.getEndTime())
+                    .taskHost(task.getHost())
+                    .logPath(task.getLogPath())
+                    .build();
                 failedTaskList.add(processAlertContent);
             }
             res = JSONUtils.toJsonString(failedTaskList);
@@ -153,11 +152,11 @@ public class AlertManager {
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
-                    .processName(processInstance.getName())
-                    .taskName(taskInstance.getName())
-                    .taskHost(taskInstance.getHost())
-                    .retryTimes(taskInstance.getRetryTimes())
-                    .build();
+                .processName(processInstance.getName())
+                .taskName(taskInstance.getName())
+                .taskHost(taskInstance.getHost())
+                .retryTimes(taskInstance.getRetryTimes())
+                .build();
             toleranceTaskInstanceList.add(processAlertContent);
         }
         return JSONUtils.toJsonString(toleranceTaskInstanceList);
@@ -198,8 +197,7 @@ public class AlertManager {
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances) {
-
-        if(Flag.YES == processInstance.getIsSubProcess()){
+        if (Flag.YES == processInstance.getIsSubProcess()) {
             return;
         }
         boolean sendWarnning = false;
