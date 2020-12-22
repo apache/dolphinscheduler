@@ -20,31 +20,31 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
-        <el-table-column :label="$t('User Type')">
+        <el-table-column :label="$t('User Type')" width="80">
           <template slot-scope="scope">
-            <span>{{scope.row.userType === 'GENERAL_USER'? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
+            {{scope.row.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
           </template>
         </el-table-column>
-        <el-table-column prop="tenantCode" :label="$t('Tenant')" width="160"></el-table-column>
-        <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
-        <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
-        <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
-        <el-table-column  :label="$t('State')">
+        <el-table-column prop="tenantCode" :label="$t('Tenant')" min-width="120"></el-table-column>
+        <el-table-column prop="queue" :label="$t('Queue')" width="90"></el-table-column>
+        <el-table-column prop="email" :label="$t('Email')" min-width="200"></el-table-column>
+        <el-table-column prop="phone" :label="$t('Phone')" width="100"></el-table-column>
+        <el-table-column :label="$t('State')" width="60">
           <template slot-scope="scope">
-            <span>{{scope.row.state === 1? `${$t('Enable')}` : `${$t('Disable')}`}}</span>
+            {{scope.row.state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Create Time')" min-width="120">
+        <el-table-column :label="$t('Create Time')" width="135">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" min-width="120">
+        <el-table-column :label="$t('Update Time')" width="135">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="130">
+        <el-table-column :label="$t('Operation')" width="120" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Authorize')" placement="top">
               <el-dropdown trigger="click">
