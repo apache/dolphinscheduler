@@ -230,7 +230,7 @@
         // taskManager Memory
         taskManagerMemory: '2G',
         // Flink Job Name
-        appName : '',
+        appName: '',
         // Command line argument
         mainArgs: '',
         // Other parameters
