@@ -15,30 +15,10 @@
  * limitations under the License.
  */
 
-import dayjs from 'dayjs'
+import Vue from 'vue'
+import { filterNull } from './filter'
 
 /**
- * Formatting time
+ * @param {String} fmt optional, define filter null
  */
-const formatDate = (value, fmt) => {
-  fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
-  if (value === null) {
-    return '-'
-  } else {
-    return dayjs(value).format(fmt)
-  }
-}
-/**
- * filter null
- */
-const filterNull = (value) => {
-  if (value === null || value === '') {
-    return '-'
-  } else {
-    return value
-  }
-}
-
-export {
-  formatDate, filterNull
-}
+Vue.filter('filterNull', filterNull)

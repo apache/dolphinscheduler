@@ -31,7 +31,11 @@
         </el-table-column>
         <el-table-column prop="className" :label="$t('Class Name')" min-width="120"></el-table-column>
         <el-table-column prop="type" :label="$t('type')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" min-width="150"></el-table-column>
+        <el-table-column :label="$t('Description')" min-width="150">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="resourceName" :label="$t('Jar Package')" min-width="150"></el-table-column>
         <el-table-column :label="$t('Update Time')" min-width="120">
           <template slot-scope="scope">
