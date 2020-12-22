@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.SpringZKServer;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.zk.CuratorZookeeperClient;
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
@@ -72,7 +73,7 @@ public class TaskPriorityQueueConsumerTest {
 
 
     @Autowired
-    private TaskPriorityQueue taskPriorityQueue;
+    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
     @Autowired
     private TaskPriorityQueueConsumer taskPriorityQueueConsumer;
@@ -142,9 +143,8 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setProcessDefine(processDefinition);
 
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
-        Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
-
-        taskPriorityQueue.put("2_1_2_1_default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
 
@@ -180,7 +180,8 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
-        taskPriorityQueue.put("2_1_2_1_default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
@@ -243,7 +244,8 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
-        taskPriorityQueue.put("2_1_2_1_default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
         dataSource.setId(80);
@@ -310,7 +312,8 @@ public class TaskPriorityQueueConsumerTest {
         processDefinition.setProjectId(1);
         taskInstance.setProcessDefine(processDefinition);
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
-        taskPriorityQueue.put("2_1_2_1_default");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "default");
+        taskPriorityQueue.put(taskPriority);
 
         DataSource dataSource = new DataSource();
         dataSource.setId(1);
@@ -402,7 +405,8 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        taskPriorityQueue.put(taskPriority);
 
         TimeUnit.SECONDS.sleep(10);
 
@@ -455,7 +459,9 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        boolean res  = taskPriorityQueueConsumer.dispatch(1);
+        TaskPriority taskPriority = new TaskPriority();
+        taskPriority.setTaskId(1);
+        boolean res  = taskPriorityQueueConsumer.dispatch(taskPriority);
 
         Assert.assertFalse(res);
     }
@@ -649,7 +655,8 @@ public class TaskPriorityQueueConsumerTest {
         Mockito.doReturn(taskInstance).when(processService).getTaskInstanceDetailByTaskId(1);
         Mockito.doReturn(taskInstance).when(processService).findTaskInstanceById(1);
 
-        taskPriorityQueue.put("2_1_2_1_NoWorkGroup");
+        TaskPriority taskPriority = new TaskPriority(2, 1, 2, 1, "NoWorkGroup");
+        taskPriorityQueue.put(taskPriority);
 
         taskPriorityQueueConsumer.run();
 
