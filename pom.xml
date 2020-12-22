@@ -118,6 +118,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
+        <swagger-models.version>1.5.24</swagger-models.version>
         <guava-retry.version>2.0.0</guava-retry.version>
     </properties>
 
@@ -539,6 +540,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
             </dependency>
 
             <dependency>
