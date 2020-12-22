@@ -124,7 +124,7 @@
     <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>
     <el-drawer
       :visible.sync="drawer"
-      size="35%"
+      size=""
       :with-header="false">
       <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
     </el-drawer>
