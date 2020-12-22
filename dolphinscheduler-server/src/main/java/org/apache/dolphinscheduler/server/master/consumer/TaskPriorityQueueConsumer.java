@@ -50,13 +50,13 @@ import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskPriority;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class TaskPriorityQueueConsumer extends Thread {
      * taskUpdateQueue
      */
     @Autowired
-    private TaskPriorityQueue<String> taskPriorityQueue;
+    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
     /**
      * processService
@@ -119,7 +119,7 @@ public class TaskPriorityQueueConsumer extends Thread {
 
     @Override
     public void run() {
-        List<String> failedDispatchTasks = new ArrayList<>();
+        List<TaskPriority> failedDispatchTasks = new ArrayList<>();
         while (Stopper.isRunning()) {
             try {
                 int fetchTaskNum = masterConfig.getMasterDispatchTaskNumber();
@@ -130,15 +130,14 @@ public class TaskPriorityQueueConsumer extends Thread {
                         continue;
                     }
                     // if not task , blocking here
-                    String taskPriorityInfo = taskPriorityQueue.take();
-                    TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
-                    boolean dispatchResult = dispatch(taskPriority.getTaskId());
+                    TaskPriority taskPriority = taskPriorityQueue.take();
+                    boolean dispatchResult = dispatch(taskPriority);
                     if (!dispatchResult) {
-                        failedDispatchTasks.add(taskPriorityInfo);
+                        failedDispatchTasks.add(taskPriority);
                     }
                 }
                 if (!failedDispatchTasks.isEmpty()) {
-                    for (String dispatchFailedTask : failedDispatchTasks) {
+                    for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
                     // If there are tasks in a cycle that cannot find the worker group,
@@ -157,12 +156,13 @@ public class TaskPriorityQueueConsumer extends Thread {
     /**
      * dispatch task
      *
-     * @param taskInstanceId taskInstanceId
+     * @param taskPriority taskPriority
      * @return result
      */
-    protected boolean dispatch(int taskInstanceId) {
+    protected boolean dispatch(TaskPriority taskPriority) {
         boolean result = false;
         try {
+            int taskInstanceId = taskPriority.getTaskId();
             TaskExecutionContext context = getTaskExecutionContext(taskInstanceId);
             ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
 

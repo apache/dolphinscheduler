@@ -34,6 +34,16 @@ public class CommandHeader implements Serializable {
     private long opaque;
 
     /**
+     *  context length
+     */
+    private int contextLength;
+
+    /**
+     *  context
+     */
+    private byte[] context;
+
+    /**
      *  body length
      */
     private int bodyLength;
@@ -60,5 +70,21 @@ public class CommandHeader implements Serializable {
 
     public void setOpaque(long opaque) {
         this.opaque = opaque;
+    }
+
+    public int getContextLength() {
+        return contextLength;
+    }
+
+    public void setContextLength(int contextLength) {
+        this.contextLength = contextLength;
+    }
+
+    public byte[] getContext() {
+        return context;
+    }
+
+    public void setContext(byte[] context) {
+        this.context = context;
     }
 }
