@@ -197,7 +197,7 @@
     },
     computed: {
       inputStyle () {
-        return `width:${this.hide ? 160 : 262}px`
+        return `width:${this.hide ? 160 : 253}px`
       }
     },
     mounted () {
@@ -213,10 +213,10 @@
       .lt-add {
         padding-left: 4px;
         a {
-          .iconfont {
-            font-size: 18px;
+          .iconfont, [class^="el-icon"] {
+            font-size: 17px;
             vertical-align: middle;
-            margin-bottom: -2px;
+            margin-top: 0;
             display: inline-block;
           }
         }
@@ -225,18 +225,18 @@
     .add {
       a {
         color: #000;
-        .iconfont {
-          font-size: 16px;
+        .iconfont, [class^="el-icon"] {
+          font-size: 18px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: -5px;
+          margin-top: 0;
         }
       }
     }
-    .add-dp{
+    .add-dp {
       a {
         color: #0097e0;
-        .iconfont {
+        .iconfont, [class^="el-icon"] {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;
