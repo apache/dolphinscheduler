@@ -20,8 +20,11 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="tenantCode" :label="$t('Tenant Code')" min-width="100"></el-table-column>
-        <el-table-column prop="tenantName" :label="$t('Tenant Name')" min-width="100"></el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" min-width="100"></el-table-column>
+        <el-table-column :label="$t('Description')" min-width="100">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="queueName" :label="$t('Queue')" min-width="80"></el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
