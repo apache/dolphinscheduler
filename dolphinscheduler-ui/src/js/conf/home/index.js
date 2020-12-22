@@ -30,25 +30,25 @@ import Chart from '@/module/ana-charts'
 import '@/module/filter/formatDate'
 import themeData from '@/module/echarts/themeData.json'
 import Permissions from '@/module/permissions'
-import 'ans-ui/lib/ans-ui.min.css'
-import ans from 'ans-ui/lib/ans-ui.min'
-import en_US from 'ans-ui/lib/locale/en' // eslint-disable-line
 import 'sass/conf/home/index.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
+import 'font-awesome/css/font-awesome.min.css'
 
 import formCreate, {maker} from '@form-create/element-ui'
 
 // Component internationalization
-const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
+const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
+
+i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
 i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
 
 // Vue.use(ans)
-Vue.use(ans, useOpt)
+Vue.use(useOpt)
 
 Vue.use(formCreate, {maker})
 
