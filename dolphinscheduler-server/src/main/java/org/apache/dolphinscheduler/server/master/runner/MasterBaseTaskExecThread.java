@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -27,17 +25,15 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 
-import java.util.concurrent.Callable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -217,14 +213,14 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             logger.info("task ready to submit: {}", taskInstance);
 
             /**
-             *  taskPriorityInfo
+             *  taskPriority
              */
-            String taskPriorityInfo = buildTaskPriorityInfo(processInstance.getProcessInstancePriority().getCode(),
+            TaskPriority taskPriority = buildTaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(),
                     taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(),
                     org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
-            taskUpdateQueue.put(taskPriorityInfo);
+            taskUpdateQueue.put(taskPriority);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
             return true;
         }catch (Exception e){
@@ -235,29 +231,22 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     * buildTaskPriorityInfo
+     * buildTaskPriority
      *
      * @param processInstancePriority processInstancePriority
      * @param processInstanceId processInstanceId
      * @param taskInstancePriority taskInstancePriority
      * @param taskInstanceId taskInstanceId
      * @param workerGroup workerGroup
-     * @return TaskPriorityInfo
+     * @return TaskPriority
      */
-    private String buildTaskPriorityInfo(int processInstancePriority,
-                                         int processInstanceId,
-                                         int taskInstancePriority,
-                                         int taskInstanceId,
-                                         String workerGroup) {
-        return processInstancePriority +
-                UNDERLINE +
-                processInstanceId +
-                UNDERLINE +
-                taskInstancePriority +
-                UNDERLINE +
-                taskInstanceId +
-                UNDERLINE +
-                workerGroup;
+    private TaskPriority buildTaskPriority(int processInstancePriority,
+                                           int processInstanceId,
+                                           int taskInstancePriority,
+                                           int taskInstanceId,
+                                           String workerGroup) {
+        return new TaskPriority(processInstancePriority, processInstanceId,
+                taskInstancePriority, taskInstanceId, workerGroup);
     }
 
     /**
