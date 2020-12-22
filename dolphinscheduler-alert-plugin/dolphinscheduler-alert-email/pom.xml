@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dolphinscheduler-alert-plugin</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.2-SNAPSHOT</version>
+        <version>1.3.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
