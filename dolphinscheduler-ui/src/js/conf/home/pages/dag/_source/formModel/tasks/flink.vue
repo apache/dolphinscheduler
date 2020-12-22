@@ -82,6 +82,19 @@
     </m-list-box>
     <div class="list-box-4p" v-if="deployMode === 'cluster'">
       <div class="clearfix list">
+        <span class="sp1" style="word-break:break-all">{{$t('appName')}}</span>
+        <span class="sp2">
+          <el-input
+            :disabled="isDetails"
+            type="input"
+            size="small"
+            v-model="appName"
+            :placeholder="$t('Please enter the job name of Flink')"
+            style="width: 200px;">
+        </el-input>
+        </span>
+      </div>
+      <div class="clearfix list">
         <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
         <span class="sp2">
           <el-input
@@ -216,6 +229,8 @@
         jobManagerMemory: '1G',
         // taskManager Memory
         taskManagerMemory: '2G',
+        // Flink Job Name
+        appName : '',
         // Command line argument
         mainArgs: '',
         // Other parameters
@@ -288,6 +303,11 @@
           return false
         }
 
+        if (!this.appName) {
+          this.$message.warning(`${i18n.$t('Please enter the job name of Flink')}`)
+          return false
+        }
+
         if (!this.jobManagerMemory) {
           this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
           return false
@@ -333,6 +353,7 @@
           flinkVersion: this.flinkVersion,
           slot: this.slot,
           taskManager: this.taskManager,
+          appName: this.appName,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
           mainArgs: this.mainArgs,
@@ -468,6 +489,7 @@
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,
+          appName: this.appName,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
           mainArgs: this.mainArgs,
