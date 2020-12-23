@@ -25,8 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import javax.transaction.NotSupportedException;
-
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.sift.SiftingAppender;
@@ -35,8 +33,8 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 
 public class LogUtils {
 
-    private LogUtils() throws NotSupportedException {
-        throw new NotSupportedException();
+    private LogUtils() throws IllegalStateException {
+        throw new IllegalStateException("Utility class");
     }
 
     /**
