@@ -108,7 +108,7 @@ export default {
   'Driver memory use': 'Driver memory use',
   'Please enter driver memory use': 'Please enter driver memory use',
   'Number of Executors': 'Number of Executors',
-  'Please enter the job name of Flink': 'Please enter the job name of Flink',
+  'Please enter the job name of Flink(optional)': 'Please enter the job name of Flink(optional)',
   'Please enter the number of Executor': 'Please enter the number of Executor',
   'Executor memory': 'Executor memory',
   'Please enter the Executor memory': 'Please enter the Executor memory',
