@@ -121,4 +121,8 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>dolphinscheduler-alert-email-${project.version}</finalName>
+    </build>
+
 </project>

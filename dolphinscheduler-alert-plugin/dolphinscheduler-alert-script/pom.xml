@@ -72,4 +72,8 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>dolphinscheduler-alert-script-${project.version}</finalName>
+    </build>
+
 </project>
