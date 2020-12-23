@@ -28,7 +28,11 @@
         <el-table-column prop="tenantCode" :label="$t('Tenant')" min-width="120"></el-table-column>
         <el-table-column prop="queue" :label="$t('Queue')" width="90"></el-table-column>
         <el-table-column prop="email" :label="$t('Email')" min-width="200"></el-table-column>
-        <el-table-column prop="phone" :label="$t('Phone')" width="100"></el-table-column>
+        <el-table-column prop="phone" :label="$t('Phone')" width="100">
+          <template slot-scope="scope">
+            <span>{{scope.row.phone | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('State')" width="60">
           <template slot-scope="scope">
             {{scope.row.state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
