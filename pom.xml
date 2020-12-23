@@ -725,8 +725,10 @@
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
-                        <include>**/api/security/PasswordAuthenticatorTest.java</include>
-                        <include>**/api/security/SecurityConfigTest.java</include>
+                        <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
+                        <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
+                        <include>**/api/security/SecurityConfigLDAPTest.java</include>
+                        <include>**/api/security/SecurityConfigPasswordTest.java</include>
                         <include>**/api/service/AccessTokenServiceTest.java</include>
                         <include>**/api/service/AlertGroupServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>
