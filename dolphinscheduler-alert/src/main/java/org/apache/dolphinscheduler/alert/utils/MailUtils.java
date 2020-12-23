@@ -55,7 +55,7 @@ public class MailUtils {
 
     public static final Boolean MAIL_USE_SSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
+    public static final String XLS_FILE_PATH = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
 
     public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
@@ -64,6 +64,10 @@ public class MailUtils {
     public static final String SSL_TRUST = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
 
     public static final AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
+
+    private MailUtils() {
+        throw new IllegalStateException("MailUtils class");
+    }
 
     //Solve the problem of messy Chinese name in excel attachment
     static {
@@ -223,7 +227,7 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, MAIL_PROTOCOL);
         props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, STARTTLS_ENABLE);
-        if (SSL_ENABLE) {
+        if (Boolean.TRUE.equals(SSL_ENABLE)) {
             props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, "true");
             props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
         }
@@ -267,13 +271,13 @@ public class MailUtils {
         part1.setContent(partContent, Constants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        File file = new File(XLS_FILE_PATH + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
         // make excel file
 
-        ExcelUtils.genExcelFile(content,title,xlsFilePath);
+        ExcelUtils.genExcelFile(content,title,XLS_FILE_PATH);
 
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));

@@ -47,14 +47,18 @@ import java.util.Map;
 public class DingTalkUtils {
     public static final Logger logger = LoggerFactory.getLogger(DingTalkUtils.class);
 
-    public static final boolean isEnableDingTalk = PropertyUtils.getBoolean(Constants.DINGTALK_ENABLE);
-    private static final String dingTaskUrl = PropertyUtils.getString(Constants.DINGTALK_WEBHOOK);
-    private static final String keyword = PropertyUtils.getString(Constants.DINGTALK_KEYWORD);
-    private static final Boolean isEnableProxy = PropertyUtils.getBoolean(Constants.DINGTALK_PROXY_ENABLE);
-    private static final String proxy = PropertyUtils.getString(Constants.DINGTALK_PROXY);
-    private static final String user = PropertyUtils.getString(Constants.DINGTALK_USER);
-    private static final String passwd = PropertyUtils.getString(Constants.DINGTALK_PASSWORD);
-    private static final Integer port = PropertyUtils.getInt(Constants.DINGTALK_PORT);
+    public static final boolean IS_ENABLE_DING_TALK = PropertyUtils.getBoolean(Constants.DINGTALK_ENABLE);
+    private static final String DING_TASK_URL = PropertyUtils.getString(Constants.DINGTALK_WEBHOOK);
+    private static final String KEYWORD = PropertyUtils.getString(Constants.DINGTALK_KEYWORD);
+    private static final Boolean IS_ENABLED_PROXY= PropertyUtils.getBoolean(Constants.DINGTALK_PROXY_ENABLE);
+    private static final String PROXY = PropertyUtils.getString(Constants.DINGTALK_PROXY);
+    private static final String USER = PropertyUtils.getString(Constants.DINGTALK_USER);
+    private static final String PASSWORD = PropertyUtils.getString(Constants.DINGTALK_PASSWORD);
+    private static final Integer PORT = PropertyUtils.getInt(Constants.DINGTALK_PORT);
+
+    private DingTalkUtils() {
+        throw new IllegalStateException("DingTalkUtils class");
+    }
 
     /**
      * send message interface
@@ -65,11 +69,11 @@ public class DingTalkUtils {
      * @throws IOException the IOException
      */
     public static String sendDingTalkMsg(String msg, String charset) throws IOException {
-        String msgToJson = textToJsonString(msg + "#" + keyword);
+        String msgToJson = textToJsonString(msg + "#" + KEYWORD);
         HttpPost httpPost = constructHttpPost(msgToJson, charset);
 
         CloseableHttpClient httpClient;
-        if (isEnableProxy) {
+        if (Boolean.TRUE.equals(IS_ENABLED_PROXY)) {
             httpClient = getProxyClient();
             RequestConfig rcf = getProxyConfig();
             httpPost.setConfig(rcf);
@@ -95,7 +99,7 @@ public class DingTalkUtils {
     }
 
     public static HttpPost constructHttpPost(String msg, String charset) {
-        HttpPost post =  new HttpPost(dingTaskUrl);
+        HttpPost post =  new HttpPost(DING_TASK_URL);
         StringEntity entity = new StringEntity(msg, charset);
         post.setEntity(entity);
         post.addHeader("Content-Type", "application/json; charset=utf-8");
@@ -104,11 +108,10 @@ public class DingTalkUtils {
 
 
     public static CloseableHttpClient getProxyClient() {
-        HttpHost httpProxy = new HttpHost(proxy, port);
+        HttpHost httpProxy = new HttpHost(PROXY, PORT);
         CredentialsProvider provider = new BasicCredentialsProvider();
-        provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, passwd));
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(provider).build();
-        return httpClient;
+        provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(USER, PASSWORD));
+        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
     }
 
     public static CloseableHttpClient getDefaultClient() {
@@ -116,14 +119,14 @@ public class DingTalkUtils {
     }
 
     public static RequestConfig getProxyConfig() {
-        HttpHost httpProxy = new HttpHost(proxy, port);
+        HttpHost httpProxy = new HttpHost(PROXY, PORT);
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
     public static String textToJsonString(String text) {
-        Map<String, Object> items = new HashMap<String, Object>();
+        Map<String, Object> items = new HashMap<>();
         items.put("msgtype", "text");
-        Map<String, String> textContent = new HashMap<String, String>();
+        Map<String, String> textContent = new HashMap<>();
         byte[] byt = StringUtils.getBytesUtf8(text);
         String txt = StringUtils.newStringUtf8(byt);
         textContent.put("content", txt);

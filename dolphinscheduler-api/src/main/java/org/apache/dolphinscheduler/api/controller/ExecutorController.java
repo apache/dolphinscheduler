@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -41,7 +42,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * execute process controller
  */
-@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG", position = 1)
+@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/executors")
 public class ExecutorController extends BaseController {
@@ -111,7 +112,7 @@ public class ExecutorController extends BaseController {
         logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                         + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
                         + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
-                loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectName, processDefinitionId, scheduleTime,
                 failureStrategy, startNodeList, taskDependType, warningType, workerGroup, receivers, receiversCc, runMode, processInstancePriority,
                 workerGroup, timeout);
 
@@ -149,7 +150,7 @@ public class ExecutorController extends BaseController {
                           @RequestParam("executeType") ExecuteType executeType
     ) {
         logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                loginUser.getUserName(), projectName, processInstanceId, executeType);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectName, processInstanceId, executeType);
         Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -170,7 +171,7 @@ public class ExecutorController extends BaseController {
     @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
     public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-        logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionId);
+        logger.info("login user {}, check process definition {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), processDefinitionId);
         Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
         return returnDataList(result);
     }
@@ -196,7 +197,7 @@ public class ExecutorController extends BaseController {
     public Result getReceiverCc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "processDefinitionId", required = false) Integer processDefinitionId,
                                 @RequestParam(value = "processInstanceId", required = false) Integer processInstanceId) {
-        logger.info("login user {}, get process definition receiver and cc", loginUser.getUserName());
+        logger.info("login user {}, get process definition receiver and cc", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
         Map<String, Object> result = execService.getReceiverCc(processDefinitionId, processInstanceId);
         return returnDataList(result);
     }

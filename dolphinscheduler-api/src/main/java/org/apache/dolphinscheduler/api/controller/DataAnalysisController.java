@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,7 +41,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * data analysis controller
  */
-@Api(tags = "DATA_ANALYSIS_TAG", position = 1)
+@Api(tags = "DATA_ANALYSIS_TAG")
 @RestController
 @RequestMapping("projects/analysis")
 public class DataAnalysisController extends BaseController {
@@ -74,7 +75,7 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
         logger.info("count task state, user:{}, start date: {}, end date:{}, project id {}",
-                loginUser.getUserName(), startDate, endDate, projectId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -102,7 +103,7 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
         logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id:{}",
-                loginUser.getUserName(), startDate, endDate, projectId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -124,7 +125,7 @@ public class DataAnalysisController extends BaseController {
     public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
         logger.info("count process definition , user:{}, project id:{}",
-                loginUser.getUserName(), projectId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectId);
         Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectId);
         return returnDataList(result);
     }
@@ -153,7 +154,7 @@ public class DataAnalysisController extends BaseController {
                                     @RequestParam(value = "endDate", required = false) String endDate,
                                     @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
         logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
-                loginUser.getUserName(), startDate, endDate, projectId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -175,7 +176,7 @@ public class DataAnalysisController extends BaseController {
     public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
         logger.info("count command state, user:{}, project id {}",
-                loginUser.getUserName(), projectId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectId);
         Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
         return returnDataList(result);
     }

@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.*;
 import org.apache.dolphinscheduler.common.utils.*;
 
@@ -38,6 +37,11 @@ import org.apache.dolphinscheduler.common.utils.*;
 public class ExcelUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
+
+    private ExcelUtils() {
+        throw new IllegalStateException("ExcelUtils class");
+    }
+
     /**
      * generate excel file
      * @param content the content
@@ -65,11 +69,12 @@ public class ExcelUtils {
             headerList.add(en.getKey());
         }
 
-        HSSFWorkbook wb = null;
-        FileOutputStream fos = null;
-           try {
-               // declare a workbook
-               wb = new HSSFWorkbook();
+           try (
+                   // declare a workbook
+                   HSSFWorkbook wb = new HSSFWorkbook();
+                   //setting file output
+                   FileOutputStream fos = new FileOutputStream(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS)
+                   ) {
                // generate a table
                HSSFSheet sheet = wb.createSheet();
                HSSFRow row = sheet.createRow(0);
@@ -111,29 +116,11 @@ public class ExcelUtils {
                    file.mkdirs();
                }
 
-               //setting file output
-               fos = new FileOutputStream(xlsFilePath + Constants.SINGLE_SLASH + title + Constants.EXCEL_SUFFIX_XLS);
-
                wb.write(fos);
 
            }catch (Exception e){
                logger.error("generate excel error",e);
                throw new RuntimeException("generate excel error",e);
-           }finally {
-               if (wb != null){
-                   try {
-                       wb.close();
-                   } catch (IOException e) {
-                       logger.error(e.getMessage(),e);
-                   }
-               }
-               if (fos != null){
-                   try {
-                       fos.close();
-                   } catch (IOException e) {
-                       logger.error(e.getMessage(),e);
-                   }
-               }
            }
     }
 

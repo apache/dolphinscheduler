@@ -50,7 +50,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * log controller
  */
-@Api(tags = "LOGGER_TAG", position = 13)
+@Api(tags = "LOGGER_TAG")
 @RestController
 @RequestMapping("/log")
 public class LoggerController extends BaseController {
@@ -83,8 +83,9 @@ public class LoggerController extends BaseController {
                            @RequestParam(value = "taskInstanceId") int taskInstanceId,
                            @RequestParam(value = "skipLineNum") int skipNum,
                            @RequestParam(value = "limit") int limit) {
+        String loggedInUser = loginUser.getUserName().replaceAll("[\n\r\t]", "_");
         logger.info(
-                "login user {}, view {} task instance log ,skipLineNum {} , limit {}", loginUser.getUserName(), taskInstanceId, skipNum, limit);
+                "login user {}, view {} task instance log ,skipLineNum {} , limit {}", loggedInUser, taskInstanceId, skipNum, limit);
         return loggerService.queryLog(taskInstanceId, skipNum, limit);
     }
 

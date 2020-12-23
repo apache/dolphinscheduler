@@ -47,7 +47,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * process instance controller
  */
-@Api(tags = "PROCESS_INSTANCE_TAG", position = 10)
+@Api(tags = "PROCESS_INSTANCE_TAG")
 @RestController
 @RequestMapping("projects/{projectName}/instance")
 public class ProcessInstanceController extends BaseController {

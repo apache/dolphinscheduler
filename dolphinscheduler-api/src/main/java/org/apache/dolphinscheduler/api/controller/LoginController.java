@@ -46,7 +46,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
  * <p>
  * swagger bootstrap ui docs refer : https://doc.xiaominfo.com/guide/enh-func.html
  */
-@Api(tags = "LOGIN_TAG", position = 1)
+@Api(tags = "LOGIN_TAG")
 @RestController
 @RequestMapping("")
 public class LoginController extends BaseController {
@@ -81,7 +81,7 @@ public class LoginController extends BaseController {
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
-        logger.info("login user name: {} ", userName);
+        logger.info("login user name: {} ", StringUtils.replaceNRTtoUnderline(userName));
 
         //user name check
         if (StringUtils.isEmpty(userName)) {
@@ -124,7 +124,7 @@ public class LoginController extends BaseController {
     @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
-        logger.info("login user:{} sign out", loginUser.getUserName());
+        logger.info("login user:{} sign out", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
         String ip = getClientIpAddress(request);
         sessionService.signOut(ip, loginUser);
         //clear session

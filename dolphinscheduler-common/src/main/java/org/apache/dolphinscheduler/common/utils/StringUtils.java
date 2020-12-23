@@ -48,7 +48,7 @@ public class StringUtils {
         if (isBlank(src)) {
             return src;
         } else {
-            return src.replaceAll("[\n|\r|\t]", "_");
+            return src.replaceAll("[\n\r\t]", "_");
         }
     }
 

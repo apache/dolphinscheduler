@@ -41,22 +41,25 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
     public static final int COOKIE_MAX_AGE = 3600;
 
+
     @Bean
     public LoginHandlerInterceptor loginInterceptor() {
         return new LoginHandlerInterceptor();
     }
 
+
     /**
      * Cookie
+     *
      * @return local resolver
      */
     @Bean(name = "localeResolver")
     public LocaleResolver localeResolver() {
         CookieLocaleResolver localeResolver = new CookieLocaleResolver();
         localeResolver.setCookieName(LOCALE_LANGUAGE_COOKIE);
-        // set default locale
+        /* set default locale */
         localeResolver.setDefaultLocale(Locale.US);
-        // set cookie max age
+        /* set cookie max age */
         localeResolver.setCookieMaxAge(COOKIE_MAX_AGE);
         return localeResolver;
     }
@@ -68,22 +71,19 @@ public class AppConfiguration implements WebMvcConfigurer {
         return lci;
     }
 
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // i18n
+        //i18n
         registry.addInterceptor(localeChangeInterceptor());
-        registry.addInterceptor(loginInterceptor())
-                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v2/**",
-                        "/doc.html", "/swagger-ui.html", "*.html", "/ui/**");
+
+        registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
     }
@@ -98,6 +98,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping(PATH_PATTERN).allowedOrigins("*").allowedMethods("*");
     }
+
 
     /**
      * Turn off suffix-based content negotiation

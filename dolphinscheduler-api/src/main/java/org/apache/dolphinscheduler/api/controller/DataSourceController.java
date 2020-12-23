@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * data source controller
  */
-@Api(tags = "DATA_SOURCE_TAG", position = 3)
+@Api(tags = "DATA_SOURCE_TAG")
 @RestController
 @RequestMapping("datasources")
 public class DataSourceController extends BaseController {
@@ -99,7 +100,8 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
-                loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                name, note, type, host, port, database, principal, userName, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
         return returnDataList(result);
@@ -154,7 +156,7 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
-                loginUser.getUserName(), name, note, type, connectType, other);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
         return returnDataList(dataSource);
@@ -178,7 +180,7 @@ public class DataSourceController extends BaseController {
     public Result queryDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") int id) {
         logger.info("login user {}, query datasource: {}",
-                loginUser.getUserName(), id);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
         Map<String, Object> result = dataSourceService.queryDataSource(id);
         return returnDataList(result);
     }
@@ -279,12 +281,12 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "connectType") DbConnectType connectType,
                                     @RequestParam(value = "other") String other) {
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
-                loginUser.getUserName(), name, note, type, connectType, other);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Boolean isConnection = dataSourceService.checkConnection(type, parameter);
         Result result = new Result();
 
-        if (isConnection) {
+        if (Boolean.TRUE.equals(isConnection)) {
             putMsg(result, SUCCESS);
         } else {
             putMsg(result, CONNECT_DATASOURCE_FAILURE);
@@ -308,12 +310,12 @@ public class DataSourceController extends BaseController {
     @ApiException(CONNECTION_TEST_FAILURE)
     public Result connectionTest(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("id") int id) {
-        logger.info("connection test, login user:{}, id:{}", loginUser.getUserName(), id);
+        logger.info("connection test, login user:{}, id:{}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
 
-        Boolean isConnection = dataSourceService.connectionTest(id);
+        boolean isConnection = dataSourceService.connectionTest(id);
         Result result = new Result();
 
-        if (isConnection) {
+        if (Boolean.TRUE.equals(isConnection)) {
             putMsg(result, SUCCESS);
         } else {
             putMsg(result, CONNECTION_TEST_FAILURE);
@@ -337,7 +339,7 @@ public class DataSourceController extends BaseController {
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     public Result delete(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                          @RequestParam("id") int id) {
-        logger.info("delete datasource,login user:{}, id:{}", loginUser.getUserName(), id);
+        logger.info("delete datasource,login user:{}, id:{}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -359,7 +361,7 @@ public class DataSourceController extends BaseController {
                                        @RequestParam(value = "name") String name
     ) {
         logger.info("login user {}, verfiy datasource name: {}",
-                loginUser.getUserName(), name);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name);
 
         return dataSourceService.verifyDataSourceName(name);
     }
@@ -382,7 +384,7 @@ public class DataSourceController extends BaseController {
     public Result unauthDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         logger.info("unauthorized datasource, login user:{}, unauthorized userId:{}",
-                loginUser.getUserName(), userId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), userId);
         Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
         return returnDataList(result);
     }
@@ -405,7 +407,7 @@ public class DataSourceController extends BaseController {
     public Result authedDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         logger.info("authorized data source, login user:{}, authorized useId:{}",
-                loginUser.getUserName(), userId);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), userId);
         Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
         return returnDataList(result);
     }
@@ -421,7 +423,7 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(KERBEROS_STARTUP_STATE)
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}", loginUser.getUserName());
+        logger.info("login user {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }

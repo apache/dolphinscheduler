@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -43,7 +44,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * alert group controller
  */
-@Api(tags = "ALERT_GROUP_TAG", position = 1)
+@Api(tags = "ALERT_GROUP_TAG")
 @RestController
 @RequestMapping("alert-group")
 public class AlertGroupController extends BaseController {
@@ -77,7 +78,8 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupType") AlertType groupType,
                                    @RequestParam(value = "description", required = false) String description) {
         logger.info("loginUser user {}, create alertgroup, groupName: {}, groupType: {}, desc: {}",
-                loginUser.getUserName(), groupName, groupType, description);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                groupName, groupType, description);
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, groupType, description);
         return returnDataList(result);
     }
@@ -94,7 +96,7 @@ public class AlertGroupController extends BaseController {
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
-                loginUser.getUserName());
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
         HashMap<String, Object> result = alertGroupService.queryAlertgroup();
         return returnDataList(result);
     }
@@ -122,7 +124,8 @@ public class AlertGroupController extends BaseController {
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
         logger.info("login  user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
-                loginUser.getUserName(), pageNo, searchVal, pageSize);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -159,7 +162,8 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupType") AlertType groupType,
                                    @RequestParam(value = "description", required = false) String description) {
         logger.info("login  user {}, updateProcessInstance alertgroup, groupName: {}, groupType: {}, desc: {}",
-                loginUser.getUserName(), groupName, groupType, description);
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                groupName, groupType, description);
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, groupType, description);
         return returnDataList(result);
     }
@@ -180,7 +184,7 @@ public class AlertGroupController extends BaseController {
     @ApiException(DELETE_ALERT_GROUP_ERROR)
     public Result delAlertgroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "id") int id) {
-        logger.info("login user {}, delete AlertGroup, id: {},", loginUser.getUserName(), id);
+        logger.info("login user {}, delete AlertGroup, id: {},", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
         Map<String, Object> result = alertGroupService.delAlertgroupById(loginUser, id);
         return returnDataList(result);
     }
@@ -201,12 +205,12 @@ public class AlertGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
-        logger.info("login user {}, verify group name: {}", loginUser.getUserName(), groupName);
+        logger.info("login user {}, verify group name: {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), groupName);
 
         boolean exist = alertGroupService.existGroupName(groupName);
         Result result = new Result();
         if (exist) {
-            logger.error("group {} has exist, can't create again.", groupName);
+            logger.error("group {} already exist, can't create again.", groupName);
             result.setCode(Status.ALERT_GROUP_EXIST.getCode());
             result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
         } else {
@@ -235,7 +239,9 @@ public class AlertGroupController extends BaseController {
     public Result grantUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                             @RequestParam(value = "alertgroupId") int alertgroupId,
                             @RequestParam(value = "userIds") String userIds) {
-        logger.info("login user {}, grant user, alertGroupId: {},userIds : {}", loginUser.getUserName(), alertgroupId, userIds);
+        logger.info("login user {}, grant user, alertGroupId: {},userIds : {}",
+                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                alertgroupId, userIds);
         Map<String, Object> result = alertGroupService.grantUser(loginUser, alertgroupId, userIds);
         return returnDataList(result);
     }

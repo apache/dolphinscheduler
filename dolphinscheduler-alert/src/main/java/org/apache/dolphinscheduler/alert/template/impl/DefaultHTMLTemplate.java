@@ -45,7 +45,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TABLE:
                 return getTableTypeMessage(content,showAll);
             case TEXT:
-                return getTextTypeMessage(content,showAll);
+                return getTextTypeMessage(content);
             default:
                 throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate",showType));
         }
@@ -104,10 +104,9 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     /**
      * get alert message which type is TEXT
      * @param content message content
-     * @param showAll weather to show all
      * @return alert message
      */
-    private String getTextTypeMessage(String content,boolean showAll){
+    private String getTextTypeMessage(String content){
 
         if (StringUtils.isNotEmpty(content)){
             ArrayNode list = JSONUtils.parseArray(content);

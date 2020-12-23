@@ -44,7 +44,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * project controller
  */
-@Api(tags = "PROJECT_TAG", position = 1)
+@Api(tags = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
 public class ProjectController extends BaseController {

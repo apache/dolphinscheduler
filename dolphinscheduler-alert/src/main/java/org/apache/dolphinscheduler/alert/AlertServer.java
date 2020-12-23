@@ -40,8 +40,6 @@ public class AlertServer {
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
-    private AlertSender alertSender;
-
     private static AlertServer instance;
 
     private FilePluginManager alertPluginManager;
@@ -61,7 +59,7 @@ public class AlertServer {
         alertPluginManager.addPlugin(new EmailAlertPlugin());
     }
 
-    public synchronized static AlertServer getInstance() {
+    public static synchronized AlertServer getInstance() {
         if (null == instance) {
             instance = new AlertServer();
         }
@@ -78,7 +76,7 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
+            AlertSender alertSender = new AlertSender(alerts, alertDao, alertPluginManager);
             alertSender.run();
         }
     }

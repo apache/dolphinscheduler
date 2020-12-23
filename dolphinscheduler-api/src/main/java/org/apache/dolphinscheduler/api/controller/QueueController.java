@@ -43,7 +43,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * queue controller
  */
-@Api(tags = "QUEUE_TAG", position = 1)
+@Api(tags = "QUEUE_TAG")
 @RestController
 @RequestMapping("/queue")
 public class QueueController extends BaseController {

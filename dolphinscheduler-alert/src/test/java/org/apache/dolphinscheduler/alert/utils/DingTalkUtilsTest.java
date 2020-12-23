@@ -73,7 +73,7 @@ public class DingTalkUtilsTest {
 
     @Test
     public void testCreateDefaultClient() {
-        CloseableHttpClient client = DingTalkUtils.getDefaultClient();;
+        CloseableHttpClient client = DingTalkUtils.getDefaultClient();
         try {
             Assert.assertNotNull(client);
             client.close();
@@ -97,8 +97,8 @@ public class DingTalkUtilsTest {
     @Test
     public void testProxyConfig() {
         RequestConfig rc = DingTalkUtils.getProxyConfig();
-        Assert.assertEquals(rc.getProxy().getPort(), 80);
-        Assert.assertEquals(rc.getProxy().getHostName(), "proxy.com.cn");
+        Assert.assertEquals(80, rc.getProxy().getPort());
+        Assert.assertEquals("proxy.com.cn", rc.getProxy().getHostName());
     }
 
     @Test
@@ -114,7 +114,7 @@ public class DingTalkUtilsTest {
         String msg = DingTalkUtils.textToJsonString("this is test:中文");
 
         logger.info("test support utf8, actual:" + msg);
-        logger.info("test support utf8, actual:" + DingTalkUtils.isEnableDingTalk);
+        logger.info("test support utf8, actual:" + DingTalkUtils.IS_ENABLE_DING_TALK);
         String expect = "{\"text\":{\"content\":\"this is test:中文\"},\"msgtype\":\"text\"}";
         Assert.assertEquals(expect, msg);
     }

@@ -82,7 +82,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * resources controller
  */
-@Api(tags = "RESOURCES_TAG", position = 1)
+@Api(tags = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
 public class ResourcesController extends BaseController {
@@ -323,8 +323,8 @@ public class ResourcesController extends BaseController {
     ) {
         String programTypeName = programType == null ? "" : programType.name();
         String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query resource list, login user:{}, resource type:{}, program type:{}", userName,programTypeName);
+        userName = userName.replaceAll("[\n\r\t]", "_");
+        logger.info("query resource list, login user:{}, program type:{}", userName,programTypeName);
         Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
         return returnDataList(result);
     }
