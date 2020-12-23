@@ -197,7 +197,7 @@
     },
     computed: {
       inputStyle () {
-        return `width:${this.hide ? 160 : 253}px`
+        return `width:${this.hide ? 160 : 252}px`
       }
     },
     mounted () {
@@ -212,17 +212,19 @@
       margin-bottom: 6px;
       .lt-add {
         padding-left: 4px;
+        line-height: 32px;
         a {
           .iconfont, [class^="el-icon"] {
             font-size: 17px;
             vertical-align: middle;
-            margin-top: 0;
             display: inline-block;
+            margin-top: 0;
           }
         }
       }
     }
     .add {
+      line-height: 32px;
       a {
         color: #000;
         .iconfont, [class^="el-icon"] {

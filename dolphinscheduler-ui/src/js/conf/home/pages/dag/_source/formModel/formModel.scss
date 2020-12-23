@@ -16,6 +16,7 @@
  */
 .form-model-wrapper {
   width: 720px;
+  height: 100vh;
   position: relative;
   .title-box {
     height: 61px;
@@ -72,12 +73,12 @@
   }
   .content-box {
     overflow-y: scroll;
-    height: calc(100vh - 61px);
-    padding-bottom: 60px;
+    height: calc(100vh - 121px);
   }
 }
 .form-model {
   padding-top: 26px;
+  padding-bottom: 10px;
   >div {
     clear: both;
   }
