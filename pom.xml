@@ -119,6 +119,8 @@
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
         <guava-retry.version>2.0.0</guava-retry.version>
+        <dep.airlift.version>0.184</dep.airlift.version>
+        <dep.packaging.version>${dep.airlift.version}</dep.packaging.version>
     </properties>
 
     <dependencyManagement>

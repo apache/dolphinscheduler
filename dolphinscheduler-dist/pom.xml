@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-dist</artifactId>
-    <packaging>pom</packaging>
+    <packaging>provisio</packaging>
     <name>${project.artifactId}</name>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>

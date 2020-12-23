@@ -72,4 +72,7 @@
 
      </dependencies>
 
+    <build>
+        <finalName>dolphinscheduler-alert-wechat-${project.version}</finalName>
+    </build>
 </project>
