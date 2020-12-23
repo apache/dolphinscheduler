@@ -77,7 +77,7 @@
                   <el-button type="success" size="mini" icon="el-icon-circle-close" :disabled="scope.row.state !== 'FAILURE'" @click="_restore(scope.row,scope.$index)" circle></el-button>
                 </span>
               </el-tooltip>
-              <el-tooltip :content="$t('Resume From Forced Success')" placement="top" :enterable="false">
+              <el-tooltip :content="$t('Resume Forced Success')" placement="top" :enterable="false">
                 <span>
                   <el-button type="success" size="mini" icon="el-icon-stopwatch" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_resumeFromForcedSuccess(scope.row,scope.$index)" circle></el-button>
                 </span>
