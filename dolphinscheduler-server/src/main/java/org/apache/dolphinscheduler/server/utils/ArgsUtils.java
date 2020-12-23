@@ -19,8 +19,12 @@ package org.apache.dolphinscheduler.server.utils;
 
 public class ArgsUtils {
 
+    private ArgsUtils() throws IllegalStateException {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String escape(String arg) {
-        return arg.replaceAll(" ", "\\\\ ").replaceAll("\"", "\\\\\"").replaceAll("'", "\\\\'");
+        return arg.replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
     }
 
 }
