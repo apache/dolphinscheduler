@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
 
+package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * flink args utils
@@ -62,7 +61,7 @@ public class FlinkArgsUtils {
             String appName = param.getAppName();
             if (StringUtils.isNotEmpty(appName)) { //-ynm
                 args.add(Constants.FLINK_APP_NAME);
-                args.add(appName);
+                args.add(ArgsUtils.escape(appName));
             }
 
             // judge flink version,from flink1.10,the parameter -yn removed

@@ -15,29 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.User;
+public class ArgsUtils {
 
-import java.util.Map;
+    private ArgsUtils() throws IllegalStateException {
+        throw new IllegalStateException("Utility class");
+    }
 
-import javax.servlet.http.HttpServletRequest;
+    public static String escape(String arg) {
+        return arg.replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
+    }
 
-public interface Authenticator {
-    /**
-     * Verifying legality via username and password
-     * @param username user name
-     * @param password user password
-     * @param extra extra info
-     * @return result object
-     */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
-
-    /**
-     * Get authenticated user
-     * @param request http servlet request
-     * @return user
-     */
-    User getAuthUser(HttpServletRequest request);
 }

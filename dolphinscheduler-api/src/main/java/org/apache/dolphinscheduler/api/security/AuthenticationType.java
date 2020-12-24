@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.security;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -24,6 +25,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum AuthenticationType {
 
     PASSWORD(0, "verify via user name and password"),
+    LDAP(1, "verify via LDAP server"),
     ;
 
     AuthenticationType(int code, String desc) {

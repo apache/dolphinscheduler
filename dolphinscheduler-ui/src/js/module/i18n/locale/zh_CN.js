@@ -106,7 +106,7 @@ export default {
   'Driver memory use': 'Driver内存数',
   'Please enter driver memory use': '请输入Driver内存数',
   'Number of Executors': 'Executor数量',
-  'Please enter the job name of Flink': '请输入Flink任务名称',
+  'Please enter the job name of Flink(optional)': '请输入Flink任务名称(选填)',
   'Please enter the number of Executor': '请输入Executor数量',
   'Executor memory': 'Executor内存数',
   'Please enter the Executor memory': '请输入Executor内存数',

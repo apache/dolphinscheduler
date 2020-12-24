@@ -17,27 +17,29 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.api.ApiApplicationServer;
 
-import java.util.Map;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.servlet.http.HttpServletRequest;
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ApiApplicationServer.class)
+@TestPropertySource(properties = {
+        "security.authentication.type=LDAP",
+})
+public class SecurityConfigLDAPTest {
 
-public interface Authenticator {
-    /**
-     * Verifying legality via username and password
-     * @param username user name
-     * @param password user password
-     * @param extra extra info
-     * @return result object
-     */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
+    @Autowired
+    private SecurityConfig securityConfig;
 
-    /**
-     * Get authenticated user
-     * @param request http servlet request
-     * @return user
-     */
-    User getAuthUser(HttpServletRequest request);
+    @Test
+    public void testAuthenticator() {
+        Authenticator authenticator = securityConfig.authenticator();
+        Assert.assertNotNull(authenticator);
+    }
 }

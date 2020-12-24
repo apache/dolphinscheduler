@@ -89,7 +89,7 @@
             type="input"
             size="small"
             v-model="appName"
-            :placeholder="$t('Please enter the job name of Flink')"
+            :placeholder="$t('Please enter the job name of Flink(optional)')"
             style="width: 200px;">
         </el-input>
         </span>
@@ -303,11 +303,6 @@
           return false
         }
 
-        if (!this.appName) {
-          this.$message.warning(`${i18n.$t('Please enter the job name of Flink')}`)
-          return false
-        }
-
         if (!this.jobManagerMemory) {
           this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
           return false
@@ -353,9 +348,9 @@
           flinkVersion: this.flinkVersion,
           slot: this.slot,
           taskManager: this.taskManager,
-          appName: this.appName,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -489,9 +484,9 @@
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,
-          appName: this.appName,
           jobManagerMemory: this.jobManagerMemory,
           taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
           mainArgs: this.mainArgs,
           others: this.others,
           programType: this.programType
@@ -522,7 +517,7 @@
         this.taskManager = o.params.taskManager || '2'
         this.jobManagerMemory = o.params.jobManagerMemory || '1G'
         this.taskManagerMemory = o.params.taskManagerMemory || '2G'
-
+        this.appName = o.params.appName || ''
         this.mainArgs = o.params.mainArgs || ''
         this.others = o.params.others
         this.programType = o.params.programType || 'SCALA'
