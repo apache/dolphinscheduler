@@ -30,15 +30,15 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
@@ -48,7 +48,7 @@ public class ProcessUtils {
     /**
      * logger
      */
-    private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
+    private static final  Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
