@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
 
+package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
+
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,9 +34,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -51,11 +52,12 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one UserAlertGroup
-     * @param user user
+     *
+     * @param user       user
      * @param alertGroup alertGroup
      * @return UserAlertGroup
      */
-    private UserAlertGroup insertOne(User user,AlertGroup alertGroup){
+    private UserAlertGroup insertOne(User user, AlertGroup alertGroup) {
         UserAlertGroup userAlertGroup = new UserAlertGroup();
         userAlertGroup.setAlertgroupName(alertGroup.getGroupName());
         userAlertGroup.setAlertgroupId(alertGroup.getId());
@@ -68,9 +70,10 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one UserAlertGroup
+     *
      * @return UserAlertGroup
      */
-    private UserAlertGroup insertOne(){
+    private UserAlertGroup insertOne() {
         UserAlertGroup userAlertGroup = new UserAlertGroup();
         userAlertGroup.setAlertgroupName("dolphin_alert_group");
         userAlertGroup.setAlertgroupId(10);
@@ -83,9 +86,10 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one user
+     *
      * @return User
      */
-    private User insertOneUser(){
+    private User insertOneUser() {
         User user = new User();
         user.setUserName("user1");
         user.setUserPassword("1");
@@ -101,9 +105,10 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one AlertGroup
+     *
      * @return AlertGroup
      */
-    private AlertGroup insertOneAlertGroup(){
+    private AlertGroup insertOneAlertGroup() {
         //insertOne
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setGroupName("alert group 1");
@@ -120,7 +125,7 @@ public class UserAlertGroupMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         //insertOneUser
         User user = insertOneUser();
         //insertOneAlertGroup
@@ -141,7 +146,7 @@ public class UserAlertGroupMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         //insertOne
         UserAlertGroup userAlertGroup = insertOne();
         //delete
@@ -172,8 +177,8 @@ public class UserAlertGroupMapperTest {
         AlertGroup alertGroup = insertOneAlertGroup();
 
         //insertOne
-        UserAlertGroup userAlertGroup = insertOne(user,alertGroup);
-        int delete = userAlertGroupMapper.deleteByAlertgroupId(alertGroup.getId());
+        UserAlertGroup userAlertGroup = insertOne(user, alertGroup);
+        int delete = userAlertGroupMapper.deleteByAlertGroupId(alertGroup.getId());
         Assert.assertEquals(delete, 1);
     }
 
@@ -188,8 +193,8 @@ public class UserAlertGroupMapperTest {
         AlertGroup alertGroup = insertOneAlertGroup();
 
         //insertOne
-        UserAlertGroup userAlertGroup = insertOne(user,alertGroup);
-        List<User> userList = userAlertGroupMapper.listUserByAlertgroupId(alertGroup.getId());
+        UserAlertGroup userAlertGroup = insertOne(user, alertGroup);
+        List<User> userList = userAlertGroupMapper.listUserByAlertGroupId(alertGroup.getId());
         Assert.assertNotEquals(userList.size(), 0);
 
     }
