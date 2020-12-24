@@ -177,8 +177,6 @@ public class AlertManager {
             alert.setAlertType(AlertType.EMAIL);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
-            alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
-            alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert.toString());
 
@@ -225,16 +223,12 @@ public class AlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
-        ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
-        //alert.setShowType(showType);
+        //ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         String content = getContentProcessInstance(processInstance, taskInstances);
         alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
+        //todo delete it alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
-        alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
-        alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
-
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert.toString());
     }

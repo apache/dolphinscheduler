@@ -32,7 +32,7 @@ public class UserAlertGroupService extends ServiceImpl<UserAlertGroupMapper, Use
     private UserAlertGroupMapper userAlertGroupMapper;
 
     boolean deleteByAlertGroupId(Integer groupId) {
-        return userAlertGroupMapper.deleteByAlertgroupId(groupId) >= 1;
+        return userAlertGroupMapper.deleteByAlertGroupId(groupId) >= 1;
     }
 
 }

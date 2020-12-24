@@ -30,16 +30,18 @@ public interface UserAlertGroupMapper extends BaseMapper<UserAlertGroup> {
 
     /**
      * delete user alertgroup relation by alertgroupId
-     * @param alertgroupId alertgroupId
+     *
+     * @param alertGroupId alertGroupId
      * @return delete result
      */
-    int deleteByAlertgroupId(@Param("alertgroupId") int alertgroupId);
+    int deleteByAlertGroupId(@Param("alertgroupId") int alertGroupId);
 
     /**
-     *  list user by alertgroupId
-     * @param alertgroupId alertgroupId
+     * list user by alertgroupId
+     *
+     * @param alertGroupId alertgroupId
      * @return user list
      */
-    List<User> listUserByAlertgroupId(@Param("alertgroupId") int alertgroupId);
+    List<User> listUserByAlertGroupId(@Param("alertgroupId") int alertGroupId);
 
 }
