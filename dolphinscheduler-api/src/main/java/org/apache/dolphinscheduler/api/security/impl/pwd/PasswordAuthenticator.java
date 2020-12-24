@@ -15,29 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.security.impl.pwd;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
+public class PasswordAuthenticator extends AbstractAuthenticator {
+    @Autowired
+    private UsersService userService;
 
-public interface Authenticator {
-    /**
-     * Verifying legality via username and password
-     * @param username user name
-     * @param password user password
-     * @param extra extra info
-     * @return result object
-     */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
-
-    /**
-     * Get authenticated user
-     * @param request http servlet request
-     * @return user
-     */
-    User getAuthUser(HttpServletRequest request);
+    @Override
+    public User login(String userId, String password, String extra) {
+        return userService.queryUser(userId, password);
+    }
 }
