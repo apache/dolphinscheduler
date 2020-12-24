@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 import Vue from 'vue'
-let v = new Vue()
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
 import JSP from './plugIn/jsPlumbHandle'
 import DownChart from './plugIn/downChart'
 import store from '@/conf/home/store'
-import dagre from "dagre"
+import dagre from 'dagre'
 
 /**
  * Prototype method
@@ -53,7 +52,9 @@ Dag.prototype.setConfig = function (o) {
  */
 Dag.prototype.create = function () {
   const self = this
-  jsPlumb.ready(() => {
+  const plumbIns = jsPlumb.getInstance()
+  plumbIns.reset()
+  plumbIns.ready(() => {
     JSP.init({
       dag: this.dag,
       instance: this.instance,
@@ -76,7 +77,7 @@ Dag.prototype.create = function () {
  * Action event on the right side of the toolbar
  */
 Dag.prototype.toolbarEvent = function ({ item, code, is }) {
-  let self = this
+  const self = this
   switch (code) {
     case 'pointer':
       JSP.handleEventPointer(is)
@@ -91,21 +92,15 @@ Dag.prototype.toolbarEvent = function ({ item, code, is }) {
       JSP.handleEventScreen({ item, is })
       break
     case 'download':
-      v.$modal.dialog({
-        width: 350,
-        closable: false,
-        showMask: true,
-        maskClosable: true,
-        title: i18n.$t('Download'),
-        content: i18n.$t('Please confirm whether the workflow has been saved before downloading'),
-        ok: {
-          handle (e) {
-            DownChart.download({
-              dagThis: self.dag
-            })
-          }
-        },
-        cancel: {}
+      Vue.prototype.$confirm(`${i18n.$t('Please confirm whether the workflow has been saved before downloading')}`, `${i18n.$t('Download')}`, {
+        confirmButtonText: `${i18n.$t('Confirm')}`,
+        cancelButtonText: `${i18n.$t('Cancel')}`,
+        type: 'warning'
+      }).then(() => {
+        DownChart.download({
+          dagThis: self.dag
+        })
+      }).catch(() => {
       })
       break
   }
@@ -128,7 +123,7 @@ Dag.prototype.backfill = function (arg) {
 
     for (const i in store.state.dag.connects) {
       const connect = store.state.dag.connects[i]
-      g.setEdge(connect['endPointSourceId'], connect['endPointTargetId'])
+      g.setEdge(connect.endPointSourceId, connect.endPointTargetId)
     }
     dagre.layout(g)
 
@@ -164,7 +159,9 @@ Dag.prototype.backfill = function (arg) {
       })
     })
   } else {
-    jsPlumb.ready(() => {
+    const plumbIns = jsPlumb.getInstance()
+    plumbIns.reset()
+    plumbIns.ready(() => {
       JSP.init({
         dag: this.dag,
         instance: this.instance,

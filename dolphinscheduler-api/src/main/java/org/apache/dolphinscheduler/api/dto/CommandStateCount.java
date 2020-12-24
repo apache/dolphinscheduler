@@ -57,4 +57,32 @@ public class CommandStateCount {
     public void setCommandState(CommandType commandState) {
         this.commandState = commandState;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CommandStateCount that = (CommandStateCount) o;
+
+        if (errorCount != that.errorCount) {
+            return false;
+        }
+        if (normalCount != that.normalCount) {
+            return false;
+        }
+        return commandState == that.commandState;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = errorCount;
+        result = 31 * result + normalCount;
+        result = 31 * result + (commandState != null ? commandState.hashCode() : 0);
+        return result;
+    }
 }

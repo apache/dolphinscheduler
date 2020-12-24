@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -37,7 +37,6 @@ public class TaskExecutionContext implements Serializable {
      * task id
      */
     private int taskInstanceId;
-
 
     /**
      * task name
@@ -475,7 +474,7 @@ public class TaskExecutionContext implements Serializable {
 
     public Command toCommand() {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(JsonSerializer.serializeToString(this));
+        requestCommand.setTaskExecutionContext(JSONUtils.toJsonString(this));
         return requestCommand.convert2Command();
     }
 
@@ -506,22 +505,22 @@ public class TaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "TaskExecutionContext{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", taskName='" + taskName + '\''
-                + ", currentExecutionStatus=" + currentExecutionStatus
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", startTime=" + startTime
-                + ", taskType='" + taskType + '\''
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", taskJson='" + taskJson + '\''
-                + ", processId=" + processId
-                + ", appIds='" + appIds + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", scheduleTime=" + scheduleTime
-                + ", globalParams='" + globalParams + '\''
-                + ", executorId=" + executorId
+            + "taskInstanceId=" + taskInstanceId
+            + ", taskName='" + taskName + '\''
+            + ", currentExecutionStatus=" + currentExecutionStatus
+            + ", firstSubmitTime=" + firstSubmitTime
+            + ", startTime=" + startTime
+            + ", taskType='" + taskType + '\''
+            + ", host='" + host + '\''
+            + ", executePath='" + executePath + '\''
+            + ", logPath='" + logPath + '\''
+            + ", taskJson='" + taskJson + '\''
+            + ", processId=" + processId
+            + ", appIds='" + appIds + '\''
+            + ", processInstanceId=" + processInstanceId
+            + ", scheduleTime=" + scheduleTime
+            + ", globalParams='" + globalParams + '\''
+            + ", executorId=" + executorId
                 + ", cmdTypeIfComplement=" + cmdTypeIfComplement
                 + ", tenantCode='" + tenantCode + '\''
                 + ", queue='" + queue + '\''

@@ -296,6 +296,28 @@ public class ProjectServiceTest {
     }
 
     @Test
+    public void testQueryProjectCreatedAndAuthorizedByUser() {
+
+        Map<String, Object> result = null;
+        User loginUser = getLoginUser();
+
+        // not admin user
+        Mockito.when(projectMapper.queryProjectCreatedAndAuthorizedByUserId(1)).thenReturn(getList());
+        result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
+        List<Project> notAdminUserResult = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
+
+        //admin user
+        loginUser.setUserType(UserType.ADMIN_USER);
+        Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
+        result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
+        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
+
+    }
+
+    @Test
     public void testQueryAllProjectList() {
 
         Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
@@ -340,13 +362,11 @@ public class ProjectServiceTest {
      * create admin user
      */
     private User getLoginUser() {
-
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setUserName(userName);
         loginUser.setId(1);
         return loginUser;
-
     }
 
     /**

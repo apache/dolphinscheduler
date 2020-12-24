@@ -39,6 +39,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
@@ -263,7 +264,7 @@ public class HadoopUtils implements Closeable {
         }
 
         try (FSDataInputStream in = fs.open(new Path(hdfsFilePath))) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }
