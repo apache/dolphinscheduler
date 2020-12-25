@@ -30,7 +30,7 @@ import java.util.Map;
  * Ding Talk Manager
  */
 public class DingTalkManager {
-    private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(DingTalkManager.class);
 
     public Map<String,Object> send(AlertInfo alert) {
         Map<String,Object> retMap = new HashMap<>();
