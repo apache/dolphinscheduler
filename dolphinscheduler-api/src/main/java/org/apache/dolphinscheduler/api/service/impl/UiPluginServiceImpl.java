@@ -45,7 +45,6 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
         if (!pluginType.getHasUi()) {
             putMsg(result, Status.PLUGIN_NOT_A_UI_COMPONENT);
             return result;
@@ -55,8 +54,8 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
             putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
+        putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefines);
-        result.put(Constants.STATUS, true);
         return result;
     }
 
