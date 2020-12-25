@@ -65,11 +65,11 @@ public class UiPluginController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "pluginType", value = "pluginType", required = true, dataType = "PluginType"),
     })
-    @PostMapping(value = "/queryPluginsByType")
+    @PostMapping(value = "/queryUiPluginsByType")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
-    public Result queryPluginsByType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value = "pluginType") PluginType pluginType) {
+    public Result queryUiPluginsByType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "pluginType") PluginType pluginType) {
 
         logger.info("loginUser user {}, query plugins by type , pluginType: {}",
             loginUser.getUserName(), pluginType);
