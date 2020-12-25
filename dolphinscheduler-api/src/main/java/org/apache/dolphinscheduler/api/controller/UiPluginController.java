@@ -71,9 +71,23 @@ public class UiPluginController extends BaseController {
     public Result queryUiPluginsByType(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "pluginType") PluginType pluginType) {
 
-        logger.info("loginUser user {}, query plugins by type , pluginType: {}",
-            loginUser.getUserName(), pluginType);
+        logger.info("query plugins by type , pluginType: {}", pluginType);
         Map<String, Object> result = uiPluginService.queryUiPluginsByType(pluginType);
+        return returnDataList(result);
+    }
+
+    @ApiOperation(value = "queryUiPluginDetailById", notes = "QUERY_UI_PLUGIN_DETAIL_BY_ID")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "id", required = true, dataType = "PluginType"),
+    })
+    @PostMapping(value = "/queryUiPluginsByID")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(QUERY_PLUGINS_ERROR)
+    public Result queryUiPluginDetailById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("pluginId") Integer pluginId) {
+
+        logger.info("query plugin detail by id , pluginId: {}", pluginId);
+        Map<String, Object> result = uiPluginService.queryUiPluginDetailById(pluginId);
         return returnDataList(result);
     }
 }

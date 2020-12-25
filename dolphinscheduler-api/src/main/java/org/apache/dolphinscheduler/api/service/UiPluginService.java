@@ -27,4 +27,7 @@ import java.util.Map;
 public interface UiPluginService {
 
     Map<String, Object> queryUiPluginsByType(PluginType pluginType);
+
+    Map<String, Object> queryUiPluginDetailById(int id);
+
 }

@@ -59,4 +59,16 @@ public class UiPluginServiceImpl extends BaseService implements UiPluginService 
         return result;
     }
 
+    @Override
+    public Map<String, Object> queryUiPluginDetailById(int id) {
+        Map<String, Object> result = new HashMap<>();
+        PluginDefine pluginDefine = pluginDefineMapper.queryDetailById(id);
+        if (null == pluginDefine) {
+            putMsg(result, Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
+            return result;
+        }
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, pluginDefine);
+        return result;
+    }
 }

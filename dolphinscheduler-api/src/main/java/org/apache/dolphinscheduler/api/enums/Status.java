@@ -283,6 +283,7 @@ public enum Status {
     PLUGIN_NOT_A_UI_COMPONENT(110001, "query plugin error, this plugin has no UI component", "查询插件错误，此插件无UI组件"),
     QUERY_PLUGINS_RESULT_IS_NULL(110002, "query plugins result is null", "查询插件为空"),
     QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
+    QUERY_PLUGIN_DETAIL_RESULT_IS_NULL(110004, "query plugin detail result is null", "查询插件详情结果为空"),
     ;
 
     private final int code;
