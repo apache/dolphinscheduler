@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
+    <select id="getOneToRun" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select command.* from t_ds_command command
+        join t_ds_process_definition definition on command.process_definition_id = definition.id
+        where definition.release_state = 1 AND definition.flag = 1
+        order by command.update_time asc
+        limit 1
+    </select>
+    <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
+        select cmd.command_type as command_type, count(1) as count
+        from t_ds_command cmd, t_ds_process_definition process
+        where cmd.process_definition_id = process.id
+        <if test="projectIdArray != null and projectIdArray.length != 0">
+            and process.project_id in 
+            <foreach collection="projectIdArray" index="index" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime != null and endTime != null">
+            and cmd.start_time <![CDATA[ >= ]]> #{startTime} and cmd.update_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        group by cmd.command_type
+    </select>
+</mapper>

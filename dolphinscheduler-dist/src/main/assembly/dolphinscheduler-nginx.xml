@@ -1,0 +1,236 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<assembly
+		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>dolphinscheduler-nginx</id>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<includeBaseDirectory>true</includeBaseDirectory>
+	<baseDirectory>${project.build.finalName}-dolphinscheduler-bin</baseDirectory>
+
+	<fileSets>
+		<!--alert start-->
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-alert/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>**/*.ftl</include>
+			</includes>
+			<outputDirectory>./conf</outputDirectory>
+		</fileSet>
+		<!--alert end-->
+
+		<!--api start-->
+		<fileSet>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<directoryMode>755</directoryMode>
+			<outputDirectory>bin</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<!--api end-->
+
+		<!--server start-->
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-server/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>config/*.*</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>**/*.yml</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<!--server end-->
+
+
+		<!--service end-->
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>**/*.yml</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<!--service end-->
+
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-ui/dist</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>./ui/dist</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-ui</directory>
+			<includes>
+				<include>install-dolphinscheduler-ui.sh</include>
+			</includes>
+			<outputDirectory>./ui</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../sql</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<outputDirectory>./sql</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../script</directory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<outputDirectory>./script</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../script</directory>
+			<includes>
+				<include>env/*.*</include>
+			</includes>
+			<outputDirectory>./conf</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../script</directory>
+			<includes>
+				<include>start-all.sh</include>
+				<include>stop-all.sh</include>
+				<include>dolphinscheduler-daemon.sh</include>
+			</includes>
+			<outputDirectory>./bin</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/.././</directory>
+			<includes>
+				<include>*.sh</include>
+				<include>*.py</include>
+				<include>DISCLAIMER</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/release-docs</directory>
+			<useDefaultExcludes>true</useDefaultExcludes>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>lib</outputDirectory>
+			<useProjectArtifact>true</useProjectArtifact>
+			<excludes>
+				<exclude>javax.servlet:servlet-api</exclude>
+				<exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
+				<exclude>org.slf4j:slf4j-log4j12</exclude>
+			</excludes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

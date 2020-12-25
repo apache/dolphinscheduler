@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>dolphinscheduler</artifactId>
+        <groupId>org.apache.dolphinscheduler</groupId>
+        <version>1.3.4-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dolphinscheduler-dist</artifactId>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>dolphinscheduler-bin</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-binary.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>src</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>nginx</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>dolphinscheduler-nginx</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-nginx.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>src</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rpmbuild</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeScope>provided</excludeScope>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>rpm-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>attached-rpm</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+
+                        <configuration>
+                            <name>apache-dolphinscheduler-incubating</name>
+                            <release>1</release>
+                            <distribution>apache dolphinscheduler incubating rpm</distribution>
+                            <group>apache</group>
+                            <packager>dolphinscheduler</packager>
+                            <!-- <version>${project.version}</version> -->
+                            <prefix>/opt/soft</prefix>
+                            <autoRequires>false</autoRequires>
+                            <defineStatements>
+                                <!-- disable compile python when rpm build -->
+                                <defineStatement>__os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')</defineStatement>
+                            </defineStatements>
+                            <mappings>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/conf</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-alert/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-common/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-dao/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-api/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-server/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>config/*.*</include>
+                                                <include>**/*.xml</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-service/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../script
+                                            </location>
+                                            <includes>
+                                                <include>env/*.*</include>
+                                            </includes>
+                                        </source>
+
+
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/lib</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-dist/target/lib
+                                            </location>
+                                            <includes>
+                                                <include>*.*</include>
+                                            </includes>
+                                            <excludes>
+                                                <exclude>servlet-api-*.jar</exclude>
+                                                <exclude>slf4j-log4j12-${slf4j.log4j12.version}.jar</exclude>
+                                            </excludes>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/bin</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../script
+                                            </location>
+                                            <includes>
+                                                <include>start-all.sh</include>
+                                                <include>stop-all.sh</include>
+                                                <include>dolphinscheduler-daemon.sh</include>
+                                            </includes>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../
+                                            </location>
+                                            <includes>
+                                                <include>*.sh</include>
+                                                <include>*.py</include>
+                                                <include>DISCLAIMER</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/release-docs
+                                            </location>
+                                            <includes>
+                                                <include>**/*</include>
+                                            </includes>
+                                        </source>
+
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/ui</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-ui/dist
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+                                    </sources>
+                                </mapping>
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/sql</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../sql
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../sql
+                                            </location>
+                                            <includes>
+                                                <include>soft_version</include>
+                                            </includes>
+                                        </source>
+                                    </sources>
+                                </mapping>
+
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/script</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../script
+                                            </location>
+                                            <includes>
+                                                <include>*.sh</include>
+                                            </includes>
+                                        </source>
+
+                                    </sources>
+                                </mapping>
+                            </mappings>
+
+                            <preinstallScriptlet>
+                                <script>mkdir -p /opt/soft</script>
+                            </preinstallScriptlet>
+                            <postinstallScriptlet>
+                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
+                            </postinstallScriptlet>
+                            <postremoveScriptlet>
+                                <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
+                            </postremoveScriptlet>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+
+
+</project>

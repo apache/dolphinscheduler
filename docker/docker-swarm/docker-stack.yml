@@ -1,0 +1,227 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: "3.4"
+
+services:
+
+  dolphinscheduler-postgresql:
+    image: bitnami/postgresql:latest
+    ports:
+    - 5432:5432
+    environment:
+      TZ: Asia/Shanghai
+      POSTGRESQL_USERNAME: root
+      POSTGRESQL_PASSWORD: root
+      POSTGRESQL_DATABASE: dolphinscheduler
+    volumes:
+    - dolphinscheduler-postgresql:/bitnami/postgresql
+    networks:
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+    - 2181:2181
+    environment:
+      TZ: Asia/Shanghai
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
+    volumes:
+    - dolphinscheduler-zookeeper:/bitnami/zookeeper
+    networks:
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-api:
+    image: apache/dolphinscheduler:latest
+    command: ["api-server"]
+    ports:
+    - 12345:12345
+    environment:
+      TZ: Asia/Shanghai
+      POSTGRESQL_HOST: dolphinscheduler-postgresql
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: root
+      POSTGRESQL_PASSWORD: root
+      POSTGRESQL_DATABASE: dolphinscheduler
+      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+    healthcheck:
+      test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
+      interval: 30
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    networks: 
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-frontend:
+    image: apache/dolphinscheduler:latest
+    command: ["frontend"]
+    ports:
+    - 8888:8888
+    environment:
+      TZ: Asia/Shanghai
+      FRONTEND_API_SERVER_HOST: dolphinscheduler-api
+      FRONTEND_API_SERVER_PORT: 12345
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8888"]
+      interval: 30
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+    - dolphinscheduler-logs:/var/log/nginx
+    networks:
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-alert:
+    image: apache/dolphinscheduler:latest
+    command: ["alert-server"]
+    environment:
+      TZ: Asia/Shanghai
+      XLS_FILE_PATH: "/tmp/xls"
+      MAIL_SERVER_HOST: ""
+      MAIL_SERVER_PORT: ""
+      MAIL_SENDER: ""
+      MAIL_USER: ""
+      MAIL_PASSWD: ""
+      MAIL_SMTP_STARTTLS_ENABLE: "false"
+      MAIL_SMTP_SSL_ENABLE: "false"
+      MAIL_SMTP_SSL_TRUST: ""
+      ENTERPRISE_WECHAT_ENABLE: "false"
+      ENTERPRISE_WECHAT_CORP_ID: ""
+      ENTERPRISE_WECHAT_SECRET: ""
+      ENTERPRISE_WECHAT_AGENT_ID: ""
+      ENTERPRISE_WECHAT_USERS: ""
+      POSTGRESQL_HOST: dolphinscheduler-postgresql
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: root
+      POSTGRESQL_PASSWORD: root
+      POSTGRESQL_DATABASE: dolphinscheduler
+    healthcheck:
+      test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
+      interval: 30
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    networks: 
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-master:
+    image: apache/dolphinscheduler:latest
+    command: ["master-server"]
+    ports: 
+    - 5678:5678
+    environment: 
+      TZ: Asia/Shanghai
+      MASTER_EXEC_THREADS: "100"
+      MASTER_EXEC_TASK_NUM: "20"
+      MASTER_HEARTBEAT_INTERVAL: "10"
+      MASTER_TASK_COMMIT_RETRYTIMES: "5"
+      MASTER_TASK_COMMIT_INTERVAL: "1000"
+      MASTER_MAX_CPULOAD_AVG: "100"
+      MASTER_RESERVED_MEMORY: "0.1"
+      POSTGRESQL_HOST: dolphinscheduler-postgresql
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: root
+      POSTGRESQL_PASSWORD: root
+      POSTGRESQL_DATABASE: dolphinscheduler
+      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+    healthcheck:
+      test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
+      interval: 30
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    networks:
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  dolphinscheduler-worker:
+    image: apache/dolphinscheduler:latest
+    command: ["worker-server"]
+    ports: 
+    - 1234:1234
+    - 50051:50051
+    environment: 
+      TZ: Asia/Shanghai
+      WORKER_EXEC_THREADS: "100"
+      WORKER_HEARTBEAT_INTERVAL: "10"
+      WORKER_FETCH_TASK_NUM: "3"
+      WORKER_MAX_CPULOAD_AVG: "100"
+      WORKER_RESERVED_MEMORY: "0.1"
+      WORKER_GROUP: "default"
+      DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
+      POSTGRESQL_HOST: dolphinscheduler-postgresql
+      POSTGRESQL_PORT: 5432
+      POSTGRESQL_USERNAME: root
+      POSTGRESQL_PASSWORD: root
+      POSTGRESQL_DATABASE: dolphinscheduler
+      ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+    healthcheck:
+      test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
+      interval: 30
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+    - dolphinscheduler-worker-data:/tmp/dolphinscheduler
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
+    configs:
+    - source: dolphinscheduler-worker-task-env
+      target: /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
+    networks:
+    - dolphinscheduler
+    deploy:
+      mode: replicated
+      replicas: 1
+
+networks:
+  dolphinscheduler:
+    driver: overlay
+
+volumes:
+  dolphinscheduler-postgresql:
+  dolphinscheduler-zookeeper:
+  dolphinscheduler-worker-data:
+  dolphinscheduler-logs:
+
+configs:
+  dolphinscheduler-worker-task-env:
+    file: ./dolphinscheduler_env.sh

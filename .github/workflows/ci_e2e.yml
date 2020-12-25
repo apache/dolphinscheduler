@@ -1,0 +1,74 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+on: ["pull_request"]
+env:
+  DOCKER_DIR: ./docker
+  LOG_DIR: /tmp/dolphinscheduler
+
+name: e2e Test
+
+jobs:
+
+  build:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Build Image
+        run: |
+          sh ./docker/build/hooks/build
+      - name: Docker Run
+        run: |
+          export VERSION=$(cat $(pwd)/pom.xml | grep '<version>' -m 1 | awk '{print $1}' | sed 's/<version>//' | sed 's/<\/version>//')
+          sed -i "s/apache\/dolphinscheduler:latest/apache\/dolphinscheduler:${VERSION}/g" $(pwd)/docker/docker-swarm/docker-compose.yml
+          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml up -d
+      - name: Check Server Status
+        run: sh $(pwd)/docker/docker-swarm/check
+      - name: Prepare e2e env
+        run: |
+          sudo apt-get install -y libxss1 libappindicator1 libindicator7 xvfb unzip libgbm1
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome*.deb
+          sudo apt-get install -f -y
+          google-chrome -version
+          googleVersion=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          wget -N https://chromedriver.storage.googleapis.com/${googleVersion}/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv -f chromedriver /usr/local/share/chromedriver
+          sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
+      - name: Run e2e Test
+        run: cd ./e2e && mvn -B clean test
+      - name: Collect logs
+        if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: dslogs
+          path: ${{ github.workspace }}/docker/docker-swarm/dolphinscheduler-logs
