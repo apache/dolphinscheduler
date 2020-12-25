@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
+<configuration scan="true" scanPeriod="120 seconds"> <!--debug="true" -->
+
+    <property name="log.base" value="logs"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- worker server logback config start -->
+    <conversionRule conversionWord="messsage"
+                    converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+    <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+            <key>taskAppId</key>
+            <logBase>${log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${taskAppId}" class="org.apache.dolphinscheduler.server.log.TaskLogAppender">
+                <file>${log.base}/${taskAppId}.log</file>
+                <encoder>
+                    <pattern>
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %messsage%n
+                    </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
+    <appender name="WORKERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.base}/dolphinscheduler-worker.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="org.apache.dolphinscheduler.server.log.WorkerLogFilter"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.base}/dolphinscheduler-worker.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+            <maxHistory>168</maxHistory>
+            <maxFileSize>200MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %messsage%n
+            </pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <!-- worker server logback config end -->
+
+    <root level="INFO">
+        <appender-ref ref="TASKLOGFILE"/>
+        <appender-ref ref="WORKERLOGFILE"/>
+    </root>
+
+</configuration>

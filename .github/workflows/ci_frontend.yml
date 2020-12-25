@@ -1,0 +1,71 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Frontend
+
+on:
+  push:
+    paths:
+      - '.github/workflows/ci_frontend.yml'
+      - 'dolphinscheduler-ui/**'
+  pull_request:
+    paths:
+      - '.github/workflows/ci_frontend.yml'
+      - 'dolphinscheduler-ui/**'
+
+jobs:
+  Compile-check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          version: 8
+      - name: Compile
+        run: |
+          cd dolphinscheduler-ui
+          npm install node-sass --unsafe-perm
+          npm install
+          npm run lint
+          npm run build
+
+  License-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Check
+        run: mvn -B apache-rat:check

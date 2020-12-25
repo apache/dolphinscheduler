@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ScheduleMapper">
+    <select id="queryByProcessDefineIdPaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name,s.*
+        from t_ds_schedules s
+        join t_ds_process_definition p_f on s.process_definition_id = p_f.id
+        join t_ds_project as p on p_f.project_id = p.id
+        join t_ds_user as u on s.user_id = u.id
+        where 1=1
+        <if test="processDefinitionId!= 0">
+            and s.process_definition_id = #{processDefinitionId}
+        </if>
+        order by s.update_time desc
+    </select>
+    <select id="querySchedulerListByProjectName" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name,s.*
+        from t_ds_schedules s
+        join t_ds_process_definition p_f on s.process_definition_id = p_f.id
+        join t_ds_project as p on p_f.project_id = p.id
+        join t_ds_user as u on s.user_id = u.id
+        where p.name = #{projectName}
+    </select>
+    <select id="selectAllByProcessDefineArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select *
+        from t_ds_schedules
+        where  1= 1
+        <if test="processDefineIds != null and processDefineIds.length != 0 ">
+            and process_definition_id in
+            <foreach collection="processDefineIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        and release_state = 1
+    </select>
+    <select id="queryByProcessDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select *
+        from t_ds_schedules
+        where process_definition_id =#{processDefinitionId}
+    </select>
+    <select id="queryReleaseSchedulerListByProcessDefinitionId" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select *
+        from t_ds_schedules
+        where process_definition_id =#{processDefinitionId} and release_state = 1
+    </select>
+</mapper>

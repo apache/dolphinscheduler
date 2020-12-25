@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper">
+    <update id="setFailoverByHostAndStateArray">
+        update t_ds_task_instance
+        set state = #{destStatus}
+        where host = #{host}
+        and state in
+        <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </update>
+    <select id="queryTaskByProcessIdAndState" resultType="java.lang.Integer">
+        select id
+        from t_ds_task_instance
+        WHERE  process_instance_id = #{processInstanceId}
+        and state = #{state}
+        and flag = 1
+    </select>
+    <select id="findValidTaskListByProcessId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select *
+        from t_ds_task_instance
+        WHERE  process_instance_id = #{processInstanceId}
+        and flag = #{flag}
+        order by start_time desc
+    </select>
+    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select *
+        from t_ds_task_instance
+        where 1 = 1
+        <if test="host != null and host != ''">
+            and host = #{host}
+        </if>
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="countTaskInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+        select  state, count(0) as count
+        from t_ds_task_instance t
+        left join t_ds_process_definition  d on d.id=t.process_definition_id
+        left join t_ds_project p on p.id=d.project_id
+        where 1=1
+        <if test="projectIds != null and projectIds.length != 0">
+            and d.project_id in
+            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime != null and endTime != null">
+            and t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        group by t.state
+    </select>
+    <select id="queryByInstanceIdAndName" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select  *
+        from t_ds_task_instance
+        where process_instance_id = #{processInstanceId}
+        and name = #{name}
+        and flag = 1
+        limit 1
+    </select>
+    <select id="countTask" resultType="java.lang.Integer">
+        select count(1) as count
+        from t_ds_task_instance task,t_ds_process_definition process
+        where task.process_definition_id=process.id
+        <if test="projectIds != null and projectIds.length != 0">
+            and process.project_id in
+            <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="taskIds != null and taskIds.length != 0">
+            and task.id in
+            <foreach collection="taskIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select instance.*,process.name as process_instance_name
+        from t_ds_task_instance instance
+        join t_ds_process_definition define ON instance.process_definition_id = define.id
+        join  t_ds_process_instance process on process.id=instance.process_instance_id
+        where define.project_id = #{projectId}
+        <if test="startTime != null">
+            and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        </if>
+        <if test="processInstanceId != 0">
+            and instance.process_instance_id = #{processInstanceId}
+        </if>
+        <if test="searchVal != null and searchVal != ''">
+            and  instance.name like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and instance.name=#{taskName}
+        </if>
+        <if test="states != null and states.length != 0">
+            and instance.state in 
+            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="host != null and host != ''">
+            and instance.host like concat('%', #{host}, '%')
+        </if>
+        <if test="executorId != 0">
+            and instance.executor_id = #{executorId}
+        </if>
+        order by instance.start_time desc
+    </select>
+</mapper>
