@@ -18,7 +18,7 @@
   <div class="list-model">
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
-        <el-table-column prop="id" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Task Name')" min-width="100">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
