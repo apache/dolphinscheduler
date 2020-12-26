@@ -118,8 +118,8 @@ public class AlertGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
     public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam("pageNo") Integer pageNo,
                              @RequestParam(value = "searchVal", required = false) String searchVal,
+                             @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
         logger.info("login  user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);

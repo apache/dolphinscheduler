@@ -22,9 +22,23 @@ import dayjs from 'dayjs'
  */
 const formatDate = (value, fmt) => {
   fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
-  return dayjs(value).format(fmt)
+  if (value === null) {
+    return '-'
+  } else {
+    return dayjs(value).format(fmt)
+  }
+}
+/**
+ * filter null
+ */
+const filterNull = (value) => {
+  if (value === null || value === '') {
+    return '-'
+  } else {
+    return value
+  }
 }
 
 export {
-  formatDate
+  formatDate, filterNull
 }

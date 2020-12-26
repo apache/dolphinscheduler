@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -33,7 +34,9 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * test task execute thread.
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({TaskManager.class, JSONUtils.class, CommonUtils.class, SpringApplicationContext.class})
+@PrepareForTest({TaskManager.class, JSONUtils.class, CommonUtils.class, SpringApplicationContext.class, OSUtils.class})
 public class TaskExecuteThreadTest {
 
     private TaskExecutionContext taskExecutionContext;
@@ -110,6 +113,12 @@ public class TaskExecuteThreadTest {
 
         PowerMockito.mockStatic(CommonUtils.class);
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
+
+        List<String> osUserList = new ArrayList<String>() {{
+                add("test");
+            }};
+        PowerMockito.mockStatic(OSUtils.class);
+        PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }
 
     @Test
@@ -117,6 +126,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setTaskType("SQL");
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+        taskExecutionContext.setTenantCode("test");
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
         taskExecuteThread.run();
         taskExecutionContext.getCurrentExecutionStatus();
@@ -132,6 +142,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setStartTime(null);
         taskExecutionContext.setDelayTime(1);
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
+        taskExecutionContext.setTenantCode("test");
         TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
         taskExecuteThread.run();
 

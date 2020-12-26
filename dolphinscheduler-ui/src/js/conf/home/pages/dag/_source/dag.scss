@@ -277,8 +277,9 @@ svg path:hover {
   background: #fff;
   border-radius: 3px;
   box-shadow: 0 2px 4px 1px rgba(0, 0, 0, 0.1);
-  padding: 4px 0;
+  padding: 4px 4px;
   visibility:hidden;
+  z-index: 10000;
   a {
     height: 30px;
     line-height: 28px;

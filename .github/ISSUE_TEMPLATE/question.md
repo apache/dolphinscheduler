@@ -7,10 +7,7 @@ assignees: ''
 
 ---
 
-*For better global communication, please give priority to using English description, thx! *
-
-*Please review https://dolphinscheduler.apache.org/en-us/docs/development/issue.html when describe an issue.*
-
+**For better global communication, Please describe it in English. If you feel the description in English is not clear, then you can append description in Chinese(just for Mandarin(CN)), thx! **
 **Describe the question**
 A clear and concise description of what the question is.
 
