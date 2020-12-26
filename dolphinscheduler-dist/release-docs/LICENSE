@@ -483,7 +483,6 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    ans-UI 1.1.7: https://github.com/analysys/ans-ui MIT
     axios 0.16.2: https://github.com/axios/axios MIT
     bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
     canvg 1.5.1: https://github.com/canvg/canvg MIT
@@ -491,6 +490,7 @@ MIT licenses
     codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
     dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
     element-ui 2.13.2: https://github.com/ElemeFE/element MIT
+    font-awesome ^4.7.0: https://github.com/FortAwesome/Font-Awesome OFL-1.1 AND MIT
     html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
     jquery 3.3.1: https://github.com/jquery/jquery MIT
     jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT
@@ -514,3 +514,8 @@ Apache 2.0 licenses
 BSD licenses
 ========================================
     d3 3.5.17: https://github.com/d3/d3 BSD-3-Clause
+
+========================================
+OFL licenses
+========================================
+    font-awesome ^4.7.0: https://github.com/FortAwesome/Font-Awesome OFL-1.1 AND MIT
