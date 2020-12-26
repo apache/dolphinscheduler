@@ -40,4 +40,17 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE t_ds_process_definition ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+
+ALTER TABLE t_ds_process_definition_version ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+
+
+
+ALTER TABLE t_ds_process_definition DROP receivers, DROP receivers_cc;
+
+ALTER TABLE t_ds_process_definition_version DROP receivers, DROP receivers_cc;
+
+ALTER TABLE  t_ds_alert DROP show_type,DROP alert_type,DROP receivers,DROP receivers_cc;
+
+
 

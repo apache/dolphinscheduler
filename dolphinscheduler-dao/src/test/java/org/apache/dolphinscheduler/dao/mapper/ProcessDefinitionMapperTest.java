@@ -47,7 +47,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @SpringBootTest
 @Transactional
 @Rollback(true)
-@Ignore("need add new column")
 public class ProcessDefinitionMapperTest {
 
 

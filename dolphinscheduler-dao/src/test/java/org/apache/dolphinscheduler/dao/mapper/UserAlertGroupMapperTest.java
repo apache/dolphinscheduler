@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @Rollback(true)
-@Ignore("need add new column")
 public class UserAlertGroupMapperTest {
 
     @Autowired
