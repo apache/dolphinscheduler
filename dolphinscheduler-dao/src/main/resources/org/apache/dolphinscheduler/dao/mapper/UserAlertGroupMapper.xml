@@ -18,14 +18,14 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper">
-    <delete id="deleteByAlertgroupId">
+    <delete id="deleteByAlertGroupId">
         delete from t_ds_relation_user_alertgroup
         where alertgroup_id = #{alertgroupId}
     </delete>
-    <select id="listUserByAlertgroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
-           SELECT u.*
-           FROM t_ds_relation_user_alertgroup g_u
-           JOIN t_ds_user u on g_u.user_id = u.id
-           WHERE g_u.alertgroup_id = #{alertgroupId}
+    <select id="listUserByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        SELECT u.*
+        FROM t_ds_relation_user_alertgroup g_u
+        JOIN t_ds_user u on g_u.user_id = u.id
+        WHERE g_u.alertgroup_id = #{alertgroupId}
     </select>
 </mapper>
