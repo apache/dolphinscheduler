@@ -1965,6 +1965,8 @@ public class ProcessService {
                     Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
                     originResSet.removeAll(authorizedUdfs);
                     break;
+                default:
+                    break;
             }
 
             resultList.addAll(originResSet);
