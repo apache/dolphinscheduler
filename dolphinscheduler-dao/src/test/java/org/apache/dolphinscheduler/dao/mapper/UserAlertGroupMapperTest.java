@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -113,7 +112,6 @@ public class UserAlertGroupMapperTest {
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setGroupName("alert group 1");
         alertGroup.setDescription("alert test1");
-        alertGroup.setGroupType(AlertType.EMAIL);
 
         alertGroup.setCreateTime(new Date());
         alertGroup.setUpdateTime(new Date());
