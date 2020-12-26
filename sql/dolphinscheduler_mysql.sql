@@ -299,7 +299,6 @@ DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `group_name` varchar(255) DEFAULT NULL COMMENT 'group name',
-  `group_type` tinyint(4) DEFAULT NULL COMMENT 'Group type (message 0, SMS 1...)',
   `description` varchar(255) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',

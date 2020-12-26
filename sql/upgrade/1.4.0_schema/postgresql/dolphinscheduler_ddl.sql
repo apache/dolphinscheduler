@@ -39,16 +39,20 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
-ALTER TABLE t_ds_process_definition ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+ALTER TABLE t_ds_process_definition ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
 
-ALTER TABLE t_ds_process_definition_version ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+ALTER TABLE t_ds_process_definition_version ADD COLUMN `warning_group_id` int4 DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
 
 
 -- ----------------------------
 -- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
 -- ----------------------------
-/*ALTER TABLE t_ds_process_definition DROP receivers, DROP receivers_cc;
+/*
+ALTER TABLE t_ds_process_definition DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
-ALTER TABLE t_ds_process_definition_version DROP receivers, DROP receivers_cc;
+ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN "receivers_cc";
 
-ALTER TABLE  t_ds_alert DROP show_type,DROP alert_type,DROP receivers,DROP receivers_cc;*/
+ALTER TABLE  t_ds_alert DROP COLUMN "show_type",DROP COLUMN "alert_type",DROP COLUMN "receivers",DROP COLUMN "receivers_cc";
+
+ALTER TABLE  t_ds_alertgroup DROP COLUMN "group_type";
+*/

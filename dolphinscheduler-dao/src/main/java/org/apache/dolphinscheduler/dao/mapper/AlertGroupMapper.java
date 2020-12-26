@@ -55,14 +55,6 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      */
     List<AlertGroup> queryByUserId(@Param("userId") int userId);
 
-
-    /**
-     * query by alert type
-     * @param alertType alertType
-     * @return alertgroup list
-     */
-    List<AlertGroup> queryByAlertType(@Param("alertType") AlertType alertType);
-
     /**
      * query all group list
      * @return alertgroup list

@@ -111,7 +111,6 @@ public class AlertGroupService extends BaseService{
         Date now = new Date();
 
         alertGroup.setGroupName(groupName);
-        alertGroup.setGroupType(groupType);
         alertGroup.setDescription(desc);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
@@ -157,10 +156,6 @@ public class AlertGroupService extends BaseService{
 
         if (StringUtils.isNotEmpty(groupName)) {
             alertGroup.setGroupName(groupName);
-        }
-
-        if (groupType != null) {
-            alertGroup.setGroupType(groupType);
         }
         alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);

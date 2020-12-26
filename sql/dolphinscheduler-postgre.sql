@@ -203,7 +203,6 @@ DROP TABLE IF EXISTS t_ds_alertgroup;
 CREATE TABLE t_ds_alertgroup (
   id int NOT NULL  ,
   group_name varchar(255) DEFAULT NULL ,
-  group_type int DEFAULT NULL ,
   description varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -297,7 +296,7 @@ CREATE TABLE t_ds_process_definition (
   flag int DEFAULT NULL ,
   locations text ,
   connects text ,
-  warning_group_id int(11) DEFAULT NULL ,
+  warning_group_id int4 DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
@@ -324,7 +323,7 @@ CREATE TABLE t_ds_process_definition_version (
   global_params text ,
   locations text ,
   connects text ,
-  warning_group_id int(11) DEFAULT NULL,
+  warning_group_id int4 DEFAULT NULL,
   create_time timestamp DEFAULT NULL ,
   timeout int DEFAULT '0' ,
   resource_ids varchar(64),
@@ -781,7 +780,7 @@ ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_
 INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,state,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
-INSERT INTO t_ds_alertgroup(group_name,group_type,description,create_time,update_time)  VALUES ('dolphinscheduler warning group', '0', 'dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_alertgroup(group_name,description,create_time,update_time)  VALUES ('dolphinscheduler warning group','dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
 INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,update_time) VALUES ( '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
