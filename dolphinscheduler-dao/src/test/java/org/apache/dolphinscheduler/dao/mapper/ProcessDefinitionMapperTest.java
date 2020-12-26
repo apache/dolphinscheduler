@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +77,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setUserId(101);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-
         processDefinitionMapper.insert(processDefinition);
         return processDefinition;
     }
@@ -171,8 +168,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setCreateTime(new Date());
         processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
-//        processDefinition.setGlobalParams("[{\"prop\":\"selenium_global_parameters_1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"selenium_global_parameters_value_1\"}]");
-//
         processDefinitionMapper.insert(processDefinition);
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getId(), "def 1");
