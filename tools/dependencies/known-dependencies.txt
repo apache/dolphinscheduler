@@ -127,7 +127,6 @@ jna-platform-4.5.2.jar
 joda-time-2.10.6.jar
 jpam-1.1.jar
 jsch-0.1.42.jar
-jsp-2.1-6.1.14.jar
 jsp-api-2.1-6.1.14.jar
 jsp-api-2.1.jar
 jsqlparser-2.1.jar
