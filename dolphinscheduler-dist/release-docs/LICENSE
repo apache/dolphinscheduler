@@ -321,7 +321,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     joda-time 2.10.1: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
-    jsp-api-2.1 6.1.14: https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-api-2.1/6.1.14, Apache 2.0
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
     libfb303 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libfb303/0.9.3, Apache 2.0
     libthrift 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libthrift/0.9.3, Apache 2.0
