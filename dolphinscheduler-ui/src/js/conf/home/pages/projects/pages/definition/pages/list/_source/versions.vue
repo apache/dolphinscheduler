@@ -21,103 +21,69 @@
       <span class="name">{{$t('Version Info')}}</span>
     </div>
 
-    <div class="table-box" v-if="processDefinitionVersions.length > 0">
-      <table class="fixed">
-        <caption><!-- placeHolder --></caption>
-        <tr>
-          <th scope="col" style="min-width: 40px;text-align: left">
-            <span>{{$t('Version')}}</span>
-          </th>
-          <th scope="col" style="min-width: 30px">
-            <span>{{$t('Description')}}</span>
-          </th>
-          <th scope="col" style="min-width: 50px">
-            <span>{{$t('Create Time')}}</span>
-          </th>
-          <th scope="col" style="min-width: 300px">
-            <span>{{$t('Operation')}}</span>
-          </th>
-        </tr>
-        <tr v-for="(item, $index) in processDefinitionVersions" :key="item.id">
-          <td>
-            <span v-if="item.version">
-              <span v-if="item.version === processDefinition.version" style="color: green"><strong>{{item.version}} {{$t('Current Version')}}</strong></span>
-              <span v-else>{{item.version}}</span>
+    <div class="table-box" v-if="versionData.processDefinitionVersions.length > 0">
+      <el-table :data="versionData.processDefinitionVersions" size="mini" style="width: 100%">
+        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column prop="userName" :label="$t('Version')">
+          <template slot-scope="scope">
+            <span v-if="scope.row.version">
+              <span v-if="scope.row.version === versionData.processDefinition.version" style="color: green"><strong>{{scope.row.version}} {{$t('Current Version')}}</strong></span>
+              <span v-else>{{scope.row.version}}</span>
             </span>
             <span v-else>-</span>
-          </td>
-          <td style="word-break:break-all;">
-            <span v-if="item.description">{{item.description}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <span v-if="item.createTime">{{item.createTime}}</span>
-            <span v-else>-</span>
-          </td>
-          <td>
-            <x-poptip
-              :ref="'poptip-switch-version-' + $index"
-              placement="top-end"
-              width="260">
-              <p>{{$t('Confirm Switch To This Version?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeSwitchVersion($index)">
-                  {{$t('Cancel')}}
-                </x-button>
-                <x-button type="primary" size="xsmall" shape="circle"
-                          @click="_mVersionSwitchProcessDefinitionVersion(item)">{{$t('Confirm')}}
-                </x-button>
-              </div>
-              <template slot="reference">
-                <x-button
-                  icon="ans-icon-dependence"
-                  type="primary"
-                  shape="circle"
-                  size="xsmall"
-                  :disabled="item.version === processDefinition.version || 'ONLINE' === processDefinition.state"
-                  data-toggle="tooltip"
-                  :title="$t('Switch To This Version')">
-                </x-button>
-              </template>
-            </x-poptip>
-            <x-poptip
-              :ref="'poptip-delete-' + $index"
-              placement="top-end"
-              width="90">
-              <p>{{$t('Delete?')}}</p>
-              <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}
-                </x-button>
-                <x-button type="primary" size="xsmall" shape="circle"
-                          @click="_mVersionDeleteProcessDefinitionVersion(item,$index)">{{$t('Confirm')}}
-                </x-button>
-              </div>
-              <template slot="reference">
-                <x-button
-                  icon="ans-icon-trash"
-                  type="error"
-                  shape="circle"
-                  size="xsmall"
-                  :disabled="item.version === processDefinition.version || 'ONLINE' === processDefinition.state"
-                  data-toggle="tooltip"
-                  :title="$t('delete')">
-                </x-button>
-              </template>
-            </x-poptip>
-          </td>
-        </tr>
-      </table>
+          </template>
+        </el-table-column>
+        <el-table-column prop="description" :label="$t('Description')"></el-table-column>
+        <el-table-column :label="$t('Create Time')" min-width="120">
+          <template slot-scope="scope">
+            <span>{{scope.row.createTime | formatDate}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Operation')" width="100">
+          <template slot-scope="scope">
+            <el-tooltip :content="$t('Switch To This Version')" placement="top">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Confirm Switch To This Version?')"
+                @onConfirm="_mVersionSwitchProcessDefinitionVersion(scope.row)"
+              >
+                <el-button type="primary" size="mini" icon="el-icon-warning" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+            <el-tooltip :content="$t('delete')" placement="top">
+              <el-popconfirm
+                :confirmButtonText="$t('Confirm')"
+                :cancelButtonText="$t('Cancel')"
+                icon="el-icon-info"
+                iconColor="red"
+                :title="$t('Delete?')"
+                @onConfirm="_mVersionDeleteProcessDefinitionVersion(scope.row,scope.row.id)"
+              >
+                <el-button type="danger" size="mini" icon="el-icon-delete" circle slot="reference"></el-button>
+              </el-popconfirm>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
 
-    <div v-if="processDefinitionVersions.length === 0">
+    <div v-if="versionData.processDefinitionVersions.length === 0">
       <m-no-data><!----></m-no-data>
     </div>
 
-    <div v-if="processDefinitionVersions.length > 0">
+    <div v-if="versionData.processDefinitionVersions.length > 0">
       <div class="bottom-box">
-        <x-button type="text" @click="_close()"> {{$t('Cancel')}}</x-button>
-        <x-page :current="pageNo" :total="total" @on-change="_mVersionGetProcessDefinitionVersionsPage" small>
-          <!----></x-page>
+        <el-pagination
+            style="float:right"
+            background
+            @current-change="_mVersionGetProcessDefinitionVersionsPage"
+            layout="prev, pager, next"
+            :total="versionData.total">
+          </el-pagination>
+        <el-button type="text" size="mini" @click="_close()" style="float:right">{{$t('Cancel')}}</el-button>
       </div>
     </div>
 
@@ -144,11 +110,7 @@
       }
     },
     props: {
-      processDefinition: Object,
-      processDefinitionVersions: Array,
-      total: Number,
-      pageNo: Number,
-      pageSize: Number
+      versionData: Object
     },
     methods: {
       /**
@@ -157,7 +119,7 @@
       _mVersionSwitchProcessDefinitionVersion (item) {
         this.$emit('mVersionSwitchProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },
@@ -168,7 +130,7 @@
       _mVersionDeleteProcessDefinitionVersion (item) {
         this.$emit('mVersionDeleteProcessDefinitionVersion', {
           version: item.version,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },
@@ -180,33 +142,16 @@
         this.$emit('mVersionGetProcessDefinitionVersionsPage', {
           pageNo: val,
           pageSize: this.pageSize,
-          processDefinitionId: this.processDefinition.id,
+          processDefinitionId: this.versionData.processDefinition.id,
           fromThis: this
         })
       },
-
-      /**
-       * Close the switch version layer
-       */
-      _closeSwitchVersion (i) {
-        this.$refs[`poptip-switch-version-${i}`][0].doClose()
-      },
-
-      /**
-       * Close the delete layer
-       */
-      _closeDelete (i) {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
-      },
-
       /**
        * Close and destroy component and component internal events
        */
       _close () {
         // flag Whether to delete a node this.$destroy()
-        this.$emit('close', {
-          fromThis: this
-        })
+        this.$emit('closeVersion')
       }
     },
     created () {

@@ -49,9 +49,10 @@ public class HiveTargetGenerator implements ITargetGenerator {
 
                 if (StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase())
                     && StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
-                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_TABLE)
-                        .append(Constants.SPACE).append(String.format("%s.%s", targetHiveParameter.getHiveDatabase(),
-                        targetHiveParameter.getHiveTable()));
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_DATABASE)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHiveDatabase())
+                        .append(Constants.SPACE).append(SqoopConstants.HIVE_TABLE)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHiveTable());
                 }
 
                 if (targetHiveParameter.isCreateHiveTable()) {

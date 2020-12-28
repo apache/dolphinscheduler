@@ -34,31 +34,33 @@
     <div class="dag-contect">
       <div class="dag-toolbar">
         <div class="assist-btn">
-          <x-button
-                  style="vertical-align: middle;"
-                  data-toggle="tooltip"
-                  :title="$t('View variables')"
-                  data-container="body"
-                  type="primary"
-                  size="xsmall"
-                  :disabled="$route.name !== 'projects-instance-details'"
-                  @click="_toggleView"
-                  icon="ans-icon-code">
-          </x-button>
-          <x-button
+          <el-button
             style="vertical-align: middle;"
             data-toggle="tooltip"
-            :title="$t('Startup parameter')"
+            :title="$t('View variables')"
             data-container="body"
             type="primary"
-            size="xsmall"
+            size="mini"
             :disabled="$route.name !== 'projects-instance-details'"
-            @click="_toggleParam"
-            icon="ans-icon-arrow-circle-right">
-          </x-button>
+            @click="_toggleView"
+            icon="el-icon-c-scale-to-original">
+          </el-button>
+          <span>
+            <el-button
+              style="vertical-align: middle;"
+              data-toggle="tooltip"
+              :title="$t('Startup parameter')"
+              data-container="body"
+              type="primary"
+              size="mini"
+              :disabled="$route.name !== 'projects-instance-details'"
+              @click="_toggleParam"
+              icon="el-icon-arrow-right">
+            </el-button>
+          </span>
           <span class="name">{{name}}</span>
           &nbsp;
-          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="el-icon-copy-document" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -68,71 +70,75 @@
                :id="item.code"
                :key="$index"
                @click="_ckOperation(item,$event)">
-              <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
+              <el-button type="text" class="operBtn" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></el-button>
             </a>
           </div>
-          <x-button
-                  type="primary"
-                  v-tooltip.light="$t('Format DAG')"
-                  icon="ans-icon-triangle-solid-right"
-                  size="xsmall"
-                  data-container="body"
-                  v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
-                  style="vertical-align: middle;"
-                  @click="dagAutomaticLayout">
-          </x-button>
-          <x-button
-                  v-tooltip.light="$t('Refresh DAG status')"
-                  data-container="body"
-                  style="vertical-align: middle;"
-                  icon="ans-icon-refresh"
-                  type="primary"
-                  :loading="isRefresh"
-                  v-if="type === 'instance'"
-                  @click="!isRefresh && _refresh()"
-                  size="xsmall" >
-          </x-button>
-          <x-button
+          <el-button
+            type="primary"
+            v-tooltip.light="$t('Format DAG')"
+            icon="el-icon-caret-right"
+            size="mini"
+            data-container="body"
+            v-if="(type === 'instance' || 'definition') && urlParam.id !=undefined"
+            style="vertical-align: middle;"
+            @click="dagAutomaticLayout">
+          </el-button>
+          <span>
+            <el-button
+              v-tooltip.light="$t('Refresh DAG status')"
+              data-container="body"
+              style="vertical-align: middle;"
+              icon="el-icon-refresh"
+              type="primary"
+              :loading="isRefresh"
+              v-if="type === 'instance'"
+              @click="!isRefresh && _refresh()"
+              size="mini" >
+            </el-button>
+          </span>
+          <el-button
                   v-if="isRtTasks"
                   style="vertical-align: middle;"
                   type="primary"
-                  size="xsmall"
-                  icon="ans-icon-play"
+                  size="mini"
+                  icon="el-icon-back"
                   @click="_rtNodesDag" >
             {{$t('Return_1')}}
-          </x-button>
-          <x-button
-            type="primary"
-            v-tooltip.light="$t('Close')"
-            icon="ans-icon-off"
-            size="xsmall"
-            data-container="body"
-            v-if="(type === 'instance' || 'definition') "
-            style="vertical-align: middle;"
-            @click="_closeDAG">
-            {{$t('Close')}}
-          </x-button>
-          <x-button
+          </el-button>
+          <span>
+            <el-button
+              type="primary"
+              v-tooltip.light="$t('Close')"
+              icon="el-icon-switch-button"
+              size="mini"
+              data-container="body"
+              v-if="(type === 'instance' || 'definition') "
+              style="vertical-align: middle;"
+              @click="_closeDAG">
+              {{$t('Close')}}
+            </el-button>
+          </span>
+          <el-button
                   style="vertical-align: middle;"
                   type="primary"
-                  size="xsmall"
+                  size="mini"
                   :loading="spinnerLoading"
                   @click="_saveChart"
-                  icon="ans-icon-save"
+                  icon="el-icon-document-checked"
                   >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
-          </x-button>
-          <x-button
-                  style="vertical-align: middle;"
-                  type="primary"
-                  size="xsmall"
-                  v-if="this.type !== 'instance' && this.urlParam.id !== null"
-                  :loading="spinnerLoading"
-                  @click="_version"
-                  icon="ans-icon-dependence"
-                  >
-            {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
-          </x-button>
+          </el-button>
+          <span>
+            <el-button
+              style="vertical-align: middle;"
+              type="primary"
+              size="mini"
+              :loading="spinnerLoading"
+              @click="_version"
+              icon="el-icon-info">
+              {{spinnerLoading ? 'Loading...' : $t('Version Info')}}
+            </el-button>
+          </span>
         </div>
       </div>
       <div class="scrollbar dag-container">
@@ -140,6 +146,45 @@
           <div class="jtk-demo-canvas canvas-wide statemachine-demo jtk-surface jtk-surface-nopan jtk-draggable" id="canvas" ></div>
         </div>
       </div>
+      <el-drawer
+        :visible.sync="drawer"
+        size="35%"
+        :with-header="false">
+        <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
+      </el-drawer>
+      <el-drawer
+        :visible.sync="nodeDrawer"
+        size="50%"
+        :with-header="false">
+        <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
+      </el-drawer>
+      <el-drawer
+        :visible.sync="lineDrawer"
+        size="50%"
+        :wrapperClosable="false"
+        :with-header="false">
+        <m-form-line-model :lineData = lineData @addLineInfo="addLineInfo" @cancel="cancel"></m-form-line-model>
+      </el-drawer>
+      <el-drawer
+        :visible.sync="udpDrawer"
+        size="50%"
+        :wrapperClosable="false"
+        :with-header="false">
+        <m-udp></m-udp>
+      </el-drawer>
+      <el-dialog
+        :title="$t('Set the DAG diagram name')"
+        :visible.sync="dialogVisible"
+        width="45%">
+        <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
+      </el-dialog>
+
+      <el-dialog
+      :title="$t('Please set the parameters before starting')"
+      :visible.sync="startDialog"
+      width="65%">
+      <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+    </el-dialog>
     </div>
   </div>
 </template>
@@ -158,6 +203,7 @@
   import { findComponentDownward } from '@/module/util/'
   import disabledState from '@/module/mixin/disabledState'
   import { mapActions, mapState, mapMutations } from 'vuex'
+  import mStart from '../../projects/pages/definition/pages/list/_source/start'
   import mVersions from '../../projects/pages/definition/pages/list/_source/versions'
 
   let eventModel
@@ -179,7 +225,39 @@
         isLoading: false,
         taskId: null,
         arg: false,
-
+        versionData: {
+          processDefinition: {
+            id: null,
+            version: '',
+            state: ''
+          },
+          processDefinitionVersions: [],
+          total: null,
+          pageNo: null,
+          pageSize: null
+        },
+        drawer: false,
+        nodeData: {
+          id: null,
+          taskType: '',
+          self: {},
+          preNode: [],
+          rearList: [],
+          instanceId: null
+        },
+        nodeDrawer: false,
+        lineData: {
+          id: null,
+          sourceId: '',
+          targetId: ''
+        },
+        lineDrawer: false,
+        udpDrawer: false,
+        dialogVisible: false,
+        startDialog: false,
+        startData: {},
+        startNodeList: '',
+        sourceType: ''
       }
     },
     mixins: [disabledState],
@@ -190,43 +268,54 @@
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState', 'switchProcessDefinitionVersion', 'getProcessDefinitionVersionsPage', 'deleteProcessDefinitionVersion']),
       ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName', 'addConnects']),
-
+      startRunning (item, startNodeList, sourceType) {
+        this.startData = item
+        this.startNodeList = startNodeList
+        this.sourceType = sourceType
+        this.startDialog = true
+      },
+      onUpdateStart () {
+        this.startDialog = false
+      },
+      closeStart () {
+        this.startDialog = false
+      },
       // DAG automatic layout
-      dagAutomaticLayout() {
-        if(this.store.state.dag.isEditDag) {
+      dagAutomaticLayout () {
+        if (this.store.state.dag.isEditDag) {
           this.$message.warning(`${i18n.$t('Please save the DAG before formatting')}`)
           return false
         }
         $('#canvas').html('')
 
-      // Destroy round robin
+        // Destroy round robin
         Dag.init({
-        dag: this,
-        instance: jsPlumb.getInstance({
-          Endpoint: [
-            'Dot', { radius: 1, cssClass: 'dot-style' }
-          ],
-          Connector: 'Bezier',
-          PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          ConnectionOverlays: [
-            [
-              'Arrow',
-              {
-                location: 1,
-                id: 'arrow',
-                length: 12,
-                foldback: 0.8
-              }
+          dag: this,
+          instance: jsPlumb.getInstance({
+            Endpoint: [
+              'Dot', { radius: 1, cssClass: 'dot-style' }
             ],
-            ['Label', {
+            Connector: 'Bezier',
+            PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+            ConnectionOverlays: [
+              [
+                'Arrow',
+                {
+                  location: 1,
+                  id: 'arrow',
+                  length: 12,
+                  foldback: 0.8
+                }
+              ],
+              ['Label', {
                 location: 0.5,
                 id: 'label'
-            }]
-          ],
-          Container: 'canvas',
-          ConnectionsDetachable: true
+              }]
+            ],
+            Container: 'canvas',
+            ConnectionsDetachable: true
+          })
         })
-      })
         if (this.tasks.length) {
           Dag.backfill(true)
           if (this.type === 'instance') {
@@ -255,8 +344,8 @@
       /**
        * copy name
        */
-      _copyName(){
-        let clipboard = new Clipboard(`.copy-name`)
+      _copyName () {
+        let clipboard = new Clipboard('.copy-name')
         clipboard.on('success', e => {
           this.$message.success(`${i18n.$t('Copy success')}`)
           // Free memory
@@ -294,8 +383,8 @@
                   let dom = $(`#${v2.id}`)
                   let state = dom.find('.state-p')
                   let depState = ''
-                   taskList.forEach(item=>{
-                    if(item.name==v1.name) {
+                  taskList.forEach(item => {
+                    if (item.name === v1.name) {
                       depState = item.state
                     }
                   })
@@ -371,7 +460,7 @@
           this.spinnerLoading = true
           // Storage store
           Dag.saveStore().then(res => {
-            if(this._verifConditions(res.tasks)) {
+            if (this._verifConditions(res.tasks)) {
               if (this.urlParam.id) {
                 /**
                  * Edit
@@ -379,7 +468,12 @@
                  * @param saveEditDAGChart => Process definition editing
                  */
                 this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
-                  this.$message.success(res.msg)
+                  // this.$message.success(res.msg)
+                  this.$message({
+                    message: res.msg,
+                    type: 'success',
+                    offset: 80
+                  })
                   this.spinnerLoading = false
                   // Jump process definition
                   if (this.type === 'instance') {
@@ -415,57 +509,36 @@
           })
         })
       },
-      _closeDAG(){
+      _closeDAG () {
         let $name = this.$route.name
-        if($name && $name.indexOf("definition") != -1){
-          this.$router.push({ name: 'projects-definition-list'})
-        }else{
-          this.$router.push({ name: 'projects-instance-list'})
+        if ($name && $name.indexOf('definition') !== -1) {
+          this.$router.push({ name: 'projects-definition-list' })
+        } else {
+          this.$router.push({ name: 'projects-instance-list' })
         }
       },
       _verifConditions (value) {
         let tasks = value
         let bool = true
-        tasks.map(v=>{
-          if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
+        tasks.map(v => {
+          if (v.type === 'CONDITIONS' && (v.conditionResult.successNode[0] === '' || v.conditionResult.successNode[0] === null || v.conditionResult.failedNode[0] === '' || v.conditionResult.failedNode[0] === null)) {
             bool = false
             return false
           }
         })
-        if(!bool) {
+        if (!bool) {
           this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
           this.spinnerLoading = false
           return false
         }
         return true
       },
-      /**
-       * Global parameter
-       * @param Promise
-       */
-      _udpTopFloorPop () {
-        return new Promise((resolve, reject) => {
-          let modal = this.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mUdp, {
-                on: {
-                  onUdp () {
-                    modal.remove()
-                    resolve()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                }
-              })
-            }
-          })
-        })
+      onUdpDialog () {
+        this._save()
+        this.dialogVisible = false
+      },
+      closeDialog () {
+        this.dialogVisible = false
       },
       /**
        * Save chart
@@ -476,11 +549,7 @@
           this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
-
-        // Global parameters (optional)
-        this._udpTopFloorPop().then(() => {
-          return this._save()
-        })
+        this.dialogVisible = true
       },
       /**
        * Return to the previous child node
@@ -531,63 +600,75 @@
        * View variables
        */
       _toggleView () {
-        findComponentDownward(this.$root, `assist-dag-index`)._toggleView()
+        findComponentDownward(this.$root, 'assist-dag-index')._toggleView()
       },
 
       /**
        * Starting parameters
        */
       _toggleParam () {
-        findComponentDownward(this.$root, `starting-params-dag-index`)._toggleParam()
+        findComponentDownward(this.$root, 'starting-params-dag-index')._toggleParam()
       },
+      addLineInfo ({ item, fromThis }) {
+        this.addConnects(item)
+        this.lineDrawer = false
+      },
+      cancel ({ fromThis }) {
+        this.lineDrawer = false
+      },
+
       /**
        * Create a node popup layer
        * @param Object id
        */
-      _createLineLabel({id, sourceId, targetId}) {
-        // $('#jsPlumb_2_50').text('111')
-        let self = this
-        self.$modal.destroy()
-        const removeNodesEvent = (fromThis) => {
-          // Manually destroy events inside the component
-          fromThis.$destroy()
-          // Close the popup
-          eventModel.remove()
-        }
-        eventModel = this.$drawer({
-          className: 'dagMask',
-          render (h) {
-            return h(mFormLineModel,{
-              on: {
-                addLineInfo ({ item, fromThis }) {
-                  self.addConnects(item)
-                  setTimeout(() => {
-                    removeNodesEvent(fromThis)
-                  }, 100)
-                },
-                cancel ({fromThis}) {
-                  removeNodesEvent(fromThis)
-                }
-              },
-              props: {
-                id: id,
-                sourceId: sourceId,
-                targetId: targetId
-              }
-            })
+      _createLineLabel ({ id, sourceId, targetId }) {
+        this.lineData.id = id
+        this.lineData.sourceId = sourceId
+        this.lineData.targetId = targetId
+        this.lineDrawer = true
+      },
+
+      seeHistory (taskName) {
+        this.nodeData.self.$router.push({
+          name: 'task-instance',
+          query: {
+            processInstanceId: this.nodeData.self.$route.params.id,
+            taskName: taskName
           }
         })
       },
+
+      addTaskInfo ({ item, fromThis }) {
+        this.addTasks(item)
+        this.nodeDrawer = false
+      },
+
+      cacheTaskInfo ({ item, fromThis }) {
+        this.cacheTasks(item)
+      },
+
+      close ({ item, flag, fromThis }) {
+        this.addTasks(item)
+        // Edit status does not allow deletion of nodes
+        if (flag) {
+          jsPlumb.remove(this.nodeData.id)
+        }
+        this.nodeDrawer = false
+      },
+      onSubProcess ({ subProcessId, fromThis }) {
+        this._subProcessHandle(subProcessId)
+      },
+
       _createNodes ({ id, type }) {
         let self = this
         let preNode = []
         let rearNode = []
         let rearList = []
-        $('div[data-targetarr*="' + id + '"]').each(function(){
-          rearNode.push($(this).attr("id"))
+        $('div[data-targetarr*="' + id + '"]').each(function () {
+          rearNode.push($(this).attr('id'))
         })
 
-        if (rearNode.length>0) {
+        if (rearNode.length > 0) {
           rearNode.forEach(v => {
             let rearobj = {}
             rearobj.value = $(`#${v}`).find('.name-p').text()
@@ -609,78 +690,96 @@
         } else {
           preNode = []
         }
-        if (eventModel) {
-          // Close the popup
-          eventModel.remove()
-        }
-
-        const removeNodesEvent = (fromThis) => {
-          // Manually destroy events inside the component
-          fromThis.$destroy()
-          // Close the popup
-          eventModel.remove()
-        }
 
         this.taskId = id
         type = type || self.dagBarId
 
-        eventModel = this.$drawer({
-          closable: false,
-          direction: 'right',
-          escClose: true,
-          className: 'dagMask',
-          render: h => h(mFormModel, {
-            on: {
-              addTaskInfo ({ item, fromThis }) {
-                self.addTasks(item)
-                setTimeout(() => {
-                  removeNodesEvent(fromThis)
-                }, 100)
-              },
-              /**
-               * Cache the item
-               * @param item
-               * @param fromThis
-               */
-              cacheTaskInfo({item, fromThis}) {
-                self.cacheTasks(item)
-              },
-              close ({ item,flag, fromThis }) {
-                self.addTasks(item)
-                // Edit status does not allow deletion of nodes
-                if (flag) {
-                  jsPlumb.remove(id)
-                }
+        this.nodeData.id = id
+        this.nodeData.taskType = type
+        this.nodeData.self = self
+        this.nodeData.preNode = preNode
+        this.nodeData.rearList = rearList
+        this.nodeData.instanceId = this.$route.params.id
 
-                removeNodesEvent(fromThis)
-              },
-              onSubProcess ({ subProcessId, fromThis }) {
-                removeNodesEvent(fromThis)
-                self._subProcessHandle(subProcessId)
-              }
-            },
-            props: {
-              id: id,
-              taskType: type,
-              self: self,
-              preNode: preNode,
-              rearList: rearList,
-              instanceId: this.$route.params.id
-            }
-          })
-        })
+        this.nodeDrawer = true
       },
       removeEventModelById ($id) {
-        if(eventModel && this.taskId == $id){
+        if (eventModel && this.taskId === $id) {
           eventModel.remove()
         }
       },
 
       /**
+        * switch version in process definition version list
+        *
+        * @param version the version user want to change
+        * @param processDefinitionId the process definition id
+        * @param fromThis fromThis
+      */
+      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.$store.state.dag.isSwitchVersion = true
+        this.switchProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success($t('Switch Version Successfully'))
+          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}?_t=${new Date().getTime()}` })
+        }).catch(e => {
+          this.$store.state.dag.isSwitchVersion = false
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      /**
+        * Paging event of process definition versions
+        *
+        * @param pageNo page number
+        * @param pageSize page size
+        * @param processDefinitionId the process definition id of page version
+        * @param fromThis fromThis
+      */
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+        this.getProcessDefinitionVersionsPage({
+          pageNo: pageNo,
+          pageSize: pageSize,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.versionData.processDefinitionVersions = res.data.lists
+          this.versionData.total = res.data.totalCount
+          this.versionData.pageSize = res.data.pageSize
+          this.versionData.pageNo = res.data.currentPage
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      /**
+       * delete one version of process definition
+       *
+       * @param version the version need to delete
+       * @param processDefinitionId the process definition id user want to delete
+       * @param fromThis fromThis
+       */
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * query the process definition pagination version
        */
       _version (item) {
-        let self = this
         this.getProcessDefinitionVersionsPage({
           pageNo: 1,
           pageSize: 10,
@@ -690,127 +789,27 @@
           let total = res.data.totalCount
           let pageSize = res.data.pageSize
           let pageNo = res.data.currentPage
-          if (this.versionsModel) {
-            this.versionsModel.remove()
-          }
-          this.versionsModel = this.$drawer({
-            direction: 'right',
-            closable: true,
-            showMask: true,
-            escClose: true,
-            render (h) {
-              return h(mVersions, {
-                on: {
-                  /**
-                   * switch version in process definition version list
-                   *
-                   * @param version the version user want to change
-                   * @param processDefinitionId the process definition id
-                   * @param fromThis fromThis
-                   */
-                  mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-
-                    self.$store.state.dag.isSwitchVersion = true
-
-                    self.switchProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success($t('Switch Version Successfully'))
-                      setTimeout(() => {
-                        fromThis.$destroy()
-                        self.versionsModel.remove()
-                      }, 0)
-                      self.$router.push({ path: `/projects/definition/list/${processDefinitionId}?_t=${new Date().getTime()}` })
-                    }).catch(e => {
-                      self.$store.state.dag.isSwitchVersion = false
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * Paging event of process definition versions
-                   *
-                   * @param pageNo page number
-                   * @param pageSize page size
-                   * @param processDefinitionId the process definition id of page version
-                   * @param fromThis fromThis
-                   */
-                  mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
-                    self.getProcessDefinitionVersionsPage({
-                      pageNo: pageNo,
-                      pageSize: pageSize,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      fromThis.processDefinitionVersions = res.data.lists
-                      fromThis.total = res.data.totalCount
-                      fromThis.pageSize = res.data.pageSize
-                      fromThis.pageNo = res.data.currentPage
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * delete one version of process definition
-                   *
-                   * @param version the version need to delete
-                   * @param processDefinitionId the process definition id user want to delete
-                   * @param fromThis fromThis
-                   */
-                  mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-                    self.deleteProcessDefinitionVersion({
-                      version: version,
-                      processDefinitionId: processDefinitionId
-                    }).then(res => {
-                      self.$message.success(res.msg || '')
-                      fromThis.$emit('mVersionGetProcessDefinitionVersionsPage', {
-                        pageNo: 1,
-                        pageSize: 10,
-                        processDefinitionId: processDefinitionId,
-                        fromThis: fromThis
-                      })
-                    }).catch(e => {
-                      self.$message.error(e.msg || '')
-                    })
-                  },
-
-                  /**
-                   * remove this drawer
-                   *
-                   * @param fromThis
-                   */
-                  close ({ fromThis }) {
-                    setTimeout(() => {
-                      fromThis.$destroy()
-                      self.versionsModel.remove()
-                    }, 0)
-                  }
-                },
-                props: {
-                  processDefinition: {
-                    id: self.urlParam.id,
-                    version: self.$store.state.dag.version,
-                    state: self.releaseState
-                  },
-                  processDefinitionVersions: processDefinitionVersions,
-                  total: total,
-                  pageNo: pageNo,
-                  pageSize: pageSize
-                }
-              })
-            }
-          })
+          this.versionData.processDefinition.id = this.urlParam.id
+          this.versionData.processDefinition.version = this.$store.state.dag.version
+          this.versionData.processDefinition.state = this.releaseState
+          this.versionData.processDefinitionVersions = processDefinitionVersions
+          this.versionData.total = total
+          this.versionData.pageNo = pageNo
+          this.versionData.pageSize = pageSize
+          this.drawer = true
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+
+      closeVersion () {
+        this.drawer = false
       }
     },
     watch: {
-      'tasks': {
+      tasks: {
         deep: true,
         handler (o) {
-
           // Edit state does not allow deletion of node a...
           this.setIsEditDag(true)
         }
@@ -843,8 +842,8 @@
               }
             ],
             ['Label', {
-                location: 0.5,
-                id: 'label'
+              location: 0.5,
+              id: 'label'
             }]
           ],
           Container: 'canvas',
@@ -869,10 +868,13 @@
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
     },
-    components: {}
+    components: { mVersions, mFormModel, mFormLineModel, mUdp, mStart }
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
+  .operBtn {
+    padding: 8px 20px;
+  }
 </style>
