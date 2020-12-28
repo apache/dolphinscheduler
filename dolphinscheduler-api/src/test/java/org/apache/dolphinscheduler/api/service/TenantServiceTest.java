@@ -193,7 +193,7 @@ public class TenantServiceTest {
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
         String resultString;
         if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
-            resultString = "租户编码[TenantServiceTest]已存在";
+            resultString = "操作系统租户[TenantServiceTest]已存在";
         } else {
             resultString = "tenant code TenantServiceTest already exists";
         }
