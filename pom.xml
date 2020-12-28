@@ -801,6 +801,7 @@
                         <include>**/api/service/TaskInstanceServiceTest.java</include>
                         <include>**/api/service/TenantServiceTest.java</include>
                         <include>**/api/service/UdfFuncServiceTest.java</include>
+                        <include>**/api/service/UiPluginServiceTest.java</include>
                         <include>**/api/service/UserAlertGroupServiceTest.java</include>
                         <include>**/api/service/UsersServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
