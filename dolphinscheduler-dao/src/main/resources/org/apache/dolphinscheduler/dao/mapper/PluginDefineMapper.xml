@@ -25,7 +25,7 @@
     </select>
 
     <select id="queryByPluginType" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
-        select *
+        select id,plugin_name,plugin_type,create_time,update_time
         from t_ds_plugin_define
         where plugin_type = #{pluginType}
     </select>
@@ -35,4 +35,11 @@
         from t_ds_plugin_define
         where plugin_name = #{pluginName} and plugin_type = #{pluginType}
     </select>
+
+    <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
+        select id,plugin_name,plugin_type,plugin_params,create_time,update_time
+        from t_ds_plugin_define
+        where id = #{id}
+    </select>
+
 </mapper>

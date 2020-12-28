@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.DolphinSchedulerPlugin;
 import org.apache.dolphinscheduler.spi.alert.AlertChannel;
@@ -91,7 +92,7 @@ public class AlertPluginManager extends AbstractDolphinPluginManager {
             String nameEn = alertChannelFactory.getName();
             String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
-            PluginDefine pluginDefine = new PluginDefine(nameEn, "alert", paramsJson);
+            PluginDefine pluginDefine = new PluginDefine(nameEn, PluginType.ALERT.getDesc(), paramsJson);
             pluginDao.addOrUpdatePluginDefine(pluginDefine);
         }
     }

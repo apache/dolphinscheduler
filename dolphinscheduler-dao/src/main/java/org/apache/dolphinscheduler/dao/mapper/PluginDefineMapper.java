@@ -43,6 +43,14 @@ public interface PluginDefineMapper extends BaseMapper<PluginDefine> {
     List<PluginDefine> queryByPluginType(@Param("pluginType") String pluginType);
 
     /**
+     * query detail by id
+     *
+     * @param id id
+     * @return PluginDefineDetail
+     */
+    PluginDefine queryDetailById(@Param("id") int id);
+
+    /**
      * query by name and type
      *
      * @param pluginName
