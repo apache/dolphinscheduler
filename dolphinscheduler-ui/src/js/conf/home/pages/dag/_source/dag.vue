@@ -175,16 +175,15 @@
       <el-dialog
         :title="$t('Set the DAG diagram name')"
         :visible.sync="dialogVisible"
-        width="45%">
+        width="auto">
         <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
-
       <el-dialog
-      :title="$t('Please set the parameters before starting')"
-      :visible.sync="startDialog"
-      width="65%">
-      <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
-    </el-dialog>
+        :title="$t('Please set the parameters before starting')"
+        :visible.sync="startDialog"
+        width="auto">
+        <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+      </el-dialog>
     </div>
   </div>
 </template>

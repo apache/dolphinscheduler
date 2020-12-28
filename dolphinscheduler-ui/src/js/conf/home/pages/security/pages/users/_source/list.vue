@@ -82,25 +82,25 @@
     </div>
     <el-dialog
       :visible.sync="authProjectDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="authDataSourceDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="authUdfFuncDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="resourceDialog"
-      width="50%">
+      width="auto">
       <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
     </el-dialog>
   </div>
