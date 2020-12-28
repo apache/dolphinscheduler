@@ -183,6 +183,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('Project')}`
           this.authProjectDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthProject (projectIds) {
@@ -260,6 +262,8 @@
           this.resourceData.udfTargetList = udfTargetList
           this.resourceData.type.name = `${i18n.$t('Resources')}`
           this.resourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
 
@@ -298,6 +302,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('Datasource')}`
           this.authDataSourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthDataSource (datasourceIds) {
@@ -334,6 +340,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('UDF Function')}`
           this.authUdfFuncDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthUdfFunc (udfIds) {
