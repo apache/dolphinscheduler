@@ -399,7 +399,7 @@
         }
 
         if (!this.executorCores) {
-          this.$message.warning(`${i18n.$t('Please enter ExecutorPlease enter Executor cores')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor cores')}`)
           return false
         }
 

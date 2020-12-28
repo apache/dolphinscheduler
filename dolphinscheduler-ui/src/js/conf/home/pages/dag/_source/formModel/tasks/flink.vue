@@ -296,7 +296,7 @@
         }
 
         if (!this.jobManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter JobManager memory')}`)
           return false
         }
 
@@ -306,7 +306,7 @@
         }
 
         if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the taskManager memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter TaskManager memory')}`)
           return false
         }
 

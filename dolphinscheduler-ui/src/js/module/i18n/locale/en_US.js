@@ -116,7 +116,7 @@ export default {
   'Memory should be a positive integer': 'Memory should be a positive integer',
   'Core number should be positive integer': 'Core number should be positive integer',
   'Please enter JobManager memory': 'Please enter JobManager memory',
-  'Please enter TaskManager memory': 'Please enter the TaskManager memory',
+  'Please enter TaskManager memory': 'Please enter TaskManager memory',
   'Please enter Slot number': 'Please enter Slot number',
   'Please enter TaskManager number': 'Please enter TaskManager number',
   'Please enter app name(optional)': 'Please enter app name(optional)',
