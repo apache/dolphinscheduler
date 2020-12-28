@@ -50,5 +50,10 @@ public class DingTalkParamsConstants {
     static final String DING_TALK_PASSWORD = "dingtalk.password";
 
     static final String NAME_DING_TALK_PASSWORD = "dingTalkPassword";
+    
+    static final String NAME_DING_TALK_ISATALL = "dingTalk.isAtAll";
+    
+    static final String NAME_DING_TALK_MOBILELIST = "dingTalk.mobileList";
+
 
 }

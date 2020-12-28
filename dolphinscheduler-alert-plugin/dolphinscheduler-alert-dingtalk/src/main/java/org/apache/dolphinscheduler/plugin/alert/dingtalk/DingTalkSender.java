@@ -36,11 +36,15 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * Ding Talk Sender
@@ -51,6 +55,10 @@ public class DingTalkSender {
     private String url;
 
     private String keyword;
+    
+    private Boolean isAtAll;
+    
+    private String mobileList;
 
     private Boolean enableProxy;
 
@@ -65,6 +73,8 @@ public class DingTalkSender {
     DingTalkSender(Map<String, String> config) {
         url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);
         keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);
+        isAtAll = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_ISATALL));
+        mobileList =config.get(DingTalkParamsConstants.NAME_DING_TALK_MOBILELIST);
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));
@@ -144,15 +154,20 @@ public class DingTalkSender {
         return RequestConfig.custom().setProxy(httpProxy).build();
     }
 
-    private static String textToJsonString(String text) {
-        Map<String, Object> items = new HashMap<>();
-        items.put("msgtype", "text");
-        Map<String, String> textContent = new HashMap<>();
-        byte[] byt = StringUtils.getBytesUtf8(text);
-        String txt = StringUtils.newStringUtf8(byt);
-        textContent.put("content", txt);
-        items.put("text", textContent);
-        return JSONUtils.toJsonString(items);
+    private  String textToJsonString(String text) {
+    	List<String> mobileLists = Arrays.asList(mobileList.split(","));
+		Map<String, Object> atMap = Maps.newHashMap();
+		atMap.put("isAtAll", isAtAll);
+		atMap.put("atMobiles", mobileLists);
+		Map<String, Object> items = new HashMap<String, Object>();
+		items.put("msgtype", "text");
+		Map<String, String> textContent = new HashMap<String, String>();
+		byte[] byt = StringUtils.getBytesUtf8(text);
+		String txt = StringUtils.newStringUtf8(byt);
+		textContent.put("content", txt);
+		items.put("text", textContent);
+		items.put("at", atMap);
+		return JSONUtils.toJsonString(items);
     }
 
     public static class DingTalkSendMsgResponse {
