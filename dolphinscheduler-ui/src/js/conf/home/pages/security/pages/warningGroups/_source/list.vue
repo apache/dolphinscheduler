@@ -62,7 +62,7 @@
     </div>
     <el-dialog
       :visible.sync="transferDialog"
-      width="40%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdate="onUpdate" @close="close"></m-transfer>
     </el-dialog>
   </div>

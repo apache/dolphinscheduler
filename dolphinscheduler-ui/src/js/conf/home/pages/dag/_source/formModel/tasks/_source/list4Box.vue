@@ -24,11 +24,19 @@
         <slot name="content"></slot>
       </div>
     </div>
+    <div class="text-box">
+      <span><slot name="text-2"></slot></span>
+    </div>
+    <div class="cont-box">
+      <div class="label-box">
+        <slot name="content-2"></slot>
+      </div>
+    </div>
   </div>
 </template>
 <script>
   export default {
-    name: 'list-box'
+    name: 'list-4-box'
   }
 </script>
 
