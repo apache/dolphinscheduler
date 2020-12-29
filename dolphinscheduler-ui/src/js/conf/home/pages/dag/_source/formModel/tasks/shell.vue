@@ -26,7 +26,7 @@
             style="opacity: 0">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="el-icon-rank" @click="setEditorVal"></em>
+            <em class="el-icon-full-screen" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -52,7 +52,7 @@
     </m-list-box>
     <el-dialog
       :visible.sync="scriptBoxDialog"
-      modal-append-to-body="true"
+      append-to-body="true"
       width="80%">
       <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
     </el-dialog>
