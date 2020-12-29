@@ -141,7 +141,7 @@
       <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
     </el-dialog>
     <el-dialog
-      title="提示"
+      :title="$t('Info')"
       :visible.sync="relatedItemsDialog"
       width="auto">
       <m-related-items :tmp="tmp" @onBatchCopy="onBatchCopy" @onBatchMove="onBatchMove" @closeRelatedItems="closeRelatedItems"></m-related-items>
