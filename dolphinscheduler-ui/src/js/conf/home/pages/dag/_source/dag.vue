@@ -148,26 +148,26 @@
       </div>
       <el-drawer
         :visible.sync="drawer"
-        size="35%"
+        size=""
         :with-header="false">
         <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
       </el-drawer>
       <el-drawer
         :visible.sync="nodeDrawer"
-        size="50%"
+        size=""
         :with-header="false">
         <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"
-        size="50%"
+        size=""
         :wrapperClosable="false"
         :with-header="false">
         <m-form-line-model :lineData = lineData @addLineInfo="addLineInfo" @cancel="cancel"></m-form-line-model>
       </el-drawer>
       <el-drawer
         :visible.sync="udpDrawer"
-        size="50%"
+        size=""
         :wrapperClosable="false"
         :with-header="false">
         <m-udp></m-udp>
@@ -175,16 +175,15 @@
       <el-dialog
         :title="$t('Set the DAG diagram name')"
         :visible.sync="dialogVisible"
-        width="45%">
+        width="auto">
         <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
-
       <el-dialog
-      :title="$t('Please set the parameters before starting')"
-      :visible.sync="startDialog"
-      width="65%">
-      <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
-    </el-dialog>
+        :title="$t('Please set the parameters before starting')"
+        :visible.sync="startDialog"
+        width="auto">
+        <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+      </el-dialog>
     </div>
   </div>
 </template>

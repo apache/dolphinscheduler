@@ -124,26 +124,26 @@
     <el-button type="primary" size="mini" :disabled="!strSelectIds" style="position: absolute; bottom: -48px; left: 225px;" @click="_batchMove(item)" >{{$t('Batch move')}}</el-button>
     <el-drawer
       :visible.sync="drawer"
-      size="35%"
+      size=""
       :with-header="false">
       <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
     </el-drawer>
     <el-dialog
       :title="$t('Please set the parameters before starting')"
       :visible.sync="startDialog"
-      width="65%">
+      width="auto">
       <m-start :startData= "startData" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
     </el-dialog>
     <el-dialog
       :title="$t('Set parameters before timing')"
       :visible.sync="timingDialog"
-      width="65%">
+      width="auto">
       <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
     </el-dialog>
     <el-dialog
       title="提示"
       :visible.sync="relatedItemsDialog"
-      width="30%">
+      width="auto">
       <m-related-items :tmp="tmp" @onBatchCopy="onBatchCopy" @onBatchMove="onBatchMove" @closeRelatedItems="closeRelatedItems"></m-related-items>
     </el-dialog>
   </div>

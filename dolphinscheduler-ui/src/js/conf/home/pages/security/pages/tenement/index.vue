@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create Tenant')}}</el-button>
           <el-dialog
             :visible.sync="createTenementDialog"
-            width="60%">
+            width="auto">
             <m-create-tenement :item="item" @onUpdate="onUpdate" @close="close"></m-create-tenement>
           </el-dialog>
         </template>
