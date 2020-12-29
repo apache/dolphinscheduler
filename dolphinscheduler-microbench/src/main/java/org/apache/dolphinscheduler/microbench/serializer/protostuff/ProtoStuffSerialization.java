@@ -16,12 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ProtoStuffSerialization implements Serialization {
 
-    //避免每次序列化都重新申请Buffer空间
     private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-    //缓存Schema
-    private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<Class<?>, Schema<?>>();
 
-    //序列化方法，把指定对象序列化成字节数组
+    private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
+
     @SuppressWarnings("unchecked")
     public <T> byte[] serialize(T obj) {
         Class<T> clazz = (Class<T>) obj.getClass();
