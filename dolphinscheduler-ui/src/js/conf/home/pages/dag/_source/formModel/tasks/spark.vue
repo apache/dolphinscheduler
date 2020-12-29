@@ -80,69 +80,62 @@
         </el-radio-group>
       </div>
     </m-list-box>
-    <div class="list-box-4p">
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Driver core number')}}</span>
-        <span class="sp2">
-          <el-input
-                  :disabled="isDetails"
-                  type="input"
-                  size="small"
-                  v-model="driverCores"
-                  :placeholder="$t('Please enter driver core number')"
-                  style="width: 200px;">
+    <m-list-4-box>
+      <div slot="text">{{$t('Driver cores')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="driverCores"
+          :placeholder="$t('Please enter Driver cores')">
         </el-input>
-        </span>
-        <span class="sp1 sp3">{{$t('Driver memory use')}}</span>
-        <span class="sp2">
-          <el-input
-                  :disabled="isDetails"
-                  type="input"
-                  size="small"
-                  v-model="driverMemory"
-                  :placeholder="$t('Please enter driver memory use')"
-                  style="width: 186px;">
-        </el-input>
-        </span>
       </div>
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Number of Executors')}}</span>
-        <span class="sp2">
-          <el-input
-              :disabled="isDetails"
-              type="input"
-              size="small"
-              v-model="numExecutors"
-              :placeholder="$t('Please enter the number of Executor')"
-              style="width: 200px;">
+      <div slot="text-2">{{$t('Driver memory')}}</div>
+      <div slot="content-2">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="driverMemory"
+          :placeholder="$t('Please enter Driver memory')">
         </el-input>
-        </span>
-        <span class="sp1 sp3">{{$t('Executor memory')}}</span>
-        <span class="sp2">
-          <el-input
-              :disabled="isDetails"
-              type="input"
-              size="small"
-              v-model="executorMemory"
-              :placeholder="$t('Please enter the Executor memory')"
-              style="width: 186px;">
+      </div>
+    </m-list-4-box>
+    <m-list-4-box>
+      <div slot="text">{{$t('Executor Number')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="numExecutors"
+          :placeholder="$t('Please enter Executor number')">
         </el-input>
-        </span>
       </div>
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Executor core number')}}</span>
-        <span class="sp2">
-          <el-input
-              :disabled="isDetails"
-              type="input"
-              size="small"
-              v-model="executorCores"
-              :placeholder="$t('Please enter Executor core number')"
-              style="width: 200px;">
-          </el-input>
-        </span>
+      <div slot="text-2">{{$t('Executor memory')}}</div>
+      <div slot="content-2">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="executorMemory"
+          :placeholder="$t('Please enter Executor memory')">
+        </el-input>
       </div>
-    </div>
+    </m-list-4-box>
+    <m-list-4-box>
+      <div slot="text">{{$t('Executor cores')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="executorCores"
+          :placeholder="$t('Please enter Executor cores')">
+        </el-input>
+      </div>
+    </m-list-4-box>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
@@ -195,6 +188,7 @@
   import i18n from '@/module/i18n'
   import mLocalParams from './_source/localParams'
   import mListBox from './_source/listBox'
+  import mList4Box from './_source/list4Box'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
@@ -374,7 +368,7 @@
         }
 
         if (!this.numExecutors) {
-          this.$message.warning(`${i18n.$t('Please enter the number of Executor')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor number')}`)
           return false
         }
 
@@ -385,17 +379,17 @@
         }
 
         if (!Number.isInteger(parseInt(this.numExecutors))) {
-          this.$message.warning(`${i18n.$t('The number of Executors should be a positive integer')}`)
+          this.$message.warning(`${i18n.$t('The Executor Number should be a positive integer')}`)
           return false
         }
 
         if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
           return false
         }
 
         if (!this.executorMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the Executor memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor memory')}`)
           return false
         }
 
@@ -405,7 +399,7 @@
         }
 
         if (!this.executorCores) {
-          this.$message.warning(`${i18n.$t('Please enter ExecutorPlease enter Executor core number')}`)
+          this.$message.warning(`${i18n.$t('Please enter Executor cores')}`)
           return false
         }
 
@@ -573,41 +567,6 @@
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, Treeselect }
+    components: { mLocalParams, mListBox, mList4Box, Treeselect }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .spark-model {
-    .list-box-4p {
-      .list {
-        margin-bottom: 14px;
-        .sp1 {
-          float: left;
-          width: 112px;
-          text-align: right;
-          margin-right: 10px;
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding-top: 6px;
-        }
-        .sp2 {
-          float: left;
-          margin-right: 4px;
-        }
-        .sp3 {
-          width: 176px;
-        }
-      }
-    }
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-</style>

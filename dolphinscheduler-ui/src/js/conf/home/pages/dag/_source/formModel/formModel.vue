@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <div class="form-model-model" v-clickoutside="_handleClose">
+  <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
       <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
@@ -28,7 +28,7 @@
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
-      <div class="from-model">
+      <div class="form-model">
         <!-- Node name -->
         <div class="clearfix list">
           <div class="text-box"><span>{{$t('Node name')}}</span></div>
@@ -52,7 +52,7 @@
           <div class="text-box"><span>{{$t('Run flag')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
-              <el-radio-group v-model="runFlag" size="small" style="vertical-align: sub;">
+              <el-radio-group v-model="runFlag" size="small">
                 <el-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</el-radio>
                 <el-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</el-radio>
               </el-radio-group>

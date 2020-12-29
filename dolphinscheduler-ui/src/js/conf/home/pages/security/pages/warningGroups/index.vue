@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create alarm group')}}</el-button>
           <el-dialog
             :visible.sync="createWarningDialog"
-            width="60%">
+            width="auto">
             <m-create-warning :item="item" @onUpdate="onUpdate" @close="close"></m-create-warning>
           </el-dialog>
         </template>

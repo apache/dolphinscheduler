@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{ $t('Create Project') }}</el-button>
           <el-dialog
             :visible.sync="createProjectDialog"
-            width="40%">
+            width="auto">
             <m-create-project :item="item" @_onUpdate="_onUpdate" @close="_close"></m-create-project>
           </el-dialog>
         </template>
