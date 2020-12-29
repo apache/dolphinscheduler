@@ -100,7 +100,7 @@
     <el-dialog
       :title="$t('Set parameters before timing')"
       :visible.sync="timingDialog"
-      width="65%">
+      width="auto">
       <m-timing :timingData="timingData" @onUpdateTiming="onUpdateTiming" @closeTiming="closeTiming"></m-timing>
     </el-dialog>
   </div>

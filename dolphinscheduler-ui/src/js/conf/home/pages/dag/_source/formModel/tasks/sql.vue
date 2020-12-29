@@ -507,14 +507,3 @@
     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .requiredIcon {
-    color: #ff0000;
-    padding-right: 4px;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>
