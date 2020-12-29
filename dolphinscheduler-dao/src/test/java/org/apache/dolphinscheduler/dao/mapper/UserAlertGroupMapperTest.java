@@ -180,20 +180,4 @@ public class UserAlertGroupMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
-    /**
-     * test list user by alertgroupId
-     */
-    @Test
-    public void testListUserByAlertgroupId() {
-        //insertOneUser
-        User user = insertOneUser();
-        //insertOneAlertGroup
-        AlertGroup alertGroup = insertOneAlertGroup();
-
-        //insertOne
-        UserAlertGroup userAlertGroup = insertOne(user, alertGroup);
-        List<User> userList = userAlertGroupMapper.listUserByAlertGroupId(alertGroup.getId());
-        Assert.assertNotEquals(userList.size(), 0);
-
-    }
 }

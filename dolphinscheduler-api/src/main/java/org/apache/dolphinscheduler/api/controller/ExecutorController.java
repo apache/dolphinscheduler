@@ -98,8 +98,6 @@ public class ExecutorController extends BaseController {
         @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType = "CommandType"),
         @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", required = true, dataType = "WarningType"),
         @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", required = true, dataType = "Int", example = "100"),
-        @ApiImplicitParam(name = "receivers", value = "RECEIVERS", dataType = "String"),
-        @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", dataType = "String"),
         @ApiImplicitParam(name = "runMode", value = "RUN_MODE", dataType = "RunMode"),
         @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority"),
         @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String", example = "default"),

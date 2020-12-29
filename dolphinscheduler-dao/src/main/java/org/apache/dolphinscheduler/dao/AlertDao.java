@@ -28,11 +28,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ServerAlertContent;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,9 +50,6 @@ public class AlertDao extends AbstractBaseDao {
     private AlertMapper alertMapper;
 
     @Autowired
-    private UserAlertGroupMapper userAlertGroupMapper;
-
-    @Autowired
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
     @Autowired
@@ -63,7 +58,6 @@ public class AlertDao extends AbstractBaseDao {
     @Override
     protected void init() {
         alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
-        userAlertGroupMapper = ConnectionFactory.getInstance().getMapper(UserAlertGroupMapper.class);
         alertPluginInstanceMapper = ConnectionFactory.getInstance().getMapper(AlertPluginInstanceMapper.class);
         alertGroupMapper = ConnectionFactory.getInstance().getMapper(AlertGroupMapper.class);
     }
@@ -92,17 +86,6 @@ public class AlertDao extends AbstractBaseDao {
         alert.setUpdateTime(new Date());
         alert.setLog(log);
         return alertMapper.updateById(alert);
-    }
-
-    /**
-     * query user list by alert group id
-     *
-     * @param alertGroupId alertGroupId
-     * @return user list
-     */
-    public List<User> queryUserByAlertGroupId(int alertGroupId) {
-
-        return userAlertGroupMapper.listUserByAlertGroupId(alertGroupId);
     }
 
     /**
@@ -188,16 +171,6 @@ public class AlertDao extends AbstractBaseDao {
      */
     public List<Alert> listWaitExecutionAlert() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
-    }
-
-    /**
-     * list user information by alert group id
-     *
-     * @param alertGroupId alertGroupId
-     * @return user list
-     */
-    public List<User> listUserByAlertGroupId(int alertGroupId) {
-        return userAlertGroupMapper.listUserByAlertGroupId(alertGroupId);
     }
 
     /**

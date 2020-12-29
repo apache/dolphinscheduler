@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * user alertgroup relation mapper interface
@@ -35,13 +35,5 @@ public interface UserAlertGroupMapper extends BaseMapper<UserAlertGroup> {
      * @return delete result
      */
     int deleteByAlertGroupId(@Param("alertgroupId") int alertGroupId);
-
-    /**
-     * list user by alertgroupId
-     *
-     * @param alertGroupId alertgroupId
-     * @return user list
-     */
-    List<User> listUserByAlertGroupId(@Param("alertgroupId") int alertGroupId);
 
 }
