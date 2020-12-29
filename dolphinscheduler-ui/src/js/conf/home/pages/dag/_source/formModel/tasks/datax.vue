@@ -522,10 +522,3 @@
     components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>
