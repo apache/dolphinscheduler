@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -84,6 +85,17 @@ public class MasterSchedulerService extends Thread {
      * master exec service
      */
     private ThreadPoolExecutor masterExecService;
+
+    /**
+     * Maximum number of retries for database connection failure
+     */
+    @Value("${maxdbconnretrytimes:360}")
+    private int maxDbConnRetrytimes;
+
+    /**
+     * Number of database connection failures
+     */
+    private int connRetrytimes=0;
 
 
     /**
@@ -146,12 +158,22 @@ public class MasterSchedulerService extends Thread {
 
             int activeCount = masterExecService.getActiveCount();
             // make sure to scan and delete command  table in one transaction
-            Command command = processService.findOneCommand();
+            Command command = null;
+            try {
+                command = processService.findOneCommand();
+                connRetrytimes=0;
+            } catch (Exception e) {
+                connRetrytimes++;
+                logger.info("Database connection retries : connRetrytimes: {}", connRetrytimes);
+                if (connRetrytimes>=maxDbConnRetrytimes){
+                    logger.error("Database connection failed more than the maximum number of times : maxdbconnretrytimes: {}", maxDbConnRetrytimes);
+                    Stopper.stop();
+                }
+                logger.error("Database connection failed ", e);
+            }
             if (command != null) {
                 logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
-
                 try {
-
                     ProcessInstance processInstance = processService.handleCommand(logger,
                             getLocalAddress(),
                             this.masterConfig.getMasterExecThreads() - activeCount, command);
