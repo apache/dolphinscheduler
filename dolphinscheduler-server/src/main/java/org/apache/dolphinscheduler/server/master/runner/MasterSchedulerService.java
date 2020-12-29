@@ -93,7 +93,7 @@ public class MasterSchedulerService extends Thread {
     private int maxDbConnRetrytimes;
 
     /**
-     * Database connection times
+     * Number of database connection failures
      */
     private int connRetrytimes=0;
 
@@ -169,7 +169,7 @@ public class MasterSchedulerService extends Thread {
                     logger.error("Database connection failed more than the maximum number of times : maxdbconnretrytimes: {}", maxDbConnRetrytimes);
                     Stopper.stop();
                 }
-                e.printStackTrace();
+                logger.error("Database connection failed ", e);
             }
             if (command != null) {
                 logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
