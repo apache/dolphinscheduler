@@ -663,5 +663,6 @@ export default {
   'Running Memory': '运行内存',
   'Max Memory': '最大内存',
   'Min Memory': '最小内存',
-  'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建'
+  'The workflow canvas is abnormal and cannot be saved, please recreate': '该工作流画布异常，无法保存，请重新创建',
+  Info: '提示'
 }
