@@ -202,35 +202,41 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .user-def-params-model {
+    .el-input__inner {
+      height: 32px;
+      line-height: 32px;
+    }
     .select-listpp {
       margin-bottom: 6px;
       .lt-add {
         padding-left: 4px;
+        line-height: 32px;
         a {
-          .iconfont {
-            font-size: 18px;
+          .iconfont, [class^="el-icon"] {
+            font-size: 17px;
             vertical-align: middle;
-            margin-bottom: -2px;
             display: inline-block;
+            margin-top: 0;
           }
         }
       }
     }
     .add {
+      line-height: 32px;
       a {
         color: #000;
-        .iconfont {
-          font-size: 16px;
+        .iconfont, [class^="el-icon"] {
+          font-size: 18px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: -5px;
+          margin-top: 0px;
         }
       }
     }
-    .add-dp{
+    .add-dp {
       a {
         color: #0097e0;
-        .iconfont {
+        .iconfont, [class^="el-icon"] {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;

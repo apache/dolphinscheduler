@@ -162,6 +162,3 @@
     components: { mListBox, mDatasource, mLocalParams }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>

@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create User')}}</el-button>
           <el-dialog
             :visible.sync="createUserDialog"
-            width="60%">
+            width="auto">
             <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>
           </el-dialog>
         </template>

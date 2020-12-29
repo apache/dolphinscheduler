@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create queue')}}</el-button>
           <el-dialog
             :visible.sync="createQueueDialog"
-            width="60%">
+            width="auto">
             <m-create-queue :item="item" @onUpdate="onUpdate" @close="close"></m-create-queue>
           </el-dialog>
         </template>
