@@ -874,6 +874,6 @@
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
   .operBtn {
-    padding: 8px 20px;
+    padding: 8px 6px;
   }
 </style>

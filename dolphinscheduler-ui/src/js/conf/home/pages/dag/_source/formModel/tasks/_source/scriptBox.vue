@@ -109,8 +109,7 @@
   }
   .from-mirror1 {
     .CodeMirror {
-      min-height: 600px;
-      max-height: 700px;
+      height: calc(70vh - 90px);
     }
   }
 </style>
