@@ -297,12 +297,12 @@ CREATE TABLE `t_ds_alert` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_alertgroup`;
 CREATE TABLE `t_ds_alertgroup`(
-                                  `id`          int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-                                  `user_id`     int(11) DEFAULT NULL COMMENT 'create user id',
-                                  `group_name`  varchar(255) DEFAULT NULL COMMENT 'group name',
-                                  `description` varchar(255) DEFAULT NULL,
-                                  `create_time` datetime     DEFAULT NULL COMMENT 'create time',
-                                  `update_time` datetime     DEFAULT NULL COMMENT 'update time',
+                                  `id`             int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+                                  `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id',
+                                  `group_name`     varchar(255) DEFAULT NULL COMMENT 'group name',
+                                  `description`    varchar(255) DEFAULT NULL,
+                                  `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
+                                  `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
                                   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 

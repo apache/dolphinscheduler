@@ -56,8 +56,8 @@ public class AlertGroup {
     /**
      * create_user_id
      */
-    @TableField(value = "user_id")
-    private int userId;
+    @TableField(value = "create_user_id")
+    private int createUserId;
 
     public int getId() {
         return id;
@@ -99,12 +99,12 @@ public class AlertGroup {
         this.description = description;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getCreateUserId() {
+        return createUserId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setCreateUserId(int createUserId) {
+        this.createUserId = createUserId;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class AlertGroup {
         if (id != that.id) {
             return false;
         }
-        if (userId != that.userId) {
+        if (createUserId != that.createUserId) {
             return false;
         }
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
@@ -137,7 +137,7 @@ public class AlertGroup {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + userId;
+        result = 31 * result + createUserId;
         result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
@@ -149,7 +149,7 @@ public class AlertGroup {
     public String toString() {
         return "AlertGroup{"
             + "id=" + id
-            + "userId=" + userId
+            + "createUserId=" + createUserId
             + ", groupName='" + groupName + '\''
             + ", description='" + description + '\''
             + ", createTime=" + createTime

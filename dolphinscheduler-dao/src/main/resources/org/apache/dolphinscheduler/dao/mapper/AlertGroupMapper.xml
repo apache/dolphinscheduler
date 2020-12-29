@@ -32,7 +32,7 @@
     </select>
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select * from t_ds_alertgroup
-        where user_id=#{userId}
+        where create_user_id = #{userId}
     </select>
 
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">

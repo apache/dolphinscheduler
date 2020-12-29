@@ -47,7 +47,7 @@ ALTER TABLE t_ds_process_definition_version
     ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
 
 ALTER TABLE t_ds_alertgroup
-    ADD COLUMN `user_id` int(11) DEFAULT NULL COMMENT 'create user id' AFTER `id`;
+    ADD COLUMN `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id' AFTER `id`;
 
 
 -- ----------------------------
