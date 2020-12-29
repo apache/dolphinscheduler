@@ -47,7 +47,7 @@ const jsEntry = (() => {
     parts.shift()
     let modules = parts.join('/')
     let entry = moduleName(modules)
-    obj[entry] = val
+    obj[entry] = ['babel-polyfill', val]
   })
   return obj
 })()
