@@ -80,71 +80,62 @@
         </el-select>
       </div>
     </m-list-box>
-    <div class="list-box-4p" v-if="deployMode === 'cluster'">
-      <div class="clearfix list">
-        <span class="sp1" style="word-break:break-all">{{$t('appName')}}</span>
-        <span class="sp2">
-          <el-input
-            :disabled="isDetails"
-            type="input"
-            size="small"
-            v-model="appName"
-            :placeholder="$t('Please enter the job name of Flink(optional)')"
-            style="width: 200px;">
+    <m-list-4-box v-if="deployMode === 'cluster'">
+      <div slot="text">{{$t('App Name')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="appName"
+          :placeholder="$t('Please enter app name(optional)')">
         </el-input>
-        </span>
       </div>
-      <div class="clearfix list">
-        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
-        <span class="sp2">
-          <el-input
-            :disabled="isDetails"
-            type="input"
-            size="small"
-            v-model="jobManagerMemory"
-            :placeholder="$t('Please enter jobManager memory')"
-            style="width: 200px;">
+    </m-list-4-box>
+    <m-list-4-box v-if="deployMode === 'cluster'">
+      <div slot="text">{{$t('JobManager Memory')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="jobManagerMemory"
+          :placeholder="$t('Please enter JobManager memory')">
         </el-input>
-        </span>
-        <span class="sp1 sp3">{{$t('taskManagerMemory')}}</span>
-        <span class="sp2">
-          <el-input
-            :disabled="isDetails"
-            type="input"
-            size="small"
-            v-model="taskManagerMemory"
-            :placeholder="$t('Please enter the taskManager memory')"
-            style="width: 186px;">
-        </el-input>
-        </span>
       </div>
-      <div class="clearfix list">
-        <span class="sp1">{{$t('slot')}}</span>
-        <span class="sp2">
-          <el-input
-                  :disabled="isDetails"
-                  type="input"
-                  size="small"
-                  v-model="slot"
-                  :placeholder="$t('Please enter solt number')"
-                  style="width: 200px;">
+      <div slot="text-2">{{$t('TaskManager Memory')}}</div>
+      <div slot="content-2">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="taskManagerMemory"
+          :placeholder="$t('Please enter TaskManager memory')">
         </el-input>
-        </span>
-        <div v-if="flinkVersion !== '>=1.10'">
-        <span class="sp1 sp3">{{$t('taskManager')}}</span>
-        <span class="sp2">
-          <el-input
-                  :disabled="isDetails"
-                  type="input"
-                  size="small"
-                  v-model="taskManager"
-                  :placeholder="$t('Please enter taskManager number')"
-                  style="width: 186px;">
-        </el-input>
-        </span>
-        </div>
       </div>
-    </div>
+    </m-list-4-box>
+    <m-list-4-box v-if="deployMode === 'cluster'">
+      <div slot="text">{{$t('Slot Number')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="slot"
+          :placeholder="$t('Please enter Slot number')">
+        </el-input>
+      </div>
+      <div slot="text-2" v-if="flinkVersion === '<1.10'">{{$t('TaskManager Number')}}</div>
+      <div slot="content-2" v-if="flinkVersion === '<1.10'">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="taskManager"
+          :placeholder="$t('Please enter TaskManager number')">
+        </el-input>
+      </div>
+    </m-list-4-box>
     <m-list-box>
       <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
@@ -197,6 +188,7 @@
   import i18n from '@/module/i18n'
   import mLocalParams from './_source/localParams'
   import mListBox from './_source/listBox'
+  import mList4Box from './_source/list4Box'
   import Treeselect from '@riophae/vue-treeselect'
   import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
@@ -304,7 +296,7 @@
         }
 
         if (!this.jobManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter jobManager memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter JobManager memory')}`)
           return false
         }
 
@@ -314,7 +306,7 @@
         }
 
         if (!this.taskManagerMemory) {
-          this.$message.warning(`${i18n.$t('Please enter the taskManager memory')}`)
+          this.$message.warning(`${i18n.$t('Please enter TaskManager memory')}`)
           return false
         }
 
@@ -556,41 +548,6 @@
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, Treeselect }
+    components: { mLocalParams, mListBox, mList4Box, Treeselect }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .flink-model {
-    .list-box-4p {
-      .list {
-        margin-bottom: 14px;
-        .sp1 {
-          float: left;
-          width: 112px;
-          text-align: right;
-          margin-right: 10px;
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding-top: 6px;
-        }
-        .sp2 {
-          float: left;
-          margin-right: 4px;
-        }
-        .sp3 {
-          width: 176px;
-        }
-      }
-    }
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-</style>

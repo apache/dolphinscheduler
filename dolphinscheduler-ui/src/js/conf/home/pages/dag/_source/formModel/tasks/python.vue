@@ -350,18 +350,3 @@
     components: { mLocalParams, mListBox, Treeselect, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>

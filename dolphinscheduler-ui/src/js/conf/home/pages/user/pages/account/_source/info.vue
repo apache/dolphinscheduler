@@ -70,7 +70,7 @@
         <el-button type="primary" size="small" round @click="_edit()" >{{$t('Edit')}}</el-button>
         <el-dialog
           :visible.sync="createUserDialog"
-          width="50%">
+          width="auto">
           <m-create-user :item="item" @onUpdate="onUpdate" @close="close"></m-create-user>
         </el-dialog>
       </template>
