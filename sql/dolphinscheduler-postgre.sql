@@ -200,13 +200,14 @@ CREATE TABLE t_ds_alert (
 --
 
 DROP TABLE IF EXISTS t_ds_alertgroup;
-CREATE TABLE t_ds_alertgroup (
-  id int NOT NULL  ,
-  group_name varchar(255) DEFAULT NULL ,
-  description varchar(255) DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
+CREATE TABLE t_ds_alertgroup(
+                                id          int NOT NULL,
+                                user_id     int4         DEFAULT NULL,
+                                group_name  varchar(255) DEFAULT NULL,
+                                description varchar(255) DEFAULT NULL,
+                                create_time timestamp    DEFAULT NULL,
+                                update_time timestamp    DEFAULT NULL,
+                                PRIMARY KEY (id)
 ) ;
 
 --
@@ -753,20 +754,27 @@ ALTER TABLE t_ds_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_version_id_se
 
 DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
-ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
+ALTER TABLE t_ds_worker_group
+    ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
-CREATE SEQUENCE  t_ds_worker_server_id_sequence;
-ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
+CREATE SEQUENCE t_ds_worker_server_id_sequence;
+ALTER TABLE t_ds_worker_server
+    ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
-INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,state,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time)
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50',
+        '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
-INSERT INTO t_ds_alertgroup(group_name,description,create_time,update_time)  VALUES ('dolphinscheduler warning group','dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_alertgroup(id, user_id, group_name, description, create_time, update_time)
+VALUES (1, 'dolphinscheduler warning group', 'dolphinscheduler warning group', '2018-11-29 10:20:39',
+        '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
+INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
+VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_version(version) VALUES ('1.3.0');

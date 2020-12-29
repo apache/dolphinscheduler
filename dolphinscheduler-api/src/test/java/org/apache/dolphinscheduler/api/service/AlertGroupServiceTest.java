@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -31,7 +29,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +38,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -61,8 +57,6 @@ public class AlertGroupServiceTest {
     private AlertGroupService alertGroupService;
     @Mock
     private AlertGroupMapper alertGroupMapper;
-    @Mock
-    private UserAlertGroupMapper userAlertGroupMapper;
 
     private String groupName = "AlertGroupServiceTest";
 
@@ -152,20 +146,6 @@ public class AlertGroupServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-    }
-
-    @Test
-    public void testGrantUser() {
-
-        Integer groupId = 1;
-
-        ArgumentCaptor<Integer> groupArgument = ArgumentCaptor.forClass(Integer.class);
-
-        Map<String, Object> result = alertGroupService.grantUser(getLoginUser(), groupId, "123,321");
-
-        logger.info(result.toString());
-        assertEquals(groupArgument.getValue(), groupId);
-        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test

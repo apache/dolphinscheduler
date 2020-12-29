@@ -31,9 +31,8 @@
         where group_name=#{groupName}
     </select>
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
-        select * from t_ds_alertgroup t
-        left join t_ds_relation_user_alertgroup r on t.id=r.alertgroup_id
-        where r.user_id=#{userId}
+        select * from t_ds_alertgroup
+        where user_id=#{userId}
     </select>
 
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">

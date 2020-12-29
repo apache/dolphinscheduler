@@ -53,6 +53,12 @@ public class AlertGroup {
     @TableField(value = "update_time")
     private Date updateTime;
 
+    /**
+     * create_user_id
+     */
+    @TableField(value = "user_id")
+    private int userId;
+
     public int getId() {
         return id;
     }
@@ -93,6 +99,14 @@ public class AlertGroup {
         this.description = description;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -105,6 +119,9 @@ public class AlertGroup {
         AlertGroup that = (AlertGroup) o;
 
         if (id != that.id) {
+            return false;
+        }
+        if (userId != that.userId) {
             return false;
         }
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
@@ -120,6 +137,7 @@ public class AlertGroup {
     @Override
     public int hashCode() {
         int result = id;
+        result = 31 * result + userId;
         result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
@@ -131,6 +149,7 @@ public class AlertGroup {
     public String toString() {
         return "AlertGroup{"
             + "id=" + id
+            + "userId=" + userId
             + ", groupName='" + groupName + '\''
             + ", description='" + description + '\''
             + ", createTime=" + createTime

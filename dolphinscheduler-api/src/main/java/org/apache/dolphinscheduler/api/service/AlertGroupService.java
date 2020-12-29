@@ -118,6 +118,7 @@ public class AlertGroupService extends BaseService {
         alertGroup.setDescription(desc);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
+        alertGroup.setUserId(loginUser.getId());
 
         // insert
         int insert = alertGroupMapper.insert(alertGroup);
@@ -162,6 +163,7 @@ public class AlertGroupService extends BaseService {
         }
         alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);
+        alertGroup.setUserId(loginUser.getId());
         // updateProcessInstance
         alertGroupMapper.updateById(alertGroup);
         putMsg(result, Status.SUCCESS);
