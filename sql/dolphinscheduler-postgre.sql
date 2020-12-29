@@ -486,20 +486,6 @@ CREATE TABLE t_ds_relation_udfs_user (
 ;
 
 --
--- Table structure for table t_ds_relation_user_alertgroup
---
-
-DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
-CREATE TABLE t_ds_relation_user_alertgroup (
-  id int NOT NULL,
-  alertgroup_id int DEFAULT NULL,
-  user_id int DEFAULT NULL,
-  create_time timestamp DEFAULT NULL,
-  update_time timestamp DEFAULT NULL,
-  PRIMARY KEY (id)
-);
-
---
 -- Table structure for table t_ds_resources
 --
 
@@ -741,9 +727,6 @@ ALTER TABLE t_ds_relation_resources_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_
 DROP SEQUENCE IF EXISTS t_ds_relation_udfs_user_id_sequence;
 CREATE SEQUENCE  t_ds_relation_udfs_user_id_sequence;
 ALTER TABLE t_ds_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_udfs_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_relation_user_alertgroup_id_sequence;
-CREATE SEQUENCE  t_ds_relation_user_alertgroup_id_sequence;
-ALTER TABLE t_ds_relation_user_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_user_alertgroup_id_sequence');
 
 DROP SEQUENCE IF EXISTS t_ds_resources_id_sequence;
 CREATE SEQUENCE  t_ds_resources_id_sequence;
@@ -781,7 +764,6 @@ INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,st
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
 INSERT INTO t_ds_alertgroup(group_name,description,create_time,update_time)  VALUES ('dolphinscheduler warning group','dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
-INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,update_time) VALUES ( '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');

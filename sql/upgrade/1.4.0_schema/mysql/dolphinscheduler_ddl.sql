@@ -56,6 +56,8 @@ ALTER TABLE t_ds_process_definition_version DROP receivers, DROP receivers_cc;
 ALTER TABLE  t_ds_alert DROP show_type,DROP alert_type,DROP receivers,DROP receivers_cc;
 
 ALTER TABLE  t_ds_alertgroup DROP group_type;
+
+DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
 */
 
 

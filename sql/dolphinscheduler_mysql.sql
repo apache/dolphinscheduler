@@ -614,27 +614,6 @@ CREATE TABLE `t_ds_relation_udfs_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of t_ds_relation_udfs_user
--- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_relation_user_alertgroup
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_relation_user_alertgroup`;
-CREATE TABLE `t_ds_relation_user_alertgroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `alertgroup_id` int(11) DEFAULT NULL COMMENT 'alert group id',
-  `user_id` int(11) DEFAULT NULL COMMENT 'user id',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of t_ds_relation_user_alertgroup
--- ----------------------------
-
--- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_resources`;
@@ -831,11 +810,6 @@ INSERT INTO `t_ds_version` VALUES ('1', '1.3.0');
 -- Records of t_ds_alertgroup
 -- ----------------------------
 INSERT INTO `t_ds_alertgroup` VALUES ('1', 'default admin warning group', '0', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
-
--- ----------------------------
--- Records of t_ds_relation_user_alertgroup
--- ----------------------------
-INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- ----------------------------
 -- Records of t_ds_user

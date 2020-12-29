@@ -46,8 +46,6 @@ public class AlertGroupService extends BaseService{
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
-    @Autowired
-    private UserAlertGroupService userAlertGroupService;
     /**
      * query alert group list
      *
@@ -187,8 +185,6 @@ public class AlertGroupService extends BaseService{
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
             return result;
         }
-
-        userAlertGroupService.deleteByAlertGroupId(id);
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -212,7 +208,6 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
-        userAlertGroupService.deleteByAlertGroupId(alertgroupId);
         if (StringUtils.isEmpty(userIds)) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -228,10 +223,6 @@ public class AlertGroupService extends BaseService{
             userAlertGroup.setCreateTime(now);
             userAlertGroup.setUpdateTime(now);
             alertGroups.add(userAlertGroup);
-        }
-
-        if (CollectionUtils.isNotEmpty(alertGroups)) {
-            userAlertGroupService.saveBatch(alertGroups);
         }
 
         putMsg(result, Status.SUCCESS);

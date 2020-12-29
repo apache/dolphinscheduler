@@ -55,4 +55,6 @@ ALTER TABLE t_ds_process_definition_version DROP COLUMN "receivers", DROP COLUMN
 ALTER TABLE  t_ds_alert DROP COLUMN "show_type",DROP COLUMN "alert_type",DROP COLUMN "receivers",DROP COLUMN "receivers_cc";
 
 ALTER TABLE  t_ds_alertgroup DROP COLUMN "group_type";
+
+DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
 */

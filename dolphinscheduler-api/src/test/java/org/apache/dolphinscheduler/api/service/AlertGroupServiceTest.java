@@ -63,8 +63,6 @@ public class AlertGroupServiceTest {
     private AlertGroupMapper alertGroupMapper;
     @Mock
     private UserAlertGroupMapper userAlertGroupMapper;
-    @Mock
-    UserAlertGroupService userAlertGroupService;
 
     private String groupName = "AlertGroupServiceTest";
 
@@ -163,10 +161,7 @@ public class AlertGroupServiceTest {
 
         ArgumentCaptor<Integer> groupArgument = ArgumentCaptor.forClass(Integer.class);
 
-        Mockito.when(userAlertGroupService.deleteByAlertGroupId(anyInt())).thenReturn(true);
-
         Map<String, Object> result = alertGroupService.grantUser(getLoginUser(), groupId, "123,321");
-        Mockito.verify(userAlertGroupService).deleteByAlertGroupId(groupArgument.capture());
 
         logger.info(result.toString());
         assertEquals(groupArgument.getValue(), groupId);
