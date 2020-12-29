@@ -26,7 +26,6 @@ import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,13 +51,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Rollback(true)
 public class AlertGroupMapperTest {
 
-
     @Autowired
     AlertGroupMapper alertGroupMapper;
-
-    @Autowired
-    UserAlertGroupMapper userAlertGroupMapper;
-
 
     /**
      * test insert
@@ -168,24 +162,6 @@ public class AlertGroupMapperTest {
     }
 
     /**
-     * test query by userId
-     */
-    @Test
-    public void testQueryByUserId() {
-        Integer count = 4;
-        Integer userId = 1;
-
-        Map<Integer, AlertGroup> alertGroupMap =
-            createAlertGroups(count, userId);
-
-        List<AlertGroup> alertGroupList =
-            alertGroupMapper.queryByUserId(userId);
-
-        compareAlertGroups(alertGroupMap, alertGroupList);
-
-    }
-
-    /**
      * test query all group list
      */
     @Test
@@ -291,48 +267,6 @@ public class AlertGroupMapperTest {
         }
 
         return alertGroupMap;
-    }
-
-    /**
-     * create AlertGroups
-     *
-     * @param count create AlertGroup count
-     * @return AlertGroup map
-     */
-    private Map<Integer, AlertGroup> createAlertGroups(
-        Integer count, Integer userId) {
-        Map<Integer, AlertGroup> alertGroupMap = new HashMap<>();
-
-        AlertGroup alertGroup = null;
-        for (int i = 0; i < count; i++) {
-            alertGroup = createAlertGroup();
-
-            createUserAlertGroup(userId, alertGroup.getId());
-
-            alertGroupMap.put(alertGroup.getId(), alertGroup);
-        }
-
-        return alertGroupMap;
-    }
-
-    /**
-     * create AlertGroup
-     *
-     * @param userId       userId
-     * @param alertgroupId alertgroupId
-     * @return UserAlertGroup
-     */
-    private UserAlertGroup createUserAlertGroup(
-        Integer userId, Integer alertgroupId) {
-        UserAlertGroup userAlertGroup = new UserAlertGroup();
-        userAlertGroup.setAlertgroupId(alertgroupId);
-        userAlertGroup.setUserId(userId);
-        userAlertGroup.setCreateTime(DateUtils.getCurrentDate());
-        userAlertGroup.setUpdateTime(DateUtils.getCurrentDate());
-
-        userAlertGroupMapper.insert(userAlertGroup);
-
-        return userAlertGroup;
     }
 
 }

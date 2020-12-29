@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 
 import java.util.Date;
 import java.util.List;
@@ -51,9 +50,6 @@ public class UserMapperTest {
 
     @Autowired
     AlertGroupMapper alertGroupMapper;
-
-    @Autowired
-    private UserAlertGroupMapper userAlertGroupMapper;
 
     @Autowired
     AccessTokenMapper accessTokenMapper;
@@ -137,24 +133,6 @@ public class UserMapperTest {
         alertGroup.setUpdateTime(new Date());
         alertGroupMapper.insert(alertGroup);
         return alertGroup;
-    }
-
-    /**
-     * insert one UserAlertGroup
-     *
-     * @param user       user
-     * @param alertGroup alertGroup
-     * @return UserAlertGroup
-     */
-    private UserAlertGroup insertOneUserAlertGroup(User user, AlertGroup alertGroup) {
-        UserAlertGroup userAlertGroup = new UserAlertGroup();
-        userAlertGroup.setAlertgroupName(alertGroup.getGroupName());
-        userAlertGroup.setAlertgroupId(alertGroup.getId());
-        userAlertGroup.setUserId(user.getId());
-        userAlertGroup.setCreateTime(new Date());
-        userAlertGroup.setUpdateTime(new Date());
-        userAlertGroupMapper.insert(userAlertGroup);
-        return userAlertGroup;
     }
 
     /**
@@ -306,23 +284,6 @@ public class UserMapperTest {
         //queryDetailsById
         User queryUser = userMapper.queryDetailsById(user.getId());
         Assert.assertEquals(user.getUserName(), queryUser.getUserName());
-    }
-
-    /**
-     * test query user list by alertgroupId
-     */
-    @Test
-    public void testQueryUserListByAlertGroupId() {
-        //insertOne
-        User user = insertOne();
-        //insertOneAlertGroup
-        AlertGroup alertGroup = insertOneAlertGroup();
-        //insertOneUserAlertGroup
-        UserAlertGroup userAlertGroup = insertOneUserAlertGroup(user, alertGroup);
-        //queryUserListByAlertGroupId
-        List<User> userList = userMapper.queryUserListByAlertGroupId(userAlertGroup.getAlertgroupId());
-        Assert.assertNotEquals(userList.size(), 0);
-
     }
 
     /**
