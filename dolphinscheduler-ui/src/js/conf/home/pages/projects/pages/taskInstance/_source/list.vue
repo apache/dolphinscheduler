@@ -74,7 +74,7 @@
     </div>
     <el-dialog
       :visible.sync="logDialog"
-      width="30%">
+      width="auto">
       <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>
