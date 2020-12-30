@@ -649,27 +649,25 @@ public class HadoopUtils implements Closeable {
 
             String yarnUrl = "http://%s:" + activeResourceManagerPort + "/ws/v1/cluster/info";
 
-            String state = null;
             try {
-                /**
-                 * send http get request to rm1
-                 */
-                state = getRMState(String.format(yarnUrl, rmIdArr[0]));
 
-                if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                    return rmIdArr[0];
-                } else if (Constants.HADOOP_RM_STATE_STANDBY.equals(state)) {
-                    state = getRMState(String.format(yarnUrl, rmIdArr[1]));
+                /**
+                 * send http get request to rm
+                 */
+
+                for (String rmId : rmIdArr) {
+                    String state = getRMState(String.format(yarnUrl, rmId));
                     if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                        return rmIdArr[1];
+                        return rmId;
                     }
-                } else {
-                    return null;
                 }
+
             } catch (Exception e) {
-                state = getRMState(String.format(yarnUrl, rmIdArr[1]));
-                if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                    return rmIdArr[0];
+                for (int i = 1; i < rmIdArr.length; i++) {
+                    String  state = getRMState(String.format(yarnUrl, rmIdArr[i]));
+                    if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
+                        return rmIdArr[i];
+                    }
                 }
             }
             return null;
