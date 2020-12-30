@@ -1,7 +1,7 @@
 package org.apache.dolphinscheduler.microbench.serializer.kyro;
 
+import org.apache.dolphinscheduler.microbench.serializer.TestBean;
 import org.apache.dolphinscheduler.microbench.serializer.common.Serialization;
-import org.apache.dolphinscheduler.remote.command.Command;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,7 +19,7 @@ public class KryoSerialization implements Serialization {
         Kryo kryo = new Kryo();
         kryo.setReferences(true);
         kryo.setRegistrationRequired(false);
-        kryo.register(Command.class);
+        kryo.register(TestBean.class);
         return kryo;
     });
 

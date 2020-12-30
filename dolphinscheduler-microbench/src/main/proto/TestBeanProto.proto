@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "org.apache.dolphinscheduler.microbench.serializer";
+option java_outer_classname = "BeanTestProto";
+
+message TestBeanProto{
+
+
+  map<string, string> items = 1;
+
+  repeated string ids = 2;
+
+  fixed64 id = 3;
+
+  string user = 5;
+
+  string psd = 6;
+
+  double ages = 7;
+
+
+}
