@@ -329,7 +329,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }

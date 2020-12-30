@@ -36,7 +36,7 @@ public enum Status {
     USER_NAME_NULL(10004, "user name is null", "用户名不能为空"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
-    TENANT_CODE_EXIST(10009, "os tenant code {0} already exists", "操作系统租户[{0}]已存在"),
+    OS_TENANT_CODE_EXIST(10009, "os tenant code {0} already exists", "操作系统租户[{0}]已存在"),
     USER_NOT_EXIST(10010, "user {0} not exists", "用户[{0}]不存在"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found", "告警组不存在"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists", "告警组名称已存在"),
