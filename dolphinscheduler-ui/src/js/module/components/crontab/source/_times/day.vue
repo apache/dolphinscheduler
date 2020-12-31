@@ -16,7 +16,7 @@
  */
 <template>
   <div class="day-model">
-    <div class="v-crontab-from-model">
+    <div class="v-crontab-form-model">
       <el-radio-group v-model="radioDay" vertical size="mini">
         <div class="list-box">
           <el-radio label="everyDay">

@@ -139,28 +139,28 @@
     <el-dialog
       :visible.sync="definitionUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-definition-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-definition-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-file-update :type="type" @onProgressFileUpdate="onProgressFileUpdate" @onUpdateFileUpdate="onUpdateFileUpdate" @onArchiveDefinition="onArchiveFileUpdate" @closeFileUpdate="closeFileUpdate"></m-file-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileChildUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-file-child-update :type="type" :id="id" @onProgressFileChildUpdate="onProgressFileChildUpdate" @onUpdateFileChildUpdate="onUpdateFileChildUpdate" @onArchiveFileChildUpdate="onArchiveFileChildUpdate" @closeFileChildUpdate="closeFileChildUpdate"></m-file-child-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="resourceChildUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
   </div>

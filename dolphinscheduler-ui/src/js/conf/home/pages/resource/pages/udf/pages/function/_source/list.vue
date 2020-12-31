@@ -65,7 +65,7 @@
     </div>
     <el-dialog
       :visible.sync="createUdfDialog"
-      width="60%">
+      width="auto">
       <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>
     </el-dialog>
   </div>
