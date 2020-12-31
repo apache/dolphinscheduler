@@ -48,8 +48,6 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.rholder.retry.RetryException;
-
 import io.netty.channel.Channel;
 
 /**
@@ -167,7 +165,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         this.doAck(taskExecutionContext);
 
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService));
     }
 
     private void doAck(TaskExecutionContext taskExecutionContext) {
