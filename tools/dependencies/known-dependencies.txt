@@ -1,5 +1,4 @@
 HikariCP-3.2.0.jar
-activation-1.1.jar
 animal-sniffer-annotations-1.14.jar
 ant-1.6.5.jar
 aopalliance-1.0.jar
