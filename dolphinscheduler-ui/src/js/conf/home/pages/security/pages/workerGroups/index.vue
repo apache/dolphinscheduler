@@ -28,7 +28,16 @@
                 :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
+          <el-pagination
+            background
+            @current-change="_page"
+            @size-change="_pageSize"
+            :page-size="searchParams.pageSize"
+            :current-page.sync="searchParams.pageNo"
+            :page-sizes="[10, 30, 50]"
+            layout="sizes, prev, pager, next, jumper"
+            :total="total">
+          </el-pagination>
         </div>
       </template>
       <template v-if="!workerGroupList.length && total<=0">
@@ -44,7 +53,6 @@
   import mList from './_source/list'
   import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateWorker from './_source/createWorker'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
@@ -88,37 +96,11 @@
       _onEdit (item) {
         this._create(item)
       },
-      _create (item) {
-        let self = this
-        let modal = this.$modal.dialog({
-          closable: false,
-          showMask: true,
-          escClose: true,
-          className: 'v-modal-custom',
-          transitionName: 'opacityp',
-          render (h) {
-            return h(mCreateWorker, {
-              on: {
-                onUpdate () {
-                  self._debounceGET('false')
-                  modal.remove()
-                },
-                close () {
-                  modal.remove()
-                }
-              },
-              props: {
-                item: item
-              }
-            })
-          }
-        })
-      },
       _getList (flag) {
         this.isLoading = !flag
         this.getWorkerGroups(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
           } else {
             this.workerGroupList = []
             this.workerGroupList = res.totalList
@@ -139,7 +121,6 @@
     },
     created () {},
     mounted () {
-      this.$modal.destroy()
     },
     components: { mList, mListConstruction, mConditions, mSpin, mNoData }
   }

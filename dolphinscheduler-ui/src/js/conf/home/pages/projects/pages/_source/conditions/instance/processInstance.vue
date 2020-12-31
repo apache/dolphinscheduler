@@ -18,47 +18,39 @@
   <m-conditions>
     <template slot="search-group">
       <div class="list">
-        <x-button type="ghost" size="small" @click="_ckQuery" icon="ans-icon-search"></x-button>
+        <el-button type="primary" size="small" @click="_ckQuery" icon="el-icon-search"></el-button>
       </div>
       <div class="list">
-        <x-datepicker
-                ref="datepicker"
-                @on-change="_onChangeStartStop"
-                type="daterange"
-                format="YYYY-MM-DD HH:mm:ss"
-                placement="bottom-end"
-                :value="[searchParams.startDate,searchParams.endDate]"
-                :panelNum="2">
-          <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
-            <em slot="suffix"
-               @click.stop="_dateEmpty()"
-               class="ans-icon-fail-solid"
-               v-show="value"
-               style="font-size: 13px;cursor: pointer;margin-top: 1px;">
-            </em>
-          </x-input>
-        </x-datepicker>
+        <el-date-picker
+          style="width: 310px"
+          v-model="dataTime"
+          size="mini"
+          @change="_onChangeStartStop"
+          type="datetimerange"
+          range-separator="-"
+          :start-placeholder="$t('startDate')"
+          :end-placeholder="$t('endDate')"
+          value-format="yyyy-MM-dd HH:mm:ss">
+        </el-date-picker>
       </div>
       <div class="list">
-        <x-select style="width: 160px;" @on-change="_onChangeState" :value="searchParams.stateType" >
-          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 160px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down">
-          </x-input>
-          <x-option
+        <el-select style="width: 140px;" @change="_onChangeState" :value="searchParams.stateType" :placeholder="$t('State')" size="mini">
+          <el-option
                   v-for="city in stateTypeList"
                   :key="city.label"
                   :value="city.code"
                   :label="city.label">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
       <div class="list">
-        <x-input v-model.trim="searchParams.host" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
+        <el-input v-model="searchParams.host" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('host')"></el-input>
       </div>
       <div class="list">
-        <x-input v-model.trim="searchParams.executorName" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('Executor')"></x-input>
+        <el-input v-model="searchParams.executorName" @keyup.enter.native="_ckQuery" style="width: 140px;" size="mini" :placeholder="$t('Executor')"></el-input>
       </div>
       <div class="list">
-        <x-input v-model.trim="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
+        <el-input v-model="searchParams.searchVal" @keyup.enter.native="_ckQuery" style="width: 200px;" size="mini" :placeholder="$t('name')"></el-input>
       </div>
     </template>
   </m-conditions>
@@ -68,7 +60,7 @@
   import { stateType } from './common'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
-    name: 'instance-conditions',
+    name: 'process-instance-conditions',
     data () {
       return {
         // state(list)
@@ -86,7 +78,8 @@
           host: '',
           // executor name
           executorName: ''
-        }
+        },
+        dataTime: []
       }
     },
     props: {},
@@ -100,20 +93,14 @@
       _onChangeStartStop (val) {
         this.searchParams.startDate = val[0]
         this.searchParams.endDate = val[1]
+        this.dataTime[0] = val[0]
+        this.dataTime[1] = val[1]
       },
       /**
        * change state
        */
       _onChangeState (val) {
-        this.searchParams.stateType = val.value
-      },
-      /**
-       * empty date
-       */
-      _dateEmpty () {
-        this.searchParams.startDate = ''
-        this.searchParams.endDate = ''
-        this.$refs.datepicker.empty()
+        this.searchParams.stateType = val
       }
     },
     watch: {

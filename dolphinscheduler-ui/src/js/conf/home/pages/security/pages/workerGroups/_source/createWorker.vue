@@ -25,23 +25,25 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
+                    size="mini"
                     :placeholder="$t('Please enter group name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>IP</template>
           <template slot="content">
-            <x-input
+            <el-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
+                    size="mini"
                     v-model="ipList"
                     :placeholder="$t('Please enter the IP address separated by commas')">
-            </x-input>
+            </el-input>
             <div class="ipt-tip">
               <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
             </div>
@@ -77,13 +79,13 @@
           this._submit()
         }
       },
-      checkIsIps(ips) {
+      checkIsIps (ips) {
         let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',');
-        for(let i=0;i<valdata.length;i++){
-            if(reg.test(valdata[i])== false){
-                return false;
-            }
+        let valdata = ips.split(',')
+        for (let i = 0; i < valdata.length; i++) {
+          if (reg.test(valdata[i]) === false) {
+            return false
+          }
         }
         return true
       },
@@ -97,7 +99,7 @@
           this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
           return false
         }
-        if(!this.checkIsIps(this.ipList)) {
+        if (!this.checkIsIps(this.ipList)) {
           this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
           return false
         }
@@ -112,16 +114,16 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this.$refs['popup'].spinnerLoading = true
-        this.store.dispatch(`security/saveWorkerGroups`, param).then(res => {
+        this.$refs.popup.spinnerLoading = true
+        this.store.dispatch('security/saveWorkerGroups', param).then(res => {
           this.$emit('onUpdate')
           this.$message.success(res.msg)
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
       }
     },

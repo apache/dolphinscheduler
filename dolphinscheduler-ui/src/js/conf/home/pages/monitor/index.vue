@@ -25,8 +25,8 @@
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   export default {
     name: 'monitor-index',
-    mounted() {
-      this.$modal.destroy()
+    mounted () {
+
     },
     components: { mSecondaryMenu }
   }

@@ -21,7 +21,7 @@
       <div slot="content">
         <label class="label-box">
           <div style="padding-top: 5px;">
-            <x-switch v-model="enable" @on-click="_onSwitch" :disabled="isDetails"></x-switch>
+            <el-switch v-model="enable" @change="_onSwitch" :disabled="isDetails"></el-switch>
           </div>
         </label>
       </div>
@@ -31,10 +31,10 @@
         <div slot="text">{{$t('Datasource')}}</div>
         <div slot="content">
           <m-datasource
-                  ref="refDs"
-                  @on-dsData="_onDsData"
-                  :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
-                  :data="{ type:dsType,datasource:datasource }">
+            ref="refDs"
+            @on-dsData="_onDsData"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
+            :data="{ type:dsType,datasource:datasource }">
           </m-datasource>
         </div>
       </m-list-box>
@@ -48,7 +48,7 @@
               style="opacity: 0;">
             </textarea>
             <a class="ans-modal-box-max">
-              <em class="ans-icon-max" @click="setEditorVal"></em>
+              <em class="el-icon-full-screen" @click="setEditorVal"></em>
             </a>
           </div>
         </div>
@@ -57,22 +57,22 @@
         <div slot="text">{{$t('TargetDataBase')}}</div>
         <div slot="content">
           <m-datasource
-                  ref="refDt"
-                  @on-dsData="_onDtData"
-                  :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
-                  :data="{ type:dtType,datasource:datatarget }">
+            ref="refDt"
+            @on-dsData="_onDtData"
+            :supportType="['MYSQL','POSTGRESQL', 'ORACLE', 'SQLSERVER']"
+            :data="{ type:dtType,datasource:datatarget }">
           </m-datasource>
         </div>
       </m-list-box>
       <m-list-box>
         <div slot="text">{{$t('TargetTable')}}</div>
         <div slot="content">
-          <x-input
+          <el-input
             type="input"
+            size="small"
             v-model="targetTable"
-            :placeholder="$t('Please enter the table of target')"
-            autocomplete="off">
-          </x-input>
+            :placeholder="$t('Please enter the table of target')">
+          </el-input>
         </div>
       </m-list-box>
       <m-list-box>
@@ -126,9 +126,6 @@
               name="code-json-mirror"
               style="opacity: 0;">
             </textarea>
-            <a class="ans-modal-box-max">
-              <em class="ans-icon-max" @click="setJsonEditorVal"></em>
-            </a>
           </div>
         </div>
       </m-list-box>
@@ -144,6 +141,27 @@
         </div>
       </m-list-box>
     </div>
+    <div class="clearfix list">
+      <div class="text-box">
+        <span>{{$t('Running Memory')}}</span>
+      </div>
+      <div class="cont-box">
+        <span >{{$t('Min Memory')}}</span>
+        <m-select-input v-model="xms" :list="[1,2,3,4]">
+        </m-select-input>
+        <span>&nbsp;&nbsp;&nbsp;G &nbsp;&nbsp;</span>
+        <span >{{$t('Max Memory')}}</span>
+        <m-select-input v-model="xmx" :list="[1,2,3,4]">
+        </m-select-input>
+        <span>&nbsp;&nbsp;&nbsp;G</span>
+      </div>
+    </div>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -196,6 +214,12 @@
         // Custom parameter
         localParams: [],
         customConfig: 0,
+        // jvm memory xms
+        xms: 1,
+        // jvm memory xms
+        xmx: 1,
+        scriptBoxDialog: false,
+        item: ''
       }
     },
     mixins: [disabledState],
@@ -204,64 +228,15 @@
       createNodeId: Number
     },
     methods: {
-      setEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  editor.setValue(val)
-                },
-                closeAble () {
-                  // this.$modal.destroy()
-                  modal.remove()
-                }
-              },
-              props: {
-                item: editor.getValue()
-              }
-            })
-          }
-        })
+      setEditorVal () {
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
       },
-      setJsonEditorVal() {
-        let self = this
-        let modal = self.$modal.dialog({
-          className: 'scriptModal',
-          closable: false,
-          showMask: true,
-          maskClosable: true,
-          onClose: function() {
-
-          },
-          render (h) {
-            return h(mScriptBox, {
-              on: {
-                getSriptBoxValue (val) {
-                  jsonEditor.setValue(val)
-                },
-                closeAble () {
-                  // this.$modal.destroy()
-                  modal.remove()
-                }
-              },
-              props: {
-                item: jsonEditor.getValue()
-              }
-            })
-          }
-        })
+      getSriptBoxValue (val) {
+        editor.setValue(val)
       },
       _onSwitch (is) {
-        if(is) {
+        if (is) {
           this.customConfig = 1
           setTimeout(() => {
             this._handlerJsonEditor()
@@ -309,7 +284,7 @@
        * verification
        */
       _verification () {
-        if(this.customConfig) {
+        if (this.customConfig) {
           if (!jsonEditor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
             return false
@@ -324,7 +299,9 @@
           this.$emit('on-params', {
             customConfig: this.customConfig,
             json: jsonEditor.getValue(),
-            localParams: this.localParams
+            localParams: this.localParams,
+            xms: +this.xms,
+            xmx: +this.xmx
           })
           return true
         } else {
@@ -370,7 +347,9 @@
             jobSpeedByte: this.jobSpeedByte * 1024,
             jobSpeedRecord: this.jobSpeedRecord,
             preStatements: this.preStatements,
-            postStatements: this.postStatements
+            postStatements: this.postStatements,
+            xms: +this.xms,
+            xmx: +this.xmx
           })
           return true
         }
@@ -440,23 +419,25 @@
           dataSource: this.rtDatasource,
           dtType: this.dtType,
           dataTarget: this.rtDatatarget,
-          sql: editor?editor.getValue():'',
+          sql: editor ? editor.getValue() : '',
           targetTable: this.targetTable,
           jobSpeedByte: this.jobSpeedByte * 1024,
           jobSpeedRecord: this.jobSpeedRecord,
           preStatements: this.preStatements,
-          postStatements: this.postStatements
-        });
+          postStatements: this.postStatements,
+          xms: +this.xms,
+          xmx: +this.xmx
+        })
       },
       _destroyEditor () {
-         if (editor) {
+        if (editor) {
           editor.toTextArea() // Uninstall
           editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
           editor.off($('.code-sql-mirror'), 'changes', this.changes)
         }
       },
       _destroyJsonEditor () {
-         if (jsonEditor) {
+        if (jsonEditor) {
           jsonEditor.toTextArea() // Uninstall
           jsonEditor.off($('.code-json-mirror'), 'keypress', this.keypress)
           jsonEditor.off($('.code-json-mirror'), 'changes', this.changes)
@@ -468,8 +449,11 @@
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
+        // set jvm memory
+        this.xms = o.params.xms || 1
+        this.xmx = o.params.xmx || 1
         // backfill
-        if(o.params.customConfig == 0) {
+        if (o.params.customConfig === 0) {
           this.customConfig = 0
           this.enable = false
           this.dsType = o.params.dsType || ''
@@ -491,7 +475,7 @@
       }
     },
     mounted () {
-      if(this.customConfig) {
+      if (this.customConfig) {
         setTimeout(() => {
           this._handlerJsonEditor()
         }, 200)
@@ -515,9 +499,9 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
-        this._cacheParams();
+        this._cacheParams()
       }
     },
     computed: {
@@ -535,13 +519,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput }
+    components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>

@@ -16,17 +16,18 @@
  */
 <template>
   <div class="udfs-model">
-    <x-select multiple
+    <el-select multiple
               v-model="udfsStr"
               :disabled="isDetails"
+              size="small"
               style="width: 100%;">
-      <x-option
+      <el-option
               v-for="city in udfsList"
               :key="city.id"
               :value="city.id"
-              :label="city.code"> 
-      </x-option>
-    </x-select>
+              :label="city.code">
+      </el-option>
+    </el-select>
   </div>
 </template>
 <script>
@@ -92,7 +93,7 @@
       },
       type (a) {
         // The props parameter needs to be changed due to the scene.
-        this.udfs = ''
+        this.$emit('on-udfsData', '')
         if (a === 'HIVE') {
           this._getUdfList()
         } else {

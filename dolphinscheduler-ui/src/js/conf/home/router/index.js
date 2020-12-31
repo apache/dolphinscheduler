@@ -397,14 +397,6 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('Token manage')}`
           }
-        },
-        {
-          path: '/security/Alarm-plugin-example',
-          name: 'Alarm-plugin-example',
-          component: resolve => require(['../pages/security/pages/alarmPluginExample/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Alarm plugin example')}`
-          }
         }
       ]
     },

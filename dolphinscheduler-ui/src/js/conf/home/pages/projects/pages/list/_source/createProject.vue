@@ -15,30 +15,31 @@
  * limitations under the License.
  */
 <template>
-  <m-popup ref="popup" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit') : $t('Create Project')" @ok="_ok">
+  <m-popup ref="popup" :nameText="item ? $t('Edit') : $t('Create Project')" :ok-text="item ? $t('Edit') : $t('Submit')"
+           @close="_close" @ok="_ok">
     <template slot="content">
       <div class="projects-create-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
+          <template slot="name"><strong>*</strong>{{ $t('Project Name') }}</template>
           <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="projectName"
-                    maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+            <el-input
+              v-model="projectName"
+              :placeholder="$t('Please enter name')"
+              maxlength="60"
+              size="small"
+              type="input">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('Description')}}</template>
+          <template slot="name">{{ $t('Description') }}</template>
           <template slot="content">
-            <x-input
-                    type="textarea"
-                    v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+            <el-input
+              v-model="description"
+              :placeholder="$t('Please enter description')"
+              size="small"
+              type="textarea">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -80,18 +81,25 @@
           param.projectId = this.item.id
         }
 
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
 
         this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
+          this.$emit('_onUpdate')
+          this.$message({
+            message: res.msg,
+            type: 'success',
+            offset: 70
+          })
           setTimeout(() => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           }, 800)
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         })
+      },
+      _close () {
+        this.$emit('close')
       },
       _verification () {
         if (!this.projectName) {

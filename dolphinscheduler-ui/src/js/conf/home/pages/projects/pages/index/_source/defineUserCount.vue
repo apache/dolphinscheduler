@@ -38,7 +38,7 @@
       return {
         isSpin: true,
         msg: true,
-        parameter: {projectId: 0}
+        parameter: { projectId: 0 }
       }
     },
     props: {
@@ -71,9 +71,9 @@
     },
     created () {
       this.isSpin = true
-      this.parameter.projectId = this.projectId;
+      this.parameter.projectId = this.projectId
       this.getDefineUserCount(this.parameter).then(res => {
-        this.msg = res.data.count > 0 ? true : false
+        this.msg = res.data.count > 0
         this.defineUserList = []
         this._handleDefineUser(res)
         this.isSpin = false

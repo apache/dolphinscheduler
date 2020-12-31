@@ -15,67 +15,49 @@
  * limitations under the License.
  */
 <template>
-  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
+  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" @close="close" ref="popup">
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('type')}}</template>
           <template slot="content">
-            <x-radio-group v-model="type">
-              <x-radio :label="'HIVE'">HIVE UDF</x-radio>
+            <el-radio-group v-model="type" size="mini" style="vertical-align: sub">
+              <el-radio :label="'HIVE'">HIVE UDF</el-radio>
               <!--<v-radio :label="'SPARK'">SPARK UDF</v-radio>-->
-            </x-radio-group>
+            </el-radio-group>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Function Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     maxlength="40"
                     v-model="funcName"
+                    size="small"
                     :placeholder="$t('Please enter a function name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Package Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     maxlength="100"
                     v-model="className"
+                    size="small"
                     :placeholder="$t('Please enter a Package name')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
-        <!-- <m-list-box-f>
-          <template slot="name">{{$t('Parameter')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="argTypes"
-                    :placeholder="$t('Please enter a parameter')">
-            </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name">{{$t('Database Name')}}</template>
-          <template slot="content">
-            <x-input
-                    type="input"
-                    v-model="database"
-                    :placeholder="$t('Please enter database name')">
-            </x-input>
-          </template>
-        </m-list-box-f> -->
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
             <treeselect style="width:535px;float:left;" v-model="resourceId" maxHeight="200" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
-            <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
+            <el-button type="primary" size="small" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</el-button>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isUpdate">
@@ -99,11 +81,12 @@
         <m-list-box-f>
           <template slot="name">{{$t('Instructions')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
+                    size="small"
                     :placeholder="$t('Please enter a instructions')">
-            </x-input>
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -136,11 +119,11 @@
         udfResourceList: [],
         isUpdate: false,
         upDisabled: false,
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
-        },
+        }
       }
     },
     props: {
@@ -148,19 +131,19 @@
     },
     methods: {
       _ok () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
           this._verifyUdfFuncName().then(res => {
             this._createUdfFunc().then()
           }).then(res => {
             setTimeout(() => {
-              this.$refs['popup'].spinnerLoading = false
+              this.$refs.popup.spinnerLoading = false
             }, 800)
           }).catch(e => {
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           })
         } else {
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
       },
       _createUdfFunc () {
@@ -183,7 +166,7 @@
             param.id = id
           }
           // api
-          this.store.dispatch(`resource/${id ? `updateUdfFunc` : `createUdfFunc`}`, param).then(res => {
+          this.store.dispatch(`resource/${id ? 'updateUdfFunc' : 'createUdfFunc'}`, param).then(res => {
             this.$emit('onUpdate', param)
             this.$message.success(res.msg)
             resolve()
@@ -200,8 +183,8 @@
         this.upDisabled = true
       },
       // selTree
-      selTree(node) {
-        this.$refs.assignment.receivedValue(node.id,node.fullName)
+      selTree (node) {
+        this.$refs.assignment.receivedValue(node.id, node.fullName)
       },
       /**
        * get udf resources
@@ -214,13 +197,13 @@
             item = this.filterEmptyDirectory(item)
             let item1 = _.cloneDeep(res.data)
             this.diGuiTree(item)
-            
+
             this.diGuiTree(this.filterJarFile(item1))
-            item1 = item1.filter( item => {
-              if(item.dirctory) {
+            item1 = item1.filter(item => {
+              if (item.dirctory) {
                 return item
               }
-            });
+            })
             this.udfResourceList = item
             this.udfResourceDirList = item1
             resolve()
@@ -228,13 +211,13 @@
         })
       },
       // filterEmptyDirectory
-      filterEmptyDirectory(array) {
+      filterEmptyDirectory (array) {
         for (const item of array) {
           if (item.children) {
             this.filterEmptyDirectory(item.children)
           }
         }
-        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length==0) || (!/\.jar$/.test(n.name) && n.children.length>0)))
+        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length === 0) || (!/\.jar$/.test(n.name) && n.children.length > 0)))
       },
       // filterJarFile
       filterJarFile (array) {
@@ -246,10 +229,10 @@
         return array.filter(n => !/\.jar$/.test(n.name))
       },
       // diGuiTree
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? delete item.children : this.diGuiTree(item.children)
         })
       },
       /**
@@ -304,6 +287,9 @@
             })
           }
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},

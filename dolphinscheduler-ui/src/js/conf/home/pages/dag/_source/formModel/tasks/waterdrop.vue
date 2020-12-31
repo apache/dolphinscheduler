@@ -17,58 +17,56 @@
 <template>
   <div class="shell-model">
     <!--deploy mode-->
-    <div class="list-box-4p">
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Deploy Mode')}}</span>
-        <span class="sp2">
-          <x-radio-group v-model="deployMode">
-            <x-radio :label="'client'" :disabled="isDetails"></x-radio>
-            <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
-            <x-radio :label="'local'" :disabled="isDetails"></x-radio>
-          </x-radio-group>
-        </span>
-        <span class="sp1 sp3">{{$t('Queue')}}</span>
-        <span class="sp4">
-          <x-input
-            :disabled="isDetails"
-            type="input"
-            v-model="queue"
-            :placeholder="$t('Please enter queue value')"
-            style="width: 60%;"
-            autocomplete="off">
-        </x-input>
-        </span>
+    <m-list-box>
+      <div slot="text">{{$t('Deploy Mode')}}</div>
+      <div slot="content">
+        <el-radio-group size="small" v-model="deployMode">
+          <el-radio :label="'client'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'cluster'" :disabled="isDetails"></el-radio>
+          <el-radio :label="'local'" :disabled="isDetails"></el-radio>
+        </el-radio-group>
       </div>
-    </div>
+    </m-list-box>
     <!--master-->
-    <div class="list-box-4p" v-if="deployMode !== 'local'">
-      <div class="clearfix list">
-        <span class="sp1">{{$t('Master')}}</span>
-        <span class="sp4">
-          <x-select
-            style="width: 130px;"
-            v-model="master"
-            :disabled="isDetails">
-          <x-option
+    <m-list-box v-if="deployMode !== 'local'">
+      <div slot="text">{{$t('Master')}}</div>
+      <div slot="content" class="display-flex">
+        <el-select
+          size="small"
+          v-model="master"
+          :disabled="isDetails">
+          <el-option
             v-for="city in masterType"
             :key="city.code"
             :value="city.code"
             :label="city.code">
-          </x-option>
-          </x-select>
-        </span>
-        <span v-if="masterUrlState">
-          <x-input
-            :disabled="isDetails"
-            type="input"
-            v-model="masterUrl"
-            :placeholder="$t('Please Enter Url')"
-            style="width: 60%;"
-            autocomplete="off">
-        </x-input>
-        </span>
+          </el-option>
+        </el-select>
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="masterUrl"
+          :placeholder="$t('Please Enter Url')"
+          class="cont-extra"
+          v-if="masterUrlState">
+        </el-input>
       </div>
-    </div>
+    </m-list-box>
+    <!--queue-->
+    <m-list-box v-if="deployMode !== 'local' && master === 'yarn'">
+      <div slot="text">{{$t('Queue')}}</div>
+      <div slot="content">
+        <el-input
+          :disabled="isDetails"
+          type="input"
+          size="small"
+          v-model="queue"
+          :placeholder="$t('Please enter queue value')"
+          style="width: 192px;">
+        </el-input>
+      </div>
+    </m-list-box>
     <!--config file-->
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
@@ -92,12 +90,11 @@
     </m-list-box>
   </div>
 </template>
+
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
-  import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Treeselect from '@riophae/vue-treeselect'
@@ -111,9 +108,9 @@
         // script
         rawScript: '',
         // waterdrop script
-        baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh',
+        baseScript: 'sh ${WATERDROP_HOME}/bin/start-waterdrop.sh', // eslint-disable-line
         // resourceNameVal
-        resourceNameVal : [],
+        resourceNameVal: [],
         // Custom parameter
         localParams: [],
         // resource(list)
@@ -127,14 +124,14 @@
         // Spark version(LIst)
         masterType: [{ code: 'yarn' }, { code: 'local' }, { code: 'spark://' }, { code: 'mesos://' }],
         // Deployment masterUrl state
-        masterUrlState:false,
+        masterUrlState: false,
         // Deployment masterUrl
         masterUrl: '',
         // Cache ResourceList
         cacheResourceList: [],
         // define options
         options: [],
-        normalizer(node) {
+        normalizer (node) {
           return {
             label: node.name
           }
@@ -176,7 +173,7 @@
           return false
         }
         // noRes
-        if (this.noRes.length>0) {
+        if (this.noRes.length > 0) {
           this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
           return false
         }
@@ -185,40 +182,40 @@
           this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
           return false
         }
-        if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length==0) {
+        if (this.resourceNameVal.resourceList && this.resourceNameVal.resourceList.length === 0) {
           this.$message.warning(`${i18n.$t('Please select the waterdrop resources')}`)
           return false
         }
         // Process resourcelist
-        let dataProcessing= _.map(this.resourceList, v => {
+        let dataProcessing = _.map(this.resourceList, v => {
           return {
             id: v
           }
         })
-        //verify deploy mode
+        // verify deploy mode
         let deployMode = this.deployMode
         let master = this.master
         let masterUrl = this.masterUrl
-        
-        if(this.deployMode == 'local'){
+
+        if (this.deployMode === 'local') {
           master = 'local'
           masterUrl = ''
           deployMode = 'client'
         }
         // get local params
         let locparams = ''
-        this.localParams.forEach(v=>{
-            locparams = locparams + ' --variable ' + v.prop + '=' + v.value
-          }
+        this.localParams.forEach(v => {
+          locparams = locparams + ' --variable ' + v.prop + '=' + v.value
+        }
         )
         // get waterdrop script
         let tureScript = ''
-        this.resourceNameVal.resourceList.forEach(v=>{
+        this.resourceNameVal.resourceList.forEach(v => {
           tureScript = tureScript + this.baseScript +
-            ' --master '+ master + masterUrl +
-            ' --deploy-mode '+ deployMode +
-            ' --queue '+ this.queue +
-            ' --config ' +  v.res +
+            ' --master ' + master + masterUrl +
+            ' --deploy-mode ' + deployMode +
+            ' --queue ' + this.queue +
+            ' --config ' + v.res +
             locparams + ' \n'
         })
 
@@ -226,60 +223,60 @@
         this.$emit('on-params', {
           resourceList: dataProcessing,
           localParams: this.localParams,
-          rawScript: tureScript,
+          rawScript: tureScript
         })
 
         return true
       },
-      diGuiTree(item) {  // Recursive convenience tree structure
+      diGuiTree (item) { // Recursive convenience tree structure
         item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?
-            this.operationTree(item) : this.diGuiTree(item.children);
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
         })
       },
-      operationTree(item) {
-        if(item.dirctory) {
-          item.isDisabled =true
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
         }
         delete item.children
       },
-      searchTree(element, id) {
+      searchTree (element, id) {
         // 根据id查找节点
-        if (element.id == id) {
-          return element;
-        } else if (element.children != null) {
-          var i;
-          var result = null;
-          for (i = 0; result == null && i < element.children.length; i++) {
-            result = this.searchTree(element.children[i], id);
+        if (element.id === id) {
+          return element
+        } else if (element.children !== null) {
+          let i
+          let result = null
+          for (i = 0; result === null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id)
           }
-          return result;
+          return result
         }
-        return null;
+        return null
       },
-      dataProcess(backResource) {
+      dataProcess (backResource) {
         let isResourceId = []
         let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.options.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.options.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-          resourceIdArr = isResourceId.map(item=>{
+          resourceIdArr = isResourceId.map(item => {
             return item.id
           })
-          Array.prototype.diff = function(a) {
-            return this.filter(function(i) {return a.indexOf(i) < 0;});
-          };
-          let diffSet = this.resourceList.diff(resourceIdArr);
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
+          }
+          let diffSet = this.resourceList.diff(resourceIdArr)
           let optionsCmp = []
-          if(diffSet.length>0) {
-            diffSet.forEach(item=>{
-              backResource.forEach(item1=>{
-                if(item==item1.id || item==item1.res) {
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item === item1.id || item === item1.res) {
                   optionsCmp.push(item1)
                 }
               })
@@ -288,15 +285,15 @@
           let noResources = [{
             id: -1,
             name: $t('Unauthorized or deleted resources'),
-            fullName: '/'+$t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
             children: []
           }]
-          if(optionsCmp.length>0) {
+          if (optionsCmp.length > 0) {
             this.allNoResources = optionsCmp
-            optionsCmp = optionsCmp.map(item=>{
-              return {id: item.id,name: item.name,fullName: item.res}
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
             })
-            optionsCmp.forEach(item=>{
+            optionsCmp.forEach(item => {
               item.isNew = true
             })
             noResources[0].children = optionsCmp
@@ -306,57 +303,62 @@
       }
     },
     watch: {
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
         this.resourceNameVal = val
-        this.$emit('on-cache-params', val);
+        this.$emit('on-cache-params', val)
       },
-      "master": {
-        handler(code) {
-          if(code == 'spark://'){
-            this.masterUrlState = true;
-          }else if(code == 'mesos://'){
-            this.masterUrlState = true;
-          }else{
-            this.masterUrlState = false;
-            this.masterUrl = ''
-          }
-        }
-      },
-    },
-    computed: {
-      cacheParams () {
-        let isResourceId = []
-        let resourceIdArr = []
-        if(this.resourceList.length>0) {
-          this.resourceList.forEach(v=>{
-            this.options.forEach(v1=>{
-              if(this.searchTree(v1,v)) {
-                isResourceId.push(this.searchTree(v1,v))
-              }
-            })
-          })
-          resourceIdArr = isResourceId.map(item=>{
-            return {id: item.id,name: item.name,res: item.fullName}
-          })
-        }
+      resourceIdArr (arr) {
         let result = []
-        resourceIdArr.forEach(item=>{
-          this.allNoResources.forEach(item1=>{
-            if(item.id==item1.id) {
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
               // resultBool = true
               result.push(item1)
             }
           })
         })
         this.noRes = result
+      },
+      master: {
+        handler (code) {
+          if (code === 'spark://') {
+            this.masterUrlState = true
+          } else if (code === 'mesos://') {
+            this.masterUrlState = true
+          } else {
+            this.masterUrlState = false
+            this.masterUrl = ''
+          }
+        }
+      }
+    },
+    computed: {
+      resourceIdArr () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.options.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
+              }
+            })
+          })
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
+          })
+        }
+        return resourceIdArr
+      },
+      cacheParams () {
         return {
-          resourceList: resourceIdArr,
+          resourceList: this.resourceIdArr,
           localParams: this.localParams,
           deployMode: this.deployMode,
           master: this.master,
           masterUrl: this.masterUrl,
-          queue:this.queue,
+          queue: this.queue
         }
       }
     },
@@ -369,7 +371,7 @@
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         this.master = o.params.master || 'yarn'
-        this.deployMode =  o.params.deployMode || 'client'
+        this.deployMode = o.params.deployMode || 'client'
         this.masterUrl = o.params.masterUrl || ''
         this.queue = o.params.queue || 'default'
         this.rawScript = o.params.rawScript || ''
@@ -379,10 +381,10 @@
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
           _.map(resourceList, v => {
-            if(!v.id) {
-              this.store.dispatch('dag/getResourceId',{
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
                 type: 'FILE',
-                fullName: '/'+v.res
+                fullName: '/' + v.res
               }).then(res => {
                 this.resourceList.push(res.id)
                 this.dataProcess(backResource)
@@ -407,61 +409,6 @@
     },
     destroyed () {
     },
-    components: { mLocalParams, mListBox, mResources, mScriptBox, Treeselect }
+    components: { mLocalParams, mListBox, Treeselect }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss" scope>
-  .scriptModal {
-    .ans-modal-box-content-wrapper {
-      width: 90%;
-      .ans-modal-box-close {
-        right: -12px;
-        top: -16px;
-        color: #fff;
-      }
-    }
-  }
-  .ans-modal-box-close {
-    z-index: 100;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-  .vue-treeselect--disabled {
-    .vue-treeselect__control {
-      background-color: #ecf3f8;
-      .vue-treeselect__single-value {
-        color: #6d859e;
-      }
-    }
-  }
-  .list-box-4p {
-    .list {
-      margin-bottom: 14px;
-      .sp1 {
-        float: left;
-        width: 112px;
-        text-align: right;
-        margin-right: 10px;
-        font-size: 14px;
-        color: #777;
-        display: inline-block;
-        padding-top: 6px;
-      }
-      .sp2 {
-        float: left;
-        margin-right: 4px;
-        padding-top: 6px;
-      }
-      .sp3 {
-        width: 90px;
-      }
-      .sp4 {
-        float: left;
-        margin-right: 4px;
-      }
-    }
-  }
-</style>

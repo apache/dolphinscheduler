@@ -16,45 +16,45 @@
  */
 <template>
   <div class="month-model">
-    <div class="v-crontab-from-model">
-      <x-radio-group v-model="radioMonth" vertical>
+    <div class="v-crontab-form-model">
+      <el-radio-group v-model="radioMonth" vertical size="mini">
         <div class="list-box">
-          <x-radio label="everyMonth">
+          <el-radio label="everyMonth" size="mini">
             <span class="text">{{$t('每一月')}}</span>
-          </x-radio>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="intervalMonth">
+          <el-radio label="intervalMonth" size="mini">
             <span class="text">{{$t('每隔')}}</span>
             <m-input-number :min="0" :max="12" :props-value="parseInt(intervalPerformVal)" @on-number="onIntervalPerform"></m-input-number>
-            <span class="text">{{$t('月执行 从')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('月执行 从')}}</span>
             <m-input-number :min="0" :max="12" :props-value="parseInt(intervalStartVal)" @on-number="onIntervalStart"></m-input-number>
-            <span class="text">{{$t('月开始')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('月开始')}}</span>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="specificlMonth">
+          <el-radio label="specificlMonth">
             <span class="text">{{$t('具体月数(可多选)')}}</span>
-            <x-select multiple :placeholder="$t('请选择具体月数')" v-model="specificMonthVal" @on-change="onspecificlMonths">
-              <x-option
+            <el-select multiple :placeholder="$t('请选择具体月数')" size="mini" v-model="specificMonthVal" @change="onspecificlMonths">
+              <el-option
                       v-for="item in selectMonthList"
                       :key="item.value"
                       :value="item.value"
                       :label="item.label">
-              </x-option>
-            </x-select>
-          </x-radio>
+              </el-option>
+            </el-select>
+          </el-radio>
         </div>
         <div class="list-box">
-          <x-radio label="cycleMonth">
+          <el-radio label="cycleMonth" size="mini">
             <span class="text">{{$t('周期从')}}</span>
             <m-input-number :min="0" :max="12" :props-value="parseInt(cycleStartVal)" @on-number="onCycleStart"></m-input-number>
-            <span class="text">{{$t('到')}}</span>
+            <span class="text" style="margin-left: 65px;">{{$t('到')}}</span>
             <m-input-number :min="0" :max="12" :props-value="parseInt(cycleEndVal)" @on-number="onCycleEnd"></m-input-number>
-            <span class="text">{{$t('月')}}</span>
-          </x-radio>
+            <span class="text" style="margin-left: 65px;">{{$t('月')}}</span>
+          </el-radio>
         </div>
-      </x-radio-group>
+      </el-radio-group>
     </div>
   </div>
 </template>

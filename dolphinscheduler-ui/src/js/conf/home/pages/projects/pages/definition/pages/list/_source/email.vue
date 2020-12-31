@@ -17,11 +17,11 @@
 <template>
   <div class="ans-input email-model">
     <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
-      <span class="tag-wrapper" v-for="(item,$index) in activeList" :key="$index" :class="activeIndex === $index ? 'active' : ''">
+      <span class="tag-wrapper" v-for="(item,$index) in activeListL" :key="$index" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
-        <em class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
+        <em class="remove-tag el-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
       </span>
-      <x-poptip
+      <el-popover
               placement="bottom-start"
               :append-to-body="true"
               :visible-arrow="false"
@@ -41,23 +41,23 @@
         <span class="label-wrapper" slot="reference" >
           <!--@keydown.tab="_emailTab"-->
           <input
-                  class="email-input"
-                  ref="emailInput"
-                  :style="{width:emailWidth + 'px'}"
-                  type="text"
-                  v-model="email"
-                  :disabled="disabled"
-                  :placeholder="$t('Please enter email')"
-                  @blur="_emailEnter"
-                  @keydown.tab="_emailTab"
-                  @keyup.delete="_emailDelete"
-                  @keyup.enter="_emailEnter"
-                  @keyup.space="_emailEnter"
-                  @keyup.186="_emailEnter"
-                  @keyup.up="_emailKeyup('up')"
-                  @keyup.down="_emailKeyup('down')">
+              class="email-input"
+              ref="emailInput"
+              :style="{width:emailWidth + 'px'}"
+              type="text"
+              v-model="email"
+              :disabled="disabled"
+              :placeholder="$t('Please enter email')"
+              @blur="_emailEnter"
+              @keydown.tab="_emailTab"
+              @keyup.delete="_emailDelete"
+              @keyup.enter="_emailEnter"
+              @keyup.space="_emailEnter"
+              @keyup.186="_emailEnter"
+              @keyup.up="_emailKeyup('up')"
+              @keyup.down="_emailKeyup('down')">
         </span>
-      </x-poptip>
+      </el-popover>
     </div>
   </div>
 </template>
@@ -74,6 +74,7 @@
         tagModel: false,
         email: '',
         activeIndex: null,
+        activeListL: _.cloneDeep(this.activeList),
         emailList: [],
         index: 0,
         emailWidth: 100,
@@ -100,18 +101,18 @@
         if (this.email === '') {
           return true
         }
-        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
+        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, '')
 
         let email = this.email
 
         let is = (n) => {
-          return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === n)
+          return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === n)
         }
 
         if (isEmial(email)) {
           if (!is(email)) {
             this.emailWidth = 0
-            this.activeList.push(email)
+            this.activeListL.push(email)
             this.email = ''
             this._handlerEmailWitch()
             return true
@@ -132,7 +133,7 @@
           this.emailList = []
           this.isEmail = false
         } else {
-          let a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList))
+          let a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL))
           let b = a.concat(emailList)
           let list = fuzzyQuery(b, val)
           this.emailList = _.uniqWith(list.length && list, _.isEqual)
@@ -161,11 +162,11 @@
         if (!this.isCn) {
           this.emailWidth = 0
           if (_.isInteger(this.activeIndex)) {
-            this.activeList.pop()
+            this.activeListL.pop()
             this.activeIndex = null
           } else {
             if (!this.email) {
-              this.activeIndex = this.activeList.length - 1
+              this.activeIndex = this.activeListL.length - 1
             }
           }
           this._handlerEmailWitch()
@@ -176,7 +177,7 @@
        */
       _del (i) {
         this.emailWidth = 0
-        this.activeList.splice(i, 1)
+        this.activeListL.splice(i, 1)
         this._handlerEmailWitch()
       },
       /**
@@ -221,14 +222,14 @@
         this.email = ''
 
         // Non-existing data
-        if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === item).length) {
+        if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === item).length) {
           this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           return
         }
         // Width initialization
         this.emailWidth = 0
         // Insert data
-        this.activeList.push(item)
+        this.activeListL.push(item)
         // Calculated width
         this._handlerEmailWitch()
         // Check mailbox index initialization
@@ -264,7 +265,12 @@
         this.activeIndex = null
       },
       activeList (val) {
-        this.$emit('valueEvent', val)
+        this.activeListL = _.cloneDeep(val)
+      },
+      activeListL (val) {
+        if (!_.isEqual(val, this.activeList)) {
+          this.$emit('valueEvent', val)
+        }
       }
     },
     created () {
@@ -299,6 +305,8 @@
 <style lang="scss" rel="stylesheet/scss">
   .email-model {
     width: 100%;
+    border: 1px solid #dcdfe6;
+    border-radius: 5px;
     .input-element {
       min-height: 32px;
       padding: 1px 8px;

@@ -15,30 +15,30 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" :asyn-loading="true">
+  <m-popup :ok-text="$t('Rename')" :nameText="$t('Rename')" @ok="_ok" @close="close" :asyn-loading="true">
     <template slot="content">
       <div class="resource-rename-model">
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="input"
                     v-model="name"
                     maxlength="60"
-                    :placeholder="$t('Please enter name')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter name')">
+            </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
-            <x-input
+            <el-input
                     type="textarea"
                     v-model="description"
-                    :placeholder="$t('Please enter description')"
-                    autocomplete="off">
-            </x-input>
+                    size="small"
+                    :placeholder="$t('Please enter description')">
+            </el-input>
           </template>
         </m-list-box-f>
       </div>
@@ -48,7 +48,6 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   export default {
@@ -67,12 +66,12 @@
       _ok (fn) {
         this._verification().then(res => {
           if (this.name === this.item.alias) {
-            return new Promise((resolve,reject) => {
-              this.description === this.item.description ? reject({msg:'内容未修改'}) : resolve()
+            return new Promise((resolve, reject) => {
+              this.description === this.item.description ? reject({ msg: '内容未修改' }) : resolve()
             })
-          }else{
+          } else {
             return this.store.dispatch('resource/resourceVerifyName', {
-              fullName: '/'+this.name,
+              fullName: '/' + this.name,
               type: 'UDF'
             })
           }
@@ -102,6 +101,9 @@
             resolve()
           }
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
     watch: {},

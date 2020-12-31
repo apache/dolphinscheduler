@@ -121,7 +121,7 @@ const selectList = {
   }),
   lastWeeks: [
     {
-      value: '1L',
+      value: '?',
       label: '星期天'
     },
     {

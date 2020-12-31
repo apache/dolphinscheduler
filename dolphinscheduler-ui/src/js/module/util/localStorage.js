@@ -48,7 +48,7 @@ const localStorage = {
   },
   getJSON: function (skey, p) {
     try {
-      var d = storage.getItem(skey)
+      let d = storage.getItem(skey)
       if (d) {
         d = JSON.parse(d)
         return d[p]
@@ -59,7 +59,7 @@ const localStorage = {
   },
   setJSON: function (skey, p, val) {
     try {
-      var f = storage.getItem(skey)
+      let f = storage.getItem(skey)
       f = f ? JSON.parse(f) : {}
       f[p] = val
       storage.setItem(skey, JSON.stringify(f))
@@ -69,7 +69,7 @@ const localStorage = {
   },
   removeJSON: function (skey, p) {
     try {
-      var d = storage.getItem(skey)
+      let d = storage.getItem(skey)
       if (d) {
         d = JSON.parse(d)
         delete d[p]

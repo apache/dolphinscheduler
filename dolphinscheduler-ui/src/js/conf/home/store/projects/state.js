@@ -15,5 +15,5 @@
  * limitations under the License.
  */
 export default {
-
+  sideBar: 1
 }

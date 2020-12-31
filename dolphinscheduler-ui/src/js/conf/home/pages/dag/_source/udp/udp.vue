@@ -17,28 +17,26 @@
 <template>
   <div class="udp-model">
     <div class="scrollbar contpi-boxt">
-      <div class="title">
-        <span>{{$t('Set the DAG diagram name')}}</span>
-      </div>
-
       <div>
-        <x-input
+        <el-input
                 type="text"
+                size="small"
                 v-model="name"
                 :disabled="router.history.current.name === 'projects-instance-details'"
                 :placeholder="$t('Please enter name (required)')">
-        </x-input>
+        </el-input>
       </div>
 
       <template v-if="router.history.current.name !== 'projects-instance-details'">
         <div style="padding-top: 12px;">
-          <x-input
+          <el-input
                   type="textarea"
+                  size="small"
                   v-model="description"
                   :autosize="{minRows:2}"
                   :placeholder="$t('Please enter description(optional)')"
                   autocomplete="off">
-          </x-input>
+          </el-input>
         </div>
       </template>
 
@@ -49,14 +47,14 @@
       <div class="title" style="padding-top: 6px;">
         <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
-          <x-switch v-model="checkedTimeout"></x-switch>
+          <el-switch v-model="checkedTimeout" size="small"></el-switch>
         </span>
       </div>
       <div class="content" style="padding-bottom: 10px;" v-if="checkedTimeout">
         <span>
-          <x-input v-model="timeout" style="width: 160px;" maxlength="9">
+          <el-input v-model="timeout" style="width: 160px;" maxlength="9" size="small">
             <span slot="append">{{$t('Minute')}}</span>
-          </x-input>
+          </el-input>
         </span>
       </div>
 
@@ -78,11 +76,11 @@
       <div class="submit">
         <template v-if="router.history.current.name === 'projects-instance-details'">
           <div class="lint-pt">
-            <x-checkbox v-model="syncDefine">{{$t('Whether to update the process definition')}}</x-checkbox>
+            <el-checkbox v-model="syncDefine" size="small">{{$t('Whether to update the process definition')}}</el-checkbox>
           </div>
         </template>
-        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :disabled="isDetails" @click="ok()">{{$t('Add')}}</x-button>
+        <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
+        <el-button type="primary" size="small" round :disabled="isDetails" @click="ok()">{{$t('Add')}}</el-button>
       </div>
     </div>
   </div>
@@ -93,7 +91,7 @@
   import mLocalParams from '../formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Affirm from '../jumpAffirm'
-  import FormTenant from "./_source/selectTenant";
+  import FormTenant from './_source/selectTenant'
 
   export default {
     name: 'udp',
@@ -136,7 +134,7 @@
         }
         return true
       },
-      _accuStore(){
+      _accuStore () {
         this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
@@ -212,10 +210,9 @@
           this.tenantId = dag.tenantId
         }
       })
-
     },
     mounted () {},
-    components: {FormTenant, mLocalParams }
+    components: { FormTenant, mLocalParams }
   }
 </script>
 

@@ -25,14 +25,14 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
-            <x-select v-model="itemId">
-              <x-option
+            <el-select v-model="itemId" size="small">
+              <el-option
                       v-for="item in itemList"
                       :key="item.id"
                       :value="item.id"
                       :label="item.name">
-              </x-option>
-            </x-select>
+              </el-option>
+            </el-select>
           </template>
         </m-list-box-f>
       </div>
@@ -40,7 +40,6 @@
   </m-popup>
 </template>
 <script>
-  import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
@@ -56,35 +55,35 @@
       }
     },
     props: {
-        tmp: Boolean
+      tmp: Boolean
     },
     methods: {
       _ok () {
-        if(this._verification()) {
-            if(this.tmp) {
-                this.$emit('onBatchMove',this.itemId)
-            } else {
-                this.$emit('onBatchCopy',this.itemId)
-            }
+        if (this._verification()) {
+          if (this.tmp) {
+            this.$emit('onBatchMove', this.itemId)
+          } else {
+            this.$emit('onBatchCopy', this.itemId)
+          }
         }
       },
-      _verification() {
-        if(!this.itemId) {
-            this.$message.warning(`${i18n.$t('Project name is required')}`)
-            return false
+      _verification () {
+        if (!this.itemId) {
+          this.$message.warning(`${i18n.$t('Project name is required')}`)
+          return false
         }
         return true
       }
-      
+
     },
     watch: {
     },
     created () {
-        this.store.dispatch('dag/getAllItems', {}).then(res => {
-            if(res.data.length> 0) {
-                this.itemList = res.data
-            }
-        })
+      this.store.dispatch('dag/getAllItems', {}).then(res => {
+        if (res.data.length > 0) {
+          this.itemList = res.data
+        }
+      })
     },
     mounted () {
 
