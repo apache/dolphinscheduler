@@ -14,33 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
-      }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
+package org.apache.dolphinscheduler.server.log;
+
+import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
+
+import org.slf4j.Marker;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.FileAppender;
+
+/**
+ * Task log appender
+ */
+public class TaskLogAppender extends FileAppender<ILoggingEvent> {
+    @Override
+    protected void append(ILoggingEvent event) {
+        Marker marker = event.getMarker();
+        if (marker != null) {
+            if (marker.equals(FINALIZE_SESSION_MARKER)) {
+                stop();
+            }
         }
-      }
+        super.subAppend(event);
     }
-  }
 }
