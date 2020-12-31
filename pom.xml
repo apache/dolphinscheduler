@@ -940,7 +940,6 @@
                         <include>**/dao/mapper/TenantMapperTest.java</include>
                         <include>**/dao/mapper/UdfFuncMapperTest.java</include>
                         <include>**/dao/mapper/UDFUserMapperTest.java</include>
-                        <include>**/dao/mapper/UserAlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/mapper/AlertPluginInstanceMapperTest.java</include>
                         <include>**/dao/mapper/PluginDefineTest.java</include>

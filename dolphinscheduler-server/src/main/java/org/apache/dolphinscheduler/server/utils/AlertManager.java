@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -28,7 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.spi.alert.ShowType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -171,14 +169,10 @@ public class AlertManager {
         try {
             Alert alert = new Alert();
             alert.setTitle("worker fault tolerance");
-            //alert.setShowType(ShowType.TABLE);
             String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
             alert.setContent(content);
-            alert.setAlertType(AlertType.EMAIL);
             alert.setCreateTime(new Date());
             alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1 : processInstance.getWarningGroupId());
-            alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
-            alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
             alertDao.addAlert(alert);
             logger.info("add alert to db , alert : {}", alert.toString());
 
@@ -225,16 +219,10 @@ public class AlertManager {
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" : "failed";
         alert.setTitle(cmdName + " " + success);
-        ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
-        //alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);
         alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
         alert.setCreateTime(new Date());
-        alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
-        alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
-
         alertDao.addAlert(alert);
         logger.info("add alert to db , alert: {}", alert.toString());
     }

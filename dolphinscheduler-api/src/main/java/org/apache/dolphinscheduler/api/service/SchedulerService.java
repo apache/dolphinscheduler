@@ -161,8 +161,7 @@ public class SchedulerService extends BaseService {
         /**
          * updateProcessInstance receivers and cc by process definition id
          */
-        processDefinition.setReceivers(receivers);
-        processDefinition.setReceiversCc(receiversCc);
+        processDefinition.setWarningGroupId(warningGroupId);
         processDefinitionMapper.updateById(processDefinition);
 
         // return scheduler object with ID
@@ -275,8 +274,8 @@ public class SchedulerService extends BaseService {
         /**
          * updateProcessInstance recipients and cc by process definition ID
          */
-        processDefinition.setReceivers(receivers);
-        processDefinition.setReceiversCc(receiversCc);
+        processDefinition.setWarningGroupId(warningGroupId);
+
         processDefinitionMapper.updateById(processDefinition);
 
         putMsg(result, Status.SUCCESS);

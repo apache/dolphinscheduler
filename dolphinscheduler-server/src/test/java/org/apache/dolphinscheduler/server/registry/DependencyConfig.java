@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -64,11 +63,6 @@ public class DependencyConfig {
     @Bean
     public AlertMapper alertMapper() {
         return Mockito.mock(AlertMapper.class);
-    }
-
-    @Bean
-    public UserAlertGroupMapper userAlertGroupMapper() {
-        return Mockito.mock(UserAlertGroupMapper.class);
     }
 
     @Bean
@@ -135,7 +129,6 @@ public class DependencyConfig {
     public ResourceMapper resourceMapper() {
         return Mockito.mock(ResourceMapper.class);
     }
-
 
     @Bean
     public ErrorCommandMapper errorCommandMapper() {

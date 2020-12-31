@@ -30,14 +30,40 @@ CREATE TABLE `t_ds_plugin_define` (
 
 DROP TABLE IF EXISTS `t_ds_alert_plugin_instance`;
 CREATE TABLE `t_ds_alert_plugin_instance` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `plugin_define_id` int NOT NULL,
-  `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `alert_group_id` int DEFAULT NULL,
-  `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
-  PRIMARY KEY (`id`)
+                                              `id`                     int NOT NULL AUTO_INCREMENT,
+                                              `plugin_define_id`       int NOT NULL,
+                                              `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
+                                              `create_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+                                              `update_time`            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                              `alert_group_id`         int          DEFAULT NULL,
+                                              `instance_name`          varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+                                              PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE t_ds_process_definition
+    ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+
+ALTER TABLE t_ds_process_definition_version
+    ADD COLUMN `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id' AFTER `connects`;
+
+ALTER TABLE t_ds_alertgroup
+    ADD COLUMN `create_user_id` int(11) DEFAULT NULL COMMENT 'create user id' AFTER `id`;
+
+
+-- ----------------------------
+-- These columns will not be used in the new version,if you determine that the historical data is useless, you can delete it using the sql below
+-- ----------------------------
+/*
+ALTER TABLE t_ds_process_definition DROP receivers, DROP receivers_cc;
+
+ALTER TABLE t_ds_process_definition_version DROP receivers, DROP receivers_cc;
+
+ALTER TABLE  t_ds_alert DROP show_type,DROP alert_type,DROP receivers,DROP receivers_cc;
+
+ALTER TABLE  t_ds_alertgroup DROP group_type;
+
+DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+*/
+
 
 

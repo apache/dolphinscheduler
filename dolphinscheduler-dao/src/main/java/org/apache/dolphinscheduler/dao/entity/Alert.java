@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -41,23 +40,13 @@ public class Alert {
      */
     @TableField(value = "title")
     private String title;
-    /**
-     * show_type
-     */
-    //TODO ShowType should be delete from Alert, Because showType is move to the plugin params
-    @TableField(value = "show_type")
-    private String showType;
+
     /**
      * content
      */
     @TableField(value = "content")
     private String content;
-    /**
-     * alert_type
-     */
-    //TODO alertType should be delete from Alert, because alert type is decide by the AlertPlugin instance
-    @TableField(value = "alert_type")
-    private AlertType alertType;
+
     /**
      * alert_status
      */
@@ -73,18 +62,7 @@ public class Alert {
      */
     @TableField("alertgroup_id")
     private int alertGroupId;
-    /**
-     * receivers
-     */
-    //TODO receivers should be delete from Alert, because only email alert need receivers . And receivers is move to Email Alert Plugin params.
-    @TableField("receivers")
-    private String receivers;
-    /**
-     * receivers_cc
-     */
-    //TODO receivers_cc should be delete from Alert, because only email alert need receivers_cc . And receivers_cc is move to Email Alert Plugin params.
-    @TableField("receivers_cc")
-    private String receiversCc;
+
     /**
      * create_time
      */
@@ -117,28 +95,12 @@ public class Alert {
         this.title = title;
     }
 
-    //    public String getShowType() {
-    //        return showType;
-    //    }
-    //
-    //    public void setShowType(String showType) {
-    //        this.showType = showType;
-    //    }
-
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public AlertType getAlertType() {
-        return alertType;
-    }
-
-    public void setAlertType(AlertType alertType) {
-        this.alertType = alertType;
     }
 
     public AlertStatus getAlertStatus() {
@@ -163,22 +125,6 @@ public class Alert {
 
     public void setAlertGroupId(int alertGroupId) {
         this.alertGroupId = alertGroupId;
-    }
-
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
     }
 
     public Date getCreateTime() {
@@ -225,25 +171,13 @@ public class Alert {
         if (!title.equals(alert.title)) {
             return false;
         }
-        if (showType != alert.showType) {
-            return false;
-        }
         if (!content.equals(alert.content)) {
-            return false;
-        }
-        if (alertType != alert.alertType) {
             return false;
         }
         if (alertStatus != alert.alertStatus) {
             return false;
         }
         if (!log.equals(alert.log)) {
-            return false;
-        }
-        if (!receivers.equals(alert.receivers)) {
-            return false;
-        }
-        if (!receiversCc.equals(alert.receiversCc)) {
             return false;
         }
         if (!createTime.equals(alert.createTime)) {
@@ -257,14 +191,10 @@ public class Alert {
     public int hashCode() {
         int result = id;
         result = 31 * result + title.hashCode();
-        result = 31 * result + showType.hashCode();
         result = 31 * result + content.hashCode();
-        result = 31 * result + alertType.hashCode();
         result = 31 * result + alertStatus.hashCode();
         result = 31 * result + log.hashCode();
         result = 31 * result + alertGroupId;
-        result = 31 * result + receivers.hashCode();
-        result = 31 * result + receiversCc.hashCode();
         result = 31 * result + createTime.hashCode();
         result = 31 * result + updateTime.hashCode();
         result = 31 * result + info.hashCode();
@@ -278,13 +208,9 @@ public class Alert {
                 + id
                 + ", title='"
                 + title + '\''
-                + ", showType="
-                + showType
                 + ", content='"
                 + content
                 + '\''
-                + ", alertType="
-                + alertType
                 + ", alertStatus="
                 + alertStatus
                 + ", log='"
@@ -292,11 +218,6 @@ public class Alert {
                 + '\''
                 + ", alertGroupId="
                 + alertGroupId
-                + ", receivers='"
-                + receivers
-                + '\''
-                + ", receiversCc='"
-                + receiversCc
                 + '\''
                 + ", createTime="
                 + createTime

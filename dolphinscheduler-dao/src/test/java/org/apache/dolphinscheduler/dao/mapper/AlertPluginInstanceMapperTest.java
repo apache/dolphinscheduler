@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -106,7 +105,6 @@ public class AlertPluginInstanceMapperTest {
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setGroupName(groupName);
         alertGroup.setDescription("alert group 1");
-        alertGroup.setGroupType(AlertType.EMAIL);
 
         alertGroup.setCreateTime(DateUtils.getCurrentDate());
         alertGroup.setUpdateTime(DateUtils.getCurrentDate());

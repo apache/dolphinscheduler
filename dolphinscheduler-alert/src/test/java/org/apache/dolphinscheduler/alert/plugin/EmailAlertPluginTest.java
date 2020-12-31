@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -70,8 +69,6 @@ public class EmailAlertPluginTest {
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setDescription("test alert group 1");
         alertGroup.setGroupName("testalertg1");
-        //TODO AlertType is neet delete from AlertGroup
-        alertGroup.setGroupType(AlertType.EMAIL);
         alertDao.getAlertGroupMapper().insert(alertGroup);
 
         //add alert
