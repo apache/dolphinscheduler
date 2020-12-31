@@ -26,9 +26,19 @@ globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
   PUBLIC_PATH: readonly
+  $t: readonly
 parserOptions:
   ecmaVersion: 2018
   sourceType: module
 plugins:
   - vue
-rules: {}
+rules:
+  vue/script-indent: ['error', 2, { 'baseIndent': 1, 'switchCase': 1 }]
+  prefer-promise-reject-errors: 'off'
+  no-prototype-builtins: 'off'
+  no-mixed-operators: 'off'
+  no-extend-native: 'off'
+  prefer-const: 'off'
+  no-var: 'error'
+overrides:
+  - { 'files': ['*.vue'], 'rules': { 'indent': 'off' }}
