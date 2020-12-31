@@ -17,6 +17,7 @@
 
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import 'babel-polyfill'
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import locale from 'element-ui/lib/locale/lang/en'
@@ -28,29 +29,23 @@ import i18n from '@/module/i18n'
 import { sync } from 'vuex-router-sync'
 import Chart from '@/module/ana-charts'
 import '@/module/filter/formatDate'
+import '@/module/filter/filterNull'
 import themeData from '@/module/echarts/themeData.json'
 import Permissions from '@/module/permissions'
-import 'ans-ui/lib/ans-ui.min.css'
-import ans from 'ans-ui/lib/ans-ui.min'
-import en_US from 'ans-ui/lib/locale/en' // eslint-disable-line
 import 'sass/conf/home/index.scss'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import 'bootstrap/dist/js/bootstrap.min.js'
 import 'canvg/dist/browser/canvg.min.js'
-
-import formCreate, {maker} from '@form-create/element-ui'
+import 'font-awesome/css/font-awesome.min.css'
 
 // Component internationalization
-const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: en_US } : {}
+const useOpt = i18n.globalScope.LOCALE === 'en_US' ? { locale: locale } : {}
 
 i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
-
 // Vue.use(ans)
-Vue.use(ans, useOpt)
-
-Vue.use(formCreate, {maker})
+Vue.use(useOpt)
 
 sync(store, router)
 
