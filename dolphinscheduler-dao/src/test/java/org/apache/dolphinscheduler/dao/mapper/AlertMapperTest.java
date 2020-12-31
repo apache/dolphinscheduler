@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
@@ -162,14 +161,10 @@ public class AlertMapperTest {
      */
     private Alert createAlert(AlertStatus alertStatus) {
         Alert alert = new Alert();
-        //alert.setShowType(ShowType.TABLE);
         alert.setTitle("test alert");
         alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
-        alert.setAlertType(AlertType.EMAIL);
         alert.setAlertStatus(alertStatus);
         alert.setLog("success");
-        alert.setReceivers("aa@aa.com");
-        alert.setReceiversCc("bb@aa.com");
         alert.setCreateTime(DateUtils.getCurrentDate());
         alert.setUpdateTime(DateUtils.getCurrentDate());
 
