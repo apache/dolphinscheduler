@@ -158,7 +158,6 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      * @param locations locations for nodes
      * @param connects connects for nodes
      * @return create result code
-     * @throws JsonProcessingException JsonProcessingException
      */
     public Map<String, Object> createProcessDefinition(User loginUser,
                                                        String projectName,
@@ -166,7 +165,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                        String processDefinitionJson,
                                                        String desc,
                                                        String locations,
-                                                       String connects) throws JsonProcessingException {
+                                                       String connects) {
 
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
@@ -836,19 +835,14 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                                                        String processDefinitionName,
                                                        String importProcessParam) {
         Map<String, Object> createProcessResult = null;
-        try {
-            createProcessResult = createProcessDefinition(loginUser
-                    , currentProjectName,
-                    processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
-                    importProcessParam,
-                    processMeta.getProcessDefinitionDescription(),
-                    processMeta.getProcessDefinitionLocations(),
-                    processMeta.getProcessDefinitionConnects());
-            putMsg(result, Status.SUCCESS);
-        } catch (JsonProcessingException e) {
-            logger.error("import process meta json data: {}", e.getMessage(), e);
-            putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
-        }
+        createProcessResult = createProcessDefinition(loginUser
+            , currentProjectName,
+            processDefinitionName + "_import_" + DateUtils.getCurrentTimeStamp(),
+            importProcessParam,
+            processMeta.getProcessDefinitionDescription(),
+            processMeta.getProcessDefinitionLocations(),
+            processMeta.getProcessDefinitionConnects());
+        putMsg(result, Status.SUCCESS);
 
         return createProcessResult;
     }
@@ -1056,8 +1050,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 processDefine.setCreateTime(now);
                 processDefine.setUpdateTime(now);
                 processDefine.setFlag(subProcess.getFlag());
-                processDefine.setReceivers(subProcess.getReceivers());
-                processDefine.setReceiversCc(subProcess.getReceiversCc());
+                processDefine.setWarningGroupId(subProcess.getWarningGroupId());
                 processDefineMapper.insert(processDefine);
 
                 logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
@@ -1330,7 +1323,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
                 }
                 runningNodeMap.remove(nodeName);
             }
-            if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
+            if (waitingRunningNodeMap.size() == 0) {
                 break;
             } else {
                 runningNodeMap.putAll(waitingRunningNodeMap);
@@ -1580,8 +1573,7 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
         processDefinition.setTimeout(processDefinitionVersion.getTimeout());
         processDefinition.setGlobalParams(processDefinitionVersion.getGlobalParams());
         processDefinition.setUpdateTime(new Date());
-        processDefinition.setReceivers(processDefinitionVersion.getReceivers());
-        processDefinition.setReceiversCc(processDefinitionVersion.getReceiversCc());
+        processDefinition.setWarningGroupId(processDefinitionVersion.getWarningGroupId());
         processDefinition.setResourceIds(processDefinitionVersion.getResourceIds());
 
         if (processDefineMapper.updateById(processDefinition) > 0) {
