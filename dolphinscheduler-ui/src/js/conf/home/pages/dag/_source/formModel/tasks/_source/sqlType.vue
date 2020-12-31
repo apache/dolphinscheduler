@@ -16,22 +16,22 @@
  */
 <template>
   <div class="sql-type-model">
-    <x-select
+    <el-select
             v-model="sqlTypeId"
             :disabled="isDetails"
-            @on-change="_handleSqlTypeChanged"
-            style="width: 120px;">
-      <x-option
+            @change="_handleSqlTypeChanged"
+            style="width: 120px;"
+            size="small">
+      <el-option
               v-for="city in sqlTypeList"
               :key="city.id"
               :value="city.id"
               :label="city.code">
-      </x-option>
-    </x-select>
+      </el-option>
+    </el-select>
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import { sqlTypeList } from './commcon'
   import disabledState from '@/module/mixin/disabledState'
   export default {
@@ -53,14 +53,14 @@
        * return sqlType
        */
       _handleSqlTypeChanged (val) {
-        this.$emit('on-sqlType', val.value)
+        this.$emit('on-sqlType', val)
       }
     },
     watch: {
     },
     created () {
       this.$nextTick(() => {
-        if (this.sqlType != 0) {
+        if (this.sqlType !== 0) {
           this.sqlTypeId = this.sqlType
         } else {
           this.sqlTypeId = this.sqlTypeList[0].id

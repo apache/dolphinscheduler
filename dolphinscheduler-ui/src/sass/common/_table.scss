@@ -176,7 +176,13 @@
 }
 .el-table th>.cell {
   color: #555;
+  padding-left: 0;
+  padding-right: 0;
 }
 .el-table td div {
   color: #666;
+}
+.el-table td>.cell {
+  padding-left: 0;
+  padding-right: 0;
 }
