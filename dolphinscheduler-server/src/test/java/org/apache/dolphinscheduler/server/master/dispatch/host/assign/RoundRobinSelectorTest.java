@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 /**
  * round robin selector
@@ -39,42 +39,59 @@ public class RoundRobinSelectorTest {
     @Test
     public void testSelect1() {
         RoundRobinSelector selector = new RoundRobinSelector();
+        // dismiss of server warm-up time
+        long startTime = System.currentTimeMillis() - 60 * 10 * 1000;
+        List<Host> hostOneList = Arrays.asList(
+            new Host("192.168.1.1", 80, 20, startTime, "kris"),
+            new Host("192.168.1.2", 80, 10, startTime, "kris"));
+
+        List<Host> hostTwoList = Arrays.asList(
+            new Host("192.168.1.1", 80, 20, startTime, "kris"),
+            new Host("192.168.1.2", 80, 10, startTime, "kris"),
+            new Host("192.168.1.3", 80, 10, startTime, "kris"));
+
         Host result;
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.2", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.1", result.getIp());
+
+        result = selector.select(hostOneList);
+        Assert.assertEquals("192.168.1.2", result.getIp());
+
         // add new host
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
-        Assert.assertEquals("192.168.1.2", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
-        Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.3", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.2", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris"),
-            new Host("192.168.1.3", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostTwoList);
         Assert.assertEquals("192.168.1.3", result.getIp());
+
         // remove host3
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.2", result.getIp());
-        result = selector.select(Arrays.asList(new Host("192.168.1.1", 80, 20, System.currentTimeMillis(), "kris"), new Host("192.168.1.2", 80, 10, System.currentTimeMillis(), "kris")));
+
+        result = selector.select(hostOneList);
         Assert.assertEquals("192.168.1.1", result.getIp());
 
     }

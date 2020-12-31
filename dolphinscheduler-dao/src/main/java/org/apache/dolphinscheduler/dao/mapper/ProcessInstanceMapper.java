@@ -75,6 +75,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param projectId projectId
      * @param processDefinitionId processDefinitionId
      * @param searchVal searchVal
+     * @param executorId executorId
      * @param statusArray statusArray
      * @param host host
      * @param startTime startTime

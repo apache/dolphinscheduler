@@ -17,7 +17,24 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper">
+    <sql id="baseSql">
+       ${alias}.id, ${alias}.user_name, ${alias}.user_password, ${alias}.user_type, ${alias}.email, ${alias}.phone, ${alias}.tenant_id,
+       ${alias}.create_time, ${alias}.update_time, ${alias}.queue, ${alias}.state
+    </sql>
+    <delete id="deleteByAlertgroupId">
+        delete from t_ds_relation_user_alertgroup
+        where alertgroup_id = #{alertgroupId}
+    </delete>
+    <select id="listUserByAlertgroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
+        SELECT
+        <include refid="baseSql">
+            <property name="alias" value="u"/>
+        </include>
+        FROM t_ds_relation_user_alertgroup g_u
+        JOIN t_ds_user u on g_u.user_id = u.id
+        WHERE g_u.alertgroup_id = #{alertgroupId}
+    </select>
     <select id="queryAllAlertPluginInstanceList" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select *
         from t_ds_alert_plugin_instance

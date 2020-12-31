@@ -59,7 +59,6 @@
     methods: {
       close () {
         this.$emit('close')
-        this.$modal.destroy()
       },
       ok () {
         if (this.asynLoading) {

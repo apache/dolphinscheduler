@@ -27,7 +27,7 @@ const menu = {
       path: 'projects-index',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-home-solid',
+      icon: 'fa-home',
       children: []
     },
     {
@@ -36,7 +36,7 @@ const menu = {
       path: 'projects-kinship',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-node',
+      icon: 'fa-tasks',
       children: []
     },
     {
@@ -45,7 +45,7 @@ const menu = {
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-gear',
+      icon: 'el-icon-s-tools',
       children: [
         {
           name: `${i18n.$t('Process definition')}`,
@@ -88,7 +88,7 @@ const menu = {
       path: 'tenement-manage',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-user-solid',
+      icon: 'el-icon-user-solid',
       children: []
     },
     {
@@ -97,7 +97,7 @@ const menu = {
       path: 'users-manage',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-user-circle-solid',
+      icon: 'el-icon-user-solid',
       children: []
     },
     {
@@ -106,7 +106,7 @@ const menu = {
       path: 'warning-groups-manage',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-danger-solid',
+      icon: 'el-icon-warning',
       children: []
     },
     {
@@ -115,7 +115,7 @@ const menu = {
       path: 'worker-groups-manage',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-diary',
+      icon: 'el-icon-s-custom',
       children: []
     },
     {
@@ -124,7 +124,7 @@ const menu = {
       path: 'queue-manage',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-recycle',
+      icon: 'fa-recycle',
       children: []
     },
     {
@@ -132,7 +132,7 @@ const menu = {
       id: 2,
       path: 'token-manage',
       isOpen: true,
-      icon: 'ans-icon-document',
+      icon: 'el-icon-document',
       children: [],
       disabled: true
     },
@@ -152,7 +152,7 @@ const menu = {
       id: 0,
       path: 'file',
       isOpen: true,
-      icon: 'ans-icon-documents',
+      icon: 'el-icon-document-copy',
       children: [],
       disabled: true
     },
@@ -161,7 +161,7 @@ const menu = {
       id: 1,
       path: '',
       isOpen: true,
-      icon: 'ans-icon-document',
+      icon: 'el-icon-document',
       disabled: true,
       children: [
         {
@@ -185,7 +185,7 @@ const menu = {
       id: 0,
       path: 'account',
       isOpen: true,
-      icon: 'ans-icon-user-solid',
+      icon: 'el-icon-user-solid',
       children: [],
       disabled: true
     },
@@ -194,7 +194,7 @@ const menu = {
       id: 1,
       path: 'password',
       isOpen: true,
-      icon: 'ans-icon-key',
+      icon: 'el-icon-key',
       children: [],
       disabled: true
     },
@@ -203,7 +203,7 @@ const menu = {
       id: 2,
       path: 'token',
       isOpen: true,
-      icon: 'ans-icon-diary',
+      icon: 'el-icon-s-custom',
       children: [],
       disabled: Permissions.getAuth()
     }
@@ -215,7 +215,7 @@ const menu = {
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-menu',
+      icon: 'el-icon-menu',
       children: [
         {
           name: 'Master',
@@ -249,7 +249,7 @@ const menu = {
       path: '',
       isOpen: true,
       disabled: true,
-      icon: 'ans-icon-menu',
+      icon: 'el-icon-menu',
       children: [
         {
           name: 'Statistics',
