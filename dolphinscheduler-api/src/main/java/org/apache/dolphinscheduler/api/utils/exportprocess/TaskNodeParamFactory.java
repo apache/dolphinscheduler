@@ -24,6 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TaskNodeParamFactory {
 
+    private TaskNodeParamFactory() {
+        throw new IllegalStateException(TaskNodeParamFactory.class.getName());
+    }
+
     private static Map<String, ProcessAddTaskParam> taskServices = new ConcurrentHashMap<>();
 
     public static ProcessAddTaskParam getByTaskType(String taskType){

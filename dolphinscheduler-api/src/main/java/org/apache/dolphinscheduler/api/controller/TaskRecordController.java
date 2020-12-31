@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskRecordService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.slf4j.Logger;
@@ -79,7 +80,11 @@ public class TaskRecordController extends BaseController {
                                             @RequestParam("pageNo") Integer pageNo,
                                             @RequestParam("pageSize") Integer pageSize
     ) {
-
+        taskName = StringUtils.replaceNRTtoUnderline(taskName);
+        state = StringUtils.replaceNRTtoUnderline(state);
+        taskDate = StringUtils.replaceNRTtoUnderline(taskDate);
+        startTime = StringUtils.replaceNRTtoUnderline(startTime);
+        endTime = StringUtils.replaceNRTtoUnderline(endTime);
         logger.info("query task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
                 taskName, state, taskDate, startTime, endTime);
         Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(false, taskName, startTime, taskDate, sourceTable, destTable, endTime, state, pageNo, pageSize);
@@ -115,7 +120,11 @@ public class TaskRecordController extends BaseController {
                                                    @RequestParam("pageNo") Integer pageNo,
                                                    @RequestParam("pageSize") Integer pageSize
     ) {
-
+        taskName = StringUtils.replaceNRTtoUnderline(taskName);
+        state = StringUtils.replaceNRTtoUnderline(state);
+        taskDate = StringUtils.replaceNRTtoUnderline(taskDate);
+        startTime = StringUtils.replaceNRTtoUnderline(startTime);
+        endTime = StringUtils.replaceNRTtoUnderline(endTime);
         logger.info("query hisotry task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
                 taskName, state, taskDate, startTime, endTime);
         Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(true, taskName, startTime, taskDate, sourceTable, destTable, endTime, state, pageNo, pageSize);

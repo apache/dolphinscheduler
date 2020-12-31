@@ -408,12 +408,12 @@ public class TaskPriorityQueueConsumer extends Thread {
                 if (CollectionUtils.isNotEmpty(oldVersionResources)) {
 
                     oldVersionResources.forEach(
-                        (t) -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
+                        t -> resourcesMap.put(t.getRes(), processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE))
                     );
                 }
 
                 // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
+                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
                 Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
 
                 if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
@@ -421,7 +421,7 @@ public class TaskPriorityQueueConsumer extends Thread {
 
                     List<Resource> resources = processService.listResourceByIds(resourceIds);
                     resources.forEach(
-                        (t) -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
+                        t -> resourcesMap.put(t.getFullName(), processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE))
                     );
                 }
             }

@@ -183,7 +183,7 @@ public class ExecutorService extends BaseService {
         List<Server> masterServers = monitorService.getServerListFromZK(true);
 
         // no master
-        if (masterServers.size() == 0) {
+        if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return false;
         }
@@ -393,7 +393,7 @@ public class ExecutorService extends BaseService {
                 CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId));
         command.setExecutorId(loginUser.getId());
 
-        if (!processService.verifyIsNeedCreateCommand(command)) {
+        if (Boolean.FALSE.equals(processService.verifyIsNeedCreateCommand(command))) {
             putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, processDefinitionId);
             return result;
         }
@@ -458,7 +458,7 @@ public class ExecutorService extends BaseService {
         if (processDefineId == null && processInstanceId == null) {
             throw new RuntimeException("You must set values for parameters processDefineId or processInstanceId");
         }
-        if (processDefineId == null && processInstanceId != null) {
+        if (processDefineId == null) {
             ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
             if (processInstance == null) {
                 throw new RuntimeException("processInstanceId is not exists");

@@ -57,7 +57,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * tenant controller
  */
-@Api(tags = "TENANT_TAG", position = 1)
+@Api(tags = "TENANT_TAG")
 @RestController
 @RequestMapping("/tenant")
 public class TenantController extends BaseController {
@@ -122,8 +122,10 @@ public class TenantController extends BaseController {
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
                                         @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
-                loginUser.getUserName(), pageNo, searchVal, pageSize);
+                loggedInUser, pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -145,7 +147,8 @@ public class TenantController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
     public Result queryTenantlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query tenant list", loginUser.getUserName());
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query tenant list", loggedInUser);
         Map<String, Object> result = tenantService.queryTenantList(loginUser);
         return returnDataList(result);
     }
@@ -202,7 +205,8 @@ public class TenantController extends BaseController {
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
     public Result deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) throws Exception {
-        logger.info("login user {}, delete tenant, tenantId: {},", loginUser.getUserName(), id);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, delete tenant, tenantId: {},", loggedInUser, id);
         Map<String, Object> result = tenantService.deleteTenantById(loginUser, id);
         return returnDataList(result);
     }
@@ -223,8 +227,10 @@ public class TenantController extends BaseController {
     @ApiException(VERIFY_TENANT_CODE_ERROR)
     public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "tenantCode") String tenantCode) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        tenantCode = StringUtils.replaceNRTtoUnderline(tenantCode);
         logger.info("login user {}, verfiy tenant code: {}",
-                loginUser.getUserName(), tenantCode);
+                loggedInUser, tenantCode);
         return tenantService.verifyTenantCode(tenantCode);
     }
 

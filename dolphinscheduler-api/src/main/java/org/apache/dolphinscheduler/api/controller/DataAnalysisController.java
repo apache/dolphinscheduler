@@ -74,8 +74,11 @@ public class DataAnalysisController extends BaseController {
                                  @RequestParam(value = "startDate", required = false) String startDate,
                                  @RequestParam(value = "endDate", required = false) String endDate,
                                  @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        startDate = StringUtils.replaceNRTtoUnderline(startDate);
+        endDate = StringUtils.replaceNRTtoUnderline(endDate);
         logger.info("count task state, user:{}, start date: {}, end date:{}, project id {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
+                loggedInUser, startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countTaskStateByProject(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -102,8 +105,11 @@ public class DataAnalysisController extends BaseController {
                                             @RequestParam(value = "startDate", required = false) String startDate,
                                             @RequestParam(value = "endDate", required = false) String endDate,
                                             @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        startDate = StringUtils.replaceNRTtoUnderline(startDate);
+        endDate = StringUtils.replaceNRTtoUnderline(endDate);
         logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
+                loggedInUser, startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -124,8 +130,9 @@ public class DataAnalysisController extends BaseController {
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+        String loggedInUSer = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("count process definition , user:{}, project id:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectId);
+                loggedInUSer, projectId);
         Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectId);
         return returnDataList(result);
     }
@@ -153,8 +160,11 @@ public class DataAnalysisController extends BaseController {
                                     @RequestParam(value = "startDate", required = false) String startDate,
                                     @RequestParam(value = "endDate", required = false) String endDate,
                                     @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        startDate = StringUtils.replaceNRTtoUnderline(startDate);
+        endDate = StringUtils.replaceNRTtoUnderline(endDate);
         logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), startDate, endDate, projectId);
+                loggedInUser, startDate, endDate, projectId);
         Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectId, startDate, endDate);
         return returnDataList(result);
     }
@@ -175,8 +185,8 @@ public class DataAnalysisController extends BaseController {
     @ApiException(QUEUE_COUNT_ERROR)
     public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "projectId", required = false, defaultValue = "0") int projectId) {
-        logger.info("count command state, user:{}, project id {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("count command state, user:{}, project id {}", loggedInUser, projectId);
         Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
         return returnDataList(result);
     }

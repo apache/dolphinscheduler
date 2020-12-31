@@ -43,7 +43,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
-    private static final String rootDir = System.getProperty("user.dir");
+    private static final String ROOT_DIR = System.getProperty("user.dir");
     protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
@@ -134,10 +134,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void runInitDML(String initSqlPath) {
         Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
+        String mysqlSQLFilePath = ROOT_DIR + initSqlPath + "dolphinscheduler_dml.sql";
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -180,11 +180,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void runInitDDL(String initSqlPath) {
         Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
+        //String mysqlSQLFilePath = ROOT_DIR + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
+        String mysqlSQLFilePath = ROOT_DIR + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
             conn = dataSource.getConnection();
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
@@ -396,11 +396,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
-        logger.info("sqlSQLFilePath" + sqlFilePath);
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", ROOT_DIR, schemaDir, getDbType().name().toLowerCase());
+        logger.info("sqlSQLFilePath {}", sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -472,10 +472,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @param schemaDir schemaDir
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir) {
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", ROOT_DIR, schemaDir, getDbType().name().toLowerCase());
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {

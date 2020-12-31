@@ -25,6 +25,10 @@ import java.util.List;
 
 public class DependentDateUtils {
 
+    private DependentDateUtils() {
+        throw new IllegalStateException(DependentDateUtils.class.getName());
+    }
+
     /**
      * get last day interval list
      * @param businessDate businessDate

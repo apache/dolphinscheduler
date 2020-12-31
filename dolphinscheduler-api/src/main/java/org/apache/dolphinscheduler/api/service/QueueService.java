@@ -52,6 +52,9 @@ public class QueueService extends BaseService {
     @Autowired
     private UserMapper userMapper;
 
+    private static final String QUEUE = "queue";
+    private static final String QUEUE_NAME = "queueName";
+
     /**
      * query queue list
      *
@@ -86,7 +89,7 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        Page<Queue> page = new Page(pageNo, pageSize);
+        Page<Queue> page = new Page<>(pageNo, pageSize);
 
 
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
@@ -116,12 +119,12 @@ public class QueueService extends BaseService {
         }
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE);
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE_NAME);
             return result;
         }
 
@@ -165,12 +168,12 @@ public class QueueService extends BaseService {
         }
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE);
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE_NAME);
             return result;
         }
 
@@ -230,12 +233,12 @@ public class QueueService extends BaseService {
         Result result = new Result();
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE);
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, QUEUE_NAME);
             return result;
         }
 

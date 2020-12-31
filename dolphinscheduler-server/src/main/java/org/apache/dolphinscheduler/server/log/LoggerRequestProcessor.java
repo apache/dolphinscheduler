@@ -138,11 +138,9 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @throws Exception exception
      */
     private byte[] getFileContentBytes(String filePath) {
-        InputStream in = null;
-        ByteArrayOutputStream bos = null;
-        try {
-            in = new FileInputStream(filePath);
-            bos  = new ByteArrayOutputStream();
+
+        try(InputStream in = new FileInputStream(filePath);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
@@ -151,9 +149,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             return bos.toByteArray();
         } catch (IOException e) {
             logger.error("get file bytes error",e);
-        } finally {
-            IOUtils.closeQuietly(bos);
-            IOUtils.closeQuietly(in);
         }
         return new byte[0];
     }
@@ -189,19 +184,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return whole file content
      */
     private String readWholeFileContent(String filePath) {
-        BufferedReader br = null;
         String line;
         StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
             while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
+                sb.append(line).append("\r\n");
             }
             return sb.toString();
         } catch (IOException e) {
             logger.error("read file error",e);
-        } finally {
-            IOUtils.closeQuietly(br);
         }
         return "";
     }

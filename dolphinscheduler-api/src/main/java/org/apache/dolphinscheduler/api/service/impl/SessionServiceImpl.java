@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SessionServiceImpl extends BaseService implements SessionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SessionServiceImpl.class);
 
     @Autowired
     private SessionMapper sessionMapper;

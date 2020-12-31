@@ -29,6 +29,10 @@ public class DataSourceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSourceFactory.class);
 
+  private DataSourceFactory() {
+    throw new IllegalStateException(DataSourceFactory.class.getName());
+  }
+
   /**
    * getDatasource
    * @param dbType dbType

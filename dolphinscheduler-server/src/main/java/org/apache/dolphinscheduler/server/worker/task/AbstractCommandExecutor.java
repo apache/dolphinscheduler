@@ -337,32 +337,24 @@ public abstract class AbstractCommandExecutor {
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                BufferedReader inReader = null;
+        parseProcessOutputExecutorService.submit(() -> {
 
-                try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    String line;
+            try(BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));) {
+                String line;
 
-                    long lastFlushTime = System.currentTimeMillis();
+                long lastFlushTime = System.currentTimeMillis();
 
-                    while ((line = inReader.readLine()) != null) {
-                        if (line.startsWith("${setValue(")) {
-                            varPool.append(line.substring("${setValue(".length(), line.length() - 2));
-                            varPool.append("$VarPool$");
-                        } else {
-                            logBuffer.add(line);
-                            lastFlushTime = flush(lastFlushTime);
-                        }
+                while ((line = inReader.readLine()) != null) {
+                    if (line.startsWith("${setValue(")) {
+                        varPool.append(line.substring("${setValue(".length(), line.length() - 2));
+                        varPool.append("$VarPool$");
+                    } else {
+                        logBuffer.add(line);
+                        lastFlushTime = flush(lastFlushTime);
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    clear();
-                    close(inReader);
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         });
         parseProcessOutputExecutorService.shutdown();
@@ -434,31 +426,20 @@ public abstract class AbstractCommandExecutor {
      * @return line list
      */
     private List<String> convertFile2List(String filename) {
-        List lineList = new ArrayList<String>(100);
+        List<String> lineList = new ArrayList<>(100);
         File file = new File(filename);
 
         if (!file.exists()) {
             return lineList;
         }
 
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8));
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
             String line = null;
             while ((line = br.readLine()) != null) {
                 lineList.add(line);
             }
         } catch (Exception e) {
             logger.error(String.format("read file: %s failed : ", filename), e);
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-
         }
         return lineList;
     }

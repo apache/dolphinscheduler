@@ -37,6 +37,10 @@ import org.slf4j.Logger;
  */
 public class TaskManager {
 
+    private TaskManager() {
+        throw new IllegalStateException(TaskManager.class.getName());
+    }
+
     /**
      * create new task
      * @param taskExecutionContext  taskExecutionContext

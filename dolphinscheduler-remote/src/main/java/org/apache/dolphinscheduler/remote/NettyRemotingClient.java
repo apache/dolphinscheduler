@@ -84,7 +84,7 @@ public class NettyRemotingClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     /**
      * started flag
@@ -178,12 +178,7 @@ public class NettyRemotingClient {
                         .addLast(new NettyDecoder(), clientHandler, encoder);
                 }
             });
-        this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                ResponseFuture.scanFutureTable();
-            }
-        }, 5000, 1000, TimeUnit.MILLISECONDS);
+        this.responseFutureExecutor.scheduleAtFixedRate(ResponseFuture::scanFutureTable, 5000, 1000, TimeUnit.MILLISECONDS);
         //
         isStarted.compareAndSet(false, true);
     }

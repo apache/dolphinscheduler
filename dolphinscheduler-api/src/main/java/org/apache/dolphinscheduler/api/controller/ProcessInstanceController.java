@@ -99,10 +99,17 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam(value = "endDate", required = false) String endTime,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
+        executorName = StringUtils.replaceNRTtoUnderline(executorName);
+        host = StringUtils.replaceNRTtoUnderline(host);
+        startTime = StringUtils.replaceNRTtoUnderline(startTime);
+        endTime = StringUtils.replaceNRTtoUnderline(endTime);
         logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
                         "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
-                loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName, stateType, host,
-                startTime, endTime, pageNo, pageSize);
+                loggedInUser, projectName, processDefinitionId, searchVal, executorName, stateType,
+                host, startTime, endTime, pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = processInstanceService.queryProcessInstanceList(
                 loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
@@ -128,8 +135,10 @@ public class ProcessInstanceController extends BaseController {
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) throws IOException {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("query task instance list by process instance id, login user:{}, project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
+                loggedInUser, projectName, processInstanceId);
         Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
         return returnDataList(result);
     }
@@ -171,9 +180,14 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "connects", required = false) String connects,
                                         @RequestParam(value = "flag", required = false) Flag flag
     ) throws ParseException {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        scheduleTime = StringUtils.replaceNRTtoUnderline(scheduleTime);
+        locations = StringUtils.replaceNRTtoUnderline(locations);
+        connects = StringUtils.replaceNRTtoUnderline(connects);
         logger.info("updateProcessInstance process instance, login user:{}, project name:{}, process instance json:{}," +
                         "process instance id:{}, schedule time:{}, sync define:{}, flag:{}, locations:{}, connects:{}",
-                loginUser.getUserName(), projectName, processInstanceJson, processInstanceId, scheduleTime,
+                loggedInUser, projectName, processInstanceJson, processInstanceId, scheduleTime,
                 syncDefine, flag, locations, connects);
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
                 processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
@@ -199,8 +213,10 @@ public class ProcessInstanceController extends BaseController {
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                            @RequestParam("processInstanceId") Integer processInstanceId
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("query process instance detail by id, login user:{},project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
+                loggedInUser, projectName, processInstanceId);
         Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
         return returnDataList(result);
     }
@@ -208,12 +224,12 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query top n process instance order by running duration
      *
-     * @param loginUser     login user
-     * @param projectName   project name
-     * @param size          number of process instance
-     * @param startTime     start time
-     * @param endTime       end time
-     * @return              list of process instance
+     * @param loginUser   login user
+     * @param projectName project name
+     * @param size        number of process instance
+     * @param startTime   start time
+     * @param endTime     end time
+     * @return list of process instance
      */
     @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
@@ -225,16 +241,17 @@ public class ProcessInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                         @RequestParam("size") Integer size,
-                                                         @RequestParam(value = "startTime",required = true) String startTime,
-                                                         @RequestParam(value = "endTime",required = true) String endTime
+                                                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                                          @RequestParam("size") Integer size,
+                                                                          @RequestParam(value = "startTime", required = true) String startTime,
+                                                                          @RequestParam(value = "endTime", required = true) String endTime
 
     ) {
-        projectName=ParameterUtils.handleEscapes(projectName);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
-                loginUser.getUserName(), projectName);
-        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+                loggedInUser, projectName);
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -258,8 +275,10 @@ public class ProcessInstanceController extends BaseController {
                                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                              @RequestParam("processInstanceId") Integer processInstanceId
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
+                loggedInUser, projectName, processInstanceId);
         // task queue
         Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
         return returnDataList(result);
@@ -367,8 +386,10 @@ public class ProcessInstanceController extends BaseController {
                                                   @PathVariable String projectName,
                                                   @RequestParam("processInstanceIds") String processInstanceIds
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
-                loginUser.getUserName(), projectName, processInstanceIds);
+                loggedInUser, projectName, processInstanceIds);
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();

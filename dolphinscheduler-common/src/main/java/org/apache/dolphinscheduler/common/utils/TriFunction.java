@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.common.utils;
  * tri function function interface
  */
 @FunctionalInterface
-public interface TriFunction<IN1, IN2, IN3, OUT1> {
+public interface TriFunction<I1, I2, I3, O1> {
 
-    OUT1 apply(IN1 in1, IN2 in2, IN3 in3);
+    O1 apply(I1 in1, I2 in2, I3 in3);
 
 }

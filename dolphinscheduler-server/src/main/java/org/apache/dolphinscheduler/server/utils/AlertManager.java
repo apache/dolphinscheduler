@@ -181,7 +181,7 @@ public class AlertManager {
             alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
             alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
             alertDao.addAlert(alert);
-            logger.info("add alert to db , alert : {}", alert.toString());
+            logger.info("add alert to db , alert : {}", alert);
 
         } catch (Exception e) {
             logger.error("send alert failed:{} ", e.getMessage());
@@ -240,7 +240,7 @@ public class AlertManager {
         alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
 
         alertDao.addAlert(alert);
-        logger.info("add alert to db , alert: {}", alert.toString());
+        logger.info("add alert to db , alert: {}", alert);
     }
 
     /**

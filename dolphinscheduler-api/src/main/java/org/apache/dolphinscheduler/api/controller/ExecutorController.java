@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -109,10 +110,17 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout) throws ParseException {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        scheduleTime = StringUtils.replaceNRTtoUnderline(scheduleTime);
+        startNodeList = StringUtils.replaceNRTtoUnderline(startNodeList);
+        receivers = StringUtils.replaceNRTtoUnderline(receivers);
+        receiversCc = StringUtils.replaceNRTtoUnderline(receiversCc);
+        workerGroup = StringUtils.replaceNRTtoUnderline(workerGroup);
         logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                         + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
                         + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectName, processDefinitionId, scheduleTime,
+                loggedInUser, projectName, processDefinitionId, scheduleTime,
                 failureStrategy, startNodeList, taskDependType, warningType, workerGroup, receivers, receiversCc, runMode, processInstancePriority,
                 workerGroup, timeout);
 
@@ -149,8 +157,10 @@ public class ExecutorController extends BaseController {
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), projectName, processInstanceId, executeType);
+                loggedInUser, projectName, processInstanceId, executeType);
         Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
         return returnDataList(result);
     }
@@ -171,7 +181,8 @@ public class ExecutorController extends BaseController {
     @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
     public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-        logger.info("login user {}, check process definition {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), processDefinitionId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, check process definition {}", loggedInUser, processDefinitionId);
         Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
         return returnDataList(result);
     }
@@ -197,7 +208,8 @@ public class ExecutorController extends BaseController {
     public Result getReceiverCc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "processDefinitionId", required = false) Integer processDefinitionId,
                                 @RequestParam(value = "processInstanceId", required = false) Integer processInstanceId) {
-        logger.info("login user {}, get process definition receiver and cc", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, get process definition receiver and cc", loggedInUser);
         Map<String, Object> result = execService.getReceiverCc(processDefinitionId, processInstanceId);
         return returnDataList(result);
     }

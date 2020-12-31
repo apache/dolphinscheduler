@@ -20,7 +20,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -83,8 +82,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
      */
     private DataSource buildDataSource() {
 
-        DruidDataSource druidDataSource = dataSource();
-        return druidDataSource;
+        return dataSource();
     }
 
     /**

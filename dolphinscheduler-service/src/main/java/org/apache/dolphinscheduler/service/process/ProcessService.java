@@ -258,7 +258,7 @@ public class ProcessService {
      */
     public Boolean verifyIsNeedCreateCommand(Command command) {
         Boolean isNeedCreate = true;
-        Map<CommandType, Integer> cmdTypeMap = new HashMap<CommandType, Integer>();
+        Map<CommandType, Integer> cmdTypeMap = new HashMap<>();
         cmdTypeMap.put(CommandType.REPEAT_RUNNING, 1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS, 1);
         cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS, 1);
@@ -434,7 +434,7 @@ public class ProcessService {
 
         List<TaskNode> taskNodeList = processData.getTasks();
 
-        if (taskNodeList != null && taskNodeList.size() > 0) {
+        if (taskNodeList != null && !taskNodeList.isEmpty()) {
 
             for (TaskNode taskNode : taskNodeList) {
                 String parameter = taskNode.getParams();
@@ -1552,7 +1552,7 @@ public class ProcessService {
         if (intList == null) {
             return new ArrayList<>();
         }
-        List<String> result = new ArrayList<String>(intList.size());
+        List<String> result = new ArrayList<>(intList.size());
         for (Integer intVar : intList) {
             result.add(String.valueOf(intVar));
         }
@@ -1703,7 +1703,7 @@ public class ProcessService {
      */
     public CycleDependency getCycleDependency(int masterId, int processDefinitionId, Date scheduledFireTime) throws Exception {
         List<CycleDependency> list = getCycleDependencies(masterId, new int[] {processDefinitionId}, scheduledFireTime);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
 
     }
 
@@ -1717,7 +1717,7 @@ public class ProcessService {
      * @throws Exception if error throws Exception
      */
     public List<CycleDependency> getCycleDependencies(int masterId, int[] ids, Date scheduledFireTime) throws Exception {
-        List<CycleDependency> cycleDependencyList = new ArrayList<CycleDependency>();
+        List<CycleDependency> cycleDependencyList = new ArrayList<>();
         if (null == ids || ids.length == 0) {
             logger.warn("ids[] is empty!is invalid!");
             return cycleDependencyList;
@@ -1769,7 +1769,7 @@ public class ProcessService {
             } else {
                 list = CronUtils.getFireDateList(start, scheduledFireTime, depCronExpression);
             }
-            if (list.size() >= 1) {
+            if (!list.isEmpty()) {
                 start = list.get(list.size() - 1);
                 CycleDependency dependency = new CycleDependency(depSchedule.getProcessDefinitionId(), start, CronUtils.getExpirationTime(start, cycleEnum), cycleEnum);
                 cycleDependencyList.add(dependency);
@@ -1905,30 +1905,30 @@ public class ProcessService {
      * @return unauthorized udf function list
      */
     public <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType) {
-        List<T> resultList = new ArrayList<T>();
+        List<T> resultList = new ArrayList<>();
 
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
-            Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
+            Set<T> originResSet = new HashSet<>(Arrays.asList(needChecks));
 
             switch (authorizationType) {
                 case RESOURCE_FILE_ID:
-                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedResourceFiles);
                     break;
                 case RESOURCE_FILE_NAME:
-                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getFullName()).collect(toSet());
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(Resource::getFullName).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
                 case UDF_FILE:
-                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(Resource::getId).collect(toSet());
                     originResSet.removeAll(authorizedUdfFiles);
                     break;
                 case DATASOURCE:
-                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks).stream().map(DataSource::getId).collect(toSet());
                     originResSet.removeAll(authorizedDatasources);
                     break;
                 case UDF:
-                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(UdfFunc::getId).collect(toSet());
                     originResSet.removeAll(authorizedUdfs);
                     break;
                 default:

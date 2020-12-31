@@ -82,7 +82,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 				super.persist(deadServerPath,(type + UNDERLINE + host));
 
 				logger.info("{} server dead , and {} added to zk dead server path success" ,
-						zkNodeType.toString(), zNode);
+						zkNodeType, zNode);
 			}
 		}
 
@@ -182,7 +182,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		String path = getZNodeParentPath(zkNodeType);
 		if(StringUtils.isEmpty(path)){
 			logger.error("check zk node exists error, host:{}, zk node type:{}",
-					host, zkNodeType.toString());
+					host, zkNodeType);
 			return false;
 		}
 		Map<String, String> serverMaps = getServerMaps(zkNodeType);

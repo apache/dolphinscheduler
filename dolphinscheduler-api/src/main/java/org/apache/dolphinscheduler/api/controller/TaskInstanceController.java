@@ -52,7 +52,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * task instance controller
  */
-@Api(tags = "TASK_INSTANCE_TAG", position = 11)
+@Api(tags = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController {
@@ -109,18 +109,16 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "endDate", required = false) String endTime,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-
+        processInstanceName = StringUtils.replaceNRTtoUnderline(processInstanceName);
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
+        taskName = StringUtils.replaceNRTtoUnderline(taskName);
+        executorName = StringUtils.replaceNRTtoUnderline(executorName);
+        host = StringUtils.replaceNRTtoUnderline(host);
+        startTime = StringUtils.replaceNRTtoUnderline(startTime);
+        endTime = StringUtils.replaceNRTtoUnderline(endTime);
         logger.info("query task instance list, projectName:{}, processInstanceId:{}, processInstanceName:{}, search value:{}, taskName:{}, executorName: {}, stateType:{}, host:{}, start:{}, end:{}",
-                StringUtils.replaceNRTtoUnderline(projectName),
-                processInstanceId,
-                StringUtils.replaceNRTtoUnderline(processInstanceName),
-                StringUtils.replaceNRTtoUnderline(searchVal),
-                StringUtils.replaceNRTtoUnderline(taskName),
-                StringUtils.replaceNRTtoUnderline(executorName),
-                stateType,
-                StringUtils.replaceNRTtoUnderline(host),
-                StringUtils.replaceNRTtoUnderline(startTime),
-                StringUtils.replaceNRTtoUnderline(endTime));
+                projectName, processInstanceId, processInstanceName, searchVal,
+                taskName, executorName, stateType, host, startTime, endTime);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                 loginUser, projectName, processInstanceId, processInstanceName, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);

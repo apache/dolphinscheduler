@@ -51,6 +51,10 @@ import org.slf4j.LoggerFactory;
 public class TimePlaceholderUtils {
     private static final Logger logger = LoggerFactory.getLogger(TimePlaceholderUtils.class);
 
+    private TimePlaceholderUtils() {
+        throw new IllegalStateException(TimePlaceholderUtils.class.getName());
+    }
+
     /**
      * Prefix of the position to be replaced
      */
@@ -237,21 +241,21 @@ public class TimePlaceholderUtils {
      */
     private static List<String> string2List(String expression) {
         List<String> result = new ArrayList<>();
-        String num = "";
+        StringBuilder num = new StringBuilder();
         for (int i = 0; i < expression.length(); i++) {
             if (Character.isDigit(expression.charAt(i))) {
-                num = num + expression.charAt(i);
+                num.append(expression.charAt(i));
             } else {
-                if (!num.isEmpty()) {
-                    result.add(num);
+                if (num.length() > 0) {
+                    result.add(num.toString());
                 }
                 result.add(expression.charAt(i) + "");
-                num = "";
+                num = new StringBuilder();
             }
         }
 
-        if (!num.isEmpty()) {
-            result.add(num);
+        if (num.length() > 0) {
+            result.add(num.toString());
         }
 
         return result;

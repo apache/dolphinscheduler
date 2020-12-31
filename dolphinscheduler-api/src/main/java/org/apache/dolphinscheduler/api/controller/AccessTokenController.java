@@ -84,9 +84,11 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
+        token = StringUtils.replaceNRTtoUnderline(token);
         logger.info("login user {}, create token , userId : {} , token expire time : {} , token : {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                userId, StringUtils.replaceNRTtoUnderline(expireTime), StringUtils.replaceNRTtoUnderline(token));
+                loggedInUser, userId, expireTime, token);
 
         Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
         return returnDataList(result);
@@ -107,9 +109,10 @@ public class AccessTokenController extends BaseController {
     public Result generateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
         logger.info("login user {}, generate token , userId : {} , token expire time : {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                userId, expireTime);
+                loggedInUser, userId, expireTime);
         Map<String, Object> result = accessTokenService.generateToken(loginUser, userId, expireTime);
         return returnDataList(result);
     }
@@ -136,8 +139,10 @@ public class AccessTokenController extends BaseController {
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
         logger.info("login user {}, list access token paging, pageNo: {}, searchVal: {}, pageSize: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                loggedInUser,
                 pageNo, searchVal, pageSize);
 
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
@@ -162,8 +167,9 @@ public class AccessTokenController extends BaseController {
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     public Result delAccessTokenById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "id") int id) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, delete access token, id: {},",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
+                loggedInUser, id);
         Map<String, Object> result = accessTokenService.delAccessTokenById(loginUser, id);
         return returnDataList(result);
     }
@@ -188,8 +194,11 @@ public class AccessTokenController extends BaseController {
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
                               @RequestParam(value = "token") String token) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
+        token = StringUtils.replaceNRTtoUnderline(token);
         logger.info("login user {}, update token , userId : {} , token expire time : {} , token : {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                loggedInUser,
                 userId, expireTime, token);
 
         Map<String, Object> result = accessTokenService.updateToken(loginUser, id, userId, expireTime, token);

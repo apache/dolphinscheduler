@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -137,11 +136,10 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @param envPath env path
      * @return python home
      */
-    private static String getPythonHome(String envPath){
-        BufferedReader br = null;
+    private static String getPythonHome(String envPath) {
         StringBuilder sb = new StringBuilder();
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
+
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)))) {
             String line;
             while ((line = br.readLine()) != null){
                 if (line.contains(Constants.PYTHON_HOME)){
@@ -160,14 +158,6 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
         }catch (IOException e){
             logger.error("read file failure",e);
-        }finally {
-            try {
-                if (br != null){
-                    br.close();
-                }
-            } catch (IOException e) {
-                logger.error(e.getMessage(),e);
-            }
         }
         return null;
     }

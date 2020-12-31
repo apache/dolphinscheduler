@@ -85,17 +85,14 @@ public class MasterRegistry {
         String address = NetUtils.getHost();
         String localNodePath = getMasterPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-        zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
-            @Override
-            public void stateChanged(CuratorFramework client, ConnectionState newState) {
-                if (newState == ConnectionState.LOST) {
-                    logger.error("master : {} connection lost from zookeeper", address);
-                } else if (newState == ConnectionState.RECONNECTED) {
-                    logger.info("master : {} reconnected to zookeeper", address);
-                    zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
-                } else if (newState == ConnectionState.SUSPENDED) {
-                    logger.warn("master : {} connection SUSPENDED ", address);
-                }
+        zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener((client, newState) -> {
+            if (newState == ConnectionState.LOST) {
+                logger.error("master : {} connection lost from zookeeper", address);
+            } else if (newState == ConnectionState.RECONNECTED) {
+                logger.info("master : {} reconnected to zookeeper", address);
+                zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
+            } else if (newState == ConnectionState.SUSPENDED) {
+                logger.warn("master : {} connection SUSPENDED ", address);
             }
         });
         int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();

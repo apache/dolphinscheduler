@@ -117,7 +117,7 @@ public class WorkerGroupService extends BaseService {
         List<WorkerGroup> workerGroups = getWorkerGroups(false);
 
         Set<String> availableWorkerGroupSet = workerGroups.stream()
-                .map(workerGroup -> workerGroup.getName())
+                .map(WorkerGroup::getName)
                 .collect(Collectors.toSet());
         result.put(Constants.DATA_LIST, availableWorkerGroupSet);
         putMsg(result, Status.SUCCESS);
@@ -139,15 +139,13 @@ public class WorkerGroupService extends BaseService {
             workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
         } catch (Exception e) {
             if (e.getMessage().contains(NO_NODE_EXCEPTION_REGEX)) {
-                if (isPaging) {
-                    return workerGroups;
-                } else {
+                if (!isPaging) {
                     //ignore noNodeException return Default
                     WorkerGroup wg = new WorkerGroup();
                     wg.setName(DEFAULT_WORKER_GROUP);
                     workerGroups.add(wg);
-                    return workerGroups;
                 }
+                return workerGroups;
             } else {
                 throw e;
             }

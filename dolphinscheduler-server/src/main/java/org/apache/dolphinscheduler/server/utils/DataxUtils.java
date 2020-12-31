@@ -44,6 +44,10 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_SQLSERVER = "sqlserverwriter";
 
+    private DataxUtils() {
+        throw new IllegalStateException(DataxUtils.class.getName());
+    }
+
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
             case MYSQL:

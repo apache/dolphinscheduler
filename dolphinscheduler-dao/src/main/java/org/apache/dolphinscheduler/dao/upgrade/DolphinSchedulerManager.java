@@ -89,7 +89,7 @@ public class DolphinSchedulerManager {
 
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
-        if(schemaList == null || schemaList.size() == 0) {
+        if(schemaList == null || schemaList.isEmpty()) {
             logger.info("There is no schema to upgrade!");
         }else {
 

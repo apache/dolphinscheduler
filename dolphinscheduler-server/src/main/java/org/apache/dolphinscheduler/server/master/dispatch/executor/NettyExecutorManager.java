@@ -120,7 +120,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
                     Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
-                    if (remained != null && remained.size() > 0) {
+                    if (remained != null && !remained.isEmpty()) {
                         host = Host.of(remained.iterator().next());
                         logger.error("retry execute command : {} host : {}", command, host);
                     } else {
@@ -175,7 +175,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * @return nodes
      */
     private Set<String> getAllNodes(ExecutionContext context){
-        Set<String> nodes = Collections.EMPTY_SET;
+        Set<String> nodes = Collections.emptySet();
         /**
          * executor type
          */

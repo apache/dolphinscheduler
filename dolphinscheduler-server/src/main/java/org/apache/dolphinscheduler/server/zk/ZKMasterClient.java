@@ -94,11 +94,6 @@ public class ZKMasterClient extends AbstractZKClient {
         }
     }
 
-    @Override
-    public void close() {
-        super.close();
-    }
-
     /**
      * handle path events that this class cares about
      *
@@ -125,7 +120,7 @@ public class ZKMasterClient extends AbstractZKClient {
      * @param failover   is failover
      */
     private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
-        logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+        logger.info("{} node deleted : {}", zkNodeType, path);
         InterProcessMutex mutex = null;
         try {
             String failoverPath = getFailoverLockPath(zkNodeType);
@@ -148,7 +143,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 failoverServerWhenDown(serverHost, zkNodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed.", zkNodeType.toString());
+            logger.error("{} server failover failed.", zkNodeType);
             logger.error("failover exception ", e);
         } finally {
             releaseMutex(mutex);

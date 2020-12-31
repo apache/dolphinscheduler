@@ -154,8 +154,7 @@ public class ZookeeperNodeManager implements InitializingBean {
             if (parts.length < 6) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
-            String group = parts[parts.length - 2];
-            return group;
+            return parts[parts.length - 2];
         }
     }
 

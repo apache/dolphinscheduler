@@ -81,7 +81,7 @@ public class ResourceTreeVisitor implements Visitor{
         for (ResourceComponent resourceComponent : childList) {
             resourceComponent.setChildren(setChildren(resourceComponent.getId(),list));
         }
-        if (childList.size()==0){
+        if (childList.isEmpty()){
             return new ArrayList<>();
         }
         return childList;
@@ -118,7 +118,7 @@ public class ResourceTreeVisitor implements Visitor{
         }else{
             tempResourceComponent = new FileLeaf();
         }
-        
+
         tempResourceComponent.setName(resource.getAlias());
         tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
         tempResourceComponent.setId(resource.getId());

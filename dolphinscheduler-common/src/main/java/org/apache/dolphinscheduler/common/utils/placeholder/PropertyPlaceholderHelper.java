@@ -36,7 +36,7 @@ public class PropertyPlaceholderHelper {
 
     private static final Log logger = LogFactory.getLog(PropertyPlaceholderHelper.class);
 
-    private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<String, String>(4);
+    private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<>(4);
 
     static {
         wellKnownSimplePrefixes.put("}", "{");
@@ -103,12 +103,7 @@ public class PropertyPlaceholderHelper {
      */
     public String replacePlaceholders(String value, final Properties properties) {
         notNull(properties, "'properties' must not be null");
-        return replacePlaceholders(value, new PlaceholderResolver() {
-            @Override
-            public String resolvePlaceholder(String placeholderName) {
-                return properties.getProperty(placeholderName);
-            }
-        });
+        return replacePlaceholders(value, properties::getProperty);
     }
 
     /**
@@ -120,7 +115,7 @@ public class PropertyPlaceholderHelper {
      */
     public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
         notNull(value, "'value' must not be null");
-        return parseStringValue(value, placeholderResolver, new HashSet<String>());
+        return parseStringValue(value, placeholderResolver, new HashSet<>());
     }
 
     protected String parseStringValue(

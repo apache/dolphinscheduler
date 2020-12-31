@@ -28,9 +28,12 @@ import java.util.concurrent.*;
  */
 public class ThreadUtils {
 
-
     private static final ThreadMXBean threadBean =  ManagementFactory.getThreadMXBean();
     private static final int STACK_DEPTH = 20;
+
+    private ThreadUtils() {
+        throw new IllegalStateException(ThreadUtils.class.getName());
+    }
 
     /**
      * Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
@@ -73,7 +76,7 @@ public class ThreadUtils {
                 maxThreadNumber,
                 keepAliveSeconds,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>(),
+                new LinkedBlockingQueue<>(),
                 threadFactory);
         threadPool.allowCoreThreadTimeOut(true);
         return threadPool;

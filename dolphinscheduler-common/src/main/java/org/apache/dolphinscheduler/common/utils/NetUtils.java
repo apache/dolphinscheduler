@@ -51,29 +51,29 @@ public class NetUtils {
     private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
     private static final String ANY_HOST_VALUE = "0.0.0.0";
     private static final String LOCAL_HOST_VALUE = "127.0.0.1";
-    private static InetAddress LOCAL_ADDRESS = null;
-    private static volatile String HOST_ADDRESS;
+    private static InetAddress localAddress = null;
+    private static volatile String hostAddress;
 
     private NetUtils() {
         throw new UnsupportedOperationException("Construct NetUtils");
     }
 
     public static String getHost() {
-        if (HOST_ADDRESS != null) {
-            return HOST_ADDRESS;
+        if (hostAddress != null) {
+            return hostAddress;
         }
 
         InetAddress address = getLocalAddress();
         if (address != null) {
-            HOST_ADDRESS = address.getHostAddress();
-            return HOST_ADDRESS;
+            hostAddress = address.getHostAddress();
+            return hostAddress;
         }
         return LOCAL_HOST_VALUE;
     }
 
     private static InetAddress getLocalAddress() {
-        if (null != LOCAL_ADDRESS) {
-            return LOCAL_ADDRESS;
+        if (null != localAddress) {
+            return localAddress;
         }
         return getLocalAddress0();
     }
@@ -84,8 +84,8 @@ public class NetUtils {
      * @return first valid local IP
      */
     private static synchronized InetAddress getLocalAddress0() {
-        if (null != LOCAL_ADDRESS) {
-            return LOCAL_ADDRESS;
+        if (null != localAddress) {
+            return localAddress;
         }
 
         InetAddress localAddress = null;
@@ -98,8 +98,8 @@ public class NetUtils {
                     if (addressOp.isPresent()) {
                         try {
                             if (addressOp.get().isReachable(100)) {
-                                LOCAL_ADDRESS = addressOp.get();
-                                return LOCAL_ADDRESS;
+                                NetUtils.localAddress = addressOp.get();
+                                return NetUtils.localAddress;
                             }
                         } catch (IOException e) {
                             logger.warn("test address id reachable io exception", e);
@@ -114,9 +114,9 @@ public class NetUtils {
         }
         Optional<InetAddress> addressOp = toValidAddress(localAddress);
         if (addressOp.isPresent()) {
-            LOCAL_ADDRESS = addressOp.get();
+            NetUtils.localAddress = addressOp.get();
         }
-        return LOCAL_ADDRESS;
+        return NetUtils.localAddress;
     }
 
     private static Optional<InetAddress> toValidAddress(InetAddress address) {

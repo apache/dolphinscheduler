@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
@@ -42,6 +41,10 @@ public class DagHelper {
 
 
     private static final Logger logger = LoggerFactory.getLogger(DagHelper.class);
+
+    private DagHelper() {
+        throw new IllegalStateException(DagHelper.class.getName());
+    }
 
 
     /**
@@ -234,7 +237,7 @@ public class DagHelper {
             taskNodeList = processData.getTasks();
         }
         for (TaskNode node : taskNodeList) {
-            if (node.isForbidden()) {
+            if (Boolean.TRUE.equals(node.isForbidden())) {
                 forbidTaskNodeMap.putIfAbsent(node.getName(), node);
             }
         }
@@ -279,7 +282,6 @@ public class DagHelper {
             if (dependNode == null || completeTaskList.containsKey(dependNodeName)
                     || dependNode.isForbidden()
                     || skipTaskNodeList.containsKey(dependNodeName)) {
-                continue;
             } else {
                 return false;
             }

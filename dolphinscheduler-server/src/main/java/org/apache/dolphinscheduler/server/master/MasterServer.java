@@ -143,12 +143,7 @@ public class MasterServer {
         /**
          *  register hooks, which are called before the process exits
          */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                close("shutdownHook");
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> close("shutdownHook")));
 
     }
 

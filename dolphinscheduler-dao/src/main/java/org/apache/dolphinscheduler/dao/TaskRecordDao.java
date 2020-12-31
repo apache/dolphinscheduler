@@ -16,9 +16,6 @@
  */
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -43,6 +40,10 @@ public class TaskRecordDao {
 
 
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
+
+    private TaskRecordDao() {
+        throw new IllegalStateException(TaskRecordDao.class.getName());
+    }
 
     /**
      *  get task record flag

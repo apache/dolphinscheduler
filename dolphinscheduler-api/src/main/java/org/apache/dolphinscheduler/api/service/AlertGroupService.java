@@ -53,7 +53,7 @@ public class AlertGroupService extends BaseService{
      *
      * @return alert group list
      */
-    public HashMap<String, Object> queryAlertgroup() {
+    public Map<String, Object> queryAlertgroup() {
 
         HashMap<String, Object> result = new HashMap<>();
         List<AlertGroup> alertGroups = alertGroupMapper.queryAllGroupList();
@@ -79,7 +79,7 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
-        Page<AlertGroup> page = new Page(pageNo, pageSize);
+        Page<AlertGroup> page = new Page<>(pageNo, pageSize);
         IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
                 page, searchVal);
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);

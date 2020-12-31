@@ -32,7 +32,7 @@ import java.util.Map;
  * resource dao
  */
 public class ResourceDao {
-    public static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDao.class);
+    public static final Logger logger = LoggerFactory.getLogger(ResourceDao.class);
 
     /**
      * list all resources

@@ -25,6 +25,11 @@ import java.util.stream.Collectors;
  * resource process definition utils
  */
 public class ResourceProcessDefinitionUtils {
+
+    private ResourceProcessDefinitionUtils() {
+        throw new IllegalStateException(ResourceProcessDefinitionUtils.class.getName());
+    }
+
     /**
      * get resource process map key is resource id,value is the set of process definition
      * @param list the map key is process definition id and value is resource_ids

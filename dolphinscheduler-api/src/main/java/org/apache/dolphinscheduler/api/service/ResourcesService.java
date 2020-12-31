@@ -77,6 +77,10 @@ public class ResourcesService extends BaseService {
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    private static final String STARTUP_STATE = "resource upload startup state: {}";
+    private static final String DIR_FORMAT_TRUE = "%s%s";
+    private static final String DIR_FORMAT_FALSE = "%s/%s";
+
     /**
      * create directory
      *
@@ -97,12 +101,12 @@ public class ResourcesService extends BaseService {
                                  String currentDir) {
         Result result = new Result();
         // if hdfs not startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())){
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
-        String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
+        String fullName = currentDir.equals("/") ? String.format(DIR_FORMAT_TRUE,currentDir,name):String.format(DIR_FORMAT_FALSE,currentDir,name);
         result = verifyResourceName(fullName,type,loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
@@ -137,7 +141,7 @@ public class ResourcesService extends BaseService {
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<String, Object>();
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -180,8 +184,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if hdfs not startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -234,7 +238,7 @@ public class ResourcesService extends BaseService {
         }
 
         // check resoure name exists
-        String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
+        String fullName = currentDir.equals("/") ? String.format(DIR_FORMAT_TRUE,currentDir,name):String.format(DIR_FORMAT_FALSE,currentDir,name);
         if (checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
@@ -281,7 +285,7 @@ public class ResourcesService extends BaseService {
     private boolean checkResourceExists(String fullName, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(fullName, userId, type);
-        return resources != null && resources.size() > 0;
+        return resources != null && !resources.isEmpty();
     }
 
 
@@ -305,8 +309,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -330,7 +334,7 @@ public class ResourcesService extends BaseService {
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
 
-        String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
+        String fullName = String.format(DIR_FORMAT_TRUE,originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
         if (!originResourceName.equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
@@ -439,7 +443,7 @@ public class ResourcesService extends BaseService {
                 List<Integer> childrenResource = listAllChildren(resource,false);
                 if (CollectionUtils.isNotEmpty(childrenResource)) {
                     String matcherFullName = Matcher.quoteReplacement(fullName);
-                    List<Resource> childResourceList = new ArrayList<>();
+                    List<Resource> childResourceList;
                     Integer[] childResIdArray = childrenResource.toArray(new Integer[childrenResource.size()]);
                     List<Resource> resourceList = resourcesMapper.listResourceByIds(childResIdArray);
                     childResourceList = resourceList.stream().map(t -> {
@@ -542,7 +546,7 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>(5);
-        Page<Resource> page = new Page(pageNo, pageSize);
+        Page<Resource> page = new Page<>(pageNo, pageSize);
         int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
             userId= 0;
@@ -557,7 +561,7 @@ public class ResourcesService extends BaseService {
 
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
                 userId,direcotryId, type.ordinal(), searchVal);
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        PageInfo<Resource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
@@ -704,8 +708,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -739,7 +743,7 @@ public class ResourcesService extends BaseService {
         if (resource.getType() == (ResourceType.UDF)) {
             List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs);
                 putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
                 return result;
             }
@@ -867,8 +871,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -937,8 +941,8 @@ public class ResourcesService extends BaseService {
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content,int pid,String currentDirectory) {
         Result result = new Result();
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -956,7 +960,7 @@ public class ResourcesService extends BaseService {
         }
 
         String name = fileName.trim() + "." + nameSuffix;
-        String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name):String.format("%s/%s",currentDirectory,name);
+        String fullName = currentDirectory.equals("/") ? String.format(DIR_FORMAT_TRUE,currentDirectory,name):String.format(DIR_FORMAT_FALSE,currentDirectory,name);
 
         result = verifyResourceName(fullName,type,loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1013,8 +1017,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -1108,8 +1112,8 @@ public class ResourcesService extends BaseService {
      */
     public org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception {
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
+            logger.error(STARTUP_STATE, PropertyUtils.getResUploadStartupState());
             throw new RuntimeException("hdfs not startup");
         }
 
@@ -1190,7 +1194,7 @@ public class ResourcesService extends BaseService {
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
         List<Resource> list ;
-        if (resourceList != null && resourceList.size() > 0) {
+        if (resourceList != null && !resourceList.isEmpty()) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
 

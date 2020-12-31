@@ -59,28 +59,25 @@ public class SchemaUtils {
             schemaDirList.add(file.getName());
         }
 
-        Collections.sort(schemaDirList, new Comparator() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                try {
-                    String dir1 = String.valueOf(o1);
-                    String dir2 = String.valueOf(o2);
-                    String version1 = dir1.split("_")[0];
-                    String version2 = dir2.split("_")[0];
-                    if (version1.equals(version2)) {
-                        return 0;
-                    }
-
-                    if (SchemaUtils.isAGreatVersion(version1, version2)) {
-                        return 1;
-                    }
-
-                    return -1;
-
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    throw new RuntimeException(e);
+        Collections.sort(schemaDirList, (o1, o2) -> {
+            try {
+                String dir1 = String.valueOf(o1);
+                String dir2 = String.valueOf(o2);
+                String version1 = dir1.split("_")[0];
+                String version2 = dir2.split("_")[0];
+                if (version1.equals(version2)) {
+                    return 0;
                 }
+
+                if (SchemaUtils.isAGreatVersion(version1, version2)) {
+                    return 1;
+                }
+
+                return -1;
+
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         });
 

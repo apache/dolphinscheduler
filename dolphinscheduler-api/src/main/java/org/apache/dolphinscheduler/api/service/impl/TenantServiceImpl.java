@@ -120,7 +120,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         tenantMapper.insert(tenant);
 
         // if hdfs startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState())) {
             createTenantDirIfNotExists(tenantCode);
         }
 
@@ -192,7 +192,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         if (!tenant.getTenantCode().equals(tenantCode)) {
             if (checkTenantExists(tenantCode)) {
                 // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState()) {
+                if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState())) {
                     String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
                     String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
                     //init hdfs resource
@@ -265,7 +265,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         }
 
         // if resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState())) {
             String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
             if (HadoopUtils.getInstance().exists(tenantPath)) {

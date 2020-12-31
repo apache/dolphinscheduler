@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class LoggerController extends BaseController {
                            @RequestParam(value = "taskInstanceId") int taskInstanceId,
                            @RequestParam(value = "skipLineNum") int skipNum,
                            @RequestParam(value = "limit") int limit) {
-        String loggedInUser = loginUser.getUserName().replaceAll("[\n\r\t]", "_");
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info(
                 "login user {}, view {} task instance log ,skipLineNum {} , limit {}", loggedInUser, taskInstanceId, skipNum, limit);
         return loggerService.queryLog(taskInstanceId, skipNum, limit);

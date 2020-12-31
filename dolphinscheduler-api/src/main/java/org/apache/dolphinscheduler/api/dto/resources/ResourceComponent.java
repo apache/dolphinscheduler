@@ -27,10 +27,10 @@ import java.util.List;
  */
 @JsonPropertyOrder({"id","pid","name","fullName","description","isDirctory","children","type"})
 public abstract class ResourceComponent {
-    public ResourceComponent() {
+    protected ResourceComponent() {
     }
 
-    public ResourceComponent(int id, int pid, String name, String fullName, String description, boolean isDirctory) {
+    protected ResourceComponent(int id, int pid, String name, String fullName, String description, boolean isDirctory) {
         this.id = id;
         this.pid = pid;
         this.name = name;

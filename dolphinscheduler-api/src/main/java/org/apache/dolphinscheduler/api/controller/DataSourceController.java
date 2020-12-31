@@ -99,9 +99,17 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        name = StringUtils.replaceNRTtoUnderline(name);
+        note = StringUtils.replaceNRTtoUnderline(note);
+        host = StringUtils.replaceNRTtoUnderline(host);
+        port = StringUtils.replaceNRTtoUnderline(port);
+        database = StringUtils.replaceNRTtoUnderline(database);
+        principal = StringUtils.replaceNRTtoUnderline(principal);
+        userName = StringUtils.replaceNRTtoUnderline(userName);
+        other = StringUtils.replaceNRTtoUnderline(other);
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                name, note, type, host, port, database, principal, userName, connectType, other);
+                loggedInUser, name, note, type, host, port, database, principal, userName, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
         return returnDataList(result);
@@ -155,8 +163,12 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        name = StringUtils.replaceNRTtoUnderline(name);
+        note = StringUtils.replaceNRTtoUnderline(note);
+        other = StringUtils.replaceNRTtoUnderline(other);
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name, note, type, connectType, other);
+                loggedInUser, name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
         return returnDataList(dataSource);
@@ -179,8 +191,8 @@ public class DataSourceController extends BaseController {
     @ApiException(QUERY_DATASOURCE_ERROR)
     public Result queryDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") int id) {
-        logger.info("login user {}, query datasource: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query datasource: {}", loggedInUser, id);
         Map<String, Object> result = dataSourceService.queryDataSource(id);
         return returnDataList(result);
     }
@@ -280,8 +292,12 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "password") String password,
                                     @RequestParam(value = "connectType") DbConnectType connectType,
                                     @RequestParam(value = "other") String other) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        name = StringUtils.replaceNRTtoUnderline(name);
+        note = StringUtils.replaceNRTtoUnderline(note);
+        other = StringUtils.replaceNRTtoUnderline(other);
         logger.info("login user {}, connect datasource: {}, note: {}, type: {}, connectType: {}, other: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name, note, type, connectType, other);
+                loggedInUser, name, note, type, connectType, other);
         String parameter = dataSourceService.buildParameter(type, host, port, database, principal, userName, password, connectType, other);
         Boolean isConnection = dataSourceService.checkConnection(type, parameter);
         Result result = new Result();
@@ -310,7 +326,8 @@ public class DataSourceController extends BaseController {
     @ApiException(CONNECTION_TEST_FAILURE)
     public Result connectionTest(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("id") int id) {
-        logger.info("connection test, login user:{}, id:{}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("connection test, login user:{}, id:{}", loggedInUser, id);
 
         boolean isConnection = dataSourceService.connectionTest(id);
         Result result = new Result();
@@ -339,7 +356,8 @@ public class DataSourceController extends BaseController {
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
     public Result delete(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                          @RequestParam("id") int id) {
-        logger.info("delete datasource,login user:{}, id:{}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("delete datasource,login user:{}, id:{}", loggedInUser, id);
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -360,8 +378,8 @@ public class DataSourceController extends BaseController {
     public Result verifyDataSourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "name") String name
     ) {
-        logger.info("login user {}, verfiy datasource name: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), name);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, verfiy datasource name: {}", loggedInUser, name);
 
         return dataSourceService.verifyDataSourceName(name);
     }
@@ -383,8 +401,9 @@ public class DataSourceController extends BaseController {
     @ApiException(UNAUTHORIZED_DATASOURCE)
     public Result unauthDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("unauthorized datasource, login user:{}, unauthorized userId:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), userId);
+                loggedInUser, userId);
         Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
         return returnDataList(result);
     }
@@ -406,8 +425,9 @@ public class DataSourceController extends BaseController {
     @ApiException(AUTHORIZED_DATA_SOURCE)
     public Result authedDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("authorized data source, login user:{}, authorized useId:{}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), userId);
+                loggedInUser, userId);
         Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
         return returnDataList(result);
     }
@@ -423,7 +443,8 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(KERBEROS_STARTUP_STATE)
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}", loggedInUser);
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }

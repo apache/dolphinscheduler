@@ -107,7 +107,7 @@ public class SchedulerService extends BaseService {
                                               Priority processInstancePriority,
                                               String workerGroup) {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -140,7 +140,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
-            logger.error(scheduleParam.getCrontab() + " verify failure");
+            logger.error("{} verify failure", scheduleParam.getCrontab());
 
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
             return result;
@@ -204,7 +204,7 @@ public class SchedulerService extends BaseService {
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
                                               String workerGroup) {
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -299,7 +299,7 @@ public class SchedulerService extends BaseService {
                                                 Integer id,
                                                 ReleaseState scheduleStatus) {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
         // check project auth
@@ -340,10 +340,10 @@ public class SchedulerService extends BaseService {
             List<Integer> subProcessDefineIds = new ArrayList<>();
             processService.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
             Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
-            if (subProcessDefineIds.size() > 0){
+            if (!subProcessDefineIds.isEmpty()){
                 List<ProcessDefinition> subProcessDefinitionList =
                         processDefinitionMapper.queryDefinitionListByIdList(idArray);
-                if (subProcessDefinitionList != null && subProcessDefinitionList.size() > 0){
+                if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()){
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList){
                         /**
                          * if there is no online process, exit directly
@@ -362,8 +362,7 @@ public class SchedulerService extends BaseService {
         // check master server exists
         List<Server> masterServers = monitorService.getServerListFromZK(true);
 
-
-        if (masterServers.size() == 0) {
+        if (masterServers.isEmpty()) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return result;
         }
@@ -375,20 +374,17 @@ public class SchedulerService extends BaseService {
 
         try {
             switch (scheduleStatus) {
-                case ONLINE: {
+                case ONLINE:
                     logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     setSchedule(project.getId(), scheduleObj);
                     break;
-                }
-                case OFFLINE: {
+                case OFFLINE:
                     logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     deleteSchedule(project.getId(), id);
                     break;
-                }
-                default: {
+                default:
                     putMsg(result, Status.SCHEDULE_STATUS_UNKNOWN, scheduleStatus.toString());
                     return result;
-                }
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
@@ -429,13 +425,13 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
             return result;
         }
-        Page<Schedule> page = new Page(pageNo, pageSize);
+        Page<Schedule> page = new Page<>(pageNo, pageSize);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(
                 page, processDefineId, searchVal
         );
 
 
-        PageInfo pageInfo = new PageInfo<Schedule>(pageNo, pageSize);
+        PageInfo<Schedule> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int)scheduleIPage.getTotal());
         pageInfo.setLists(scheduleIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
@@ -598,7 +594,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
         List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression,Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
-        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)));
+        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(DateUtils::dateToString));
         putMsg(result, Status.SUCCESS);
         return result;
     }

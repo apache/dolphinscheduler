@@ -60,8 +60,9 @@ public class MonitorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
     public Result listMaster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query all master", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
-        logger.info("list master, user:{}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user: {}, query all master", loggedInUser);
+        logger.info("list master, user:{}", loggedInUser);
         Map<String, Object> result = monitorService.queryMaster(loginUser);
         return returnDataList(result);
     }
@@ -77,7 +78,8 @@ public class MonitorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_WORKERS_ERROR)
     public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query all workers", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user: {}, query all workers", loggedInUser);
         Map<String, Object> result = monitorService.queryWorker(loginUser);
         return returnDataList(result);
     }
@@ -93,7 +95,8 @@ public class MonitorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
     public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query database state", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user: {}, query database state", loggedInUser);
         Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
         return returnDataList(result);
     }
@@ -109,7 +112,8 @@ public class MonitorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
     public Result queryZookeeperState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query zookeeper state", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user: {}, query zookeeper state", loggedInUser);
         Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
         return returnDataList(result);
     }

@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -65,7 +66,8 @@ public class QueueController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
     public Result queryList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query queue list", loginUser.getUserName());
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query queue list", loggedInUser);
         Map<String, Object> result = queueService.queryList(loginUser);
         return returnDataList(result);
     }
@@ -92,7 +94,9 @@ public class QueueController extends BaseController {
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
-        logger.info("login user {}, query queue list,search value:{}", loginUser.getUserName(), searchVal);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
+        logger.info("login user {}, query queue list,search value:{}", loggedInUser, searchVal);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -122,8 +126,11 @@ public class QueueController extends BaseController {
     public Result createQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        queue = StringUtils.replaceNRTtoUnderline(queue);
+        queueName = StringUtils.replaceNRTtoUnderline(queueName);
         logger.info("login user {}, create queue, queue: {}, queueName: {}",
-                loginUser.getUserName(), queue, queueName);
+                loggedInUser, queue, queueName);
         Map<String, Object> result = queueService.createQueue(loginUser, queue, queueName);
         return returnDataList(result);
     }
@@ -150,8 +157,11 @@ public class QueueController extends BaseController {
                               @RequestParam(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        queue = StringUtils.replaceNRTtoUnderline(queue);
+        queueName = StringUtils.replaceNRTtoUnderline(queueName);
         logger.info("login user {}, update queue, id: {}, queue: {}, queueName: {}",
-                loginUser.getUserName(), id, queue, queueName);
+                loggedInUser, id, queue, queueName);
         Map<String, Object> result = queueService.updateQueue(loginUser, id, queue, queueName);
         return returnDataList(result);
     }
@@ -177,9 +187,11 @@ public class QueueController extends BaseController {
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName
     ) {
-
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        queue = StringUtils.replaceNRTtoUnderline(queue);
+        queueName = StringUtils.replaceNRTtoUnderline(queueName);
         logger.info("login user {}, verfiy queue: {} queue name: {}",
-                loginUser.getUserName(), queue, queueName);
+                loggedInUser, queue, queueName);
         return queueService.verifyQueue(queue, queueName);
     }
 

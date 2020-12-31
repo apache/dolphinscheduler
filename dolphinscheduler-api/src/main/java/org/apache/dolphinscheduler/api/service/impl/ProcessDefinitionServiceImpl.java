@@ -678,31 +678,13 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
      */
     private void downloadProcessDefinitionFile(HttpServletResponse response, List<ProcessMeta> processDefinitionList) {
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        BufferedOutputStream buff = null;
-        ServletOutputStream out = null;
-        try {
-            out = response.getOutputStream();
-            buff = new BufferedOutputStream(out);
+
+        try(BufferedOutputStream buff =
+                    new BufferedOutputStream(response.getOutputStream())) {
             buff.write(JSONUtils.toJsonString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
             buff.flush();
-            buff.close();
         } catch (IOException e) {
             logger.warn("export process fail", e);
-        } finally {
-            if (null != buff) {
-                try {
-                    buff.close();
-                } catch (Exception e) {
-                    logger.warn("export process buffer not close", e);
-                }
-            }
-            if (null != out) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    logger.warn("export process output stream not close", e);
-                }
-            }
         }
     }
 

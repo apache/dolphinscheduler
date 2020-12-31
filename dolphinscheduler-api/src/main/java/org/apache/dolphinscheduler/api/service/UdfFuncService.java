@@ -46,7 +46,7 @@ import java.util.Map;
  * udf function service
  */
 @Service
-public class UdfFuncService extends BaseService{
+public class UdfFuncService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncService.class);
 
@@ -63,14 +63,14 @@ public class UdfFuncService extends BaseService{
     /**
      * create udf function
      *
-     * @param loginUser login user
-     * @param type udf type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database database
-     * @param desc description
+     * @param loginUser  login user
+     * @param type       udf type
+     * @param funcName   function name
+     * @param argTypes   argument types
+     * @param database   database
+     * @param desc       description
      * @param resourceId resource id
-     * @param className class name
+     * @param className  class name
      * @return create result code
      */
     public Result createUdfFunction(User loginUser,
@@ -84,7 +84,7 @@ public class UdfFuncService extends BaseService{
         Result result = new Result();
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
@@ -130,20 +130,19 @@ public class UdfFuncService extends BaseService{
     }
 
     /**
-     *
      * @param name name
      * @return check result code
      */
-    private boolean checkUdfFuncNameExists(String name){
+    private boolean checkUdfFuncNameExists(String name) {
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
-        return resource != null && resource.size() > 0;
+        return resource != null && !resource.isEmpty();
     }
 
 
     /**
      * query udf function
      *
-     * @param id  udf function id
+     * @param id udf function id
      * @return udf function detail
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
@@ -162,14 +161,14 @@ public class UdfFuncService extends BaseService{
     /**
      * updateProcessInstance udf function
      *
-     * @param udfFuncId udf function id
-     * @param type  resource type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database data base
-     * @param desc description
+     * @param udfFuncId  udf function id
+     * @param type       resource type
+     * @param funcName   function name
+     * @param argTypes   argument types
+     * @param database   data base
+     * @param desc       description
      * @param resourceId resource id
-     * @param className class name
+     * @param className  class name
      * @return update result code
      */
     public Map<String, Object> updateUdfFunc(int udfFuncId,
@@ -191,20 +190,18 @@ public class UdfFuncService extends BaseService{
         }
 
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()){
+        if (Boolean.FALSE.equals(PropertyUtils.getResUploadStartupState())) {
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
 
         // verify udfFuncName is exist
-        if (!funcName.equals(udf.getFuncName())) {
-            if (checkUdfFuncNameExists(funcName)) {
-                logger.error("UdfFunc {} has exist, can't create again.", funcName);
-                result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
-                result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
-                return result;
-            }
+        if (!funcName.equals(udf.getFuncName()) && checkUdfFuncNameExists(funcName)) {
+            logger.error("UdfFunc {} has exist, can't create again.", funcName);
+            result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
+            result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
+            return result;
         }
 
         Resource resource = resourceMapper.selectById(resourceId);
@@ -238,8 +235,8 @@ public class UdfFuncService extends BaseService{
      * query udf function list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @param searchVal search value
      * @return udf function list page
      */
@@ -247,9 +244,9 @@ public class UdfFuncService extends BaseService{
         Map<String, Object> result = new HashMap<>(5);
 
 
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotalCount((int)udfFuncList.getTotal());
+        pageInfo.setTotalCount((int) udfFuncList.getTotal());
         pageInfo.setLists(udfFuncList.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -261,8 +258,8 @@ public class UdfFuncService extends BaseService{
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return udf function list page
      */
     private IPage<UdfFunc> getUdfFuncsPage(User loginUser, String searchVal, Integer pageSize, int pageNo) {
@@ -271,7 +268,7 @@ public class UdfFuncService extends BaseService{
         if (isAdmin(loginUser)) {
             userId = 0;
         }
-        Page<UdfFunc> page = new Page(pageNo, pageSize);
+        Page<UdfFunc> page = new Page<>(pageNo, pageSize);
         return udfFuncMapper.queryUdfFuncPaging(page, userId, searchVal);
     }
 
@@ -279,7 +276,7 @@ public class UdfFuncService extends BaseService{
      * query udf list
      *
      * @param loginUser login user
-     * @param type  udf type
+     * @param type      udf type
      * @return udf func list
      */
     public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
@@ -304,7 +301,7 @@ public class UdfFuncService extends BaseService{
     @Transactional(rollbackFor = RuntimeException.class)
     public Result delete(int id) {
         Result result = new Result();
-        
+
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         putMsg(result, Status.SUCCESS);

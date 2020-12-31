@@ -32,6 +32,10 @@ public class VarPoolUtils {
 
     private static final  String VALUE = "value";
 
+    private VarPoolUtils() {
+        throw new IllegalStateException(VarPoolUtils.class.getName());
+    }
+
     /**
      * setTaskNodeLocalParams
      * @param taskNode taskNode
@@ -107,4 +111,4 @@ public class VarPoolUtils {
         }
         return rawScript;
     }
-} 
+}

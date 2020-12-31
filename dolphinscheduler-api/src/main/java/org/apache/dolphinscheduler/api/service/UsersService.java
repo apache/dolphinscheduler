@@ -107,17 +107,19 @@ public class UsersService extends BaseService {
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    private static final String PATH_FORMAT = "%s/%s";
+
 
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser login user
-     * @param userName user name
+     * @param loginUser    login user
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
      * @return create result code
      * @throws Exception exception
      */
@@ -154,7 +156,7 @@ public class UsersService extends BaseService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState())) {
             // if tenant not exists
             if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))) {
                 createTenantDirIfNotExists(tenant.getTenantCode());
@@ -253,7 +255,7 @@ public class UsersService extends BaseService {
     /**
      * query user
      *
-     * @param name name
+     * @param name     name
      * @param password password
      * @return user info
      */
@@ -287,9 +289,9 @@ public class UsersService extends BaseService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search avlue
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -299,7 +301,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Page<User> page = new Page(pageNo, pageSize);
+        Page<User> page = new Page<>(pageNo, pageSize);
 
         IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
 
@@ -315,15 +317,14 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
-     *
-     * @param loginUser
-     * @param userId user id
-     * @param userName user name
+     * @param loginUser    The login user
+     * @param userId       user id
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tennat id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tennat id
+     * @param phone        phone
+     * @param queue        queue
      * @return update result code
      * @throws Exception exception
      */
@@ -394,7 +395,7 @@ public class UsersService extends BaseService {
             Tenant newTenant = tenantMapper.queryById(tenantId);
             if (newTenant != null) {
                 // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState() && oldTenant != null) {
+                if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState()) && oldTenant != null) {
                     String newTenantCode = newTenant.getTenantCode();
                     String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
                     String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
@@ -454,7 +455,7 @@ public class UsersService extends BaseService {
      * delete user
      *
      * @param loginUser login user
-     * @param id user id
+     * @param id        user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
@@ -474,12 +475,10 @@ public class UsersService extends BaseService {
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
-        if (user != null) {
-            if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(), id);
-                if (HadoopUtils.getInstance().exists(userPath)) {
-                    HadoopUtils.getInstance().delete(userPath, true);
-                }
+        if (user != null && Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState())) {
+            String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(), id);
+            if (HadoopUtils.getInstance().exists(userPath)) {
+                HadoopUtils.getInstance().delete(userPath, true);
             }
         }
 
@@ -492,8 +491,8 @@ public class UsersService extends BaseService {
     /**
      * grant project
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -542,8 +541,8 @@ public class UsersService extends BaseService {
     /**
      * grant resource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -560,7 +559,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Set<Integer> needAuthorizeResIds = new HashSet();
+        Set<Integer> needAuthorizeResIds = new HashSet<>();
         if (StringUtils.isNotBlank(resourceIds)) {
             String[] resourceFullIdArr = resourceIds.split(",");
             // need authorize resource id set
@@ -577,7 +576,7 @@ public class UsersService extends BaseService {
         //get the authorized resource id list by user id
         List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
         //if resource type is UDF,need check whether it is bound by UDF functon
-        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 
         //get the unauthorized resource id list
         oldAuthorizedResIds.removeAll(needAuthorizeResIds);
@@ -640,8 +639,8 @@ public class UsersService extends BaseService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId user id
-     * @param udfIds udf id array
+     * @param userId    user id
+     * @param udfIds    udf id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
@@ -686,8 +685,8 @@ public class UsersService extends BaseService {
     /**
      * grant datasource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser     login user
+     * @param userId        user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -751,9 +750,9 @@ public class UsersService extends BaseService {
 
             StringBuilder sb = new StringBuilder();
 
-            if (alertGroups != null && alertGroups.size() > 0) {
+            if (alertGroups != null && !alertGroups.isEmpty()) {
                 for (int i = 0; i < alertGroups.size() - 1; i++) {
-                    sb.append(alertGroups.get(i).getGroupName() + ",");
+                    sb.append(alertGroups.get(i).getGroupName()).append(",");
                 }
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
@@ -832,7 +831,7 @@ public class UsersService extends BaseService {
     /**
      * unauthorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -846,14 +845,14 @@ public class UsersService extends BaseService {
 
         List<User> userList = userMapper.selectList(null);
         List<User> resultUsers = new ArrayList<>();
-        Set<User> userSet = null;
-        if (userList != null && userList.size() > 0) {
+        Set<User> userSet;
+        if (userList != null && !userList.isEmpty()) {
             userSet = new HashSet<>(userList);
 
             List<User> authedUserList = userMapper.queryUserListByAlertGroupId(alertgroupId);
 
-            Set<User> authedUserSet = null;
-            if (authedUserList != null && authedUserList.size() > 0) {
+            Set<User> authedUserSet;
+            if (authedUserList != null && !authedUserList.isEmpty()) {
                 authedUserSet = new HashSet<>(authedUserList);
                 userSet.removeAll(authedUserSet);
             }
@@ -869,7 +868,7 @@ public class UsersService extends BaseService {
     /**
      * authorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertgroupId alert group id
      * @return authorized result code
      */
@@ -891,10 +890,14 @@ public class UsersService extends BaseService {
      * @return true if tenant exists, otherwise return false
      */
     private boolean checkTenantExists(int tenantId) {
-        return tenantMapper.queryById(tenantId) != null ? true : false;
+        return tenantMapper.queryById(tenantId) != null;
     }
 
     /**
+     * @param userName The username
+     * @param password The password
+     * @param email    The Email
+     * @param phone    Teh phone number
      * @return if check failed return the field, otherwise return null
      */
     private String checkUserParams(String userName, String password, String email, String phone) {
@@ -921,8 +924,8 @@ public class UsersService extends BaseService {
      * copy resource files
      *
      * @param resourceComponent resource component
-     * @param srcBasePath src base path
-     * @param dstBasePath dst base path
+     * @param srcBasePath       src base path
+     * @param dstBasePath       dst base path
      * @throws IOException io exception
      */
     private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
@@ -931,21 +934,21 @@ public class UsersService extends BaseService {
         if (CollectionUtils.isNotEmpty(components)) {
             for (ResourceComponent component : components) {
                 // verify whether exist
-                if (!HadoopUtils.getInstance().exists(String.format("%s/%s", srcBasePath, component.getFullName()))) {
+                if (!HadoopUtils.getInstance().exists(String.format(PATH_FORMAT, srcBasePath, component.getFullName()))) {
                     logger.error("resource file: {} not exist,copy error", component.getFullName());
                     throw new ServiceException(Status.RESOURCE_NOT_EXIST);
                 }
 
                 if (!component.isDirctory()) {
                     // copy it to dst
-                    HadoopUtils.getInstance().copy(String.format("%s/%s", srcBasePath, component.getFullName()), String.format("%s/%s", dstBasePath, component.getFullName()), false, true);
+                    HadoopUtils.getInstance().copy(String.format(PATH_FORMAT, srcBasePath, component.getFullName()), String.format(PATH_FORMAT, dstBasePath, component.getFullName()), false, true);
                     continue;
                 }
 
                 if (CollectionUtils.isEmpty(component.getChildren())) {
                     // if not exist,need create it
-                    if (!HadoopUtils.getInstance().exists(String.format("%s/%s", dstBasePath, component.getFullName()))) {
-                        HadoopUtils.getInstance().mkdir(String.format("%s/%s", dstBasePath, component.getFullName()));
+                    if (!HadoopUtils.getInstance().exists(String.format(PATH_FORMAT, dstBasePath, component.getFullName()))) {
+                        HadoopUtils.getInstance().mkdir(String.format(PATH_FORMAT, dstBasePath, component.getFullName()));
                     }
                 } else {
                     copyResourceFiles(component, srcBasePath, dstBasePath);
@@ -957,10 +960,10 @@ public class UsersService extends BaseService {
     /**
      * register user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName user name
-     * @param userPassword user password
+     * @param userName       user name
+     * @param userPassword   user password
      * @param repeatPassword repeat password
-     * @param email email
+     * @param email          email
      * @return register result code
      * @throws Exception exception
      */
@@ -990,7 +993,7 @@ public class UsersService extends BaseService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName user name
+     * @param userName  user name
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {

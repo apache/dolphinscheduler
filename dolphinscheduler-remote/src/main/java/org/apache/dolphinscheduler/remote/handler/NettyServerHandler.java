@@ -55,7 +55,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * server processors queue
      */
-    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap();
+    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap<>();
 
     public NettyServerHandler(NettyRemotingServer nettyRemotingServer) {
         this.nettyRemotingServer = nettyRemotingServer;
@@ -120,15 +120,11 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         final CommandType commandType = msg.getType();
         final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(commandType);
         if (pair != null) {
-            Runnable r = new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        pair.getLeft().process(channel, msg);
-                    } catch (Throwable ex) {
-                        logger.error("process msg {} error", msg, ex);
-                    }
+            Runnable r = () -> {
+                try {
+                    pair.getLeft().process(channel, msg);
+                } catch (Throwable ex) {
+                    logger.error("process msg {} error", msg, ex);
                 }
             };
             try {

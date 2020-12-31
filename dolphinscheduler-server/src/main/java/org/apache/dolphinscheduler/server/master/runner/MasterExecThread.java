@@ -174,7 +174,7 @@ public class MasterExecThread implements Runnable {
      *
      * @param parentNodeName parent node name
      */
-    private Map<String, Object> propToValue = new ConcurrentHashMap<String, Object>();
+    private Map<String, Object> propToValue = new ConcurrentHashMap<>();
 
     /**
      * constructor of MasterExecThread

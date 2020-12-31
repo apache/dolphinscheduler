@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_UPLOAD_PATH;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
@@ -66,10 +64,10 @@ public class HadoopUtils implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
 
     private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-    public static final String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
-    public static final String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
-    public static final String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-    public static final String jobHistoryAddress = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
+    public static final String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+    public static final String RM_HA_IDS = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
+    public static final String APP_ADDRESS = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
+    public static final String JOB_HISTORY_ADDRESS = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
 
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
@@ -103,7 +101,7 @@ public class HadoopUtils implements Closeable {
      */
 
     private void initHdfsPath() {
-        Path path = new Path(resourceUploadPath);
+        Path path = new Path(RESOURCE_UPLOAD_PATH);
 
         try {
             if (!fs.exists(path)) {
@@ -198,20 +196,20 @@ public class HadoopUtils implements Closeable {
      */
     public String getApplicationUrl(String applicationId) throws Exception {
         /**
-         * if rmHaIds contains xx, it signs not use resourcemanager
+         * if RM_HA_IDS contains xx, it signs not use resourcemanager
          * otherwise:
-         *  if rmHaIds is empty, single resourcemanager enabled
-         *  if rmHaIds not empty: resourcemanager HA enabled
+         *  if RM_HA_IDS is empty, single resourcemanager enabled
+         *  if RM_HA_IDS not empty: resourcemanager HA enabled
          */
         String appUrl = "";
 
-        if (StringUtils.isEmpty(rmHaIds)) {
+        if (StringUtils.isEmpty(RM_HA_IDS)) {
             //single resourcemanager enabled
-            appUrl = appAddress;
+            appUrl = APP_ADDRESS;
             yarnEnabled = true;
         } else {
             //resourcemanager HA enabled
-            appUrl = getAppAddress(appAddress, rmHaIds);
+            appUrl = getAppAddress(APP_ADDRESS, RM_HA_IDS);
             yarnEnabled = true;
             logger.info("application url : {}", appUrl);
         }
@@ -225,7 +223,7 @@ public class HadoopUtils implements Closeable {
     public String getJobHistoryUrl(String applicationId) {
         //eg:application_1587475402360_712719 -> job_1587475402360_712719
         String jobId = applicationId.replace("application", "job");
-        return String.format(jobHistoryAddress, jobId);
+        return String.format(JOB_HISTORY_ADDRESS, jobId);
     }
 
     /**
@@ -481,11 +479,11 @@ public class HadoopUtils implements Closeable {
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
-        if ("/".equals(resourceUploadPath)) {
+        if ("/".equals(RESOURCE_UPLOAD_PATH)) {
             // if basepath is configured to /,  the generated url may be  //default/resources (with extra leading /)
             return "";
         } else {
-            return resourceUploadPath;
+            return RESOURCE_UPLOAD_PATH;
         }
     }
 

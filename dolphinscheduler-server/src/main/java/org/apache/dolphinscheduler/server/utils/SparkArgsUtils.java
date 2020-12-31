@@ -37,6 +37,10 @@ public class SparkArgsUtils {
 
     private static final String SPARK_ON_YARN = "yarn";
 
+    private SparkArgsUtils() {
+        throw new IllegalStateException(SparkArgsUtils.class.getName());
+    }
+
     /**
      * build args
      *

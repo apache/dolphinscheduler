@@ -28,6 +28,10 @@ public class PlaceholderUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PlaceholderUtils.class);
 
+    private PlaceholderUtils() {
+        throw new IllegalStateException(PlaceholderUtils.class.getName());
+    }
+
     /**
      * Prefix of the position to be replaced
      */

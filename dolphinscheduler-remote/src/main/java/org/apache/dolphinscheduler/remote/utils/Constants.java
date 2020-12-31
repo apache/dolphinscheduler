@@ -61,4 +61,8 @@ public class Constants {
      */
     public static final int WARM_UP_TIME = 10 * 60 * 1000;
 
+    private Constants() {
+        throw new IllegalStateException(Constants.class.getName());
+    }
+
 }

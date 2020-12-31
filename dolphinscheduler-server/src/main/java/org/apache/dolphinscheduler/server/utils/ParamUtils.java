@@ -34,6 +34,10 @@ import java.util.Map;
  */
 public class ParamUtils {
 
+    private ParamUtils() {
+        throw new IllegalStateException(ParamUtils.class.getName());
+    }
+
     /**
      * parameter conversion
      * @param globalParams      global params

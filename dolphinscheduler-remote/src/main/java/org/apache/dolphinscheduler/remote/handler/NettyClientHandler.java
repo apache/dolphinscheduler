@@ -74,7 +74,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor) {
         this.nettyRemotingClient = nettyRemotingClient;
         this.callbackExecutor = callbackExecutor;
-        this.processors = new ConcurrentHashMap();
+        this.processors = new ConcurrentHashMap<>();
     }
 
     /**
@@ -138,12 +138,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             future.setResponseCommand(command);
             future.release();
             if (future.getInvokeCallback() != null) {
-                this.callbackExecutor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        future.executeInvokeCallback();
-                    }
-                });
+                this.callbackExecutor.submit(future::executeInvokeCallback);
             } else {
                 future.putResponse(command);
             }

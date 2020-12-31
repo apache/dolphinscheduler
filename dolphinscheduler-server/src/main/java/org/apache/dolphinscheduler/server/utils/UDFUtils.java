@@ -18,9 +18,7 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.slf4j.Logger;
 
@@ -39,6 +37,10 @@ public class UDFUtils {
      *  create function format
      */
     private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
+
+    private UDFUtils() {
+        throw new IllegalStateException(UDFUtils.class.getName());
+    }
 
     /**
      * create function list

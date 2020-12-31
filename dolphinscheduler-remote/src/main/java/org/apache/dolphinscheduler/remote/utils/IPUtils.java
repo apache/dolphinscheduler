@@ -34,6 +34,10 @@ public class IPUtils {
 
     private static String LOCAL_HOST = "unknown";
 
+    private IPUtils() {
+        throw new IllegalStateException(IPUtils.class.getName());
+    }
+
     static {
         String host = System.getenv("HOSTNAME");
         if (isNotEmpty(host)) {
@@ -135,8 +139,6 @@ public class IPUtils {
 
         Matcher mat = pat.matcher(addr);
 
-        boolean ipAddress = mat.find();
-
-        return ipAddress;
+        return mat.find();
     }
 }

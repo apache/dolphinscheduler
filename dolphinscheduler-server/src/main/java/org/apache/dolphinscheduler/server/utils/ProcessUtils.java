@@ -63,6 +63,10 @@ public class ProcessUtils {
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
 
+    private ProcessUtils() {
+        throw new IllegalStateException(ProcessUtils.class.getName());
+    }
+
     /**
      * build command line characters.
      *

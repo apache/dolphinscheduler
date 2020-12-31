@@ -76,8 +76,10 @@ public class ProjectController extends BaseController {
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
-
-        logger.info("login user {}, create project name: {}, desc: {}", loginUser.getUserName(), projectName, description);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String nameParam = StringUtils.replaceNRTtoUnderline(projectName);
+        String descriptionParam = StringUtils.replaceNRTtoUnderline(description);
+        logger.info("login user {}, create project name: {}, desc: {}", loggedInUser, nameParam, descriptionParam);
         Map<String, Object> result = projectService.createProject(loginUser, projectName, description);
         return returnDataList(result);
     }
@@ -104,7 +106,10 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectId") Integer projectId,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
-        logger.info("login user {} , updateProcessInstance project name: {}, desc: {}", loginUser.getUserName(), projectName, description);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String nameParam = StringUtils.replaceNRTtoUnderline(projectName);
+        String descriptionParam = StringUtils.replaceNRTtoUnderline(description);
+        logger.info("login user {} , updateProcessInstance project name: {}, desc: {}",loggedInUser, nameParam, descriptionParam);
         Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description);
         return returnDataList(result);
     }
@@ -125,7 +130,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_PROJECT_DETAILS_BY_ID_ERROR)
     public Result queryProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("projectId") Integer projectId) {
-        logger.info("login user {}, query project by id: {}", loginUser.getUserName(), projectId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query project by id: {}", loggedInUser, projectId);
 
         Map<String, Object> result = projectService.queryById(projectId);
         return returnDataList(result);
@@ -154,8 +160,8 @@ public class ProjectController extends BaseController {
                                          @RequestParam("pageSize") Integer pageSize,
                                          @RequestParam("pageNo") Integer pageNo
     ) {
-
-        logger.info("login user {}, query project list paging", loginUser.getUserName());
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query project list paging", loggedInUser);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
         return returnDataListPaging(result);
@@ -178,8 +184,8 @@ public class ProjectController extends BaseController {
     public Result deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectId") Integer projectId
     ) {
-
-        logger.info("login user {}, delete project: {}.", loginUser.getUserName(), projectId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, delete project: {}.", loggedInUser, projectId);
         Map<String, Object> result = projectService.deleteProject(loginUser, projectId);
         return returnDataList(result);
     }
@@ -200,7 +206,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     public Result queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
-        logger.info("login user {}, query unauthorized project by user id: {}.", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query unauthorized project by user id: {}.", loggedInUser, userId);
         Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
         return returnDataList(result);
     }
@@ -222,7 +229,8 @@ public class ProjectController extends BaseController {
     @ApiException(QUERY_AUTHORIZED_PROJECT)
     public Result queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
-        logger.info("login user {}, query authorized project by user id: {}.", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query authorized project by user id: {}.", loggedInUser, userId);
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
         return returnDataList(result);
     }
@@ -238,9 +246,9 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     public Result queryProjectCreatedAndAuthorizedByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, query authorized and user created project by user id: {}.",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                StringUtils.replaceNRTtoUnderline(String.valueOf(loginUser.getId())));
+                loggedInUser, loginUser.getId());
         Map<String, Object> result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return returnDataList(result);
     }
@@ -263,8 +271,10 @@ public class ProjectController extends BaseController {
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("file") MultipartFile file,
                                           @RequestParam("projectName") String projectName) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String nameParam = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("import process definition by id, login user:{}, project: {}",
-                loginUser.getUserName(), projectName);
+                loggedInUser, nameParam);
         Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, file, projectName);
         return returnDataList(result);
     }
@@ -280,7 +290,8 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query all project list", loginUser.getUserName());
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, query all project list", loggedInUser);
         Map<String, Object> result = projectService.queryAllProjectList();
         return returnDataList(result);
     }

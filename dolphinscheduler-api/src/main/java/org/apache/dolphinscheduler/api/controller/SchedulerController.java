@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 /**
  * schedule controller
  */
-@Api(tags = "SCHEDULER_TAG", position = 13)
+@Api(tags = "SCHEDULER_TAG")
 @RestController
 @RequestMapping("/projects/{projectName}/schedule")
 public class SchedulerController extends BaseController {
@@ -100,9 +101,15 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) throws IOException {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        schedule = StringUtils.replaceNRTtoUnderline(schedule);
+        receivers = StringUtils.replaceNRTtoUnderline(receivers);
+        receiversCc = StringUtils.replaceNRTtoUnderline(receiversCc);
+        workerGroup = StringUtils.replaceNRTtoUnderline(workerGroup);
         logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
-                loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
+                loggedInUser, projectName, processDefinitionId, schedule, warningType, warningGroupId,
                 failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
         Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
                 warningType, warningGroupId, failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
@@ -151,9 +158,15 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) throws IOException {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        schedule = StringUtils.replaceNRTtoUnderline(schedule);
+        receivers = StringUtils.replaceNRTtoUnderline(receivers);
+        receiversCc = StringUtils.replaceNRTtoUnderline(receiversCc);
+        workerGroup = StringUtils.replaceNRTtoUnderline(workerGroup);
         logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, " +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {},workerGroupId:{}",
-                loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
+                loggedInUser, projectName, id, schedule, warningType, warningGroupId, failureStrategy,
                 receivers, receiversCc, processInstancePriority, workerGroup);
 
         Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
@@ -178,8 +191,10 @@ public class SchedulerController extends BaseController {
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("login user {}, schedule setScheduleState, project name: {}, id: {}",
-                loginUser.getUserName(), projectName, id);
+                loggedInUser, projectName, id);
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.ONLINE);
         return returnDataList(result);
     }
@@ -201,8 +216,10 @@ public class SchedulerController extends BaseController {
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("login user {}, schedule offline, project name: {}, process definition id: {}",
-                loginUser.getUserName(), projectName, id);
+                loggedInUser, projectName, id);
 
         Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectName, id, ReleaseState.OFFLINE);
         return returnDataList(result);
@@ -235,8 +252,10 @@ public class SchedulerController extends BaseController {
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("login user {}, query schedule, project name: {}, process definition id: {}",
-                loginUser.getUserName(), projectName, processDefinitionId);
+                loggedInUser, projectName, processDefinitionId);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
         return returnDataListPaging(result);
@@ -261,8 +280,10 @@ public class SchedulerController extends BaseController {
                                      @PathVariable String projectName,
                                      @RequestParam("scheduleId") Integer scheduleId
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("delete schedule by id, login user:{}, project name:{}, schedule id:{}",
-                loginUser.getUserName(), projectName, scheduleId);
+                loggedInUser, projectName, scheduleId);
         Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
         return returnDataList(result);
     }
@@ -279,8 +300,10 @@ public class SchedulerController extends BaseController {
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     public Result queryScheduleList(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                     @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("login user {}, query schedule list, project name: {}",
-                loginUser.getUserName(), projectName);
+                loggedInUser, projectName);
         Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectName);
         return returnDataList(result);
     }
@@ -304,8 +327,10 @@ public class SchedulerController extends BaseController {
                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                   @RequestParam(value = "schedule") String schedule
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        projectName = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("login user {}, project name: {}, preview schedule: {}",
-                loginUser.getUserName(), projectName, schedule);
+                loggedInUser, projectName, schedule);
         Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
         return returnDataList(result);
     }

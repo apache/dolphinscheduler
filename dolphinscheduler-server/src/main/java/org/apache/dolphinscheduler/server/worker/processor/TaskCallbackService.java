@@ -180,7 +180,6 @@ public class TaskCallbackService {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if(future.isSuccess()){
                     remove(taskInstanceId);
-                    return;
                 }
             }
         });

@@ -33,7 +33,9 @@ public class ZooKeeperState {
 	private final String host;
 	private final int port;
 
-	private float minLatency = -1, avgLatency = -1, maxLatency = -1;
+	private float minLatency = -1;
+	private float avgLatency = -1;
+	private float maxLatency = -1;
 	private long received = -1;
 	private long sent = -1;
 	private int outStanding = -1;
@@ -44,12 +46,12 @@ public class ZooKeeperState {
 	private int connections = -1;
 
 	public ZooKeeperState(String connectionString) {
-		String host = connectionString.substring(0,
+		String subHost = connectionString.substring(0,
 				connectionString.indexOf(':'));
-		int port = Integer.parseInt(connectionString.substring(connectionString
+		int subPort = Integer.parseInt(connectionString.substring(connectionString
 				.indexOf(':') + 1));
-		this.host = host;
-		this.port = port;
+		this.host = subHost;
+		this.port = subPort;
 	}
 
 	public void getZookeeperInfo() {
@@ -77,7 +79,7 @@ public class ZooKeeperState {
 						nodeCount = Integer.parseInt(getStringValueFromLine(line));
 					}
 				}
-			} 	
+			}
 		}
 
 		String wchsText = cmd("wchs");
@@ -89,7 +91,7 @@ public class ZooKeeperState {
 						watches = Integer.parseInt(getStringValueFromLine(line));
 					}
 				}
-			}	
+			}
 		}
 
 		String consText = cmd("cons");
@@ -114,7 +116,7 @@ public class ZooKeeperState {
 
 
 	private String getStringValueFromLine(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
+		return line.substring(line.indexOf(":") + 1).replace(
 				" ", "").trim();
 	}
 
@@ -133,7 +135,6 @@ public class ZooKeeperState {
 				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
-				return;
 			}
 		}
 

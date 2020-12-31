@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,7 +42,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.*;
 /**
  * worker group controller
  */
-@Api(tags = "WORKER_GROUP_TAG", position = 1)
+@Api(tags = "WORKER_GROUP_TAG")
 @RestController
 @RequestMapping("/worker-group")
 public class WorkerGroupController extends BaseController {
@@ -77,8 +78,10 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam(value = "searchVal", required = false) String searchVal,
                                              @RequestParam("pageSize") Integer pageSize
     ) {
+        String loggedInUSer = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
-                loginUser.getUserName(), pageNo, pageSize, searchVal);
+                loggedInUSer, pageNo, pageSize, searchVal);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
@@ -97,8 +100,9 @@ public class WorkerGroupController extends BaseController {
     @ApiException(QUERY_WORKER_GROUP_FAIL)
     public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser
     ) {
+        String loggedInUSer = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("query all worker group: login user {}",
-                loginUser.getUserName());
+                loggedInUSer);
 
         Map<String, Object> result = workerGroupService.queryAllGroup();
         return returnDataList(result);

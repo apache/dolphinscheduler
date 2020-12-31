@@ -81,7 +81,8 @@ public class LoginController extends BaseController {
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
-        logger.info("login user name: {} ", StringUtils.replaceNRTtoUnderline(userName));
+        userName = StringUtils.replaceNRTtoUnderline(userName);
+        logger.info("login user name: {} ", userName);
 
         //user name check
         if (StringUtils.isEmpty(userName)) {
@@ -124,7 +125,8 @@ public class LoginController extends BaseController {
     @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
-        logger.info("login user:{} sign out", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user:{} sign out", loggedInUser);
         String ip = getClientIpAddress(request);
         sessionService.signOut(ip, loginUser);
         //clear session

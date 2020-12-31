@@ -25,6 +25,10 @@ import java.net.InetSocketAddress;
  */
 public class ChannelUtils {
 
+    private ChannelUtils() {
+        throw new IllegalStateException(ChannelUtils.class.getName());
+    }
+
     /**
      *  get local address
      *

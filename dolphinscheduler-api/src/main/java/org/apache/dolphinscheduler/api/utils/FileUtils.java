@@ -38,6 +38,10 @@ import java.nio.file.Paths;
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
+    private FileUtils() {
+        throw new IllegalStateException(FileUtils.class.getName());
+    }
+
     /**
      * copy source file to target file
      *

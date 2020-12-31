@@ -120,8 +120,12 @@ public class ResourcesController extends BaseController {
                                   @RequestParam(value = "description", required = false) String description,
                                   @RequestParam(value = "pid") int pid,
                                   @RequestParam(value = "currentDir") String currentDir) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        alias = StringUtils.replaceNRTtoUnderline(alias);
+        description = StringUtils.replaceNRTtoUnderline(description);
+        currentDir = StringUtils.replaceNRTtoUnderline(currentDir);
         logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
-                loginUser.getUserName(), type, alias, description, pid, currentDir);
+                loggedInUser, type, alias, description, pid, currentDir);
         return resourceService.createDirectory(loginUser, alias, description, type, pid, currentDir);
     }
 
@@ -154,8 +158,13 @@ public class ResourcesController extends BaseController {
                                  @RequestParam("file") MultipartFile file,
                                  @RequestParam(value = "pid") int pid,
                                  @RequestParam(value = "currentDir") String currentDir) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        alias = StringUtils.replaceNRTtoUnderline(alias);
+        description = StringUtils.replaceNRTtoUnderline(description);
+        String fileName = StringUtils.replaceNRTtoUnderline(file.getName());
+        String oFileName = StringUtils.replaceNRTtoUnderline(file.getOriginalFilename());
         logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
-                loginUser.getUserName(), type, alias, description, file.getName(), file.getOriginalFilename());
+                loggedInUser, type, alias, description, fileName, oFileName);
         return resourceService.createResource(loginUser, alias, description, type, file, pid, currentDir);
     }
 
@@ -186,8 +195,12 @@ public class ResourcesController extends BaseController {
                                  @RequestParam(value = "name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
                                  @RequestParam(value = "file" ,required = false) MultipartFile file) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        alias = StringUtils.replaceNRTtoUnderline(alias);
+        description = StringUtils.replaceNRTtoUnderline(description);
+        String fileName = StringUtils.replaceNRTtoUnderline(file.getName());
         logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}, file: {}",
-                loginUser.getUserName(), type, alias, description, file);
+                loggedInUser, type, alias, description, fileName);
         return resourceService.updateResource(loginUser, resourceId, alias, description, type, file);
     }
 
@@ -208,7 +221,8 @@ public class ResourcesController extends BaseController {
     public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "type") ResourceType type
     ) {
-        logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("query resource list, login user:{}, resource type:{}", loggedInUser, type);
         Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
         return returnDataList(result);
     }
@@ -241,8 +255,10 @@ public class ResourcesController extends BaseController {
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageSize") Integer pageSize
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
         logger.info("query resource list, login user:{}, resource type:{}, search value:{}",
-                loginUser.getUserName(), type, searchVal);
+                loggedInUser, type, searchVal);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -271,8 +287,9 @@ public class ResourcesController extends BaseController {
     public Result deleteResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id") int resourceId
     ) throws Exception {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, delete resource id: {}",
-                loginUser.getUserName(), resourceId);
+                loggedInUser, resourceId);
         return resourceService.delete(loginUser, resourceId);
     }
 
@@ -297,8 +314,10 @@ public class ResourcesController extends BaseController {
                                      @RequestParam(value = "fullName") String fullName,
                                      @RequestParam(value = "type") ResourceType type
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        fullName = StringUtils.replaceNRTtoUnderline(fullName);
         logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                loginUser.getUserName(), fullName, type);
+                loggedInUser, fullName, type);
 
         return resourceService.verifyResourceName(fullName, type, loginUser);
     }
@@ -322,9 +341,8 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "programType",required = false) ProgramType programType
     ) {
         String programTypeName = programType == null ? "" : programType.name();
-        String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n\r\t]", "_");
-        logger.info("query resource list, login user:{}, program type:{}", userName,programTypeName);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("query resource list, login user:{}, program type:{}", loggedInUser, programTypeName);
         Map<String, Object> result = resourceService.queryResourceByProgramType(loginUser, type,programType);
         return returnDataList(result);
     }
@@ -352,8 +370,10 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "id", required = false) Integer id,
                                 @RequestParam(value = "type") ResourceType type
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        fullName = StringUtils.replaceNRTtoUnderline(fullName);
         logger.info("login user {}, query resource by full name: {} or id: {},resource type: {}",
-                loginUser.getUserName(), fullName, id, type);
+                loggedInUser, fullName, id, type);
 
         return resourceService.queryResource(fullName, id, type);
     }
@@ -380,8 +400,9 @@ public class ResourcesController extends BaseController {
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, view resource : {}, skipLineNum {} , limit {}",
-                loginUser.getUserName(), resourceId, skipLineNum, limit);
+                loggedInUser, resourceId, skipLineNum, limit);
 
         return resourceService.readResource(resourceId, skipLineNum, limit);
     }
@@ -419,8 +440,13 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "pid") int pid,
                                        @RequestParam(value = "currentDir") String currentDir
     ) {
-        logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                loginUser.getUserName(), fileName, type, fileSuffix, description, content, pid, currentDir);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        fileName = StringUtils.replaceNRTtoUnderline(fileName);
+        fileSuffix = StringUtils.replaceNRTtoUnderline(fileSuffix);
+        description = StringUtils.replaceNRTtoUnderline(description);
+        content = StringUtils.replaceNRTtoUnderline(content);
+        logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {}, desc : {},content : {}",
+                loggedInUser, fileName, type, fileSuffix, description, content);
         if (StringUtils.isEmpty(content)) {
             logger.error("resource file contents are not allowed to be empty");
             return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
@@ -447,8 +473,9 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "id") int resourceId,
                                         @RequestParam(value = "content") String content
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, updateProcessInstance resource : {}",
-                loginUser.getUserName(), resourceId);
+                loggedInUser, resourceId);
         if (StringUtils.isEmpty(content)) {
             logger.error("The resource file contents are not allowed to be empty");
             return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
@@ -472,8 +499,9 @@ public class ResourcesController extends BaseController {
     @ApiException(DOWNLOAD_RESOURCE_FILE_ERROR)
     public ResponseEntity downloadResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "id") int resourceId) throws Exception {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, download resource : {}",
-                loginUser.getUserName(), resourceId);
+                loggedInUser, resourceId);
         Resource file = resourceService.downloadResource(resourceId);
         if (file == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.RESOURCE_NOT_EXIST.getMsg());
@@ -520,8 +548,13 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "resourceId") int resourceId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        funcName = StringUtils.replaceNRTtoUnderline(funcName);
+        argTypes = StringUtils.replaceNRTtoUnderline(argTypes);
+        database = StringUtils.replaceNRTtoUnderline(database);
+        description = StringUtils.replaceNRTtoUnderline(description);
         logger.info("login user {}, create udf function, type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
-                loginUser.getUserName(), type, funcName, argTypes, database, description, resourceId);
+                loggedInUser, type, funcName, argTypes, database, description, resourceId);
         return udfFuncService.createUdfFunction(loginUser, funcName, className, argTypes, database, description, type, resourceId);
     }
 
@@ -542,8 +575,9 @@ public class ResourcesController extends BaseController {
     @ApiException(VIEW_UDF_FUNCTION_ERROR)
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("id") int id) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, query udf{}",
-                loginUser.getUserName(), id);
+                loggedInUser, id);
         Map<String, Object> map = udfFuncService.queryUdfFuncDetail(id);
         return returnDataList(map);
     }
@@ -585,8 +619,13 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "database", required = false) String database,
                                 @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "resourceId") int resourceId) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        funcName = StringUtils.replaceNRTtoUnderline(funcName);
+        argTypes = StringUtils.replaceNRTtoUnderline(argTypes);
+        database = StringUtils.replaceNRTtoUnderline(database);
+        description = StringUtils.replaceNRTtoUnderline(description);
         logger.info("login user {}, updateProcessInstance udf function id: {},type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
-                loginUser.getUserName(), udfFuncId, type, funcName, argTypes, database, description, resourceId);
+                loggedInUser, udfFuncId, type, funcName, argTypes, database, description, resourceId);
         Map<String, Object> result = udfFuncService.updateUdfFunc(udfFuncId, funcName, className, argTypes, database, description, type, resourceId);
         return returnDataList(result);
     }
@@ -614,8 +653,10 @@ public class ResourcesController extends BaseController {
                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                    @RequestParam("pageSize") Integer pageSize
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
         logger.info("query udf functions list, login user:{},search value:{}",
-                loginUser.getUserName(), searchVal);
+                loggedInUser, searchVal);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -641,9 +682,8 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
-        String userName = loginUser.getUserName();
-        userName = userName.replaceAll("[\n|\r|\t]", "_");
-        logger.info("query udf func list, user:{}, type:{}", userName, type);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("query udf func list, user:{}, type:{}", loggedInUser, type);
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }
@@ -666,8 +706,10 @@ public class ResourcesController extends BaseController {
     public Result verifyUdfFuncName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name") String name
     ) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        name = StringUtils.replaceNRTtoUnderline(name);
         logger.info("login user {}, verfiy udf function name: {}",
-                loginUser.getUserName(), name);
+                loggedInUser, name);
 
         return udfFuncService.verifyUdfFuncByName(name);
     }
@@ -689,7 +731,8 @@ public class ResourcesController extends BaseController {
     public Result deleteUdfFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "id") int udfFuncId
     ) {
-        logger.info("login user {}, delete udf function id: {}", loginUser.getUserName(), udfFuncId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, delete udf function id: {}", loggedInUser, udfFuncId);
         return udfFuncService.delete(udfFuncId);
     }
 
@@ -709,7 +752,8 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
     public Result authorizedFile(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("userId") Integer userId) {
-        logger.info("authorized file resource, user: {}, user id:{}", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("authorized file resource, user: {}, user id:{}", loggedInUser, userId);
         Map<String, Object> result = resourceService.authorizedFile(loginUser, userId);
         return returnDataList(result);
     }
@@ -731,7 +775,8 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZE_RESOURCE_TREE)
     public Result authorizeResourceTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
-        logger.info("all resource file, user:{}, user id:{}", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("all resource file, user:{}, user id:{}", loggedInUser, userId);
         Map<String, Object> result = resourceService.authorizeResourceTree(loginUser, userId);
         return returnDataList(result);
     }
@@ -753,7 +798,8 @@ public class ResourcesController extends BaseController {
     @ApiException(UNAUTHORIZED_UDF_FUNCTION_ERROR)
     public Result unauthUDFFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("userId") Integer userId) {
-        logger.info("unauthorized udf function, login user:{}, unauthorized user id:{}", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("unauthorized udf function, login user:{}, unauthorized user id:{}", loggedInUser, userId);
 
         Map<String, Object> result = resourceService.unauthorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
@@ -776,7 +822,8 @@ public class ResourcesController extends BaseController {
     @ApiException(AUTHORIZED_UDF_FUNCTION_ERROR)
     public Result authorizedUDFFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
-        logger.info("auth udf function, login user:{}, auth user id:{}", loginUser.getUserName(), userId);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("auth udf function, login user:{}, auth user id:{}", loggedInUser, userId);
         Map<String, Object> result = resourceService.authorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
     }

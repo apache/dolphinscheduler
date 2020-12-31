@@ -93,8 +93,8 @@ public class DataSourceService extends BaseService {
             putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
-        Boolean isConnection = checkConnection(type, parameter);
-        if (!isConnection) {
+
+        if (Boolean.FALSE.equals(checkConnection(type, parameter))) {
             logger.info("connect failed, type:{}, parameter:{}", type, parameter);
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
@@ -168,8 +168,7 @@ public class DataSourceService extends BaseService {
         // connectionParams json
         String connectionParams = paramObject.toString();
 
-        Boolean isConnection = checkConnection(type, connectionParams);
-        if (!isConnection) {
+        if (Boolean.FALSE.equals(checkConnection(type, connectionParams))) {
             logger.info("connect failed, type:{}, parameter:{}", type, parameter);
             putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
             return result;
@@ -189,7 +188,7 @@ public class DataSourceService extends BaseService {
 
     private boolean checkName(String name) {
         List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
-        return queryDataSource != null && queryDataSource.size() > 0;
+        return queryDataSource != null && !queryDataSource.isEmpty();
     }
 
 
@@ -201,7 +200,7 @@ public class DataSourceService extends BaseService {
      */
     public Map<String, Object> queryDataSource(int id) {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -254,7 +253,7 @@ public class DataSourceService extends BaseService {
                 break;
         }
 
-        Map<String, String> otherMap = new LinkedHashMap<String, String>();
+        Map<String, String> otherMap = new LinkedHashMap<>();
         if (other != null) {
             String[] configs = other.split(separator);
             for (String config : configs) {
@@ -294,7 +293,7 @@ public class DataSourceService extends BaseService {
     public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
         IPage<DataSource> dataSourceList = null;
-        Page<DataSource> dataSourcePage = new Page(pageNo, pageSize);
+        Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
 
         if (isAdmin(loginUser)) {
             dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
@@ -304,7 +303,7 @@ public class DataSourceService extends BaseService {
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setLists(dataSources);
         result.put(Constants.DATA_LIST, pageInfo);
@@ -363,7 +362,8 @@ public class DataSourceService extends BaseService {
     public Result verifyDataSourceName(String name) {
         Result result = new Result();
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
-        if (dataSourceList != null && dataSourceList.size() > 0) {
+        if (dataSourceList != null && !dataSourceList.isEmpty()) {
+            name = org.apache.dolphinscheduler.common.utils.StringUtils.replaceNRTtoUnderline(name);
             logger.error("datasource name:{} has exist, can't create again.", name);
             putMsg(result, Status.DATASOURCE_EXIST);
         } else {
@@ -498,7 +498,7 @@ public class DataSourceService extends BaseService {
                                  String password, DbConnectType connectType, String other) {
 
         String address = buildAddress(type, host, port, connectType);
-        Map<String, Object> parameterMap = new LinkedHashMap<String, Object>(6);
+        Map<String, Object> parameterMap = new LinkedHashMap<>(6);
         String jdbcUrl;
         if (DbType.SQLSERVER == type) {
             jdbcUrl = address + ";databaseName=" + database;
@@ -655,13 +655,13 @@ public class DataSourceService extends BaseService {
         List<DataSource> resultList = new ArrayList<>();
         List<DataSource> datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
         Set<DataSource> datasourceSet = null;
-        if (datasourceList != null && datasourceList.size() > 0) {
+        if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
             List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
 
             Set<DataSource> authedDataSourceSet = null;
-            if (authedDataSourceList != null && authedDataSourceList.size() > 0) {
+            if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
                 authedDataSourceSet = new HashSet<>(authedDataSourceList);
                 datasourceSet.removeAll(authedDataSourceSet);
 

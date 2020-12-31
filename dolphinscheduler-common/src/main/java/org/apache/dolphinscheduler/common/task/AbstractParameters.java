@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,16 +27,10 @@ import java.util.Map;
  */
 public abstract class AbstractParameters implements IParameters {
 
-  @Override
-  public abstract boolean checkParameters();
-
-  @Override
-  public abstract List<ResourceInfo> getResourceFilesList();
-
   /**
    * local parameters
    */
-  public List<Property> localParams;
+  private List<Property> localParams;
 
   /**
    * get local parameters list

@@ -214,7 +214,7 @@ public class ProcedureTask extends AbstractTask {
                                                       Map<String, Property> paramsMap,
                                                       Collection<Property> userDefParamsList) throws Exception {
         Map<Integer,Property> outParameterMap = new HashMap<>();
-        if (userDefParamsList != null && userDefParamsList.size() > 0){
+        if (userDefParamsList != null && !userDefParamsList.isEmpty()){
             int index = 1;
             for (Property property : userDefParamsList){
                 logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"

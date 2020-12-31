@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * shell parameters

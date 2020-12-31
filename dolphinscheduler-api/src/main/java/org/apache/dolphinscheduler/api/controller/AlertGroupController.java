@@ -77,8 +77,11 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "groupType") AlertType groupType,
                                    @RequestParam(value = "description", required = false) String description) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        groupName = StringUtils.replaceNRTtoUnderline(groupName);
+        description = StringUtils.replaceNRTtoUnderline(description);
         logger.info("loginUser user {}, create alertgroup, groupName: {}, groupType: {}, desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
+                loggedInUser,
                 groupName, groupType, description);
         Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, groupType, description);
         return returnDataList(result);
@@ -95,9 +98,10 @@ public class AlertGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login  user {}, query all alertGroup",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()));
-        HashMap<String, Object> result = alertGroupService.queryAlertgroup();
+                loggedInUser);
+        Map<String, Object> result = alertGroupService.queryAlertgroup();
         return returnDataList(result);
     }
 
@@ -123,9 +127,10 @@ public class AlertGroupController extends BaseController {
                              @RequestParam(value = "searchVal", required = false) String searchVal,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam("pageSize") Integer pageSize) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
         logger.info("login  user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                pageNo, searchVal, pageSize);
+                loggedInUser, pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
@@ -161,9 +166,11 @@ public class AlertGroupController extends BaseController {
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "groupType") AlertType groupType,
                                    @RequestParam(value = "description", required = false) String description) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        groupName = StringUtils.replaceNRTtoUnderline(groupName);
+        description = StringUtils.replaceNRTtoUnderline(description);
         logger.info("login  user {}, updateProcessInstance alertgroup, groupName: {}, groupType: {}, desc: {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                groupName, groupType, description);
+                loggedInUser, groupName, groupType, description);
         Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, groupType, description);
         return returnDataList(result);
     }
@@ -184,7 +191,8 @@ public class AlertGroupController extends BaseController {
     @ApiException(DELETE_ALERT_GROUP_ERROR)
     public Result delAlertgroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "id") int id) {
-        logger.info("login user {}, delete AlertGroup, id: {},", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), id);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        logger.info("login user {}, delete AlertGroup, id: {},", loggedInUser, id);
         Map<String, Object> result = alertGroupService.delAlertgroupById(loginUser, id);
         return returnDataList(result);
     }
@@ -205,7 +213,9 @@ public class AlertGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
-        logger.info("login user {}, verify group name: {}", StringUtils.replaceNRTtoUnderline(loginUser.getUserName()), groupName);
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        groupName = StringUtils.replaceNRTtoUnderline(groupName);
+        logger.info("login user {}, verify group name: {}", loggedInUser, groupName);
 
         boolean exist = alertGroupService.existGroupName(groupName);
         Result result = new Result();
@@ -239,9 +249,9 @@ public class AlertGroupController extends BaseController {
     public Result grantUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                             @RequestParam(value = "alertgroupId") int alertgroupId,
                             @RequestParam(value = "userIds") String userIds) {
+        String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("login user {}, grant user, alertGroupId: {},userIds : {}",
-                StringUtils.replaceNRTtoUnderline(loginUser.getUserName()),
-                alertgroupId, userIds);
+                loggedInUser, alertgroupId, userIds);
         Map<String, Object> result = alertGroupService.grantUser(loginUser, alertgroupId, userIds);
         return returnDataList(result);
     }
