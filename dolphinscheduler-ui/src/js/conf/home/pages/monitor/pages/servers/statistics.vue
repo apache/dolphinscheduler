@@ -67,63 +67,63 @@
 </template>
 
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import mSpin from '@/module/components/spin/spin'
-  import themeData from '@/module/echarts/themeData.json'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import mSpin from '@/module/components/spin/spin'
+import themeData from '@/module/echarts/themeData.json'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'statistics',
-    data () {
-      return {
-        isLoading: false,
-        queueCount: {},
-        commandCountData: {},
-        color: themeData.color
+export default {
+  name: 'statistics',
+  data () {
+    return {
+      isLoading: false,
+      queueCount: {},
+      commandCountData: {},
+      color: themeData.color
+    }
+  },
+  props: {},
+  methods: {
+    // ...mapActions('monitor', ['getDatabaseData'])
+    // ...mapActions('projects', ['getCommandStateCount']),
+    ...mapActions('projects', ['getQueueCount']),
+    ...mapActions('projects', ['getCommandStateCount'])
+  },
+  watch: {},
+  created () {
+    this.isLoading = true
+    this.getQueueCount().then(res => {
+      this.queueCount = res.data
+      this.isLoading = false
+    }).catch(() => {
+      this.isLoading = false
+    })
+
+    this.getCommandStateCount().then(res => {
+      let normal = 0
+      let error = 0
+      _.forEach(res.data, (v, i) => {
+        const key = _.keys(v)
+        if (key[0] === 'errorCount') {
+          error = error + v.errorCount
+        }
+        if (key[1] === 'normalCount') {
+          normal = normal + v.normalCount
+        }
       }
-    },
-    props: {},
-    methods: {
-      // ...mapActions('monitor', ['getDatabaseData'])
-      // ...mapActions('projects', ['getCommandStateCount']),
-      ...mapActions('projects', ['getQueueCount']),
-      ...mapActions('projects', ['getCommandStateCount'])
-    },
-    watch: {},
-    created () {
-      this.isLoading = true
-      this.getQueueCount().then(res => {
-        this.queueCount = res.data
-        this.isLoading = false
-      }).catch(() => {
-        this.isLoading = false
-      })
-
-      this.getCommandStateCount().then(res => {
-        let normal = 0
-        let error = 0
-        _.forEach(res.data, (v, i) => {
-          let key = _.keys(v)
-          if (key[0] === 'errorCount') {
-            error = error + v.errorCount
-          }
-          if (key[1] === 'normalCount') {
-            normal = normal + v.normalCount
-          }
-        }
-        )
-        this.commandCountData = {
-          normalCount: normal,
-          errorCount: error
-        }
-      }).catch(() => {
-      })
-    },
-    mounted () {
-    },
-    components: { mListConstruction, mSpin }
-  }
+      )
+      this.commandCountData = {
+        normalCount: normal,
+        errorCount: error
+      }
+    }).catch(() => {
+    })
+  },
+  mounted () {
+  },
+  components: { mListConstruction, mSpin }
+}
 
 </script>
 <style lang="scss" rel="stylesheet/scss">

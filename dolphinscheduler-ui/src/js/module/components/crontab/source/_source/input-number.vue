@@ -22,78 +22,78 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'input-number',
-    data () {
-      return {
-        value: 1,
-        isIncrease: false,
-        isReduce: false
-      }
+export default {
+  name: 'input-number',
+  data () {
+    return {
+      value: 1,
+      isIncrease: false,
+      isReduce: false
+    }
+  },
+  props: {
+    min: {
+      type: Number,
+      default: 0
     },
-    props: {
-      min: {
-        type: Number,
-        default: 0
-      },
-      max: {
-        type: Number,
-        default: 10
-      },
-      propsValue: Number
+    max: {
+      type: Number,
+      default: 10
     },
-    methods: {
-      onBlur () {
+    propsValue: Number
+  },
+  methods: {
+    onBlur () {
         let $reg = /^\+?[1-9][0-9]*$/　　// eslint-disable-line
-        let $val = this.value
-        // if (parseInt($val) >= this.min || parseInt($val) <= this.max) {
-        //   return
-        // }
-        // Verify integer
-        if (!$reg.test($val)) {
-          this.value = this.min
-        }
-        // Maximum value
-        if (this.value > this.max) {
-          this.value = this.max
-        }
-        // minimum value
-        if (this.min > this.value) {
-          this.value = this.min
-        }
-        this.$emit('on-number', this.value)
-      },
-      onIncrease () {
-        this.value = parseInt(this.value) + 1
-        this.$emit('on-number', this.value)
-      },
-      onReduce () {
-        this.value = parseInt(this.value) - 1
-        this.$emit('on-number', this.value)
+      const $val = this.value
+      // if (parseInt($val) >= this.min || parseInt($val) <= this.max) {
+      //   return
+      // }
+      // Verify integer
+      if (!$reg.test($val)) {
+        this.value = this.min
       }
+      // Maximum value
+      if (this.value > this.max) {
+        this.value = this.max
+      }
+      // minimum value
+      if (this.min > this.value) {
+        this.value = this.min
+      }
+      this.$emit('on-number', this.value)
     },
-    watch: {
+    onIncrease () {
+      this.value = parseInt(this.value) + 1
+      this.$emit('on-number', this.value)
     },
-    beforeCreate () {
-    },
-    created () {
-      this.value = this.propsValue ? this.propsValue : this.min
-    },
-    beforeMount () {
-    },
-    mounted () {
-    },
-    beforeUpdate () {
-    },
-    updated () {
-    },
-    beforeDestroy () {
-    },
-    destroyed () {
-    },
-    computed: {},
-    components: {}
-  }
+    onReduce () {
+      this.value = parseInt(this.value) - 1
+      this.$emit('on-number', this.value)
+    }
+  },
+  watch: {
+  },
+  beforeCreate () {
+  },
+  created () {
+    this.value = this.propsValue ? this.propsValue : this.min
+  },
+  beforeMount () {
+  },
+  mounted () {
+  },
+  beforeUpdate () {
+  },
+  updated () {
+  },
+  beforeDestroy () {
+  },
+  destroyed () {
+  },
+  computed: {},
+  components: {}
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

@@ -61,49 +61,49 @@
   </div>
 </template>
 <script>
-  import { mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 
-  export default {
-    name: 'tenement-list',
-    data () {
-      return {
-        list: []
-      }
+export default {
+  name: 'tenement-list',
+  data () {
+    return {
+      list: []
+    }
+  },
+  props: {
+    tenementList: Array,
+    pageNo: Number,
+    pageSize: Number
+  },
+  methods: {
+    ...mapActions('security', ['deleteQueue']),
+    _delete (item, i) {
+      this.deleteQueue({
+        id: item.id
+      }).then(res => {
+        this.$emit('on-update')
+        this.$message.success(res.msg)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
     },
-    props: {
-      tenementList: Array,
-      pageNo: Number,
-      pageSize: Number
-    },
-    methods: {
-      ...mapActions('security', ['deleteQueue']),
-      _delete (item, i) {
-        this.deleteQueue({
-          id: item.id
-        }).then(res => {
-          this.$emit('on-update')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      _edit (item) {
-        this.$emit('on-edit', item)
-      }
-    },
-    watch: {
-      tenementList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
-      }
-    },
-    created () {
-      this.list = this.tenementList
-    },
-    mounted () {
-    },
-    components: { }
-  }
+    _edit (item) {
+      this.$emit('on-edit', item)
+    }
+  },
+  watch: {
+    tenementList (a) {
+      this.list = []
+      setTimeout(() => {
+        this.list = a
+      })
+    }
+  },
+  created () {
+    this.list = this.tenementList
+  },
+  mounted () {
+  },
+  components: { }
+}
 </script>

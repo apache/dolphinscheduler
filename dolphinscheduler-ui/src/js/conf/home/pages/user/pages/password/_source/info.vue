@@ -55,79 +55,79 @@
   </div>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import { mapState, mapActions } from 'vuex'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import i18n from '@/module/i18n'
+import { mapState, mapActions } from 'vuex'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-  export default {
-    name: 'password-info',
-    data () {
-      return {
-        // loading
-        spinnerLoading: false,
-        // user password
-        userPassword: '',
-        // Confirm password
-        oldUserPassword: ''
-      }
-    },
-    props: {},
-    methods: {
-      ...mapActions('user', ['signOut']),
-      ...mapActions('security', ['updateUser']),
-      /**
+export default {
+  name: 'password-info',
+  data () {
+    return {
+      // loading
+      spinnerLoading: false,
+      // user password
+      userPassword: '',
+      // Confirm password
+      oldUserPassword: ''
+    }
+  },
+  props: {},
+  methods: {
+    ...mapActions('user', ['signOut']),
+    ...mapActions('security', ['updateUser']),
+    /**
        * edit
        */
-      _edit () {
-        // verification
-        if (this._verification()) {
-          let param = {
-            id: this.userInfo.id,
-            userName: this.userInfo.userName,
-            userPassword: this.userPassword,
-            tenantId: this.userInfo.tenantId,
-            email: this.userInfo.email,
-            phone: this.userInfo.phone,
-            state: this.userInfo.state
-          }
-          this.spinnerLoading = true
-          this.updateUser(param).then(res => {
-            this.$message.success(res.msg)
-            setTimeout(() => {
-              this.spinnerLoading = false
-              this.signOut()
-            }, 1500)
-          }).catch(e => {
-            this.$message.error(e.msg || '')
+    _edit () {
+      // verification
+      if (this._verification()) {
+        const param = {
+          id: this.userInfo.id,
+          userName: this.userInfo.userName,
+          userPassword: this.userPassword,
+          tenantId: this.userInfo.tenantId,
+          email: this.userInfo.email,
+          phone: this.userInfo.phone,
+          state: this.userInfo.state
+        }
+        this.spinnerLoading = true
+        this.updateUser(param).then(res => {
+          this.$message.success(res.msg)
+          setTimeout(() => {
             this.spinnerLoading = false
-          })
-        }
-      },
-      /**
-       * verification
-       */
-      _verification () {
-        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
-
-        // password
-        if (!regPassword.test(this.userPassword)) {
-          this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
-          return false
-        }
-
-        // confirm password
-        if (this.userPassword !== this.oldUserPassword) {
-          this.$message.warning(`${i18n.$t('The password is inconsistent with the confirmation password')}`)
-          return false
-        }
-        return true
+            this.signOut()
+          }, 1500)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          this.spinnerLoading = false
+        })
       }
     },
-    computed: {
-      ...mapState('user', ['userInfo'])
-    },
-    components: { mListBoxF }
-  }
+    /**
+       * verification
+       */
+    _verification () {
+      const regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,./;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/
+
+      // password
+      if (!regPassword.test(this.userPassword)) {
+        this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+        return false
+      }
+
+      // confirm password
+      if (this.userPassword !== this.oldUserPassword) {
+        this.$message.warning(`${i18n.$t('The password is inconsistent with the confirmation password')}`)
+        return false
+      }
+      return true
+    }
+  },
+  computed: {
+    ...mapState('user', ['userInfo'])
+  },
+  components: { mListBoxF }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

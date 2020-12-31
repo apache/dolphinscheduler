@@ -91,75 +91,75 @@
 </template>
 
 <script>
-  import mNoData from '@/module/components/noData/noData'
+import mNoData from '@/module/components/noData/noData'
 
-  export default {
-    name: 'versions',
-    data () {
-      return {
-        tableHeaders: [
-          {
-            label: 'version',
-            prop: 'version'
-          },
-          {
-            label: 'createTime',
-            prop: 'createTime'
-          }
-        ]
-      }
-    },
-    props: {
-      versionData: Object
-    },
-    methods: {
-      /**
+export default {
+  name: 'versions',
+  data () {
+    return {
+      tableHeaders: [
+        {
+          label: 'version',
+          prop: 'version'
+        },
+        {
+          label: 'createTime',
+          prop: 'createTime'
+        }
+      ]
+    }
+  },
+  props: {
+    versionData: Object
+  },
+  methods: {
+    /**
        * switch version in process definition version list
        */
-      _mVersionSwitchProcessDefinitionVersion (item) {
-        this.$emit('mVersionSwitchProcessDefinitionVersion', {
-          version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
-          fromThis: this
-        })
-      },
+    _mVersionSwitchProcessDefinitionVersion (item) {
+      this.$emit('mVersionSwitchProcessDefinitionVersion', {
+        version: item.version,
+        processDefinitionId: this.versionData.processDefinition.id,
+        fromThis: this
+      })
+    },
 
-      /**
+    /**
        * delete one version of process definition
        */
-      _mVersionDeleteProcessDefinitionVersion (item) {
-        this.$emit('mVersionDeleteProcessDefinitionVersion', {
-          version: item.version,
-          processDefinitionId: this.versionData.processDefinition.id,
-          fromThis: this
-        })
-      },
+    _mVersionDeleteProcessDefinitionVersion (item) {
+      this.$emit('mVersionDeleteProcessDefinitionVersion', {
+        version: item.version,
+        processDefinitionId: this.versionData.processDefinition.id,
+        fromThis: this
+      })
+    },
 
-      /**
+    /**
        * Paging event of process definition versions
        */
-      _mVersionGetProcessDefinitionVersionsPage (val) {
-        this.$emit('mVersionGetProcessDefinitionVersionsPage', {
-          pageNo: val,
-          pageSize: this.pageSize,
-          processDefinitionId: this.versionData.processDefinition.id,
-          fromThis: this
-        })
-      },
-      /**
+    _mVersionGetProcessDefinitionVersionsPage (val) {
+      this.$emit('mVersionGetProcessDefinitionVersionsPage', {
+        pageNo: val,
+        pageSize: this.pageSize,
+        processDefinitionId: this.versionData.processDefinition.id,
+        fromThis: this
+      })
+    },
+    /**
        * Close and destroy component and component internal events
        */
-      _close () {
-        // flag Whether to delete a node this.$destroy()
-        this.$emit('closeVersion')
-      }
-    },
-    created () {
-    },
-    mounted () {
-    },
-    components: { mNoData }
-  }
+    _close () {
+      // flag Whether to delete a node this.$destroy()
+      this.$emit('closeVersion')
+    }
+  },
+  created () {
+  },
+  mounted () {
+  },
+  components: { mNoData }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

@@ -22,13 +22,13 @@
   </m-list-construction>
 </template>
 <script>
-  import mInfo from './_source/info'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import mInfo from './_source/info'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'password-index',
-    mounted () {
-    },
-    components: { mListConstruction, mInfo }
-  }
+export default {
+  name: 'password-index',
+  mounted () {
+  },
+  components: { mListConstruction, mInfo }
+}
 </script>

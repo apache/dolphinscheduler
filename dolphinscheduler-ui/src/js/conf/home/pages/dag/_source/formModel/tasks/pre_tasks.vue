@@ -44,66 +44,66 @@
   </div>
 </template>
 <script>
-  import disabledState from '@/module/mixin/disabledState'
-  export default {
-    name: 'pre_tasks',
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object
-    },
-    data () {
-      return {
-        preTasksSelectorId: '_preTasksSelectorId', // Refresh target vue-component by changing id
-        preTasks: [],
-        preTasksOld: []
-      }
-    },
-    mounted () {
-      this.preTasks = this.backfillItem.preTasks || this.preTasks
-      this.preTasksOld = this.preTasks
+import disabledState from '@/module/mixin/disabledState'
+export default {
+  name: 'pre_tasks',
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object
+  },
+  data () {
+    return {
+      preTasksSelectorId: '_preTasksSelectorId', // Refresh target vue-component by changing id
+      preTasks: [],
+      preTasksOld: []
+    }
+  },
+  mounted () {
+    this.preTasks = this.backfillItem.preTasks || this.preTasks
+    this.preTasksOld = this.preTasks
 
-      // Refresh target vue-component by changing id
-      this.$nextTick(() => {
-        this.preTasksSelectorId = 'preTasksSelectorId'
-      })
-    },
-    computed: {
-      preTaskList: function () {
-        let currentTaskId = this.backfillItem.id || this.id
-        let cacheTasks = Object.assign({}, this.store.state.dag.tasks)
-        let keys = Object.keys(cacheTasks)
-        for (let i = 0; i < keys.length; i++) {
-          let key = keys[i]
-          if ((!cacheTasks[key].id || !cacheTasks[key].name) || (currentTaskId && cacheTasks[key].id === currentTaskId)) {
-            // Clean undefined and current task data
-            delete cacheTasks[key]
-          }
+    // Refresh target vue-component by changing id
+    this.$nextTick(() => {
+      this.preTasksSelectorId = 'preTasksSelectorId'
+    })
+  },
+  computed: {
+    preTaskList: function () {
+      const currentTaskId = this.backfillItem.id || this.id
+      const cacheTasks = Object.assign({}, this.store.state.dag.tasks)
+      const keys = Object.keys(cacheTasks)
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]
+        if ((!cacheTasks[key].id || !cacheTasks[key].name) || (currentTaskId && cacheTasks[key].id === currentTaskId)) {
+          // Clean undefined and current task data
+          delete cacheTasks[key]
         }
+      }
 
-        return cacheTasks
-      },
-      // preTaskIds used to create new connection
-      preTasksToAdd: function () {
-        let toAddTasks = this.preTasks.filter(taskId => {
-          return (this.preTasksOld.indexOf(taskId) === -1)
-        })
-        return toAddTasks
-      },
-      // preTaskIds used to delete connection
-      preTasksToDelete: function () {
-        return this.preTasksOld.filter(taskId => this.preTasks.indexOf(taskId) === -1)
-      }
+      return cacheTasks
     },
-    methods: {
-      // Pass data to parent-level to process dag
-      _verification () {
-        this.$emit('on-pre-tasks', {
-          preTasks: this.preTasks,
-          preTasksToAdd: this.preTasksToAdd,
-          preTasksToDelete: this.preTasksToDelete
-        })
-        return true
-      }
+    // preTaskIds used to create new connection
+    preTasksToAdd: function () {
+      const toAddTasks = this.preTasks.filter(taskId => {
+        return (this.preTasksOld.indexOf(taskId) === -1)
+      })
+      return toAddTasks
+    },
+    // preTaskIds used to delete connection
+    preTasksToDelete: function () {
+      return this.preTasksOld.filter(taskId => this.preTasks.indexOf(taskId) === -1)
+    }
+  },
+  methods: {
+    // Pass data to parent-level to process dag
+    _verification () {
+      this.$emit('on-pre-tasks', {
+        preTasks: this.preTasks,
+        preTasksToAdd: this.preTasksToAdd,
+        preTasksToDelete: this.preTasksToDelete
+      })
+      return true
     }
   }
+}
 </script>

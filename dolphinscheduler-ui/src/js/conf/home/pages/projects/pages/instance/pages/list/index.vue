@@ -46,162 +46,162 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import mList from './_source/list'
-  import mSpin from '@/module/components/spin/spin'
-  import localStore from '@/module/util/localStorage'
-  import { setUrlParams } from '@/module/util/routerUtil'
-  import mNoData from '@/module/components/noData/noData'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/processInstance'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import mList from './_source/list'
+import mSpin from '@/module/components/spin/spin'
+import localStore from '@/module/util/localStorage'
+import { setUrlParams } from '@/module/util/routerUtil'
+import mNoData from '@/module/components/noData/noData'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/processInstance'
 
-  export default {
-    name: 'instance-list-index',
-    data () {
-      return {
-        // loading
-        isLoading: true,
-        // total
-        total: null,
-        // data
-        processInstanceList: [],
-        // Parameter
-        searchParams: {
-          // Search keywords
-          searchVal: '',
-          // Number of pages
-          pageSize: 10,
-          // Current page
-          pageNo: 1,
-          // host
-          host: '',
-          // State
-          stateType: '',
-          // Start Time
-          startDate: '',
-          // End Time
-          endDate: '',
-          // Exectuor Name
-          executorName: ''
-        },
-        isLeft: true
-      }
-    },
-    props: {},
-    methods: {
-      ...mapActions('dag', ['getProcessInstance']),
-      /**
+export default {
+  name: 'instance-list-index',
+  data () {
+    return {
+      // loading
+      isLoading: true,
+      // total
+      total: null,
+      // data
+      processInstanceList: [],
+      // Parameter
+      searchParams: {
+        // Search keywords
+        searchVal: '',
+        // Number of pages
+        pageSize: 10,
+        // Current page
+        pageNo: 1,
+        // host
+        host: '',
+        // State
+        stateType: '',
+        // Start Time
+        startDate: '',
+        // End Time
+        endDate: '',
+        // Exectuor Name
+        executorName: ''
+      },
+      isLeft: true
+    }
+  },
+  props: {},
+  methods: {
+    ...mapActions('dag', ['getProcessInstance']),
+    /**
        * Query
        */
-      _onQuery (o) {
-        this.searchParams = _.assign(this.searchParams, o)
-        setUrlParams(this.searchParams)
-        this._debounceGET()
-      },
-      /**
+    _onQuery (o) {
+      this.searchParams = _.assign(this.searchParams, o)
+      setUrlParams(this.searchParams)
+      this._debounceGET()
+    },
+    /**
        * Paging event
        */
-      _page (val) {
-        this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
-      },
-      _pageSize (val) {
-        this.searchParams.pageSize = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
-      },
-      /**
+    _page (val) {
+      this.searchParams.pageNo = val
+      setUrlParams(this.searchParams)
+      this._debounceGET()
+    },
+    _pageSize (val) {
+      this.searchParams.pageSize = val
+      setUrlParams(this.searchParams)
+      this._debounceGET()
+    },
+    /**
        * get list data
        */
-      _getProcessInstanceListP (flag) {
-        this.isLoading = !flag
-        this.getProcessInstance(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo - 1
-          } else {
-            this.processInstanceList = []
-            this.processInstanceList = res.totalList
-            this.total = res.total
-            this.isLoading = false
-          }
-        }).catch(e => {
+    _getProcessInstanceListP (flag) {
+      this.isLoading = !flag
+      this.getProcessInstance(this.searchParams).then(res => {
+        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+          this.searchParams.pageNo = this.searchParams.pageNo - 1
+        } else {
+          this.processInstanceList = []
+          this.processInstanceList = res.totalList
+          this.total = res.total
           this.isLoading = false
-        })
-      },
-      /**
+        }
+      }).catch(e => {
+        this.isLoading = false
+      })
+    },
+    /**
        * update
        */
-      _onUpdate () {
-        this._debounceGET()
-      },
-      /**
+    _onUpdate () {
+      this._debounceGET()
+    },
+    /**
        * Routing changes
        */
-      _routerView () {
-        return this.$route.name === 'projects-instance-details'
-      },
-      /**
+    _routerView () {
+      return this.$route.name === 'projects-instance-details'
+    },
+    /**
        * Anti shake request interface
        * @desc Prevent functions from being called multiple times
        */
-      _debounceGET: _.debounce(function (flag) {
-        if (sessionStorage.getItem('isLeft') === 0) {
-          this.isLeft = false
-        } else {
-          this.isLeft = true
-        }
-        this._getProcessInstanceListP(flag)
-      }, 100, {
-        leading: false,
-        trailing: true
-      })
-    },
-    watch: {
-      // Routing changes
-      '$route' (a, b) {
-        if (a.name === 'instance' && b.name === 'projects-instance-details') {
-          this._debounceGET()
-        } else {
-          // url no params get instance list
-          this.searchParams.pageNo = !_.isEmpty(a.query) && a.query.pageNo || 1
-        }
-      },
-      searchParams: {
-        deep: true,
-        handler () {
-          this._debounceGET()
-        }
+    _debounceGET: _.debounce(function (flag) {
+      if (sessionStorage.getItem('isLeft') === 0) {
+        this.isLeft = false
+      } else {
+        this.isLeft = true
+      }
+      this._getProcessInstanceListP(flag)
+    }, 100, {
+      leading: false,
+      trailing: true
+    })
+  },
+  watch: {
+    // Routing changes
+    '$route' (a, b) {
+      if (a.name === 'instance' && b.name === 'projects-instance-details') {
+        this._debounceGET()
+      } else {
+        // url no params get instance list
+        this.searchParams.pageNo = !_.isEmpty(a.query) && a.query.pageNo || 1
       }
     },
-    created () {
-      // Delete process definition ID
-      localStore.removeItem('subProcessId')
-
-      // Route parameter merge
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
-
-      // Judge the request data according to the route
-      if (!this._routerView()) {
+    searchParams: {
+      deep: true,
+      handler () {
         this._debounceGET()
       }
-    },
-    mounted () {
-      // Cycle acquisition status
-      this.setIntervalP = setInterval(() => {
-        this._debounceGET('false')
-      }, 90000)
-    },
-    beforeDestroy () {
-      // Destruction wheel
-      clearInterval(this.setIntervalP)
-      sessionStorage.setItem('isLeft', 1)
-    },
-    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
-  }
+    }
+  },
+  created () {
+    // Delete process definition ID
+    localStore.removeItem('subProcessId')
+
+    // Route parameter merge
+    if (!_.isEmpty(this.$route.query)) {
+      this.searchParams = _.assign(this.searchParams, this.$route.query)
+    }
+
+    // Judge the request data according to the route
+    if (!this._routerView()) {
+      this._debounceGET()
+    }
+  },
+  mounted () {
+    // Cycle acquisition status
+    this.setIntervalP = setInterval(() => {
+      this._debounceGET('false')
+    }, 90000)
+  },
+  beforeDestroy () {
+    // Destruction wheel
+    clearInterval(this.setIntervalP)
+    sessionStorage.setItem('isLeft', 1)
+  },
+  components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

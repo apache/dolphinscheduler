@@ -70,134 +70,134 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import { positionList } from './commcon'
-  import disabledState from '@/module/mixin/disabledState'
-  export default {
-    name: 'http-params',
-    data () {
-      return {
-        // Increased data
-        httpParamsList: [],
-        // Current execution index
-        httpParamsIndex: null,
-        // 参数位置的下拉框
-        positionList: positionList
-      }
-    },
-    mixins: [disabledState],
-    props: {
-      udpList: Array,
-      // hide direct/type
-      hide: {
-        type: Boolean,
-        default: true
-      }
-    },
-    methods: {
-      /**
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import { positionList } from './commcon'
+import disabledState from '@/module/mixin/disabledState'
+export default {
+  name: 'http-params',
+  data () {
+    return {
+      // Increased data
+      httpParamsList: [],
+      // Current execution index
+      httpParamsIndex: null,
+      // 参数位置的下拉框
+      positionList: positionList
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    udpList: Array,
+    // hide direct/type
+    hide: {
+      type: Boolean,
+      default: true
+    }
+  },
+  methods: {
+    /**
        * Current index
        */
-      _getIndex (index) {
-        this.httpParamsIndex = index
-      },
-      /**
+    _getIndex (index) {
+      this.httpParamsIndex = index
+    },
+    /**
        * 获取参数位置
        */
-      _handlePositionChanged () {
-        this._verifProp('value')
-      },
-      /**
+    _handlePositionChanged () {
+      this._verifProp('value')
+    },
+    /**
        * delete item
        */
-      _removeUdp (index) {
-        this.httpParamsList.splice(index, 1)
-        this._verifProp('value')
-      },
-      /**
+    _removeUdp (index) {
+      this.httpParamsList.splice(index, 1)
+      this._verifProp('value')
+    },
+    /**
        * add
        */
-      _addUdp () {
-        this.httpParamsList.push({
-          prop: '',
-          httpParametersType: 'PARAMETER',
-          value: ''
-        })
-      },
-      /**
+    _addUdp () {
+      this.httpParamsList.push({
+        prop: '',
+        httpParametersType: 'PARAMETER',
+        value: ''
+      })
+    },
+    /**
        * blur verification
        */
-      _handleValue () {
-        this._verifValue('value')
-      },
-      /**
+    _handleValue () {
+      this._verifValue('value')
+    },
+    /**
        * Verify that the value exists or is empty
        */
-      _verifProp (type) {
-        let arr = []
-        let flag = true
-        _.map(this.httpParamsList, v => {
-          arr.push(v.prop)
-          if (!v.prop) {
-            flag = false
-          }
-          if (v.value === '') {
-            this.$message.warning(`${i18n.$t('value is empty')}`)
-            return false
-          }
-        })
-        if (!flag) {
-          if (!type) {
-            this.$message.warning(`${i18n.$t('prop is empty')}`)
-          }
-          return false
+    _verifProp (type) {
+      const arr = []
+      let flag = true
+      _.map(this.httpParamsList, v => {
+        arr.push(v.prop)
+        if (!v.prop) {
+          flag = false
         }
-        let newArr = _.cloneDeep(_.uniqWith(arr, _.isEqual))
-        if (newArr.length !== arr.length) {
-          if (!type) {
-            this.$message.warning(`${i18n.$t('prop is repeat')}`)
-          }
-          return false
-        }
-        this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
-        return true
-      },
-      _verifValue (type) {
-        let arr = []
-        let flag = true
-        _.map(this.httpParamsList, v => {
-          arr.push(v.value)
-          if (!v.value) {
-            flag = false
-          }
-        })
-        if (!flag) {
+        if (v.value === '') {
           this.$message.warning(`${i18n.$t('value is empty')}`)
           return false
         }
-        this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
-        return true
+      })
+      if (!flag) {
+        if (!type) {
+          this.$message.warning(`${i18n.$t('prop is empty')}`)
+        }
+        return false
       }
-    },
-    watch: {
-      // Monitor data changes
-      udpList () {
-        this.httpParamsList = this.udpList
+      const newArr = _.cloneDeep(_.uniqWith(arr, _.isEqual))
+      if (newArr.length !== arr.length) {
+        if (!type) {
+          this.$message.warning(`${i18n.$t('prop is repeat')}`)
+        }
+        return false
       }
+      this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
+      return true
     },
-    created () {
+    _verifValue (type) {
+      const arr = []
+      let flag = true
+      _.map(this.httpParamsList, v => {
+        arr.push(v.value)
+        if (!v.value) {
+          flag = false
+        }
+      })
+      if (!flag) {
+        this.$message.warning(`${i18n.$t('value is empty')}`)
+        return false
+      }
+      this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
+      return true
+    }
+  },
+  watch: {
+    // Monitor data changes
+    udpList () {
       this.httpParamsList = this.udpList
-    },
-    computed: {
-      inputStyle () {
-        return 'width:30%'
-      }
-    },
-    mounted () {
-    },
-    components: { }
-  }
+    }
+  },
+  created () {
+    this.httpParamsList = this.udpList
+  },
+  computed: {
+    inputStyle () {
+      return 'width:30%'
+    }
+  },
+  mounted () {
+  },
+  components: { }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

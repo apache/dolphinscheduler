@@ -32,10 +32,10 @@ const formatDate = (value, fmt) => {
  * Formatting iso date
  */
 const formatISODate = date => {
-  let [datetime, timezone] = date.split('+')
+  const [datetime, timezone] = date.split('+')
   if (!timezone || timezone.indexOf(':') >= 0) return date
-  let hourOfTz = timezone.substring(0, 2) || '00'
-  let secondOfTz = timezone.substring(2, 4) || '00'
+  const hourOfTz = timezone.substring(0, 2) || '00'
+  const secondOfTz = timezone.substring(2, 4) || '00'
   return `${datetime}+${hourOfTz}:${secondOfTz}`
 }
 /**

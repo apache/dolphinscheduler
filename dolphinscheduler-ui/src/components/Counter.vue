@@ -24,30 +24,30 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      factor: { type: Number, default: 1 }
+export default {
+  props: {
+    factor: { type: Number, default: 1 }
+  },
+  data () {
+    return {
+      count: 0
+    }
+  },
+  methods: {
+    inc () {
+      this.count++
     },
-    data () {
-      return {
-        count: 0
-      }
+    dec () {
+      this.count--
     },
-    methods: {
-      inc () {
-        this.count++
-      },
-      dec () {
-        this.count--
-      },
-      reset () {
-        this.count = 0
-      }
-    },
-    computed: {
-      computedCount: function () {
-        return this.count * this.factor
-      }
+    reset () {
+      this.count = 0
+    }
+  },
+  computed: {
+    computedCount: function () {
+      return this.count * this.factor
     }
   }
+}
 </script>

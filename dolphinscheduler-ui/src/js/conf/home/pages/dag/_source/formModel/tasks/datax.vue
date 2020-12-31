@@ -165,261 +165,184 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
-  import mDatasource from './_source/datasource'
-  import mLocalParams from './_source/localParams'
-  import mStatementList from './_source/statementList'
-  import disabledState from '@/module/mixin/disabledState'
-  import mSelectInput from '../_source/selectInput'
-  import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import mListBox from './_source/listBox'
+import mScriptBox from './_source/scriptBox'
+import mDatasource from './_source/datasource'
+import mLocalParams from './_source/localParams'
+import mStatementList from './_source/statementList'
+import disabledState from '@/module/mixin/disabledState'
+import mSelectInput from '../_source/selectInput'
+import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
-  let editor
-  let jsonEditor
+let editor
+let jsonEditor
 
-  export default {
-    name: 'datax',
+export default {
+  name: 'datax',
 
-    data () {
-      return {
-        // Data Custom template
-        enable: false,
-        // Data source type
-        dsType: '',
-        // data source
-        datasource: '',
-        // Data source type
-        dtType: '',
-        // data source
-        datatarget: '',
-        // Return to the selected data source
-        rtDatasource: '',
-        // Return to the selected data target
-        rtDatatarget: '',
-        // Sql statement
-        sql: '',
-        json: '',
-        // target table
-        targetTable: '',
-        // Pre statements
-        preStatements: [],
-        // Post statements
-        postStatements: [],
-        // speed byte
-        jobSpeedByte: 0,
-        // speed record
-        jobSpeedRecord: 1000,
-        // Custom parameter
-        localParams: [],
-        customConfig: 0,
-        // jvm memory xms
-        xms: 1,
-        // jvm memory xms
-        xmx: 1,
-        scriptBoxDialog: false,
-        item: ''
+  data () {
+    return {
+      // Data Custom template
+      enable: false,
+      // Data source type
+      dsType: '',
+      // data source
+      datasource: '',
+      // Data source type
+      dtType: '',
+      // data source
+      datatarget: '',
+      // Return to the selected data source
+      rtDatasource: '',
+      // Return to the selected data target
+      rtDatatarget: '',
+      // Sql statement
+      sql: '',
+      json: '',
+      // target table
+      targetTable: '',
+      // Pre statements
+      preStatements: [],
+      // Post statements
+      postStatements: [],
+      // speed byte
+      jobSpeedByte: 0,
+      // speed record
+      jobSpeedRecord: 1000,
+      // Custom parameter
+      localParams: [],
+      customConfig: 0,
+      // jvm memory xms
+      xms: 1,
+      // jvm memory xms
+      xmx: 1,
+      scriptBoxDialog: false,
+      item: ''
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object,
+    createNodeId: Number
+  },
+  methods: {
+    setEditorVal () {
+      this.item = editor.getValue()
+      this.scriptBoxDialog = true
+    },
+    getSriptBoxValue (val) {
+      editor.setValue(val)
+    },
+    _onSwitch (is) {
+      if (is) {
+        this.customConfig = 1
+        setTimeout(() => {
+          this._handlerJsonEditor()
+        }, 200)
+      } else {
+        this.customConfig = 0
+        setTimeout(() => {
+          this._handlerEditor()
+        }, 200)
       }
     },
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object,
-      createNodeId: Number
-    },
-    methods: {
-      setEditorVal () {
-        this.item = editor.getValue()
-        this.scriptBoxDialog = true
-      },
-      getSriptBoxValue (val) {
-        editor.setValue(val)
-      },
-      _onSwitch (is) {
-        if (is) {
-          this.customConfig = 1
-          setTimeout(() => {
-            this._handlerJsonEditor()
-          }, 200)
-        } else {
-          this.customConfig = 0
-          setTimeout(() => {
-            this._handlerEditor()
-          }, 200)
-        }
-      },
-      /**
+    /**
        * return data source
        */
-      _onDsData (o) {
-        this.dsType = o.type
-        this.rtDatasource = o.datasource
-      },
-      /**
+    _onDsData (o) {
+      this.dsType = o.type
+      this.rtDatasource = o.datasource
+    },
+    /**
        * return data target
        */
-      _onDtData (o) {
-        this.dtType = o.type
-        this.rtDatatarget = o.datasource
-      },
-      /**
+    _onDtData (o) {
+      this.dtType = o.type
+      this.rtDatatarget = o.datasource
+    },
+    /**
        * return pre statements
        */
-      _onPreStatements (a) {
-        this.preStatements = a
-      },
-      /**
+    _onPreStatements (a) {
+      this.preStatements = a
+    },
+    /**
        * return post statements
        */
-      _onPostStatements (a) {
-        this.postStatements = a
-      },
-      /**
+    _onPostStatements (a) {
+      this.postStatements = a
+    },
+    /**
        * return localParams
        */
-      _onLocalParams (a) {
-        this.localParams = a
-      },
-      /**
+    _onLocalParams (a) {
+      this.localParams = a
+    },
+    /**
        * verification
        */
-      _verification () {
-        if (this.customConfig) {
-          if (!jsonEditor.getValue()) {
-            this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
-            return false
-          }
-
-          // localParams Subcomponent verification
-          if (!this.$refs.refLocalParams._verifProp()) {
-            return false
-          }
-
-          // storage
-          this.$emit('on-params', {
-            customConfig: this.customConfig,
-            json: jsonEditor.getValue(),
-            localParams: this.localParams,
-            xms: +this.xms,
-            xmx: +this.xmx
-          })
-          return true
-        } else {
-          if (!editor.getValue()) {
-            this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
-            return false
-          }
-
-          // datasource Subcomponent verification
-          if (!this.$refs.refDs._verifDatasource()) {
-            return false
-          }
-
-          // datasource Subcomponent verification
-          if (!this.$refs.refDt._verifDatasource()) {
-            return false
-          }
-
-          if (!this.targetTable) {
-            this.$message.warning(`${i18n.$t('Please enter a Target Table(required)')}`)
-            return false
-          }
-
-          // preStatements Subcomponent verification
-          if (!this.$refs.refPreStatements._verifProp()) {
-            return false
-          }
-
-          // postStatements Subcomponent verification
-          if (!this.$refs.refPostStatements._verifProp()) {
-            return false
-          }
-
-          // storage
-          this.$emit('on-params', {
-            customConfig: this.customConfig,
-            dsType: this.dsType,
-            dataSource: this.rtDatasource,
-            dtType: this.dtType,
-            dataTarget: this.rtDatatarget,
-            sql: editor.getValue(),
-            targetTable: this.targetTable,
-            jobSpeedByte: this.jobSpeedByte * 1024,
-            jobSpeedRecord: this.jobSpeedRecord,
-            preStatements: this.preStatements,
-            postStatements: this.postStatements,
-            xms: +this.xms,
-            xmx: +this.xmx
-          })
-          return true
-        }
-      },
-      /**
-       * Processing code highlighting
-       */
-      _handlerEditor () {
-        this._destroyEditor()
-
-        // editor
-        editor = codemirror('code-sql-mirror', {
-          mode: 'sql',
-          readOnly: this.isDetails
-        })
-
-        this.keypress = () => {
-          if (!editor.getOption('readOnly')) {
-            editor.showHint({
-              completeSingle: false
-            })
-          }
+    _verification () {
+      if (this.customConfig) {
+        if (!jsonEditor.getValue()) {
+          this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
+          return false
         }
 
-        // Monitor keyboard
-        editor.on('keypress', this.keypress)
-
-        editor.on('changes', () => {
-          this._cacheParams()
-        })
-
-        editor.setValue(this.sql)
-
-        return editor
-      },
-      _handlerJsonEditor () {
-        this._destroyJsonEditor()
-
-        // jsonEditor
-        jsonEditor = codemirror('code-json-mirror', {
-          mode: 'json',
-          readOnly: this.isDetails
-        })
-
-        this.keypress = () => {
-          if (!jsonEditor.getOption('readOnly')) {
-            jsonEditor.showHint({
-              completeSingle: false
-            })
-          }
+        // localParams Subcomponent verification
+        if (!this.$refs.refLocalParams._verifProp()) {
+          return false
         }
 
-        // Monitor keyboard
-        jsonEditor.on('keypress', this.keypress)
-
-        jsonEditor.on('changes', () => {
-          // this._cacheParams()
+        // storage
+        this.$emit('on-params', {
+          customConfig: this.customConfig,
+          json: jsonEditor.getValue(),
+          localParams: this.localParams,
+          xms: +this.xms,
+          xmx: +this.xmx
         })
+        return true
+      } else {
+        if (!editor.getValue()) {
+          this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
+          return false
+        }
 
-        jsonEditor.setValue(this.json)
+        // datasource Subcomponent verification
+        if (!this.$refs.refDs._verifDatasource()) {
+          return false
+        }
 
-        return jsonEditor
-      },
-      _cacheParams () {
-        this.$emit('on-cache-params', {
+        // datasource Subcomponent verification
+        if (!this.$refs.refDt._verifDatasource()) {
+          return false
+        }
+
+        if (!this.targetTable) {
+          this.$message.warning(`${i18n.$t('Please enter a Target Table(required)')}`)
+          return false
+        }
+
+        // preStatements Subcomponent verification
+        if (!this.$refs.refPreStatements._verifProp()) {
+          return false
+        }
+
+        // postStatements Subcomponent verification
+        if (!this.$refs.refPostStatements._verifProp()) {
+          return false
+        }
+
+        // storage
+        this.$emit('on-params', {
+          customConfig: this.customConfig,
           dsType: this.dsType,
           dataSource: this.rtDatasource,
           dtType: this.dtType,
           dataTarget: this.rtDatatarget,
-          sql: editor ? editor.getValue() : '',
+          sql: editor.getValue(),
           targetTable: this.targetTable,
           jobSpeedByte: this.jobSpeedByte * 1024,
           jobSpeedRecord: this.jobSpeedRecord,
@@ -428,97 +351,174 @@
           xms: +this.xms,
           xmx: +this.xmx
         })
-      },
-      _destroyEditor () {
-        if (editor) {
-          editor.toTextArea() // Uninstall
-          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
-          editor.off($('.code-sql-mirror'), 'changes', this.changes)
-        }
-      },
-      _destroyJsonEditor () {
-        if (jsonEditor) {
-          jsonEditor.toTextArea() // Uninstall
-          jsonEditor.off($('.code-json-mirror'), 'keypress', this.keypress)
-          jsonEditor.off($('.code-json-mirror'), 'changes', this.changes)
-        }
+        return true
       }
     },
-    created () {
-      let o = this.backfillItem
-
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        // set jvm memory
-        this.xms = o.params.xms || 1
-        this.xmx = o.params.xmx || 1
-        // backfill
-        if (o.params.customConfig === 0) {
-          this.customConfig = 0
-          this.enable = false
-          this.dsType = o.params.dsType || ''
-          this.datasource = o.params.dataSource || ''
-          this.dtType = o.params.dtType || ''
-          this.datatarget = o.params.dataTarget || ''
-          this.sql = o.params.sql || ''
-          this.targetTable = o.params.targetTable || ''
-          this.jobSpeedByte = o.params.jobSpeedByte / 1024 || 0
-          this.jobSpeedRecord = o.params.jobSpeedRecord || 0
-          this.preStatements = o.params.preStatements || []
-          this.postStatements = o.params.postStatements || []
-        } else {
-          this.customConfig = 1
-          this.enable = true
-          this.json = o.params.json || []
-          this.localParams = o.params.localParams || ''
-        }
-      }
-    },
-    mounted () {
-      if (this.customConfig) {
-        setTimeout(() => {
-          this._handlerJsonEditor()
-        }, 200)
-      } else {
-        setTimeout(() => {
-          this._handlerEditor()
-        }, 200)
-      }
-    },
-    destroyed () {
-      /**
-       * Destroy the editor instance
+    /**
+       * Processing code highlighting
        */
+    _handlerEditor () {
+      this._destroyEditor()
+
+      // editor
+      editor = codemirror('code-sql-mirror', {
+        mode: 'sql',
+        readOnly: this.isDetails
+      })
+
+      this.keypress = () => {
+        if (!editor.getOption('readOnly')) {
+          editor.showHint({
+            completeSingle: false
+          })
+        }
+      }
+
+      // Monitor keyboard
+      editor.on('keypress', this.keypress)
+
+      editor.on('changes', () => {
+        this._cacheParams()
+      })
+
+      editor.setValue(this.sql)
+
+      return editor
+    },
+    _handlerJsonEditor () {
+      this._destroyJsonEditor()
+
+      // jsonEditor
+      jsonEditor = codemirror('code-json-mirror', {
+        mode: 'json',
+        readOnly: this.isDetails
+      })
+
+      this.keypress = () => {
+        if (!jsonEditor.getOption('readOnly')) {
+          jsonEditor.showHint({
+            completeSingle: false
+          })
+        }
+      }
+
+      // Monitor keyboard
+      jsonEditor.on('keypress', this.keypress)
+
+      jsonEditor.on('changes', () => {
+        // this._cacheParams()
+      })
+
+      jsonEditor.setValue(this.json)
+
+      return jsonEditor
+    },
+    _cacheParams () {
+      this.$emit('on-cache-params', {
+        dsType: this.dsType,
+        dataSource: this.rtDatasource,
+        dtType: this.dtType,
+        dataTarget: this.rtDatatarget,
+        sql: editor ? editor.getValue() : '',
+        targetTable: this.targetTable,
+        jobSpeedByte: this.jobSpeedByte * 1024,
+        jobSpeedRecord: this.jobSpeedRecord,
+        preStatements: this.preStatements,
+        postStatements: this.postStatements,
+        xms: +this.xms,
+        xmx: +this.xmx
+      })
+    },
+    _destroyEditor () {
       if (editor) {
         editor.toTextArea() // Uninstall
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-sql-mirror'), 'changes', this.changes)
       }
+    },
+    _destroyJsonEditor () {
       if (jsonEditor) {
         jsonEditor.toTextArea() // Uninstall
         jsonEditor.off($('.code-json-mirror'), 'keypress', this.keypress)
+        jsonEditor.off($('.code-json-mirror'), 'changes', this.changes)
       }
-    },
-    watch: {
-      // Watch the cacheParams
-      cacheParams (val) {
-        this._cacheParams()
+    }
+  },
+  created () {
+    const o = this.backfillItem
+
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o)) {
+      // set jvm memory
+      this.xms = o.params.xms || 1
+      this.xmx = o.params.xmx || 1
+      // backfill
+      if (o.params.customConfig === 0) {
+        this.customConfig = 0
+        this.enable = false
+        this.dsType = o.params.dsType || ''
+        this.datasource = o.params.dataSource || ''
+        this.dtType = o.params.dtType || ''
+        this.datatarget = o.params.dataTarget || ''
+        this.sql = o.params.sql || ''
+        this.targetTable = o.params.targetTable || ''
+        this.jobSpeedByte = o.params.jobSpeedByte / 1024 || 0
+        this.jobSpeedRecord = o.params.jobSpeedRecord || 0
+        this.preStatements = o.params.preStatements || []
+        this.postStatements = o.params.postStatements || []
+      } else {
+        this.customConfig = 1
+        this.enable = true
+        this.json = o.params.json || []
+        this.localParams = o.params.localParams || ''
       }
-    },
-    computed: {
-      cacheParams () {
-        return {
-          dsType: this.dsType,
-          dataSource: this.rtDatasource,
-          dtType: this.dtType,
-          dataTarget: this.rtDatatarget,
-          targetTable: this.targetTable,
-          jobSpeedByte: this.jobSpeedByte * 1024,
-          jobSpeedRecord: this.jobSpeedRecord,
-          preStatements: this.preStatements,
-          postStatements: this.postStatements
-        }
+    }
+  },
+  mounted () {
+    if (this.customConfig) {
+      setTimeout(() => {
+        this._handlerJsonEditor()
+      }, 200)
+    } else {
+      setTimeout(() => {
+        this._handlerEditor()
+      }, 200)
+    }
+  },
+  destroyed () {
+    /**
+       * Destroy the editor instance
+       */
+    if (editor) {
+      editor.toTextArea() // Uninstall
+      editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+    }
+    if (jsonEditor) {
+      jsonEditor.toTextArea() // Uninstall
+      jsonEditor.off($('.code-json-mirror'), 'keypress', this.keypress)
+    }
+  },
+  watch: {
+    // Watch the cacheParams
+    cacheParams (val) {
+      this._cacheParams()
+    }
+  },
+  computed: {
+    cacheParams () {
+      return {
+        dsType: this.dsType,
+        dataSource: this.rtDatasource,
+        dtType: this.dtType,
+        dataTarget: this.rtDatatarget,
+        targetTable: this.targetTable,
+        jobSpeedByte: this.jobSpeedByte * 1024,
+        jobSpeedRecord: this.jobSpeedRecord,
+        preStatements: this.preStatements,
+        postStatements: this.postStatements
       }
-    },
-    components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput, mScriptBox }
-  }
+    }
+  },
+  components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput, mScriptBox }
+}
 </script>

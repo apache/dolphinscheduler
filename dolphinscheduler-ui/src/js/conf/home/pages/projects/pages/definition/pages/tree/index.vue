@@ -75,135 +75,135 @@
 
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import Tree from './_source/tree'
-  import { uuid } from '@/module/util'
-  import mSpin from '@/module/components/spin/spin'
-  import mNoData from '@/module/components/noData/noData'
-  import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import Tree from './_source/tree'
+import { uuid } from '@/module/util'
+import mSpin from '@/module/components/spin/spin'
+import mNoData from '@/module/components/noData/noData'
+import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'tree-view-index-index',
-    data () {
-      return {
-        // limit
-        limit: 25,
-        // loading
-        isLoading: true,
-        // node type
-        tasksType: tasksType,
-        // node state
-        tasksState: tasksState,
-        // tree data
-        treeData: {},
-        // is data
-        isNodata: false
-      }
+export default {
+  name: 'tree-view-index-index',
+  data () {
+    return {
+      // limit
+      limit: 25,
+      // loading
+      isLoading: true,
+      // node type
+      tasksType: tasksType,
+      // node state
+      tasksState: tasksState,
+      // tree data
+      treeData: {},
+      // is data
+      isNodata: false
+    }
+  },
+  props: {},
+  methods: {
+    ...mapActions('dag', ['getViewTree']),
+    _close () {
+      this.$router.go(-1)
     },
-    props: {},
-    methods: {
-      ...mapActions('dag', ['getViewTree']),
-      _close () {
-        this.$router.go(-1)
-      },
-      /**
+    /**
        * get tree data
        */
-      _getViewTree () {
-        this.isLoading = true
+    _getViewTree () {
+      this.isLoading = true
 
-        Tree.reset()
+      Tree.reset()
 
-        this.getViewTree({
-          processId: this.$route.params.id,
-          limit: this.limit
-        }).then(res => {
-          let data = _.cloneDeep(res)
-          this.treeData = data
-          if (!this.treeData.children) {
-            this.isLoading = false
-            this.isNodata = true
-            return
-          }
-          let recursiveChildren = (children) => {
-            if (children.length) {
-              _.map(children, v => {
-                v.uuid = `${uuid('uuid_')}${uuid() + uuid()}`
-                if (v.children.length) {
-                  recursiveChildren(v.children)
-                }
-              })
-            }
-          }
-          recursiveChildren(data.children)
-          // init tree
-          Tree.init({
-            data: _.cloneDeep(data),
-            limit: this.limit,
-            selfTree: this
-          }).then(() => {
-            setTimeout(() => {
-              // this.isLoading = false
-            }, 100)
-          })
-        }).catch(e => {
+      this.getViewTree({
+        processId: this.$route.params.id,
+        limit: this.limit
+      }).then(res => {
+        const data = _.cloneDeep(res)
+        this.treeData = data
+        if (!this.treeData.children) {
           this.isLoading = false
-          if (!e.data) {
-            this.isNodata = true
+          this.isNodata = true
+          return
+        }
+        const recursiveChildren = (children) => {
+          if (children.length) {
+            _.map(children, v => {
+              v.uuid = `${uuid('uuid_')}${uuid() + uuid()}`
+              if (v.children.length) {
+                recursiveChildren(v.children)
+              }
+            })
           }
+        }
+        recursiveChildren(data.children)
+        // init tree
+        Tree.init({
+          data: _.cloneDeep(data),
+          limit: this.limit,
+          selfTree: this
+        }).then(() => {
+          setTimeout(() => {
+            // this.isLoading = false
+          }, 100)
         })
-      },
+      }).catch(e => {
+        this.isLoading = false
+        if (!e.data) {
+          this.isNodata = true
+        }
+      })
+    },
 
-      /**
+    /**
        * Return to the previous child node
        */
-      _rtTasksDag () {
-        let getIds = this.$route.query.subProcessIds
-        let idsArr = getIds.split(',')
-        let ids = idsArr.slice(0, idsArr.length - 1)
-        let id = idsArr[idsArr.length - 1]
-        let query = {}
+    _rtTasksDag () {
+      const getIds = this.$route.query.subProcessIds
+      const idsArr = getIds.split(',')
+      const ids = idsArr.slice(0, idsArr.length - 1)
+      const id = idsArr[idsArr.length - 1]
+      let query = {}
 
-        if (id !== idsArr[0]) {
-          query = { subProcessIds: ids.join(',') }
-        }
-        this.$router.push({ path: `/projects/definition/tree/${id}`, query: query })
-      },
-      /**
+      if (id !== idsArr[0]) {
+        query = { subProcessIds: ids.join(',') }
+      }
+      this.$router.push({ path: `/projects/definition/tree/${id}`, query: query })
+    },
+    /**
        * Subprocess processing
        * @param subProcessId 子流程Id
        */
-      _subProcessHandle (subProcessId) {
-        let subProcessIds = []
-        let getIds = this.$route.query.subProcessIds
-        if (getIds) {
-          let newId = getIds.split(',')
-          newId.push(this.$route.params.id)
-          subProcessIds = newId
-        } else {
-          subProcessIds.push(this.$route.params.id)
-        }
-        this.$router.push({ path: `/projects/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
-      },
-      _onChangeSelect (o) {
-        this.limit = o
-        this._getViewTree()
+    _subProcessHandle (subProcessId) {
+      let subProcessIds = []
+      const getIds = this.$route.query.subProcessIds
+      if (getIds) {
+        const newId = getIds.split(',')
+        newId.push(this.$route.params.id)
+        subProcessIds = newId
+      } else {
+        subProcessIds.push(this.$route.params.id)
       }
+      this.$router.push({ path: `/projects/definition/tree/${subProcessId}`, query: { subProcessIds: subProcessIds.join(',') } })
     },
-    watch: {
-      '$route.params.id' () {
-        this._getViewTree()
-      }
-    },
-    created () {
+    _onChangeSelect (o) {
+      this.limit = o
       this._getViewTree()
-    },
-    mounted () {
-    },
-    components: { mSpin, mListConstruction, mNoData }
-  }
+    }
+  },
+  watch: {
+    '$route.params.id' () {
+      this._getViewTree()
+    }
+  },
+  created () {
+    this._getViewTree()
+  },
+  mounted () {
+  },
+  components: { mSpin, mListConstruction, mNoData }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

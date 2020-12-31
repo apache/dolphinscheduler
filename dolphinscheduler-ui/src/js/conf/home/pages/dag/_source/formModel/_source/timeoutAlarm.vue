@@ -58,73 +58,73 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import disabledState from '@/module/mixin/disabledState'
+import _ from 'lodash'
+import disabledState from '@/module/mixin/disabledState'
 
-  export default {
-    name: 'form-timeout-alarm',
-    data () {
-      return {
-        // Timeout display hiding
-        enable: false,
-        // Timeout strategy
-        strategy: [],
-        // Timeout period
-        interval: null
+export default {
+  name: 'form-timeout-alarm',
+  data () {
+    return {
+      // Timeout display hiding
+      enable: false,
+      // Timeout strategy
+      strategy: [],
+      // Timeout period
+      interval: null
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object
+  },
+  methods: {
+    _onSwitch (is) {
+      // Timeout strategy
+      this.strategy = is ? ['WARN'] : []
+      // Timeout period
+      this.interval = is ? 30 : null
+    },
+    _verification () {
+      // Verification timeout policy
+      if (this.enable && !this.strategy.length) {
+        this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
+        return false
       }
-    },
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object
-    },
-    methods: {
-      _onSwitch (is) {
-        // Timeout strategy
-        this.strategy = is ? ['WARN'] : []
-        // Timeout period
-        this.interval = is ? 30 : null
-      },
-      _verification () {
-        // Verification timeout policy
-        if (this.enable && !this.strategy.length) {
-          this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
-          return false
-        }
-        // Verify timeout duration Non 0 positive integer
-        const reg = /^[1-9]\d*$/
-        if (this.enable && !reg.test(this.interval)) {
-          this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
-          return false
-        }
-        this.$emit('on-timeout', {
-          strategy: (() => {
-            // Handling checkout sequence
-            let strategy = this.strategy
-            if (strategy.length === 2 && strategy[0] === 'FAILED') {
-              return [strategy[1], strategy[0]].join(',')
-            } else {
-              return strategy.join(',')
-            }
-          })(),
-          interval: parseInt(this.interval),
-          enable: this.enable
-        })
-        return true
+      // Verify timeout duration Non 0 positive integer
+      const reg = /^[1-9]\d*$/
+      if (this.enable && !reg.test(this.interval)) {
+        this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
+        return false
       }
-    },
-    watch: {
-    },
-    created () {
-      let o = this.backfillItem
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o) && o.timeout) {
-        this.enable = o.timeout.enable || false
-        this.strategy = _.split(o.timeout.strategy, ',') || ['WARN']
-        this.interval = o.timeout.interval || null
-      }
-    },
-    mounted () {
-    },
-    components: {}
-  }
+      this.$emit('on-timeout', {
+        strategy: (() => {
+          // Handling checkout sequence
+          const strategy = this.strategy
+          if (strategy.length === 2 && strategy[0] === 'FAILED') {
+            return [strategy[1], strategy[0]].join(',')
+          } else {
+            return strategy.join(',')
+          }
+        })(),
+        interval: parseInt(this.interval),
+        enable: this.enable
+      })
+      return true
+    }
+  },
+  watch: {
+  },
+  created () {
+    const o = this.backfillItem
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o) && o.timeout) {
+      this.enable = o.timeout.enable || false
+      this.strategy = _.split(o.timeout.strategy, ',') || ['WARN']
+      this.interval = o.timeout.interval || null
+    }
+  },
+  mounted () {
+  },
+  components: {}
+}
 </script>

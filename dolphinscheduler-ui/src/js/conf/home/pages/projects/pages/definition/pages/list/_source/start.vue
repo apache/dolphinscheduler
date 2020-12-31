@@ -163,137 +163,137 @@
   </div>
 </template>
 <script>
-  import dayjs from 'dayjs'
-  import mEmail from './email.vue'
-  import store from '@/conf/home/store'
-  import { warningTypeList } from './util'
-  import mPriority from '@/module/components/priority/priority'
-  import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+import dayjs from 'dayjs'
+import mEmail from './email.vue'
+import store from '@/conf/home/store'
+import { warningTypeList } from './util'
+import mPriority from '@/module/components/priority/priority'
+import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
-  export default {
-    name: 'start-process',
-    data () {
-      return {
-        store,
-        processDefinitionId: 0,
-        failureStrategy: 'CONTINUE',
-        warningTypeList: warningTypeList,
-        workflowName: '',
-        warningType: '',
-        notifyGroupList: [],
-        warningGroupId: '',
-        scheduleTime: '',
-        spinnerLoading: false,
-        execType: false,
-        taskDependType: 'TASK_POST',
-        receivers: [],
-        receiversCc: [],
-        runMode: 'RUN_MODE_SERIAL',
-        processInstancePriority: 'MEDIUM',
-        workerGroup: 'default'
+export default {
+  name: 'start-process',
+  data () {
+    return {
+      store,
+      processDefinitionId: 0,
+      failureStrategy: 'CONTINUE',
+      warningTypeList: warningTypeList,
+      workflowName: '',
+      warningType: '',
+      notifyGroupList: [],
+      warningGroupId: '',
+      scheduleTime: '',
+      spinnerLoading: false,
+      execType: false,
+      taskDependType: 'TASK_POST',
+      receivers: [],
+      receiversCc: [],
+      runMode: 'RUN_MODE_SERIAL',
+      processInstancePriority: 'MEDIUM',
+      workerGroup: 'default'
 
+    }
+  },
+  props: {
+    startData: Object,
+    startNodeList: {
+      type: String,
+      default: ''
+    },
+    sourceType: String
+  },
+  methods: {
+    _datepicker (val) {
+      this.scheduleTime = val
+    },
+    _start () {
+      this.spinnerLoading = true
+      const param = {
+        processDefinitionId: this.startData.id,
+        scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
+        failureStrategy: this.failureStrategy,
+        warningType: this.warningType,
+        warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
+        execType: this.execType ? 'COMPLEMENT_DATA' : null,
+        startNodeList: this.startNodeList,
+        taskDependType: this.taskDependType,
+        runMode: this.runMode,
+        processInstancePriority: this.processInstancePriority,
+        receivers: this.receivers.join(',') || '',
+        receiversCc: this.receiversCc.join(',') || '',
+        workerGroup: this.workerGroup
       }
-    },
-    props: {
-      startData: Object,
-      startNodeList: {
-        type: String,
-        default: ''
-      },
-      sourceType: String
-    },
-    methods: {
-      _datepicker (val) {
-        this.scheduleTime = val
-      },
-      _start () {
-        this.spinnerLoading = true
-        let param = {
-          processDefinitionId: this.startData.id,
-          scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
-          failureStrategy: this.failureStrategy,
-          warningType: this.warningType,
-          warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
-          execType: this.execType ? 'COMPLEMENT_DATA' : null,
-          startNodeList: this.startNodeList,
-          taskDependType: this.taskDependType,
-          runMode: this.runMode,
-          processInstancePriority: this.processInstancePriority,
-          receivers: this.receivers.join(',') || '',
-          receiversCc: this.receiversCc.join(',') || '',
-          workerGroup: this.workerGroup
-        }
-        // Executed from the specified node
-        if (this.sourceType === 'contextmenu') {
-          param.taskDependType = this.taskDependType
-        }
-        this.store.dispatch('dag/processStart', param).then(res => {
-          this.$message.success(res.msg)
-          this.$emit('onUpdateStart')
-          setTimeout(() => {
-            this.spinnerLoading = false
-            this.close()
-          }, 500)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
+      // Executed from the specified node
+      if (this.sourceType === 'contextmenu') {
+        param.taskDependType = this.taskDependType
+      }
+      this.store.dispatch('dag/processStart', param).then(res => {
+        this.$message.success(res.msg)
+        this.$emit('onUpdateStart')
+        setTimeout(() => {
           this.spinnerLoading = false
-        })
-      },
-      _getNotifyGroupList () {
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getNotifyGroupList').then(res => {
-            this.notifyGroupList = res
-            resolve()
-          })
-        })
-      },
-      _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
-        })
-      },
-      ok () {
-        this._start()
-      },
-      close () {
-        this.$emit('closeStart')
-      }
+          this.close()
+        }, 500)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.spinnerLoading = false
+      })
     },
-    watch: {
-      execType (a) {
-        this.scheduleTime = a ? [dayjs().format('YYYY-MM-DD 00:00:00'), dayjs().format('YYYY-MM-DD 00:00:00')] : ''
-      }
-    },
-    created () {
-      this.warningType = this.warningTypeList[0].id
-      this.workflowName = this.startData.name
-
-      this._getReceiver()
-      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
-      if (stateWorkerGroupsList.length) {
-        this.workerGroup = stateWorkerGroupsList[0].id
-      } else {
-        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
-          this.$nextTick(() => {
-            if (res.length > 0) {
-              this.workerGroup = res[0].id
-            }
-          })
-        })
-      }
-    },
-    mounted () {
-      this._getNotifyGroupList().then(() => {
-        this.$nextTick(() => {
-          this.warningGroupId = ''
+    _getNotifyGroupList () {
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('dag/getNotifyGroupList').then(res => {
+          this.notifyGroupList = res
+          resolve()
         })
       })
-      this.workflowName = this.startData.name
     },
-    computed: {},
-    components: { mEmail, mPriority, mWorkerGroups }
-  }
+    _getReceiver () {
+      this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
+        this.receivers = res.receivers && res.receivers.split(',') || []
+        this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+      })
+    },
+    ok () {
+      this._start()
+    },
+    close () {
+      this.$emit('closeStart')
+    }
+  },
+  watch: {
+    execType (a) {
+      this.scheduleTime = a ? [dayjs().format('YYYY-MM-DD 00:00:00'), dayjs().format('YYYY-MM-DD 00:00:00')] : ''
+    }
+  },
+  created () {
+    this.warningType = this.warningTypeList[0].id
+    this.workflowName = this.startData.name
+
+    this._getReceiver()
+    const stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+    if (stateWorkerGroupsList.length) {
+      this.workerGroup = stateWorkerGroupsList[0].id
+    } else {
+      this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+        this.$nextTick(() => {
+          if (res.length > 0) {
+            this.workerGroup = res[0].id
+          }
+        })
+      })
+    }
+  },
+  mounted () {
+    this._getNotifyGroupList().then(() => {
+      this.$nextTick(() => {
+        this.warningGroupId = ''
+      })
+    })
+    this.workflowName = this.startData.name
+  },
+  computed: {},
+  components: { mEmail, mPriority, mWorkerGroups }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

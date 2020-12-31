@@ -86,134 +86,134 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import mLocalParams from '../formModel/tasks/_source/localParams'
-  import disabledState from '@/module/mixin/disabledState'
-  import Affirm from '../jumpAffirm'
-  import FormTenant from './_source/selectTenant'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import mLocalParams from '../formModel/tasks/_source/localParams'
+import disabledState from '@/module/mixin/disabledState'
+import Affirm from '../jumpAffirm'
+import FormTenant from './_source/selectTenant'
 
-  export default {
-    name: 'udp',
-    data () {
-      return {
-        originalName: '',
-        // dag name
-        name: '',
-        // dag description
-        description: '',
-        // Global custom parameters
-        udpList: [],
-        // Global custom parameters
-        udpListCache: [],
-        // Whether to update the process definition
-        syncDefine: true,
-        // Timeout alarm
-        timeout: 0,
+export default {
+  name: 'udp',
+  data () {
+    return {
+      originalName: '',
+      // dag name
+      name: '',
+      // dag description
+      description: '',
+      // Global custom parameters
+      udpList: [],
+      // Global custom parameters
+      udpListCache: [],
+      // Whether to update the process definition
+      syncDefine: true,
+      // Timeout alarm
+      timeout: 0,
 
-        tenantId: -1,
-        // checked Timeout alarm
-        checkedTimeout: true
-      }
-    },
-    mixins: [disabledState],
-    props: {
-    },
-    methods: {
-      /**
+      tenantId: -1,
+      // checked Timeout alarm
+      checkedTimeout: true
+    }
+  },
+  mixins: [disabledState],
+  props: {
+  },
+  methods: {
+    /**
        * udp data
        */
-      _onLocalParams (a) {
-        this.udpList = a
-      },
-      _verifTimeout () {
-        const reg = /^[1-9]\d*$/
-        if (!reg.test(this.timeout)) {
-          this.$message.warning(`${i18n.$t('Please enter a positive integer greater than 0')}`)
-          return false
-        }
-        return true
-      },
-      _accuStore () {
-        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
-        this.store.commit('dag/setName', _.cloneDeep(this.name))
-        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-        this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
-        this.store.commit('dag/setDesc', _.cloneDeep(this.description))
-        this.store.commit('dag/setSyncDefine', this.syncDefine)
-      },
-      /**
+    _onLocalParams (a) {
+      this.udpList = a
+    },
+    _verifTimeout () {
+      const reg = /^[1-9]\d*$/
+      if (!reg.test(this.timeout)) {
+        this.$message.warning(`${i18n.$t('Please enter a positive integer greater than 0')}`)
+        return false
+      }
+      return true
+    },
+    _accuStore () {
+      this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+      this.store.commit('dag/setName', _.cloneDeep(this.name))
+      this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+      this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
+      this.store.commit('dag/setDesc', _.cloneDeep(this.description))
+      this.store.commit('dag/setSyncDefine', this.syncDefine)
+    },
+    /**
        * submit
        */
-      ok () {
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('DAG graph name cannot be empty')}`)
+    ok () {
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('DAG graph name cannot be empty')}`)
+        return
+      }
+
+      const _verif = () => {
+        // verification udf
+        if (!this.$refs.refLocalParams._verifProp()) {
+          return
+        }
+        // verification timeout
+        if (this.checkedTimeout && !this._verifTimeout()) {
           return
         }
 
-        let _verif = () => {
-          // verification udf
-          if (!this.$refs.refLocalParams._verifProp()) {
-            return
-          }
-          // verification timeout
-          if (this.checkedTimeout && !this._verifTimeout()) {
-            return
-          }
+        // Storage global globalParams
+        this._accuStore()
 
-          // Storage global globalParams
-          this._accuStore()
+        Affirm.setIsPop(false)
+        this.$emit('onUdp')
+      }
 
-          Affirm.setIsPop(false)
-          this.$emit('onUdp')
-        }
-
-        if (this.originalName !== this.name) {
-          this.store.dispatch('dag/verifDAGName', this.name).then(res => {
-            _verif()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-          })
-        } else {
+      if (this.originalName !== this.name) {
+        this.store.dispatch('dag/verifDAGName', this.name).then(res => {
           _verif()
-        }
-      },
-      /**
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      } else {
+        _verif()
+      }
+    },
+    /**
        * Close the popup
        */
-      close () {
-        this.$emit('close')
+    close () {
+      this.$emit('close')
+    }
+  },
+  watch: {
+    checkedTimeout (val) {
+      if (!val) {
+        this.timeout = 0
+        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
       }
-    },
-    watch: {
-      checkedTimeout (val) {
-        if (!val) {
-          this.timeout = 0
-          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-        }
+    }
+  },
+  created () {
+    const dag = _.cloneDeep(this.store.state.dag)
+    this.udpList = dag.globalParams
+    this.udpListCache = dag.globalParams
+    this.name = dag.name
+    this.originalName = dag.name
+    this.description = dag.description
+    this.syncDefine = dag.syncDefine
+    this.timeout = dag.timeout || 0
+    this.checkedTimeout = this.timeout !== 0
+    this.$nextTick(() => {
+      if (dag.tenantId === -1) {
+        this.tenantId = this.store.state.user.userInfo.tenantId
+      } else {
+        this.tenantId = dag.tenantId
       }
-    },
-    created () {
-      const dag = _.cloneDeep(this.store.state.dag)
-      this.udpList = dag.globalParams
-      this.udpListCache = dag.globalParams
-      this.name = dag.name
-      this.originalName = dag.name
-      this.description = dag.description
-      this.syncDefine = dag.syncDefine
-      this.timeout = dag.timeout || 0
-      this.checkedTimeout = this.timeout !== 0
-      this.$nextTick(() => {
-        if (dag.tenantId === -1) {
-          this.tenantId = this.store.state.user.userInfo.tenantId
-        } else {
-          this.tenantId = dag.tenantId
-        }
-      })
-    },
-    mounted () {},
-    components: { FormTenant, mLocalParams }
-  }
+    })
+  },
+  mounted () {},
+  components: { FormTenant, mLocalParams }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

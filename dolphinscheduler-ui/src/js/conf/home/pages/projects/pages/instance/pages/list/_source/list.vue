@@ -220,268 +220,268 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
 
-  export default {
-    name: 'list',
-    data () {
-      return {
-        // data
-        list: [],
-        // btn type
-        buttonType: '',
-        strDelete: '',
-        checkAll: false
-      }
-    },
-    props: {
-      processInstanceList: Array,
-      pageNo: Number,
-      pageSize: Number
-    },
-    methods: {
-      ...mapActions('dag', ['editExecutorsState', 'deleteInstance', 'batchDeleteInstance']),
-      /**
+export default {
+  name: 'list',
+  data () {
+    return {
+      // data
+      list: [],
+      // btn type
+      buttonType: '',
+      strDelete: '',
+      checkAll: false
+    }
+  },
+  props: {
+    processInstanceList: Array,
+    pageNo: Number,
+    pageSize: Number
+  },
+  methods: {
+    ...mapActions('dag', ['editExecutorsState', 'deleteInstance', 'batchDeleteInstance']),
+    /**
        * Return run type
        */
-      _rtRunningType (code) {
-        return _.filter(runningType, v => v.code === code)[0].desc
-      },
-      /**
+    _rtRunningType (code) {
+      return _.filter(runningType, v => v.code === code)[0].desc
+    },
+    /**
        * Return status
        */
-      _rtState (code) {
-        let o = tasksState[code]
-        return `<em class="fa ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
-      },
-      /**
+    _rtState (code) {
+      const o = tasksState[code]
+      return `<em class="fa ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
+    },
+    /**
        * delete
        */
-      _delete (item, i) {
-        // remove tow++
-        if (i < 0) {
-          this._batchDelete()
-          return
-        }
-        // remove one
-        this.deleteInstance({
-          processInstanceId: item.id
-        }).then(res => {
-          this._onUpdate()
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      /**
+    _delete (item, i) {
+      // remove tow++
+      if (i < 0) {
+        this._batchDelete()
+        return
+      }
+      // remove one
+      this.deleteInstance({
+        processInstanceId: item.id
+      }).then(res => {
+        this._onUpdate()
+        this.$message.success(res.msg)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
+    },
+    /**
        * edit
        */
-      _reEdit (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.id}` })
-      },
-      /**
+    _reEdit (item) {
+      this.$router.push({ path: `/projects/instance/list/${item.id}` })
+    },
+    /**
        * Rerun
        * @param REPEAT_RUNNING
        */
-      _reRun (item, index) {
-        console.log(index)
-        this._countDownFn({
-          id: item.id,
-          executeType: 'REPEAT_RUNNING',
-          index: index,
-          buttonType: 'run'
-        })
-      },
-      /**
+    _reRun (item, index) {
+      console.log(index)
+      this._countDownFn({
+        id: item.id,
+        executeType: 'REPEAT_RUNNING',
+        index: index,
+        buttonType: 'run'
+      })
+    },
+    /**
        * Resume running
        * @param PAUSE => RECOVER_SUSPENDED_PROCESS
        * @param FAILURE => START_FAILURE_TASK_PROCESS
        */
-      _restore (item, index) {
-        this._countDownFn({
-          id: item.id,
-          executeType: 'START_FAILURE_TASK_PROCESS',
-          index: index,
-          buttonType: 'store'
-        })
-      },
-      /**
+    _restore (item, index) {
+      this._countDownFn({
+        id: item.id,
+        executeType: 'START_FAILURE_TASK_PROCESS',
+        index: index,
+        buttonType: 'store'
+      })
+    },
+    /**
        * stop
        * @param STOP
        */
-      _stop (item, index) {
-        if (item.state === 'STOP') {
-          this._countDownFn({
-            id: item.id,
-            executeType: 'RECOVER_SUSPENDED_PROCESS',
-            index: index,
-            buttonType: 'suspend'
-          })
-        } else {
-          this._upExecutorsState({
-            processInstanceId: item.id,
-            executeType: 'STOP'
-          })
-        }
-      },
-      /**
+    _stop (item, index) {
+      if (item.state === 'STOP') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          processInstanceId: item.id,
+          executeType: 'STOP'
+        })
+      }
+    },
+    /**
        * pause
        * @param PAUSE
        */
-      _suspend (item, index) {
-        if (item.state === 'PAUSE') {
-          this._countDownFn({
-            id: item.id,
-            executeType: 'RECOVER_SUSPENDED_PROCESS',
-            index: index,
-            buttonType: 'suspend'
-          })
-        } else {
-          this._upExecutorsState({
-            processInstanceId: item.id,
-            executeType: 'PAUSE'
-          })
-        }
-      },
-      /**
+    _suspend (item, index) {
+      if (item.state === 'PAUSE') {
+        this._countDownFn({
+          id: item.id,
+          executeType: 'RECOVER_SUSPENDED_PROCESS',
+          index: index,
+          buttonType: 'suspend'
+        })
+      } else {
+        this._upExecutorsState({
+          processInstanceId: item.id,
+          executeType: 'PAUSE'
+        })
+      }
+    },
+    /**
        * operating
        */
-      _upExecutorsState (o) {
-        this.editExecutorsState(o).then(res => {
-          this.$message.success(res.msg)
-          $('body').find('.tooltip.fade.top.in').remove()
-          this._onUpdate()
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this._onUpdate()
-        })
-      },
-      /**
+    _upExecutorsState (o) {
+      this.editExecutorsState(o).then(res => {
+        this.$message.success(res.msg)
+        $('body').find('.tooltip.fade.top.in').remove()
+        this._onUpdate()
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this._onUpdate()
+      })
+    },
+    /**
        * Countdown method refresh
        */
-      _countDownFn (param) {
-        this.buttonType = param.buttonType
-        this.editExecutorsState({
-          processInstanceId: param.id,
-          executeType: param.executeType
-        }).then(res => {
-          this.list[param.index].disabled = false
-          $('body').find('.tooltip.fade.top.in').remove()
-          this.$forceUpdate()
-          this.$message.success(res.msg)
-          // Countdown
-          this._countDown(() => {
-            this._onUpdate()
-          }, param.index)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
+    _countDownFn (param) {
+      this.buttonType = param.buttonType
+      this.editExecutorsState({
+        processInstanceId: param.id,
+        executeType: param.executeType
+      }).then(res => {
+        this.list[param.index].disabled = false
+        $('body').find('.tooltip.fade.top.in').remove()
+        this.$forceUpdate()
+        this.$message.success(res.msg)
+        // Countdown
+        this._countDown(() => {
           this._onUpdate()
-        })
-      },
-      /**
+        }, param.index)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this._onUpdate()
+      })
+    },
+    /**
        * update
        */
-      _onUpdate () {
-        this.$emit('on-update')
-      },
-      /**
+    _onUpdate () {
+      this.$emit('on-update')
+    },
+    /**
        * list data handle
        */
-      _listDataHandle (data) {
-        if (data.length) {
-          _.map(data, v => {
-            v.disabled = true
-            v.count = 9
-          })
-        }
-        return data
-      },
-      /**
+    _listDataHandle (data) {
+      if (data.length) {
+        _.map(data, v => {
+          v.disabled = true
+          v.count = 9
+        })
+      }
+      return data
+    },
+    /**
        * Countdown
        */
-      _countDown (fn, index) {
-        const TIME_COUNT = 10
-        let timer
-        let $count
-        if (!timer) {
-          $count = TIME_COUNT
-          timer = setInterval(() => {
-            if ($count > 0 && $count <= TIME_COUNT) {
-              $count--
-              this.list[index].count = $count
-              this.$forceUpdate()
-            } else {
-              fn()
-              clearInterval(timer)
-              timer = null
-            }
-          }, 1000)
-        }
-      },
-      _gantt (item) {
-        this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
-      },
-      _topCheckBoxClick (v) {
-        this.list.forEach((item, i) => {
-          this.$set(this.list[i], 'isCheck', v)
-        })
-        this._arrDelChange()
-      },
-      // _arrDelChange (v) {
-      //   let arr = []
-      //   this.list.forEach((item)=>{
-      //     if (item.isCheck) {
-      //       arr.push(item.id)
-      //     }
-      //   })
-      //   this.strDelete = _.join(arr, ',')
-      //   if (v === false) {
-      //     this.checkAll = false
-      //   }
-      // },
-      _arrDelChange (v) {
-        let arr = []
-        arr = _.map(v, 'id')
-        console.log(arr)
-        this.strDelete = _.join(arr, ',')
-      },
-      _batchDelete () {
-        this.batchDeleteInstance({
-          processInstanceIds: this.strDelete
-        }).then(res => {
-          this._onUpdate()
-          this.checkAll = false
-          this.strDelete = ''
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.checkAll = false
-          this.strDelete = ''
-          this.$message.error(e.msg || '')
-        })
+    _countDown (fn, index) {
+      const TIME_COUNT = 10
+      let timer
+      let $count
+      if (!timer) {
+        $count = TIME_COUNT
+        timer = setInterval(() => {
+          if ($count > 0 && $count <= TIME_COUNT) {
+            $count--
+            this.list[index].count = $count
+            this.$forceUpdate()
+          } else {
+            fn()
+            clearInterval(timer)
+            timer = null
+          }
+        }, 1000)
       }
     },
-    watch: {
-      processInstanceList: {
-        handler (a) {
-          this.checkAll = false
-          this.list = []
-          setTimeout(() => {
-            this.list = _.cloneDeep(this._listDataHandle(a))
-          })
-        },
-        immediate: true,
-        deep: true
-      },
-      pageNo () {
+    _gantt (item) {
+      this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+    },
+    _topCheckBoxClick (v) {
+      this.list.forEach((item, i) => {
+        this.$set(this.list[i], 'isCheck', v)
+      })
+      this._arrDelChange()
+    },
+    // _arrDelChange (v) {
+    //   let arr = []
+    //   this.list.forEach((item)=>{
+    //     if (item.isCheck) {
+    //       arr.push(item.id)
+    //     }
+    //   })
+    //   this.strDelete = _.join(arr, ',')
+    //   if (v === false) {
+    //     this.checkAll = false
+    //   }
+    // },
+    _arrDelChange (v) {
+      let arr = []
+      arr = _.map(v, 'id')
+      console.log(arr)
+      this.strDelete = _.join(arr, ',')
+    },
+    _batchDelete () {
+      this.batchDeleteInstance({
+        processInstanceIds: this.strDelete
+      }).then(res => {
+        this._onUpdate()
+        this.checkAll = false
         this.strDelete = ''
-      }
+        this.$message.success(res.msg)
+      }).catch(e => {
+        this.checkAll = false
+        this.strDelete = ''
+        this.$message.error(e.msg || '')
+      })
+    }
+  },
+  watch: {
+    processInstanceList: {
+      handler (a) {
+        this.checkAll = false
+        this.list = []
+        setTimeout(() => {
+          this.list = _.cloneDeep(this._listDataHandle(a))
+        })
+      },
+      immediate: true,
+      deep: true
     },
-    created () {
-    },
-    mounted () {
-    },
-    components: { }
-  }
+    pageNo () {
+      this.strDelete = ''
+    }
+  },
+  created () {
+  },
+  mounted () {
+  },
+  components: { }
+}
 </script>

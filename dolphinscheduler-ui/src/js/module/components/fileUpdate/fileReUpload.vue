@@ -84,47 +84,65 @@
   </m-popup>
 </template>
 <script>
-  import io from '@/module/io'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mProgressBar from '@/module/components/progressBar/progressBar'
+import io from '@/module/io'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import mProgressBar from '@/module/components/progressBar/progressBar'
 
-  export default {
-    name: 'file-update',
-    data () {
-      return {
-        store,
-        // name
-        name: '',
-        // description
-        description: '',
-        // progress
-        progress: 0,
-        // file
-        file: null,
-        currentDir: '/',
-        // Whether to drag upload
-        dragOver: false
-      }
-    },
-    watch: {
-    },
-    props: {
-      type: String,
-      fileName: String,
-      desc: String,
-      id: Number
-    },
-    methods: {
-      /**
+export default {
+  name: 'file-update',
+  data () {
+    return {
+      store,
+      // name
+      name: '',
+      // description
+      description: '',
+      // progress
+      progress: 0,
+      // file
+      file: null,
+      currentDir: '/',
+      // Whether to drag upload
+      dragOver: false
+    }
+  },
+  watch: {
+  },
+  props: {
+    type: String,
+    fileName: String,
+    desc: String,
+    id: Number
+  },
+  methods: {
+    /**
        * submit
        */
-      _ok () {
-        this.$refs.popup.spinnerLoading = true
-        if (this._validation()) {
-          if (this.fileName === this.name) {
+    _ok () {
+      this.$refs.popup.spinnerLoading = true
+      if (this._validation()) {
+        if (this.fileName === this.name) {
+          const isLt1024M = this.file.size / 1024 / 1024 < 1024
+          if (isLt1024M) {
+            this._formDataUpdate().then(res => {
+              setTimeout(() => {
+                this.$refs.popup.spinnerLoading = false
+              }, 800)
+            }).catch(e => {
+              this.$refs.popup.spinnerLoading = false
+            })
+          } else {
+            this.$message.warning(`${i18n.$t('Upload File Size')}`)
+            this.$refs.popup.spinnerLoading = false
+          }
+        } else {
+          this.store.dispatch('resource/resourceVerifyName', {
+            fullName: '/' + this.name,
+            type: this.type
+          }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
             if (isLt1024M) {
               this._formDataUpdate().then(res => {
@@ -138,109 +156,91 @@
               this.$message.warning(`${i18n.$t('Upload File Size')}`)
               this.$refs.popup.spinnerLoading = false
             }
-          } else {
-            this.store.dispatch('resource/resourceVerifyName', {
-              fullName: '/' + this.name,
-              type: this.type
-            }).then(res => {
-              const isLt1024M = this.file.size / 1024 / 1024 < 1024
-              if (isLt1024M) {
-                this._formDataUpdate().then(res => {
-                  setTimeout(() => {
-                    this.$refs.popup.spinnerLoading = false
-                  }, 800)
-                }).catch(e => {
-                  this.$refs.popup.spinnerLoading = false
-                })
-              } else {
-                this.$message.warning(`${i18n.$t('Upload File Size')}`)
-                this.$refs.popup.spinnerLoading = false
-              }
-            }).catch(e => {
-              this.$message.error(e.msg || '')
-              this.$refs.popup.spinnerLoading = false
-            })
-          }
-        } else {
-          this.$refs.popup.spinnerLoading = false
-        }
-      },
-      /**
-       * validation
-       */
-      _validation () {
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('Please enter file name')}`)
-          return false
-        }
-        if (!this.file) {
-          this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
-          return false
-        }
-        return true
-      },
-      /**
-       * update file
-       */
-      _formDataUpdate () {
-        return new Promise((resolve, reject) => {
-          let self = this
-          let formData = new FormData()
-          formData.append('file', this.file)
-          formData.append('name', this.name)
-          formData.append('description', this.description)
-          formData.append('id', this.id)
-          formData.append('type', this.type)
-          io.post('resources/update', res => {
-            this.$message.success(res.msg)
-            resolve()
-            self.$emit('onUpdate')
-          }, e => {
-            reject(e)
-            self.$emit('close')
+          }).catch(e => {
             this.$message.error(e.msg || '')
-          }, {
-            data: formData,
-            emulateJSON: false,
-            onUploadProgress (progressEvent) {
-              // Size has been uploaded
-              let loaded = progressEvent.loaded
-              // Total attachment size
-              let total = progressEvent.total
-              self.progress = Math.floor(100 * loaded / total)
-              self.$emit('onProgress', self.progress)
-            }
+            this.$refs.popup.spinnerLoading = false
           })
-        })
-      },
-      /**
-       * Archive to the top right corner Continue uploading
-       */
-      _ckArchive () {
-        $('.update-file-modal').hide()
-        this.$emit('onArchive')
-      },
-      /**
-       * Drag and drop upload
-       */
-      _onDrop (e) {
-        let file = e.dataTransfer.files[0]
-        this.file = file
-        this.name = file.name
-        this.dragOver = false
+        }
+      } else {
+        this.$refs.popup.spinnerLoading = false
       }
     },
-    mounted () {
-      this.name = this.fileName
-      this.description = this.desc
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
-        this.file = file
-        this.name = file.name
+    /**
+       * validation
+       */
+    _validation () {
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('Please enter file name')}`)
+        return false
+      }
+      if (!this.file) {
+        this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
+        return false
+      }
+      return true
+    },
+    /**
+       * update file
+       */
+    _formDataUpdate () {
+      return new Promise((resolve, reject) => {
+        const self = this
+        const formData = new FormData()
+        formData.append('file', this.file)
+        formData.append('name', this.name)
+        formData.append('description', this.description)
+        formData.append('id', this.id)
+        formData.append('type', this.type)
+        io.post('resources/update', res => {
+          this.$message.success(res.msg)
+          resolve()
+          self.$emit('onUpdate')
+        }, e => {
+          reject(e)
+          self.$emit('close')
+          this.$message.error(e.msg || '')
+        }, {
+          data: formData,
+          emulateJSON: false,
+          onUploadProgress (progressEvent) {
+            // Size has been uploaded
+            const loaded = progressEvent.loaded
+            // Total attachment size
+            const total = progressEvent.total
+            self.progress = Math.floor(100 * loaded / total)
+            self.$emit('onProgress', self.progress)
+          }
+        })
       })
     },
-    components: { mPopup, mListBoxF, mProgressBar }
-  }
+    /**
+       * Archive to the top right corner Continue uploading
+       */
+    _ckArchive () {
+      $('.update-file-modal').hide()
+      this.$emit('onArchive')
+    },
+    /**
+       * Drag and drop upload
+       */
+    _onDrop (e) {
+      const file = e.dataTransfer.files[0]
+      this.file = file
+      this.name = file.name
+      this.dragOver = false
+    }
+  },
+  mounted () {
+    this.name = this.fileName
+    this.description = this.desc
+    $('#file').change(() => {
+      const file = $('#file')[0].files[0]
+      this.file = file
+      this.name = file.name
+    })
+  },
+  components: { mPopup, mListBoxF, mProgressBar }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

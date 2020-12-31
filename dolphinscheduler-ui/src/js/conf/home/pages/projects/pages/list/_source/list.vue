@@ -71,68 +71,68 @@
   </div>
 </template>
 <script>
-  import { mapActions, mapMutations } from 'vuex'
-  import localStore from '@/module/util/localStorage'
-  import { findComponentDownward } from '@/module/util/'
+import { mapActions, mapMutations } from 'vuex'
+import localStore from '@/module/util/localStorage'
+import { findComponentDownward } from '@/module/util/'
 
-  export default {
-    name: 'projects-list',
-    data () {
-      return {
-        list: []
-      }
+export default {
+  name: 'projects-list',
+  data () {
+    return {
+      list: []
+    }
+  },
+  props: {
+    projectsList: Array,
+    pageNo: Number,
+    pageSize: Number
+  },
+  methods: {
+    ...mapActions('projects', ['deleteProjects']),
+    ...mapMutations('dag', ['setProjectName']),
+    _switchProjects (item) {
+      this.setProjectName(item.name)
+      localStore.setItem('projectName', `${item.name}`)
+      localStore.setItem('projectId', `${item.id}`)
+      this.$router.push({ path: '/projects/index' })
     },
-    props: {
-      projectsList: Array,
-      pageNo: Number,
-      pageSize: Number
-    },
-    methods: {
-      ...mapActions('projects', ['deleteProjects']),
-      ...mapMutations('dag', ['setProjectName']),
-      _switchProjects (item) {
-        this.setProjectName(item.name)
-        localStore.setItem('projectName', `${item.name}`)
-        localStore.setItem('projectId', `${item.id}`)
-        this.$router.push({ path: '/projects/index' })
-      },
-      /**
+    /**
        * Delete Project
        * @param item Current record
        * @param i index
        */
-      _delete (item, i) {
-        this.deleteProjects({
-          projectId: item.id
-        }).then(res => {
-          this.$emit('on-update')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      /**
+    _delete (item, i) {
+      this.deleteProjects({
+        projectId: item.id
+      }).then(res => {
+        this.$emit('on-update')
+        this.$message.success(res.msg)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
+    },
+    /**
        * edit project
        * @param item Current record
        */
-      _edit (item) {
-        findComponentDownward(this.$root, 'projects-list')._create(item)
-      }
+    _edit (item) {
+      findComponentDownward(this.$root, 'projects-list')._create(item)
+    }
 
-    },
-    watch: {
-      projectsList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
-      }
-    },
-    created () {
-    },
-    mounted () {
-      this.list = this.projectsList
-    },
-    components: { }
-  }
+  },
+  watch: {
+    projectsList (a) {
+      this.list = []
+      setTimeout(() => {
+        this.list = a
+      })
+    }
+  },
+  created () {
+  },
+  mounted () {
+    this.list = this.projectsList
+  },
+  components: { }
+}
 </script>

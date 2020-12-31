@@ -65,87 +65,87 @@
   </m-conditions>
 </template>
 <script>
-  import _ from 'lodash'
-  import mConditions from '@/module/components/conditions/conditions'
-  export default {
-    name: 'conditions',
-    data () {
-      return {
-        stateList: [
-          {
-            label: `${this.$t('none')}`,
-            code: ''
-          },
-          {
-            label: `${this.$t('success')}`,
-            code: '成功'
-          },
-          {
-            label: `${this.$t('waiting')}`,
-            code: '等待'
-          },
-          {
-            label: `${this.$t('execution')}`,
-            code: '执行中'
-          },
-          {
-            label: `${this.$t('finish')}`,
-            code: '完成'
-          }, {
-            label: `${this.$t('failed')}`,
-            code: '失败'
-          }
-        ],
-        searchParams: {
-          taskName: '',
-          state: '',
-          sourceTable: '',
-          destTable: '',
-          taskDate: '',
-          startDate: '',
-          endDate: ''
+import _ from 'lodash'
+import mConditions from '@/module/components/conditions/conditions'
+export default {
+  name: 'conditions',
+  data () {
+    return {
+      stateList: [
+        {
+          label: `${this.$t('none')}`,
+          code: ''
         },
-        dataTime: []
-      }
-    },
-    props: {},
-    methods: {
-      _ckQuery () {
-        this.$emit('on-query', this.searchParams)
+        {
+          label: `${this.$t('success')}`,
+          code: '成功'
+        },
+        {
+          label: `${this.$t('waiting')}`,
+          code: '等待'
+        },
+        {
+          label: `${this.$t('execution')}`,
+          code: '执行中'
+        },
+        {
+          label: `${this.$t('finish')}`,
+          code: '完成'
+        }, {
+          label: `${this.$t('failed')}`,
+          code: '失败'
+        }
+      ],
+      searchParams: {
+        taskName: '',
+        state: '',
+        sourceTable: '',
+        destTable: '',
+        taskDate: '',
+        startDate: '',
+        endDate: ''
       },
-      /**
+      dataTime: []
+    }
+  },
+  props: {},
+  methods: {
+    _ckQuery () {
+      this.$emit('on-query', this.searchParams)
+    },
+    /**
        * change times
        */
-      _onChangeStartStop (val) {
-        this.searchParams.startDate = val[0]
-        this.searchParams.endDate = val[1]
-      },
-      /**
+    _onChangeStartStop (val) {
+      this.searchParams.startDate = val[0]
+      this.searchParams.endDate = val[1]
+    },
+    /**
        * change state
        */
-      _onChangeState (val) {
-        this.searchParams.state = val
-      },
-      /**
+    _onChangeState (val) {
+      this.searchParams.state = val
+    },
+    /**
        * empty date
        */
-      _dateEmpty () {
-        this.searchParams.startDate = ''
-        this.searchParams.endDate = ''
-        this.$refs.datepicker.empty()
-      },
-      _onChangeDate (val) {
-        this.searchParams.taskDate = val
-      }
+    _dateEmpty () {
+      this.searchParams.startDate = ''
+      this.searchParams.endDate = ''
+      this.$refs.datepicker.empty()
     },
-    created () {
-      // Routing parameter merging
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
-    },
-    mounted () {
-    },
-    components: { mConditions }
-  }
+    _onChangeDate (val) {
+      this.searchParams.taskDate = val
+    }
+  },
+  created () {
+    // Routing parameter merging
+    if (!_.isEmpty(this.$route.query)) {
+      this.searchParams = _.assign(this.searchParams, this.$route.query)
+    }
+  },
+  mounted () {
+  },
+  components: { mConditions }
+}
 </script>

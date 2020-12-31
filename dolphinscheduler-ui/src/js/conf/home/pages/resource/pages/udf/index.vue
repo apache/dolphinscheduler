@@ -18,7 +18,7 @@
   <router-view></router-view>
 </template>
 <script>
-  export default {
-    name: 'udf-manage-index'
-  }
+export default {
+  name: 'udf-manage-index'
+}
 </script>

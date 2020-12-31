@@ -54,91 +54,91 @@
   </m-popup>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-  export default {
-    name: 'create-warning',
-    data () {
-      return {
-        store,
-        id: 0,
-        name: '',
-        ipList: ''
+export default {
+  name: 'create-warning',
+  data () {
+    return {
+      store,
+      id: 0,
+      name: '',
+      ipList: ''
+    }
+  },
+  props: {
+    item: Object
+  },
+  methods: {
+    _ok () {
+      if (this._verification()) {
+        // Verify username
+        this._submit()
       }
     },
-    props: {
-      item: Object
-    },
-    methods: {
-      _ok () {
-        if (this._verification()) {
-          // Verify username
-          this._submit()
-        }
-      },
-      checkIsIps (ips) {
-        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-        let valdata = ips.split(',')
-        for (let i = 0; i < valdata.length; i++) {
-          if (reg.test(valdata[i]) === false) {
-            return false
-          }
-        }
-        return true
-      },
-      _verification () {
-        // group name
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('Please enter group name')}`)
+    checkIsIps (ips) {
+      const reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+      const valdata = ips.split(',')
+      for (let i = 0; i < valdata.length; i++) {
+        if (reg.test(valdata[i]) === false) {
           return false
         }
-        if (!this.ipList) {
-          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
-          return false
-        }
-        if (!this.checkIsIps(this.ipList)) {
-          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
-          return false
-        }
-        return true
-      },
-      _submit () {
-        let param = {
-          id: this.id,
-          name: this.name,
-          ipList: this.ipList
-        }
-        if (this.item) {
-          param.id = this.item.id
-        }
-        this.$refs.popup.spinnerLoading = true
-        this.store.dispatch('security/saveWorkerGroups', param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
-        })
       }
+      return true
     },
-    watch: {},
-    created () {
+    _verification () {
+      // group name
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('Please enter group name')}`)
+        return false
+      }
+      if (!this.ipList) {
+        this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
+        return false
+      }
+      if (!this.checkIsIps(this.ipList)) {
+        this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
+        return false
+      }
+      return true
+    },
+    _submit () {
+      const param = {
+        id: this.id,
+        name: this.name,
+        ipList: this.ipList
+      }
       if (this.item) {
-        this.id = this.item.id
-        this.name = this.item.name
-        this.ipList = this.item.ipList
+        param.id = this.item.id
       }
-    },
-    mounted () {
-    },
-    components: { mPopup, mListBoxF }
-  }
+      this.$refs.popup.spinnerLoading = true
+      this.store.dispatch('security/saveWorkerGroups', param).then(res => {
+        this.$emit('onUpdate')
+        this.$message.success(res.msg)
+        setTimeout(() => {
+          this.$refs.popup.spinnerLoading = false
+        }, 800)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.$refs.popup.spinnerLoading = false
+      })
+    }
+  },
+  watch: {},
+  created () {
+    if (this.item) {
+      this.id = this.item.id
+      this.name = this.item.name
+      this.ipList = this.item.ipList
+    }
+  },
+  mounted () {
+  },
+  components: { mPopup, mListBoxF }
+}
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .create-worker-model {

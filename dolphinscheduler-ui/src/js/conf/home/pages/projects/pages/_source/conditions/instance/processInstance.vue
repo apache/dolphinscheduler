@@ -56,65 +56,65 @@
   </m-conditions>
 </template>
 <script>
-  import _ from 'lodash'
-  import { stateType } from './common'
-  import mConditions from '@/module/components/conditions/conditions'
-  export default {
-    name: 'process-instance-conditions',
-    data () {
-      return {
-        // state(list)
-        stateTypeList: stateType,
-        searchParams: {
-          // state
-          stateType: '',
-          // start date
-          startDate: '',
-          // end date
-          endDate: '',
-          // search value
-          searchVal: '',
-          // host
-          host: '',
-          // executor name
-          executorName: ''
-        },
-        dataTime: []
-      }
-    },
-    props: {},
-    methods: {
-      _ckQuery () {
-        this.$emit('on-query', this.searchParams)
+import _ from 'lodash'
+import { stateType } from './common'
+import mConditions from '@/module/components/conditions/conditions'
+export default {
+  name: 'process-instance-conditions',
+  data () {
+    return {
+      // state(list)
+      stateTypeList: stateType,
+      searchParams: {
+        // state
+        stateType: '',
+        // start date
+        startDate: '',
+        // end date
+        endDate: '',
+        // search value
+        searchVal: '',
+        // host
+        host: '',
+        // executor name
+        executorName: ''
       },
-      /**
+      dataTime: []
+    }
+  },
+  props: {},
+  methods: {
+    _ckQuery () {
+      this.$emit('on-query', this.searchParams)
+    },
+    /**
        * change times
        */
-      _onChangeStartStop (val) {
-        this.searchParams.startDate = val[0]
-        this.searchParams.endDate = val[1]
-        this.dataTime[0] = val[0]
-        this.dataTime[1] = val[1]
-      },
-      /**
+    _onChangeStartStop (val) {
+      this.searchParams.startDate = val[0]
+      this.searchParams.endDate = val[1]
+      this.dataTime[0] = val[0]
+      this.dataTime[1] = val[1]
+    },
+    /**
        * change state
        */
-      _onChangeState (val) {
-        this.searchParams.stateType = val
-      }
-    },
-    watch: {
-    },
-    created () {
-      // Routing parameter merging
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
-    },
-    mounted () {
-    },
-    computed: {
-    },
-    components: { mConditions }
-  }
+    _onChangeState (val) {
+      this.searchParams.stateType = val
+    }
+  },
+  watch: {
+  },
+  created () {
+    // Routing parameter merging
+    if (!_.isEmpty(this.$route.query)) {
+      this.searchParams = _.assign(this.searchParams, this.$route.query)
+    }
+  },
+  mounted () {
+  },
+  computed: {
+  },
+  components: { mConditions }
+}
 </script>

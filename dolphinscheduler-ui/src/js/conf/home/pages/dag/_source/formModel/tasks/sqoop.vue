@@ -569,206 +569,227 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
-  import mDatasource from './_source/datasource'
-  import mLocalParams from './_source/localParams'
-  import disabledState from '@/module/mixin/disabledState'
-  import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import mListBox from './_source/listBox'
+import mScriptBox from './_source/scriptBox'
+import mDatasource from './_source/datasource'
+import mLocalParams from './_source/localParams'
+import disabledState from '@/module/mixin/disabledState'
+import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
-  let editor
-  let shellEditor
+let editor
+let shellEditor
 
-  export default {
-    name: 'sql',
-    data () {
-      return {
-        /**
+export default {
+  name: 'sql',
+  data () {
+    return {
+      /**
          * Is Custom Task
          */
-        isCustomTask: false,
-        /**
+      isCustomTask: false,
+      /**
          * Customer Params
          */
-        localParams: [],
+      localParams: [],
 
-        /**
+      /**
          * Hadoop Custom Params
          */
-        hadoopCustomParams: [],
+      hadoopCustomParams: [],
 
-        /**
+      /**
          * Sqoop Advanced Params
          */
-        sqoopAdvancedParams: [],
-        /**
+      sqoopAdvancedParams: [],
+      /**
          * script
          */
-        customShell: '',
-        /**
+      customShell: '',
+      /**
          * task name
          */
-        jobName: '',
-        /**
+      jobName: '',
+      /**
          * mysql query type
          */
-        srcQueryType: '1',
-        /**
+      srcQueryType: '1',
+      /**
          * source data source
          */
-        srcDatasource: '',
-        /**
+      srcDatasource: '',
+      /**
          * target data source
          */
-        targetDatasource: '',
-        /**
+      targetDatasource: '',
+      /**
          * concurrency
          */
-        concurrency: 1,
-        /**
+      concurrency: 1,
+      /**
          * default job type
          */
-        jobType: 'TEMPLATE',
-        /**
+      jobType: 'TEMPLATE',
+      /**
          * direct model type
          */
-        modelType: 'import',
+      modelType: 'import',
 
-        modelTypeList: [{ code: 'import' }, { code: 'export' }],
+      modelTypeList: [{ code: 'import' }, { code: 'export' }],
 
-        sourceTypeList: [
-          {
-            code: 'MYSQL'
-          }
-        ],
+      sourceTypeList: [
+        {
+          code: 'MYSQL'
+        }
+      ],
 
-        targetTypeList: [
-          {
-            code: 'HIVE'
-          },
-          {
-            code: 'HDFS'
-          }
-        ],
-
-        sourceType: 'MYSQL',
-        targetType: 'HDFS',
-
-        sourceMysqlParams: {
-          srcType: 'MYSQL',
-          srcDatasource: '',
-          srcTable: '',
-          srcQueryType: '1',
-          srcQuerySql: '',
-          srcColumnType: '0',
-          srcColumns: '',
-          srcConditionList: [],
-          mapColumnHive: [],
-          mapColumnJava: []
+      targetTypeList: [
+        {
+          code: 'HIVE'
         },
+        {
+          code: 'HDFS'
+        }
+      ],
 
-        sourceHdfsParams: {
-          exportDir: ''
-        },
+      sourceType: 'MYSQL',
+      targetType: 'HDFS',
 
-        sourceHiveParams: {
-          hiveDatabase: '',
-          hiveTable: '',
-          hivePartitionKey: '',
-          hivePartitionValue: ''
-        },
+      sourceMysqlParams: {
+        srcType: 'MYSQL',
+        srcDatasource: '',
+        srcTable: '',
+        srcQueryType: '1',
+        srcQuerySql: '',
+        srcColumnType: '0',
+        srcColumns: '',
+        srcConditionList: [],
+        mapColumnHive: [],
+        mapColumnJava: []
+      },
 
-        targetHdfsParams: {
-          targetPath: '',
-          deleteTargetDir: true,
-          fileType: '--as-avrodatafile',
-          compressionCodec: 'snappy',
-          fieldsTerminated: '',
-          linesTerminated: ''
-        },
+      sourceHdfsParams: {
+        exportDir: ''
+      },
 
-        targetMysqlParams: {
-          targetType: 'MYSQL',
-          targetDatasource: '',
-          targetTable: '',
-          targetColumns: '',
-          fieldsTerminated: '',
-          linesTerminated: '',
-          preQuery: '',
-          isUpdate: false,
-          targetUpdateKey: '',
-          targetUpdateMode: 'allowinsert'
-        },
+      sourceHiveParams: {
+        hiveDatabase: '',
+        hiveTable: '',
+        hivePartitionKey: '',
+        hivePartitionValue: ''
+      },
 
-        targetHiveParams: {
-          hiveDatabase: '',
-          hiveTable: '',
-          createHiveTable: false,
-          dropDelimiter: false,
-          hiveOverWrite: true,
-          replaceDelimiter: '',
-          hivePartitionKey: '',
-          hivePartitionValue: ''
-        },
-        item: '',
-        scriptBoxDialog: false
+      targetHdfsParams: {
+        targetPath: '',
+        deleteTargetDir: true,
+        fileType: '--as-avrodatafile',
+        compressionCodec: 'snappy',
+        fieldsTerminated: '',
+        linesTerminated: ''
+      },
+
+      targetMysqlParams: {
+        targetType: 'MYSQL',
+        targetDatasource: '',
+        targetTable: '',
+        targetColumns: '',
+        fieldsTerminated: '',
+        linesTerminated: '',
+        preQuery: '',
+        isUpdate: false,
+        targetUpdateKey: '',
+        targetUpdateMode: 'allowinsert'
+      },
+
+      targetHiveParams: {
+        hiveDatabase: '',
+        hiveTable: '',
+        createHiveTable: false,
+        dropDelimiter: false,
+        hiveOverWrite: true,
+        replaceDelimiter: '',
+        hivePartitionKey: '',
+        hivePartitionValue: ''
+      },
+      item: '',
+      scriptBoxDialog: false
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object
+  },
+  methods: {
+    setEditorVal () {
+      this.item = editor.getValue()
+      this.scriptBoxDialog = true
+    },
+    getSriptBoxValue (val) {
+      editor.setValue(val)
+    },
+    _handleQueryType (o) {
+      this.sourceMysqlParams.srcQueryType = this.srcQueryType
+      this._getTargetTypeList(this.sourceType)
+      this.targetType = this.targetTypeList[0].code
+    },
+
+    _handleModelTypeChange (a) {
+      this._getSourceTypeList(a)
+      this.sourceType = this.sourceTypeList[0].code
+      this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
+    },
+
+    _handleSourceTypeChange (a) {
+      this._getTargetTypeList(a.label)
+      this.targetType = this.targetTypeList[0].code
+    },
+
+    _getSourceTypeList (data) {
+      switch (data) {
+        case 'import':
+          this.sourceTypeList = [
+            {
+              code: 'MYSQL'
+            }
+          ]
+          break
+        case 'export':
+          this.sourceTypeList = [
+            {
+              code: 'HDFS'
+            },
+            {
+              code: 'HIVE'
+            }
+          ]
+          break
+        default:
+          this.sourceTypeList = [
+            {
+              code: 'MYSQL'
+            },
+            {
+              code: 'HIVE'
+            },
+            {
+              code: 'HDFS'
+            }
+          ]
+          break
       }
     },
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object
-    },
-    methods: {
-      setEditorVal () {
-        this.item = editor.getValue()
-        this.scriptBoxDialog = true
-      },
-      getSriptBoxValue (val) {
-        editor.setValue(val)
-      },
-      _handleQueryType (o) {
-        this.sourceMysqlParams.srcQueryType = this.srcQueryType
-        this._getTargetTypeList(this.sourceType)
-        this.targetType = this.targetTypeList[0].code
-      },
 
-      _handleModelTypeChange (a) {
-        this._getSourceTypeList(a)
-        this.sourceType = this.sourceTypeList[0].code
-        this._handleSourceTypeChange({ label: this.sourceType, value: this.sourceType })
-      },
-
-      _handleSourceTypeChange (a) {
-        this._getTargetTypeList(a.label)
-        this.targetType = this.targetTypeList[0].code
-      },
-
-      _getSourceTypeList (data) {
-        switch (data) {
-          case 'import':
-            this.sourceTypeList = [
-              {
-                code: 'MYSQL'
-              }
-            ]
-            break
-          case 'export':
-            this.sourceTypeList = [
+    _getTargetTypeList (data) {
+      switch (data) {
+        case 'MYSQL':
+          if (this.srcQueryType === '1') {
+            this.targetTypeList = [
               {
                 code: 'HDFS'
-              },
-              {
-                code: 'HIVE'
-              }
-            ]
-            break
-          default:
-            this.sourceTypeList = [
-              {
-                code: 'MYSQL'
-              },
+              }]
+          } else {
+            this.targetTypeList = [
               {
                 code: 'HIVE'
               },
@@ -776,466 +797,361 @@
                 code: 'HDFS'
               }
             ]
-            break
-        }
-      },
-
-      _getTargetTypeList (data) {
-        switch (data) {
-          case 'MYSQL':
-            if (this.srcQueryType === '1') {
-              this.targetTypeList = [
-                {
-                  code: 'HDFS'
-                }]
-            } else {
-              this.targetTypeList = [
-                {
-                  code: 'HIVE'
-                },
-                {
-                  code: 'HDFS'
-                }
-              ]
+          }
+          break
+        case 'HDFS':
+          this.targetTypeList = [
+            {
+              code: 'MYSQL'
             }
-            break
-          case 'HDFS':
-            this.targetTypeList = [
-              {
-                code: 'MYSQL'
-              }
-            ]
-            break
-          case 'HIVE':
-            this.targetTypeList = [
-              {
-                code: 'MYSQL'
-              }
-            ]
-            break
-          default:
-            this.targetTypeList = [
-              {
-                code: 'HIVE'
-              },
-              {
-                code: 'HDFS'
-              }
-            ]
-            break
-        }
-      },
+          ]
+          break
+        case 'HIVE':
+          this.targetTypeList = [
+            {
+              code: 'MYSQL'
+            }
+          ]
+          break
+        default:
+          this.targetTypeList = [
+            {
+              code: 'HIVE'
+            },
+            {
+              code: 'HDFS'
+            }
+          ]
+          break
+      }
+    },
 
-      _onMapColumnHive (a) {
-        this.sourceMysqlParams.mapColumnHive = a
-      },
+    _onMapColumnHive (a) {
+      this.sourceMysqlParams.mapColumnHive = a
+    },
 
-      _onMapColumnJava (a) {
-        this.sourceMysqlParams.mapColumnJava = a
-      },
+    _onMapColumnJava (a) {
+      this.sourceMysqlParams.mapColumnJava = a
+    },
 
-      /**
+    /**
        * return data source
        */
-      _onSourceDsData (o) {
-        this.sourceMysqlParams.srcType = o.type
-        this.sourceMysqlParams.srcDatasource = o.datasource
-      },
+    _onSourceDsData (o) {
+      this.sourceMysqlParams.srcType = o.type
+      this.sourceMysqlParams.srcDatasource = o.datasource
+    },
 
-      /**
+    /**
        * return data source
        */
-      _onTargetDsData (o) {
-        this.targetMysqlParams.targetType = o.type
-        this.targetMysqlParams.targetDatasource = o.datasource
-      },
+    _onTargetDsData (o) {
+      this.targetMysqlParams.targetType = o.type
+      this.targetMysqlParams.targetDatasource = o.datasource
+    },
 
-      /**
+    /**
        * stringify the source params
        */
-      _handleSourceParams () {
-        let params = null
-        switch (this.sourceType) {
-          case 'MYSQL':
-            this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === '1' && editor
-              ? editor.getValue() : this.sourceMysqlParams.srcQuerySql
-            params = JSON.stringify(this.sourceMysqlParams)
-            break
-          case 'ORACLE':
-            params = JSON.stringify(this.sourceOracleParams)
-            break
-          case 'HDFS':
-            params = JSON.stringify(this.sourceHdfsParams)
-            break
-          case 'HIVE':
-            params = JSON.stringify(this.sourceHiveParams)
-            break
-          default:
-            params = ''
-            break
-        }
-        return params
-      },
+    _handleSourceParams () {
+      let params = null
+      switch (this.sourceType) {
+        case 'MYSQL':
+          this.sourceMysqlParams.srcQuerySql = this.sourceMysqlParams.srcQueryType === '1' && editor
+            ? editor.getValue() : this.sourceMysqlParams.srcQuerySql
+          params = JSON.stringify(this.sourceMysqlParams)
+          break
+        case 'ORACLE':
+          params = JSON.stringify(this.sourceOracleParams)
+          break
+        case 'HDFS':
+          params = JSON.stringify(this.sourceHdfsParams)
+          break
+        case 'HIVE':
+          params = JSON.stringify(this.sourceHiveParams)
+          break
+        default:
+          params = ''
+          break
+      }
+      return params
+    },
 
-      /**
+    /**
        * stringify the target params
        */
-      _handleTargetParams () {
-        let params = null
-        switch (this.targetType) {
-          case 'HIVE':
-            params = JSON.stringify(this.targetHiveParams)
-            break
-          case 'HDFS':
-            params = JSON.stringify(this.targetHdfsParams)
-            break
-          case 'MYSQL':
-            params = JSON.stringify(this.targetMysqlParams)
-            break
-          default:
-            params = ''
-            break
-        }
+    _handleTargetParams () {
+      let params = null
+      switch (this.targetType) {
+        case 'HIVE':
+          params = JSON.stringify(this.targetHiveParams)
+          break
+        case 'HDFS':
+          params = JSON.stringify(this.targetHdfsParams)
+          break
+        case 'MYSQL':
+          params = JSON.stringify(this.targetMysqlParams)
+          break
+        default:
+          params = ''
+          break
+      }
 
-        return params
-      },
+      return params
+    },
 
-      /**
+    /**
        * get source params by source type
        */
-      _getSourceParams (data) {
-        switch (this.sourceType) {
-          case 'MYSQL':
-            this.sourceMysqlParams = JSON.parse(data)
-            this.srcDatasource = this.sourceMysqlParams.srcDatasource
-            break
-          case 'ORACLE':
-            this.sourceOracleParams = JSON.parse(data)
-            break
-          case 'HDFS':
-            this.sourceHdfsParams = JSON.parse(data)
-            break
-          case 'HIVE':
-            this.sourceHiveParams = JSON.parse(data)
-            break
-          default:
-            break
-        }
-      },
+    _getSourceParams (data) {
+      switch (this.sourceType) {
+        case 'MYSQL':
+          this.sourceMysqlParams = JSON.parse(data)
+          this.srcDatasource = this.sourceMysqlParams.srcDatasource
+          break
+        case 'ORACLE':
+          this.sourceOracleParams = JSON.parse(data)
+          break
+        case 'HDFS':
+          this.sourceHdfsParams = JSON.parse(data)
+          break
+        case 'HIVE':
+          this.sourceHiveParams = JSON.parse(data)
+          break
+        default:
+          break
+      }
+    },
 
-      /**
+    /**
        * get target params by target type
        */
-      _getTargetParams (data) {
-        switch (this.targetType) {
-          case 'HIVE':
-            this.targetHiveParams = JSON.parse(data)
-            break
-          case 'HDFS':
-            this.targetHdfsParams = JSON.parse(data)
-            break
-          case 'MYSQL':
-            this.targetMysqlParams = JSON.parse(data)
-            this.targetDatasource = this.targetMysqlParams.targetDatasource
-            break
-          default:
-            break
-        }
-      },
+    _getTargetParams (data) {
+      switch (this.targetType) {
+        case 'HIVE':
+          this.targetHiveParams = JSON.parse(data)
+          break
+        case 'HDFS':
+          this.targetHdfsParams = JSON.parse(data)
+          break
+        case 'MYSQL':
+          this.targetMysqlParams = JSON.parse(data)
+          this.targetDatasource = this.targetMysqlParams.targetDatasource
+          break
+        default:
+          break
+      }
+    },
 
-      /**
+    /**
        * verification
        */
-      _verification () {
-        let sqoopParams = {
-          jobType: this.jobType,
-          localParams: this.localParams
+    _verification () {
+      const sqoopParams = {
+        jobType: this.jobType,
+        localParams: this.localParams
+      }
+      if (this.jobType === 'CUSTOM') {
+        if (!shellEditor.getValue()) {
+          this.$message.warning(`${i18n.$t('Please enter Custom Shell(required)')}`)
+          return false
         }
-        if (this.jobType === 'CUSTOM') {
-          if (!shellEditor.getValue()) {
-            this.$message.warning(`${i18n.$t('Please enter Custom Shell(required)')}`)
-            return false
-          }
-          sqoopParams.customShell = shellEditor.getValue()
-        } else {
-          if (!this.jobName) {
-            this.$message.warning(`${i18n.$t('Please enter Job Name(required)')}`)
-            return false
-          }
+        sqoopParams.customShell = shellEditor.getValue()
+      } else {
+        if (!this.jobName) {
+          this.$message.warning(`${i18n.$t('Please enter Job Name(required)')}`)
+          return false
+        }
 
-          switch (this.sourceType) {
-            case 'MYSQL':
-              if (!this.$refs.refSourceDs._verifDatasource()) {
+        switch (this.sourceType) {
+          case 'MYSQL':
+            if (!this.$refs.refSourceDs._verifDatasource()) {
+              return false
+            }
+            if (this.srcQueryType === '1') {
+              if (!editor.getValue()) {
+                this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
                 return false
               }
-              if (this.srcQueryType === '1') {
-                if (!editor.getValue()) {
-                  this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
-                  return false
-                }
-                this.sourceMysqlParams.srcTable = ''
-                this.sourceMysqlParams.srcColumnType = '0'
-                this.sourceMysqlParams.srcColumns = ''
-              } else {
-                if (this.sourceMysqlParams.srcTable === '') {
-                  this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
-                  return false
-                }
-                this.sourceMysqlParams.srcQuerySql = ''
-                if (this.sourceMysqlParams.srcColumnType === '1' && this.sourceMysqlParams.srcColumns === '') {
-                  this.$message.warning(`${i18n.$t('Please enter Columns (Comma separated)')}`)
-                  return false
-                }
-                if (this.sourceMysqlParams.srcColumnType === '0') {
-                  this.sourceMysqlParams.srcColumns = ''
-                }
-              }
-
-              break
-            case 'HDFS':
-              if (this.sourceHdfsParams.exportDir === '') {
-                this.$message.warning(`${i18n.$t('Please enter Export Dir(required)')}`)
-                return false
-              }
-              break
-            case 'HIVE':
-              if (this.sourceHiveParams.hiveDatabase === '') {
-                this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
-                return false
-              }
-              if (this.sourceHiveParams.hiveTable === '') {
-                this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
-                return false
-              }
-              break
-            default:
-              break
-          }
-
-          switch (this.targetType) {
-            case 'HIVE':
-              if (this.targetHiveParams.hiveDatabase === '') {
-                this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
-                return false
-              }
-              if (this.targetHiveParams.hiveTable === '') {
-                this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
-                return false
-              }
-              break
-            case 'HDFS':
-              if (this.targetHdfsParams.targetPath === '') {
-                this.$message.warning(`${i18n.$t('Please enter Target Dir(required)')}`)
-                return false
-              }
-              break
-            case 'MYSQL':
-              if (!this.$refs.refTargetDs._verifDatasource()) {
-                return false
-              }
-
-              if (this.targetMysqlParams.targetTable === '') {
+              this.sourceMysqlParams.srcTable = ''
+              this.sourceMysqlParams.srcColumnType = '0'
+              this.sourceMysqlParams.srcColumns = ''
+            } else {
+              if (this.sourceMysqlParams.srcTable === '') {
                 this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
                 return false
               }
-              break
-            default:
-              break
-          }
-          sqoopParams.jobName = this.jobName
-          sqoopParams.hadoopCustomParams = this.hadoopCustomParams
-          sqoopParams.sqoopAdvancedParams = this.sqoopAdvancedParams
-          sqoopParams.concurrency = this.concurrency
-          sqoopParams.modelType = this.modelType
-          sqoopParams.sourceType = this.sourceType
-          sqoopParams.targetType = this.targetType
-          sqoopParams.targetParams = this._handleTargetParams()
-          sqoopParams.sourceParams = this._handleSourceParams()
+              this.sourceMysqlParams.srcQuerySql = ''
+              if (this.sourceMysqlParams.srcColumnType === '1' && this.sourceMysqlParams.srcColumns === '') {
+                this.$message.warning(`${i18n.$t('Please enter Columns (Comma separated)')}`)
+                return false
+              }
+              if (this.sourceMysqlParams.srcColumnType === '0') {
+                this.sourceMysqlParams.srcColumns = ''
+              }
+            }
+
+            break
+          case 'HDFS':
+            if (this.sourceHdfsParams.exportDir === '') {
+              this.$message.warning(`${i18n.$t('Please enter Export Dir(required)')}`)
+              return false
+            }
+            break
+          case 'HIVE':
+            if (this.sourceHiveParams.hiveDatabase === '') {
+              this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
+              return false
+            }
+            if (this.sourceHiveParams.hiveTable === '') {
+              this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
+              return false
+            }
+            break
+          default:
+            break
         }
 
-        // storage
-        this.$emit('on-params', sqoopParams)
-        return true
-      },
+        switch (this.targetType) {
+          case 'HIVE':
+            if (this.targetHiveParams.hiveDatabase === '') {
+              this.$message.warning(`${i18n.$t('Please enter Hive Database(required)')}`)
+              return false
+            }
+            if (this.targetHiveParams.hiveTable === '') {
+              this.$message.warning(`${i18n.$t('Please enter Hive Table(required)')}`)
+              return false
+            }
+            break
+          case 'HDFS':
+            if (this.targetHdfsParams.targetPath === '') {
+              this.$message.warning(`${i18n.$t('Please enter Target Dir(required)')}`)
+              return false
+            }
+            break
+          case 'MYSQL':
+            if (!this.$refs.refTargetDs._verifDatasource()) {
+              return false
+            }
 
-      /**
+            if (this.targetMysqlParams.targetTable === '') {
+              this.$message.warning(`${i18n.$t('Please enter Mysql Table(required)')}`)
+              return false
+            }
+            break
+          default:
+            break
+        }
+        sqoopParams.jobName = this.jobName
+        sqoopParams.hadoopCustomParams = this.hadoopCustomParams
+        sqoopParams.sqoopAdvancedParams = this.sqoopAdvancedParams
+        sqoopParams.concurrency = this.concurrency
+        sqoopParams.modelType = this.modelType
+        sqoopParams.sourceType = this.sourceType
+        sqoopParams.targetType = this.targetType
+        sqoopParams.targetParams = this._handleTargetParams()
+        sqoopParams.sourceParams = this._handleSourceParams()
+      }
+
+      // storage
+      this.$emit('on-params', sqoopParams)
+      return true
+    },
+
+    /**
        * Processing code highlighting
        */
-      _handlerEditor () {
-        this._destroyEditor()
+    _handlerEditor () {
+      this._destroyEditor()
 
-        editor = codemirror('code-sqoop-mirror', {
-          mode: 'sql',
-          readOnly: this.isDetails
-        })
+      editor = codemirror('code-sqoop-mirror', {
+        mode: 'sql',
+        readOnly: this.isDetails
+      })
 
-        this.keypress = () => {
-          if (!editor.getOption('readOnly')) {
-            editor.showHint({
-              completeSingle: false
-            })
-          }
-        }
-
-        this.changes = () => {
-          this._cacheParams()
-        }
-
-        // Monitor keyboard
-        editor.on('keypress', this.keypress)
-
-        editor.on('changes', this.changes)
-
-        editor.setValue(this.sourceMysqlParams.srcQuerySql)
-
-        return editor
-      },
-
-      /**
-       * Processing code highlighting
-       */
-      _handlerShellEditor () {
-        this._destroyShellEditor()
-
-        // shellEditor
-        shellEditor = codemirror('code-shell-mirror', {
-          mode: 'shell',
-          readOnly: this.isDetails
-        })
-
-        this.keypress = () => {
-          if (!shellEditor.getOption('readOnly')) {
-            shellEditor.showHint({
-              completeSingle: false
-            })
-          }
-        }
-
-        // Monitor keyboard
-        shellEditor.on('keypress', this.keypress)
-        shellEditor.setValue(this.customShell)
-
-        return shellEditor
-      },
-
-      /**
-       * return localParams
-       */
-      _onLocalParams (a) {
-        this.localParams = a
-      },
-
-      /**
-       * return hadoopParams
-       */
-      _onHadoopCustomParams (a) {
-        this.hadoopCustomParams = a
-      },
-
-      /**
-       * return sqoopAdvancedParams
-       */
-      _onSqoopAdvancedParams (a) {
-        this.sqoopAdvancedParams = a
-      },
-
-      _cacheParams () {
-        this.$emit('on-cache-params', {
-          concurrency: this.concurrency,
-          modelType: this.modelType,
-          sourceType: this.sourceType,
-          targetType: this.targetType,
-          sourceParams: this._handleSourceParams(),
-          targetParams: this._handleTargetParams(),
-          localParams: this.localParams
-        })
-      },
-
-      _destroyEditor () {
-        if (editor) {
-          editor.toTextArea() // Uninstall
-          editor.off($('.code-sqoop-mirror'), 'keypress', this.keypress)
-          editor.off($('.code-sqoop-mirror'), 'changes', this.changes)
-          editor = null
-        }
-      },
-      _destroyShellEditor () {
-        if (shellEditor) {
-          shellEditor.toTextArea() // Uninstall
-          shellEditor.off($('.code-shell-mirror'), 'keypress', this.keypress)
-          shellEditor.off($('.code-shell-mirror'), 'changes', this.changes)
+      this.keypress = () => {
+        if (!editor.getOption('readOnly')) {
+          editor.showHint({
+            completeSingle: false
+          })
         }
       }
-    },
-    watch: {
-      // Listening to sqlType
-      sqlType (val) {
-        if (val === 0) {
-          this.showType = []
-        }
-        if (val !== 0) {
-          this.title = ''
-          this.receivers = []
-          this.receiversCc = []
-        }
-      },
-      // Listening data source
-      type (val) {
-        if (val !== 'HIVE') {
-          this.connParams = ''
-        }
-      },
-      // Watch the cacheParams
-      cacheParams (val) {
+
+      this.changes = () => {
         this._cacheParams()
       }
+
+      // Monitor keyboard
+      editor.on('keypress', this.keypress)
+
+      editor.on('changes', this.changes)
+
+      editor.setValue(this.sourceMysqlParams.srcQuerySql)
+
+      return editor
     },
 
-    created () {
-      this._destroyEditor()
-      let o = this.backfillItem
+    /**
+       * Processing code highlighting
+       */
+    _handlerShellEditor () {
+      this._destroyShellEditor()
 
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        this.jobType = o.params.jobType
-        this.isCustomTask = false
-        if (this.jobType === 'CUSTOM') {
-          this.customShell = o.params.customShell
-          this.isCustomTask = true
-        } else {
-          this.jobName = o.params.jobName
-          this.hadoopCustomParams = o.params.hadoopCustomParams
-          this.sqoopAdvancedParams = o.params.sqoopAdvancedParams
-          this.concurrency = o.params.concurrency || 1
-          this.modelType = o.params.modelType
-          this.sourceType = o.params.sourceType
-          this._getTargetTypeList(this.sourceType)
-          this.targetType = o.params.targetType
-          this._getSourceParams(o.params.sourceParams)
-          this._getTargetParams(o.params.targetParams)
-          this.localParams = o.params.localParams
+      // shellEditor
+      shellEditor = codemirror('code-shell-mirror', {
+        mode: 'shell',
+        readOnly: this.isDetails
+      })
+
+      this.keypress = () => {
+        if (!shellEditor.getOption('readOnly')) {
+          shellEditor.showHint({
+            completeSingle: false
+          })
         }
       }
+
+      // Monitor keyboard
+      shellEditor.on('keypress', this.keypress)
+      shellEditor.setValue(this.customShell)
+
+      return shellEditor
     },
 
-    mounted () {
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 200)
-
-      setTimeout(() => {
-        this._handlerShellEditor()
-      }, 200)
-
-      setTimeout(() => {
-        this.srcQueryType = this.sourceMysqlParams.srcQueryType
-      }, 500)
-    },
-
-    destroyed () {
-      /**
-       * Destroy the editor instance
+    /**
+       * return localParams
        */
+    _onLocalParams (a) {
+      this.localParams = a
+    },
+
+    /**
+       * return hadoopParams
+       */
+    _onHadoopCustomParams (a) {
+      this.hadoopCustomParams = a
+    },
+
+    /**
+       * return sqoopAdvancedParams
+       */
+    _onSqoopAdvancedParams (a) {
+      this.sqoopAdvancedParams = a
+    },
+
+    _cacheParams () {
+      this.$emit('on-cache-params', {
+        concurrency: this.concurrency,
+        modelType: this.modelType,
+        sourceType: this.sourceType,
+        targetType: this.targetType,
+        sourceParams: this._handleSourceParams(),
+        targetParams: this._handleTargetParams(),
+        localParams: this.localParams
+      })
+    },
+
+    _destroyEditor () {
       if (editor) {
         editor.toTextArea() // Uninstall
         editor.off($('.code-sqoop-mirror'), 'keypress', this.keypress)
@@ -1243,24 +1159,108 @@
         editor = null
       }
     },
-
-    computed: {
-      cacheParams () {
-        return {
-          concurrency: this.concurrency,
-          modelType: this.modelType,
-          sourceType: this.sourceType,
-          targetType: this.targetType,
-          localParams: this.localParams,
-          sourceMysqlParams: this.sourceMysqlParams,
-          sourceHdfsParams: this.sourceHdfsParams,
-          sourceHiveParams: this.sourceHiveParams,
-          targetHdfsParams: this.targetHdfsParams,
-          targetMysqlParams: this.targetMysqlParams,
-          targetHiveParams: this.targetHiveParams
-        }
+    _destroyShellEditor () {
+      if (shellEditor) {
+        shellEditor.toTextArea() // Uninstall
+        shellEditor.off($('.code-shell-mirror'), 'keypress', this.keypress)
+        shellEditor.off($('.code-shell-mirror'), 'changes', this.changes)
+      }
+    }
+  },
+  watch: {
+    // Listening to sqlType
+    sqlType (val) {
+      if (val === 0) {
+        this.showType = []
+      }
+      if (val !== 0) {
+        this.title = ''
+        this.receivers = []
+        this.receiversCc = []
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mScriptBox }
-  }
+    // Listening data source
+    type (val) {
+      if (val !== 'HIVE') {
+        this.connParams = ''
+      }
+    },
+    // Watch the cacheParams
+    cacheParams (val) {
+      this._cacheParams()
+    }
+  },
+
+  created () {
+    this._destroyEditor()
+    const o = this.backfillItem
+
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o)) {
+      this.jobType = o.params.jobType
+      this.isCustomTask = false
+      if (this.jobType === 'CUSTOM') {
+        this.customShell = o.params.customShell
+        this.isCustomTask = true
+      } else {
+        this.jobName = o.params.jobName
+        this.hadoopCustomParams = o.params.hadoopCustomParams
+        this.sqoopAdvancedParams = o.params.sqoopAdvancedParams
+        this.concurrency = o.params.concurrency || 1
+        this.modelType = o.params.modelType
+        this.sourceType = o.params.sourceType
+        this._getTargetTypeList(this.sourceType)
+        this.targetType = o.params.targetType
+        this._getSourceParams(o.params.sourceParams)
+        this._getTargetParams(o.params.targetParams)
+        this.localParams = o.params.localParams
+      }
+    }
+  },
+
+  mounted () {
+    setTimeout(() => {
+      this._handlerEditor()
+    }, 200)
+
+    setTimeout(() => {
+      this._handlerShellEditor()
+    }, 200)
+
+    setTimeout(() => {
+      this.srcQueryType = this.sourceMysqlParams.srcQueryType
+    }, 500)
+  },
+
+  destroyed () {
+    /**
+       * Destroy the editor instance
+       */
+    if (editor) {
+      editor.toTextArea() // Uninstall
+      editor.off($('.code-sqoop-mirror'), 'keypress', this.keypress)
+      editor.off($('.code-sqoop-mirror'), 'changes', this.changes)
+      editor = null
+    }
+  },
+
+  computed: {
+    cacheParams () {
+      return {
+        concurrency: this.concurrency,
+        modelType: this.modelType,
+        sourceType: this.sourceType,
+        targetType: this.targetType,
+        localParams: this.localParams,
+        sourceMysqlParams: this.sourceMysqlParams,
+        sourceHdfsParams: this.sourceHdfsParams,
+        sourceHiveParams: this.sourceHiveParams,
+        targetHdfsParams: this.targetHdfsParams,
+        targetMysqlParams: this.targetMysqlParams,
+        targetHiveParams: this.targetHiveParams
+      }
+    }
+  },
+  components: { mListBox, mDatasource, mLocalParams, mScriptBox }
+}
 </script>

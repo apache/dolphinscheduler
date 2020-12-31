@@ -35,77 +35,77 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import store from '@/conf/home/store'
-  import { runningType } from '@/conf/home/pages/dag/_source/config'
-  import { warningTypeList } from '@/conf/home/pages/projects/pages/definition/pages/list/_source/util'
+import _ from 'lodash'
+import store from '@/conf/home/store'
+import { runningType } from '@/conf/home/pages/dag/_source/config'
+import { warningTypeList } from '@/conf/home/pages/projects/pages/definition/pages/list/_source/util'
 
-  export default {
-    name: 'starting-params-dag-index',
-    data () {
-      return {
-        store,
-        startupParam: store.state.dag.startup,
-        isView: false,
-        isActive: true,
-        notifyGroupList: null,
-        workerGroupList: null
-      }
-    },
-    methods: {
-      _toggleParam () {
-        this.isView = !this.isView
-      },
-      _rtRunningType (code) {
-        return _.filter(runningType, v => v.code === code)[0].desc
-      },
-      _rtWarningType (id) {
-        return _.filter(warningTypeList, v => v.id === id)[0].code
-      },
-      _rtNotifyGroupName (id) {
-        let o = _.filter(this.notifyGroupList, v => v.id === id)
-        if (o && o.length) {
-          return o[0].code
-        }
-        return '-'
-      },
-      _rtWorkerGroupName (id) {
-        let o = _.filter(this.workerGroupList, v => v.id === id)
-        if (o && o.length) {
-          return o[0].name
-        }
-        return '-'
-      },
-      _getNotifyGroupList () {
-        this.store.dispatch('dag/getNotifyGroupList').then(res => {
-          this.notifyGroupList = res
-        })
-      },
-      _getWorkerGroupList () {
-        let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
-        if (!stateWorkerGroupsList.length) {
-          this.store.dispatch('security/getWorkerGroupsAll').then(res => {
-            this.workerGroupList = res
-          })
-        } else {
-          this.workerGroupList = stateWorkerGroupsList
-        }
-      }
-    },
-    watch: {
-      $route: {
-        deep: true,
-        handler () {
-          this.isActive = false
-          this.$nextTick(() => (this.isActive = true))
-        }
-      }
-    },
-    mounted () {
-      this._getNotifyGroupList()
-      this._getWorkerGroupList()
+export default {
+  name: 'starting-params-dag-index',
+  data () {
+    return {
+      store,
+      startupParam: store.state.dag.startup,
+      isView: false,
+      isActive: true,
+      notifyGroupList: null,
+      workerGroupList: null
     }
+  },
+  methods: {
+    _toggleParam () {
+      this.isView = !this.isView
+    },
+    _rtRunningType (code) {
+      return _.filter(runningType, v => v.code === code)[0].desc
+    },
+    _rtWarningType (id) {
+      return _.filter(warningTypeList, v => v.id === id)[0].code
+    },
+    _rtNotifyGroupName (id) {
+      const o = _.filter(this.notifyGroupList, v => v.id === id)
+      if (o && o.length) {
+        return o[0].code
+      }
+      return '-'
+    },
+    _rtWorkerGroupName (id) {
+      const o = _.filter(this.workerGroupList, v => v.id === id)
+      if (o && o.length) {
+        return o[0].name
+      }
+      return '-'
+    },
+    _getNotifyGroupList () {
+      this.store.dispatch('dag/getNotifyGroupList').then(res => {
+        this.notifyGroupList = res
+      })
+    },
+    _getWorkerGroupList () {
+      const stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (!stateWorkerGroupsList.length) {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.workerGroupList = res
+        })
+      } else {
+        this.workerGroupList = stateWorkerGroupsList
+      }
+    }
+  },
+  watch: {
+    $route: {
+      deep: true,
+      handler () {
+        this.isActive = false
+        this.$nextTick(() => (this.isActive = true))
+      }
+    }
+  },
+  mounted () {
+    this._getNotifyGroupList()
+    this._getWorkerGroupList()
   }
+}
 </script>
 <style lang="scss">
   .starting-params-dag-index {

@@ -30,78 +30,78 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import mListBox from './listBox'
-  import disabledState from '@/module/mixin/disabledState'
-  import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+import _ from 'lodash'
+import mListBox from './listBox'
+import disabledState from '@/module/mixin/disabledState'
+import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
-  let editor
+let editor
 
-  export default {
-    name: 'shell',
-    data () {
-      return {
-        // script
-        rawScript: ''
-      }
-    },
-    mixins: [disabledState],
-    props: {
-      jsonItem: String
-    },
-    methods: {
-      /**
+export default {
+  name: 'shell',
+  data () {
+    return {
+      // script
+      rawScript: ''
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    jsonItem: String
+  },
+  methods: {
+    /**
        * Processing code highlighting
        */
-      _handlerEditor () {
-        // editor
-        let self = this
-        editor = codemirror('code-shell-mirror1', {
-          mode: 'shell',
-          readOnly: this.isDetails
-        })
-        editor.on('change', function () {
-          self.$emit('getJsonBoxValue', editor.getValue())
-        })
+    _handlerEditor () {
+      // editor
+      const self = this
+      editor = codemirror('code-shell-mirror1', {
+        mode: 'shell',
+        readOnly: this.isDetails
+      })
+      editor.on('change', function () {
+        self.$emit('getJsonBoxValue', editor.getValue())
+      })
 
-        this.keypress = () => {
-          if (!editor.getOption('readOnly')) {
-            editor.showHint({
-              completeSingle: false
-            })
-          }
+      this.keypress = () => {
+        if (!editor.getOption('readOnly')) {
+          editor.showHint({
+            completeSingle: false
+          })
         }
-
-        // Monitor keyboard
-        editor.on('keypress', this.keypress)
-
-        editor.setValue(this.rawScript)
-
-        return editor
       }
-    },
-    watch: {},
-    created () {
-      let o = this.jsonItem
 
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        this.rawScript = o
-      }
-    },
-    mounted () {
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 200)
-    },
-    destroyed () {
-      if (editor) {
-        editor.toTextArea() // Uninstall
-        editor.off($('.code-shell-mirror1'), 'keypress', this.keypress)
-      }
-    },
-    components: { mListBox }
-  }
+      // Monitor keyboard
+      editor.on('keypress', this.keypress)
+
+      editor.setValue(this.rawScript)
+
+      return editor
+    }
+  },
+  watch: {},
+  created () {
+    const o = this.jsonItem
+
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o)) {
+      this.rawScript = o
+    }
+  },
+  mounted () {
+    setTimeout(() => {
+      this._handlerEditor()
+    }, 200)
+  },
+  destroyed () {
+    if (editor) {
+      editor.toTextArea() // Uninstall
+      editor.off($('.code-shell-mirror1'), 'keypress', this.keypress)
+    }
+  },
+  components: { mListBox }
+}
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>
   .script-model {

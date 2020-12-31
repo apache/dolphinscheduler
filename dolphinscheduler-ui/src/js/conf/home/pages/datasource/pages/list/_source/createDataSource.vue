@@ -150,349 +150,349 @@
   </div>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import { isJson } from '@/module/util/util'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import { isJson } from '@/module/util/util'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-  export default {
-    name: 'create-datasource',
-    data () {
-      return {
-        store,
-        // btn loading
-        spinnerLoading: false,
-        // Data source type
-        type: 'MYSQL',
-        // name
-        name: '',
-        // description
-        note: '',
-        // host
-        host: '',
-        // port
-        port: '',
-        // data storage name
-        database: '',
-        // principal
-        principal: '',
-        // database username
-        userName: '',
-        // Database password
-        password: '',
-        // Database connect type
-        connectType: '',
-        // Jdbc connection parameter
-        other: '',
-        // btn test loading
-        testLoading: false,
-        showPrincipal: true,
-        showdDatabase: false,
-        showConnectType: false,
-        isShowPrincipal: true,
-        prePortMapper: {},
-        datasourceTypeList: [
-          {
-            value: 'MYSQL',
-            label: 'MYSQL'
-          },
-          {
-            value: 'POSTGRESQL',
-            label: 'POSTGRESQL'
-          },
-          {
-            value: 'HIVE',
-            label: 'HIVE/IMPALA'
-          },
-          {
-            value: 'SPARK',
-            label: 'SPARK'
-          },
-          {
-            value: 'CLICKHOUSE',
-            label: 'CLICKHOUSE'
-          },
-          {
-            value: 'ORACLE',
-            label: 'ORACLE'
-          },
-          {
-            value: 'SQLSERVER',
-            label: 'SQLSERVER'
-          },
-          {
-            value: 'DB2',
-            label: 'DB2'
-          },
-          {
-            value: 'PRESTO',
-            label: 'PRESTO'
-          }
-        ]
-      }
-    },
-    props: {
-      item: Object
-    },
+export default {
+  name: 'create-datasource',
+  data () {
+    return {
+      store,
+      // btn loading
+      spinnerLoading: false,
+      // Data source type
+      type: 'MYSQL',
+      // name
+      name: '',
+      // description
+      note: '',
+      // host
+      host: '',
+      // port
+      port: '',
+      // data storage name
+      database: '',
+      // principal
+      principal: '',
+      // database username
+      userName: '',
+      // Database password
+      password: '',
+      // Database connect type
+      connectType: '',
+      // Jdbc connection parameter
+      other: '',
+      // btn test loading
+      testLoading: false,
+      showPrincipal: true,
+      showdDatabase: false,
+      showConnectType: false,
+      isShowPrincipal: true,
+      prePortMapper: {},
+      datasourceTypeList: [
+        {
+          value: 'MYSQL',
+          label: 'MYSQL'
+        },
+        {
+          value: 'POSTGRESQL',
+          label: 'POSTGRESQL'
+        },
+        {
+          value: 'HIVE',
+          label: 'HIVE/IMPALA'
+        },
+        {
+          value: 'SPARK',
+          label: 'SPARK'
+        },
+        {
+          value: 'CLICKHOUSE',
+          label: 'CLICKHOUSE'
+        },
+        {
+          value: 'ORACLE',
+          label: 'ORACLE'
+        },
+        {
+          value: 'SQLSERVER',
+          label: 'SQLSERVER'
+        },
+        {
+          value: 'DB2',
+          label: 'DB2'
+        },
+        {
+          value: 'PRESTO',
+          label: 'PRESTO'
+        }
+      ]
+    }
+  },
+  props: {
+    item: Object
+  },
 
-    methods: {
-      _rtOtherPlaceholder () {
-        return `${i18n.$t('Please enter format')} {"key1":"value1","key2":"value2"...} ${i18n.$t('connection parameter')}`
-      },
-      /**
+  methods: {
+    _rtOtherPlaceholder () {
+      return `${i18n.$t('Please enter format')} {"key1":"value1","key2":"value2"...} ${i18n.$t('connection parameter')}`
+    },
+    /**
        * submit
        */
-      _ok () {
-        if (this._verification()) {
-          this._verifName().then(res => {
-            this._submit()
-          })
-        }
-      },
-      /**
+    _ok () {
+      if (this._verification()) {
+        this._verifName().then(res => {
+          this._submit()
+        })
+      }
+    },
+    /**
        * close
        */
-      _close () {
-        this.$emit('close')
-      },
-      /**
+    _close () {
+      this.$emit('close')
+    },
+    /**
        * return param
        */
-      _rtParam () {
-        return {
-          type: this.type,
-          name: this.name,
-          note: this.note,
-          host: this.host,
-          port: this.port,
-          database: this.database,
-          principal: this.principal,
-          userName: this.userName,
-          password: this.password,
-          connectType: this.connectType,
-          other: this.other
-        }
-      },
-      /**
+    _rtParam () {
+      return {
+        type: this.type,
+        name: this.name,
+        note: this.note,
+        host: this.host,
+        port: this.port,
+        database: this.database,
+        principal: this.principal,
+        userName: this.userName,
+        password: this.password,
+        connectType: this.connectType,
+        other: this.other
+      }
+    },
+    /**
        * test connect
        */
-      _testConnect () {
-        if (this._verification()) {
-          this.testLoading = true
-          this.store.dispatch('datasource/connectDatasources', this._rtParam()).then(res => {
-            setTimeout(() => {
-              this.$message.success(res.msg)
-              this.testLoading = false
-            }, 800)
-          }).catch(e => {
-            this.$message.error(e.msg || '')
+    _testConnect () {
+      if (this._verification()) {
+        this.testLoading = true
+        this.store.dispatch('datasource/connectDatasources', this._rtParam()).then(res => {
+          setTimeout(() => {
+            this.$message.success(res.msg)
             this.testLoading = false
-          })
-        }
-      },
-      /**
+          }, 800)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          this.testLoading = false
+        })
+      }
+    },
+    /**
        * Verify that the data source name exists
        */
-      _verifName () {
-        return new Promise((resolve, reject) => {
-          if (this.name === this.item.name) {
-            resolve()
-            return
-          }
-          this.store.dispatch('datasource/verifyName', { name: this.name }).then(res => {
-            resolve()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-            reject(e)
-          })
+    _verifName () {
+      return new Promise((resolve, reject) => {
+        if (this.name === this.item.name) {
+          resolve()
+          return
+        }
+        this.store.dispatch('datasource/verifyName', { name: this.name }).then(res => {
+          resolve()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          reject(e)
         })
-      },
-      /**
+      })
+    },
+    /**
        * verification
        */
-      _verification () {
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('Please enter resource name')}`)
-          return false
-        }
-        if (!this.host) {
-          this.$message.warning(`${i18n.$t('Please enter IP/hostname')}`)
-          return false
-        }
-        if (!this.port) {
-          this.$message.warning(`${i18n.$t('Please enter port')}`)
-          return false
-        }
-        if (!this.userName) {
-          this.$message.warning(`${i18n.$t('Please enter user name')}`)
-          return false
-        }
+    _verification () {
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('Please enter resource name')}`)
+        return false
+      }
+      if (!this.host) {
+        this.$message.warning(`${i18n.$t('Please enter IP/hostname')}`)
+        return false
+      }
+      if (!this.port) {
+        this.$message.warning(`${i18n.$t('Please enter port')}`)
+        return false
+      }
+      if (!this.userName) {
+        this.$message.warning(`${i18n.$t('Please enter user name')}`)
+        return false
+      }
 
-        if (!this.database && this.showdDatabase === false) {
-          this.$message.warning(`${i18n.$t('Please enter database name')}`)
+      if (!this.database && this.showdDatabase === false) {
+        this.$message.warning(`${i18n.$t('Please enter database name')}`)
+        return false
+      }
+      if (this.other) {
+        if (!isJson(this.other)) {
+          this.$message.warning(`${i18n.$t('jdbc connection parameters is not a correct JSON format')}`)
           return false
         }
-        if (this.other) {
-          if (!isJson(this.other)) {
-            this.$message.warning(`${i18n.$t('jdbc connection parameters is not a correct JSON format')}`)
-            return false
-          }
-        }
+      }
 
-        return true
-      },
-      /**
+      return true
+    },
+    /**
        * submit => add/update
        */
-      _submit () {
-        this.spinnerLoading = true
-        let param = this._rtParam()
-        // edit
-        if (this.item) {
-          param.id = this.item.id
-        }
-        this.store.dispatch(`datasource/${this.item ? 'updateDatasource' : 'createDatasources'}`, param).then(res => {
-          this.$message.success(res.msg)
-          this.spinnerLoading = false
-          this.$emit('onUpdate')
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.spinnerLoading = false
-        })
-      },
-      /**
+    _submit () {
+      this.spinnerLoading = true
+      const param = this._rtParam()
+      // edit
+      if (this.item) {
+        param.id = this.item.id
+      }
+      this.store.dispatch(`datasource/${this.item ? 'updateDatasource' : 'createDatasources'}`, param).then(res => {
+        this.$message.success(res.msg)
+        this.spinnerLoading = false
+        this.$emit('onUpdate')
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.spinnerLoading = false
+      })
+    },
+    /**
        * Get modified data
        */
-      _getEditDatasource () {
-        this.store.dispatch('datasource/getEditDatasource', { id: this.item.id }).then(res => {
-          this.type = res.type
-          this.name = res.name
-          this.note = res.note
-          this.host = res.host
+    _getEditDatasource () {
+      this.store.dispatch('datasource/getEditDatasource', { id: this.item.id }).then(res => {
+        this.type = res.type
+        this.name = res.name
+        this.note = res.note
+        this.host = res.host
 
-          // When in Editpage, Prevent default value overwrite backfill value
-          setTimeout(() => {
-            this.port = res.port
-          }, 0)
+        // When in Editpage, Prevent default value overwrite backfill value
+        setTimeout(() => {
+          this.port = res.port
+        }, 0)
 
-          this.principal = res.principal
-          this.database = res.database
-          this.userName = res.userName
-          this.password = res.password
-          this.connectType = res.connectType
-          this.other = JSON.stringify(res.other) === '{}' ? '' : JSON.stringify(res.other)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      /**
+        this.principal = res.principal
+        this.database = res.database
+        this.userName = res.userName
+        this.password = res.password
+        this.connectType = res.connectType
+        this.other = JSON.stringify(res.other) === '{}' ? '' : JSON.stringify(res.other)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
+    },
+    /**
        * Set default port for each type.
        */
-      _setDefaultValues (value) {
-        // Default type is MYSQL
-        let type = this.type || 'MYSQL'
+    _setDefaultValues (value) {
+      // Default type is MYSQL
+      const type = this.type || 'MYSQL'
 
-        let defaultPort = this._getDefaultPort(type)
+      const defaultPort = this._getDefaultPort(type)
 
-        // Backfill the previous input from memcache
-        let mapperPort = this.prePortMapper[type]
+      // Backfill the previous input from memcache
+      const mapperPort = this.prePortMapper[type]
 
-        this.port = mapperPort || defaultPort
-      },
+      this.port = mapperPort || defaultPort
+    },
 
-      /**
+    /**
        * Get default port by type
        */
-      _getDefaultPort (type) {
-        let defaultPort = ''
-        switch (type) {
-          case 'MYSQL':
-            defaultPort = '3306'
-            break
-          case 'POSTGRESQL':
-            defaultPort = '5432'
-            break
-          case 'HIVE':
-            defaultPort = '10000'
-            break
-          case 'SPARK':
-            defaultPort = '10015'
-            break
-          case 'CLICKHOUSE':
-            defaultPort = '8123'
-            break
-          case 'ORACLE':
-            defaultPort = '1521'
-            break
-          case 'SQLSERVER':
-            defaultPort = '1433'
-            break
-          case 'DB2':
-            defaultPort = '50000'
-            break
-          case 'PRESTO':
-            defaultPort = '8080'
-            break
-          default:
-            break
-        }
-        return defaultPort
+    _getDefaultPort (type) {
+      let defaultPort = ''
+      switch (type) {
+        case 'MYSQL':
+          defaultPort = '3306'
+          break
+        case 'POSTGRESQL':
+          defaultPort = '5432'
+          break
+        case 'HIVE':
+          defaultPort = '10000'
+          break
+        case 'SPARK':
+          defaultPort = '10015'
+          break
+        case 'CLICKHOUSE':
+          defaultPort = '8123'
+          break
+        case 'ORACLE':
+          defaultPort = '1521'
+          break
+        case 'SQLSERVER':
+          defaultPort = '1433'
+          break
+        case 'DB2':
+          defaultPort = '50000'
+          break
+        case 'PRESTO':
+          defaultPort = '8080'
+          break
+        default:
+          break
       }
-    },
-    created () {
-      // Backfill
-      if (this.item.id) {
-        this._getEditDatasource()
+      return defaultPort
+    }
+  },
+  created () {
+    // Backfill
+    if (this.item.id) {
+      this._getEditDatasource()
+    }
+
+    this._setDefaultValues()
+  },
+  watch: {
+    type (value) {
+      if (value === 'POSTGRESQL') {
+        this.showdDatabase = true
+      } else {
+        this.showdDatabase = false
       }
 
-      this._setDefaultValues()
-    },
-    watch: {
-      type (value) {
-        if (value === 'POSTGRESQL') {
-          this.showdDatabase = true
-        } else {
-          this.showdDatabase = false
-        }
+      if (value === 'ORACLE' && !this.item.id) {
+        this.showConnectType = true
+        this.connectType = 'ORACLE_SERVICE_NAME'
+      } else if (value === 'ORACLE' && this.item.id) {
+        this.showConnectType = true
+      } else {
+        this.showConnectType = false
+      }
+      // Set default port for each type datasource
+      this._setDefaultValues(value)
 
-        if (value === 'ORACLE' && !this.item.id) {
-          this.showConnectType = true
-          this.connectType = 'ORACLE_SERVICE_NAME'
-        } else if (value === 'ORACLE' && this.item.id) {
-          this.showConnectType = true
-        } else {
-          this.showConnectType = false
-        }
-        // Set default port for each type datasource
-        this._setDefaultValues(value)
-
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('datasource/getKerberosStartupState').then(res => {
-            this.isShowPrincipal = res
-            if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
-              this.showPrincipal = false
-            } else {
-              this.showPrincipal = true
-            }
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-            reject(e)
-          })
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('datasource/getKerberosStartupState').then(res => {
+          this.isShowPrincipal = res
+          if ((value === 'HIVE' || value === 'SPARK') && this.isShowPrincipal === true) {
+            this.showPrincipal = false
+          } else {
+            this.showPrincipal = true
+          }
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          reject(e)
         })
-      },
-      /**
+      })
+    },
+    /**
        * Cache the previous input port for each type datasource
        * @param value
        */
-      port (value) {
-        this.prePortMapper[this.type] = value
-      }
-    },
+    port (value) {
+      this.prePortMapper[this.type] = value
+    }
+  },
 
-    mounted () {
-    },
-    components: { mListBoxF }
-  }
+  mounted () {
+  },
+  components: { mListBoxF }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

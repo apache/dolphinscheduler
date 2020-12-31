@@ -48,80 +48,80 @@
   </m-list-construction>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import mList from './_source/list'
-  import store from '@/conf/home/store'
-  import mSpin from '@/module/components/spin/spin'
-  import mNoData from '@/module/components/noData/noData'
-  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mConditions from '@/module/components/conditions/conditions'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import mList from './_source/list'
+import store from '@/conf/home/store'
+import mSpin from '@/module/components/spin/spin'
+import mNoData from '@/module/components/noData/noData'
+import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+import mConditions from '@/module/components/conditions/conditions'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'worker-groups-index',
-    data () {
-      return {
-        total: null,
-        isLoading: false,
-        workerGroupList: [],
-        searchParams: {
-          pageSize: 10,
-          pageNo: 1,
-          searchVal: ''
-        },
-        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
-      }
-    },
-    mixins: [listUrlParamHandle],
-    props: {},
-    methods: {
-      ...mapActions('security', ['getWorkerGroups']),
-      /**
+export default {
+  name: 'worker-groups-index',
+  data () {
+    return {
+      total: null,
+      isLoading: false,
+      workerGroupList: [],
+      searchParams: {
+        pageSize: 10,
+        pageNo: 1,
+        searchVal: ''
+      },
+      isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
+    }
+  },
+  mixins: [listUrlParamHandle],
+  props: {},
+  methods: {
+    ...mapActions('security', ['getWorkerGroups']),
+    /**
        * Inquire
        */
-      _onConditions (o) {
-        this.searchParams = _.assign(this.searchParams, o)
-        this.searchParams.pageNo = 1
-      },
-      _page (val) {
-        this.searchParams.pageNo = val
-      },
-      _pageSize (val) {
-        this.searchParams.pageSize = val
-      },
-      _onUpdate () {
-        this._debounceGET()
-      },
-      _onEdit (item) {
-        this._create(item)
-      },
-      _getList (flag) {
-        this.isLoading = !flag
-        this.getWorkerGroups(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo - 1
-          } else {
-            this.workerGroupList = []
-            this.workerGroupList = res.totalList
-            this.total = res.total
-            this.isLoading = false
-          }
-        }).catch(e => {
+    _onConditions (o) {
+      this.searchParams = _.assign(this.searchParams, o)
+      this.searchParams.pageNo = 1
+    },
+    _page (val) {
+      this.searchParams.pageNo = val
+    },
+    _pageSize (val) {
+      this.searchParams.pageSize = val
+    },
+    _onUpdate () {
+      this._debounceGET()
+    },
+    _onEdit (item) {
+      this._create(item)
+    },
+    _getList (flag) {
+      this.isLoading = !flag
+      this.getWorkerGroups(this.searchParams).then(res => {
+        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+          this.searchParams.pageNo = this.searchParams.pageNo - 1
+        } else {
+          this.workerGroupList = []
+          this.workerGroupList = res.totalList
+          this.total = res.total
           this.isLoading = false
-        })
-      }
-    },
-    watch: {
-      // router
-      '$route' (a) {
-        // url no params get instance list
-        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-      }
-    },
-    created () {},
-    mounted () {
-    },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
-  }
+        }
+      }).catch(e => {
+        this.isLoading = false
+      })
+    }
+  },
+  watch: {
+    // router
+    '$route' (a) {
+      // url no params get instance list
+      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+    }
+  },
+  created () {},
+  mounted () {
+  },
+  components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+}
 </script>

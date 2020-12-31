@@ -25,28 +25,28 @@
   </div>
 </template>
 <script>
-  import echarts from 'echarts'
-  import gaugeOption from './gaugeOption'
+import echarts from 'echarts'
+import gaugeOption from './gaugeOption'
 
-  export default {
-    name: 'gauge',
-    data () {
-      return {}
-    },
-    props: {
-      id: String,
-      name: String,
-      value: Number
-    },
-    methods: {},
-    created () {
-    },
-    mounted () {
+export default {
+  name: 'gauge',
+  data () {
+    return {}
+  },
+  props: {
+    id: String,
+    name: String,
+    value: Number
+  },
+  methods: {},
+  created () {
+  },
+  mounted () {
       const gauge = echarts.init(document.getElementById(this.id)) // eslint-disable-line
-      gauge.setOption(gaugeOption(this.value), true)
-    },
-    components: {}
-  }
+    gauge.setOption(gaugeOption(this.value), true)
+  },
+  components: {}
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

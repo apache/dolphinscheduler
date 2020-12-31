@@ -31,15 +31,15 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'list-construction',
-    data () {
-      return {}
-    },
-    props: {
-      title: String
-    }
+export default {
+  name: 'list-construction',
+  data () {
+    return {}
+  },
+  props: {
+    title: String
   }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

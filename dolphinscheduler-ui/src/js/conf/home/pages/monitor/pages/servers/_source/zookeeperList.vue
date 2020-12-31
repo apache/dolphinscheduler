@@ -47,12 +47,12 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'zookeeper-list',
-    props: {
-      list: Array
-    }
+export default {
+  name: 'zookeeper-list',
+  props: {
+    list: Array
   }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

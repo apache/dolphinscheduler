@@ -102,117 +102,117 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import disabledState from '@/module/mixin/disabledState'
+import _ from 'lodash'
+import disabledState from '@/module/mixin/disabledState'
 
-  export default {
-    name: 'form-dependent-timeout',
-    data () {
-      return {
-        // Timeout display hiding
+export default {
+  name: 'form-dependent-timeout',
+  data () {
+    return {
+      // Timeout display hiding
+      enable: false,
+      waitStartTimeout: {
         enable: false,
-        waitStartTimeout: {
-          enable: false,
-          // Timeout strategy
-          strategy: ['FAILED'],
-          // Timeout period
-          interval: null,
-          checkInterval: null
-        },
-        waitCompleteTimeout: {
-          enable: false,
-          // Timeout strategy
-          strategy: [],
-          // Timeout period
-          interval: null
-        }
+        // Timeout strategy
+        strategy: ['FAILED'],
+        // Timeout period
+        interval: null,
+        checkInterval: null
+      },
+      waitCompleteTimeout: {
+        enable: false,
+        // Timeout strategy
+        strategy: [],
+        // Timeout period
+        interval: null
+      }
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object
+  },
+  methods: {
+    _onSwitch (p, is) {
+      // reset timeout setting when switch timeout on/off.
+      // p = 0 for timeout switch; p = 1 for wait start timeout switch; p = 2 for wait complete timeout switch.
+      if (p === 1 || p === 0) {
+        this.waitStartTimeout.interval = is ? 30 : null
+        this.waitStartTimeout.checkInterval = is ? 1 : null
+      }
+      if (p === 2 || p === 0) {
+        this.waitCompleteTimeout.strategy = is ? ['WARN'] : []
+        this.waitCompleteTimeout.interval = is ? 30 : null
       }
     },
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object
-    },
-    methods: {
-      _onSwitch (p, is) {
-        // reset timeout setting when switch timeout on/off.
-        // p = 0 for timeout switch; p = 1 for wait start timeout switch; p = 2 for wait complete timeout switch.
-        if (p === 1 || p === 0) {
-          this.waitStartTimeout.interval = is ? 30 : null
-          this.waitStartTimeout.checkInterval = is ? 1 : null
-        }
-        if (p === 2 || p === 0) {
-          this.waitCompleteTimeout.strategy = is ? ['WARN'] : []
-          this.waitCompleteTimeout.interval = is ? 30 : null
-        }
-      },
-      _verification () {
-        // Verification timeout policy
-        if (this.enable &&
+    _verification () {
+      // Verification timeout policy
+      if (this.enable &&
           (this.waitCompleteTimeout.enable && !this.waitCompleteTimeout.strategy.length) ||
           (this.waitStartTimeout.enable && !this.waitStartTimeout.strategy.length)) {
-          this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
-          return false
-        }
-        // Verify timeout duration Non 0 positive integer
-        const reg = /^[1-9]\d*$/
-        if (this.enable &&
+        this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
+        return false
+      }
+      // Verify timeout duration Non 0 positive integer
+      const reg = /^[1-9]\d*$/
+      if (this.enable &&
           (this.waitCompleteTimeout.enable && !reg.test(this.waitCompleteTimeout.interval)) ||
           (this.waitStartTimeout.enable && (!reg.test(this.waitStartTimeout.interval || !reg.test(this.waitStartTimeout.checkInterval))))) {
-          this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
-          return false
-        }
-        // Verify timeout duration longer than check interval
-        if (this.enable && this.waitStartTimeout.enable && this.waitStartTimeout.checkInterval >= this.waitStartTimeout.interval) {
-          this.$message.warning(`${this.$t('Timeout must be longer than check interval')}`)
-          return false
-        }
-        this.$emit('on-timeout', {
-          waitStartTimeout: {
-            strategy: 'FAILED',
-            interval: parseInt(this.waitStartTimeout.interval),
-            checkInterval: parseInt(this.waitStartTimeout.checkInterval),
-            enable: this.waitStartTimeout.enable
-          },
-          waitCompleteTimeout: {
-            strategy: (() => {
-              // Handling checkout sequence
-              let strategy = this.waitCompleteTimeout.strategy
-              if (strategy.length === 2 && strategy[0] === 'FAILED') {
-                return [strategy[1], strategy[0]].join(',')
-              } else {
-                return strategy.join(',')
-              }
-            })(),
-            interval: parseInt(this.waitCompleteTimeout.interval),
-            enable: this.waitCompleteTimeout.enable
-          }
-        })
-        return true
+        this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
+        return false
       }
-    },
-    watch: {
-    },
-    created () {
-      let o = this.backfillItem
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        if (o.timeout) {
-          this.enable = true
-          this.waitCompleteTimeout.enable = o.timeout.enable || false
-          this.waitCompleteTimeout.strategy = _.split(o.timeout.strategy, ',') || ['WARN']
-          this.waitCompleteTimeout.interval = o.timeout.interval || null
-        }
-        if (o.waitStartTimeout) {
-          this.enable = true
-          this.waitStartTimeout.enable = o.waitStartTimeout.enable || false
-          this.waitStartTimeout.strategy = ['FAILED']
-          this.waitStartTimeout.interval = o.waitStartTimeout.interval || null
-          this.waitStartTimeout.checkInterval = o.waitStartTimeout.checkInterval || null
-        }
+      // Verify timeout duration longer than check interval
+      if (this.enable && this.waitStartTimeout.enable && this.waitStartTimeout.checkInterval >= this.waitStartTimeout.interval) {
+        this.$message.warning(`${this.$t('Timeout must be longer than check interval')}`)
+        return false
       }
-    },
-    mounted () {
-    },
-    components: {}
-  }
+      this.$emit('on-timeout', {
+        waitStartTimeout: {
+          strategy: 'FAILED',
+          interval: parseInt(this.waitStartTimeout.interval),
+          checkInterval: parseInt(this.waitStartTimeout.checkInterval),
+          enable: this.waitStartTimeout.enable
+        },
+        waitCompleteTimeout: {
+          strategy: (() => {
+            // Handling checkout sequence
+            const strategy = this.waitCompleteTimeout.strategy
+            if (strategy.length === 2 && strategy[0] === 'FAILED') {
+              return [strategy[1], strategy[0]].join(',')
+            } else {
+              return strategy.join(',')
+            }
+          })(),
+          interval: parseInt(this.waitCompleteTimeout.interval),
+          enable: this.waitCompleteTimeout.enable
+        }
+      })
+      return true
+    }
+  },
+  watch: {
+  },
+  created () {
+    const o = this.backfillItem
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o)) {
+      if (o.timeout) {
+        this.enable = true
+        this.waitCompleteTimeout.enable = o.timeout.enable || false
+        this.waitCompleteTimeout.strategy = _.split(o.timeout.strategy, ',') || ['WARN']
+        this.waitCompleteTimeout.interval = o.timeout.interval || null
+      }
+      if (o.waitStartTimeout) {
+        this.enable = true
+        this.waitStartTimeout.enable = o.waitStartTimeout.enable || false
+        this.waitStartTimeout.strategy = ['FAILED']
+        this.waitStartTimeout.interval = o.waitStartTimeout.interval || null
+        this.waitStartTimeout.checkInterval = o.waitStartTimeout.checkInterval || null
+      }
+    }
+  },
+  mounted () {
+  },
+  components: {}
+}
 </script>

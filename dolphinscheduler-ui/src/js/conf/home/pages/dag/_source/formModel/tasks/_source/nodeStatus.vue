@@ -44,139 +44,139 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import { cycleList, nodeStatusList } from './commcon'
-  import disabledState from '@/module/mixin/disabledState'
-  export default {
-    name: 'node-status',
-    data () {
-      return {
-        list: [],
-        definitionList: [],
-        projectList: [],
-        cycleList: cycleList,
-        isInstance: false,
-        itemIndex: null,
-        nodeStatusList: nodeStatusList
-      }
-    },
-    mixins: [disabledState],
-    props: {
-      dependItemList: Array,
-      index: Number,
-      dependTaskList: Array,
-      preNode: Array
-    },
-    model: {
-      prop: 'dependItemList',
-      event: 'dependItemListEvent'
-    },
-    methods: {
-      /**
+import _ from 'lodash'
+import { cycleList, nodeStatusList } from './commcon'
+import disabledState from '@/module/mixin/disabledState'
+export default {
+  name: 'node-status',
+  data () {
+    return {
+      list: [],
+      definitionList: [],
+      projectList: [],
+      cycleList: cycleList,
+      isInstance: false,
+      itemIndex: null,
+      nodeStatusList: nodeStatusList
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    dependItemList: Array,
+    index: Number,
+    dependTaskList: Array,
+    preNode: Array
+  },
+  model: {
+    prop: 'dependItemList',
+    event: 'dependItemListEvent'
+  },
+  methods: {
+    /**
        * add task
        */
-      _add () {
-        // btn loading
-        this.isLoading = true
-        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+    _add () {
+      // btn loading
+      this.isLoading = true
+      this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
 
-        // remove tooltip
-        this._removeTip()
-      },
-      /**
+      // remove tooltip
+      this._removeTip()
+    },
+    /**
        * remove task
        */
-      _remove (i) {
-        this._removeTip()
-        if (!this.dependItemList.length || this.dependItemList.length === 0) {
-          this.$emit('on-delete-all', {
-            index: this.index
-          })
-        }
-      },
-      _getProjectList () {
-        return new Promise((resolve, reject) => {
-          this.projectList = _.map(_.cloneDeep(this.store.state.dag.projectListS), v => {
+    _remove (i) {
+      this._removeTip()
+      if (!this.dependItemList.length || this.dependItemList.length === 0) {
+        this.$emit('on-delete-all', {
+          index: this.index
+        })
+      }
+    },
+    _getProjectList () {
+      return new Promise((resolve, reject) => {
+        this.projectList = _.map(_.cloneDeep(this.store.state.dag.projectListS), v => {
+          return {
+            value: v.id,
+            label: v.name
+          }
+        })
+        resolve()
+      })
+    },
+    _getProcessByProjectId (id) {
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
+          this.definitionList = _.map(_.cloneDeep(res), v => {
             return {
               value: v.id,
               label: v.name
             }
           })
-          resolve()
+          resolve(res)
         })
-      },
-      _getProcessByProjectId (id) {
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
-            this.definitionList = _.map(_.cloneDeep(res), v => {
-              return {
-                value: v.id,
-                label: v.name
-              }
-            })
-            resolve(res)
-          })
-        })
-      },
-      /**
+      })
+    },
+    /**
        * get dependItemList
        */
-      _getDependItemList (ids, is = true) {
-        return new Promise((resolve, reject) => {
-          if (is) {
-            this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
-              resolve(['ALL'].concat(_.map(res, v => v.name)))
-            })
-          }
-        })
-      },
-      _rtNewParams () {
-        return {
-          depTasks: '',
-          status: ''
-        }
-      },
-      _rtOldParams (value, depTasksList, item) {
-        return {
-          depTasks: '',
-          status: ''
-        }
-      },
-      /**
-       * remove tip
-       */
-      _removeTip () {
-        $('body').find('.tooltip.fade.top.in').remove()
-      }
-    },
-    watch: {
-    },
-    beforeCreate () {
-    },
-    created () {
-      // is type projects-instance-details
-      this.isInstance = this.router.history.current.name === 'projects-instance-details'
-      // get processlist
-      this._getProjectList().then(() => {
-        if (!this.dependItemList.length) {
-          this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
-        } else {
-          // get definitionId ids
-          let ids = _.map(this.dependItemList, v => v.definitionId).join(',')
-          // get item list
-          this._getDependItemList(ids, false).then(res => {
-            _.map(this.dependItemList, (v, i) => {
-              this._getProcessByProjectId(v.projectId).then(definitionList => {
-                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
-              })
-            })
+    _getDependItemList (ids, is = true) {
+      return new Promise((resolve, reject) => {
+        if (is) {
+          this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
+            resolve(['ALL'].concat(_.map(res, v => v.name)))
           })
         }
       })
     },
-    mounted () {},
-    components: {}
-  }
+    _rtNewParams () {
+      return {
+        depTasks: '',
+        status: ''
+      }
+    },
+    _rtOldParams (value, depTasksList, item) {
+      return {
+        depTasks: '',
+        status: ''
+      }
+    },
+    /**
+       * remove tip
+       */
+    _removeTip () {
+      $('body').find('.tooltip.fade.top.in').remove()
+    }
+  },
+  watch: {
+  },
+  beforeCreate () {
+  },
+  created () {
+    // is type projects-instance-details
+    this.isInstance = this.router.history.current.name === 'projects-instance-details'
+    // get processlist
+    this._getProjectList().then(() => {
+      if (!this.dependItemList.length) {
+        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+      } else {
+        // get definitionId ids
+        const ids = _.map(this.dependItemList, v => v.definitionId).join(',')
+        // get item list
+        this._getDependItemList(ids, false).then(res => {
+          _.map(this.dependItemList, (v, i) => {
+            this._getProcessByProjectId(v.projectId).then(definitionList => {
+              this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+            })
+          })
+        })
+      }
+    })
+  },
+  mounted () {},
+  components: {}
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

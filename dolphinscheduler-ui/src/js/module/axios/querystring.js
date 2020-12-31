@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 /* istanbul ignore next */
-let param = function (a) {
-  let s = []
-  let rbracket = /\[\]$/
-  let isArray = function (obj) {
+const param = function (a) {
+  const s = []
+  const rbracket = /\[\]$/
+  const isArray = function (obj) {
     return Object.prototype.toString.call(obj) === '[object Array]'
   }
-  let add = function (k, v) {
+  const add = function (k, v) {
     v = typeof v === 'function' ? v() : v === null ? '' : v === undefined ? '' : v
     s[s.length] = encodeURIComponent(k) + '=' + encodeURIComponent(v)
   }
-  let buildParams = function (prefix, obj) {
+  const buildParams = function (prefix, obj) {
     let i, len, key
 
     if (prefix) {

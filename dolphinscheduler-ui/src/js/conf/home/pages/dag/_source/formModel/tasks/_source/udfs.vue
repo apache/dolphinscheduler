@@ -31,82 +31,82 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import disabledState from '@/module/mixin/disabledState'
+import _ from 'lodash'
+import disabledState from '@/module/mixin/disabledState'
 
-  export default {
-    name: 'udfs',
-    data () {
-      return {
-        // UDFS Function
-        udfsStr: [],
-        // UDFS Function(List)
-        udfsList: []
-      }
-    },
-    mixins: [disabledState],
-    props: {
-      udfs: String,
-      type: String
-    },
-    methods: {
-      /**
+export default {
+  name: 'udfs',
+  data () {
+    return {
+      // UDFS Function
+      udfsStr: [],
+      // UDFS Function(List)
+      udfsList: []
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    udfs: String,
+    type: String
+  },
+  methods: {
+    /**
        * verification
        */
-      _verifUdfs () {
-        this.$emit('on-udfsData', this.udfsStr.join(','))
-        return true
-      },
-      /**
+    _verifUdfs () {
+      this.$emit('on-udfsData', this.udfsStr.join(','))
+      return true
+    },
+    /**
        * Get UDFS function data
        */
-      _getUdfList () {
-        this.udfsList = []
-        this.store.dispatch('dag/getUdfList', { type: this.type }).then(res => {
-          this.udfsList = _.map(res.data, v => {
-            return {
-              id: v.id,
-              code: v.funcName
-            }
-          })
-          let udfs = _.cloneDeep(this.udfs.split(','))
-          if (udfs.length) {
-            let arr = []
-            _.map(udfs, v => {
-              _.map(this.udfsList, v1 => {
-                if (parseInt(v) === v1.id) {
-                  arr.push(parseInt(v))
-                }
-              })
-            })
-            this.$nextTick(() => {
-              _.map(_.cloneDeep(this.udfsList), v => v.res)
-              this.udfsStr = arr
-            })
+    _getUdfList () {
+      this.udfsList = []
+      this.store.dispatch('dag/getUdfList', { type: this.type }).then(res => {
+        this.udfsList = _.map(res.data, v => {
+          return {
+            id: v.id,
+            code: v.funcName
           }
         })
-      }
-    },
-    watch: {
-      udfsStr (val) {
-        this._verifUdfs()
-      },
-      type (a) {
-        // The props parameter needs to be changed due to the scene.
-        this.$emit('on-udfsData', '')
-        if (a === 'HIVE') {
-          this._getUdfList()
-        } else {
-          this.udfsList = []
+        const udfs = _.cloneDeep(this.udfs.split(','))
+        if (udfs.length) {
+          const arr = []
+          _.map(udfs, v => {
+            _.map(this.udfsList, v1 => {
+              if (parseInt(v) === v1.id) {
+                arr.push(parseInt(v))
+              }
+            })
+          })
+          this.$nextTick(() => {
+            _.map(_.cloneDeep(this.udfsList), v => v.res)
+            this.udfsStr = arr
+          })
         }
-      }
-    },
-    created () {
-      this._getUdfList()
-    },
-    mounted () {
+      })
     }
+  },
+  watch: {
+    udfsStr (val) {
+      this._verifUdfs()
+    },
+    type (a) {
+      // The props parameter needs to be changed due to the scene.
+      this.$emit('on-udfsData', '')
+      if (a === 'HIVE') {
+        this._getUdfList()
+      } else {
+        this.udfsList = []
+      }
+    }
+  },
+  created () {
+    this._getUdfList()
+  },
+  mounted () {
   }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

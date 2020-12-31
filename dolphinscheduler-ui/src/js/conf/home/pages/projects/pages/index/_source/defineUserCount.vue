@@ -27,62 +27,62 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import { bar } from './chartConfig'
-  import Chart from '@/module/ana-charts'
-  import mNoData from '@/module/components/noData/noData'
-  export default {
-    name: 'define-user-count',
-    data () {
-      return {
-        isSpin: true,
-        msg: true,
-        parameter: { projectId: 0 }
-      }
-    },
-    props: {
-      projectId: Number
-    },
-    methods: {
-      ...mapActions('projects', ['getDefineUserCount']),
-      _handleDefineUser (res) {
-        let data = res.data.userList || []
-        this.defineUserList = _.map(data, v => {
-          return {
-            key: v.userName + ',' + v.userId + ',' + v.count,
-            value: v.count
-          }
-        })
-        const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
-        myChart.echart.setOption(bar)
-        // Jump not allowed on home page
-        if (this.projectId) {
-          myChart.echart.on('click', e => {
-            this.$router.push({
-              name: 'projects-definition-list',
-              query: {
-                userId: e.name.split(',')[1]
-              }
-            })
-          })
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import { bar } from './chartConfig'
+import Chart from '@/module/ana-charts'
+import mNoData from '@/module/components/noData/noData'
+export default {
+  name: 'define-user-count',
+  data () {
+    return {
+      isSpin: true,
+      msg: true,
+      parameter: { projectId: 0 }
+    }
+  },
+  props: {
+    projectId: Number
+  },
+  methods: {
+    ...mapActions('projects', ['getDefineUserCount']),
+    _handleDefineUser (res) {
+      const data = res.data.userList || []
+      this.defineUserList = _.map(data, v => {
+        return {
+          key: v.userName + ',' + v.userId + ',' + v.count,
+          value: v.count
         }
-      }
-    },
-    created () {
-      this.isSpin = true
-      this.parameter.projectId = this.projectId
-      this.getDefineUserCount(this.parameter).then(res => {
-        this.msg = res.data.count > 0
-        this.defineUserList = []
-        this._handleDefineUser(res)
-        this.isSpin = false
-      }).catch(e => {
-        this.isSpin = false
       })
-    },
-    mounted () {
-    },
-    components: { mNoData }
-  }
+      const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
+      myChart.echart.setOption(bar)
+      // Jump not allowed on home page
+      if (this.projectId) {
+        myChart.echart.on('click', e => {
+          this.$router.push({
+            name: 'projects-definition-list',
+            query: {
+              userId: e.name.split(',')[1]
+            }
+          })
+        })
+      }
+    }
+  },
+  created () {
+    this.isSpin = true
+    this.parameter.projectId = this.projectId
+    this.getDefineUserCount(this.parameter).then(res => {
+      this.msg = res.data.count > 0
+      this.defineUserList = []
+      this._handleDefineUser(res)
+      this.isSpin = false
+    }).catch(e => {
+      this.isSpin = false
+    })
+  },
+  mounted () {
+  },
+  components: { mNoData }
+}
 </script>

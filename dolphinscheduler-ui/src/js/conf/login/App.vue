@@ -57,91 +57,91 @@
   </div>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import io from '@/module/io'
-  import cookies from 'js-cookie'
+import i18n from '@/module/i18n'
+import io from '@/module/io'
+import cookies from 'js-cookie'
 
-  export default {
-    name: 'login-model',
-    data () {
-      return {
-        spinnerLoading: false,
-        userName: '',
-        userPassword: '',
-        isUserName: false,
-        isUserPassword: false,
-        userNameText: '',
-        userPasswordText: ''
-      }
-    },
-    props: {},
-    methods: {
-      _ok () {
-        if (this._verification()) {
-          this.spinnerLoading = true
-          this._gLogin().then(res => {
-            setTimeout(() => {
-              this.spinnerLoading = false
-              sessionStorage.setItem('isLeft', 1)
-              if (res.data.hasOwnProperty('sessionId')) {
-                let sessionId = res.data.sessionId
-                sessionStorage.setItem('sessionId', sessionId)
-                cookies.set('sessionId', sessionId, { path: '/' })
-              }
-
-              if (this.userName === 'admin') {
-                window.location.href = `${PUBLIC_PATH}/#/security/tenant`
-              } else {
-                window.location.href = `${PUBLIC_PATH}/#/home`
-              }
-            }, 1000)
-          }).catch(e => {
-            this.userPasswordText = e.msg
-            this.isUserPassword = true
+export default {
+  name: 'login-model',
+  data () {
+    return {
+      spinnerLoading: false,
+      userName: '',
+      userPassword: '',
+      isUserName: false,
+      isUserPassword: false,
+      userNameText: '',
+      userPasswordText: ''
+    }
+  },
+  props: {},
+  methods: {
+    _ok () {
+      if (this._verification()) {
+        this.spinnerLoading = true
+        this._gLogin().then(res => {
+          setTimeout(() => {
             this.spinnerLoading = false
-          })
-        }
-      },
-      _verification () {
-        let flag = true
-        if (!this.userName) {
-          this.userNameText = `${i18n.$t('Please enter user name')}`
-          this.isUserName = true
-          flag = false
-        }
-        if (!this.userPassword) {
-          this.userPasswordText = `${i18n.$t('Please enter your password')}`
+            sessionStorage.setItem('isLeft', 1)
+            if (res.data.hasOwnProperty('sessionId')) {
+              const sessionId = res.data.sessionId
+              sessionStorage.setItem('sessionId', sessionId)
+              cookies.set('sessionId', sessionId, { path: '/' })
+            }
+
+            if (this.userName === 'admin') {
+              window.location.href = `${PUBLIC_PATH}/#/security/tenant`
+            } else {
+              window.location.href = `${PUBLIC_PATH}/#/home`
+            }
+          }, 1000)
+        }).catch(e => {
+          this.userPasswordText = e.msg
           this.isUserPassword = true
-          flag = false
-        }
-        return flag
-      },
-      _gLogin () {
-        return new Promise((resolve, reject) => {
-          io.post('login', {
-            userName: this.userName,
-            userPassword: this.userPassword
-          }, res => {
-            resolve(res)
-          }).catch(e => {
-            reject(e)
-          })
+          this.spinnerLoading = false
         })
       }
     },
-    watch: {
-      userName () {
-        this.isUserName = false
-      },
-      userPassword () {
-        this.isUserPassword = false
+    _verification () {
+      let flag = true
+      if (!this.userName) {
+        this.userNameText = `${i18n.$t('Please enter user name')}`
+        this.isUserName = true
+        flag = false
       }
+      if (!this.userPassword) {
+        this.userPasswordText = `${i18n.$t('Please enter your password')}`
+        this.isUserPassword = true
+        flag = false
+      }
+      return flag
     },
-    created () {
-    },
-    mounted () {
+    _gLogin () {
+      return new Promise((resolve, reject) => {
+        io.post('login', {
+          userName: this.userName,
+          userPassword: this.userPassword
+        }, res => {
+          resolve(res)
+        }).catch(e => {
+          reject(e)
+        })
+      })
     }
+  },
+  watch: {
+    userName () {
+      this.isUserName = false
+    },
+    userPassword () {
+      this.isUserPassword = false
+    }
+  },
+  created () {
+  },
+  mounted () {
   }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

@@ -21,11 +21,11 @@
   </div>
 </template>
 <script>
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
-  export default {
-    name: 'security-index',
-    mounted () {
-    },
-    components: { mSecondaryMenu }
-  }
+import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
+export default {
+  name: 'security-index',
+  mounted () {
+  },
+  components: { mSecondaryMenu }
+}
 </script>

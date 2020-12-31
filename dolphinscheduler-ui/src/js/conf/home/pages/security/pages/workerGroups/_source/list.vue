@@ -40,48 +40,48 @@
   </div>
 </template>
 <script>
-  import { mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 
-  export default {
-    name: 'user-list',
-    data () {
-      return {
-        list: []
-      }
+export default {
+  name: 'user-list',
+  data () {
+    return {
+      list: []
+    }
+  },
+  props: {
+    workerGroupList: Array,
+    pageNo: Number,
+    pageSize: Number
+  },
+  methods: {
+    ...mapActions('security', ['deleteWorkerGroups']),
+    _delete (item, i) {
+      this.deleteWorkerGroups({
+        id: item.id
+      }).then(res => {
+        this.$emit('on-update')
+        this.$message.success(res.msg)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
     },
-    props: {
-      workerGroupList: Array,
-      pageNo: Number,
-      pageSize: Number
-    },
-    methods: {
-      ...mapActions('security', ['deleteWorkerGroups']),
-      _delete (item, i) {
-        this.deleteWorkerGroups({
-          id: item.id
-        }).then(res => {
-          this.$emit('on-update')
-          this.$message.success(res.msg)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      _edit (item) {
-        this.$emit('on-edit', item)
-      }
-    },
-    watch: {
-      workerGroupList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
-      }
-    },
-    created () {
-      this.list = this.workerGroupList
-    },
-    mounted () {},
-    components: {}
-  }
+    _edit (item) {
+      this.$emit('on-edit', item)
+    }
+  },
+  watch: {
+    workerGroupList (a) {
+      this.list = []
+      setTimeout(() => {
+        this.list = a
+      })
+    }
+  },
+  created () {
+    this.list = this.workerGroupList
+  },
+  mounted () {},
+  components: {}
+}
 </script>

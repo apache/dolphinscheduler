@@ -78,52 +78,52 @@
   </div>
 </template>
 <script>
-  import { mapState, mapMutations } from 'vuex'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
+import { mapState, mapMutations } from 'vuex'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 
-  export default {
-    name: 'user-info',
-    data () {
-      return {
-        createUserDialog: false,
-        item: {}
-      }
-    },
-    props: {},
-    methods: {
-      ...mapMutations('user', ['setUserInfo']),
-      /**
+export default {
+  name: 'user-info',
+  data () {
+    return {
+      createUserDialog: false,
+      item: {}
+    }
+  },
+  props: {},
+  methods: {
+    ...mapMutations('user', ['setUserInfo']),
+    /**
        * edit
        */
-      _edit () {
-        this.item = this.userInfo
-        this.createUserDialog = true
-      },
-      onUpdate (param) {
-        this.setUserInfo({
-          userName: param.userName,
-          userPassword: param.userPassword,
-          email: param.email,
-          phone: param.phone
-        })
-        this.createUserDialog = false
-      },
+    _edit () {
+      this.item = this.userInfo
+      this.createUserDialog = true
+    },
+    onUpdate (param) {
+      this.setUserInfo({
+        userName: param.userName,
+        userPassword: param.userPassword,
+        email: param.email,
+        phone: param.phone
+      })
+      this.createUserDialog = false
+    },
 
-      close () {
-        this.createUserDialog = false
-      }
-    },
-    watch: {},
-    created () {
-    },
-    mounted () {
-    },
-    computed: {
-      ...mapState('user', ['userInfo'])
-    },
-    components: { mListBoxF, mCreateUser }
-  }
+    close () {
+      this.createUserDialog = false
+    }
+  },
+  watch: {},
+  created () {
+  },
+  mounted () {
+  },
+  computed: {
+    ...mapState('user', ['userInfo'])
+  },
+  components: { mListBoxF, mCreateUser }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

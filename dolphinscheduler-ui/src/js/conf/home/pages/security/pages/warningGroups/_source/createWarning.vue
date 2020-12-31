@@ -64,88 +64,88 @@
   </m-popup>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-  export default {
-    name: 'create-warning',
-    data () {
-      return {
-        store,
-        groupName: '',
-        groupType: 'EMAIL',
-        description: '',
-        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
-      }
-    },
-    props: {
-      item: Object
-    },
-    methods: {
-      _ok () {
-        if (this._verification()) {
-          // The name is not verified
-          if (this.item && this.item.groupName === this.groupName) {
-            this._submit()
-            return
-          }
+export default {
+  name: 'create-warning',
+  data () {
+    return {
+      store,
+      groupName: '',
+      groupType: 'EMAIL',
+      description: '',
+      options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
+    }
+  },
+  props: {
+    item: Object
+  },
+  methods: {
+    _ok () {
+      if (this._verification()) {
+        // The name is not verified
+        if (this.item && this.item.groupName === this.groupName) {
+          this._submit()
+          return
+        }
 
-          // Verify username
-          this.store.dispatch('security/verifyName', {
-            type: 'alertgroup',
-            groupName: this.groupName
-          }).then(res => {
-            this._submit()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-          })
-        }
-      },
-      _verification () {
-        // group name
-        if (!this.groupName.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter group name')}`)
-          return false
-        }
-        return true
-      },
-      _submit () {
-        let param = {
-          groupName: this.groupName,
-          groupType: this.groupType,
-          description: this.description
-        }
-        if (this.item) {
-          param.id = this.item.id
-        }
-        this.$refs.popup.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
+        // Verify username
+        this.store.dispatch('security/verifyName', {
+          type: 'alertgroup',
+          groupName: this.groupName
+        }).then(res => {
+          this._submit()
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
         })
-      },
-      close () {
-        this.$emit('close')
       }
     },
-    watch: {},
-    created () {
+    _verification () {
+      // group name
+      if (!this.groupName.replace(/\s*/g, '')) {
+        this.$message.warning(`${i18n.$t('Please enter group name')}`)
+        return false
+      }
+      return true
+    },
+    _submit () {
+      const param = {
+        groupName: this.groupName,
+        groupType: this.groupType,
+        description: this.description
+      }
       if (this.item) {
-        this.groupName = this.item.groupName
-        this.groupType = this.item.groupType
-        this.description = this.item.description
+        param.id = this.item.id
       }
+      this.$refs.popup.spinnerLoading = true
+      this.store.dispatch(`security/${this.item ? 'updateAlertgrou' : 'createAlertgrou'}`, param).then(res => {
+        this.$emit('onUpdate')
+        this.$message.success(res.msg)
+        setTimeout(() => {
+          this.$refs.popup.spinnerLoading = false
+        }, 800)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.$refs.popup.spinnerLoading = false
+      })
     },
-    mounted () {
-    },
-    components: { mPopup, mListBoxF }
-  }
+    close () {
+      this.$emit('close')
+    }
+  },
+  watch: {},
+  created () {
+    if (this.item) {
+      this.groupName = this.item.groupName
+      this.groupType = this.item.groupType
+      this.description = this.item.description
+    }
+  },
+  mounted () {
+  },
+  components: { mPopup, mListBoxF }
+}
 </script>

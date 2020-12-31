@@ -65,113 +65,113 @@
   </m-popup>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  export default {
-    name: 'create-tenement',
-    data () {
-      return {
-        store,
-        queueList: [],
-        queueId: '',
-        tenantCode: '',
-        description: ''
-      }
-    },
-    props: {
-      item: Object
-    },
-    methods: {
-      _ok () {
-        if (this._verification()) {
-          // The name is not verified
-          if (this.item && this.item.groupName === this.groupName) {
-            this._submit()
-            return
-          }
-          // Verify username
-          this.store.dispatch('security/verifyName', {
-            type: 'tenant',
-            tenantCode: this.tenantCode
-          }).then(res => {
-            this._submit()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-          })
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+export default {
+  name: 'create-tenement',
+  data () {
+    return {
+      store,
+      queueList: [],
+      queueId: '',
+      tenantCode: '',
+      description: ''
+    }
+  },
+  props: {
+    item: Object
+  },
+  methods: {
+    _ok () {
+      if (this._verification()) {
+        // The name is not verified
+        if (this.item && this.item.groupName === this.groupName) {
+          this._submit()
+          return
         }
-      },
-      _getQueueList () {
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('security/getQueueList').then(res => {
-            this.queueList = _.map(res, v => {
-              return {
-                id: v.id,
-                code: v.queueName
-              }
-            })
-            this.$nextTick(() => {
-              this.queueId = this.queueList[0].id
-            })
-            resolve()
-          })
-        })
-      },
-      _verification () {
-        let isEn = /^[0-9a-zA-Z_.-]{1,}$/
-        if (!this.tenantCode.replace(/\s*/g, '')) {
-          this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
-          return false
-        }
-        if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
-          this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
-          return false
-        }
-        return true
-      },
-      _submit () {
-        // 提交
-        let param = {
-          tenantCode: this.tenantCode,
-          queueId: this.queueId,
-          description: this.description
-        }
-        if (this.item) {
-          param.id = this.item.id
-        }
-        this.$refs.popup.spinnerLoading = true
-        this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
-          this.$emit('onUpdate')
-          this.$message.success(res.msg)
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
+        // Verify username
+        this.store.dispatch('security/verifyName', {
+          type: 'tenant',
+          tenantCode: this.tenantCode
+        }).then(res => {
+          this._submit()
         }).catch(e => {
           this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
         })
-      },
-      close () {
-        this.$emit('close')
       }
     },
-    watch: {
-    },
-    created () {
-      this._getQueueList().then(res => {
-        if (this.item) {
-          this.$nextTick(() => {
-            this.queueId = this.item.queueId
+    _getQueueList () {
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('security/getQueueList').then(res => {
+          this.queueList = _.map(res, v => {
+            return {
+              id: v.id,
+              code: v.queueName
+            }
           })
-          this.tenantCode = this.item.tenantCode
-          this.description = this.item.description
-        }
+          this.$nextTick(() => {
+            this.queueId = this.queueList[0].id
+          })
+          resolve()
+        })
       })
     },
-    mounted () {
+    _verification () {
+      const isEn = /^[0-9a-zA-Z_.-]{1,}$/
+      if (!this.tenantCode.replace(/\s*/g, '')) {
+        this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
+        return false
+      }
+      if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
+        this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
+        return false
+      }
+      return true
     },
-    components: { mPopup, mListBoxF }
-  }
+    _submit () {
+      // 提交
+      const param = {
+        tenantCode: this.tenantCode,
+        queueId: this.queueId,
+        description: this.description
+      }
+      if (this.item) {
+        param.id = this.item.id
+      }
+      this.$refs.popup.spinnerLoading = true
+      this.store.dispatch(`security/${this.item ? 'updateQueue' : 'createQueue'}`, param).then(res => {
+        this.$emit('onUpdate')
+        this.$message.success(res.msg)
+        setTimeout(() => {
+          this.$refs.popup.spinnerLoading = false
+        }, 800)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.$refs.popup.spinnerLoading = false
+      })
+    },
+    close () {
+      this.$emit('close')
+    }
+  },
+  watch: {
+  },
+  created () {
+    this._getQueueList().then(res => {
+      if (this.item) {
+        this.$nextTick(() => {
+          this.queueId = this.item.queueId
+        })
+        this.tenantCode = this.item.tenantCode
+        this.description = this.item.description
+      }
+    })
+  },
+  mounted () {
+  },
+  components: { mPopup, mListBoxF }
+}
 </script>

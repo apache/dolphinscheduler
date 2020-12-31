@@ -73,123 +73,123 @@
   </m-popup>
 </template>
 <script>
-  import io from '@/module/io'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mProgressBar from '@/module/components/progressBar/progressBar'
+import io from '@/module/io'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import mProgressBar from '@/module/components/progressBar/progressBar'
 
-  export default {
-    name: 'file-update',
-    data () {
-      return {
-        store,
-        // name
-        name: '',
-        // description
-        description: '',
-        // progress
-        progress: 0,
-        // file
-        file: '',
-        // Whether to drag upload
-        dragOver: false
-      }
-    },
-    watch: {
-    },
-    props: {
-      type: String
-    },
-    methods: {
-      /**
+export default {
+  name: 'file-update',
+  data () {
+    return {
+      store,
+      // name
+      name: '',
+      // description
+      description: '',
+      // progress
+      progress: 0,
+      // file
+      file: '',
+      // Whether to drag upload
+      dragOver: false
+    }
+  },
+  watch: {
+  },
+  props: {
+    type: String
+  },
+  methods: {
+    /**
        * submit
        */
-      _ok () {
-        this.$refs.popup.spinnerLoading = true
-        if (this._validation()) {
-          this._formDataUpdate().then(res => {
-            setTimeout(() => {
-              this.$refs.popup.spinnerLoading = false
-            }, 800)
-          }).catch(e => {
+    _ok () {
+      this.$refs.popup.spinnerLoading = true
+      if (this._validation()) {
+        this._formDataUpdate().then(res => {
+          setTimeout(() => {
             this.$refs.popup.spinnerLoading = false
-          })
-        } else {
+          }, 800)
+        }).catch(e => {
           this.$refs.popup.spinnerLoading = false
-        }
-      },
-      /**
-       * validation
-       */
-      _validation () {
-        if (!this.file) {
-          this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
-          return false
-        }
-        return true
-      },
-      /**
-       * update file
-       */
-      _formDataUpdate () {
-        return new Promise((resolve, reject) => {
-          let self = this
-          let formData = new FormData()
-          formData.append('file', this.file)
-          formData.append('projectName', this.store.state.dag.projectName)
-          io.post('projects/import-definition', res => {
-            this.$message.success(res.msg)
-            resolve()
-            self.$emit('onUpdateDefinition')
-          }, e => {
-            reject(e)
-            self.$emit('closeDefinition')
-            this.$message.error(e.msg || '')
-          }, {
-            data: formData,
-            emulateJSON: false,
-            onUploadProgress (progressEvent) {
-              // Size has been uploaded
-              let loaded = progressEvent.loaded
-              // Total attachment size
-              let total = progressEvent.total
-              self.progress = Math.floor(100 * loaded / total)
-              self.$emit('onProgressDefinition', self.progress)
-            }
-          })
         })
-      },
-      /**
-       * Archive to the top right corner Continue uploading
-       */
-      _ckArchive () {
-        $('.update-file-modal').hide()
-        this.$emit('onArchiveDefinition')
-      },
-      close () {
-        this.$emit('closeDefinition')
-      },
-      /**
-       * Drag and drop upload
-       */
-      _onDrop (e) {
-        let file = e.dataTransfer.files[0]
-        this.file = file
-        this.name = file.name
-        this.dragOver = false
+      } else {
+        this.$refs.popup.spinnerLoading = false
       }
     },
-    mounted () {
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
-        this.file = file
-        this.name = file.name
+    /**
+       * validation
+       */
+    _validation () {
+      if (!this.file) {
+        this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
+        return false
+      }
+      return true
+    },
+    /**
+       * update file
+       */
+    _formDataUpdate () {
+      return new Promise((resolve, reject) => {
+        const self = this
+        const formData = new FormData()
+        formData.append('file', this.file)
+        formData.append('projectName', this.store.state.dag.projectName)
+        io.post('projects/import-definition', res => {
+          this.$message.success(res.msg)
+          resolve()
+          self.$emit('onUpdateDefinition')
+        }, e => {
+          reject(e)
+          self.$emit('closeDefinition')
+          this.$message.error(e.msg || '')
+        }, {
+          data: formData,
+          emulateJSON: false,
+          onUploadProgress (progressEvent) {
+            // Size has been uploaded
+            const loaded = progressEvent.loaded
+            // Total attachment size
+            const total = progressEvent.total
+            self.progress = Math.floor(100 * loaded / total)
+            self.$emit('onProgressDefinition', self.progress)
+          }
+        })
       })
     },
-    components: { mPopup, mListBoxF, mProgressBar }
-  }
+    /**
+       * Archive to the top right corner Continue uploading
+       */
+    _ckArchive () {
+      $('.update-file-modal').hide()
+      this.$emit('onArchiveDefinition')
+    },
+    close () {
+      this.$emit('closeDefinition')
+    },
+    /**
+       * Drag and drop upload
+       */
+    _onDrop (e) {
+      const file = e.dataTransfer.files[0]
+      this.file = file
+      this.name = file.name
+      this.dragOver = false
+    }
+  },
+  mounted () {
+    $('#file').change(() => {
+      const file = $('#file')[0].files[0]
+      this.file = file
+      this.name = file.name
+    })
+  },
+  components: { mPopup, mListBoxF, mProgressBar }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

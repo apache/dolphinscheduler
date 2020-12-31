@@ -56,201 +56,201 @@
   </span>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import router from '@/conf/home/router'
-  import { downloadFile } from '@/module/download'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import router from '@/conf/home/router'
+import { downloadFile } from '@/module/download'
 
-  /**
+/**
    * Calculate text size
    */
-  const handerTextareaSize = (isH = 0) => {
-    $('body').find('.tooltip.fade.top.in').remove()
-    return $('.textarea-ft').css({ height: `${$('.content-log-box').height() - isH}px` })
-  }
+const handerTextareaSize = (isH = 0) => {
+  $('body').find('.tooltip.fade.top.in').remove()
+  return $('.textarea-ft').css({ height: `${$('.content-log-box').height() - isH}px` })
+}
 
-  let content = ''
+let content = ''
 
-  export default {
-    name: 'log',
-    data () {
-      return {
-        store,
-        router,
-        isLog: false,
-        stateId: $(`#${this.item.id}`).attr('data-state-id') || null,
-        isScreen: false,
-        loadingIndex: 0,
-        isData: true,
-        loading: false
-      }
+export default {
+  name: 'log',
+  data () {
+    return {
+      store,
+      router,
+      isLog: false,
+      stateId: $(`#${this.item.id}`).attr('data-state-id') || null,
+      isScreen: false,
+      loadingIndex: 0,
+      isData: true,
+      loading: false
+    }
+  },
+  props: {
+    item: {
+      type: Object,
+      default: Object
     },
-    props: {
-      item: {
-        type: Object,
-        default: Object
-      },
-      source: {
-        type: String,
-        default: 'from'
-      },
-      logId: Number
+    source: {
+      type: String,
+      default: 'from'
     },
-    methods: {
-      _refreshLog () {
-        this.loading = true
-        this.store.dispatch('dag/getLog', this._rtParam).then(res => {
-          setTimeout(() => {
-            this.loading = false
-            if (res.data) {
-              this.$message.success(`${i18n.$t('Update log success')}`)
-            } else {
-              this.$message.warning(`${i18n.$t('No more logs')}`)
-            }
-          }, 1500)
-          // Handling text field size
-          handerTextareaSize().html('').text(res.data || `${i18n.$t('No log')}`)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
+    logId: Number
+  },
+  methods: {
+    _refreshLog () {
+      this.loading = true
+      this.store.dispatch('dag/getLog', this._rtParam).then(res => {
+        setTimeout(() => {
           this.loading = false
-        })
-      },
-      _ckLog () {
-        this.isLog = true
-
-        this.store.dispatch('dag/getLog', this._rtParam).then(res => {
-          if (!res.data) {
-            this.isData = false
-            setTimeout(() => {
-              this.$message.warning(`${i18n.$t('No more logs')}`)
-            }, 1000)
-            // Handling text field size
-            handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
+          if (res.data) {
+            this.$message.success(`${i18n.$t('Update log success')}`)
           } else {
-            this.isData = true
-            content = res.data
-            // Handling text field size
-            handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
-
-            setTimeout(() => {
-              $('#textarea').scrollTop(2)
-            }, 800)
+            this.$message.warning(`${i18n.$t('No more logs')}`)
           }
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      },
-      _screenOpen () {
-        this.isScreen = true
-        let $logBox = $('.log-box')
-        let winW = $(window).width() - 40
-        let winH = $(window).height() - 40
-        $logBox.css({
-          width: winW,
-          height: winH,
-          marginLeft: `-${parseInt(winW / 2)}px`,
-          marginTop: `-${parseInt(winH / 2)}px`
-        })
-        $logBox.find('.content').animate({ scrollTop: 0 }, 0)
+        }, 1500)
         // Handling text field size
-        handerTextareaSize().html('').text(content)
-      },
-      _screenClose () {
-        this.isScreen = false
-        let $logBox = $('.log-box')
-        $logBox.attr('style', '')
-        $logBox.find('.content').animate({ scrollTop: 0 }, 0)
-        // Handling text field size
-        handerTextareaSize().html('').text(content)
-      },
-      /**
+        handerTextareaSize().html('').text(res.data || `${i18n.$t('No log')}`)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.loading = false
+      })
+    },
+    _ckLog () {
+      this.isLog = true
+
+      this.store.dispatch('dag/getLog', this._rtParam).then(res => {
+        if (!res.data) {
+          this.isData = false
+          setTimeout(() => {
+            this.$message.warning(`${i18n.$t('No more logs')}`)
+          }, 1000)
+          // Handling text field size
+          handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
+        } else {
+          this.isData = true
+          content = res.data
+          // Handling text field size
+          handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
+
+          setTimeout(() => {
+            $('#textarea').scrollTop(2)
+          }, 800)
+        }
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+      })
+    },
+    _screenOpen () {
+      this.isScreen = true
+      const $logBox = $('.log-box')
+      const winW = $(window).width() - 40
+      const winH = $(window).height() - 40
+      $logBox.css({
+        width: winW,
+        height: winH,
+        marginLeft: `-${parseInt(winW / 2)}px`,
+        marginTop: `-${parseInt(winH / 2)}px`
+      })
+      $logBox.find('.content').animate({ scrollTop: 0 }, 0)
+      // Handling text field size
+      handerTextareaSize().html('').text(content)
+    },
+    _screenClose () {
+      this.isScreen = false
+      const $logBox = $('.log-box')
+      $logBox.attr('style', '')
+      $logBox.find('.content').animate({ scrollTop: 0 }, 0)
+      // Handling text field size
+      handerTextareaSize().html('').text(content)
+    },
+    /**
        * Download log
        */
-      _downloadLog () {
-        downloadFile('/log/download-log', {
-          taskInstanceId: this.stateId || this.logId
-        })
-      },
-      /**
+    _downloadLog () {
+      downloadFile('/log/download-log', {
+        taskInstanceId: this.stateId || this.logId
+      })
+    },
+    /**
        * up
        */
-      _onUp: _.debounce(function () {
-        this.loadingIndex = this.loadingIndex - 1
-        this._ckLog()
-      }, 1000, {
-        leading: false,
-        trailing: true
-      }),
-      /**
+    _onUp: _.debounce(function () {
+      this.loadingIndex = this.loadingIndex - 1
+      this._ckLog()
+    }, 1000, {
+      leading: false,
+      trailing: true
+    }),
+    /**
        * down
        */
-      _onDown: _.debounce(function () {
-        this.loadingIndex = this.loadingIndex + 1
-        this._ckLog()
-      }, 1000, {
-        leading: false,
-        trailing: true
-      }),
-      /**
+    _onDown: _.debounce(function () {
+      this.loadingIndex = this.loadingIndex + 1
+      this._ckLog()
+    }, 1000, {
+      leading: false,
+      trailing: true
+    }),
+    /**
        * Monitor scroll bar
        */
-      _onTextareaScroll () {
-        let self = this
-        $('#textarea-log').scroll(function () {
-          let $this = $(this)
-          // Listen for scrollbar events
-          if (($this.scrollTop() + $this.height()) === $this.height()) {
-            if (self.loadingIndex > 0) {
-              self.$message.info(`${i18n.$t('Loading Log...')}`)
-              self._onUp()
-            }
+    _onTextareaScroll () {
+      const self = this
+      $('#textarea-log').scroll(function () {
+        const $this = $(this)
+        // Listen for scrollbar events
+        if (($this.scrollTop() + $this.height()) === $this.height()) {
+          if (self.loadingIndex > 0) {
+            self.$message.info(`${i18n.$t('Loading Log...')}`)
+            self._onUp()
           }
-          // Listen for scrollbar events
-          if ($this.get(0).scrollHeight === ($this.height() + $this.scrollTop())) {
-            // No data is not requested
-            if (self.isData) {
-              self.$message.info(`${i18n.$t('Loading Log...')}`)
-              self._onDown()
-            }
+        }
+        // Listen for scrollbar events
+        if ($this.get(0).scrollHeight === ($this.height() + $this.scrollTop())) {
+          // No data is not requested
+          if (self.isData) {
+            self.$message.info(`${i18n.$t('Loading Log...')}`)
+            self._onDown()
           }
-        })
-      },
-      /**
+        }
+      })
+    },
+    /**
        * close
        */
-      close () {
-        $('body').find('.tooltip.fade.top.in').remove()
-        this.isScreen = false
-        this.isLog = false
-        content = ''
-        this.$emit('close')
+    close () {
+      $('body').find('.tooltip.fade.top.in').remove()
+      this.isScreen = false
+      this.isLog = false
+      content = ''
+      this.$emit('close')
+    }
+  },
+  watch: {},
+  created () {
+    // Source is a task instance
+    if (this.source === 'list') {
+      this.$message.info(`${i18n.$t('Loading Log...')}`)
+      this._ckLog()
+    }
+  },
+  mounted () {
+    this._onTextareaScroll()
+  },
+  updated () {
+  },
+  computed: {
+    _rtParam () {
+      return {
+        taskInstanceId: this.stateId || this.logId,
+        skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
+        limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
       }
-    },
-    watch: {},
-    created () {
-      // Source is a task instance
-      if (this.source === 'list') {
-        this.$message.info(`${i18n.$t('Loading Log...')}`)
-        this._ckLog()
-      }
-    },
-    mounted () {
-      this._onTextareaScroll()
-    },
-    updated () {
-    },
-    computed: {
-      _rtParam () {
-        return {
-          taskInstanceId: this.stateId || this.logId,
-          skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
-          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
-        }
-      }
-    },
-    components: { }
-  }
+    }
+  },
+  components: { }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

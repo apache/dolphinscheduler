@@ -57,67 +57,67 @@
   </m-list-construction>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import { mapActions } from 'vuex'
-  import { folderList } from '../_source/common'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import localStore from '@/module/util/localStorage'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import i18n from '@/module/i18n'
+import { mapActions } from 'vuex'
+import { folderList } from '../_source/common'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import localStore from '@/module/util/localStorage'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'resource-list-create-FILE',
-    data () {
-      return {
-        type: '',
-        name: '',
-        description: '',
-        folderList: folderList,
-        spinnerLoading: false
-      }
-    },
-    props: {},
-    methods: {
-      ...mapActions('resource', ['createResourceFolder']),
-      ok () {
-        if (this._validation()) {
-          this.spinnerLoading = true
-          this.createResourceFolder({
-            type: 'FILE',
-            name: this.name,
-            currentDir: localStore.getItem('currentDir'),
-            pid: this.$route.params.id,
-            description: this.description
-          }).then(res => {
-            this.$message.success(res.msg)
-            setTimeout(() => {
-              this.spinnerLoading = false
-              this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}` })
-            }, 800)
-          }).catch(e => {
-            this.$message.error(e.msg || '')
+export default {
+  name: 'resource-list-create-FILE',
+  data () {
+    return {
+      type: '',
+      name: '',
+      description: '',
+      folderList: folderList,
+      spinnerLoading: false
+    }
+  },
+  props: {},
+  methods: {
+    ...mapActions('resource', ['createResourceFolder']),
+    ok () {
+      if (this._validation()) {
+        this.spinnerLoading = true
+        this.createResourceFolder({
+          type: 'FILE',
+          name: this.name,
+          currentDir: localStore.getItem('currentDir'),
+          pid: this.$route.params.id,
+          description: this.description
+        }).then(res => {
+          this.$message.success(res.msg)
+          setTimeout(() => {
             this.spinnerLoading = false
-          })
-        }
-      },
-      _validation () {
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('Please enter resource folder name')}`)
-          return false
-        }
-
-        return true
+            this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}` })
+          }, 800)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          this.spinnerLoading = false
+        })
       }
     },
-    watch: {},
-    created () {
-    },
-    mounted () {
-    },
-    destroyed () {
-    },
-    computed: {},
-    components: { mListConstruction, mListBoxF }
-  }
+    _validation () {
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('Please enter resource folder name')}`)
+        return false
+      }
+
+      return true
+    }
+  },
+  watch: {},
+  created () {
+  },
+  mounted () {
+  },
+  destroyed () {
+  },
+  computed: {},
+  components: { mListConstruction, mListBoxF }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

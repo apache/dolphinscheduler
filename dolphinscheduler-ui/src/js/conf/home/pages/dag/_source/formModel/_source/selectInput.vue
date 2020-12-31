@@ -45,78 +45,78 @@
   </el-select>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import disabledState from '@/module/mixin/disabledState'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import disabledState from '@/module/mixin/disabledState'
 
-  export default {
-    name: 'form-select-input',
-    data () {
-      return {
-        selectedValue: this.value,
-        isIconState: false,
-        isInput: true
+export default {
+  name: 'form-select-input',
+  data () {
+    return {
+      selectedValue: this.value,
+      isIconState: false,
+      isInput: true
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    value: String,
+    list: Array
+  },
+  model: {
+    prop: 'value',
+    event: 'valueEvent'
+  },
+  methods: {
+    _onChange (o) {
+      this.$emit('valueEvent', +o)
+      this._setIconState(+o)
+    },
+    _setIconState (value) {
+      // Whether there is a list
+      this.isIconState = _.includes(this.list, parseInt(value))
+    },
+    _ckIcon () {
+      if (this.isDetails) {
+        return
+      }
+      this.isInput = false
+      this.$emit('valueEvent', +this.list[0])
+      this.isIconState = true
+      // Refresh instance
+      setTimeout(() => {
+        this.isInput = true
+      }, 1)
+    },
+    _onBlur () {
+      const val = $(this.$refs.input.$el).find('input')[0].value
+      if (this._validation(val)) {
+        this.$emit('valueEvent', val)
+        this._setIconState(val)
       }
     },
-    mixins: [disabledState],
-    props: {
-      value: String,
-      list: Array
-    },
-    model: {
-      prop: 'value',
-      event: 'valueEvent'
-    },
-    methods: {
-      _onChange (o) {
-        this.$emit('valueEvent', +o)
-        this._setIconState(+o)
-      },
-      _setIconState (value) {
-        // Whether there is a list
-        this.isIconState = _.includes(this.list, parseInt(value))
-      },
-      _ckIcon () {
-        if (this.isDetails) {
-          return
-        }
-        this.isInput = false
-        this.$emit('valueEvent', +this.list[0])
-        this.isIconState = true
-        // Refresh instance
-        setTimeout(() => {
-          this.isInput = true
-        }, 1)
-      },
-      _onBlur () {
-        let val = $(this.$refs.input.$el).find('input')[0].value
-        if (this._validation(val)) {
-          this.$emit('valueEvent', val)
-          this._setIconState(val)
-        }
-      },
-      _validation (val) {
-        if (val === '0') return true
+    _validation (val) {
+      if (val === '0') return true
 
-        if (!(/(^[0-9]*[1-9][0-9]*$)/.test(val))) {
-          this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
-          // init
-          this._ckIcon()
-          return false
-        }
-        return true
+      if (!(/(^[0-9]*[1-9][0-9]*$)/.test(val))) {
+        this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
+        // init
+        this._ckIcon()
+        return false
       }
-    },
-    watch: {
-      value (val) {
-        this.selectedValue = val
-      }
-    },
-    created () {
-      this._setIconState(this.selectedValue)
-    },
-    mounted () {
-    },
-    components: {}
-  }
+      return true
+    }
+  },
+  watch: {
+    value (val) {
+      this.selectedValue = val
+    }
+  },
+  created () {
+    this._setIconState(this.selectedValue)
+  },
+  mounted () {
+  },
+  components: {}
+}
 </script>

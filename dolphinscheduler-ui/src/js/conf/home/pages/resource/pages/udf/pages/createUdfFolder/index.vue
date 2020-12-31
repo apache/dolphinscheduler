@@ -57,64 +57,64 @@
   </m-list-construction>
 </template>
 <script>
-  import i18n from '@/module/i18n'
-  import { mapActions } from 'vuex'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import i18n from '@/module/i18n'
+import { mapActions } from 'vuex'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'resource-list-create-udf',
-    data () {
-      return {
-        type: '',
-        name: '',
-        description: '',
-        spinnerLoading: false
-      }
-    },
-    props: {},
-    methods: {
-      ...mapActions('resource', ['createResourceFolder']),
-      ok () {
-        if (this._validation()) {
-          this.spinnerLoading = true
-          this.createResourceFolder({
-            type: 'UDF',
-            name: this.name,
-            currentDir: '/',
-            pid: -1,
-            description: this.description
-          }).then(res => {
-            this.$message.success(res.msg)
-            setTimeout(() => {
-              this.spinnerLoading = false
-              this.$router.push({ path: '/resource/udf' })
-            }, 800)
-          }).catch(e => {
-            this.$message.error(e.msg || '')
+export default {
+  name: 'resource-list-create-udf',
+  data () {
+    return {
+      type: '',
+      name: '',
+      description: '',
+      spinnerLoading: false
+    }
+  },
+  props: {},
+  methods: {
+    ...mapActions('resource', ['createResourceFolder']),
+    ok () {
+      if (this._validation()) {
+        this.spinnerLoading = true
+        this.createResourceFolder({
+          type: 'UDF',
+          name: this.name,
+          currentDir: '/',
+          pid: -1,
+          description: this.description
+        }).then(res => {
+          this.$message.success(res.msg)
+          setTimeout(() => {
             this.spinnerLoading = false
-          })
-        }
-      },
-      _validation () {
-        if (!this.name) {
-          this.$message.warning(`${i18n.$t('Please enter resource folder name')}`)
-          return false
-        }
-
-        return true
+            this.$router.push({ path: '/resource/udf' })
+          }, 800)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          this.spinnerLoading = false
+        })
       }
     },
-    watch: {},
-    created () {
-    },
-    mounted () {
-    },
-    destroyed () {
-    },
-    computed: {},
-    components: { mListConstruction, mListBoxF }
-  }
+    _validation () {
+      if (!this.name) {
+        this.$message.warning(`${i18n.$t('Please enter resource folder name')}`)
+        return false
+      }
+
+      return true
+    }
+  },
+  watch: {},
+  created () {
+  },
+  mounted () {
+  },
+  destroyed () {
+  },
+  computed: {},
+  components: { mListConstruction, mListBoxF }
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

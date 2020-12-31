@@ -71,64 +71,64 @@
   </div>
 </template>
 <script>
-  import { mapActions } from 'vuex'
-  import mCreateUdf from './createUdf'
+import { mapActions } from 'vuex'
+import mCreateUdf from './createUdf'
 
-  export default {
-    name: 'udf-manage-list',
-    data () {
-      return {
-        list: [],
-        spinnerLoading: false,
-        createUdfDialog: false,
-        item: {}
-      }
-    },
-    props: {
-      udfFuncList: Array,
-      pageNo: Number,
-      pageSize: Number
-    },
-    methods: {
-      ...mapActions('resource', ['deleteUdf']),
-      _delete (item, i) {
-        this.spinnerLoading = true
-        this.deleteUdf({
-          id: item.id
-        }).then(res => {
-          this.$emit('on-update')
-          this.$message.success(res.msg)
-          this.spinnerLoading = false
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.spinnerLoading = false
-        })
-      },
-      _edit (item) {
-        this.item = item
-        this.createUdfDialog = true
-      },
-      onUpdate () {
+export default {
+  name: 'udf-manage-list',
+  data () {
+    return {
+      list: [],
+      spinnerLoading: false,
+      createUdfDialog: false,
+      item: {}
+    }
+  },
+  props: {
+    udfFuncList: Array,
+    pageNo: Number,
+    pageSize: Number
+  },
+  methods: {
+    ...mapActions('resource', ['deleteUdf']),
+    _delete (item, i) {
+      this.spinnerLoading = true
+      this.deleteUdf({
+        id: item.id
+      }).then(res => {
         this.$emit('on-update')
-        this.createUdfDialog = false
-      },
-      close () {
-        this.createUdfDialog = false
-      }
+        this.$message.success(res.msg)
+        this.spinnerLoading = false
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.spinnerLoading = false
+      })
     },
-    watch: {
-      udfFuncList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
-      }
+    _edit (item) {
+      this.item = item
+      this.createUdfDialog = true
     },
-    created () {
+    onUpdate () {
+      this.$emit('on-update')
+      this.createUdfDialog = false
     },
-    mounted () {
-      this.list = this.udfFuncList
-    },
-    components: { mCreateUdf }
-  }
+    close () {
+      this.createUdfDialog = false
+    }
+  },
+  watch: {
+    udfFuncList (a) {
+      this.list = []
+      setTimeout(() => {
+        this.list = a
+      })
+    }
+  },
+  created () {
+  },
+  mounted () {
+    this.list = this.udfFuncList
+  },
+  components: { mCreateUdf }
+}
 </script>

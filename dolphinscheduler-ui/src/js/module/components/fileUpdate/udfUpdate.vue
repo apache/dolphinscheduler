@@ -51,124 +51,124 @@
   </div>
 </template>
 <script>
-  import io from '@/module/io'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
+import io from '@/module/io'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
 
-  export default {
-    name: 'udf-update',
-    data () {
-      return {
-        store,
-        udfName: '',
-        udfDesc: '',
-        file: '',
-        progress: 0,
-        spinnerLoading: false,
-        pid: null,
-        currentDir: ''
-      }
-    },
-    props: {
+export default {
+  name: 'udf-update',
+  data () {
+    return {
+      store,
+      udfName: '',
+      udfDesc: '',
+      file: '',
+      progress: 0,
+      spinnerLoading: false,
+      pid: null,
+      currentDir: ''
+    }
+  },
+  props: {
 
-    },
-    methods: {
-      /**
+  },
+  methods: {
+    /**
        * validation
        */
-      _validation () {
-        if (!this.currentDir) {
-          this.$message.warning(`${i18n.$t('Please select UDF resources directory')}`)
-          return false
-        }
-        if (!this.udfName) {
-          this.$message.warning(`${i18n.$t('Please enter file name')}`)
-          return false
-        }
-        if (!this.file) {
-          this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
-          return false
-        }
-        return true
-      },
-      _verifyName () {
-        return new Promise((resolve, reject) => {
-          this.store.dispatch('resource/resourceVerifyName', {
-            fullName: '/' + this.currentDir + '/' + this.udfName,
-            type: 'UDF'
-          }).then(res => {
-            resolve()
-          }).catch(e => {
-            this.$message.error(e.msg || '')
-            reject(e)
-          })
-        })
-      },
-      receivedValue (pid, name) {
-        this.pid = pid
-        this.currentDir = name
-      },
-      _formDataUpdate () {
-        let self = this
-        let formData = new FormData()
-        formData.append('file', this.file)
-        formData.append('type', 'UDF')
-        formData.append('pid', this.pid)
-        formData.append('currentDir', this.currentDir)
-        formData.append('name', this.udfName)
-        formData.append('description', this.udfDesc)
-        this.spinnerLoading = true
-        this.$emit('on-update-present', false)
-        io.post('resources/create', res => {
-          this.$message.success(res.msg)
-          this.spinnerLoading = false
-          this.progress = 0
-          this.$emit('on-update', res.data)
-        }, e => {
-          this.spinnerLoading = false
-          this.progress = 0
-          this.$message.error(e.msg || '')
-          this.$emit('on-update', e)
-        }, {
-          data: formData,
-          emulateJSON: false,
-          timeout: 99999999,
-          onUploadProgress (progressEvent) {
-            // Size has been uploaded
-            let loaded = progressEvent.loaded
-            // Total attachment size
-            let total = progressEvent.total
-            self.progress = Math.floor(100 * loaded / total)
-          }
-        })
-      },
-      _ok () {
-        if (this._validation()) {
-          this._verifyName().then(res => {
-            this._formDataUpdate()
-          })
-        }
+    _validation () {
+      if (!this.currentDir) {
+        this.$message.warning(`${i18n.$t('Please select UDF resources directory')}`)
+        return false
       }
+      if (!this.udfName) {
+        this.$message.warning(`${i18n.$t('Please enter file name')}`)
+        return false
+      }
+      if (!this.file) {
+        this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
+        return false
+      }
+      return true
     },
-    watch: {},
-    created () {
-    },
-    mounted () {
-      $('#file').change(() => {
-        let file = $('#file')[0].files[0]
-        this.file = file
-        this.udfName = file.name
+    _verifyName () {
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('resource/resourceVerifyName', {
+          fullName: '/' + this.currentDir + '/' + this.udfName,
+          type: 'UDF'
+        }).then(res => {
+          resolve()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          reject(e)
+        })
       })
     },
-    updated () {
+    receivedValue (pid, name) {
+      this.pid = pid
+      this.currentDir = name
     },
-    beforeDestroy () {
+    _formDataUpdate () {
+      const self = this
+      const formData = new FormData()
+      formData.append('file', this.file)
+      formData.append('type', 'UDF')
+      formData.append('pid', this.pid)
+      formData.append('currentDir', this.currentDir)
+      formData.append('name', this.udfName)
+      formData.append('description', this.udfDesc)
+      this.spinnerLoading = true
+      this.$emit('on-update-present', false)
+      io.post('resources/create', res => {
+        this.$message.success(res.msg)
+        this.spinnerLoading = false
+        this.progress = 0
+        this.$emit('on-update', res.data)
+      }, e => {
+        this.spinnerLoading = false
+        this.progress = 0
+        this.$message.error(e.msg || '')
+        this.$emit('on-update', e)
+      }, {
+        data: formData,
+        emulateJSON: false,
+        timeout: 99999999,
+        onUploadProgress (progressEvent) {
+          // Size has been uploaded
+          const loaded = progressEvent.loaded
+          // Total attachment size
+          const total = progressEvent.total
+          self.progress = Math.floor(100 * loaded / total)
+        }
+      })
     },
-    destroyed () {
-    },
-    computed: {},
-    components: {}
-  }
+    _ok () {
+      if (this._validation()) {
+        this._verifyName().then(res => {
+          this._formDataUpdate()
+        })
+      }
+    }
+  },
+  watch: {},
+  created () {
+  },
+  mounted () {
+    $('#file').change(() => {
+      const file = $('#file')[0].files[0]
+      this.file = file
+      this.udfName = file.name
+    })
+  },
+  updated () {
+  },
+  beforeDestroy () {
+  },
+  destroyed () {
+  },
+  computed: {},
+  components: {}
+}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

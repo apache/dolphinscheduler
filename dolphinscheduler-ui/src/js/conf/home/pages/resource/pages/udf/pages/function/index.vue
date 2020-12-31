@@ -55,97 +55,97 @@
   </m-list-construction>
 </template>
 <script>
-  import _ from 'lodash'
-  import { mapActions } from 'vuex'
-  import mList from './_source/list'
-  import mCreateUdf from './_source/createUdf'
-  import mSpin from '@/module/components/spin/spin'
-  import mNoData from '@/module/components/noData/noData'
-  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-  import mConditions from '@/module/components/conditions/conditions'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+import _ from 'lodash'
+import { mapActions } from 'vuex'
+import mList from './_source/list'
+import mCreateUdf from './_source/createUdf'
+import mSpin from '@/module/components/spin/spin'
+import mNoData from '@/module/components/noData/noData'
+import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+import mConditions from '@/module/components/conditions/conditions'
+import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  export default {
-    name: 'udf-function-index',
-    data () {
-      return {
-        total: null,
-        isLoading: false,
-        udfFuncList: [],
-        searchParams: {
-          id: -1,
-          pageSize: 10,
-          pageNo: 1,
-          searchVal: ''
-        },
-        isLeft: true,
-        createUdfDialog: false
-      }
+export default {
+  name: 'udf-function-index',
+  data () {
+    return {
+      total: null,
+      isLoading: false,
+      udfFuncList: [],
+      searchParams: {
+        id: -1,
+        pageSize: 10,
+        pageNo: 1,
+        searchVal: ''
+      },
+      isLeft: true,
+      createUdfDialog: false
+    }
+  },
+  mixins: [listUrlParamHandle],
+  props: {},
+  methods: {
+    ...mapActions('resource', ['getUdfFuncListP']),
+    _onConditions (o) {
+      this.searchParams = _.assign(this.searchParams, o)
+      this.searchParams.pageNo = 1
     },
-    mixins: [listUrlParamHandle],
-    props: {},
-    methods: {
-      ...mapActions('resource', ['getUdfFuncListP']),
-      _onConditions (o) {
-        this.searchParams = _.assign(this.searchParams, o)
-        this.searchParams.pageNo = 1
-      },
-      _page (val) {
-        this.searchParams.pageNo = val
-      },
-      _pageSize (val) {
-        this.searchParams.pageSize = val
-      },
-      _create () {
-        this.createUdfDialog = true
-      },
-      onUpdate () {
-        this._updateList()
-        this.createUdfDialog = false
-      },
+    _page (val) {
+      this.searchParams.pageNo = val
+    },
+    _pageSize (val) {
+      this.searchParams.pageSize = val
+    },
+    _create () {
+      this.createUdfDialog = true
+    },
+    onUpdate () {
+      this._updateList()
+      this.createUdfDialog = false
+    },
 
-      close () {
-        this.createUdfDialog = false
-      },
+    close () {
+      this.createUdfDialog = false
+    },
 
-      _updateList () {
-        this._debounceGET()
-      },
-      _getList (flag) {
-        if (sessionStorage.getItem('isLeft') === 0) {
-          this.isLeft = false
+    _updateList () {
+      this._debounceGET()
+    },
+    _getList (flag) {
+      if (sessionStorage.getItem('isLeft') === 0) {
+        this.isLeft = false
+      } else {
+        this.isLeft = true
+      }
+      this.isLoading = !flag
+      this.getUdfFuncListP(this.searchParams).then(res => {
+        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+          this.searchParams.pageNo = this.searchParams.pageNo - 1
         } else {
-          this.isLeft = true
-        }
-        this.isLoading = !flag
-        this.getUdfFuncListP(this.searchParams).then(res => {
-          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo - 1
-          } else {
-            this.udfFuncList = []
-            this.udfFuncList = res.totalList
-            this.total = res.total
-            this.isLoading = false
-          }
-        }).catch(e => {
+          this.udfFuncList = []
+          this.udfFuncList = res.totalList
+          this.total = res.total
           this.isLoading = false
-        })
-      }
-    },
-    watch: {
-      // router
-      '$route' (a) {
-        // url no params get instance list
-        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-      }
-    },
-    created () {
-    },
-    mounted () {
-    },
-    beforeDestroy () {
-      sessionStorage.setItem('isLeft', 1)
-    },
-    components: { mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
-  }
+        }
+      }).catch(e => {
+        this.isLoading = false
+      })
+    }
+  },
+  watch: {
+    // router
+    '$route' (a) {
+      // url no params get instance list
+      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+    }
+  },
+  created () {
+  },
+  mounted () {
+  },
+  beforeDestroy () {
+    sessionStorage.setItem('isLeft', 1)
+  },
+  components: { mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
+}
 </script>

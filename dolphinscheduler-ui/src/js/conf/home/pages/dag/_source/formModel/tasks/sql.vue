@@ -145,365 +145,365 @@
   </div>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import mUdfs from './_source/udfs'
-  import mListBox from './_source/listBox'
-  import mScriptBox from './_source/scriptBox'
-  import mSqlType from './_source/sqlType'
-  import mDatasource from './_source/datasource'
-  import mLocalParams from './_source/localParams'
-  import mStatementList from './_source/statementList'
-  import disabledState from '@/module/mixin/disabledState'
-  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
-  import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import mUdfs from './_source/udfs'
+import mListBox from './_source/listBox'
+import mScriptBox from './_source/scriptBox'
+import mSqlType from './_source/sqlType'
+import mDatasource from './_source/datasource'
+import mLocalParams from './_source/localParams'
+import mStatementList from './_source/statementList'
+import disabledState from '@/module/mixin/disabledState'
+import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
+import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
-  let editor
+let editor
 
-  export default {
-    name: 'sql',
-    data () {
-      return {
-        // Data source type
-        type: '',
-        // data source
-        datasource: '',
-        // Return to the selected data source
-        rtDatasource: '',
-        // Sql statement
-        sql: '',
-        // Custom parameter
-        localParams: [],
-        // UDF function
-        udfs: '',
-        // Sql type
-        sqlType: '0',
-        // Email title
-        title: '',
-        // Form/attachment
-        showType: ['TABLE'],
-        // Sql parameter
-        connParams: '',
-        // Pre statements
-        preStatements: [],
-        // Post statements
-        postStatements: [],
-        // recipients
-        receivers: [],
-        // copy to
-        receiversCc: [],
-        item: '',
-        scriptBoxDialog: false
-      }
+export default {
+  name: 'sql',
+  data () {
+    return {
+      // Data source type
+      type: '',
+      // data source
+      datasource: '',
+      // Return to the selected data source
+      rtDatasource: '',
+      // Sql statement
+      sql: '',
+      // Custom parameter
+      localParams: [],
+      // UDF function
+      udfs: '',
+      // Sql type
+      sqlType: '0',
+      // Email title
+      title: '',
+      // Form/attachment
+      showType: ['TABLE'],
+      // Sql parameter
+      connParams: '',
+      // Pre statements
+      preStatements: [],
+      // Post statements
+      postStatements: [],
+      // recipients
+      receivers: [],
+      // copy to
+      receiversCc: [],
+      item: '',
+      scriptBoxDialog: false
+    }
+  },
+  mixins: [disabledState],
+  props: {
+    backfillItem: Object,
+    createNodeId: Number
+  },
+  methods: {
+    setEditorVal () {
+      this.item = editor.getValue()
+      this.scriptBoxDialog = true
     },
-    mixins: [disabledState],
-    props: {
-      backfillItem: Object,
-      createNodeId: Number
+    getSriptBoxValue (val) {
+      editor.setValue(val)
     },
-    methods: {
-      setEditorVal () {
-        this.item = editor.getValue()
-        this.scriptBoxDialog = true
-      },
-      getSriptBoxValue (val) {
-        editor.setValue(val)
-      },
-      /**
+    /**
        * return sqlType
        */
-      _onSqlType (a) {
-        this.sqlType = a
-        if (a === 0) {
-          this.showType = ['TABLE']
-        }
-      },
-      /**
+    _onSqlType (a) {
+      this.sqlType = a
+      if (a === 0) {
+        this.showType = ['TABLE']
+      }
+    },
+    /**
        * return udfs
        */
-      _onUdfsData (a) {
-        this.udfs = a
-      },
-      /**
+    _onUdfsData (a) {
+      this.udfs = a
+    },
+    /**
        * return Custom parameter
        */
-      _onUdpData (a) {
-        this.localParams = a
-      },
-      /**
+    _onUdpData (a) {
+      this.localParams = a
+    },
+    /**
        * return data source
        */
-      _onDsData (o) {
-        this.type = o.type
-        this.rtDatasource = o.datasource
-      },
-      /**
+    _onDsData (o) {
+      this.type = o.type
+      this.rtDatasource = o.datasource
+    },
+    /**
        * return pre statements
        */
-      _onPreStatements (a) {
-        this.preStatements = a
-      },
-      /**
+    _onPreStatements (a) {
+      this.preStatements = a
+    },
+    /**
        * return post statements
        */
-      _onPostStatements (a) {
-        this.postStatements = a
-      },
-      /**
+    _onPostStatements (a) {
+      this.postStatements = a
+    },
+    /**
        * verification
        */
-      _verification () {
-        if (!editor.getValue()) {
-          this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
-          return false
-        }
+    _verification () {
+      if (!editor.getValue()) {
+        this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
+        return false
+      }
 
-        // datasource Subcomponent verification
-        if (!this.$refs.refDs._verifDatasource()) {
+      // datasource Subcomponent verification
+      if (!this.$refs.refDs._verifDatasource()) {
+        return false
+      }
+      if (this.sqlType === 0 && !this.showType.length) {
+        this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
+        return false
+      }
+      if (this.sqlType === 0 && !this.title) {
+        this.$message.warning(`${i18n.$t('Mail subject required')}`)
+        return false
+      }
+      if (this.sqlType === 0 && !this.receivers.length) {
+        this.$message.warning(`${i18n.$t('Recipient required')}`)
+        return false
+      }
+      // receivers Subcomponent verification
+      if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
+        return false
+      }
+      // receiversCc Subcomponent verification
+      if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
+        return false
+      }
+      // udfs Subcomponent verification Verification only if the data type is HIVE
+      if (this.type === 'HIVE') {
+        if (!this.$refs.refUdfs._verifUdfs()) {
           return false
         }
-        if (this.sqlType === 0 && !this.showType.length) {
-          this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
-          return false
-        }
-        if (this.sqlType === 0 && !this.title) {
-          this.$message.warning(`${i18n.$t('Mail subject required')}`)
-          return false
-        }
-        if (this.sqlType === 0 && !this.receivers.length) {
-          this.$message.warning(`${i18n.$t('Recipient required')}`)
-          return false
-        }
-        // receivers Subcomponent verification
-        if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
-          return false
-        }
-        // receiversCc Subcomponent verification
-        if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
-          return false
-        }
-        // udfs Subcomponent verification Verification only if the data type is HIVE
-        if (this.type === 'HIVE') {
-          if (!this.$refs.refUdfs._verifUdfs()) {
-            return false
-          }
-        }
+      }
 
-        // localParams Subcomponent verification
-        if (!this.$refs.refLocalParams._verifProp()) {
-          return false
-        }
+      // localParams Subcomponent verification
+      if (!this.$refs.refLocalParams._verifProp()) {
+        return false
+      }
 
-        // preStatements Subcomponent verification
-        if (!this.$refs.refPreStatements._verifProp()) {
-          return false
-        }
+      // preStatements Subcomponent verification
+      if (!this.$refs.refPreStatements._verifProp()) {
+        return false
+      }
 
-        // postStatements Subcomponent verification
-        if (!this.$refs.refPostStatements._verifProp()) {
-          return false
-        }
+      // postStatements Subcomponent verification
+      if (!this.$refs.refPostStatements._verifProp()) {
+        return false
+      }
 
-        // storage
-        this.$emit('on-params', {
-          type: this.type,
-          datasource: this.rtDatasource,
-          sql: editor.getValue(),
-          udfs: this.udfs,
-          sqlType: this.sqlType,
-          title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            /**
+      // storage
+      this.$emit('on-params', {
+        type: this.type,
+        datasource: this.rtDatasource,
+        sql: editor.getValue(),
+        udfs: this.udfs,
+        sqlType: this.sqlType,
+        title: this.title,
+        receivers: this.receivers.join(','),
+        receiversCc: this.receiversCc.join(','),
+        showType: (() => {
+          /**
              * Special processing return order TABLE,ATTACHMENT
              * Handling checkout sequence
              */
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
-          localParams: this.localParams,
-          connParams: this.connParams,
-          preStatements: this.preStatements,
-          postStatements: this.postStatements
-        })
-        return true
-      },
-      /**
+          const showType = this.showType
+          if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+            return [showType[1], showType[0]].join(',')
+          } else {
+            return showType.join(',')
+          }
+        })(),
+        localParams: this.localParams,
+        connParams: this.connParams,
+        preStatements: this.preStatements,
+        postStatements: this.postStatements
+      })
+      return true
+    },
+    /**
        * Processing code highlighting
        */
-      _handlerEditor () {
-        this._destroyEditor()
+    _handlerEditor () {
+      this._destroyEditor()
 
-        // editor
-        editor = codemirror('code-sql-mirror', {
-          mode: 'sql',
-          readOnly: this.isDetails
-        })
+      // editor
+      editor = codemirror('code-sql-mirror', {
+        mode: 'sql',
+        readOnly: this.isDetails
+      })
 
-        this.keypress = () => {
-          if (!editor.getOption('readOnly')) {
-            editor.showHint({
-              completeSingle: false
-            })
-          }
-        }
-
-        this.changes = () => {
-          this._cacheParams()
-        }
-
-        // Monitor keyboard
-        editor.on('keypress', this.keypress)
-
-        editor.on('changes', this.changes)
-
-        editor.setValue(this.sql)
-
-        return editor
-      },
-      _getReceiver () {
-        let param = {}
-        let current = this.router.history.current
-        if (current.name === 'projects-definition-details') {
-          param.processDefinitionId = current.params.id
-        } else {
-          param.processInstanceId = current.params.id
-        }
-        this.store.dispatch('dag/getReceiver', param).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
-        })
-      },
-      _cacheParams () {
-        this.$emit('on-cache-params', {
-          type: this.type,
-          datasource: this.rtDatasource,
-          sql: editor ? editor.getValue() : '',
-          udfs: this.udfs,
-          sqlType: this.sqlType,
-          title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
-          localParams: this.localParams,
-          connParams: this.connParams,
-          preStatements: this.preStatements,
-          postStatements: this.postStatements
-        })
-      },
-      _destroyEditor () {
-        if (editor) {
-          editor.toTextArea() // Uninstall
-          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
-          editor.off($('.code-sql-mirror'), 'changes', this.changes)
+      this.keypress = () => {
+        if (!editor.getOption('readOnly')) {
+          editor.showHint({
+            completeSingle: false
+          })
         }
       }
-    },
-    watch: {
-      // Listening to sqlType
-      sqlType (val) {
-        if (val === 0) {
-          this.showType = []
-        }
-        if (val !== 0) {
-          this.title = ''
-          this.receivers = []
-          this.receiversCc = []
-        }
-      },
-      // Listening data source
-      type (val) {
-        if (val !== 'HIVE') {
-          this.connParams = ''
-        }
-      },
-      // Watch the cacheParams
-      cacheParams (val) {
+
+      this.changes = () => {
         this._cacheParams()
       }
-    },
-    created () {
-      let o = this.backfillItem
 
-      // Non-null objects represent backfill
-      if (!_.isEmpty(o)) {
-        // backfill
-        this.type = o.params.type || ''
-        this.datasource = o.params.datasource || ''
-        this.sql = o.params.sql || ''
-        this.udfs = o.params.udfs || ''
-        this.sqlType = o.params.sqlType
-        this.connParams = o.params.connParams || ''
-        this.localParams = o.params.localParams || []
-        if (o.params.showType === '') {
-          this.showType = []
-        } else {
-          this.showType = o.params.showType.split(',') || []
-        }
-        this.preStatements = o.params.preStatements || []
-        this.postStatements = o.params.postStatements || []
-        this.title = o.params.title || ''
-        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
-        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
-      }
-      // read tasks from cache
-      if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
-        this.router.history.current.name !== 'definition-create') {
-        this._getReceiver()
-      }
+      // Monitor keyboard
+      editor.on('keypress', this.keypress)
+
+      editor.on('changes', this.changes)
+
+      editor.setValue(this.sql)
+
+      return editor
     },
-    mounted () {
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 200)
+    _getReceiver () {
+      const param = {}
+      const current = this.router.history.current
+      if (current.name === 'projects-definition-details') {
+        param.processDefinitionId = current.params.id
+      } else {
+        param.processInstanceId = current.params.id
+      }
+      this.store.dispatch('dag/getReceiver', param).then(res => {
+        this.receivers = res.receivers && res.receivers.split(',') || []
+        this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+      })
     },
-    destroyed () {
-      /**
-       * Destroy the editor instance
-       */
+    _cacheParams () {
+      this.$emit('on-cache-params', {
+        type: this.type,
+        datasource: this.rtDatasource,
+        sql: editor ? editor.getValue() : '',
+        udfs: this.udfs,
+        sqlType: this.sqlType,
+        title: this.title,
+        receivers: this.receivers.join(','),
+        receiversCc: this.receiversCc.join(','),
+        showType: (() => {
+          const showType = this.showType
+          if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+            return [showType[1], showType[0]].join(',')
+          } else {
+            return showType.join(',')
+          }
+        })(),
+        localParams: this.localParams,
+        connParams: this.connParams,
+        preStatements: this.preStatements,
+        postStatements: this.postStatements
+      })
+    },
+    _destroyEditor () {
       if (editor) {
         editor.toTextArea() // Uninstall
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
         editor.off($('.code-sql-mirror'), 'changes', this.changes)
       }
-    },
-    computed: {
-      cacheParams () {
-        return {
-          type: this.type,
-          datasource: this.rtDatasource,
-          udfs: this.udfs,
-          sqlType: this.sqlType,
-          title: this.title,
-          receivers: this.receivers.join(','),
-          receiversCc: this.receiversCc.join(','),
-          showType: (() => {
-            let showType = this.showType
-            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
-              return [showType[1], showType[0]].join(',')
-            } else {
-              return showType.join(',')
-            }
-          })(),
-          localParams: this.localParams,
-          connParams: this.connParams,
-          preStatements: this.preStatements,
-          postStatements: this.postStatements
-        }
+    }
+  },
+  watch: {
+    // Listening to sqlType
+    sqlType (val) {
+      if (val === 0) {
+        this.showType = []
+      }
+      if (val !== 0) {
+        this.title = ''
+        this.receivers = []
+        this.receiversCc = []
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
-  }
+    // Listening data source
+    type (val) {
+      if (val !== 'HIVE') {
+        this.connParams = ''
+      }
+    },
+    // Watch the cacheParams
+    cacheParams (val) {
+      this._cacheParams()
+    }
+  },
+  created () {
+    const o = this.backfillItem
+
+    // Non-null objects represent backfill
+    if (!_.isEmpty(o)) {
+      // backfill
+      this.type = o.params.type || ''
+      this.datasource = o.params.datasource || ''
+      this.sql = o.params.sql || ''
+      this.udfs = o.params.udfs || ''
+      this.sqlType = o.params.sqlType
+      this.connParams = o.params.connParams || ''
+      this.localParams = o.params.localParams || []
+      if (o.params.showType === '') {
+        this.showType = []
+      } else {
+        this.showType = o.params.showType.split(',') || []
+      }
+      this.preStatements = o.params.preStatements || []
+      this.postStatements = o.params.postStatements || []
+      this.title = o.params.title || ''
+      this.receivers = o.params.receivers && o.params.receivers.split(',') || []
+      this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+    }
+    // read tasks from cache
+    if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
+        this.router.history.current.name !== 'definition-create') {
+      this._getReceiver()
+    }
+  },
+  mounted () {
+    setTimeout(() => {
+      this._handlerEditor()
+    }, 200)
+  },
+  destroyed () {
+    /**
+       * Destroy the editor instance
+       */
+    if (editor) {
+      editor.toTextArea() // Uninstall
+      editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+      editor.off($('.code-sql-mirror'), 'changes', this.changes)
+    }
+  },
+  computed: {
+    cacheParams () {
+      return {
+        type: this.type,
+        datasource: this.rtDatasource,
+        udfs: this.udfs,
+        sqlType: this.sqlType,
+        title: this.title,
+        receivers: this.receivers.join(','),
+        receiversCc: this.receiversCc.join(','),
+        showType: (() => {
+          const showType = this.showType
+          if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+            return [showType[1], showType[0]].join(',')
+          } else {
+            return showType.join(',')
+          }
+        })(),
+        localParams: this.localParams,
+        connParams: this.connParams,
+        preStatements: this.preStatements,
+        postStatements: this.postStatements
+      }
+    }
+  },
+  components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
+}
 </script>

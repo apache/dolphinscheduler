@@ -47,77 +47,77 @@
   </m-popup>
 </template>
 <script>
-  import _ from 'lodash'
-  import i18n from '@/module/i18n'
-  import store from '@/conf/home/store'
-  import mPopup from '@/module/components/popup/popup'
-  import mListBoxF from '@/module/components/listBoxF/listBoxF'
+import _ from 'lodash'
+import i18n from '@/module/i18n'
+import store from '@/conf/home/store'
+import mPopup from '@/module/components/popup/popup'
+import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-  export default {
-    name: 'projects-create',
-    data () {
-      return {
-        store,
-        description: '',
-        projectName: ''
+export default {
+  name: 'projects-create',
+  data () {
+    return {
+      store,
+      description: '',
+      projectName: ''
+    }
+  },
+  props: {
+    item: Object
+  },
+  methods: {
+    _ok () {
+      if (!this._verification()) {
+        return
       }
-    },
-    props: {
-      item: Object
-    },
-    methods: {
-      _ok () {
-        if (!this._verification()) {
-          return
-        }
 
-        let param = {
-          projectName: _.trim(this.projectName),
-          description: _.trim(this.description)
-        }
-
-        // edit
-        if (this.item) {
-          param.projectId = this.item.id
-        }
-
-        this.$refs.popup.spinnerLoading = true
-
-        this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
-          this.$emit('_onUpdate')
-          this.$message({
-            message: res.msg,
-            type: 'success',
-            offset: 70
-          })
-          setTimeout(() => {
-            this.$refs.popup.spinnerLoading = false
-          }, 800)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.$refs.popup.spinnerLoading = false
-        })
-      },
-      _close () {
-        this.$emit('close')
-      },
-      _verification () {
-        if (!this.projectName) {
-          this.$message.warning(`${i18n.$t('Please enter name')}`)
-          return false
-        }
-        return true
+      const param = {
+        projectName: _.trim(this.projectName),
+        description: _.trim(this.description)
       }
-    },
-    watch: {},
-    created () {
+
+      // edit
       if (this.item) {
-        this.projectName = this.item.name
-        this.description = this.item.description
+        param.projectId = this.item.id
       }
+
+      this.$refs.popup.spinnerLoading = true
+
+      this.store.dispatch(`projects/${this.item ? 'updateProjects' : 'createProjects'}`, param).then(res => {
+        this.$emit('_onUpdate')
+        this.$message({
+          message: res.msg,
+          type: 'success',
+          offset: 70
+        })
+        setTimeout(() => {
+          this.$refs.popup.spinnerLoading = false
+        }, 800)
+      }).catch(e => {
+        this.$message.error(e.msg || '')
+        this.$refs.popup.spinnerLoading = false
+      })
     },
-    mounted () {
+    _close () {
+      this.$emit('close')
     },
-    components: { mPopup, mListBoxF }
-  }
+    _verification () {
+      if (!this.projectName) {
+        this.$message.warning(`${i18n.$t('Please enter name')}`)
+        return false
+      }
+      return true
+    }
+  },
+  watch: {},
+  created () {
+    if (this.item) {
+      this.projectName = this.item.name
+      this.description = this.item.description
+    }
+  },
+  mounted () {
+  },
+  components: { mPopup, mListBoxF }
+}
 </script>
