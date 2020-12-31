@@ -47,7 +47,7 @@ const jsEntry = (() => {
     parts.shift()
     let modules = parts.join('/')
     let entry = moduleName(modules)
-    obj[entry] = val
+    obj[entry] = ['babel-polyfill', val]
   })
   return obj
 })()
@@ -125,6 +125,16 @@ const baseConfig = {
   },
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src')],
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          emitWarning: true
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
