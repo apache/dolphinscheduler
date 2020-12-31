@@ -14,33 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
-      }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
-        }
-      }
-    }
+import dayjs from 'dayjs'
+
+/**
+ * Formatting time
+ */
+const formatDate = (value, fmt) => {
+  fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
+  if (value === null) {
+    return '-'
+  } else {
+    return dayjs(formatISODate(value)).format(fmt)
   }
+}
+/**
+ * Formatting iso date
+ */
+const formatISODate = date => {
+  let [datetime, timezone] = date.split('+')
+  if (!timezone || timezone.indexOf(':') >= 0) return date
+  let hourOfTz = timezone.substring(0, 2) || '00'
+  let secondOfTz = timezone.substring(2, 4) || '00'
+  return `${datetime}+${hourOfTz}:${secondOfTz}`
+}
+/**
+ * filter null
+ */
+const filterNull = (value) => {
+  if (value === null || value === '') {
+    return '-'
+  } else {
+    return value
+  }
+}
+
+export {
+  formatDate, filterNull
 }

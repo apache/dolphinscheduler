@@ -14,33 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
+<template>
+  <m-layout>
+    <m-nav slot="top"></m-nav>
+    <router-view slot="bottom" v-if="isRenderRouterView"></router-view>
+  </m-layout>
+</template>
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
+<script>
+  import visibility from '@/module/visibility'
+  import mLayout from '@/module/components/layout/layout'
+  import mNav from '@/module/components/nav/nav'
+  export default {
+    name: 'app',
+    data () {
+      return {
+        isRenderRouterView: true
       }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
+    },
+    methods: {
+      reload () {
+        this.isRenderRouterView = false
+        this.$nextTick(() => {
+          this.isRenderRouterView = true
+        })
       }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
+    },
+    mounted () {
+      visibility.change((evt, hidden) => {
+        if (hidden === false) {
+          this.reload()
         }
-      }
-    }
+      })
+    },
+    components: { mLayout, mNav }
   }
-}
+</script>

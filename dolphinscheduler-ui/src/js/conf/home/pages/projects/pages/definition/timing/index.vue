@@ -14,33 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
-
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
+<template>
+  <m-list-construction :title="$t('Cron Manage')">
+    <template slot="operation">
+      <span style=" float: right; padding-right:50px">
+        <em class="el-icon-circle-close" style="font-size:20px " data-container="body" data-toggle="tooltip" :title="$t('Return')" @click="_close()"></em>
+      </span>
+    </template>
+    <template slot="content">
+      <m-list></m-list>
+    </template>
+  </m-list-construction>
+</template>
+<script>
+  import mList from './_source/list'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  export default {
+    name: 'definition-timing-index',
+    methods: {
+      _close () {
+        this.$router.go(-1)
       }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
-        }
-      }
-    }
+    },
+    components: { mList, mListConstruction }
   }
-}
+</script>

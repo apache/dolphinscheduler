@@ -14,33 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
+<template>
+  <div class="main-layout-model">
+    <div class="m-top">
+      <slot name="top"></slot>
+    </div>
+    <div class="m-bottom">
+      <slot name="bottom"></slot>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    name: 'main-layout'
+  }
+</script>
 
-    .ans-radio-wrapper {
-      height: auto !important;
+<style lang="scss" rel="stylesheet/scss">
+  .main-layout-model {
+    position: relative;
+    .m-top {
+      width: 100%;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 60px;
+      z-index: 1000;
     }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
-      }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
-        }
-      }
+    .m-bottom {
+      position: absolute;
+      top: 60px;
+      left: 0px;
+      width: 100%;
+      min-height: calc(100% - 60px);
+
     }
   }
-}
+</style>

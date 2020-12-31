@@ -14,33 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
-
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
+<template>
+  <div class="assist-dag-model">
+    <template v-if="isView && isActive">
+      <m-variables-view></m-variables-view>
+    </template>
+  </div>
+</template>
+<script>
+  import mVariablesView from './variablesView'
+  export default {
+    name: 'assist-dag-index',
+    data () {
+      return {
+        isView: false,
+        isActive: true
       }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
+    },
+    methods: {
+      _toggleView () {
+        this.isView = !this.isView
       }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
+    },
+    watch: {
+      $route: {
+        deep: true,
+        handler () {
+          this.isActive = false
+          this.$nextTick(() => (this.isActive = true))
         }
       }
-    }
+    },
+    components: { mVariablesView }
   }
-}
+</script>

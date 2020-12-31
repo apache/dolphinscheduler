@@ -14,33 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
-      }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
-        }
-      }
-    }
+import i18n from '@/module/i18n'
+import { resolveURL } from '@/module/io'
+
+/**
+ * download file
+ */
+const downloadFile = ($url, $obj) => {
+  const param = {
+    url: resolveURL($url),
+    obj: $obj
   }
+
+  if (!param.url) {
+    this.$message.warning(`${i18n.$t('Unable to download without proper url')}`)
+    return
+  }
+
+  const generatorInput = function (obj) {
+    let result = ''
+    const keyArr = Object.keys(obj)
+    keyArr.forEach(function (key) {
+      result += "<input type='hidden' name = '" + key + "' value='" + obj[key] + "'>"
+    })
+    return result
+  }
+  $(`<form action="${param.url}" method="get">${generatorInput(param.obj)}</form>`).appendTo('body').submit().remove()
 }
+
+export { downloadFile }

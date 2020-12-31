@@ -14,33 +14,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
+<template>
+  <div class="clearfix list">
+    <div class="text-box">
+      <span><slot name="text"></slot></span>
+    </div>
+    <div class="cont-box">
+      <div class="label-box">
+        <slot name="content"></slot>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+  export default {
+    name: 'list-box'
+  }
+</script>
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
+<style lang="scss" rel="stylesheet/scss">
+  .cont-box {
+    .label-box {
+      .ans-radio-group {
+        margin-top: 7px;
       }
     }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
-      }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
+  }
+  .v-checkbox-wrapper {
+    &.v-checkbox-wrapper-disabled {
+      color: #999 ;
+      .v-checkbox {
+        .v-checkbox-inner{
+          border-color:#dddee1;
+          background: #f7f7f7;
+          color: #bbbec4 ;
+          &:after{
+            border: 2px solid #ddd;
+            border-top: 0;
+            border-left: 0;
           }
         }
       }
     }
   }
-}
+</style>

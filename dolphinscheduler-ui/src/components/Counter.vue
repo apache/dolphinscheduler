@@ -14,33 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.v-crontab-form-model {
-  .list-box {
-    //padding: 6px 0;
+<template>
+  <div>
+    <div>{{ computedCount }}</div>
+    <button @click="inc">加</button>
+    <button @click="dec">减</button>
+    <button @click="reset">重置</button>
+  </div>
+</template>
 
-    .ans-radio-wrapper {
-      height: auto !important;
-    }
-    .ans-radio-group-item {
-      .text {
-        color: #888;
+<script>
+  export default {
+    props: {
+      factor: { type: Number, default: 1 }
+    },
+    data () {
+      return {
+        count: 0
       }
-    }
-    .ans-radio-wrapper-checked {
-      .text {
-        color: #0097e0;
+    },
+    methods: {
+      inc () {
+        this.count++
+      },
+      dec () {
+        this.count--
+      },
+      reset () {
+        this.count = 0
       }
-    }
-    .ans-select {
-      .tag-container {
-        .tag-wrapper {
-          line-height: 10px;
-          margin-left: 6px;
-          .tag-text {
-            margin-right: 0;
-          }
-        }
+    },
+    computed: {
+      computedCount: function () {
+        return this.count * this.factor
       }
     }
   }
-}
+</script>
