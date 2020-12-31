@@ -87,123 +87,123 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import { directList, typeList } from './commcon'
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'user-def-params',
-  data () {
-    return {
-      // Direct data Custom parameter type support IN
-      directList: directList,
-      // Type data Custom parameter type support OUT
-      typeList: typeList,
-      // Increased data
-      localParamsList: [],
-      // Current execution index
-      localParamsIndex: null
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    udpList: Array,
-    // hide direct/type
-    hide: {
-      type: Boolean,
-      default: true
-    }
-  },
-  methods: {
-    /**
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import { directList, typeList } from './commcon'
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'user-def-params',
+    data () {
+      return {
+        // Direct data Custom parameter type support IN
+        directList: directList,
+        // Type data Custom parameter type support OUT
+        typeList: typeList,
+        // Increased data
+        localParamsList: [],
+        // Current execution index
+        localParamsIndex: null
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      udpList: Array,
+      // hide direct/type
+      hide: {
+        type: Boolean,
+        default: true
+      }
+    },
+    methods: {
+      /**
        * Current index
        */
-    _getIndex (index) {
-      this.localParamsIndex = index
-    },
-    /**
+      _getIndex (index) {
+        this.localParamsIndex = index
+      },
+      /**
        * handle direct
        */
-    _handleDirectChanged () {
-      this._verifProp('value')
-    },
-    /**
+      _handleDirectChanged () {
+        this._verifProp('value')
+      },
+      /**
        * handle type
        */
-    _handleTypeChanged () {
-      this._verifProp('value')
-    },
-    /**
+      _handleTypeChanged () {
+        this._verifProp('value')
+      },
+      /**
        * delete item
        */
-    _removeUdp (index) {
-      this.localParamsList.splice(index, 1)
-      this._verifProp('value')
-    },
-    /**
+      _removeUdp (index) {
+        this.localParamsList.splice(index, 1)
+        this._verifProp('value')
+      },
+      /**
        * add
        */
-    _addUdp () {
-      this.localParamsList.push({
-        prop: '',
-        direct: 'IN',
-        type: 'VARCHAR',
-        value: ''
-      })
-    },
-    /**
+      _addUdp () {
+        this.localParamsList.push({
+          prop: '',
+          direct: 'IN',
+          type: 'VARCHAR',
+          value: ''
+        })
+      },
+      /**
        * blur verification
        */
-    _handleValue () {
-      this._verifProp('value')
-    },
-    /**
+      _handleValue () {
+        this._verifProp('value')
+      },
+      /**
        * Verify that the value exists or is empty
        */
-    _verifProp (type) {
-      const arr = []
-      let flag = true
-      _.map(this.localParamsList, v => {
-        arr.push(v.prop)
-        if (!v.prop) {
-          flag = false
+      _verifProp (type) {
+        let arr = []
+        let flag = true
+        _.map(this.localParamsList, v => {
+          arr.push(v.prop)
+          if (!v.prop) {
+            flag = false
+          }
+        })
+        if (!flag) {
+          if (!type) {
+            this.$message.warning(`${i18n.$t('prop is empty')}`)
+          }
+          return false
         }
-      })
-      if (!flag) {
-        if (!type) {
-          this.$message.warning(`${i18n.$t('prop is empty')}`)
+        let newArr = _.cloneDeep(_.uniqWith(arr, _.isEqual))
+        if (newArr.length !== arr.length) {
+          if (!type) {
+            this.$message.warning(`${i18n.$t('prop is repeat')}`)
+          }
+          return false
         }
-        return false
+        this.$emit('on-local-params', _.cloneDeep(this.localParamsList))
+        return true
       }
-      const newArr = _.cloneDeep(_.uniqWith(arr, _.isEqual))
-      if (newArr.length !== arr.length) {
-        if (!type) {
-          this.$message.warning(`${i18n.$t('prop is repeat')}`)
-        }
-        return false
+    },
+    watch: {
+      // Monitor data changes
+      udpList () {
+        this.localParamsList = this.udpList
       }
-      this.$emit('on-local-params', _.cloneDeep(this.localParamsList))
-      return true
-    }
-  },
-  watch: {
-    // Monitor data changes
-    udpList () {
+    },
+    created () {
       this.localParamsList = this.udpList
-    }
-  },
-  created () {
-    this.localParamsList = this.udpList
-  },
-  computed: {
-    inputStyle () {
-      return `width:${this.hide ? 160 : 252}px`
-    }
-  },
-  mounted () {
-  },
-  components: { }
-}
+    },
+    computed: {
+      inputStyle () {
+        return `width:${this.hide ? 160 : 252}px`
+      }
+    },
+    mounted () {
+    },
+    components: { }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

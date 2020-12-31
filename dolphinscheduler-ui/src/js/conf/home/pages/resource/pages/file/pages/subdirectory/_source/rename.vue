@@ -45,78 +45,78 @@
   </m-popup>
 </template>
 <script>
-import i18n from '@/module/i18n'
-import store from '@/conf/home/store'
-import localStore from '@/module/util/localStorage'
-import mPopup from '@/module/components/popup/popup'
-import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import i18n from '@/module/i18n'
+  import store from '@/conf/home/store'
+  import localStore from '@/module/util/localStorage'
+  import mPopup from '@/module/components/popup/popup'
+  import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-export default {
-  name: 'resource-file-rename',
-  data () {
-    return {
-      store,
-      description: '',
-      name: ''
-    }
-  },
-  props: {
-    item: Object
-  },
-  methods: {
-    _ok (fn) {
-      this._verification().then(res => {
-        if (this.name === this.item.alias) {
-          return new Promise((resolve, reject) => {
-            this.description === this.item.description ? reject({ msg: '内容未修改' }) : resolve()
-          })
-        } else {
-          return this.store.dispatch('resource/resourceVerifyName', {
-            fullName: localStore.getItem('currentDir') + '/' + this.name,
+  export default {
+    name: 'resource-file-rename',
+    data () {
+      return {
+        store,
+        description: '',
+        name: ''
+      }
+    },
+    props: {
+      item: Object
+    },
+    methods: {
+      _ok (fn) {
+        this._verification().then(res => {
+          if (this.name === this.item.alias) {
+            return new Promise((resolve, reject) => {
+              this.description === this.item.description ? reject({ msg: '内容未修改' }) : resolve()
+            })
+          } else {
+            return this.store.dispatch('resource/resourceVerifyName', {
+              fullName: localStore.getItem('currentDir') + '/' + this.name,
+              type: 'FILE'
+            })
+          }
+        }).then(res => {
+          return this.store.dispatch('resource/resourceRename', {
+            name: this.name,
+            description: this.description,
+            id: this.item.id,
             type: 'FILE'
           })
-        }
-      }).then(res => {
-        return this.store.dispatch('resource/resourceRename', {
-          name: this.name,
-          description: this.description,
-          id: this.item.id,
-          type: 'FILE'
+        }).then(res => {
+          this.$message.success(res.msg)
+          this.$emit('onUpDate', res.data)
+          fn()
+        }).catch(e => {
+          fn()
+          this.$message.error(e.msg || '')
         })
-      }).then(res => {
-        this.$message.success(res.msg)
-        this.$emit('onUpDate', res.data)
-        fn()
-      }).catch(e => {
-        fn()
-        this.$message.error(e.msg || '')
-      })
-    },
-    _verification () {
-      return new Promise((resolve, reject) => {
-        if (!this.name) {
+      },
+      _verification () {
+        return new Promise((resolve, reject) => {
+          if (!this.name) {
             reject({ // eslint-disable-line
-            msg: `${i18n.$t('Please enter resource name')}`
-          })
-        } else {
-          resolve()
-        }
-      })
+              msg: `${i18n.$t('Please enter resource name')}`
+            })
+          } else {
+            resolve()
+          }
+        })
+      },
+      close () {
+        this.$emit('close')
+      }
     },
-    close () {
-      this.$emit('close')
-    }
-  },
-  watch: {},
-  created () {
-    const item = this.item || {}
-    if (item) {
-      this.name = item.alias
-      this.description = item.description
-    }
-  },
-  mounted () {
-  },
-  components: { mPopup, mListBoxF }
-}
+    watch: {},
+    created () {
+      let item = this.item || {}
+      if (item) {
+        this.name = item.alias
+        this.description = item.description
+      }
+    },
+    mounted () {
+    },
+    components: { mPopup, mListBoxF }
+  }
 </script>

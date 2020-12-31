@@ -166,207 +166,207 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import cookies from 'js-cookie'
-import { mapState, mapActions } from 'vuex'
-import { findComponentDownward } from '@/module/util/'
-import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
-import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
-import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
-import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
-import mProgressBar from '@/module/components/progressBar/progressBar'
-import { findLocale, localeList } from '@/module/i18n/config'
+  import _ from 'lodash'
+  import cookies from 'js-cookie'
+  import { mapState, mapActions } from 'vuex'
+  import { findComponentDownward } from '@/module/util/'
+  import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
+  import mFileChildUpdate from '@/module/components/fileUpdate/fileChildUpdate'
+  import mResourceChildUpdate from '@/module/components/fileUpdate/resourceChildUpdate'
+  import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
+  import mProgressBar from '@/module/components/progressBar/progressBar'
+  import { findLocale, localeList } from '@/module/i18n/config'
 
-export default {
-  name: 'roof-nav',
-  data () {
-    return {
-      // Whether to drag
-      isDrag: false,
-      // Upload progress
-      progress: 0,
-      // Whether to upload
-      isUpdate: false,
-      // Whether to log in
-      isLogin: false,
-      // Mobile compatible navigation
-      mIsNav: false,
-      // Take the language list data to get rid of the language pack
-      localeList: _.map(_.cloneDeep(localeList()), v => _.omit(v, ['locale'])),
-      // Selected language
-      activeLocale: '',
-      // Environmental variable
-      docLink: '',
-      type: '',
-      definitionUpdateDialog: false,
-      fileUpdateDialog: false,
-      fileChildUpdateDialog: false,
-      id: null,
-      resourceChildUpdateDialog: false
-    }
-  },
+  export default {
+    name: 'roof-nav',
+    data () {
+      return {
+        // Whether to drag
+        isDrag: false,
+        // Upload progress
+        progress: 0,
+        // Whether to upload
+        isUpdate: false,
+        // Whether to log in
+        isLogin: false,
+        // Mobile compatible navigation
+        mIsNav: false,
+        // Take the language list data to get rid of the language pack
+        localeList: _.map(_.cloneDeep(localeList()), v => _.omit(v, ['locale'])),
+        // Selected language
+        activeLocale: '',
+        // Environmental variable
+        docLink: '',
+        type: '',
+        definitionUpdateDialog: false,
+        fileUpdateDialog: false,
+        fileChildUpdateDialog: false,
+        id: null,
+        resourceChildUpdateDialog: false
+      }
+    },
 
-  methods: {
-    ...mapActions('user', ['signOut']),
-    /**
+    methods: {
+      ...mapActions('user', ['signOut']),
+      /**
        * User Info
        */
-    _goAccount () {
-      this.isLogin = false
-      this.$router.push({ name: 'account' })
-    },
-    /**
+      _goAccount () {
+        this.isLogin = false
+        this.$router.push({ name: 'account' })
+      },
+      /**
        * _toggle User
        */
-    _toggleUser (command) {
-      if (command === 'user') {
-        this._goAccount()
-      } else {
-        this._signOut()
-      }
-    },
-    /**
+      _toggleUser (command) {
+        if (command === 'user') {
+          this._goAccount()
+        } else {
+          this._signOut()
+        }
+      },
+      /**
        * Upload (for the time being)
        */
-    _fileUpdate (type) {
-      if (this.progress) {
-        this._toggleArchive()
-        return
-      }
-      this.type = type
-      if (this.type === 'DEFINITION') {
-        this.definitionUpdateDialog = true
-      } else {
-        this.fileUpdateDialog = true
-      }
-    },
-    onProgressDefinition (val) {
-      this.progress = val
-    },
-    onUpdateDefinition () {
-      const self = this
-      findComponentDownward(self.$root, 'definition-list-index')._updateList()
-      this.isUpdate = false
-      this.progress = 0
-      this.definitionUpdateDialog = false
-    },
+      _fileUpdate (type) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.type = type
+        if (this.type === 'DEFINITION') {
+          this.definitionUpdateDialog = true
+        } else {
+          this.fileUpdateDialog = true
+        }
+      },
+      onProgressDefinition (val) {
+        this.progress = val
+      },
+      onUpdateDefinition () {
+        let self = this
+        findComponentDownward(self.$root, 'definition-list-index')._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.definitionUpdateDialog = false
+      },
 
-    onArchiveDefinition () {
-      this.isUpdate = true
-    },
+      onArchiveDefinition () {
+        this.isUpdate = true
+      },
 
-    closeDefinition () {
-      this.progress = 0
-      this.definitionUpdateDialog = false
-    },
+      closeDefinition () {
+        this.progress = 0
+        this.definitionUpdateDialog = false
+      },
 
-    onProgressFileUpdate (val) {
-      this.progress = val
-    },
-    onUpdateFileUpdate () {
-      const self = this
-      findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
-      this.isUpdate = false
-      this.progress = 0
-      this.fileUpdateDialog = false
-    },
-    onArchiveFileUpdate () {
-      this.isUpdate = true
-    },
-    closeFileUpdate () {
-      this.progress = 0
-      this.fileUpdateDialog = false
-    },
+      onProgressFileUpdate (val) {
+        this.progress = val
+      },
+      onUpdateFileUpdate () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileUpdateDialog = false
+      },
+      onArchiveFileUpdate () {
+        this.isUpdate = true
+      },
+      closeFileUpdate () {
+        this.progress = 0
+        this.fileUpdateDialog = false
+      },
 
-    _fileChildUpdate (type, data) {
-      if (this.progress) {
-        this._toggleArchive()
-        return
-      }
-      this.type = true
-      this.id = data
-      this.fileChildUpdateDialog = true
-    },
+      _fileChildUpdate (type, data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.type = true
+        this.id = data
+        this.fileChildUpdateDialog = true
+      },
 
-    onProgressFileChildUpdate (val) {
-      this.progress = val
-    },
-    onUpdateFileChildUpdate () {
-      const self = this
-      findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
-      this.isUpdate = false
-      this.progress = 0
-      this.fileChildUpdateDialog = false
-    },
+      onProgressFileChildUpdate (val) {
+        this.progress = val
+      },
+      onUpdateFileChildUpdate () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.fileChildUpdateDialog = false
+      },
 
-    onArchiveFileChildUpdate () {
-      this.isUpdate = true
-    },
+      onArchiveFileChildUpdate () {
+        this.isUpdate = true
+      },
 
-    closeFileChildUpdate () {
-      this.progress = 0
-      this.fileChildUpdateDialog = false
-    },
+      closeFileChildUpdate () {
+        this.progress = 0
+        this.fileChildUpdateDialog = false
+      },
 
-    _resourceChildUpdate (type, data) {
-      if (this.progress) {
-        this._toggleArchive()
-        return
-      }
-      this.type = type
-      this.id = data
-      this.resourceChildUpdateDialog = true
-    },
-    onProgressResourceChildUpdate (val) {
-      this.progress = val
-    },
-    onUpdateResourceChildUpdate () {
-      const self = this
-      findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
-      this.isUpdate = false
-      this.progress = 0
-      this.resourceChildUpdateDialog = false
-    },
-    onArchiveResourceChildUpdate () {
-      this.isUpdate = true
-    },
-    closeResourceChildUpdate () {
-      this.progress = 0
-      this.resourceChildUpdateDialog = false
-    },
-    /**
+      _resourceChildUpdate (type, data) {
+        if (this.progress) {
+          this._toggleArchive()
+          return
+        }
+        this.type = type
+        this.id = data
+        this.resourceChildUpdateDialog = true
+      },
+      onProgressResourceChildUpdate (val) {
+        this.progress = val
+      },
+      onUpdateResourceChildUpdate () {
+        let self = this
+        findComponentDownward(self.$root, `resource-list-index-${this.type}`)._updateList()
+        this.isUpdate = false
+        this.progress = 0
+        this.resourceChildUpdateDialog = false
+      },
+      onArchiveResourceChildUpdate () {
+        this.isUpdate = true
+      },
+      closeResourceChildUpdate () {
+        this.progress = 0
+        this.resourceChildUpdateDialog = false
+      },
+      /**
        * Upload popup layer display
        */
-    _toggleArchive () {
-      $('.update-file-modal').show()
-    },
-    /**
+      _toggleArchive () {
+        $('.update-file-modal').show()
+      },
+      /**
        * sign out
        */
-    _signOut () {
-      this.signOut()
-    },
-    /**
+      _signOut () {
+        this.signOut()
+      },
+      /**
        * Language switching
        */
-    _toggleLanguage (language) {
-      console.log(language)
-      cookies.set('language', language, { path: '/' })
-      setTimeout(() => {
-        window.location.reload()
-      }, 100)
-    }
-  },
-  created () {
-    const language = cookies.get('language')
-    this.activeLocale = language ? findLocale(language) : '中文'
+      _toggleLanguage (language) {
+        console.log(language)
+        cookies.set('language', language, { path: '/' })
+        setTimeout(() => {
+          window.location.reload()
+        }, 100)
+      }
+    },
+    created () {
+      let language = cookies.get('language')
+      this.activeLocale = language ? findLocale(language) : '中文'
       this.docLink = process.env.NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
-  },
-  computed: {
-    ...mapState('user', ['userInfo'])
-  },
-  components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate }
-}
+    },
+    computed: {
+      ...mapState('user', ['userInfo'])
+    },
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate, mFileChildUpdate, mResourceChildUpdate }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

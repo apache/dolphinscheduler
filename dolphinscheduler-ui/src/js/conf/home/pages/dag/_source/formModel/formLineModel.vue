@@ -48,67 +48,67 @@
   </div>
 </template>
 <script>
-import disabledState from '@/module/mixin/disabledState'
+  import disabledState from '@/module/mixin/disabledState'
 
-export default {
-  name: 'form-line-model',
-  data () {
-    return {
-      // loading
-      spinnerLoading: false,
-      // node name
-      labelName: ''
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    lineData: Object
-  },
-  methods: {
-    cancel () {
-      this.$emit('cancel', {
-        fromThis: this
-      })
-    },
-    ok () {
-      if ($(`#${this.lineData.id}`).prev().attr('class') === 'jtk-overlay') {
-        $(`#${this.lineData.id}`).prev().empty()
+  export default {
+    name: 'form-line-model',
+    data () {
+      return {
+        // loading
+        spinnerLoading: false,
+        // node name
+        labelName: ''
       }
-      $(`#${this.lineData.id}`).text(this.labelName)
-      this.$emit('addLineInfo', {
-        item: {
-          labelName: this.labelName,
-          sourceId: this.lineData.sourceId,
-          targetId: this.lineData.targetId
-        },
-        fromThis: this
-      })
-    }
-  },
-  watch: {
+    },
+    mixins: [disabledState],
+    props: {
+      lineData: Object
+    },
+    methods: {
+      cancel () {
+        this.$emit('cancel', {
+          fromThis: this
+        })
+      },
+      ok () {
+        if ($(`#${this.lineData.id}`).prev().attr('class') === 'jtk-overlay') {
+          $(`#${this.lineData.id}`).prev().empty()
+        }
+        $(`#${this.lineData.id}`).text(this.labelName)
+        this.$emit('addLineInfo', {
+          item: {
+            labelName: this.labelName,
+            sourceId: this.lineData.sourceId,
+            targetId: this.lineData.targetId
+          },
+          fromThis: this
+        })
+      }
+    },
+    watch: {
 
-  },
-  created () {
-    if ($(`#${this.lineData.id}`).prev().attr('class').indexOf('jtk-overlay') !== -1) {
-      this.labelName = $(`#${this.lineData.id}`).prev().text()
-    } else {
-      this.labelName = $(`#${this.lineData.id}`).text()
-    }
-  },
-  mounted () {
+    },
+    created () {
+      if ($(`#${this.lineData.id}`).prev().attr('class').indexOf('jtk-overlay') !== -1) {
+        this.labelName = $(`#${this.lineData.id}`).prev().text()
+      } else {
+        this.labelName = $(`#${this.lineData.id}`).text()
+      }
+    },
+    mounted () {
 
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {
 
-  },
-  components: {}
-}
+    },
+    components: {}
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

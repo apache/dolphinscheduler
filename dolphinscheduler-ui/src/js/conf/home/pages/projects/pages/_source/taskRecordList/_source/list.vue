@@ -55,37 +55,37 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'list',
-  data () {
-    return {
-      list: [],
-      backfillItem: {}
-    }
-  },
-  props: {
-    taskRecordList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    _rtTooltip (name) {
-      return `<div style="word-wrap:break-word;text-align: left;">${name}</div>`
-    }
-  },
-  watch: {
-    taskRecordList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-  },
-  mounted () {
-    this.list = this.taskRecordList
-  },
-  components: { }
-}
+  export default {
+    name: 'list',
+    data () {
+      return {
+        list: [],
+        backfillItem: {}
+      }
+    },
+    props: {
+      taskRecordList: Array,
+      pageNo: Number,
+      pageSize: Number
+    },
+    methods: {
+      _rtTooltip (name) {
+        return `<div style="word-wrap:break-word;text-align: left;">${name}</div>`
+      }
+    },
+    watch: {
+      taskRecordList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+    },
+    mounted () {
+      this.list = this.taskRecordList
+    },
+    components: { }
+  }
 </script>

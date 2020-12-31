@@ -66,46 +66,46 @@
   </m-list-construction>
 </template>
 <script>
-import dayjs from 'dayjs'
-import mDefineUserCount from './_source/defineUserCount'
-import mTaskStatusCount from './_source/taskStatusCount'
-import mProcessStateCount from './_source/processStateCount'
-import localStore from '@/module/util/localStorage'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import dayjs from 'dayjs'
+  import mDefineUserCount from './_source/defineUserCount'
+  import mTaskStatusCount from './_source/taskStatusCount'
+  import mProcessStateCount from './_source/processStateCount'
+  import localStore from '@/module/util/localStorage'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-export default {
-  name: 'projects-index-index',
-  data () {
-    return {
-      searchParams: {
-        projectId: null,
-        startDate: '',
-        endDate: ''
-      },
-      dataTime: []
+  export default {
+    name: 'projects-index-index',
+    data () {
+      return {
+        searchParams: {
+          projectId: null,
+          startDate: '',
+          endDate: ''
+        },
+        dataTime: []
+      }
+    },
+    props: {
+      id: Number
+    },
+    methods: {
+      _datepicker (val) {
+        this.searchParams.startDate = val[0]
+        this.searchParams.endDate = val[1]
+      }
+    },
+    created () {
+      this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
+      this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
+      this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
+    },
+    components: {
+      mListConstruction,
+      mDefineUserCount,
+      mTaskStatusCount,
+      mProcessStateCount
     }
-  },
-  props: {
-    id: Number
-  },
-  methods: {
-    _datepicker (val) {
-      this.searchParams.startDate = val[0]
-      this.searchParams.endDate = val[1]
-    }
-  },
-  created () {
-    this.searchParams.projectId = this.id === 0 ? 0 : localStore.getItem('projectId')
-    this.dataTime[0] = dayjs().format('YYYY-MM-DD 00:00:00')
-    this.dataTime[1] = dayjs().format('YYYY-MM-DD HH:mm:ss')
-  },
-  components: {
-    mListConstruction,
-    mDefineUserCount,
-    mTaskStatusCount,
-    mProcessStateCount
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

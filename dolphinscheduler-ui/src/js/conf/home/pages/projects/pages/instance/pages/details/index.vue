@@ -18,12 +18,12 @@
   <m-instance-details></m-instance-details>
 </template>
 <script>
-import mInstanceDetails from '@/conf/home/pages/dag/instanceDetails.vue'
-export default {
-  name: 'instance-details-index',
-  data () {
-    return {}
-  },
-  components: { mInstanceDetails }
-}
+  import mInstanceDetails from '@/conf/home/pages/dag/instanceDetails.vue'
+  export default {
+    name: 'instance-details-index',
+    data () {
+      return {}
+    },
+    components: { mInstanceDetails }
+  }
 </script>

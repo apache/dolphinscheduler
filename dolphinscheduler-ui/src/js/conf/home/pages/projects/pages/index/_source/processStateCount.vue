@@ -48,96 +48,96 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import { pie } from './chartConfig'
-import Chart from '@/module/ana-charts'
-import echarts from 'echarts'
-import mNoData from '@/module/components/noData/noData'
-import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
-export default {
-  name: 'process-state-count',
-  data () {
-    return {
-      isSpin: true,
-      msg: '',
-      processStateList: [],
-      currentName: ''
-    }
-  },
-  props: {
-    searchParams: Object
-  },
-  methods: {
-    ...mapActions('projects', ['getProcessStateCount']),
-    _goProcess (name) {
-      this.$router.push({
-        name: 'projects-instance-list',
-        query: {
-          stateType: _.find(stateType, ['label', name]).code,
-          startDate: this.searchParams.startDate,
-          endDate: this.searchParams.endDate
-        }
-      })
-    },
-    _handleProcessState (res) {
-      const data = res.data.taskCountDtos
-      this.processStateList = _.map(data, v => {
-        return {
-          key: _.find(stateType, ['code', v.taskStateType]).label,
-          value: v.count
-        }
-      })
-      const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
-      myChart.echart.setOption(pie)
-      // 首页不允许跳转
-      if (this.searchParams.projectId) {
-        myChart.echart.on('click', e => {
-          this._goProcess(e.data.name)
-        })
-      }
-    }
-  },
-  watch: {
-    searchParams: {
-      deep: true,
-      immediate: true,
-      handler (o) {
-        this.isSpin = true
-        this.getProcessStateCount(o).then(res => {
-          this.processStateList = []
-          this._handleProcessState(res)
-          this.isSpin = false
-        }).catch(e => {
-          this.msg = e.msg || 'error'
-          this.isSpin = false
-        })
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import { pie } from './chartConfig'
+  import Chart from '@/module/ana-charts'
+  import echarts from 'echarts'
+  import mNoData from '@/module/components/noData/noData'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
+  export default {
+    name: 'process-state-count',
+    data () {
+      return {
+        isSpin: true,
+        msg: '',
+        processStateList: [],
+        currentName: ''
       }
     },
-    '$store.state.projects.sideBar': function () {
-      echarts.init(document.getElementById('process-state-pie')).resize()
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    this.currentName = this.$router.currentRoute.name
-  },
-  beforeMount () {
-  },
-  mounted () {
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mNoData }
-}
+    props: {
+      searchParams: Object
+    },
+    methods: {
+      ...mapActions('projects', ['getProcessStateCount']),
+      _goProcess (name) {
+        this.$router.push({
+          name: 'projects-instance-list',
+          query: {
+            stateType: _.find(stateType, ['label', name]).code,
+            startDate: this.searchParams.startDate,
+            endDate: this.searchParams.endDate
+          }
+        })
+      },
+      _handleProcessState (res) {
+        let data = res.data.taskCountDtos
+        this.processStateList = _.map(data, v => {
+          return {
+            key: _.find(stateType, ['code', v.taskStateType]).label,
+            value: v.count
+          }
+        })
+        const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
+        myChart.echart.setOption(pie)
+        // 首页不允许跳转
+        if (this.searchParams.projectId) {
+          myChart.echart.on('click', e => {
+            this._goProcess(e.data.name)
+          })
+        }
+      }
+    },
+    watch: {
+      searchParams: {
+        deep: true,
+        immediate: true,
+        handler (o) {
+          this.isSpin = true
+          this.getProcessStateCount(o).then(res => {
+            this.processStateList = []
+            this._handleProcessState(res)
+            this.isSpin = false
+          }).catch(e => {
+            this.msg = e.msg || 'error'
+            this.isSpin = false
+          })
+        }
+      },
+      '$store.state.projects.sideBar': function () {
+        echarts.init(document.getElementById('process-state-pie')).resize()
+      }
+    },
+    beforeCreate () {
+    },
+    created () {
+      this.currentName = this.$router.currentRoute.name
+    },
+    beforeMount () {
+    },
+    mounted () {
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

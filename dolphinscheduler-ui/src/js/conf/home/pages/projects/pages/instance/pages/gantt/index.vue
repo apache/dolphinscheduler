@@ -42,75 +42,75 @@
   </m-list-construction>
 </template>
 <script>
-import { mapActions } from 'vuex'
-import Gantt from './_source/gantt'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import { tasksState } from '@/conf/home/pages/dag/_source/config'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import { mapActions } from 'vuex'
+  import Gantt from './_source/gantt'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-export default {
-  name: 'instance-gantt-index',
-  data () {
-    return {
-      // Node state
-      tasksState: tasksState,
-      // loading
-      isLoading: true,
-      // gantt data
-      ganttData: {
-        taskNames: []
-      },
-      // Data available
-      isNodata: false
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('dag', ['getViewGantt']),
-    /**
+  export default {
+    name: 'instance-gantt-index',
+    data () {
+      return {
+        // Node state
+        tasksState: tasksState,
+        // loading
+        isLoading: true,
+        // gantt data
+        ganttData: {
+          taskNames: []
+        },
+        // Data available
+        isNodata: false
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('dag', ['getViewGantt']),
+      /**
        * get data
        */
-    _getViewGantt () {
-      this.isLoading = true
-      this.getViewGantt({
-        processInstanceId: this.$route.params.id
-      }).then(res => {
-        this.ganttData = res
-        if (!res.taskNames.length || !res) {
+      _getViewGantt () {
+        this.isLoading = true
+        this.getViewGantt({
+          processInstanceId: this.$route.params.id
+        }).then(res => {
+          this.ganttData = res
+          if (!res.taskNames.length || !res) {
+            this.isLoading = false
+            this.isNodata = true
+            return
+          }
+          // Gantt
+          Gantt.init({
+            el: '.gantt',
+            tasks: res.tasks
+          })
+          setTimeout(() => {
+            this.isLoading = false
+          }, 200)
+        }).catch(e => {
           this.isLoading = false
-          this.isNodata = true
-          return
-        }
-        // Gantt
-        Gantt.init({
-          el: '.gantt',
-          tasks: res.tasks
         })
-        setTimeout(() => {
-          this.isLoading = false
-        }, 200)
-      }).catch(e => {
-        this.isLoading = false
-      })
-    }
-  },
-  watch: {},
-  created () {
+      }
+    },
+    watch: {},
+    created () {
 
-  },
-  mounted () {
-    this._getViewGantt()
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mListConstruction, mSpin, mNoData }
-}
+    },
+    mounted () {
+      this._getViewGantt()
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mListConstruction, mSpin, mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

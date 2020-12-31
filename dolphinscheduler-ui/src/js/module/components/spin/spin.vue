@@ -25,22 +25,22 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'spin',
-  data () {
-    return {}
-  },
-  props: {
-    isSpin: {
-      type: Boolean,
-      default: true
+  export default {
+    name: 'spin',
+    data () {
+      return {}
     },
-    isLeft: {
-      type: Boolean,
-      default: true
+    props: {
+      isSpin: {
+        type: Boolean,
+        default: true
+      },
+      isLeft: {
+        type: Boolean,
+        default: true
+      }
     }
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

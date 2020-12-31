@@ -25,9 +25,9 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'list-box-f'
-}
+  export default {
+    name: 'list-box-f'
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

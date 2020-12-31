@@ -35,211 +35,211 @@
   </m-popup>
 </template>
 <script>
-import _ from 'lodash'
-import mPopup from '@/module/components/popup/popup'
-import Treeselect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import _ from 'lodash'
+  import mPopup from '@/module/components/popup/popup'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
-export default {
-  name: 'transfer',
-  data () {
-    return {
-      valueConsistsOf: 'LEAF_PRIORITY',
-      checkedValue: 'fileResource',
-      sourceList: this.resourceData.fileSourceList,
-      targetList: this.resourceData.fileTargetList,
-      cacheSourceList: this.resourceData.fileSourceList,
-      cacheTargetList: this.resourceData.fileTargetList,
+  export default {
+    name: 'transfer',
+    data () {
+      return {
+        valueConsistsOf: 'LEAF_PRIORITY',
+        checkedValue: 'fileResource',
+        sourceList: this.resourceData.fileSourceList,
+        targetList: this.resourceData.fileTargetList,
+        cacheSourceList: this.resourceData.fileSourceList,
+        cacheTargetList: this.resourceData.fileTargetList,
 
-      fileSource: this.resourceData.fileSourceList,
-      fileList: [],
-      udfList: [],
-      selectFileSource: [],
-      selectUdfSource: [],
-      fileTarget: this.resourceData.fileTargetList,
-      udfSource: this.resourceData.udfSourceList,
-      udfTarget: this.resourceData.udfTargetList,
-      searchSourceVal: '',
-      searchTargetVal: '',
-      // define default value
-      value: null,
-      normalizer (node) {
-        return {
-          label: node.name
+        fileSource: this.resourceData.fileSourceList,
+        fileList: [],
+        udfList: [],
+        selectFileSource: [],
+        selectUdfSource: [],
+        fileTarget: this.resourceData.fileTargetList,
+        udfSource: this.resourceData.udfSourceList,
+        udfTarget: this.resourceData.udfTargetList,
+        searchSourceVal: '',
+        searchTargetVal: '',
+        // define default value
+        value: null,
+        normalizer (node) {
+          return {
+            label: node.name
+          }
         }
       }
-    }
-  },
-  props: {
-    resourceData: Object
-  },
-  created () {
-    const file = this.fileSourceList
-    const udf = this.udfSourceList
-    this.diGuiTree(file)
-    this.diGuiTree(udf)
-    this.fileList = file
-    this.udfList = udf
-    this.selectFileSource = this.resourceData.fileTargetList
-    this.selectUdfSource = this.resourceData.udfTargetList
-  },
-  methods: {
-    /*
+    },
+    props: {
+      resourceData: Object
+    },
+    created () {
+      let file = this.fileSourceList
+      let udf = this.udfSourceList
+      this.diGuiTree(file)
+      this.diGuiTree(udf)
+      this.fileList = file
+      this.udfList = udf
+      this.selectFileSource = this.resourceData.fileTargetList
+      this.selectUdfSource = this.resourceData.udfTargetList
+    },
+    methods: {
+      /*
         getParent
       */
-    getParent (data2, nodeId2) {
-      let arrRes = []
-      if (data2.length === 0) {
-        if (nodeId2) {
-          arrRes.unshift(data2)
+      getParent (data2, nodeId2) {
+        let arrRes = []
+        if (data2.length === 0) {
+          if (nodeId2) {
+            arrRes.unshift(data2)
+          }
+          return arrRes
         }
-        return arrRes
-      }
-      const rev = (data, nodeId) => {
-        for (let i = 0, length = data.length; i < length; i++) {
-          const node = data[i]
-          if (node.id === nodeId) {
-            arrRes.unshift(node)
-            rev(data2, node.pid)
-            break
-          } else {
-            if (node.children) {
-              rev(node.children, nodeId)
+        let rev = (data, nodeId) => {
+          for (let i = 0, length = data.length; i < length; i++) {
+            let node = data[i]
+            if (node.id === nodeId) {
+              arrRes.unshift(node)
+              rev(data2, node.pid)
+              break
+            } else {
+              if (node.children) {
+                rev(node.children, nodeId)
+              }
             }
           }
+          return arrRes
         }
+        arrRes = rev(data2, nodeId2)
         return arrRes
-      }
-      arrRes = rev(data2, nodeId2)
-      return arrRes
-    },
-    _ok () {
-      let fullPathId = []
-      const pathId = []
-      this.selectFileSource.forEach(v => {
-        this.fileList.forEach(v1 => {
-          const arr = []
-          arr[0] = v1
-          if (this.getParent(arr, v).length > 0) {
-            fullPathId = this.getParent(arr, v).map(v2 => {
-              return v2.id
-            })
-            pathId.push(fullPathId.join('-'))
-          }
+      },
+      _ok () {
+        let fullPathId = []
+        let pathId = []
+        this.selectFileSource.forEach(v => {
+          this.fileList.forEach(v1 => {
+            let arr = []
+            arr[0] = v1
+            if (this.getParent(arr, v).length > 0) {
+              fullPathId = this.getParent(arr, v).map(v2 => {
+                return v2.id
+              })
+              pathId.push(fullPathId.join('-'))
+            }
+          })
         })
-      })
-      let fullUdfPathId = []
-      const pathUdfId = []
-      this.selectUdfSource.forEach(v => {
-        this.udfList.forEach(v1 => {
-          const arr = []
-          arr[0] = v1
-          if (this.getParent(arr, v).length > 0) {
-            fullUdfPathId = this.getParent(arr, v).map(v2 => {
-              return v2.id
-            })
-            pathUdfId.push(fullUdfPathId.join('-'))
-          }
+        let fullUdfPathId = []
+        let pathUdfId = []
+        this.selectUdfSource.forEach(v => {
+          this.udfList.forEach(v1 => {
+            let arr = []
+            arr[0] = v1
+            if (this.getParent(arr, v).length > 0) {
+              fullUdfPathId = this.getParent(arr, v).map(v2 => {
+                return v2.id
+              })
+              pathUdfId.push(fullUdfPathId.join('-'))
+            }
+          })
         })
-      })
-      const selAllSource = pathId.concat(pathUdfId)
-      this.$refs.popup.spinnerLoading = true
-      setTimeout(() => {
-        this.$refs.popup.spinnerLoading = false
-        this.$emit('onUpdateAuthResource', _.map(selAllSource, v => v).join(','))
-      }, 800)
-    },
-    _ckFile () {
-      this.checkedValue = 'fileResource'
-      this.sourceList = this.fileSource
-      this.targetList = this.fileTarget
-      this.cacheSourceList = this.fileSource
-      this.cacheTargetList = this.fileTarget
-    },
-    _ckUDf () {
-      this.checkedValue = 'udfResource'
-      this.sourceList = this.udfSource
-      this.targetList = this.udfTarget
-      this.cacheSourceList = this.udfSource
-      this.cacheTargetList = this.udfTarget
-    },
-    _sourceQuery () {
-      this.sourceList = this.sourceList.filter(v => v.name.indexOf(this.searchSourceVal) > -1)
-    },
-    _targetQuery () {
-      this.targetList = this.targetList.filter(v => v.name.indexOf(this.searchTargetVal) > -1)
-    },
-    _ckSource (item) {
-      this.targetList = this.cacheTargetList
-      this.targetList.unshift(item)
-      this.searchTargetVal = ''
-      const i1 = _.findIndex(this.sourceList, v => item.id === v.id)
-      this.sourceList.splice(i1, 1)
-      const i2 = _.findIndex(this.cacheSourceList, v => item.id === v.id)
-      if (i2 !== -1) {
-        this.cacheSourceList.splice(i2, 1)
+        let selAllSource = pathId.concat(pathUdfId)
+        this.$refs.popup.spinnerLoading = true
+        setTimeout(() => {
+          this.$refs.popup.spinnerLoading = false
+          this.$emit('onUpdateAuthResource', _.map(selAllSource, v => v).join(','))
+        }, 800)
+      },
+      _ckFile () {
+        this.checkedValue = 'fileResource'
+        this.sourceList = this.fileSource
+        this.targetList = this.fileTarget
+        this.cacheSourceList = this.fileSource
+        this.cacheTargetList = this.fileTarget
+      },
+      _ckUDf () {
+        this.checkedValue = 'udfResource'
+        this.sourceList = this.udfSource
+        this.targetList = this.udfTarget
+        this.cacheSourceList = this.udfSource
+        this.cacheTargetList = this.udfTarget
+      },
+      _sourceQuery () {
+        this.sourceList = this.sourceList.filter(v => v.name.indexOf(this.searchSourceVal) > -1)
+      },
+      _targetQuery () {
+        this.targetList = this.targetList.filter(v => v.name.indexOf(this.searchTargetVal) > -1)
+      },
+      _ckSource (item) {
+        this.targetList = this.cacheTargetList
+        this.targetList.unshift(item)
+        this.searchTargetVal = ''
+        let i1 = _.findIndex(this.sourceList, v => item.id === v.id)
+        this.sourceList.splice(i1, 1)
+        let i2 = _.findIndex(this.cacheSourceList, v => item.id === v.id)
+        if (i2 !== -1) {
+          this.cacheSourceList.splice(i2, 1)
+        }
+        if (this.checkedValue === 'fileResource') {
+          this.fileTarget = this.targetList
+          this.fileSource = this.sourceList
+        } else {
+          this.udfTarget = this.targetList
+          this.udfSource = this.sourceList
+        }
+      },
+      _ckTarget (item) {
+        this.sourceList = this.cacheSourceList
+        this.sourceList.unshift(item)
+        this.searchSourceVal = ''
+        let i1 = _.findIndex(this.targetList, v => item.id === v.id)
+        this.targetList.splice(i1, 1)
+        let i2 = _.findIndex(this.cacheTargetList, v => item.id === v.id)
+        if (i2 !== -1) {
+          this.cacheTargetList.splice(i2, 1)
+        }
+        if (this.checkedValue === 'fileResource') {
+          this.fileSource = this.sourceList
+          this.fileTarget = this.targetList
+        } else {
+          this.udfSource = this.sourceList
+          this.udfTarget = this.targetList
+        }
+      },
+      diGuiTree (item) { // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
+        })
+      },
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
+        }
+        delete item.children
+      },
+      close () {
+        console.log(888)
+        this.$emit('closeAuthResource')
       }
-      if (this.checkedValue === 'fileResource') {
-        this.fileTarget = this.targetList
-        this.fileSource = this.sourceList
-      } else {
-        this.udfTarget = this.targetList
-        this.udfSource = this.sourceList
+    },
+    watch: {
+      searchSourceVal (val) {
+        if (!val) {
+          this.sourceList = _.cloneDeep(this.cacheSourceList)
+          return
+        }
+        this._sourceQuery()
+      },
+      searchTargetVal (val) {
+        if (!val) {
+          this.targetList = _.cloneDeep(this.cacheTargetList)
+          return
+        }
+        this._targetQuery()
       }
     },
-    _ckTarget (item) {
-      this.sourceList = this.cacheSourceList
-      this.sourceList.unshift(item)
-      this.searchSourceVal = ''
-      const i1 = _.findIndex(this.targetList, v => item.id === v.id)
-      this.targetList.splice(i1, 1)
-      const i2 = _.findIndex(this.cacheTargetList, v => item.id === v.id)
-      if (i2 !== -1) {
-        this.cacheTargetList.splice(i2, 1)
-      }
-      if (this.checkedValue === 'fileResource') {
-        this.fileSource = this.sourceList
-        this.fileTarget = this.targetList
-      } else {
-        this.udfSource = this.sourceList
-        this.udfTarget = this.targetList
-      }
-    },
-    diGuiTree (item) { // Recursive convenience tree structure
-      item.forEach(item => {
-        item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-          ? this.operationTree(item) : this.diGuiTree(item.children)
-      })
-    },
-    operationTree (item) {
-      if (item.dirctory) {
-        item.isDisabled = true
-      }
-      delete item.children
-    },
-    close () {
-      console.log(888)
-      this.$emit('closeAuthResource')
-    }
-  },
-  watch: {
-    searchSourceVal (val) {
-      if (!val) {
-        this.sourceList = _.cloneDeep(this.cacheSourceList)
-        return
-      }
-      this._sourceQuery()
-    },
-    searchTargetVal (val) {
-      if (!val) {
-        this.targetList = _.cloneDeep(this.cacheTargetList)
-        return
-      }
-      this._targetQuery()
-    }
-  },
-  components: { mPopup, Treeselect }
-}
+    components: { mPopup, Treeselect }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

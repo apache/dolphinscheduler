@@ -31,16 +31,16 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'progress-bar',
-  data () {
-    return {}
-  },
-  props: {
-    value: Number,
-    textPlacement: String
+  export default {
+    name: 'progress-bar',
+    data () {
+      return {}
+    },
+    props: {
+      value: Number,
+      textPlacement: String
+    }
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

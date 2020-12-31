@@ -60,49 +60,49 @@
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
 
-export default {
-  name: 'token-list',
-  data () {
-    return {
-      list: []
-    }
-  },
-  props: {
-    tokenList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('user', ['deleteToken']),
-    _delete (item, i) {
-      this.deleteToken({
-        id: item.id
-      }).then(res => {
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
+  export default {
+    name: 'token-list',
+    data () {
+      return {
+        list: []
+      }
     },
-    _edit (item) {
-      this.$emit('on-edit', item)
-    }
-  },
-  watch: {
-    tokenList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-    this.list = this.tokenList
-  },
-  mounted () {
-  },
-  components: { }
-}
+    props: {
+      tokenList: Array,
+      pageNo: Number,
+      pageSize: Number
+    },
+    methods: {
+      ...mapActions('user', ['deleteToken']),
+      _delete (item, i) {
+        this.deleteToken({
+          id: item.id
+        }).then(res => {
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      _edit (item) {
+        this.$emit('on-edit', item)
+      }
+    },
+    watch: {
+      tokenList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+      this.list = this.tokenList
+    },
+    mounted () {
+    },
+    components: { }
+  }
 </script>

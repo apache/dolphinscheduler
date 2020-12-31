@@ -50,109 +50,109 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mList from './_source/list'
-import mSpin from '@/module/components/spin/spin'
-import localStore from '@/module/util/localStorage'
-import mNoData from '@/module/components/noData/noData'
-import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-import mConditions from '@/module/components/conditions/conditions'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
-import { findComponentDownward } from '@/module/util/'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mList from './_source/list'
+  import mSpin from '@/module/components/spin/spin'
+  import localStore from '@/module/util/localStorage'
+  import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import mConditions from '@/module/components/conditions/conditions'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import { findComponentDownward } from '@/module/util/'
 
-export default {
-  name: 'definition-list-index',
-  data () {
-    return {
-      total: null,
-      processListP: [],
-      isLoading: true,
-      searchParams: {
-        pageSize: 10,
-        pageNo: 1,
-        searchVal: '',
-        userId: ''
-      },
-      isLeft: true
-    }
-  },
-  mixins: [listUrlParamHandle],
-  props: {
-  },
-  methods: {
-    ...mapActions('dag', ['getProcessListP']),
-    /**
+  export default {
+    name: 'definition-list-index',
+    data () {
+      return {
+        total: null,
+        processListP: [],
+        isLoading: true,
+        searchParams: {
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: '',
+          userId: ''
+        },
+        isLeft: true
+      }
+    },
+    mixins: [listUrlParamHandle],
+    props: {
+    },
+    methods: {
+      ...mapActions('dag', ['getProcessListP']),
+      /**
        * File Upload
        */
-    _uploading () {
-      findComponentDownward(this.$root, 'roof-nav')._fileUpdate('DEFINITION')
-    },
-    /**
+      _uploading () {
+        findComponentDownward(this.$root, 'roof-nav')._fileUpdate('DEFINITION')
+      },
+      /**
        * page
        */
-    _page (val) {
-      this.searchParams.pageNo = val
-    },
-    _pageSize (val) {
-      this.searchParams.pageSize = val
-    },
-    /**
+      _page (val) {
+        this.searchParams.pageNo = val
+      },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
+      /**
        * conditions
        */
-    _onConditions (o) {
-      this.searchParams.searchVal = o.searchVal
-      this.searchParams.pageNo = 1
-    },
-    /**
+      _onConditions (o) {
+        this.searchParams.searchVal = o.searchVal
+        this.searchParams.pageNo = 1
+      },
+      /**
        * get data list
        */
-    _getList (flag) {
-      if (sessionStorage.getItem('isLeft') === 0) {
-        this.isLeft = false
-      } else {
-        this.isLeft = true
-      }
-      this.isLoading = !flag
-      this.getProcessListP(this.searchParams).then(res => {
-        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-          this.searchParams.pageNo = this.searchParams.pageNo - 1
+      _getList (flag) {
+        if (sessionStorage.getItem('isLeft') === 0) {
+          this.isLeft = false
         } else {
-          this.processListP = []
-          this.processListP = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          this.isLeft = true
         }
-      }).catch(e => {
-        this.isLoading = false
-      })
+        this.isLoading = !flag
+        this.getProcessListP(this.searchParams).then(res => {
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
+          } else {
+            this.processListP = []
+            this.processListP = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
+        }).catch(e => {
+          this.isLoading = false
+        })
+      },
+      _onUpdate () {
+        this._debounceGET('false')
+      },
+      _updateList () {
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        this._debounceGET()
+      }
     },
-    _onUpdate () {
-      this._debounceGET('false')
+    watch: {
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
     },
-    _updateList () {
-      this.searchParams.pageNo = 1
-      this.searchParams.searchVal = ''
-      this._debounceGET()
-    }
-  },
-  watch: {
-    '$route' (a) {
-      // url no params get instance list
-      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-    }
-  },
-  created () {
-    localStore.removeItem('subProcessId')
-  },
-  mounted () {
+    created () {
+      localStore.removeItem('subProcessId')
+    },
+    mounted () {
 
-  },
-  beforeDestroy () {
-    sessionStorage.setItem('isLeft', 1)
-  },
-  components: { mList, mConditions, mSpin, mListConstruction, mNoData }
-}
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft', 1)
+    },
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

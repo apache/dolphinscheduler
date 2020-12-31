@@ -35,9 +35,9 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'list-4-box'
-}
+  export default {
+    name: 'list-4-box'
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

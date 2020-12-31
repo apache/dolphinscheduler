@@ -44,145 +44,145 @@
   </m-list-construction>
 </template>
 <script>
-import i18n from '@/module/i18n'
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import { filtTypeArr } from '../_source/common'
-import mNoType from '../details/_source/noType'
-import { bytesToSize } from '@/module/util/util'
-import codemirror from '../_source/codemirror'
-import mSpin from '@/module/components/spin/spin'
-import localStore from '@/module/util/localStorage'
-import mNoData from '@/module/components/noData/noData'
-import { handlerSuffix } from '../details/_source/utils'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import i18n from '@/module/i18n'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import { filtTypeArr } from '../_source/common'
+  import mNoType from '../details/_source/noType'
+  import { bytesToSize } from '@/module/util/util'
+  import codemirror from '../_source/codemirror'
+  import mSpin from '@/module/components/spin/spin'
+  import localStore from '@/module/util/localStorage'
+  import mNoData from '@/module/components/noData/noData'
+  import { handlerSuffix } from '../details/_source/utils'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-let editor
+  let editor
 
-export default {
-  name: 'file-details',
-  data () {
-    return {
-      name: '',
-      isNoType: true,
-      isLoading: false,
-      filtTypeArr: filtTypeArr,
-      loadingIndex: 0,
-      mode: 'python',
-      isData: true,
-      size: null,
-      spinnerLoading: false,
-      msg: ''
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('resource', ['getViewResources', 'updateContent']),
-    ok () {
-      if (this._validation()) {
-        this.spinnerLoading = true
-        this.updateContent({
-          id: this.$route.params.id,
-          content: editor.getValue()
-        }).then(res => {
-          this.$message.success(res.msg)
-          setTimeout(() => {
+  export default {
+    name: 'file-details',
+    data () {
+      return {
+        name: '',
+        isNoType: true,
+        isLoading: false,
+        filtTypeArr: filtTypeArr,
+        loadingIndex: 0,
+        mode: 'python',
+        isData: true,
+        size: null,
+        spinnerLoading: false,
+        msg: ''
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('resource', ['getViewResources', 'updateContent']),
+      ok () {
+        if (this._validation()) {
+          this.spinnerLoading = true
+          this.updateContent({
+            id: this.$route.params.id,
+            content: editor.getValue()
+          }).then(res => {
+            this.$message.success(res.msg)
+            setTimeout(() => {
+              this.spinnerLoading = false
+              this.close()
+            }, 800)
+          }).catch(e => {
+            this.$message.error(e.msg || '')
             this.spinnerLoading = false
-            this.close()
-          }, 800)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.spinnerLoading = false
-        })
-      }
-    },
-    _validation () {
-      if (editor.doc.size > 3000) {
-        this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
-        return false
-      }
-      return true
-    },
-    close () {
-      this.$router.go(-1)
-    },
-    _getViewResources () {
-      this.isLoading = true
-      this.getViewResources({
-        id: this.$route.params.id,
-        skipLineNum: 0,
-        limit: 3000
-      }).then(res => {
-        this.name = res.data.alias.split('.')[0]
-        if (!res.data) {
-          this.isData = false
-        } else {
-          this.isData = true
-          const content = res.data.content ? res.data.content + '\n' : ''
-          this._handlerEditor().setValue(content)
-          setTimeout(() => {
-            $('.code-mirror-model').scrollTop(12).scrollLeft(0)
-          }, 200)
-        }
-        this.isLoading = false
-      }).catch(e => {
-        this.msg = e.msg || 'error'
-        this.$message.error(e.msg || '')
-        this.isLoading = false
-      })
-    },
-    /**
-       * Processing code highlighting
-       */
-    _handlerEditor () {
-      // editor
-      editor = codemirror('code-edit-mirror', {
-        mode: this.mode,
-        readOnly: false
-      })
-
-      this.keypress = () => {
-        if (!editor.getOption('readOnly')) {
-          editor.showHint({
-            completeSingle: false
           })
         }
+      },
+      _validation () {
+        if (editor.doc.size > 3000) {
+          this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
+          return false
+        }
+        return true
+      },
+      close () {
+        this.$router.go(-1)
+      },
+      _getViewResources () {
+        this.isLoading = true
+        this.getViewResources({
+          id: this.$route.params.id,
+          skipLineNum: 0,
+          limit: 3000
+        }).then(res => {
+          this.name = res.data.alias.split('.')[0]
+          if (!res.data) {
+            this.isData = false
+          } else {
+            this.isData = true
+            let content = res.data.content ? res.data.content + '\n' : ''
+            this._handlerEditor().setValue(content)
+            setTimeout(() => {
+              $('.code-mirror-model').scrollTop(12).scrollLeft(0)
+            }, 200)
+          }
+          this.isLoading = false
+        }).catch(e => {
+          this.msg = e.msg || 'error'
+          this.$message.error(e.msg || '')
+          this.isLoading = false
+        })
+      },
+      /**
+       * Processing code highlighting
+       */
+      _handlerEditor () {
+        // editor
+        editor = codemirror('code-edit-mirror', {
+          mode: this.mode,
+          readOnly: false
+        })
+
+        this.keypress = () => {
+          if (!editor.getOption('readOnly')) {
+            editor.showHint({
+              completeSingle: false
+            })
+          }
+        }
+
+        // Monitor keyboard
+        editor.on('keypress', this.keypress)
+
+        return editor
       }
-
-      // Monitor keyboard
-      editor.on('keypress', this.keypress)
-
-      return editor
-    }
-  },
-  watch: {
-  },
-  created () {
-    const file = _.split(localStore.getItem('file'), '|', 2)
-    const fileName = file[0]
-    const fileSize = file[1]
-    const i = fileName.lastIndexOf('.')
-    const a = fileName.substring(i, fileName.length)
-    this.mode = handlerSuffix[a]
-    this.size = bytesToSize(parseInt(fileSize))
-    this.isNoType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
-  },
-  mounted () {
-    if (this.isNoType) {
-      // get data
-      this._getViewResources()
-    }
-  },
-  destroyed () {
-    if (editor) {
-      editor.toTextArea()
-      editor.off($('.code-edit-mirror'), 'keypress', this.keypress)
-    }
-  },
-  computed: {
-  },
-  components: { mListConstruction, mNoType, mSpin, mNoData }
-}
+    },
+    watch: {
+    },
+    created () {
+      let file = _.split(localStore.getItem('file'), '|', 2)
+      let fileName = file[0]
+      let fileSize = file[1]
+      let i = fileName.lastIndexOf('.')
+      let a = fileName.substring(i, fileName.length)
+      this.mode = handlerSuffix[a]
+      this.size = bytesToSize(parseInt(fileSize))
+      this.isNoType = _.includes(this.filtTypeArr, _.trimStart(a, '.'))
+    },
+    mounted () {
+      if (this.isNoType) {
+        // get data
+        this._getViewResources()
+      }
+    },
+    destroyed () {
+      if (editor) {
+        editor.toTextArea()
+        editor.off($('.code-edit-mirror'), 'keypress', this.keypress)
+      }
+    },
+    computed: {
+    },
+    components: { mListConstruction, mNoType, mSpin, mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

@@ -59,195 +59,195 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '../_source/i18n'
-import { selectList, isStr } from '../util/index'
-import mInputNumber from '../_source/input-number'
+  import _ from 'lodash'
+  import i18n from '../_source/i18n'
+  import { selectList, isStr } from '../util/index'
+  import mInputNumber from '../_source/input-number'
 
-export default {
-  name: 'year',
-  mixins: [i18n],
-  data () {
-    return {
-      yearValue: '*',
-      radioYear: 'everyYear',
-      selectYearList: selectList.year,
-      intervalPerformVal: 1,
-      intervalStartVal: 2019,
-      specificYearVal: [],
-      cycleStartVal: 2019,
-      cycleEndVal: 2019
-    }
-  },
-  props: {
-    yearVal: String,
-    value: {
-      type: String,
-      default: '*'
-    }
-  },
-  model: {
-    prop: 'value',
-    event: 'yearValueEvent'
-  },
-  methods: {
-    // Interval execution time（1）
-    onIntervalPerform (val) {
-      console.log(val)
-      this.intervalPerformVal = val
-      if (this.radioYear === 'intervalYear') {
-        this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+  export default {
+    name: 'year',
+    mixins: [i18n],
+    data () {
+      return {
+        yearValue: '*',
+        radioYear: 'everyYear',
+        selectYearList: selectList.year,
+        intervalPerformVal: 1,
+        intervalStartVal: 2019,
+        specificYearVal: [],
+        cycleStartVal: 2019,
+        cycleEndVal: 2019
       }
     },
-    // Interval start time（2）
-    onIntervalStart (val) {
-      this.intervalStartVal = val
-      if (this.radioYear === 'intervalYear') {
-        this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+    props: {
+      yearVal: String,
+      value: {
+        type: String,
+        default: '*'
       }
     },
-    // Specific year
-    onspecificYears (arr) {
+    model: {
+      prop: 'value',
+      event: 'yearValueEvent'
     },
-    // Cycle start value
-    onCycleStart (val) {
-      this.cycleStartVal = val
-      if (this.radioYear === 'cycleYear') {
-        this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-      }
-    },
-    // Cycle end value
-    onCycleEnd (val) {
-      this.cycleEndVal = val
-      if (this.radioYear === 'cycleYear') {
-        this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-      }
-    },
-    // Reset every year
-    everyReset () {
-      this.yearValue = '*'
-    },
-    // Reset every other year
-    intervalReset () {
-      this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
-    },
-    // Reset specific years
-    specificReset () {
-      if (this.specificYearVal.length) {
-        this.yearValue = this.specificYearVal.join(',')
-      } else {
+    methods: {
+      // Interval execution time（1）
+      onIntervalPerform (val) {
+        console.log(val)
+        this.intervalPerformVal = val
+        if (this.radioYear === 'intervalYear') {
+          this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+        }
+      },
+      // Interval start time（2）
+      onIntervalStart (val) {
+        this.intervalStartVal = val
+        if (this.radioYear === 'intervalYear') {
+          this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+        }
+      },
+      // Specific year
+      onspecificYears (arr) {
+      },
+      // Cycle start value
+      onCycleStart (val) {
+        this.cycleStartVal = val
+        if (this.radioYear === 'cycleYear') {
+          this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+        }
+      },
+      // Cycle end value
+      onCycleEnd (val) {
+        this.cycleEndVal = val
+        if (this.radioYear === 'cycleYear') {
+          this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+        }
+      },
+      // Reset every year
+      everyReset () {
         this.yearValue = '*'
-      }
-    },
-    // Reset cycle years
-    cycleReset () {
-      this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-    },
-    /**
+      },
+      // Reset every other year
+      intervalReset () {
+        this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+      },
+      // Reset specific years
+      specificReset () {
+        if (this.specificYearVal.length) {
+          this.yearValue = this.specificYearVal.join(',')
+        } else {
+          this.yearValue = '*'
+        }
+      },
+      // Reset cycle years
+      cycleReset () {
+        this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+      },
+      /**
        * Parse parameter value
        */
-    analyticalValue () {
-      return new Promise((resolve, reject) => {
-        const $yearVal = _.cloneDeep(this.value)
-        // Interval year
-        const $interval = isStr($yearVal, '/')
-        // Specific year
-        const $specific = isStr($yearVal, ',')
-        // Cycle year
-        const $cycle = isStr($yearVal, '-')
+      analyticalValue () {
+        return new Promise((resolve, reject) => {
+          let $yearVal = _.cloneDeep(this.value)
+          // Interval year
+          let $interval = isStr($yearVal, '/')
+          // Specific year
+          let $specific = isStr($yearVal, ',')
+          // Cycle year
+          let $cycle = isStr($yearVal, '-')
 
-        // Every year
-        if ($yearVal === '*') {
-          this.radioYear = 'everyYear'
-          this.yearValue = '*'
-          return
-        }
+          // Every year
+          if ($yearVal === '*') {
+            this.radioYear = 'everyYear'
+            this.yearValue = '*'
+            return
+          }
 
-        // Positive integer (year)
-        if ($yearVal.length === 4 && _.isInteger(parseInt($yearVal))) {
-          this.radioYear = 'specificYear'
-          this.specificYearVal = [$yearVal]
-          return
-        }
+          // Positive integer (year)
+          if ($yearVal.length === 4 && _.isInteger(parseInt($yearVal))) {
+            this.radioYear = 'specificYear'
+            this.specificYearVal = [$yearVal]
+            return
+          }
 
-        // Interval year
-        if ($interval) {
-          this.radioYear = 'intervalYear'
-          this.intervalStartVal = parseInt($interval[0])
-          this.intervalPerformVal = parseInt($interval[1])
-          this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
-          return
-        }
+          // Interval year
+          if ($interval) {
+            this.radioYear = 'intervalYear'
+            this.intervalStartVal = parseInt($interval[0])
+            this.intervalPerformVal = parseInt($interval[1])
+            this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+            return
+          }
 
-        // Specific years
-        if ($specific) {
-          this.radioYear = 'specificYear'
-          this.specificYearVal = $specific
-          return
-        }
+          // Specific years
+          if ($specific) {
+            this.radioYear = 'specificYear'
+            this.specificYearVal = $specific
+            return
+          }
 
-        // Cycle year
-        if ($cycle) {
-          this.radioYear = 'cycleYear'
-          this.cycleStartVal = parseInt($cycle[0])
-          this.cycleEndVal = parseInt($cycle[1])
-          this.yearValue = `${this.cycleStartVal}/${this.cycleEndVal}`
-          return
-        }
-        resolve()
-      })
-    }
-  },
-  watch: {
-    // Derived value
-    yearValue (val) {
-      this.$emit('yearValueEvent', val)
-    },
-    // Selected type
-    radioYear (val) {
-      switch (val) {
-        case 'everyYear':
-          this.everyReset()
-          break
-        case 'intervalYear':
-          this.intervalReset()
-          break
-        case 'specificYear':
-          this.specificReset()
-          break
-        case 'cycleYear':
-          this.cycleReset()
-          break
+          // Cycle year
+          if ($cycle) {
+            this.radioYear = 'cycleYear'
+            this.cycleStartVal = parseInt($cycle[0])
+            this.cycleEndVal = parseInt($cycle[1])
+            this.yearValue = `${this.cycleStartVal}/${this.cycleEndVal}`
+            return
+          }
+          resolve()
+        })
       }
     },
-    // Specific years
-    specificYearVal (arr) {
-      this.yearValue = arr.join(',')
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    this.analyticalValue().then(() => {
-      console.log('Data structure parsing succeeded!')
-    })
-  },
-  beforeMount () {
-  },
-  mounted () {
+    watch: {
+      // Derived value
+      yearValue (val) {
+        this.$emit('yearValueEvent', val)
+      },
+      // Selected type
+      radioYear (val) {
+        switch (val) {
+          case 'everyYear':
+            this.everyReset()
+            break
+          case 'intervalYear':
+            this.intervalReset()
+            break
+          case 'specificYear':
+            this.specificReset()
+            break
+          case 'cycleYear':
+            this.cycleReset()
+            break
+        }
+      },
+      // Specific years
+      specificYearVal (arr) {
+        this.yearValue = arr.join(',')
+      }
+    },
+    beforeCreate () {
+    },
+    created () {
+      this.analyticalValue().then(() => {
+        console.log('Data structure parsing succeeded!')
+      })
+    },
+    beforeMount () {
+    },
+    mounted () {
 
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mInputNumber }
-}
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mInputNumber }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

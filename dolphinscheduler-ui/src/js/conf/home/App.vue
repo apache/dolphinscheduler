@@ -22,31 +22,31 @@
 </template>
 
 <script>
-import visibility from '@/module/visibility'
-import mLayout from '@/module/components/layout/layout'
-import mNav from '@/module/components/nav/nav'
-export default {
-  name: 'app',
-  data () {
-    return {
-      isRenderRouterView: true
-    }
-  },
-  methods: {
-    reload () {
-      this.isRenderRouterView = false
-      this.$nextTick(() => {
-        this.isRenderRouterView = true
-      })
-    }
-  },
-  mounted () {
-    visibility.change((evt, hidden) => {
-      if (hidden === false) {
-        this.reload()
+  import visibility from '@/module/visibility'
+  import mLayout from '@/module/components/layout/layout'
+  import mNav from '@/module/components/nav/nav'
+  export default {
+    name: 'app',
+    data () {
+      return {
+        isRenderRouterView: true
       }
-    })
-  },
-  components: { mLayout, mNav }
-}
+    },
+    methods: {
+      reload () {
+        this.isRenderRouterView = false
+        this.$nextTick(() => {
+          this.isRenderRouterView = true
+        })
+      }
+    },
+    mounted () {
+      visibility.change((evt, hidden) => {
+        if (hidden === false) {
+          this.reload()
+        }
+      })
+    },
+    components: { mLayout, mNav }
+  }
 </script>

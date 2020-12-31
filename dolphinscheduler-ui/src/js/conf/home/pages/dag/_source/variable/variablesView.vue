@@ -62,73 +62,73 @@
   </div>
 </template>
 <script>
-import i18n from '@/module/i18n'
-import { mapActions } from 'vuex'
-import Clipboard from 'clipboard'
+  import i18n from '@/module/i18n'
+  import { mapActions } from 'vuex'
+  import Clipboard from 'clipboard'
 
-export default {
-  name: 'variables-view',
-  data () {
-    return {
-      list: {}
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('dag', ['getViewvariables']),
-    /**
+  export default {
+    name: 'variables-view',
+    data () {
+      return {
+        list: {}
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('dag', ['getViewvariables']),
+      /**
        * Get variable data
        */
-    _getViewvariables () {
-      this.getViewvariables({
-        processInstanceId: this.$route.params.id
-      }).then(res => {
-        this.list = res.data
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _getViewvariables () {
+        this.getViewvariables({
+          processInstanceId: this.$route.params.id
+        }).then(res => {
+          this.list = res.data
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * Click to copy
        */
-    _copy (className) {
-      const clipboard = new Clipboard(`.${className}`)
-      clipboard.on('success', e => {
-        this.$message.success(`${i18n.$t('Copy success')}`)
-        // Free memory
-        clipboard.destroy()
-      })
-      clipboard.on('error', e => {
-        // Copy is not supported
-        this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
-        // Free memory
-        clipboard.destroy()
-      })
-    },
-    /**
+      _copy (className) {
+        let clipboard = new Clipboard(`.${className}`)
+        clipboard.on('success', e => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', e => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+      },
+      /**
        * Copyed text processing
        */
-    _rtClipboard (el, taskType) {
-      const arr = []
-      Object.keys(el).forEach((key) => {
-        if (taskType === 'SQL' || taskType === 'PROCEDURE') {
-          if (key !== 'direct' && key !== 'type') {
+      _rtClipboard (el, taskType) {
+        let arr = []
+        Object.keys(el).forEach((key) => {
+          if (taskType === 'SQL' || taskType === 'PROCEDURE') {
+            if (key !== 'direct' && key !== 'type') {
+              arr.push(`${key}=${el[key]}`)
+            }
+          } else {
             arr.push(`${key}=${el[key]}`)
           }
-        } else {
-          arr.push(`${key}=${el[key]}`)
-        }
-      })
-      return arr.join(' ')
+        })
+        return arr.join(' ')
+      }
+    },
+    watch: {},
+    created () {
+      this._getViewvariables()
+    },
+    mounted () {
     }
-  },
-  watch: {},
-  created () {
-    this._getViewvariables()
-  },
-  mounted () {
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

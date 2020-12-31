@@ -40,54 +40,54 @@
   </m-popup>
 </template>
 <script>
-import i18n from '@/module/i18n'
-import store from '@/conf/home/store'
-import mPopup from '@/module/components/popup/popup'
-import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import i18n from '@/module/i18n'
+  import store from '@/conf/home/store'
+  import mPopup from '@/module/components/popup/popup'
+  import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-export default {
-  name: 'create-tenement',
-  data () {
-    return {
-      store,
-      itemList: [],
-      itemId: ''
-    }
-  },
-  props: {
-    tmp: Boolean
-  },
-  methods: {
-    _ok () {
-      if (this._verification()) {
-        if (this.tmp) {
-          this.$emit('onBatchMove', this.itemId)
-        } else {
-          this.$emit('onBatchCopy', this.itemId)
-        }
+  export default {
+    name: 'create-tenement',
+    data () {
+      return {
+        store,
+        itemList: [],
+        itemId: ''
       }
     },
-    _verification () {
-      if (!this.itemId) {
-        this.$message.warning(`${i18n.$t('Project name is required')}`)
-        return false
+    props: {
+      tmp: Boolean
+    },
+    methods: {
+      _ok () {
+        if (this._verification()) {
+          if (this.tmp) {
+            this.$emit('onBatchMove', this.itemId)
+          } else {
+            this.$emit('onBatchCopy', this.itemId)
+          }
+        }
+      },
+      _verification () {
+        if (!this.itemId) {
+          this.$message.warning(`${i18n.$t('Project name is required')}`)
+          return false
+        }
+        return true
       }
-      return true
-    }
 
-  },
-  watch: {
-  },
-  created () {
-    this.store.dispatch('dag/getAllItems', {}).then(res => {
-      if (res.data.length > 0) {
-        this.itemList = res.data
-      }
-    })
-  },
-  mounted () {
+    },
+    watch: {
+    },
+    created () {
+      this.store.dispatch('dag/getAllItems', {}).then(res => {
+        if (res.data.length > 0) {
+          this.itemList = res.data
+        }
+      })
+    },
+    mounted () {
 
-  },
-  components: { mPopup, mListBoxF }
-}
+    },
+    components: { mPopup, mListBoxF }
+  }
 </script>

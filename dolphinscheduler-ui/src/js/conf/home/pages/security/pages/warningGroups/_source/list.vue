@@ -68,106 +68,106 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import { mapActions } from 'vuex'
-import mTransfer from '@/module/components/transfer/transfer'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import { mapActions } from 'vuex'
+  import mTransfer from '@/module/components/transfer/transfer'
 
-export default {
-  name: 'user-list',
-  data () {
-    return {
-      list: [],
-      transferDialog: false,
-      item: {},
-      transferData: {
-        sourceListPrs: [],
-        targetListPrs: [],
-        type: {
-          name: `${i18n.$t('Managing Users')}`
+  export default {
+    name: 'user-list',
+    data () {
+      return {
+        list: [],
+        transferDialog: false,
+        item: {},
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: `${i18n.$t('Managing Users')}`
+          }
         }
       }
-    }
-  },
-  props: {
-    alertgroupList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('security', ['deleteAlertgrou', 'getAuthList', 'grantAuthorization']),
-    _delete (item, i) {
-      this.deleteAlertgrou({
-        id: item.id
-      }).then(res => {
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
     },
-    _edit (item) {
-      this.$emit('on-edit', item)
+    props: {
+      alertgroupList: Array,
+      pageNo: Number,
+      pageSize: Number
     },
-    _mangeUser (item, i) {
-      this.getAuthList({
-        id: item.id,
-        type: 'user',
-        category: 'users'
-      }).then(data => {
-        const sourceListPrs = _.map(data[0], v => {
-          return {
-            id: v.id,
-            name: v.userName
-          }
+    methods: {
+      ...mapActions('security', ['deleteAlertgrou', 'getAuthList', 'grantAuthorization']),
+      _delete (item, i) {
+        this.deleteAlertgrou({
+          id: item.id
+        }).then(res => {
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
-        const targetListPrs = _.map(data[1], v => {
-          return {
-            id: v.id,
-            name: v.userName
-          }
+      },
+      _edit (item) {
+        this.$emit('on-edit', item)
+      },
+      _mangeUser (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'user',
+          category: 'users'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.userName
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferDialog = true
         })
-        this.item = item
-        this.transferData.sourceListPrs = sourceListPrs
-        this.transferData.targetListPrs = targetListPrs
-        this.transferDialog = true
-      })
-    },
-    onUpdate (userIds) {
-      this._grantAuthorization('alert-group/grant-user', {
-        userIds: userIds,
-        alertgroupId: this.item.id
-      })
-      this.transferDialog = false
-    },
-    close () {
-      this.transferDialog = false
-    },
+      },
+      onUpdate (userIds) {
+        this._grantAuthorization('alert-group/grant-user', {
+          userIds: userIds,
+          alertgroupId: this.item.id
+        })
+        this.transferDialog = false
+      },
+      close () {
+        this.transferDialog = false
+      },
 
-    _grantAuthorization (api, param) {
-      this.grantAuthorization({
-        api: api,
-        param: param
-      }).then(res => {
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    }
-  },
-  watch: {
-    alertgroupList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-    this.list = this.alertgroupList
-  },
-  mounted () {
-  },
-  components: { mTransfer }
-}
+      _grantAuthorization (api, param) {
+        this.grantAuthorization({
+          api: api,
+          param: param
+        }).then(res => {
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      }
+    },
+    watch: {
+      alertgroupList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+      this.list = this.alertgroupList
+    },
+    mounted () {
+    },
+    components: { mTransfer }
+  }
 </script>

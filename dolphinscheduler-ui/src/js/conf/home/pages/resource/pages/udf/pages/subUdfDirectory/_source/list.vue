@@ -83,85 +83,85 @@
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
-import mRename from './rename'
-import { downloadFile } from '@/module/download'
-import { bytesToSize } from '@/module/util/util'
-import localStore from '@/module/util/localStorage'
+  import { mapActions } from 'vuex'
+  import mRename from './rename'
+  import { downloadFile } from '@/module/download'
+  import { bytesToSize } from '@/module/util/util'
+  import localStore from '@/module/util/localStorage'
 
-export default {
-  name: 'udf-manage-list',
-  data () {
-    return {
-      list: [],
-      renameDialog: false,
-      index: null
-    }
-  },
-  props: {
-    udfResourcesList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('resource', ['deleteResource']),
-    _downloadFile (item) {
-      downloadFile('resources/download', {
-        id: item.id
-      })
-    },
-    _go (item) {
-      localStore.setItem('file', `${item.alias}|${item.size}`)
-      if (item.directory) {
-        localStore.setItem('currentDir', `${item.fullName}`)
-        this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
+  export default {
+    name: 'udf-manage-list',
+    data () {
+      return {
+        list: [],
+        renameDialog: false,
+        index: null
       }
     },
-    _rtSize (val) {
-      return bytesToSize(parseInt(val))
+    props: {
+      udfResourcesList: Array,
+      pageNo: Number,
+      pageSize: Number
     },
-    _closeDelete (i) {
-      this.$refs[`poptip-${i}`][0].doClose()
-    },
-    _delete (item, i) {
-      this.deleteResource({
-        id: item.id
-      }).then(res => {
+    methods: {
+      ...mapActions('resource', ['deleteResource']),
+      _downloadFile (item) {
+        downloadFile('resources/download', {
+          id: item.id
+        })
+      },
+      _go (item) {
+        localStore.setItem('file', `${item.alias}|${item.size}`)
+        if (item.directory) {
+          localStore.setItem('currentDir', `${item.fullName}`)
+          this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
+        }
+      },
+      _rtSize (val) {
+        return bytesToSize(parseInt(val))
+      },
+      _closeDelete (i) {
         this.$refs[`poptip-${i}`][0].doClose()
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$refs[`poptip-${i}`][0].doClose()
-        this.$message.error(e.msg || '')
-      })
-    },
-    _rename (item, i) {
-      this.item = item
-      this.index = i
-      this.renameDialog = true
-    },
-    onUpDate (item) {
-      this.$set(this.list, this.index, item)
-      this.renameDialog = false
-    },
+      },
+      _delete (item, i) {
+        this.deleteResource({
+          id: item.id
+        }).then(res => {
+          this.$refs[`poptip-${i}`][0].doClose()
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$refs[`poptip-${i}`][0].doClose()
+          this.$message.error(e.msg || '')
+        })
+      },
+      _rename (item, i) {
+        this.item = item
+        this.index = i
+        this.renameDialog = true
+      },
+      onUpDate (item) {
+        this.$set(this.list, this.index, item)
+        this.renameDialog = false
+      },
 
-    close () {
-      this.renameDialog = false
-    }
-  },
-  watch: {
-    udfResourcesList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-  },
-  mounted () {
-    this.list = this.udfResourcesList
-  },
-  components: { mRename }
-}
+      close () {
+        this.renameDialog = false
+      }
+    },
+    watch: {
+      udfResourcesList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+    },
+    mounted () {
+      this.list = this.udfResourcesList
+    },
+    components: { mRename }
+  }
 </script>

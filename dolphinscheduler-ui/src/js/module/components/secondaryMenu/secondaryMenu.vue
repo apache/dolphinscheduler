@@ -54,45 +54,45 @@
   </div>
 </template>
 <script>
-import menu from './_source/menu'
+  import menu from './_source/menu'
 
-export default {
-  name: 'secondary-menu',
-  data () {
-    return {
-      menuList: menu(this.type),
-      index: 0,
-      id: this.$route.params.id,
-      isTogHide: false,
-      isLeft: true
-    }
-  },
-  props: {
-    type: String,
-    className: String
-  },
-  watch: {
-    isTogHide (is) {
-      const layoutBox = $('.main-layout-box')
-      is ? layoutBox.addClass('toggle') : layoutBox.removeClass('toggle')
-    }
-  },
-  methods: {
-    _toggleSubMenu (item) {
-      item.isOpen = !item.isOpen
-    },
-    _toggleMenu () {
-      this.isTogHide = !this.isTogHide
-      if (this.isTogHide) {
-        sessionStorage.setItem('isLeft', 0)
-      } else {
-        sessionStorage.setItem('isLeft', 1)
+  export default {
+    name: 'secondary-menu',
+    data () {
+      return {
+        menuList: menu(this.type),
+        index: 0,
+        id: this.$route.params.id,
+        isTogHide: false,
+        isLeft: true
       }
+    },
+    props: {
+      type: String,
+      className: String
+    },
+    watch: {
+      isTogHide (is) {
+        let layoutBox = $('.main-layout-box')
+        is ? layoutBox.addClass('toggle') : layoutBox.removeClass('toggle')
+      }
+    },
+    methods: {
+      _toggleSubMenu (item) {
+        item.isOpen = !item.isOpen
+      },
+      _toggleMenu () {
+        this.isTogHide = !this.isTogHide
+        if (this.isTogHide) {
+          sessionStorage.setItem('isLeft', 0)
+        } else {
+          sessionStorage.setItem('isLeft', 1)
+        }
+      }
+    },
+    mounted () {
     }
-  },
-  mounted () {
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

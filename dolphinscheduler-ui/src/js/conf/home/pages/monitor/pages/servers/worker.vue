@@ -70,58 +70,58 @@
   </m-list-construction>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mGauge from './_source/gauge'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import themeData from '@/module/echarts/themeData.json'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
-import zookeeperDirectoriesPopup from './_source/zookeeperDirectories'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mGauge from './_source/gauge'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import themeData from '@/module/echarts/themeData.json'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import zookeeperDirectoriesPopup from './_source/zookeeperDirectories'
 
-export default {
-  name: 'servers-worker',
-  data () {
-    return {
-      isLoading: false,
-      workerList: [],
-      color: themeData.color,
-      drawer: false,
-      zkDirectories: []
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('monitor', ['getWorkerData']),
-    _showZkDirectories (item) {
-      item.zkDirectories.forEach(zkDirectory => {
-        this.zkDirectories.push({
-          zkDirectory: zkDirectory
+  export default {
+    name: 'servers-worker',
+    data () {
+      return {
+        isLoading: false,
+        workerList: [],
+        color: themeData.color,
+        drawer: false,
+        zkDirectories: []
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('monitor', ['getWorkerData']),
+      _showZkDirectories (item) {
+        item.zkDirectories.forEach(zkDirectory => {
+          this.zkDirectories.push({
+            zkDirectory: zkDirectory
+          })
         })
-      })
-      this.drawer = true
-    }
-  },
-  watch: {},
-  created () {
+        this.drawer = true
+      }
+    },
+    watch: {},
+    created () {
 
-  },
-  mounted () {
-    this.isLoading = true
-    this.getWorkerData().then(res => {
-      this.workerList = _.map(res, (v, i) => {
-        return _.assign(v, {
-          id: v.host + '_' + v.id,
-          resInfo: JSON.parse(v.resInfo)
-        })
-      })
-      this.isLoading = false
-    }).catch(() => {
+    },
+    mounted () {
       this.isLoading = true
-    })
-  },
-  components: { mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
-}
+      this.getWorkerData().then(res => {
+        this.workerList = _.map(res, (v, i) => {
+          return _.assign(v, {
+            id: v.host + '_' + v.id,
+            resInfo: JSON.parse(v.resInfo)
+          })
+        })
+        this.isLoading = false
+      }).catch(() => {
+        this.isLoading = true
+      })
+    },
+    components: { mListConstruction, mSpin, mNoData, mGauge, zookeeperDirectoriesPopup }
+  }
 </script>
 <style lang="scss" rel="stylesheet/scss">
   @import "./servers";

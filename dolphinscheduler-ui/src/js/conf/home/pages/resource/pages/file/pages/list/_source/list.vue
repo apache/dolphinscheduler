@@ -85,101 +85,101 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import mRename from './rename'
-import { mapActions } from 'vuex'
-import { filtTypeArr } from '../../_source/common'
-import { bytesToSize } from '@/module/util/util'
-import { downloadFile } from '@/module/download'
-import localStore from '@/module/util/localStorage'
-export default {
-  name: 'file-manage-list',
-  data () {
-    return {
-      list: [],
-      renameDialog: false,
-      item: {},
-      index: null
-    }
-  },
-  props: {
-    fileResourcesList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('resource', ['deleteResource']),
-    _edit (item) {
-      localStore.setItem('file', `${item.alias}|${item.size}`)
-      this.$router.push({ path: `/resource/file/edit/${item.id}` })
-    },
-    _go (item) {
-      localStore.setItem('file', `${item.alias}|${item.size}`)
-      if (item.directory) {
-        localStore.setItem('currentDir', `${item.fullName}`)
-        this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
-      } else {
-        this.$router.push({ path: `/resource/file/list/${item.id}` })
+  import _ from 'lodash'
+  import mRename from './rename'
+  import { mapActions } from 'vuex'
+  import { filtTypeArr } from '../../_source/common'
+  import { bytesToSize } from '@/module/util/util'
+  import { downloadFile } from '@/module/download'
+  import localStore from '@/module/util/localStorage'
+  export default {
+    name: 'file-manage-list',
+    data () {
+      return {
+        list: [],
+        renameDialog: false,
+        item: {},
+        index: null
       }
     },
-    _downloadFile (item) {
-      downloadFile('resources/download', {
-        id: item.id
-      })
+    props: {
+      fileResourcesList: Array,
+      pageNo: Number,
+      pageSize: Number
     },
-    _rtSize (val) {
-      return bytesToSize(parseInt(val))
-    },
-    _delete (item, i) {
-      this.deleteResource({
-        id: item.id
-      }).then(res => {
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    _rename (item, i) {
-      this.item = item
-      this.index = i
-      this.renameDialog = true
-    },
+    methods: {
+      ...mapActions('resource', ['deleteResource']),
+      _edit (item) {
+        localStore.setItem('file', `${item.alias}|${item.size}`)
+        this.$router.push({ path: `/resource/file/edit/${item.id}` })
+      },
+      _go (item) {
+        localStore.setItem('file', `${item.alias}|${item.size}`)
+        if (item.directory) {
+          localStore.setItem('currentDir', `${item.fullName}`)
+          this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
+        } else {
+          this.$router.push({ path: `/resource/file/list/${item.id}` })
+        }
+      },
+      _downloadFile (item) {
+        downloadFile('resources/download', {
+          id: item.id
+        })
+      },
+      _rtSize (val) {
+        return bytesToSize(parseInt(val))
+      },
+      _delete (item, i) {
+        this.deleteResource({
+          id: item.id
+        }).then(res => {
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      _rename (item, i) {
+        this.item = item
+        this.index = i
+        this.renameDialog = true
+      },
 
-    onUpDate (item) {
-      this.$set(this.list, this.index, item)
-      this.renameDialog = false
-    },
+      onUpDate (item) {
+        this.$set(this.list, this.index, item)
+        this.renameDialog = false
+      },
 
-    close () {
-      this.renameDialog = false
-    },
+      close () {
+        this.renameDialog = false
+      },
 
-    _rtDisb ({ alias, size }) {
-      const i = alias.lastIndexOf('.')
-      const a = alias.substring(i, alias.length)
-      let flag = _.includes(filtTypeArr, _.trimStart(a, '.'))
-      if (flag && (size < 1000000)) {
-        flag = true
-      } else {
-        flag = false
+      _rtDisb ({ alias, size }) {
+        let i = alias.lastIndexOf('.')
+        let a = alias.substring(i, alias.length)
+        let flag = _.includes(filtTypeArr, _.trimStart(a, '.'))
+        if (flag && (size < 1000000)) {
+          flag = true
+        } else {
+          flag = false
+        }
+        return !flag
       }
-      return !flag
-    }
-  },
-  watch: {
-    fileResourcesList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-  },
-  mounted () {
-    this.list = this.fileResourcesList
-  },
-  components: { mRename }
-}
+    },
+    watch: {
+      fileResourcesList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+    },
+    mounted () {
+      this.list = this.fileResourcesList
+    },
+    components: { mRename }
+  }
 </script>

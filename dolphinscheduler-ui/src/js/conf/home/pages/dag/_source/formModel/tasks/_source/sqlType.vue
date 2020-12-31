@@ -32,42 +32,42 @@
   </div>
 </template>
 <script>
-import { sqlTypeList } from './commcon'
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'sql-type',
-  data () {
-    return {
-      // sql(List)
-      sqlTypeList: sqlTypeList,
-      // sql
-      sqlTypeId: '0'
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    sqlType: String
-  },
-  methods: {
-    /**
+  import { sqlTypeList } from './commcon'
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'sql-type',
+    data () {
+      return {
+        // sql(List)
+        sqlTypeList: sqlTypeList,
+        // sql
+        sqlTypeId: '0'
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      sqlType: String
+    },
+    methods: {
+      /**
        * return sqlType
        */
-    _handleSqlTypeChanged (val) {
-      this.$emit('on-sqlType', val)
-    }
-  },
-  watch: {
-  },
-  created () {
-    this.$nextTick(() => {
-      if (this.sqlType !== 0) {
-        this.sqlTypeId = this.sqlType
-      } else {
-        this.sqlTypeId = this.sqlTypeList[0].id
+      _handleSqlTypeChanged (val) {
+        this.$emit('on-sqlType', val)
       }
-    })
-  },
-  mounted () {
+    },
+    watch: {
+    },
+    created () {
+      this.$nextTick(() => {
+        if (this.sqlType !== 0) {
+          this.sqlTypeId = this.sqlType
+        } else {
+          this.sqlTypeId = this.sqlTypeList[0].id
+        }
+      })
+    },
+    mounted () {
+    }
   }
-}
 </script>

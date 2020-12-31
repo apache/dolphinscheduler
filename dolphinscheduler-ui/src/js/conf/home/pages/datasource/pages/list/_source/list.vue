@@ -66,64 +66,64 @@
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
-import { findComponentDownward } from '@/module/util/'
-import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
+  import { mapActions } from 'vuex'
+  import { findComponentDownward } from '@/module/util/'
+  import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
 
-export default {
-  name: 'datasource-list',
-  data () {
-    return {
-      // list
-      list: []
-    }
-  },
-  props: {
-    // External incoming data
-    datasourcesList: Array,
-    // current page number
-    pageNo: Number,
-    // Total number of articles
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('datasource', ['deleteDatasource']),
-    /**
+  export default {
+    name: 'datasource-list',
+    data () {
+      return {
+        // list
+        list: []
+      }
+    },
+    props: {
+      // External incoming data
+      datasourcesList: Array,
+      // current page number
+      pageNo: Number,
+      // Total number of articles
+      pageSize: Number
+    },
+    methods: {
+      ...mapActions('datasource', ['deleteDatasource']),
+      /**
        * Delete current line
        */
-    _delete (item, i) {
-      this.deleteDatasource({
-        id: item.id
-      }).then(res => {
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _delete (item, i) {
+        this.deleteDatasource({
+          id: item.id
+        }).then(res => {
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * edit
        */
-    _edit (item) {
-      findComponentDownward(this.$root, 'datasource-indexP')._create(item)
-    }
-  },
-  watch: {
-    /**
+      _edit (item) {
+        findComponentDownward(this.$root, 'datasource-indexP')._create(item)
+      }
+    },
+    watch: {
+      /**
        * Monitor external data changes
        */
-    datasourcesList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-    this.list = this.datasourcesList
-  },
-  mounted () {
-  },
-  components: { mTooltipsJSON }
-}
+      datasourcesList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+      this.list = this.datasourcesList
+    },
+    mounted () {
+    },
+    components: { mTooltipsJSON }
+  }
 </script>

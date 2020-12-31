@@ -293,207 +293,495 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mLog from './log'
-import mMr from './tasks/mr'
-import mSql from './tasks/sql'
-import i18n from '@/module/i18n'
-import mShell from './tasks/shell'
-import mWaterdrop from './tasks/waterdrop'
-import mSpark from './tasks/spark'
-import mFlink from './tasks/flink'
-import mPython from './tasks/python'
-import JSP from './../plugIn/jsPlumbHandle'
-import mProcedure from './tasks/procedure'
-import mDependent from './tasks/dependent'
-import mHttp from './tasks/http'
-import mDatax from './tasks/datax'
-import mConditions from './tasks/conditions'
-import mSqoop from './tasks/sqoop'
-import mSubProcess from './tasks/sub_process'
-import mSelectInput from './_source/selectInput'
-import mTimeoutAlarm from './_source/timeoutAlarm'
-import mDependentTimeout from './_source/dependentTimeout'
-import mWorkerGroups from './_source/workerGroups'
-import mPreTasks from './tasks/pre_tasks'
-import clickoutside from '@/module/util/clickoutside'
-import disabledState from '@/module/mixin/disabledState'
-import { isNameExDag, rtBantpl } from './../plugIn/util'
-import mPriority from '@/module/components/priority/priority'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mLog from './log'
+  import mMr from './tasks/mr'
+  import mSql from './tasks/sql'
+  import i18n from '@/module/i18n'
+  import mShell from './tasks/shell'
+  import mWaterdrop from './tasks/waterdrop'
+  import mSpark from './tasks/spark'
+  import mFlink from './tasks/flink'
+  import mPython from './tasks/python'
+  import JSP from './../plugIn/jsPlumbHandle'
+  import mProcedure from './tasks/procedure'
+  import mDependent from './tasks/dependent'
+  import mHttp from './tasks/http'
+  import mDatax from './tasks/datax'
+  import mConditions from './tasks/conditions'
+  import mSqoop from './tasks/sqoop'
+  import mSubProcess from './tasks/sub_process'
+  import mSelectInput from './_source/selectInput'
+  import mTimeoutAlarm from './_source/timeoutAlarm'
+  import mDependentTimeout from './_source/dependentTimeout'
+  import mWorkerGroups from './_source/workerGroups'
+  import mPreTasks from './tasks/pre_tasks'
+  import clickoutside from '@/module/util/clickoutside'
+  import disabledState from '@/module/mixin/disabledState'
+  import { isNameExDag, rtBantpl } from './../plugIn/util'
+  import mPriority from '@/module/components/priority/priority'
 
-export default {
-  name: 'form-model',
-  data () {
-    return {
-      // loading
-      spinnerLoading: false,
-      // node name
-      name: '',
-      // description
-      description: '',
-      // Node echo data
-      backfillItem: {},
-      cacheBackfillItem: {},
-      // Resource(list)
-      resourcesList: [],
-      successNode: 'success',
-      failedNode: 'failed',
-      successBranch: '',
-      failedBranch: '',
-      conditionResult: {
-        successNode: [],
-        failedNode: []
-      },
-      // dependence
-      dependence: {},
-      // cache dependence
-      cacheDependence: {},
-      // Current node params data
-      params: {},
-      // Running sign
-      runFlag: 'NORMAL',
-      // The second echo problem caused by the node data is specifically which node hook caused the unfinished special treatment
-      isContentBox: false,
-      // Number of failed retries
-      maxRetryTimes: '0',
-      // Failure retry interval
-      retryInterval: '1',
-      // Delay execution time
-      delayTime: '0',
-      // Task timeout alarm
-      timeout: {},
-      // (For Dependent nodes) Wait start timeout alarm
-      waitStartTimeout: {},
-      // Task priority
-      taskInstancePriority: 'MEDIUM',
-      // worker group id
-      workerGroup: 'default',
-      stateList: [
-        {
-          value: 'success',
-          label: `${i18n.$t('success')}`
+  export default {
+    name: 'form-model',
+    data () {
+      return {
+        // loading
+        spinnerLoading: false,
+        // node name
+        name: '',
+        // description
+        description: '',
+        // Node echo data
+        backfillItem: {},
+        cacheBackfillItem: {},
+        // Resource(list)
+        resourcesList: [],
+        successNode: 'success',
+        failedNode: 'failed',
+        successBranch: '',
+        failedBranch: '',
+        conditionResult: {
+          successNode: [],
+          failedNode: []
         },
-        {
-          value: 'failed',
-          label: `${i18n.$t('failed')}`
-        }
-      ],
-      // preTasks
-      preTaskIdsInWorkflow: [],
-      preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
-      preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
-    }
-  },
-  /**
+        // dependence
+        dependence: {},
+        // cache dependence
+        cacheDependence: {},
+        // Current node params data
+        params: {},
+        // Running sign
+        runFlag: 'NORMAL',
+        // The second echo problem caused by the node data is specifically which node hook caused the unfinished special treatment
+        isContentBox: false,
+        // Number of failed retries
+        maxRetryTimes: '0',
+        // Failure retry interval
+        retryInterval: '1',
+        // Delay execution time
+        delayTime: '0',
+        // Task timeout alarm
+        timeout: {},
+        // (For Dependent nodes) Wait start timeout alarm
+        waitStartTimeout: {},
+        // Task priority
+        taskInstancePriority: 'MEDIUM',
+        // worker group id
+        workerGroup: 'default',
+        stateList: [
+          {
+            value: 'success',
+            label: `${i18n.$t('success')}`
+          },
+          {
+            value: 'failed',
+            label: `${i18n.$t('failed')}`
+          }
+        ],
+        // preTasks
+        preTaskIdsInWorkflow: [],
+        preTasksToAdd: [], // pre-taskIds to add, used in jsplumb connects
+        preTasksToDelete: [] // pre-taskIds to delete, used in jsplumb connects
+      }
+    },
+    /**
      * Click on events that are not generated internally by the component
      */
-  directives: { clickoutside },
-  mixins: [disabledState],
-  props: {
-    nodeData: Object
-  },
-  methods: {
-    ...mapActions('dag', ['getTaskInstanceList']),
-    /**
+    directives: { clickoutside },
+    mixins: [disabledState],
+    props: {
+      nodeData: Object
+    },
+    methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
+      /**
        * depend
        */
-    _onDependent (o) {
-      this.dependence = Object.assign(this.dependence, {}, o)
-    },
-    /**
+      _onDependent (o) {
+        this.dependence = Object.assign(this.dependence, {}, o)
+      },
+      /**
        * Pre-tasks in workflow
        */
-    _onPreTasks (o) {
-      this.preTaskIdsInWorkflow = o.preTasks
-      this.preTasksToAdd = o.preTasksToAdd
-      this.preTasksToDelete = o.preTasksToDelete
-    },
-    /**
+      _onPreTasks (o) {
+        this.preTaskIdsInWorkflow = o.preTasks
+        this.preTasksToAdd = o.preTasksToAdd
+        this.preTasksToDelete = o.preTasksToDelete
+      },
+      /**
        * cache dependent
        */
-    _onCacheDependent (o) {
-      this.cacheDependence = Object.assign(this.cacheDependence, {}, o)
-    },
-    /**
+      _onCacheDependent (o) {
+        this.cacheDependence = Object.assign(this.cacheDependence, {}, o)
+      },
+      /**
        * Task timeout alarm
        */
-    _onTimeout (o) {
-      this.timeout = Object.assign(this.timeout, {}, o)
-    },
-    /**
+      _onTimeout (o) {
+        this.timeout = Object.assign(this.timeout, {}, o)
+      },
+      /**
        * Dependent timeout alarm
        */
-    _onDependentTimeout (o) {
-      this.timeout = Object.assign(this.timeout, {}, o.waitCompleteTimeout)
-      this.waitStartTimeout = Object.assign(this.waitStartTimeout, {}, o.waitStartTimeout)
-    },
-    /**
+      _onDependentTimeout (o) {
+        this.timeout = Object.assign(this.timeout, {}, o.waitCompleteTimeout)
+        this.waitStartTimeout = Object.assign(this.waitStartTimeout, {}, o.waitStartTimeout)
+      },
+      /**
        * Click external to close the current component
        */
-    _handleClose () {
-      // this.close()
-    },
-    /**
+      _handleClose () {
+        // this.close()
+      },
+      /**
        * Jump to task instance
        */
-    _seeHistory () {
-      this.$emit('seeHistory', this.backfillItem.name)
-    },
-    /**
+      _seeHistory () {
+        this.$emit('seeHistory', this.backfillItem.name)
+      },
+      /**
        * Enter the child node to judge the process instance or the process definition
        * @param  type = instance
        */
-    _goSubProcess () {
-      if (_.isEmpty(this.backfillItem)) {
-        this.$message.warning(`${i18n.$t('The newly created sub-Process has not yet been executed and cannot enter the sub-Process')}`)
-        return
-      }
-      if (this.router.history.current.name === 'projects-instance-details') {
-        const stateId = $(`#${this.nodeData.id}`).attr('data-state-id') || null
-        if (!stateId) {
-          this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
+      _goSubProcess () {
+        if (_.isEmpty(this.backfillItem)) {
+          this.$message.warning(`${i18n.$t('The newly created sub-Process has not yet been executed and cannot enter the sub-Process')}`)
           return
         }
-        this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
+        if (this.router.history.current.name === 'projects-instance-details') {
+          let stateId = $(`#${this.nodeData.id}`).attr('data-state-id') || null
+          if (!stateId) {
+            this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
+            return
+          }
+          this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
+            this.$emit('onSubProcess', {
+              subProcessId: res.data.subProcessInstanceId,
+              fromThis: this
+            })
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
+        } else {
           this.$emit('onSubProcess', {
-            subProcessId: res.data.subProcessInstanceId,
+            subProcessId: this.backfillItem.params.processDefinitionId,
             fromThis: this
           })
-        }).catch(e => {
-          this.$message.error(e.msg || '')
+        }
+      },
+      /**
+       * return params
+       */
+      _onParams (o) {
+        this.params = Object.assign({}, o)
+      },
+
+      _onCacheParams (o) {
+        this.params = Object.assign(this.params, {}, o)
+        this._cacheItem()
+      },
+
+      _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
+        this.$emit('cacheTaskInfo', {
+          item: {
+            type: this.nodeData.taskType,
+            id: this.nodeData.id,
+            name: this.name,
+            params: this.params,
+            description: this.description,
+            runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
+            dependence: this.cacheDependence,
+            maxRetryTimes: this.maxRetryTimes,
+            retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
+            timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroup: this.workerGroup,
+            status: this.status,
+            branch: this.branch
+          },
+          fromThis: this
         })
-      } else {
-        this.$emit('onSubProcess', {
-          subProcessId: this.backfillItem.params.processDefinitionId,
+      },
+      /**
+       * verification name
+       */
+      _verifName () {
+        if (!_.trim(this.name)) {
+          this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
+          return false
+        }
+        if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
+          this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
+          return false
+        }
+        if (this.name === this.backfillItem.name) {
+          return true
+        }
+        // Name repeat depends on dom backfill dependent store
+        if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
+          this.$message.warning(`${i18n.$t('Name already exists')}`)
+          return false
+        }
+        return true
+      },
+      _verifWorkGroup () {
+        let item = this.store.state.security.workerGroupsListAll.find(item => {
+          return item.id === this.workerGroup
+        })
+        if (item === undefined) {
+          this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
+          return false
+        }
+        return true
+      },
+      /**
+       * Global verification procedure
+       */
+      _verification () {
+        // Verify name
+        if (!this._verifName()) {
+          return
+        }
+        // verif workGroup
+        if (!this._verifWorkGroup()) {
+          return
+        }
+        // Verify task alarm parameters
+        if (this.nodeData.taskType === 'DEPENDENT') {
+          if (!this.$refs.dependentTimeout._verification()) {
+            return
+          }
+        } else {
+          if (!this.$refs.timeout._verification()) {
+            return
+          }
+        }
+
+        // Verify node parameters
+        if (!this.$refs[this.nodeData.taskType]._verification()) {
+          return
+        }
+        // Verify preTasks and update dag-things
+        if (this.$refs.PRE_TASK) {
+          if (!this.$refs.PRE_TASK._verification()) {
+            return
+          } else {
+            // Sync data-targetarr
+            $(`#${this.nodeData.id}`).attr(
+              'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
+
+            // Update JSP connections
+            let plumbIns = JSP.JspInstance
+            let targetId = this.nodeData.id
+
+            // Update new connections
+            this.preTasksToAdd.map(sourceId => {
+              plumbIns.connect({
+                source: sourceId,
+                target: targetId,
+                type: 'basic',
+                paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+                HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
+              })
+            })
+
+            // Update remove connections
+            let currentConnects = plumbIns.getAllConnections()
+            let len = currentConnects.length
+            for (let i = 0; i < len; i++) {
+              if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
+                plumbIns.deleteConnection(currentConnects[i])
+                i -= 1
+                len -= 1
+              }
+            }
+          }
+        }
+
+        $(`#${this.nodeData.id}`).find('span').text(this.name)
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
+        // Store the corresponding node data structure
+        this.$emit('addTaskInfo', {
+          item: {
+            type: this.nodeData.taskType,
+            id: this.nodeData.id,
+            name: this.name,
+            params: this.params,
+            description: this.description,
+            runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
+            dependence: this.dependence,
+            maxRetryTimes: this.maxRetryTimes,
+            retryInterval: this.retryInterval,
+            delayTime: this.delayTime,
+            timeout: this.timeout,
+            waitStartTimeout: this.waitStartTimeout,
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroup: this.workerGroup,
+            status: this.status,
+            branch: this.branch
+          },
+          fromThis: this
+        })
+
+        // set run flag
+        this._setRunFlag()
+      },
+      /**
+       * Sub-workflow selected node echo name
+       */
+      _onSetProcessName (name) {
+        this.name = name
+      },
+      /**
+       *  set run flag
+       */
+      _setRunFlag () {
+        let dom = $(`#${this.nodeData.id}`).find('.ban-p')
+        dom.html('')
+        if (this.runFlag === 'FORBIDDEN') {
+          dom.append(rtBantpl())
+        }
+      },
+      /**
+       * Submit verification
+       */
+      ok () {
+        this._verification()
+      },
+      /**
+       * Close and destroy component and component internal events
+       */
+      close () {
+        let flag = false
+        // Delete node without storage
+        if (!this.backfillItem.name) {
+          flag = true
+        }
+        this.isContentBox = false
+        // flag Whether to delete a node this.$destroy()
+        this.$emit('close', {
+          item: this.cacheBackfillItem,
+          flag: flag,
           fromThis: this
         })
       }
     },
-    /**
-       * return params
+    watch: {
+      /**
+       * Watch the item change, cache the value it changes
+       **/
+      _item (val) {
+        // this._cacheItem()
+      }
+    },
+    created () {
+      // Unbind copy and paste events
+      JSP.removePaste()
+      // Backfill data
+      let taskList = this.store.state.dag.tasks
+
+      // fillback use cacheTasks
+      let cacheTasks = this.store.state.dag.cacheTasks
+      let o = {}
+      if (cacheTasks[this.nodeData.id]) {
+        o = cacheTasks[this.nodeData.id]
+        this.backfillItem = cacheTasks[this.nodeData.id]
+      } else {
+        if (taskList.length) {
+          taskList.forEach(v => {
+            if (v.id === this.nodeData.id) {
+              o = v
+              this.backfillItem = v
+            }
+          })
+        }
+      }
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.name = o.name
+        this.taskInstancePriority = o.taskInstancePriority
+        this.runFlag = o.runFlag || 'NORMAL'
+        this.description = o.description
+        this.maxRetryTimes = o.maxRetryTimes
+        this.retryInterval = o.retryInterval
+        this.delayTime = o.delayTime
+        if (o.conditionResult) {
+          this.successBranch = o.conditionResult.successNode[0]
+          this.failedBranch = o.conditionResult.failedNode[0]
+        }
+        // If the workergroup has been deleted, set the default workergroup
+        for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+          let workerGroup = this.store.state.security.workerGroupsListAll[i].id
+          if (o.workerGroup === workerGroup) {
+            break
+          }
+        }
+        if (o.workerGroup === undefined) {
+          this.store.dispatch('dag/getTaskInstanceList', {
+            pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
+          }).then(res => {
+            this.workerGroup = res.totalList[0].workerGroup
+          })
+        } else {
+          this.workerGroup = o.workerGroup
+        }
+
+        this.params = o.params || {}
+        this.dependence = o.dependence || {}
+        this.cacheDependence = o.dependence || {}
+      } else {
+        this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
+      }
+      this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
+      this.isContentBox = true
+
+      // Init value of preTask selector
+      let preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
+      if (!_.isEmpty(this.backfillItem)) {
+        if (preTaskIds && preTaskIds.length) {
+          this.backfillItem.preTasks = preTaskIds.split(',')
+        } else {
+          this.backfillItem.preTasks = []
+        }
+      }
+    },
+    mounted () {
+      let self = this
+      $('#cancelBtn').mousedown(function (event) {
+        event.preventDefault()
+        self.close()
+      })
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {
+      /**
+       * Child workflow entry show/hide
        */
-    _onParams (o) {
-      this.params = Object.assign({}, o)
-    },
+      _isGoSubProcess () {
+        return this.nodeData.taskType === 'SUB_PROCESS' && this.name
+      },
 
-    _onCacheParams (o) {
-      this.params = Object.assign(this.params, {}, o)
-      this._cacheItem()
-    },
-
-    _cacheItem () {
-      this.conditionResult.successNode[0] = this.successBranch
-      this.conditionResult.failedNode[0] = this.failedBranch
-      this.$emit('cacheTaskInfo', {
-        item: {
+      // Define the item model
+      _item () {
+        return {
           type: this.nodeData.taskType,
           id: this.nodeData.id,
           name: this.name,
-          params: this.params,
           description: this.description,
           runFlag: this.runFlag,
-          conditionResult: this.conditionResult,
           dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,
           retryInterval: this.retryInterval,
@@ -502,323 +790,35 @@ export default {
           waitStartTimeout: this.waitStartTimeout,
           taskInstancePriority: this.taskInstancePriority,
           workerGroup: this.workerGroup,
-          status: this.status,
-          branch: this.branch
-        },
-        fromThis: this
-      })
-    },
-    /**
-       * verification name
-       */
-    _verifName () {
-      if (!_.trim(this.name)) {
-        this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
-        return false
-      }
-      if (this.successBranch !== '' && this.successBranch !== null && this.successBranch === this.failedBranch) {
-        this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
-        return false
-      }
-      if (this.name === this.backfillItem.name) {
-        return true
-      }
-      // Name repeat depends on dom backfill dependent store
-      if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
-        this.$message.warning(`${i18n.$t('Name already exists')}`)
-        return false
-      }
-      return true
-    },
-    _verifWorkGroup () {
-      const item = this.store.state.security.workerGroupsListAll.find(item => {
-        return item.id === this.workerGroup
-      })
-      if (item === undefined) {
-        this.$message.warning(`${i18n.$t('The Worker group no longer exists, please select the correct Worker group!')}`)
-        return false
-      }
-      return true
-    },
-    /**
-       * Global verification procedure
-       */
-    _verification () {
-      // Verify name
-      if (!this._verifName()) {
-        return
-      }
-      // verif workGroup
-      if (!this._verifWorkGroup()) {
-        return
-      }
-      // Verify task alarm parameters
-      if (this.nodeData.taskType === 'DEPENDENT') {
-        if (!this.$refs.dependentTimeout._verification()) {
-          return
-        }
-      } else {
-        if (!this.$refs.timeout._verification()) {
-          return
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
-
-      // Verify node parameters
-      if (!this.$refs[this.nodeData.taskType]._verification()) {
-        return
-      }
-      // Verify preTasks and update dag-things
-      if (this.$refs.PRE_TASK) {
-        if (!this.$refs.PRE_TASK._verification()) {
-          return
-        } else {
-          // Sync data-targetarr
-          $(`#${this.nodeData.id}`).attr(
-            'data-targetarr', this.preTaskIdsInWorkflow ? this.preTaskIdsInWorkflow.join(',') : '')
-
-          // Update JSP connections
-          const plumbIns = JSP.JspInstance
-          const targetId = this.nodeData.id
-
-          // Update new connections
-          this.preTasksToAdd.map(sourceId => {
-            plumbIns.connect({
-              source: sourceId,
-              target: targetId,
-              type: 'basic',
-              paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
-              HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 }
-            })
-          })
-
-          // Update remove connections
-          const currentConnects = plumbIns.getAllConnections()
-          let len = currentConnects.length
-          for (let i = 0; i < len; i++) {
-            if (this.preTasksToDelete.indexOf(currentConnects[i].sourceId) > -1 && currentConnects[i].targetId === targetId) {
-              plumbIns.deleteConnection(currentConnects[i])
-              i -= 1
-              len -= 1
-            }
-          }
-        }
-      }
-
-      $(`#${this.nodeData.id}`).find('span').text(this.name)
-      this.conditionResult.successNode[0] = this.successBranch
-      this.conditionResult.failedNode[0] = this.failedBranch
-      // Store the corresponding node data structure
-      this.$emit('addTaskInfo', {
-        item: {
-          type: this.nodeData.taskType,
-          id: this.nodeData.id,
-          name: this.name,
-          params: this.params,
-          description: this.description,
-          runFlag: this.runFlag,
-          conditionResult: this.conditionResult,
-          dependence: this.dependence,
-          maxRetryTimes: this.maxRetryTimes,
-          retryInterval: this.retryInterval,
-          delayTime: this.delayTime,
-          timeout: this.timeout,
-          waitStartTimeout: this.waitStartTimeout,
-          taskInstancePriority: this.taskInstancePriority,
-          workerGroup: this.workerGroup,
-          status: this.status,
-          branch: this.branch
-        },
-        fromThis: this
-      })
-
-      // set run flag
-      this._setRunFlag()
     },
-    /**
-       * Sub-workflow selected node echo name
-       */
-    _onSetProcessName (name) {
-      this.name = name
-    },
-    /**
-       *  set run flag
-       */
-    _setRunFlag () {
-      const dom = $(`#${this.nodeData.id}`).find('.ban-p')
-      dom.html('')
-      if (this.runFlag === 'FORBIDDEN') {
-        dom.append(rtBantpl())
-      }
-    },
-    /**
-       * Submit verification
-       */
-    ok () {
-      this._verification()
-    },
-    /**
-       * Close and destroy component and component internal events
-       */
-    close () {
-      let flag = false
-      // Delete node without storage
-      if (!this.backfillItem.name) {
-        flag = true
-      }
-      this.isContentBox = false
-      // flag Whether to delete a node this.$destroy()
-      this.$emit('close', {
-        item: this.cacheBackfillItem,
-        flag: flag,
-        fromThis: this
-      })
+    components: {
+      mMr,
+      mShell,
+      mWaterdrop,
+      mSubProcess,
+      mProcedure,
+      mSql,
+      mLog,
+      mSpark,
+      mFlink,
+      mPython,
+      mDependent,
+      mHttp,
+      mDatax,
+      mSqoop,
+      mConditions,
+      mSelectInput,
+      mTimeoutAlarm,
+      mDependentTimeout,
+      mPriority,
+      mWorkerGroups,
+      mPreTasks
     }
-  },
-  watch: {
-    /**
-       * Watch the item change, cache the value it changes
-       **/
-    _item (val) {
-      // this._cacheItem()
-    }
-  },
-  created () {
-    // Unbind copy and paste events
-    JSP.removePaste()
-    // Backfill data
-    const taskList = this.store.state.dag.tasks
-
-    // fillback use cacheTasks
-    const cacheTasks = this.store.state.dag.cacheTasks
-    let o = {}
-    if (cacheTasks[this.nodeData.id]) {
-      o = cacheTasks[this.nodeData.id]
-      this.backfillItem = cacheTasks[this.nodeData.id]
-    } else {
-      if (taskList.length) {
-        taskList.forEach(v => {
-          if (v.id === this.nodeData.id) {
-            o = v
-            this.backfillItem = v
-          }
-        })
-      }
-    }
-    // Non-null objects represent backfill
-    if (!_.isEmpty(o)) {
-      this.name = o.name
-      this.taskInstancePriority = o.taskInstancePriority
-      this.runFlag = o.runFlag || 'NORMAL'
-      this.description = o.description
-      this.maxRetryTimes = o.maxRetryTimes
-      this.retryInterval = o.retryInterval
-      this.delayTime = o.delayTime
-      if (o.conditionResult) {
-        this.successBranch = o.conditionResult.successNode[0]
-        this.failedBranch = o.conditionResult.failedNode[0]
-      }
-      // If the workergroup has been deleted, set the default workergroup
-      for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-        const workerGroup = this.store.state.security.workerGroupsListAll[i].id
-        if (o.workerGroup === workerGroup) {
-          break
-        }
-      }
-      if (o.workerGroup === undefined) {
-        this.store.dispatch('dag/getTaskInstanceList', {
-          pageSize: 10, pageNo: 1, processInstanceId: this.nodeData.instanceId, name: o.name
-        }).then(res => {
-          this.workerGroup = res.totalList[0].workerGroup
-        })
-      } else {
-        this.workerGroup = o.workerGroup
-      }
-
-      this.params = o.params || {}
-      this.dependence = o.dependence || {}
-      this.cacheDependence = o.dependence || {}
-    } else {
-      this.workerGroup = this.store.state.security.workerGroupsListAll[0].id
-    }
-    this.cacheBackfillItem = JSON.parse(JSON.stringify(o))
-    this.isContentBox = true
-
-    // Init value of preTask selector
-    const preTaskIds = $(`#${this.nodeData.id}`).attr('data-targetarr')
-    if (!_.isEmpty(this.backfillItem)) {
-      if (preTaskIds && preTaskIds.length) {
-        this.backfillItem.preTasks = preTaskIds.split(',')
-      } else {
-        this.backfillItem.preTasks = []
-      }
-    }
-  },
-  mounted () {
-    const self = this
-    $('#cancelBtn').mousedown(function (event) {
-      event.preventDefault()
-      self.close()
-    })
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {
-    /**
-       * Child workflow entry show/hide
-       */
-    _isGoSubProcess () {
-      return this.nodeData.taskType === 'SUB_PROCESS' && this.name
-    },
-
-    // Define the item model
-    _item () {
-      return {
-        type: this.nodeData.taskType,
-        id: this.nodeData.id,
-        name: this.name,
-        description: this.description,
-        runFlag: this.runFlag,
-        dependence: this.cacheDependence,
-        maxRetryTimes: this.maxRetryTimes,
-        retryInterval: this.retryInterval,
-        delayTime: this.delayTime,
-        timeout: this.timeout,
-        waitStartTimeout: this.waitStartTimeout,
-        taskInstancePriority: this.taskInstancePriority,
-        workerGroup: this.workerGroup,
-        successBranch: this.successBranch,
-        failedBranch: this.failedBranch
-      }
-    }
-  },
-  components: {
-    mMr,
-    mShell,
-    mWaterdrop,
-    mSubProcess,
-    mProcedure,
-    mSql,
-    mLog,
-    mSpark,
-    mFlink,
-    mPython,
-    mDependent,
-    mHttp,
-    mDatax,
-    mSqoop,
-    mConditions,
-    mSelectInput,
-    mTimeoutAlarm,
-    mDependentTimeout,
-    mPriority,
-    mWorkerGroups,
-    mPreTasks
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

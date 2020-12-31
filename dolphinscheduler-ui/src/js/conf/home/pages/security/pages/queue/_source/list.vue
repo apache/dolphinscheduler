@@ -43,49 +43,49 @@
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
+  import { mapActions } from 'vuex'
 
-export default {
-  name: 'tenement-list',
-  data () {
-    return {
-      list: []
-    }
-  },
-  props: {
-    queueList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('security', ['deleteQueue']),
-    _delete (item, i) {
-      this.deleteQueue({
-        id: item.id
-      }).then(res => {
-        this.list.splice(i, 1)
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
+  export default {
+    name: 'tenement-list',
+    data () {
+      return {
+        list: []
+      }
     },
-    _edit (item) {
-      this.$emit('on-edit', item)
-    }
-  },
-  watch: {
-    queueList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-    this.list = this.queueList
-  },
-  mounted () {
-  },
-  components: { }
-}
+    props: {
+      queueList: Array,
+      pageNo: Number,
+      pageSize: Number
+    },
+    methods: {
+      ...mapActions('security', ['deleteQueue']),
+      _delete (item, i) {
+        this.deleteQueue({
+          id: item.id
+        }).then(res => {
+          this.list.splice(i, 1)
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      _edit (item) {
+        this.$emit('on-edit', item)
+      }
+    },
+    watch: {
+      queueList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+      this.list = this.queueList
+    },
+    mounted () {
+    },
+    components: { }
+  }
 </script>

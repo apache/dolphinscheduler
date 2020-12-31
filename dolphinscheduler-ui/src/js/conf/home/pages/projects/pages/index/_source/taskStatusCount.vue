@@ -49,95 +49,95 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import { pie } from './chartConfig'
-import Chart from '@/module/ana-charts'
-import mNoData from '@/module/components/noData/noData'
-import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import { pie } from './chartConfig'
+  import Chart from '@/module/ana-charts'
+  import mNoData from '@/module/components/noData/noData'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
 
-export default {
-  name: 'task-status-count',
-  data () {
-    return {
-      isSpin: true,
-      msg: '',
-      taskStatusList: []
-    }
-  },
-  props: {
-    searchParams: Object
-  },
-  methods: {
-    ...mapActions('projects', ['getTaskStatusCount']),
-    _goTask (name) {
-      this.$router.push({
-        name: 'task-instance',
-        query: {
-          stateType: _.find(stateType, ['label', name]).code,
-          startDate: this.searchParams.startDate,
-          endDate: this.searchParams.endDate
-        }
-      })
+  export default {
+    name: 'task-status-count',
+    data () {
+      return {
+        isSpin: true,
+        msg: '',
+        taskStatusList: []
+      }
     },
-    _handleTaskStatus (res) {
-      const data = res.data.taskCountDtos
-      this.taskStatusList = _.map(data, v => {
-        return {
-          // CHECK!!
-          key: _.find(stateType, ['code', v.taskStateType]).label,
-          value: v.count,
-          type: 'type'
-        }
-      })
-      const myChart = Chart.pie('#task-status-pie', this.taskStatusList, { title: '' })
-      myChart.echart.setOption(pie)
+    props: {
+      searchParams: Object
+    },
+    methods: {
+      ...mapActions('projects', ['getTaskStatusCount']),
+      _goTask (name) {
+        this.$router.push({
+          name: 'task-instance',
+          query: {
+            stateType: _.find(stateType, ['label', name]).code,
+            startDate: this.searchParams.startDate,
+            endDate: this.searchParams.endDate
+          }
+        })
+      },
+      _handleTaskStatus (res) {
+        let data = res.data.taskCountDtos
+        this.taskStatusList = _.map(data, v => {
+          return {
+            // CHECK!!
+            key: _.find(stateType, ['code', v.taskStateType]).label,
+            value: v.count,
+            type: 'type'
+          }
+        })
+        const myChart = Chart.pie('#task-status-pie', this.taskStatusList, { title: '' })
+        myChart.echart.setOption(pie)
 
-      // Jump forbidden in index page
-      if (this.searchParams.projectId) {
-        myChart.echart.on('click', e => {
-          this._goTask(e.data.name)
-        })
+        // Jump forbidden in index page
+        if (this.searchParams.projectId) {
+          myChart.echart.on('click', e => {
+            this._goTask(e.data.name)
+          })
+        }
       }
-    }
-  },
-  watch: {
-    searchParams: {
-      deep: true,
-      immediate: true,
-      handler (o) {
-        this.isSpin = true
-        this.getTaskStatusCount(o).then(res => {
-          this.taskStatusList = []
-          this._handleTaskStatus(res)
-          this.isSpin = false
-        }).catch(e => {
-          console.log(e)
-          this.msg = e.msg || 'error'
-          this.isSpin = false
-        })
+    },
+    watch: {
+      searchParams: {
+        deep: true,
+        immediate: true,
+        handler (o) {
+          this.isSpin = true
+          this.getTaskStatusCount(o).then(res => {
+            this.taskStatusList = []
+            this._handleTaskStatus(res)
+            this.isSpin = false
+          }).catch(e => {
+            console.log(e)
+            this.msg = e.msg || 'error'
+            this.isSpin = false
+          })
+        }
       }
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-  },
-  beforeMount () {
-  },
-  mounted () {
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mNoData }
-}
+    },
+    beforeCreate () {
+    },
+    created () {
+    },
+    beforeMount () {
+    },
+    mounted () {
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

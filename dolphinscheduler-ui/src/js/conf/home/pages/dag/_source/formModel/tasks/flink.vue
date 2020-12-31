@@ -184,370 +184,370 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import mLocalParams from './_source/localParams'
-import mListBox from './_source/listBox'
-import mList4Box from './_source/list4Box'
-import Treeselect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import disabledState from '@/module/mixin/disabledState'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import mLocalParams from './_source/localParams'
+  import mListBox from './_source/listBox'
+  import mList4Box from './_source/list4Box'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import disabledState from '@/module/mixin/disabledState'
 
-export default {
-  name: 'flink',
-  data () {
-    return {
-      valueConsistsOf: 'LEAF_PRIORITY',
-      // Main function class
-      mainClass: '',
-      // Master jar package
-      mainJar: null,
-      // Master jar package(List)
-      mainJarLists: [],
-      mainJarList: [],
-      // Deployment method
-      deployMode: 'cluster',
-      // Resource(list)
-      resourceList: [],
-      // Cache ResourceList
-      cacheResourceList: [],
-      // Custom function
-      localParams: [],
-      // Driver Number of cores
-      slot: 1,
-      // Driver Number of memory
-      taskManager: '2',
-      // jobManager Memory
-      jobManagerMemory: '1G',
-      // taskManager Memory
-      taskManagerMemory: '2G',
-      // Flink Job Name
-      appName: '',
-      // Command line argument
-      mainArgs: '',
-      // Other parameters
-      others: '',
-      // Program type
-      programType: 'SCALA',
-      // Program type(List)
-      programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
+  export default {
+    name: 'flink',
+    data () {
+      return {
+        valueConsistsOf: 'LEAF_PRIORITY',
+        // Main function class
+        mainClass: '',
+        // Master jar package
+        mainJar: null,
+        // Master jar package(List)
+        mainJarLists: [],
+        mainJarList: [],
+        // Deployment method
+        deployMode: 'cluster',
+        // Resource(list)
+        resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
+        // Custom function
+        localParams: [],
+        // Driver Number of cores
+        slot: 1,
+        // Driver Number of memory
+        taskManager: '2',
+        // jobManager Memory
+        jobManagerMemory: '1G',
+        // taskManager Memory
+        taskManagerMemory: '2G',
+        // Flink Job Name
+        appName: '',
+        // Command line argument
+        mainArgs: '',
+        // Other parameters
+        others: '',
+        // Program type
+        programType: 'SCALA',
+        // Program type(List)
+        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
 
-      flinkVersion: '<1.10',
-      // Flink Versions(List)
-      flinkVersionList: [{ code: '<1.10' }, { code: '>=1.10' }],
+        flinkVersion: '<1.10',
+        // Flink Versions(List)
+        flinkVersionList: [{ code: '<1.10' }, { code: '>=1.10' }],
 
-      normalizer (node) {
-        return {
-          label: node.name
-        }
-      },
-      allNoResources: [],
-      noRes: []
-    }
-  },
-  props: {
-    backfillItem: Object
-  },
-  mixins: [disabledState],
-  methods: {
-    /**
+        normalizer (node) {
+          return {
+            label: node.name
+          }
+        },
+        allNoResources: [],
+        noRes: []
+      }
+    },
+    props: {
+      backfillItem: Object
+    },
+    mixins: [disabledState],
+    methods: {
+      /**
        * getResourceId
        */
-    marjarId (name) {
-      this.store.dispatch('dag/getResourceId', {
-        type: 'FILE',
-        fullName: '/' + name
-      }).then(res => {
-        this.mainJar = res.id
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      marjarId (name) {
+        this.store.dispatch('dag/getResourceId', {
+          type: 'FILE',
+          fullName: '/' + name
+        }).then(res => {
+          this.mainJar = res.id
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * return localParams
        */
-    _onLocalParams (a) {
-      this.localParams = a
-    },
-    /**
+      _onLocalParams (a) {
+        this.localParams = a
+      },
+      /**
        * return resourceList
        */
-    _onResourcesData (a) {
-      this.resourceList = a
-    },
-    /**
+      _onResourcesData (a) {
+        this.resourceList = a
+      },
+      /**
        * cache resourceList
        */
-    _onCacheResourcesData (a) {
-      this.cacheResourceList = a
-    },
-    /**
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
+      },
+      /**
        * verification
        */
-    _verification () {
-      if (this.programType !== 'PYTHON' && !this.mainClass) {
-        this.$message.warning(`${i18n.$t('Please enter main class')}`)
-        return false
-      }
-
-      if (!this.mainJar) {
-        this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
-        return false
-      }
-
-      if (!this.jobManagerMemory) {
-        this.$message.warning(`${i18n.$t('Please enter JobManager memory')}`)
-        return false
-      }
-
-      if (!Number.isInteger(parseInt(this.jobManagerMemory))) {
-        this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-        return false
-      }
-
-      if (!this.taskManagerMemory) {
-        this.$message.warning(`${i18n.$t('Please enter TaskManager memory')}`)
-        return false
-      }
-
-      if (!_.isNumber(parseInt(this.taskManagerMemory))) {
-        this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
-        return false
-      }
-
-      // noRes
-      if (this.noRes.length > 0) {
-        this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
-        return false
-      }
-
-      // localParams Subcomponent verification
-      if (!this.$refs.refLocalParams._verifProp()) {
-        return false
-      }
-
-      // storage
-      this.$emit('on-params', {
-        mainClass: this.mainClass,
-        mainJar: {
-          id: this.mainJar
-        },
-        deployMode: this.deployMode,
-        resourceList: _.map(this.resourceList, v => {
-          return { id: v }
-        }),
-        localParams: this.localParams,
-        flinkVersion: this.flinkVersion,
-        slot: this.slot,
-        taskManager: this.taskManager,
-        jobManagerMemory: this.jobManagerMemory,
-        taskManagerMemory: this.taskManagerMemory,
-        appName: this.appName,
-        mainArgs: this.mainArgs,
-        others: this.others,
-        programType: this.programType
-      })
-      return true
-    },
-    diGuiTree (item) { // Recursive convenience tree structure
-      item.forEach(item => {
-        item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-          ? this.operationTree(item) : this.diGuiTree(item.children)
-      })
-    },
-    operationTree (item) {
-      if (item.dirctory) {
-        item.isDisabled = true
-      }
-      delete item.children
-    },
-    searchTree (element, id) {
-      // 根据id查找节点
-      if (element.id === id) {
-        return element
-      } else if (element.children !== null) {
-        let i
-        let result = null
-        for (i = 0; result === null && i < element.children.length; i++) {
-          result = this.searchTree(element.children[i], id)
+      _verification () {
+        if (this.programType !== 'PYTHON' && !this.mainClass) {
+          this.$message.warning(`${i18n.$t('Please enter main class')}`)
+          return false
         }
-        return result
-      }
-      return null
-    },
-    dataProcess (backResource) {
-      const isResourceId = []
-      let resourceIdArr = []
-      if (this.resourceList.length > 0) {
-        this.resourceList.forEach(v => {
-          this.mainJarList.forEach(v1 => {
-            if (this.searchTree(v1, v)) {
-              isResourceId.push(this.searchTree(v1, v))
-            }
-          })
-        })
-        resourceIdArr = isResourceId.map(item => {
-          return item.id
-        })
-        Array.prototype.diff = function (a) {
-          return this.filter(function (i) { return a.indexOf(i) < 0 })
+
+        if (!this.mainJar) {
+          this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
+          return false
         }
-        const diffSet = this.resourceList.diff(resourceIdArr)
-        let optionsCmp = []
-        if (diffSet.length > 0) {
-          diffSet.forEach(item => {
-            backResource.forEach(item1 => {
-              if (item === item1.id || item === item1.res) {
-                optionsCmp.push(item1)
+
+        if (!this.jobManagerMemory) {
+          this.$message.warning(`${i18n.$t('Please enter JobManager memory')}`)
+          return false
+        }
+
+        if (!Number.isInteger(parseInt(this.jobManagerMemory))) {
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
+          return false
+        }
+
+        if (!this.taskManagerMemory) {
+          this.$message.warning(`${i18n.$t('Please enter TaskManager memory')}`)
+          return false
+        }
+
+        if (!_.isNumber(parseInt(this.taskManagerMemory))) {
+          this.$message.warning(`${i18n.$t('Memory should be a positive integer')}`)
+          return false
+        }
+
+        // noRes
+        if (this.noRes.length > 0) {
+          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          return false
+        }
+
+        // localParams Subcomponent verification
+        if (!this.$refs.refLocalParams._verifProp()) {
+          return false
+        }
+
+        // storage
+        this.$emit('on-params', {
+          mainClass: this.mainClass,
+          mainJar: {
+            id: this.mainJar
+          },
+          deployMode: this.deployMode,
+          resourceList: _.map(this.resourceList, v => {
+            return { id: v }
+          }),
+          localParams: this.localParams,
+          flinkVersion: this.flinkVersion,
+          slot: this.slot,
+          taskManager: this.taskManager,
+          jobManagerMemory: this.jobManagerMemory,
+          taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        })
+        return true
+      },
+      diGuiTree (item) { // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
+        })
+      },
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
+        }
+        delete item.children
+      },
+      searchTree (element, id) {
+        // 根据id查找节点
+        if (element.id === id) {
+          return element
+        } else if (element.children !== null) {
+          let i
+          let result = null
+          for (i = 0; result === null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id)
+          }
+          return result
+        }
+        return null
+      },
+      dataProcess (backResource) {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-        }
-        const noResources = [{
-          id: -1,
-          name: $t('Unauthorized or deleted resources'),
-          fullName: '/' + $t('Unauthorized or deleted resources'),
-          children: []
-        }]
-        if (optionsCmp.length > 0) {
-          this.allNoResources = optionsCmp
-          optionsCmp = optionsCmp.map(item => {
-            return { id: item.id, name: item.name, fullName: item.res }
+          resourceIdArr = isResourceId.map(item => {
+            return item.id
           })
-          optionsCmp.forEach(item => {
-            item.isNew = true
-          })
-          noResources[0].children = optionsCmp
-          this.mainJarList = this.mainJarList.concat(noResources)
-        }
-      }
-    }
-  },
-  watch: {
-    // Listening type
-    programType (type) {
-      if (type === 'PYTHON') {
-        this.mainClass = ''
-      }
-    },
-    // Watch the cacheParams
-    cacheParams (val) {
-      this.$emit('on-cache-params', val)
-    },
-    resourceIdArr (arr) {
-      const result = []
-      arr.forEach(item => {
-        this.allNoResources.forEach(item1 => {
-          if (item.id === item1.id) {
-            // resultBool = true
-            result.push(item1)
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
           }
-        })
-      })
-      this.noRes = result
-    }
-  },
-  computed: {
-    resourceIdArr () {
-      const isResourceId = []
-      let resourceIdArr = []
-      if (this.resourceList.length > 0) {
-        this.resourceList.forEach(v => {
-          this.mainJarList.forEach(v1 => {
-            if (this.searchTree(v1, v)) {
-              isResourceId.push(this.searchTree(v1, v))
+          let diffSet = this.resourceList.diff(resourceIdArr)
+          let optionsCmp = []
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item === item1.id || item === item1.res) {
+                  optionsCmp.push(item1)
+                }
+              })
+            })
+          }
+          let noResources = [{
+            id: -1,
+            name: $t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
+            children: []
+          }]
+          if (optionsCmp.length > 0) {
+            this.allNoResources = optionsCmp
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
+            })
+            optionsCmp.forEach(item => {
+              item.isNew = true
+            })
+            noResources[0].children = optionsCmp
+            this.mainJarList = this.mainJarList.concat(noResources)
+          }
+        }
+      }
+    },
+    watch: {
+      // Listening type
+      programType (type) {
+        if (type === 'PYTHON') {
+          this.mainClass = ''
+        }
+      },
+      // Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val)
+      },
+      resourceIdArr (arr) {
+        let result = []
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
+              // resultBool = true
+              result.push(item1)
             }
           })
         })
-        resourceIdArr = isResourceId.map(item => {
-          return { id: item.id, name: item.name, res: item.fullName }
-        })
+        this.noRes = result
       }
-      return resourceIdArr
     },
-    cacheParams () {
-      return {
-        mainClass: this.mainClass,
-        mainJar: {
-          id: this.mainJar
-        },
-        deployMode: this.deployMode,
-        resourceList: this.resourceIdArr,
-        localParams: this.localParams,
-        slot: this.slot,
-        taskManager: this.taskManager,
-        jobManagerMemory: this.jobManagerMemory,
-        taskManagerMemory: this.taskManagerMemory,
-        appName: this.appName,
-        mainArgs: this.mainArgs,
-        others: this.others,
-        programType: this.programType
-      }
-    }
-  },
-  created () {
-    const item = this.store.state.dag.resourcesListS
-    const items = this.store.state.dag.resourcesListJar
-    this.diGuiTree(item)
-    this.diGuiTree(items)
-    this.mainJarList = item
-    this.mainJarLists = items
-    const o = this.backfillItem
-    // Non-null objects represent backfill
-    if (!_.isEmpty(o)) {
-      this.mainClass = o.params.mainClass || ''
-      if (o.params.mainJar.res) {
-        this.marjarId(o.params.mainJar.res)
-      } else if (o.params.mainJar.res === '') {
-        this.mainJar = ''
-      } else {
-        this.mainJar = o.params.mainJar.id || ''
-      }
-      this.deployMode = o.params.deployMode || ''
-      this.flinkVersion = o.params.flinkVersion || '<1.10'
-      this.slot = o.params.slot || 1
-      this.taskManager = o.params.taskManager || '2'
-      this.jobManagerMemory = o.params.jobManagerMemory || '1G'
-      this.taskManagerMemory = o.params.taskManagerMemory || '2G'
-      this.appName = o.params.appName || ''
-      this.mainArgs = o.params.mainArgs || ''
-      this.others = o.params.others
-      this.programType = o.params.programType || 'SCALA'
-
-      // backfill resourceList
-      const backResource = o.params.resourceList || []
-      const resourceList = o.params.resourceList || []
-      if (resourceList.length) {
-        _.map(resourceList, v => {
-          if (!v.id) {
-            this.store.dispatch('dag/getResourceId', {
-              type: 'FILE',
-              fullName: '/' + v.res
-            }).then(res => {
-              this.resourceList.push(res.id)
-              this.dataProcess(backResource)
-            }).catch(e => {
-              this.resourceList.push(v.res)
-              this.dataProcess(backResource)
+    computed: {
+      resourceIdArr () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
+              }
             })
-          } else {
-            this.resourceList.push(v.id)
-            this.dataProcess(backResource)
-          }
-        })
-        this.cacheResourceList = resourceList
+          })
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
+          })
+        }
+        return resourceIdArr
+      },
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            id: this.mainJar
+          },
+          deployMode: this.deployMode,
+          resourceList: this.resourceIdArr,
+          localParams: this.localParams,
+          slot: this.slot,
+          taskManager: this.taskManager,
+          jobManagerMemory: this.jobManagerMemory,
+          taskManagerMemory: this.taskManagerMemory,
+          appName: this.appName,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        }
       }
+    },
+    created () {
+      let item = this.store.state.dag.resourcesListS
+      let items = this.store.state.dag.resourcesListJar
+      this.diGuiTree(item)
+      this.diGuiTree(items)
+      this.mainJarList = item
+      this.mainJarLists = items
+      let o = this.backfillItem
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.mainClass = o.params.mainClass || ''
+        if (o.params.mainJar.res) {
+          this.marjarId(o.params.mainJar.res)
+        } else if (o.params.mainJar.res === '') {
+          this.mainJar = ''
+        } else {
+          this.mainJar = o.params.mainJar.id || ''
+        }
+        this.deployMode = o.params.deployMode || ''
+        this.flinkVersion = o.params.flinkVersion || '<1.10'
+        this.slot = o.params.slot || 1
+        this.taskManager = o.params.taskManager || '2'
+        this.jobManagerMemory = o.params.jobManagerMemory || '1G'
+        this.taskManagerMemory = o.params.taskManagerMemory || '2G'
+        this.appName = o.params.appName || ''
+        this.mainArgs = o.params.mainArgs || ''
+        this.others = o.params.others
+        this.programType = o.params.programType || 'SCALA'
 
-      // backfill localParams
-      const localParams = o.params.localParams || []
-      if (localParams.length) {
-        this.localParams = localParams
+        // backfill resourceList
+        let backResource = o.params.resourceList || []
+        let resourceList = o.params.resourceList || []
+        if (resourceList.length) {
+          _.map(resourceList, v => {
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
+                type: 'FILE',
+                fullName: '/' + v.res
+              }).then(res => {
+                this.resourceList.push(res.id)
+                this.dataProcess(backResource)
+              }).catch(e => {
+                this.resourceList.push(v.res)
+                this.dataProcess(backResource)
+              })
+            } else {
+              this.resourceList.push(v.id)
+              this.dataProcess(backResource)
+            }
+          })
+          this.cacheResourceList = resourceList
+        }
+
+        // backfill localParams
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
       }
-    }
-  },
-  mounted () {
+    },
+    mounted () {
 
-  },
-  components: { mLocalParams, mListBox, mList4Box, Treeselect }
-}
+    },
+    components: { mLocalParams, mListBox, mList4Box, Treeselect }
+  }
 </script>

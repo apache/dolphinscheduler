@@ -41,40 +41,40 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-export default {
-  name: 'conditions',
-  data () {
-    return {
-      // search value
-      searchVal: ''
-    }
-  },
-  props: {
-    operation: Array
-  },
-  methods: {
-    /**
+  import _ from 'lodash'
+  export default {
+    name: 'conditions',
+    data () {
+      return {
+        // search value
+        searchVal: ''
+      }
+    },
+    props: {
+      operation: Array
+    },
+    methods: {
+      /**
        * emit Query parameter
        */
-    _ckQuery () {
-      this.$emit('on-conditions', {
-        searchVal: _.trim(this.searchVal)
-      })
-    }
-  },
-  computed: {
-    // Whether the slot comes in
-    isShow () {
-      return this.$slots['search-group']
-    }
-  },
-  created () {
-    // Routing parameter merging
-    if (!_.isEmpty(this.$route.query)) {
-      this.searchVal = this.$route.query.searchVal || ''
-    }
-  },
-  components: {}
-}
+      _ckQuery () {
+        this.$emit('on-conditions', {
+          searchVal: _.trim(this.searchVal)
+        })
+      }
+    },
+    computed: {
+      // Whether the slot comes in
+      isShow () {
+        return this.$slots['search-group']
+      }
+    },
+    created () {
+      // Routing parameter merging
+      if (!_.isEmpty(this.$route.query)) {
+        this.searchVal = this.$route.query.searchVal || ''
+      }
+    },
+    components: {}
+  }
 </script>

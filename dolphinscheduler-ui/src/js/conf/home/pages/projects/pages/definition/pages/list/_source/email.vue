@@ -62,244 +62,244 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import emailList from '~/external/email'
-import { isEmial, fuzzyQuery } from './util'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import emailList from '~/external/email'
+  import { isEmial, fuzzyQuery } from './util'
 
-export default {
-  name: 'email',
-  data () {
-    return {
-      tagModel: false,
-      email: '',
-      activeIndex: null,
-      activeListL: _.cloneDeep(this.activeList),
-      emailList: [],
-      index: 0,
-      emailWidth: 100,
-      isCn: false
-    }
-  },
-  props: {
-    activeList: Array,
-    repeatData: Array,
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  model: {
-    prop: 'activeList',
-    event: 'valueEvent'
-  },
-  methods: {
-    /**
+  export default {
+    name: 'email',
+    data () {
+      return {
+        tagModel: false,
+        email: '',
+        activeIndex: null,
+        activeListL: _.cloneDeep(this.activeList),
+        emailList: [],
+        index: 0,
+        emailWidth: 100,
+        isCn: false
+      }
+    },
+    props: {
+      activeList: Array,
+      repeatData: Array,
+      disabled: {
+        type: Boolean,
+        default: false
+      }
+    },
+    model: {
+      prop: 'activeList',
+      event: 'valueEvent'
+    },
+    methods: {
+      /**
        * Manually add a mailbox
        */
-    _manualEmail () {
-      if (this.email === '') {
-        return true
-      }
-      this.email = _.trim(this.email).replace(/(;$)|(；$)/g, '')
-
-      const email = this.email
-
-      const is = (n) => {
-        return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === n)
-      }
-
-      if (isEmial(email)) {
-        if (!is(email)) {
-          this.emailWidth = 0
-          this.activeListL.push(email)
-          this.email = ''
-          this._handlerEmailWitch()
+      _manualEmail () {
+        if (this.email === '') {
           return true
+        }
+        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, '')
+
+        let email = this.email
+
+        let is = (n) => {
+          return _.some(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === n)
+        }
+
+        if (isEmial(email)) {
+          if (!is(email)) {
+            this.emailWidth = 0
+            this.activeListL.push(email)
+            this.email = ''
+            this._handlerEmailWitch()
+            return true
+          } else {
+            this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
+            return false
+          }
         } else {
-          this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
+          this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
           return false
         }
-      } else {
-        this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
-        return false
-      }
-    },
-    /**
+      },
+      /**
        * Processing mailbox
        */
-    _handlerEmail (val) {
-      if (!val) {
-        this.emailList = []
-        this.isEmail = false
-      } else {
-        const a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL))
-        const b = a.concat(emailList)
-        const list = fuzzyQuery(b, val)
-        this.emailList = _.uniqWith(list.length && list, _.isEqual)
-        this.isEmail = !!list.length
-        if (this.emailList.length) {
-          this.index = 1
-        }
-      }
-    },
-    /**
-       * Carriage return
-       */
-    _emailEnter () {
-      // not list Hand filling
-      if (!this.emailList.length) {
-        this._manualEmail()
-        return
-      }
-      this._selectEmail(this.index)
-    },
-    /**
-       * delete email
-       */
-    _emailDelete () {
-      // Do not delete in case of input method in Chinese
-      if (!this.isCn) {
-        this.emailWidth = 0
-        if (_.isInteger(this.activeIndex)) {
-          this.activeListL.pop()
-          this.activeIndex = null
+      _handlerEmail (val) {
+        if (!val) {
+          this.emailList = []
+          this.isEmail = false
         } else {
-          if (!this.email) {
-            this.activeIndex = this.activeListL.length - 1
+          let a = _.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL))
+          let b = a.concat(emailList)
+          let list = fuzzyQuery(b, val)
+          this.emailList = _.uniqWith(list.length && list, _.isEqual)
+          this.isEmail = !!list.length
+          if (this.emailList.length) {
+            this.index = 1
           }
         }
-        this._handlerEmailWitch()
-      }
-    },
-    /**
+      },
+      /**
+       * Carriage return
+       */
+      _emailEnter () {
+        // not list Hand filling
+        if (!this.emailList.length) {
+          this._manualEmail()
+          return
+        }
+        this._selectEmail(this.index)
+      },
+      /**
+       * delete email
+       */
+      _emailDelete () {
+        // Do not delete in case of input method in Chinese
+        if (!this.isCn) {
+          this.emailWidth = 0
+          if (_.isInteger(this.activeIndex)) {
+            this.activeListL.pop()
+            this.activeIndex = null
+          } else {
+            if (!this.email) {
+              this.activeIndex = this.activeListL.length - 1
+            }
+          }
+          this._handlerEmailWitch()
+        }
+      },
+      /**
        * click delete
        */
-    _del (i) {
-      this.emailWidth = 0
-      this.activeListL.splice(i, 1)
-      this._handlerEmailWitch()
-    },
-    /**
+      _del (i) {
+        this.emailWidth = 0
+        this.activeListL.splice(i, 1)
+        this._handlerEmailWitch()
+      },
+      /**
        * keyup Up/down event processing
        */
-    _emailKeyup (type) {
-      const emailList = this.emailList.length
-      if (emailList === 1) {
-        this.index = 1
-        return
-      }
-      if (emailList) {
-        if (type === 'up') {
-          this.index = ((i) => {
-            let num
-            if (i === 0 || i === 1) {
-              num = emailList
-            } else {
-              num = i - 1
-            }
-            return num
-          })(this.index)
-        } else {
-          this.index = ((i) => {
-            let num
-            if (i === 0 || i === emailList) {
-              num = 1
-            } else {
-              num = i + 1
-            }
-            return num
-          })(this.index)
+      _emailKeyup (type) {
+        let emailList = this.emailList.length
+        if (emailList === 1) {
+          this.index = 1
+          return
         }
-      }
-    },
-    /**
+        if (emailList) {
+          if (type === 'up') {
+            this.index = ((i) => {
+              let num
+              if (i === 0 || i === 1) {
+                num = emailList
+              } else {
+                num = i - 1
+              }
+              return num
+            })(this.index)
+          } else {
+            this.index = ((i) => {
+              let num
+              if (i === 0 || i === emailList) {
+                num = 1
+              } else {
+                num = i + 1
+              }
+              return num
+            })(this.index)
+          }
+        }
+      },
+      /**
        * Check mailbox processing
        */
-    _selectEmail (i) {
-      const item = this.emailList[i - 1]
-      this.isEmail = false
-      this.email = ''
+      _selectEmail (i) {
+        let item = this.emailList[i - 1]
+        this.isEmail = false
+        this.email = ''
 
-      // Non-existing data
-      if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === item).length) {
-        this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
-        return
-      }
-      // Width initialization
-      this.emailWidth = 0
-      // Insert data
-      this.activeListL.push(item)
-      // Calculated width
-      this._handlerEmailWitch()
-      // Check mailbox index initialization
-      this.activeIndex = null
-      setTimeout(() => {
-        // Focus position
-        this.$refs.emailInput.focus()
-      }, 100)
-    },
-    /**
+        // Non-existing data
+        if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeListL)), v => v === item).length) {
+          this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
+          return
+        }
+        // Width initialization
+        this.emailWidth = 0
+        // Insert data
+        this.activeListL.push(item)
+        // Calculated width
+        this._handlerEmailWitch()
+        // Check mailbox index initialization
+        this.activeIndex = null
+        setTimeout(() => {
+          // Focus position
+          this.$refs.emailInput.focus()
+        }, 100)
+      },
+      /**
        * Processing width
        */
-    _handlerEmailWitch () {
-      setTimeout(() => {
-        this.emailWidth = parseInt($('.email-model').width() - $(this.$refs.emailInput).position().left - 20)
-        if (this.emailWidth < 80) {
-          this.emailWidth = 200
-        }
-      }, 100)
-    },
-    /**
+      _handlerEmailWitch () {
+        setTimeout(() => {
+          this.emailWidth = parseInt($('.email-model').width() - $(this.$refs.emailInput).position().left - 20)
+          if (this.emailWidth < 80) {
+            this.emailWidth = 200
+          }
+        }, 100)
+      },
+      /**
        * Tab event processing
        */
-    _emailTab () {
-      // Data processing
-      this._emailEnter()
-    }
-  },
-  watch: {
-    email (val) {
-      this._handlerEmail(val)
-      // Check mailbox index initialization
-      this.activeIndex = null
-    },
-    activeList (val) {
-      this.activeListL = _.cloneDeep(val)
-    },
-    activeListL (val) {
-      if (!_.isEqual(val, this.activeList)) {
-        this.$emit('valueEvent', val)
+      _emailTab () {
+        // Data processing
+        this._emailEnter()
       }
+    },
+    watch: {
+      email (val) {
+        this._handlerEmail(val)
+        // Check mailbox index initialization
+        this.activeIndex = null
+      },
+      activeList (val) {
+        this.activeListL = _.cloneDeep(val)
+      },
+      activeListL (val) {
+        if (!_.isEqual(val, this.activeList)) {
+          this.$emit('valueEvent', val)
+        }
+      }
+    },
+    created () {
+
+    },
+    mounted () {
+      setTimeout(() => {
+        // Processing width
+        this._handlerEmailWitch()
+      }, 500)
+
+      // Input method judgment
+      $('.email-input').on('input', function () {
+        // Chinese input is not truncated
+        if ($(this).prop('comStart')) return
+        this.isCn = false
+      }).on('compositionstart', () => {
+        $(this).prop('comStart', true)
+        // Check mailbox index initialization
+        this.activeIndex = null
+        this.isCn = true
+      }).on('compositionend', () => {
+        $(this).prop('comStart', false)
+        // Check mailbox index initialization
+        this.activeIndex = null
+        this.isCn = false
+      })
     }
-  },
-  created () {
-
-  },
-  mounted () {
-    setTimeout(() => {
-      // Processing width
-      this._handlerEmailWitch()
-    }, 500)
-
-    // Input method judgment
-    $('.email-input').on('input', function () {
-      // Chinese input is not truncated
-      if ($(this).prop('comStart')) return
-      this.isCn = false
-    }).on('compositionstart', () => {
-      $(this).prop('comStart', true)
-      // Check mailbox index initialization
-      this.activeIndex = null
-      this.isCn = true
-    }).on('compositionend', () => {
-      $(this).prop('comStart', false)
-      // Check mailbox index initialization
-      this.activeIndex = null
-      this.isCn = false
-    })
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

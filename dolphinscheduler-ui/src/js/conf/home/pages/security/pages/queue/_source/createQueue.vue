@@ -53,107 +53,107 @@
   </m-popup>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import store from '@/conf/home/store'
-import mPopup from '@/module/components/popup/popup'
-import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import store from '@/conf/home/store'
+  import mPopup from '@/module/components/popup/popup'
+  import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-export default {
-  name: 'create-tenement',
-  data () {
-    return {
-      store,
-      queue: '',
-      queueName: ''
-    }
-  },
-  props: {
-    item: Object
-  },
-  methods: {
-    _ok () {
-      if (!this._verification()) {
-        return
+  export default {
+    name: 'create-tenement',
+    data () {
+      return {
+        store,
+        queue: '',
+        queueName: ''
       }
+    },
+    props: {
+      item: Object
+    },
+    methods: {
+      _ok () {
+        if (!this._verification()) {
+          return
+        }
 
-      const param = {
-        queue: _.trim(this.queue),
-        queueName: _.trim(this.queueName)
-      }
-      // edit
-      if (this.item) {
-        param.id = this.item.id
-      }
+        let param = {
+          queue: _.trim(this.queue),
+          queueName: _.trim(this.queueName)
+        }
+        // edit
+        if (this.item) {
+          param.id = this.item.id
+        }
 
-      const $then = (res) => {
-        this.$emit('onUpdate')
-        this.$message.success(res.msg)
-        setTimeout(() => {
+        let $then = (res) => {
+          this.$emit('onUpdate')
+          this.$message.success(res.msg)
+          setTimeout(() => {
+            this.$refs.popup.spinnerLoading = false
+          }, 800)
+        }
+
+        let $catch = (e) => {
+          this.$message.error(e.msg || '')
           this.$refs.popup.spinnerLoading = false
-        }, 800)
-      }
+        }
 
-      const $catch = (e) => {
-        this.$message.error(e.msg || '')
-        this.$refs.popup.spinnerLoading = false
-      }
-
-      if (this.item) {
-        this.$refs.popup.spinnerLoading = true
-        this.store.dispatch('security/updateQueueQ', param).then(res => {
-          $then(res)
-        }).catch(e => {
-          $catch(e)
-        })
-      } else {
-        this._verifyName(param).then(() => {
+        if (this.item) {
           this.$refs.popup.spinnerLoading = true
-          this.store.dispatch('security/createQueueQ', param).then(res => {
+          this.store.dispatch('security/updateQueueQ', param).then(res => {
             $then(res)
           }).catch(e => {
             $catch(e)
           })
-        }).catch(e => {
-          this.$message.error(e.msg || '')
+        } else {
+          this._verifyName(param).then(() => {
+            this.$refs.popup.spinnerLoading = true
+            this.store.dispatch('security/createQueueQ', param).then(res => {
+              $then(res)
+            }).catch(e => {
+              $catch(e)
+            })
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
+        }
+      },
+      _verification () {
+        if (!this.queueName.replace(/\s*/g, '')) {
+          this.$message.warning(`${i18n.$t('Please enter name')}`)
+          return false
+        }
+        if (!this.queue.replace(/\s*/g, '')) {
+          this.$message.warning(`${i18n.$t('Please enter queue value')}`)
+          return false
+        }
+        return true
+      },
+      _verifyName (param) {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/verifyQueueQ', param).then(res => {
+            resolve()
+          }).catch(e => {
+            reject(e)
+          })
         })
+      },
+      close () {
+        this.$emit('close')
       }
     },
-    _verification () {
-      if (!this.queueName.replace(/\s*/g, '')) {
-        this.$message.warning(`${i18n.$t('Please enter name')}`)
-        return false
-      }
-      if (!this.queue.replace(/\s*/g, '')) {
-        this.$message.warning(`${i18n.$t('Please enter queue value')}`)
-        return false
-      }
-      return true
+    watch: {
     },
-    _verifyName (param) {
-      return new Promise((resolve, reject) => {
-        this.store.dispatch('security/verifyQueueQ', param).then(res => {
-          resolve()
-        }).catch(e => {
-          reject(e)
-        })
-      })
+    created () {
+      if (this.item) {
+        this.queueName = this.item.queueName
+        this.queue = this.item.queue
+      }
     },
-    close () {
-      this.$emit('close')
-    }
-  },
-  watch: {
-  },
-  created () {
-    if (this.item) {
-      this.queueName = this.item.queueName
-      this.queue = this.item.queue
-    }
-  },
-  mounted () {
+    mounted () {
 
-  },
-  components: { mPopup, mListBoxF }
-}
+    },
+    components: { mPopup, mListBoxF }
+  }
 </script>

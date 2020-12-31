@@ -27,21 +27,21 @@
   </div>
 </template>
 <script>
-import { syntaxHighlight } from '@/module/util/util'
+  import { syntaxHighlight } from '@/module/util/util'
 
-export default {
-  name: 'tooltips',
-  data () {
-    return {}
-  },
-  props: {
-    JSON: String,
-    id: Number
-  },
-  mounted () {
-    $(`#result-${this.id}`).html(syntaxHighlight(this.JSON))
+  export default {
+    name: 'tooltips',
+    data () {
+      return {}
+    },
+    props: {
+      JSON: String,
+      id: Number
+    },
+    mounted () {
+      $(`#result-${this.id}`).html(syntaxHighlight(this.JSON))
+    }
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

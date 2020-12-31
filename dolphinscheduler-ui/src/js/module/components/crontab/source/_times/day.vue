@@ -131,258 +131,258 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '../_source/i18n'
-import { selectList, isStr, isWeek } from '../util/index'
-import mInputNumber from '../_source/input-number'
+  import _ from 'lodash'
+  import i18n from '../_source/i18n'
+  import { selectList, isStr, isWeek } from '../util/index'
+  import mInputNumber from '../_source/input-number'
 
-export default {
-  name: 'day',
-  mixins: [i18n],
-  data () {
-    return {
-      radioDay: 'everyDay',
-      dayValue: '*',
-      weekValue: '?',
-      everyDayVal: '*',
-      WkintervalWeekPerformVal: 2, // Every few days
-      WkintervalWeekStartVal: 2, // What day of the week
-      selectWeekList: _.map(_.cloneDeep(selectList.week), v => {
-        return {
-          value: v.value,
-          label: `${this.$t(v.label)}`
+  export default {
+    name: 'day',
+    mixins: [i18n],
+    data () {
+      return {
+        radioDay: 'everyDay',
+        dayValue: '*',
+        weekValue: '?',
+        everyDayVal: '*',
+        WkintervalWeekPerformVal: 2, // Every few days
+        WkintervalWeekStartVal: 2, // What day of the week
+        selectWeekList: _.map(_.cloneDeep(selectList.week), v => {
+          return {
+            value: v.value,
+            label: `${this.$t(v.label)}`
+          }
+        }),
+        intervalDayPerformVal: 1, // Every other day
+        intervalDayStartVal: 1, // From the day
+        WkspecificWeekVal: [], // Specific day of the week
+        selectSpecificWeekList: selectList.specificWeek,
+        WkspecificDayVal: [], // Specific day of the week
+        selectSpecificDayList: selectList.day,
+        monthLastDaysVal: 'L',
+        monthLastWorkingDays: 'LW',
+        monthLastWeeksVal: '?',
+        monthLastWeeksList: _.map(_.cloneDeep(selectList.lastWeeks), v => {
+          return {
+            value: v.value,
+            label: `${this.$t(v.label)}`
+          }
+        }),
+        monthTailBeforeVal: 1,
+        recentlyWorkingDaysMonthVal: 1,
+        WkmonthNumWeeksDayVal: 1,
+        WkmonthNumWeeksWeekVal: 1,
+        WkmonthNumWeeksWeekList: _.map(_.cloneDeep(selectList.week), v => {
+          return {
+            value: v.value,
+            label: `${this.$t(v.label)}`
+          }
+        })
+      }
+    },
+    props: {
+      dayVal: String,
+      weekVal: String
+    },
+    methods: {
+      // Every few weeks
+      onWkintervalWeekPerform (val) {
+        this.WkintervalWeekPerformVal = val
+        if (this.radioDay === 'WkintervalWeek') {
+          this.dayValue = '?'
+          this.weekValue = `${this.WkintervalWeekStartVal}/${this.WkintervalWeekPerformVal}`
         }
-      }),
-      intervalDayPerformVal: 1, // Every other day
-      intervalDayStartVal: 1, // From the day
-      WkspecificWeekVal: [], // Specific day of the week
-      selectSpecificWeekList: selectList.specificWeek,
-      WkspecificDayVal: [], // Specific day of the week
-      selectSpecificDayList: selectList.day,
-      monthLastDaysVal: 'L',
-      monthLastWorkingDays: 'LW',
-      monthLastWeeksVal: '?',
-      monthLastWeeksList: _.map(_.cloneDeep(selectList.lastWeeks), v => {
-        return {
-          value: v.value,
-          label: `${this.$t(v.label)}`
+      },
+      // Every other day
+      onIntervalDayPerform (val) {
+        this.intervalDayPerformVal = val
+        if (this.radioDay === 'intervalDay') {
+          this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
         }
-      }),
-      monthTailBeforeVal: 1,
-      recentlyWorkingDaysMonthVal: 1,
-      WkmonthNumWeeksDayVal: 1,
-      WkmonthNumWeeksWeekVal: 1,
-      WkmonthNumWeeksWeekList: _.map(_.cloneDeep(selectList.week), v => {
-        return {
-          value: v.value,
-          label: `${this.$t(v.label)}`
+      },
+      // From week day
+      onIntervalDayStart (val) {
+        this.intervalDayStartVal = val
+        if (this.radioDay === 'intervalDay') {
+          this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
         }
-      })
-    }
-  },
-  props: {
-    dayVal: String,
-    weekVal: String
-  },
-  methods: {
-    // Every few weeks
-    onWkintervalWeekPerform (val) {
-      this.WkintervalWeekPerformVal = val
-      if (this.radioDay === 'WkintervalWeek') {
-        this.dayValue = '?'
+      },
+      // By the end of this month
+      onMonthTailBefore (val) {
+        this.monthTailBeforeVal = val
+        if (this.radioDay === 'monthTailBefore') {
+          this.dayValue = `L-${this.monthTailBeforeVal}`
+        }
+      },
+      // Last working day
+      onRecentlyWorkingDaysMonth (val) {
+        this.recentlyWorkingDaysMonthVal = val
+        if (this.radioDay === 'recentlyWorkingDaysMonth') {
+          this.dayValue = `${this.recentlyWorkingDaysMonthVal}W`
+        }
+      },
+      // On the day of this month
+      onWkmonthNumWeeksDay (val) {
+        this.WkmonthNumWeeksDayVal = val
+        this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
+      },
+
+      // Reset every day
+      everyDayReset () {
+        this.dayValue = _.cloneDeep(this.everyDayVal)
+      },
+      // Reset interval week starts from *
+      WkintervalWeekReset () {
         this.weekValue = `${this.WkintervalWeekStartVal}/${this.WkintervalWeekPerformVal}`
-      }
-    },
-    // Every other day
-    onIntervalDayPerform (val) {
-      this.intervalDayPerformVal = val
-      if (this.radioDay === 'intervalDay') {
+      },
+      // Reset interval days from *
+      intervalDayReset () {
         this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
-      }
-    },
-    // From week day
-    onIntervalDayStart (val) {
-      this.intervalDayStartVal = val
-      if (this.radioDay === 'intervalDay') {
-        this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
-      }
-    },
-    // By the end of this month
-    onMonthTailBefore (val) {
-      this.monthTailBeforeVal = val
-      if (this.radioDay === 'monthTailBefore') {
+      },
+      // Specific week (multiple choices)
+      WkspecificWeekReset () {
+        this.weekValue = this.WkspecificWeekVal.length ? this.WkspecificWeekVal.join(',') : '*'
+      },
+      // Specific days (multiple choices)
+      specificDayReset () {
+        this.dayValue = this.WkspecificDayVal.length ? this.WkspecificDayVal.join(',') : '*'
+      },
+      // On the last day of the month
+      monthLastDaysReset () {
+        this.dayValue = _.cloneDeep(this.monthLastDaysVal)
+      },
+      // On the last working day of the month
+      monthLastWorkingDaysReset () {
+        this.dayValue = _.cloneDeep(this.monthLastWorkingDays)
+      },
+      // At the end of the month*
+      monthLastWeeksReset () {
+        this.dayValue = _.cloneDeep(this.monthLastWeeksVal)
+      },
+      // By the end of this month
+      monthTailBeforeReset () {
         this.dayValue = `L-${this.monthTailBeforeVal}`
-      }
-    },
-    // Last working day
-    onRecentlyWorkingDaysMonth (val) {
-      this.recentlyWorkingDaysMonthVal = val
-      if (this.radioDay === 'recentlyWorkingDaysMonth') {
+      },
+      // Last working day (Monday to Friday) to this month
+      recentlyWorkingDaysMonthReset () {
         this.dayValue = `${this.recentlyWorkingDaysMonthVal}W`
+      },
+      // On the day of this month
+      WkmonthNumReset () {
+        this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
       }
     },
-    // On the day of this month
-    onWkmonthNumWeeksDay (val) {
-      this.WkmonthNumWeeksDayVal = val
-      this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
-    },
-
-    // Reset every day
-    everyDayReset () {
-      this.dayValue = _.cloneDeep(this.everyDayVal)
-    },
-    // Reset interval week starts from *
-    WkintervalWeekReset () {
-      this.weekValue = `${this.WkintervalWeekStartVal}/${this.WkintervalWeekPerformVal}`
-    },
-    // Reset interval days from *
-    intervalDayReset () {
-      this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
-    },
-    // Specific week (multiple choices)
-    WkspecificWeekReset () {
-      this.weekValue = this.WkspecificWeekVal.length ? this.WkspecificWeekVal.join(',') : '*'
-    },
-    // Specific days (multiple choices)
-    specificDayReset () {
-      this.dayValue = this.WkspecificDayVal.length ? this.WkspecificDayVal.join(',') : '*'
-    },
-    // On the last day of the month
-    monthLastDaysReset () {
-      this.dayValue = _.cloneDeep(this.monthLastDaysVal)
-    },
-    // On the last working day of the month
-    monthLastWorkingDaysReset () {
-      this.dayValue = _.cloneDeep(this.monthLastWorkingDays)
-    },
-    // At the end of the month*
-    monthLastWeeksReset () {
-      this.dayValue = _.cloneDeep(this.monthLastWeeksVal)
-    },
-    // By the end of this month
-    monthTailBeforeReset () {
-      this.dayValue = `L-${this.monthTailBeforeVal}`
-    },
-    // Last working day (Monday to Friday) to this month
-    recentlyWorkingDaysMonthReset () {
-      this.dayValue = `${this.recentlyWorkingDaysMonthVal}W`
-    },
-    // On the day of this month
-    WkmonthNumReset () {
-      this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
-    }
-  },
-  watch: {
-    dayValue (val) {
-      this.$emit('on-day-value', val)
-      // console.log('dayValue=>  ' + val)
-    },
-    weekValue (val) {
-      this.$emit('on-week-value', val)
-      // console.log('weekValue=>  ' + val)
-    },
-    // Selected type
-    radioDay (val) {
-      switch (val) {
-        case 'everyDay':
-          this.weekValue = '?'
-          this.everyDayReset()
-          break
-        case 'WkintervalWeek':
+    watch: {
+      dayValue (val) {
+        this.$emit('on-day-value', val)
+        // console.log('dayValue=>  ' + val)
+      },
+      weekValue (val) {
+        this.$emit('on-week-value', val)
+        // console.log('weekValue=>  ' + val)
+      },
+      // Selected type
+      radioDay (val) {
+        switch (val) {
+          case 'everyDay':
+            this.weekValue = '?'
+            this.everyDayReset()
+            break
+          case 'WkintervalWeek':
+            this.dayValue = '?'
+            this.WkintervalWeekReset()
+            break
+          case 'intervalDay':
+            this.weekValue = '?'
+            this.intervalDayReset()
+            break
+          case 'WkspecificWeek':
+            this.dayValue = '?'
+            this.WkspecificWeekReset()
+            break
+          case 'specificDay':
+            this.weekValue = '?'
+            this.specificDayReset()
+            break
+          case 'monthLastDays':
+            this.weekValue = '?'
+            this.monthLastDaysReset()
+            break
+          case 'monthLastWorkingDays':
+            this.weekValue = '?'
+            this.monthLastWorkingDaysReset()
+            break
+          case 'monthLastWeeks':
+            this.weekValue = '1L'
+            this.monthLastWeeksReset()
+            break
+          case 'monthTailBefore':
+            this.weekValue = '?'
+            this.monthTailBeforeReset()
+            break
+          case 'recentlyWorkingDaysMonth':
+            this.weekValue = '?'
+            this.recentlyWorkingDaysMonthReset()
+            break
+          case 'WkmonthNumWeeks':
+            this.dayValue = '?'
+            this.WkmonthNumReset()
+            break
+        }
+      },
+      WkintervalWeekStartVal (val) {
+        if (this.radioDay === 'WkintervalWeek') {
           this.dayValue = '?'
-          this.WkintervalWeekReset()
-          break
-        case 'intervalDay':
-          this.weekValue = '?'
-          this.intervalDayReset()
-          break
-        case 'WkspecificWeek':
+          this.weekValue = `${val}/${this.WkintervalWeekPerformVal}`
+        }
+      },
+      // Specific day of the week (multiple choice)
+      WkspecificWeekVal (val) {
+        if (this.radioDay === 'WkspecificWeek') {
           this.dayValue = '?'
-          this.WkspecificWeekReset()
-          break
-        case 'specificDay':
+          this.weekValue = val.join(',')
+        }
+      },
+      // Specific days (multiple choices)
+      WkspecificDayVal (val) {
+        if (this.radioDay === 'specificDay') {
           this.weekValue = '?'
-          this.specificDayReset()
-          break
-        case 'monthLastDays':
-          this.weekValue = '?'
-          this.monthLastDaysReset()
-          break
-        case 'monthLastWorkingDays':
-          this.weekValue = '?'
-          this.monthLastWorkingDaysReset()
-          break
-        case 'monthLastWeeks':
-          this.weekValue = '1L'
-          this.monthLastWeeksReset()
-          break
-        case 'monthTailBefore':
-          this.weekValue = '?'
-          this.monthTailBeforeReset()
-          break
-        case 'recentlyWorkingDaysMonth':
-          this.weekValue = '?'
-          this.recentlyWorkingDaysMonthReset()
-          break
-        case 'WkmonthNumWeeks':
+          this.dayValue = val.join(',')
+        }
+      },
+      monthLastWeeksVal (val) {
+        if (this.radioDay === 'monthLastWeeks') {
+          this.weekValue = val
           this.dayValue = '?'
-          this.WkmonthNumReset()
-          break
+        }
+      },
+      WkmonthNumWeeksWeekVal (val) {
+        if (this.radioDay === 'WkmonthNumWeeks') {
+          this.dayValue = '?'
+          this.weekValue = `${val}#${this.WkmonthNumWeeksDayVal}`
+        }
       }
     },
-    WkintervalWeekStartVal (val) {
-      if (this.radioDay === 'WkintervalWeek') {
-        this.dayValue = '?'
-        this.weekValue = `${val}/${this.WkintervalWeekPerformVal}`
-      }
+    beforeCreate () {
     },
-    // Specific day of the week (multiple choice)
-    WkspecificWeekVal (val) {
-      if (this.radioDay === 'WkspecificWeek') {
-        this.dayValue = '?'
-        this.weekValue = val.join(',')
-      }
-    },
-    // Specific days (multiple choices)
-    WkspecificDayVal (val) {
-      if (this.radioDay === 'specificDay') {
-        this.weekValue = '?'
-        this.dayValue = val.join(',')
-      }
-    },
-    monthLastWeeksVal (val) {
-      if (this.radioDay === 'monthLastWeeks') {
-        this.weekValue = val
-        this.dayValue = '?'
-      }
-    },
-    WkmonthNumWeeksWeekVal (val) {
-      if (this.radioDay === 'WkmonthNumWeeks') {
-        this.dayValue = '?'
-        this.weekValue = `${val}#${this.WkmonthNumWeeksDayVal}`
-      }
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    const $dayVal = _.cloneDeep(this.dayVal)
-    const $weekVal = _.cloneDeep(this.weekVal)
-    const isWeek1 = $weekVal.indexOf('/') !== -1
-    const isWeek2 = $weekVal.indexOf('#') !== -1
+    created () {
+      let $dayVal = _.cloneDeep(this.dayVal)
+      let $weekVal = _.cloneDeep(this.weekVal)
+      let isWeek1 = $weekVal.indexOf('/') !== -1
+      let isWeek2 = $weekVal.indexOf('#') !== -1
 
-    // Initialization
-    if ($dayVal === '*' && $weekVal === '?') {
-      console.log('Initialization')
-      this.radioDay = 'everyDay'
-      return
-    }
+      // Initialization
+      if ($dayVal === '*' && $weekVal === '?') {
+        console.log('Initialization')
+        this.radioDay = 'everyDay'
+        return
+      }
 
-    // week
-    if (isWeek1 || isWeek2 || isWeek($weekVal)) {
-      this.dayValue = '?'
+      // week
+      if (isWeek1 || isWeek2 || isWeek($weekVal)) {
+        this.dayValue = '?'
 
-      /**
+        /**
          * Processing by sequence number (excluding days)
          * @param [
          * WkintervalWeek=>(/),
@@ -390,42 +390,42 @@ export default {
          * WkmonthNumWeeks=>(#)
          * ]
          */
-      const hanleWeekOne = () => {
-        console.log('1/3')
-        const a = isStr($weekVal, '/')
-        this.WkintervalWeekStartVal = parseInt(a[0])
-        this.WkintervalWeekPerformVal = parseInt(a[1])
-        this.dayValue = '?'
-        this.weekValue = `${this.WkintervalWeekPerformVal}/${this.WkintervalWeekStartVal}`
-        this.radioDay = 'WkintervalWeek'
-      }
+        let hanleWeekOne = () => {
+          console.log('1/3')
+          let a = isStr($weekVal, '/')
+          this.WkintervalWeekStartVal = parseInt(a[0])
+          this.WkintervalWeekPerformVal = parseInt(a[1])
+          this.dayValue = '?'
+          this.weekValue = `${this.WkintervalWeekPerformVal}/${this.WkintervalWeekStartVal}`
+          this.radioDay = 'WkintervalWeek'
+        }
 
-      const hanleWeekTwo = () => {
-        console.log('TUE,WED')
-        this.WkspecificWeekVal = $weekVal.split(',')
-        this.radioDay = 'WkspecificWeek'
-      }
+        let hanleWeekTwo = () => {
+          console.log('TUE,WED')
+          this.WkspecificWeekVal = $weekVal.split(',')
+          this.radioDay = 'WkspecificWeek'
+        }
 
-      const hanleWeekThree = () => {
-        console.log('6#5')
-        const a = isStr($weekVal, '#')
-        this.WkmonthNumWeeksWeekVal = parseInt(a[0])
-        this.WkmonthNumWeeksDayVal = parseInt(a[1])
-        this.radioDay = 'WkmonthNumWeeks'
-      }
+        let hanleWeekThree = () => {
+          console.log('6#5')
+          let a = isStr($weekVal, '#')
+          this.WkmonthNumWeeksWeekVal = parseInt(a[0])
+          this.WkmonthNumWeeksDayVal = parseInt(a[1])
+          this.radioDay = 'WkmonthNumWeeks'
+        }
 
-      // Processing week
-      if (isStr($weekVal, '/')) {
-        hanleWeekOne()
-      } else if (isStr($weekVal, '#')) {
-        hanleWeekThree()
-      } else if (isWeek($weekVal)) {
-        hanleWeekTwo()
-      }
-    } else {
-      this.weekValue = '?'
+        // Processing week
+        if (isStr($weekVal, '/')) {
+          hanleWeekOne()
+        } else if (isStr($weekVal, '#')) {
+          hanleWeekThree()
+        } else if (isWeek($weekVal)) {
+          hanleWeekTwo()
+        }
+      } else {
+        this.weekValue = '?'
 
-      /**
+        /**
          * Processing by sequence number (excluding week)
          * @param [
          * everyDay=>(*),
@@ -438,80 +438,80 @@ export default {
          * recentlyWorkingDaysMonth=>(6W)
          * ]
          */
-      const hanleDayOne = () => {
-        console.log('*')
+        const hanleDayOne = () => {
+          console.log('*')
+        }
+        const hanleDayTwo = () => {
+          console.log('1/1')
+          let a = isStr($dayVal, '/')
+          this.intervalDayStartVal = parseInt(a[0])
+          this.intervalDayPerformVal = parseInt(a[1])
+          this.radioDay = 'intervalDay'
+        }
+        const hanleDayThree = () => {
+          console.log('1,2,5,3,4')
+          this.WkspecificDayVal = $dayVal.split(',')
+          this.radioDay = 'specificDay'
+        }
+        const hanleDayFour = () => {
+          console.log('L')
+          this.radioDay = 'monthLastDays'
+        }
+        const hanleDayFive = () => {
+          console.log('LW')
+          this.radioDay = 'monthLastWorkingDays'
+        }
+        const hanleDaySix = () => {
+          console.log('3L')
+          this.monthLastWeeksVal = $dayVal
+          this.radioDay = 'monthLastWeeks'
+        }
+        const hanleDaySeven = () => {
+          console.log('L-4')
+          let a = isStr($dayVal, '-')
+          this.monthTailBeforeVal = parseInt(a[1])
+          this.radioDay = 'monthTailBefore'
+        }
+        const hanleDayEight = () => {
+          console.log('6W')
+          this.recentlyWorkingDaysMonthVal = parseInt($dayVal.slice(0, $dayVal.length - 1))
+          this.radioDay = 'recentlyWorkingDaysMonth'
+        }
+        if ($dayVal === '*') {
+          hanleDayOne()
+        } else if (isStr($dayVal, '/')) {
+          hanleDayTwo()
+        } else if ($dayVal === 'L') {
+          hanleDayFour()
+        } else if ($dayVal === 'LW') {
+          hanleDayFive()
+        } else if ($dayVal.charAt($dayVal.length - 1) === 'L') {
+          hanleDaySix()
+        } else if (isStr($dayVal, '-')) {
+          hanleDaySeven()
+        } else if ($dayVal.charAt($dayVal.length - 1) === 'W') {
+          hanleDayEight()
+        } else {
+          hanleDayThree()
+        }
       }
-      const hanleDayTwo = () => {
-        console.log('1/1')
-        const a = isStr($dayVal, '/')
-        this.intervalDayStartVal = parseInt(a[0])
-        this.intervalDayPerformVal = parseInt(a[1])
-        this.radioDay = 'intervalDay'
-      }
-      const hanleDayThree = () => {
-        console.log('1,2,5,3,4')
-        this.WkspecificDayVal = $dayVal.split(',')
-        this.radioDay = 'specificDay'
-      }
-      const hanleDayFour = () => {
-        console.log('L')
-        this.radioDay = 'monthLastDays'
-      }
-      const hanleDayFive = () => {
-        console.log('LW')
-        this.radioDay = 'monthLastWorkingDays'
-      }
-      const hanleDaySix = () => {
-        console.log('3L')
-        this.monthLastWeeksVal = $dayVal
-        this.radioDay = 'monthLastWeeks'
-      }
-      const hanleDaySeven = () => {
-        console.log('L-4')
-        const a = isStr($dayVal, '-')
-        this.monthTailBeforeVal = parseInt(a[1])
-        this.radioDay = 'monthTailBefore'
-      }
-      const hanleDayEight = () => {
-        console.log('6W')
-        this.recentlyWorkingDaysMonthVal = parseInt($dayVal.slice(0, $dayVal.length - 1))
-        this.radioDay = 'recentlyWorkingDaysMonth'
-      }
-      if ($dayVal === '*') {
-        hanleDayOne()
-      } else if (isStr($dayVal, '/')) {
-        hanleDayTwo()
-      } else if ($dayVal === 'L') {
-        hanleDayFour()
-      } else if ($dayVal === 'LW') {
-        hanleDayFive()
-      } else if ($dayVal.charAt($dayVal.length - 1) === 'L') {
-        hanleDaySix()
-      } else if (isStr($dayVal, '-')) {
-        hanleDaySeven()
-      } else if ($dayVal.charAt($dayVal.length - 1) === 'W') {
-        hanleDayEight()
-      } else {
-        hanleDayThree()
-      }
-    }
-  },
-  beforeMount () {
-  },
-  mounted () {
+    },
+    beforeMount () {
+    },
+    mounted () {
 
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mInputNumber }
-}
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mInputNumber }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

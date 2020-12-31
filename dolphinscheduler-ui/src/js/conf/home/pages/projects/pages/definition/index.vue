@@ -18,7 +18,7 @@
   <router-view></router-view>
 </template>
 <script>
-export default {
-  name: 'process-definition-index'
-}
+  export default {
+    name: 'process-definition-index'
+  }
 </script>

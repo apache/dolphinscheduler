@@ -159,212 +159,212 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import mEmail from './email.vue'
-import store from '@/conf/home/store'
-import { warningTypeList } from './util'
-import { vCrontab } from '@/module/components/crontab/index'
-import { formatDate } from '@/module/filter/filter'
-import mPriority from '@/module/components/priority/priority'
-import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import mEmail from './email.vue'
+  import store from '@/conf/home/store'
+  import { warningTypeList } from './util'
+  import { vCrontab } from '@/module/components/crontab/index'
+  import { formatDate } from '@/module/filter/filter'
+  import mPriority from '@/module/components/priority/priority'
+  import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
-export default {
-  name: 'timing-process',
-  data () {
-    return {
-      store,
-      processDefinitionId: 0,
-      failureStrategy: 'CONTINUE',
-      warningTypeList: warningTypeList,
-      warningType: 'NONE',
-      notifyGroupList: [],
-      warningGroupId: '',
-      spinnerLoading: false,
-      scheduleTime: '',
-      crontab: '0 0 * * * ? *',
-      cronPopover: false,
-      receivers: [],
-      receiversCc: [],
-      i18n: i18n.globalScope.LOCALE,
-      processInstancePriority: 'MEDIUM',
-      workerGroup: '',
-      previewTimes: []
-    }
-  },
-  props: {
-    timingData: Object
-  },
-  methods: {
-    _datepicker (val) {
-      this.scheduleTime = val
+  export default {
+    name: 'timing-process',
+    data () {
+      return {
+        store,
+        processDefinitionId: 0,
+        failureStrategy: 'CONTINUE',
+        warningTypeList: warningTypeList,
+        warningType: 'NONE',
+        notifyGroupList: [],
+        warningGroupId: '',
+        spinnerLoading: false,
+        scheduleTime: '',
+        crontab: '0 0 * * * ? *',
+        cronPopover: false,
+        receivers: [],
+        receiversCc: [],
+        i18n: i18n.globalScope.LOCALE,
+        processInstancePriority: 'MEDIUM',
+        workerGroup: '',
+        previewTimes: []
+      }
     },
-    _verification () {
-      if (!this.scheduleTime) {
-        this.$message.warning(`${i18n.$t('Please select time')}`)
-        return false
-      }
-
-      if (this.scheduleTime[0] === this.scheduleTime[1]) {
-        this.$message.warning(`${i18n.$t('The start time must not be the same as the end')}`)
-        return false
-      }
-
-      if (!this.crontab) {
-        this.$message.warning(`${i18n.$t('Please enter crontab')}`)
-        return false
-      }
-      return true
+    props: {
+      timingData: Object
     },
-    _timing () {
-      if (this._verification()) {
-        let api = ''
-        const searchParams = {
-          schedule: JSON.stringify({
-            startTime: this.scheduleTime[0],
-            endTime: this.scheduleTime[1],
-            crontab: this.crontab
-          }),
-          failureStrategy: this.failureStrategy,
-          warningType: this.warningType,
-          processInstancePriority: this.processInstancePriority,
-          warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
-          receivers: this.receivers.join(',') || '',
-          receiversCc: this.receiversCc.join(',') || '',
-          workerGroup: this.workerGroup
+    methods: {
+      _datepicker (val) {
+        this.scheduleTime = val
+      },
+      _verification () {
+        if (!this.scheduleTime) {
+          this.$message.warning(`${i18n.$t('Please select time')}`)
+          return false
         }
-        let msg = ''
 
-        // edit
-        if (this.timingData.item.crontab) {
-          api = 'dag/updateSchedule'
-          searchParams.id = this.timingData.item.id
-          msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
+        if (this.scheduleTime[0] === this.scheduleTime[1]) {
+          this.$message.warning(`${i18n.$t('The start time must not be the same as the end')}`)
+          return false
+        }
+
+        if (!this.crontab) {
+          this.$message.warning(`${i18n.$t('Please enter crontab')}`)
+          return false
+        }
+        return true
+      },
+      _timing () {
+        if (this._verification()) {
+          let api = ''
+          let searchParams = {
+            schedule: JSON.stringify({
+              startTime: this.scheduleTime[0],
+              endTime: this.scheduleTime[1],
+              crontab: this.crontab
+            }),
+            failureStrategy: this.failureStrategy,
+            warningType: this.warningType,
+            processInstancePriority: this.processInstancePriority,
+            warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
+            receivers: this.receivers.join(',') || '',
+            receiversCc: this.receiversCc.join(',') || '',
+            workerGroup: this.workerGroup
+          }
+          let msg = ''
+
+          // edit
+          if (this.timingData.item.crontab) {
+            api = 'dag/updateSchedule'
+            searchParams.id = this.timingData.item.id
+            msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
+          } else {
+            api = 'dag/createSchedule'
+            searchParams.processDefinitionId = this.timingData.item.id
+            msg = `${i18n.$t('Create')}${i18n.$t('success')}`
+          }
+
+          this.store.dispatch(api, searchParams).then(res => {
+            this.$message.success(msg)
+            this.$emit('onUpdateTiming')
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
+        }
+      },
+
+      _preview () {
+        if (this._verification()) {
+          let api = 'dag/previewSchedule'
+          let searchParams = {
+            schedule: JSON.stringify({
+              startTime: this.scheduleTime[0],
+              endTime: this.scheduleTime[1],
+              crontab: this.crontab
+            })
+          }
+
+          this.store.dispatch(api, searchParams).then(res => {
+            if (res.length) {
+              this.previewTimes = res
+            } else {
+              this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
+            }
+          })
+        }
+      },
+
+      _getNotifyGroupList () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('dag/getNotifyGroupList').then(res => {
+            this.notifyGroupList = res
+            if (this.notifyGroupList.length) {
+              resolve()
+            } else {
+              reject(new Error(0))
+            }
+          })
+        })
+      },
+      ok () {
+        this._timing()
+      },
+      close () {
+        this.$emit('closeTiming')
+      },
+      preview () {
+        this._preview()
+      }
+    },
+    watch: {
+    },
+    created () {
+      if (this.timingData.item.workerGroup === undefined) {
+        let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+        if (stateWorkerGroupsList.length) {
+          this.workerGroup = stateWorkerGroupsList[0].id
         } else {
-          api = 'dag/createSchedule'
-          searchParams.processDefinitionId = this.timingData.item.id
-          msg = `${i18n.$t('Create')}${i18n.$t('success')}`
-        }
-
-        this.store.dispatch(api, searchParams).then(res => {
-          this.$message.success(msg)
-          this.$emit('onUpdateTiming')
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
-      }
-    },
-
-    _preview () {
-      if (this._verification()) {
-        const api = 'dag/previewSchedule'
-        const searchParams = {
-          schedule: JSON.stringify({
-            startTime: this.scheduleTime[0],
-            endTime: this.scheduleTime[1],
-            crontab: this.crontab
+          this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+            this.$nextTick(() => {
+              this.workerGroup = res[0].id
+            })
           })
         }
-
-        this.store.dispatch(api, searchParams).then(res => {
-          if (res.length) {
-            this.previewTimes = res
-          } else {
-            this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
-          }
-        })
-      }
-    },
-
-    _getNotifyGroupList () {
-      return new Promise((resolve, reject) => {
-        this.store.dispatch('dag/getNotifyGroupList').then(res => {
-          this.notifyGroupList = res
-          if (this.notifyGroupList.length) {
-            resolve()
-          } else {
-            reject(new Error(0))
-          }
-        })
-      })
-    },
-    ok () {
-      this._timing()
-    },
-    close () {
-      this.$emit('closeTiming')
-    },
-    preview () {
-      this._preview()
-    }
-  },
-  watch: {
-  },
-  created () {
-    if (this.timingData.item.workerGroup === undefined) {
-      const stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
-      if (stateWorkerGroupsList.length) {
-        this.workerGroup = stateWorkerGroupsList[0].id
       } else {
-        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+        this.workerGroup = this.timingData.item.workerGroup
+      }
+      if (this.timingData.item.crontab !== null) {
+        this.crontab = this.timingData.item.crontab
+      }
+      if (this.timingData.type === 'timing') {
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        if (month < 10) {
+          month = '0' + month
+        }
+        if (day < 10) {
+          day = '0' + day
+        }
+        let startDate = year + '-' + month + '-' + day + ' ' + '00:00:00'
+        let endDate = (year + 100) + '-' + month + '-' + day + ' ' + '00:00:00'
+        let times = []
+        times[0] = startDate
+        times[1] = endDate
+        this.crontab = '0 0 * * * ? *'
+        this.scheduleTime = times
+      }
+      this.receivers = _.cloneDeep(this.timingData.receiversD)
+      this.receiversCc = _.cloneDeep(this.timingData.receiversCcD)
+    },
+    mounted () {
+      let item = this.timingData.item
+      // Determine whether to echo
+      if (this.timingData.item.crontab) {
+        this.crontab = item.crontab
+        this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
+        this.failureStrategy = item.failureStrategy
+        this.warningType = item.warningType
+        this.processInstancePriority = item.processInstancePriority
+        this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
-            this.workerGroup = res[0].id
+            // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
+            this.warningGroupId = item.warningGroupId
           })
-        })
+        }).catch(() => { this.warningGroupId = '' })
+      } else {
+        this._getNotifyGroupList().then(() => {
+          this.$nextTick(() => {
+            this.warningGroupId = ''
+          })
+        }).catch(() => { this.warningGroupId = '' })
       }
-    } else {
-      this.workerGroup = this.timingData.item.workerGroup
-    }
-    if (this.timingData.item.crontab !== null) {
-      this.crontab = this.timingData.item.crontab
-    }
-    if (this.timingData.type === 'timing') {
-      const date = new Date()
-      const year = date.getFullYear()
-      let month = date.getMonth() + 1
-      let day = date.getDate()
-      if (month < 10) {
-        month = '0' + month
-      }
-      if (day < 10) {
-        day = '0' + day
-      }
-      const startDate = year + '-' + month + '-' + day + ' ' + '00:00:00'
-      const endDate = (year + 100) + '-' + month + '-' + day + ' ' + '00:00:00'
-      const times = []
-      times[0] = startDate
-      times[1] = endDate
-      this.crontab = '0 0 * * * ? *'
-      this.scheduleTime = times
-    }
-    this.receivers = _.cloneDeep(this.timingData.receiversD)
-    this.receiversCc = _.cloneDeep(this.timingData.receiversCcD)
-  },
-  mounted () {
-    const item = this.timingData.item
-    // Determine whether to echo
-    if (this.timingData.item.crontab) {
-      this.crontab = item.crontab
-      this.scheduleTime = [formatDate(item.startTime), formatDate(item.endTime)]
-      this.failureStrategy = item.failureStrategy
-      this.warningType = item.warningType
-      this.processInstancePriority = item.processInstancePriority
-      this._getNotifyGroupList().then(() => {
-        this.$nextTick(() => {
-          // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
-          this.warningGroupId = item.warningGroupId
-        })
-      }).catch(() => { this.warningGroupId = '' })
-    } else {
-      this._getNotifyGroupList().then(() => {
-        this.$nextTick(() => {
-          this.warningGroupId = ''
-        })
-      }).catch(() => { this.warningGroupId = '' })
-    }
-  },
-  components: { vCrontab, mEmail, mPriority, mWorkerGroups }
-}
+    },
+    components: { vCrontab, mEmail, mPriority, mWorkerGroups }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

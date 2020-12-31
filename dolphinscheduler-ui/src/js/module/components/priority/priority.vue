@@ -31,74 +31,74 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import disabledState from '@/module/mixin/disabledState'
+  import _ from 'lodash'
+  import disabledState from '@/module/mixin/disabledState'
 
-export default {
-  name: 'priority',
-  data () {
-    return {
-      selectedValue: this.value,
-      priorityList: [
-        {
-          code: 'HIGHEST',
-          unicode: 'el-icon-top',
-          color: '#ff0000'
-        },
-        {
-          code: 'HIGH',
-          unicode: 'el-icon-top',
-          color: '#ff0000'
-        },
-        {
-          code: 'MEDIUM',
-          unicode: 'el-icon-top',
-          color: '#EA7D24'
-        },
-        {
-          code: 'LOW',
-          unicode: 'el-icon-bottom',
-          color: '#2A8734'
-        },
-        {
-          code: 'LOWEST',
-          unicode: 'el-icon-bottom',
-          color: '#2A8734'
-        }
-      ]
-    }
-  },
-  props: {
-    value: {
-      type: String,
-      default: 'MEDIUM'
-    }
-  },
-  mixins: [disabledState],
-  model: {
-    prop: 'value',
-    event: 'priorityEvent'
-  },
-  methods: {
-    _rtUnicode (value) {
-      const o = _.find(this.priorityList, ['code', value])
-      return `<em class="${o.unicode}" style="color:${o.color}"></em>`
+  export default {
+    name: 'priority',
+    data () {
+      return {
+        selectedValue: this.value,
+        priorityList: [
+          {
+            code: 'HIGHEST',
+            unicode: 'el-icon-top',
+            color: '#ff0000'
+          },
+          {
+            code: 'HIGH',
+            unicode: 'el-icon-top',
+            color: '#ff0000'
+          },
+          {
+            code: 'MEDIUM',
+            unicode: 'el-icon-top',
+            color: '#EA7D24'
+          },
+          {
+            code: 'LOW',
+            unicode: 'el-icon-bottom',
+            color: '#2A8734'
+          },
+          {
+            code: 'LOWEST',
+            unicode: 'el-icon-bottom',
+            color: '#2A8734'
+          }
+        ]
+      }
     },
-    _onChange (o) {
-      this.$emit('priorityEvent', o)
-    }
-  },
-  watch: {
-    value (val) {
-      this.selectedValue = val
-    }
-  },
-  created () {
-  },
-  mounted () {
-  },
-  components: {}
-}
+    props: {
+      value: {
+        type: String,
+        default: 'MEDIUM'
+      }
+    },
+    mixins: [disabledState],
+    model: {
+      prop: 'value',
+      event: 'priorityEvent'
+    },
+    methods: {
+      _rtUnicode (value) {
+        let o = _.find(this.priorityList, ['code', value])
+        return `<em class="${o.unicode}" style="color:${o.color}"></em>`
+      },
+      _onChange (o) {
+        this.$emit('priorityEvent', o)
+      }
+    },
+    watch: {
+      value (val) {
+        this.selectedValue = val
+      }
+    },
+    created () {
+    },
+    mounted () {
+    },
+    components: {}
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

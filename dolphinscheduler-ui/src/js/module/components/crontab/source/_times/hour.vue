@@ -59,196 +59,196 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '../_source/i18n'
-import { selectList, isStr } from '../util/index'
-import mInputNumber from '../_source/input-number'
+  import _ from 'lodash'
+  import i18n from '../_source/i18n'
+  import { selectList, isStr } from '../util/index'
+  import mInputNumber from '../_source/input-number'
 
-export default {
-  name: 'hour',
-  mixins: [i18n],
-  data () {
-    return {
-      hourValue: '*',
-      radioHour: 'everyHour',
-      selectHourList: selectList['24'],
-      intervalPerformVal: 5,
-      intervalStartVal: 3,
-      specificHoursVal: [],
-      cycleStartVal: 1,
-      cycleEndVal: 1
-    }
-  },
-  props: {
-    hourVal: String,
-    value: {
-      type: String,
-      default: '*'
-    }
-  },
-  model: {
-    prop: 'value',
-    event: 'hourValueEvent'
-  },
-  methods: {
-    // Interval execution time（1）
-    onIntervalPerform (val) {
-      this.intervalPerformVal = val
-      if (this.radioHour === 'intervalHour') {
-        this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+  export default {
+    name: 'hour',
+    mixins: [i18n],
+    data () {
+      return {
+        hourValue: '*',
+        radioHour: 'everyHour',
+        selectHourList: selectList['24'],
+        intervalPerformVal: 5,
+        intervalStartVal: 3,
+        specificHoursVal: [],
+        cycleStartVal: 1,
+        cycleEndVal: 1
       }
     },
-    // Interval start time（2）
-    onIntervalStart (val) {
-      this.intervalStartVal = val
-      if (this.radioHour === 'intervalHour') {
-        this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+    props: {
+      hourVal: String,
+      value: {
+        type: String,
+        default: '*'
       }
     },
-    // Specific hours
-    onspecificHours (arr) {
+    model: {
+      prop: 'value',
+      event: 'hourValueEvent'
     },
-    // Cycle start value
-    onCycleStart (val) {
-      this.cycleStartVal = val
-      if (this.radioHour === 'cycleHour') {
-        this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-      }
-    },
-    // Cycle end value
-    onCycleEnd (val) {
-      this.cycleEndVal = val
-      if (this.radioHour === 'cycleHour') {
-        this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-      }
-    },
-    // Reset every hour
-    everyReset () {
-      this.hourValue = '*'
-    },
-    // Reset interval hours
-    intervalReset () {
-      this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
-    },
-    // Reset specific hours
-    specificReset () {
-      if (this.specificHoursVal.length) {
-        this.hourValue = this.specificHoursVal.join(',')
-      } else {
+    methods: {
+      // Interval execution time（1）
+      onIntervalPerform (val) {
+        this.intervalPerformVal = val
+        if (this.radioHour === 'intervalHour') {
+          this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+        }
+      },
+      // Interval start time（2）
+      onIntervalStart (val) {
+        this.intervalStartVal = val
+        if (this.radioHour === 'intervalHour') {
+          this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+        }
+      },
+      // Specific hours
+      onspecificHours (arr) {
+      },
+      // Cycle start value
+      onCycleStart (val) {
+        this.cycleStartVal = val
+        if (this.radioHour === 'cycleHour') {
+          this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+        }
+      },
+      // Cycle end value
+      onCycleEnd (val) {
+        this.cycleEndVal = val
+        if (this.radioHour === 'cycleHour') {
+          this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+        }
+      },
+      // Reset every hour
+      everyReset () {
         this.hourValue = '*'
-      }
-    },
-    // Reset cycle hours
-    cycleReset () {
-      this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
-    },
-    /**
+      },
+      // Reset interval hours
+      intervalReset () {
+        this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+      },
+      // Reset specific hours
+      specificReset () {
+        if (this.specificHoursVal.length) {
+          this.hourValue = this.specificHoursVal.join(',')
+        } else {
+          this.hourValue = '*'
+        }
+      },
+      // Reset cycle hours
+      cycleReset () {
+        this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
+      },
+      /**
        * Parse parameter value
        */
-    analyticalValue () {
-      return new Promise((resolve, reject) => {
-        const $hourVal = _.cloneDeep(this.value)
-        // Interval hour
-        const $interval = isStr($hourVal, '/')
-        // Specific hours
-        const $specific = isStr($hourVal, ',')
-        // Cycle hour
-        const $cycle = isStr($hourVal, '-')
+      analyticalValue () {
+        return new Promise((resolve, reject) => {
+          let $hourVal = _.cloneDeep(this.value)
+          // Interval hour
+          let $interval = isStr($hourVal, '/')
+          // Specific hours
+          let $specific = isStr($hourVal, ',')
+          // Cycle hour
+          let $cycle = isStr($hourVal, '-')
 
-        // Every hour
-        if ($hourVal === '*') {
-          this.radioHour = 'everyHour'
-          this.hourValue = '*'
-          return
-        }
+          // Every hour
+          if ($hourVal === '*') {
+            this.radioHour = 'everyHour'
+            this.hourValue = '*'
+            return
+          }
 
-        // Positive integer (hour)
-        if ($hourVal.length === 1 && _.isInteger(parseInt($hourVal)) ||
+          // Positive integer (hour)
+          if ($hourVal.length === 1 && _.isInteger(parseInt($hourVal)) ||
             $hourVal.length === 2 && _.isInteger(parseInt($hourVal))
-        ) {
-          this.radioHour = 'specificHour'
-          this.specificHoursVal = [$hourVal]
-          return
-        }
+          ) {
+            this.radioHour = 'specificHour'
+            this.specificHoursVal = [$hourVal]
+            return
+          }
 
-        // Interval hour
-        if ($interval) {
-          this.radioHour = 'intervalHour'
-          this.intervalStartVal = parseInt($interval[0])
-          this.intervalPerformVal = parseInt($interval[1])
-          this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
-          return
-        }
+          // Interval hour
+          if ($interval) {
+            this.radioHour = 'intervalHour'
+            this.intervalStartVal = parseInt($interval[0])
+            this.intervalPerformVal = parseInt($interval[1])
+            this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
+            return
+          }
 
-        // Specific hours
-        if ($specific) {
-          this.radioHour = 'specificHour'
-          this.specificHoursVal = $specific
-          return
-        }
+          // Specific hours
+          if ($specific) {
+            this.radioHour = 'specificHour'
+            this.specificHoursVal = $specific
+            return
+          }
 
-        // Cycle hour
-        if ($cycle) {
-          this.radioHour = 'cycleHour'
-          this.cycleStartVal = parseInt($cycle[0])
-          this.cycleEndVal = parseInt($cycle[1])
-          this.hourValue = `${this.cycleStartVal}/${this.cycleEndVal}`
-          return
-        }
-        resolve()
-      })
-    }
-  },
-  watch: {
-    // Derived value
-    hourValue (val) {
-      this.$emit('hourValueEvent', val)
-    },
-    // Selected type
-    radioHour (val) {
-      switch (val) {
-        case 'everyHour':
-          this.everyReset()
-          break
-        case 'intervalHour':
-          this.intervalReset()
-          break
-        case 'specificHour':
-          this.specificReset()
-          break
-        case 'cycleHour':
-          this.cycleReset()
-          break
+          // Cycle hour
+          if ($cycle) {
+            this.radioHour = 'cycleHour'
+            this.cycleStartVal = parseInt($cycle[0])
+            this.cycleEndVal = parseInt($cycle[1])
+            this.hourValue = `${this.cycleStartVal}/${this.cycleEndVal}`
+            return
+          }
+          resolve()
+        })
       }
     },
-    // Specific hours
-    specificHoursVal (arr) {
-      this.hourValue = arr.join(',')
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    this.analyticalValue().then(() => {
-      console.log('Data structure parsing succeeded!')
-    })
-  },
-  beforeMount () {
-  },
-  mounted () {
+    watch: {
+      // Derived value
+      hourValue (val) {
+        this.$emit('hourValueEvent', val)
+      },
+      // Selected type
+      radioHour (val) {
+        switch (val) {
+          case 'everyHour':
+            this.everyReset()
+            break
+          case 'intervalHour':
+            this.intervalReset()
+            break
+          case 'specificHour':
+            this.specificReset()
+            break
+          case 'cycleHour':
+            this.cycleReset()
+            break
+        }
+      },
+      // Specific hours
+      specificHoursVal (arr) {
+        this.hourValue = arr.join(',')
+      }
+    },
+    beforeCreate () {
+    },
+    created () {
+      this.analyticalValue().then(() => {
+        console.log('Data structure parsing succeeded!')
+      })
+    },
+    beforeMount () {
+    },
+    mounted () {
 
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: { mInputNumber }
-}
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: { mInputNumber }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

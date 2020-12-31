@@ -55,106 +55,106 @@
   </m-list-construction>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mList from './_source/list'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import mCreateDataSource from './_source/createDataSource'
-import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-import mConditions from '@/module/components/conditions/conditions'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mList from './_source/list'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import mCreateDataSource from './_source/createDataSource'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import mConditions from '@/module/components/conditions/conditions'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-export default {
-  name: 'datasource-indexP',
-  data () {
-    return {
-      // loading
-      isLoading: true,
-      // Total number of articles
-      total: 20,
-      // data sources(List)
-      datasourcesList: [],
-      searchParams: {
-        // Number of pages per page
-        pageSize: 10,
-        // Number of pages
-        pageNo: 1,
-        // Search value
-        searchVal: ''
+  export default {
+    name: 'datasource-indexP',
+    data () {
+      return {
+        // loading
+        isLoading: true,
+        // Total number of articles
+        total: 20,
+        // data sources(List)
+        datasourcesList: [],
+        searchParams: {
+          // Number of pages per page
+          pageSize: 10,
+          // Number of pages
+          pageNo: 1,
+          // Search value
+          searchVal: ''
 
-      },
-      dialogVisible: false,
-      item: {}
-    }
-  },
-  mixins: [listUrlParamHandle],
-  props: {},
-  methods: {
-    ...mapActions('datasource', ['getDatasourcesListP']),
-    /**
+        },
+        dialogVisible: false,
+        item: {}
+      }
+    },
+    mixins: [listUrlParamHandle],
+    props: {},
+    methods: {
+      ...mapActions('datasource', ['getDatasourcesListP']),
+      /**
        * create data source
        */
-    _create (item) {
-      this.item = item
-      this.dialogVisible = true
-    },
-    onUpdate () {
-      this._debounceGET('false')
-      this.dialogVisible = false
-    },
-    close () {
-      this.dialogVisible = false
-    },
-    /**
+      _create (item) {
+        this.item = item
+        this.dialogVisible = true
+      },
+      onUpdate () {
+        this._debounceGET('false')
+        this.dialogVisible = false
+      },
+      close () {
+        this.dialogVisible = false
+      },
+      /**
        * page
        */
-    _page (val) {
-      this.searchParams.pageNo = val
-    },
-    _pageSize (val) {
-      this.searchParams.pageSize = val
-    },
-    /**
+      _page (val) {
+        this.searchParams.pageNo = val
+      },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
+      /**
        * conditions event
        */
-    _onConditions (o) {
-      this.searchParams = _.assign(this.searchParams, o)
-      this.searchParams.pageNo = 1
-    },
-    /**
+      _onConditions (o) {
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
+      },
+      /**
        * get data(List)
        */
-    _getList (flag) {
-      this.isLoading = !flag
-      this.getDatasourcesListP(this.searchParams).then(res => {
-        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-          this.searchParams.pageNo = this.searchParams.pageNo - 1
-        } else {
-          this.datasourcesList = []
-          this.datasourcesList = res.totalList
-          this.total = res.total
+      _getList (flag) {
+        this.isLoading = !flag
+        this.getDatasourcesListP(this.searchParams).then(res => {
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
+          } else {
+            this.datasourcesList = []
+            this.datasourcesList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
+        }).catch(e => {
           this.isLoading = false
-        }
-      }).catch(e => {
-        this.isLoading = false
-      })
+        })
+      },
+      _onUpdate () {
+        this._debounceGET('false')
+      }
     },
-    _onUpdate () {
-      this._debounceGET('false')
-    }
-  },
-  watch: {
-    // router
-    '$route' (a) {
-      // url no params get instance list
-      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-    }
-  },
-  created () {
-  },
-  mounted () {
-  },
-  components: { mList, mConditions, mSpin, mListConstruction, mNoData, mCreateDataSource }
-}
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
+    },
+    created () {
+    },
+    mounted () {
+    },
+    components: { mList, mConditions, mSpin, mListConstruction, mNoData, mCreateDataSource }
+  }
 </script>

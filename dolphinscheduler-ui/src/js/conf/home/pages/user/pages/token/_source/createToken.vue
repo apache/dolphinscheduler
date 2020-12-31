@@ -68,117 +68,117 @@
   </m-popup>
 </template>
 <script>
-import _ from 'lodash'
-import dayjs from 'dayjs'
-import i18n from '@/module/i18n'
-import store from '@/conf/home/store'
-import Permissions from '@/module/permissions'
-import mPopup from '@/module/components/popup/popup'
-import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import _ from 'lodash'
+  import dayjs from 'dayjs'
+  import i18n from '@/module/i18n'
+  import store from '@/conf/home/store'
+  import Permissions from '@/module/permissions'
+  import mPopup from '@/module/components/popup/popup'
+  import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
-export default {
-  name: 'create-token',
-  data () {
-    return {
-      store,
-      expireTime: dayjs().format('YYYY-MM-DD 23:59:59'),
-      userId: null,
-      disabledDate: date => (date.getTime() - new Date(new Date().getTime() - 24 * 60 * 60 * 1000)) < 0,
-      token: '',
-      userIdList: [],
-      tokenLoading: false,
-      auth: !Permissions.getAuth(),
-      pickerOptions: {
-        disabledDate (time) {
-          return time.getTime() < Date.now() - 8.64e7 // 当前时间以后可以选择当前时间
+  export default {
+    name: 'create-token',
+    data () {
+      return {
+        store,
+        expireTime: dayjs().format('YYYY-MM-DD 23:59:59'),
+        userId: null,
+        disabledDate: date => (date.getTime() - new Date(new Date().getTime() - 24 * 60 * 60 * 1000)) < 0,
+        token: '',
+        userIdList: [],
+        tokenLoading: false,
+        auth: !Permissions.getAuth(),
+        pickerOptions: {
+          disabledDate (time) {
+            return time.getTime() < Date.now() - 8.64e7 // 当前时间以后可以选择当前时间
+          }
         }
       }
-    }
-  },
-  props: {
-    item: Object
-  },
-  methods: {
-    _ok () {
-      if (this._verification()) {
-        this._submit()
-      }
     },
-    _verification () {
-      if (!this.token) {
-        this.$message.warning(`${i18n.$t('Please generate token')}`)
-        return false
-      }
-      return true
+    props: {
+      item: Object
     },
-    _submit () {
-      const param = {
-        expireTime: dayjs(this.expireTime).format('YYYY-MM-DD HH:mm:ss'),
-        userId: this.userId,
-        token: this.token
-      }
-      if (this.item) {
-        param.id = this.item.id
-      }
-      this.$refs.popup.spinnerLoading = true
-      this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
-        this.$emit('onUpdate')
-        this.$message.success(res.msg)
-        setTimeout(() => {
+    methods: {
+      _ok () {
+        if (this._verification()) {
+          this._submit()
+        }
+      },
+      _verification () {
+        if (!this.token) {
+          this.$message.warning(`${i18n.$t('Please generate token')}`)
+          return false
+        }
+        return true
+      },
+      _submit () {
+        let param = {
+          expireTime: dayjs(this.expireTime).format('YYYY-MM-DD HH:mm:ss'),
+          userId: this.userId,
+          token: this.token
+        }
+        if (this.item) {
+          param.id = this.item.id
+        }
+        this.$refs.popup.spinnerLoading = true
+        this.store.dispatch(`user/${this.item ? 'updateToken' : 'createToken'}`, param).then(res => {
+          this.$emit('onUpdate')
+          this.$message.success(res.msg)
+          setTimeout(() => {
+            this.$refs.popup.spinnerLoading = false
+          }, 800)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
           this.$refs.popup.spinnerLoading = false
-        }, 800)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-        this.$refs.popup.spinnerLoading = false
-      })
-    },
-    _generateToken () {
-      this.tokenLoading = true
-      this.store.dispatch('user/generateToken', {
-        userId: this.userId,
-        expireTime: this.expireTime
-      }).then(res => {
-        setTimeout(() => {
+        })
+      },
+      _generateToken () {
+        this.tokenLoading = true
+        this.store.dispatch('user/generateToken', {
+          userId: this.userId,
+          expireTime: this.expireTime
+        }).then(res => {
+          setTimeout(() => {
+            this.tokenLoading = false
+            this.token = res
+          }, 1200)
+        }).catch(e => {
+          this.token = ''
+          this.$message.error(e.msg || '')
           this.tokenLoading = false
-          this.token = res
-        }, 1200)
-      }).catch(e => {
+        })
+      },
+      _onChange () {
         this.token = ''
-        this.$message.error(e.msg || '')
-        this.tokenLoading = false
-      })
-    },
-    _onChange () {
-      this.token = ''
-    },
-    close () {
-      this.$emit('close')
-    }
-  },
-  watch: {},
-  created () {
-    const d = (userId) => {
-      if (this.item) {
-        this.expireTime = this.item.expireTime
-        this.userId = this.item.userId
-        this.token = this.item.token
-      } else {
-        this.userId = userId
+      },
+      close () {
+        this.$emit('close')
       }
-    }
-    if (this.auth) {
-      this.store.dispatch('security/getUsersAll').then(res => {
-        this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
-        d(this.userIdList[0].id)
-      })
-    } else {
-      d(this.store.state.user.userInfo.id)
-    }
-  },
-  mounted () {
-  },
-  components: { mPopup, mListBoxF }
-}
+    },
+    watch: {},
+    created () {
+      const d = (userId) => {
+        if (this.item) {
+          this.expireTime = this.item.expireTime
+          this.userId = this.item.userId
+          this.token = this.item.token
+        } else {
+          this.userId = userId
+        }
+      }
+      if (this.auth) {
+        this.store.dispatch('security/getUsersAll').then(res => {
+          this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
+          d(this.userIdList[0].id)
+        })
+      } else {
+        d(this.store.state.user.userInfo.id)
+      }
+    },
+    mounted () {
+    },
+    components: { mPopup, mListBoxF }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

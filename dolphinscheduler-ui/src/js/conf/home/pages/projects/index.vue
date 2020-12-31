@@ -23,21 +23,21 @@
   </div>
 </template>
 <script>
-import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
-export default {
-  name: 'projects-index',
-  data () {
-    return {
-      isProjectsList: this.$router.history.current.name === 'projects-list'
-    }
-  },
-  watch: {
-    '$route' ({ name }) {
-      this.isProjectsList = name === 'projects-list'
-    }
-  },
-  components: { mSecondaryMenu }
-}
+  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
+  export default {
+    name: 'projects-index',
+    data () {
+      return {
+        isProjectsList: this.$router.history.current.name === 'projects-list'
+      }
+    },
+    watch: {
+      '$route' ({ name }) {
+        this.isProjectsList = name === 'projects-list'
+      }
+    },
+    components: { mSecondaryMenu }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

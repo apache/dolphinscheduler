@@ -65,46 +65,46 @@
   </m-list-construction>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mGauge from './_source/gauge'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import themeData from '@/module/echarts/themeData.json'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mGauge from './_source/gauge'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import themeData from '@/module/echarts/themeData.json'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-export default {
-  name: 'servers-master',
-  data () {
-    return {
-      isLoading: false,
-      masterList: [],
-      color: themeData.color
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('monitor', ['getMasterData'])
-  },
-  watch: {},
-  created () {
-  },
-  mounted () {
-    this.isLoading = true
-    this.getMasterData().then(res => {
-      this.masterList = _.map(res, (v, i) => {
-        return _.assign(v, {
-          id: v.host + '_' + v.id,
-          resInfo: JSON.parse(v.resInfo)
+  export default {
+    name: 'servers-master',
+    data () {
+      return {
+        isLoading: false,
+        masterList: [],
+        color: themeData.color
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('monitor', ['getMasterData'])
+    },
+    watch: {},
+    created () {
+    },
+    mounted () {
+      this.isLoading = true
+      this.getMasterData().then(res => {
+        this.masterList = _.map(res, (v, i) => {
+          return _.assign(v, {
+            id: v.host + '_' + v.id,
+            resInfo: JSON.parse(v.resInfo)
+          })
         })
+        this.isLoading = false
+      }).catch(() => {
+        this.isLoading = false
       })
-      this.isLoading = false
-    }).catch(() => {
-      this.isLoading = false
-    })
-  },
-  components: { mListConstruction, mSpin, mNoData, mGauge }
-}
+    },
+    components: { mListConstruction, mSpin, mNoData, mGauge }
+  }
 </script>
 <style lang="scss" rel="stylesheet/scss">
   @import "./servers";

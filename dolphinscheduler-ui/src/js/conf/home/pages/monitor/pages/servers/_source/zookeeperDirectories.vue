@@ -39,25 +39,25 @@
 </template>
 
 <script>
-import mNoData from '@/module/components/noData/noData'
+  import mNoData from '@/module/components/noData/noData'
 
-export default {
-  name: 'zookeeperDirectoriesPopup',
-  data () {
-    return {
-      tableHeaders: [
-        {
-          label: $t('zkDirectory'),
-          prop: 'zkDirectory'
-        }
-      ]
-    }
-  },
-  props: {
-    zkDirectories: Array
-  },
-  components: { mNoData }
-}
+  export default {
+    name: 'zookeeperDirectoriesPopup',
+    data () {
+      return {
+        tableHeaders: [
+          {
+            label: $t('zkDirectory'),
+            prop: 'zkDirectory'
+          }
+        ]
+      }
+    },
+    props: {
+      zkDirectories: Array
+    },
+    components: { mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

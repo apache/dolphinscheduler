@@ -55,96 +55,96 @@
   </div>
 </template>
 <script>
-import { mapActions, mapState } from 'vuex'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import graphGrid from './_source/graphGrid.vue'
+  import { mapActions, mapState } from 'vuex'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import graphGrid from './_source/graphGrid.vue'
 
-export default {
-  name: 'projects-kinship-index',
-  components: { graphGrid, mSpin, mNoData },
-  data () {
-    return {
-      isLoading: true,
-      isShowLabel: true,
-      currentItemName: ''
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG']),
-    /**
+  export default {
+    name: 'projects-kinship-index',
+    components: { graphGrid, mSpin, mNoData },
+    data () {
+      return {
+        isLoading: true,
+        isShowLabel: true,
+        currentItemName: ''
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('kinship', ['getWorkFlowList', 'getWorkFlowDAG']),
+      /**
        * init
        */
-    init () {
-      this.isLoading = true
-      // Promise Get node needs data
-      Promise.all([
-        // get process definition
-        this.getWorkFlowList(),
-        this.getWorkFlowDAG()
-      ]).then((data) => {
-        this.isLoading = false
-      }).catch(() => {
-        this.isLoading = false
-      })
-    },
-    /**
+      init () {
+        this.isLoading = true
+        // Promise Get node needs data
+        Promise.all([
+          // get process definition
+          this.getWorkFlowList(),
+          this.getWorkFlowDAG()
+        ]).then((data) => {
+          this.isLoading = false
+        }).catch(() => {
+          this.isLoading = false
+        })
+      },
+      /**
        * reset
        */
-    reset () {
-      this.isLoading = true
-      this.$nextTick(() => {
+      reset () {
+        this.isLoading = true
+        this.$nextTick(() => {
+          this.isLoading = false
+        })
+      },
+      async onChange (item) {
+        const { value, label } = item || {}
+        this.isLoading = true
+        this.currentItemName = label
+        try {
+          await this.getWorkFlowDAG(value)
+        } catch (error) {
+          this.$message.error(error.msg || '')
+        }
         this.isLoading = false
-      })
-    },
-    async onChange (item) {
-      const { value, label } = item || {}
-      this.isLoading = true
-      this.currentItemName = label
-      try {
-        await this.getWorkFlowDAG(value)
-      } catch (error) {
-        this.$message.error(error.msg || '')
-      }
-      this.isLoading = false
-    },
-    tooltipOption (text) {
-      return {
-        text,
-        maxWidth: '500px',
-        placement: 'top',
-        theme: 'dark',
-        triggerEvent: 'mouseenter',
-        large: false
+      },
+      tooltipOption (text) {
+        return {
+          text,
+          maxWidth: '500px',
+          placement: 'top',
+          theme: 'dark',
+          triggerEvent: 'mouseenter',
+          large: false
+        }
+      },
+      changeLabel () {
+        this.isLoading = true
+        this.isShowLabel = !this.isShowLabel
+        this.$nextTick(() => {
+          this.isLoading = false
+        })
       }
     },
-    changeLabel () {
-      this.isLoading = true
-      this.isShowLabel = !this.isShowLabel
-      this.$nextTick(() => {
-        this.isLoading = false
-      })
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+      }
+    },
+    created () {
+      this.init()
+    },
+    computed: {
+      ...mapState('kinship', ['locations', 'workList']),
+      inputFocusStyle () {
+        return 'width:280px'
+      }
+    },
+    mounted () {
     }
-  },
-  watch: {
-    // router
-    '$route' (a) {
-      // url no params get instance list
-    }
-  },
-  created () {
-    this.init()
-  },
-  computed: {
-    ...mapState('kinship', ['locations', 'workList']),
-    inputFocusStyle () {
-      return 'width:280px'
-    }
-  },
-  mounted () {
   }
-}
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .project-kinship-content {

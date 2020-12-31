@@ -97,314 +97,314 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import mListBox from './_source/listBox'
-import mLocalParams from './_source/localParams'
-import Treeselect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'mr',
-  data () {
-    return {
-      valueConsistsOf: 'LEAF_PRIORITY',
-      // Main function class
-      mainClass: '',
-      // Master jar package
-      mainJar: null,
-      // Main jar package (List)
-      mainJarLists: [],
-      mainJarList: [],
-      // Resource(list)
-      resourceList: [],
-      // Cache ResourceList
-      cacheResourceList: [],
-      // Custom parameter
-      localParams: [],
-      // Command line argument
-      mainArgs: '',
-      // Other parameters
-      others: '',
-      // Program type
-      programType: 'JAVA',
-      // Program type(List)
-      programTypeList: [{ code: 'JAVA' }, { code: 'PYTHON' }],
-      normalizer (node) {
-        return {
-          label: node.name
-        }
-      },
-      allNoResources: [],
-      noRes: []
-    }
-  },
-  props: {
-    backfillItem: Object
-  },
-  mixins: [disabledState],
-  methods: {
-    /**
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import mListBox from './_source/listBox'
+  import mLocalParams from './_source/localParams'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'mr',
+    data () {
+      return {
+        valueConsistsOf: 'LEAF_PRIORITY',
+        // Main function class
+        mainClass: '',
+        // Master jar package
+        mainJar: null,
+        // Main jar package (List)
+        mainJarLists: [],
+        mainJarList: [],
+        // Resource(list)
+        resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
+        // Custom parameter
+        localParams: [],
+        // Command line argument
+        mainArgs: '',
+        // Other parameters
+        others: '',
+        // Program type
+        programType: 'JAVA',
+        // Program type(List)
+        programTypeList: [{ code: 'JAVA' }, { code: 'PYTHON' }],
+        normalizer (node) {
+          return {
+            label: node.name
+          }
+        },
+        allNoResources: [],
+        noRes: []
+      }
+    },
+    props: {
+      backfillItem: Object
+    },
+    mixins: [disabledState],
+    methods: {
+      /**
        * getResourceId
        */
-    marjarId (name) {
-      this.store.dispatch('dag/getResourceId', {
-        type: 'FILE',
-        fullName: '/' + name
-      }).then(res => {
-        this.mainJar = res.id
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      marjarId (name) {
+        this.store.dispatch('dag/getResourceId', {
+          type: 'FILE',
+          fullName: '/' + name
+        }).then(res => {
+          this.mainJar = res.id
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * return localParams
        */
-    _onLocalParams (a) {
-      this.localParams = a
-    },
-    /**
+      _onLocalParams (a) {
+        this.localParams = a
+      },
+      /**
        * return resourceList
        */
-    _onResourcesData (a) {
-      this.resourceList = a
-    },
-    /**
+      _onResourcesData (a) {
+        this.resourceList = a
+      },
+      /**
        * cache resourceList
        */
-    _onCacheResourcesData (a) {
-      this.cacheResourceList = a
-    },
-    diGuiTree (item) { // Recursive convenience tree structure
-      item.forEach(item => {
-        item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
-          ? this.operationTree(item) : this.diGuiTree(item.children)
-      })
-    },
-    operationTree (item) {
-      if (item.dirctory) {
-        item.isDisabled = true
-      }
-      delete item.children
-    },
-    searchTree (element, id) {
-      // 根据id查找节点
-      if (element.id === id) {
-        return element
-      } else if (element.children !== null) {
-        let i
-        let result = null
-        for (i = 0; result === null && i < element.children.length; i++) {
-          result = this.searchTree(element.children[i], id)
-        }
-        return result
-      }
-      return null
-    },
-    dataProcess (backResource) {
-      const isResourceId = []
-      let resourceIdArr = []
-      if (this.resourceList.length > 0) {
-        this.resourceList.forEach(v => {
-          this.mainJarList.forEach(v1 => {
-            if (this.searchTree(v1, v)) {
-              isResourceId.push(this.searchTree(v1, v))
-            }
-          })
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
+      },
+      diGuiTree (item) { // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0
+            ? this.operationTree(item) : this.diGuiTree(item.children)
         })
-        resourceIdArr = isResourceId.map(item => {
-          return item.id
-        })
-        Array.prototype.diff = function (a) {
-          return this.filter(function (i) { return a.indexOf(i) < 0 })
+      },
+      operationTree (item) {
+        if (item.dirctory) {
+          item.isDisabled = true
         }
-        const diffSet = this.resourceList.diff(resourceIdArr)
-        let optionsCmp = []
-        if (diffSet.length > 0) {
-          diffSet.forEach(item => {
-            backResource.forEach(item1 => {
-              if (item === item1.id || item === item1.res) {
-                optionsCmp.push(item1)
+        delete item.children
+      },
+      searchTree (element, id) {
+        // 根据id查找节点
+        if (element.id === id) {
+          return element
+        } else if (element.children !== null) {
+          let i
+          let result = null
+          for (i = 0; result === null && i < element.children.length; i++) {
+            result = this.searchTree(element.children[i], id)
+          }
+          return result
+        }
+        return null
+      },
+      dataProcess (backResource) {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
               }
             })
           })
-        }
-        const noResources = [{
-          id: -1,
-          name: $t('Unauthorized or deleted resources'),
-          fullName: '/' + $t('Unauthorized or deleted resources'),
-          children: []
-        }]
-        if (optionsCmp.length > 0) {
-          this.allNoResources = optionsCmp
-          optionsCmp = optionsCmp.map(item => {
-            return { id: item.id, name: item.name, fullName: item.res }
+          resourceIdArr = isResourceId.map(item => {
+            return item.id
           })
-          optionsCmp.forEach(item => {
-            item.isNew = true
-          })
-          noResources[0].children = optionsCmp
-          this.mainJarList = this.mainJarList.concat(noResources)
+          Array.prototype.diff = function (a) {
+            return this.filter(function (i) { return a.indexOf(i) < 0 })
+          }
+          let diffSet = this.resourceList.diff(resourceIdArr)
+          let optionsCmp = []
+          if (diffSet.length > 0) {
+            diffSet.forEach(item => {
+              backResource.forEach(item1 => {
+                if (item === item1.id || item === item1.res) {
+                  optionsCmp.push(item1)
+                }
+              })
+            })
+          }
+          let noResources = [{
+            id: -1,
+            name: $t('Unauthorized or deleted resources'),
+            fullName: '/' + $t('Unauthorized or deleted resources'),
+            children: []
+          }]
+          if (optionsCmp.length > 0) {
+            this.allNoResources = optionsCmp
+            optionsCmp = optionsCmp.map(item => {
+              return { id: item.id, name: item.name, fullName: item.res }
+            })
+            optionsCmp.forEach(item => {
+              item.isNew = true
+            })
+            noResources[0].children = optionsCmp
+            this.mainJarList = this.mainJarList.concat(noResources)
+          }
         }
-      }
-    },
-    /**
+      },
+      /**
        * verification
        */
-    _verification () {
-      if (this.programType !== 'PYTHON' && !this.mainClass) {
-        this.$message.warning(`${i18n.$t('Please enter main class')}`)
-        return false
+      _verification () {
+        if (this.programType !== 'PYTHON' && !this.mainClass) {
+          this.$message.warning(`${i18n.$t('Please enter main class')}`)
+          return false
+        }
+
+        if (!this.mainJar) {
+          this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
+          return false
+        }
+
+        // noRes
+        if (this.noRes.length > 0) {
+          this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
+          return false
+        }
+
+        // localParams Subcomponent verification
+        if (!this.$refs.refLocalParams._verifProp()) {
+          return false
+        }
+        // storage
+        this.$emit('on-params', {
+          mainClass: this.mainClass,
+          mainJar: {
+            id: this.mainJar
+          },
+          resourceList: _.map(this.resourceList, v => {
+            return { id: v }
+          }),
+          localParams: this.localParams,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        })
+        return true
       }
 
-      if (!this.mainJar) {
-        this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
-        return false
-      }
-
-      // noRes
-      if (this.noRes.length > 0) {
-        this.$message.warning(`${i18n.$t('Please delete all non-existent resources')}`)
-        return false
-      }
-
-      // localParams Subcomponent verification
-      if (!this.$refs.refLocalParams._verifProp()) {
-        return false
-      }
-      // storage
-      this.$emit('on-params', {
-        mainClass: this.mainClass,
-        mainJar: {
-          id: this.mainJar
-        },
-        resourceList: _.map(this.resourceList, v => {
-          return { id: v }
-        }),
-        localParams: this.localParams,
-        mainArgs: this.mainArgs,
-        others: this.others,
-        programType: this.programType
-      })
-      return true
-    }
-
-  },
-  watch: {
-    /**
+    },
+    watch: {
+      /**
        * monitor
        */
-    programType (type) {
-      if (type === 'PYTHON') {
-        this.mainClass = ''
-      }
-    },
-    // Watch the cacheParams
-    cacheParams (val) {
-      this.$emit('on-cache-params', val)
-    },
-    resourceIdArr (arr) {
-      const result = []
-      arr.forEach(item => {
-        this.allNoResources.forEach(item1 => {
-          if (item.id === item1.id) {
-            // resultBool = true
-            result.push(item1)
-          }
-        })
-      })
-      this.noRes = result
-    }
-  },
-  computed: {
-    resourceIdArr () {
-      const isResourceId = []
-      let resourceIdArr = []
-      if (this.resourceList.length > 0) {
-        this.resourceList.forEach(v => {
-          this.mainJarList.forEach(v1 => {
-            if (this.searchTree(v1, v)) {
-              isResourceId.push(this.searchTree(v1, v))
+      programType (type) {
+        if (type === 'PYTHON') {
+          this.mainClass = ''
+        }
+      },
+      // Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val)
+      },
+      resourceIdArr (arr) {
+        let result = []
+        arr.forEach(item => {
+          this.allNoResources.forEach(item1 => {
+            if (item.id === item1.id) {
+              // resultBool = true
+              result.push(item1)
             }
           })
         })
-        resourceIdArr = isResourceId.map(item => {
-          return { id: item.id, name: item.name, res: item.fullName }
-        })
+        this.noRes = result
       }
-      return resourceIdArr
     },
-    cacheParams () {
-      return {
-        mainClass: this.mainClass,
-        mainJar: {
-          id: this.mainJar
-        },
-        resourceList: this.resourceIdArr,
-        localParams: this.localParams,
-        mainArgs: this.mainArgs,
-        others: this.others,
-        programType: this.programType
-      }
-    }
-  },
-  created () {
-    const item = this.store.state.dag.resourcesListS
-    const items = this.store.state.dag.resourcesListJar
-    this.diGuiTree(item)
-    this.diGuiTree(items)
-    this.mainJarList = item
-    this.mainJarLists = items
-    const o = this.backfillItem
-
-    // Non-null objects represent backfill
-    if (!_.isEmpty(o)) {
-      this.mainClass = o.params.mainClass || ''
-      if (o.params.mainJar.res) {
-        this.marjarId(o.params.mainJar.res)
-      } else if (o.params.mainJar.res === '') {
-        this.mainJar = ''
-      } else {
-        this.mainJar = o.params.mainJar.id || ''
-      }
-      this.mainArgs = o.params.mainArgs || ''
-      this.others = o.params.others
-      this.programType = o.params.programType || 'JAVA'
-
-      // backfill resourceList
-      const resourceList = o.params.resourceList || []
-      if (resourceList.length) {
-        _.map(resourceList, v => {
-          if (!v.id) {
-            this.store.dispatch('dag/getResourceId', {
-              type: 'FILE',
-              fullName: '/' + v.res
-            }).then(res => {
-              this.resourceList.push(res.id)
-              this.dataProcess(backResource)
-            }).catch(e => {
-              this.resourceList.push(v.res)
-              this.dataProcess(backResource)
+    computed: {
+      resourceIdArr () {
+        let isResourceId = []
+        let resourceIdArr = []
+        if (this.resourceList.length > 0) {
+          this.resourceList.forEach(v => {
+            this.mainJarList.forEach(v1 => {
+              if (this.searchTree(v1, v)) {
+                isResourceId.push(this.searchTree(v1, v))
+              }
             })
-          } else {
-            this.resourceList.push(v.id)
-            this.dataProcess(backResource)
-          }
-        })
-        this.cacheResourceList = resourceList
+          })
+          resourceIdArr = isResourceId.map(item => {
+            return { id: item.id, name: item.name, res: item.fullName }
+          })
+        }
+        return resourceIdArr
+      },
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            id: this.mainJar
+          },
+          resourceList: this.resourceIdArr,
+          localParams: this.localParams,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        }
       }
+    },
+    created () {
+      let item = this.store.state.dag.resourcesListS
+      let items = this.store.state.dag.resourcesListJar
+      this.diGuiTree(item)
+      this.diGuiTree(items)
+      this.mainJarList = item
+      this.mainJarLists = items
+      let o = this.backfillItem
 
-      // backfill localParams
-      const backResource = o.params.resourceList || []
-      const localParams = o.params.localParams || []
-      if (localParams.length) {
-        this.localParams = localParams
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.mainClass = o.params.mainClass || ''
+        if (o.params.mainJar.res) {
+          this.marjarId(o.params.mainJar.res)
+        } else if (o.params.mainJar.res === '') {
+          this.mainJar = ''
+        } else {
+          this.mainJar = o.params.mainJar.id || ''
+        }
+        this.mainArgs = o.params.mainArgs || ''
+        this.others = o.params.others
+        this.programType = o.params.programType || 'JAVA'
+
+        // backfill resourceList
+        let resourceList = o.params.resourceList || []
+        if (resourceList.length) {
+          _.map(resourceList, v => {
+            if (!v.id) {
+              this.store.dispatch('dag/getResourceId', {
+                type: 'FILE',
+                fullName: '/' + v.res
+              }).then(res => {
+                this.resourceList.push(res.id)
+                this.dataProcess(backResource)
+              }).catch(e => {
+                this.resourceList.push(v.res)
+                this.dataProcess(backResource)
+              })
+            } else {
+              this.resourceList.push(v.id)
+              this.dataProcess(backResource)
+            }
+          })
+          this.cacheResourceList = resourceList
+        }
+
+        // backfill localParams
+        let backResource = o.params.resourceList || []
+        let localParams = o.params.localParams || []
+        if (localParams.length) {
+          this.localParams = localParams
+        }
       }
-    }
-  },
-  mounted () {
+    },
+    mounted () {
 
-  },
-  components: { mLocalParams, mListBox, Treeselect }
-}
+    },
+    components: { mLocalParams, mListBox, Treeselect }
+  }
 </script>

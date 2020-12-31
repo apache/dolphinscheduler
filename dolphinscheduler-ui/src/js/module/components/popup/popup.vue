@@ -29,50 +29,50 @@
   </div>
 </template>
 <script>
-import i18n from '@/module/i18n'
-export default {
-  name: 'popup',
-  data () {
-    return {
-      spinnerLoading: false,
-      apDisabled: false
-    }
-  },
-  props: {
-    nameText: {
-      type: String,
-      default: `${i18n.$t('Create')}`
-    },
-    okText: {
-      type: String,
-      default: `${i18n.$t('Confirm')}`
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    asynLoading: {
-      type: Boolean,
-      default: false
-    }
-  },
-  methods: {
-    close () {
-      this.$emit('close')
-    },
-    ok () {
-      if (this.asynLoading) {
-        this.spinnerLoading = true
-        this.$emit('ok', () => {
-          this.spinnerLoading = false
-        })
-      } else {
-        this.$emit('ok')
+  import i18n from '@/module/i18n'
+  export default {
+    name: 'popup',
+    data () {
+      return {
+        spinnerLoading: false,
+        apDisabled: false
       }
-    }
-  },
-  components: { }
-}
+    },
+    props: {
+      nameText: {
+        type: String,
+        default: `${i18n.$t('Create')}`
+      },
+      okText: {
+        type: String,
+        default: `${i18n.$t('Confirm')}`
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      asynLoading: {
+        type: Boolean,
+        default: false
+      }
+    },
+    methods: {
+      close () {
+        this.$emit('close')
+      },
+      ok () {
+        if (this.asynLoading) {
+          this.spinnerLoading = true
+          this.$emit('ok', () => {
+            this.spinnerLoading = false
+          })
+        } else {
+          this.$emit('ok')
+        }
+      }
+    },
+    components: { }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

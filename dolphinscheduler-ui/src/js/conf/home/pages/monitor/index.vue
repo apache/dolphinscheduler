@@ -22,12 +22,12 @@
 
 </template>
 <script>
-import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
-export default {
-  name: 'monitor-index',
-  mounted () {
+  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
+  export default {
+    name: 'monitor-index',
+    mounted () {
 
-  },
-  components: { mSecondaryMenu }
-}
+    },
+    components: { mSecondaryMenu }
+  }
 </script>

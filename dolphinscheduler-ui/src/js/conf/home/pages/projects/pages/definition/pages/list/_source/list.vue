@@ -149,225 +149,225 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import mStart from './start'
-import mTiming from './timing'
-import mRelatedItems from './relatedItems'
-import { mapActions } from 'vuex'
-import { publishStatus } from '@/conf/home/pages/dag/_source/config'
-import mVersions from './versions'
+  import _ from 'lodash'
+  import mStart from './start'
+  import mTiming from './timing'
+  import mRelatedItems from './relatedItems'
+  import { mapActions } from 'vuex'
+  import { publishStatus } from '@/conf/home/pages/dag/_source/config'
+  import mVersions from './versions'
 
-export default {
-  name: 'definition-list',
-  data () {
-    return {
-      list: [],
-      strSelectIds: '',
-      checkAll: false,
-      drawer: false,
-      versionData: {
-        processDefinition: {},
-        processDefinitionVersions: [],
-        total: null,
-        pageNo: null,
-        pageSize: null
-      },
-      startDialog: false,
-      startData: {},
-      timingDialog: false,
-      timingData: {
-        item: {},
-        receiversD: [],
-        receiversCcD: [],
-        type: ''
-      },
-      relatedItemsDialog: false,
-      tmp: false
-    }
-  },
-  props: {
-    processList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
-    ...mapActions('security', ['getWorkerGroupsAll']),
-
-    selectable (row, index) {
-      if (row.releaseState === 'ONLINE') {
-        return false
-      } else {
-        return true
+  export default {
+    name: 'definition-list',
+    data () {
+      return {
+        list: [],
+        strSelectIds: '',
+        checkAll: false,
+        drawer: false,
+        versionData: {
+          processDefinition: {},
+          processDefinitionVersions: [],
+          total: null,
+          pageNo: null,
+          pageSize: null
+        },
+        startDialog: false,
+        startData: {},
+        timingDialog: false,
+        timingData: {
+          item: {},
+          receiversD: [],
+          receiversCcD: [],
+          type: ''
+        },
+        relatedItemsDialog: false,
+        tmp: false
       }
     },
-    _rtPublishStatus (code) {
-      return _.filter(publishStatus, v => v.code === code)[0].desc
+    props: {
+      processList: Array,
+      pageNo: Number,
+      pageSize: Number
     },
-    _treeView (item) {
-      this.$router.push({ path: `/projects/definition/tree/${item.id}` })
-    },
-    /**
+    methods: {
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition', 'exportDefinition', 'getProcessDefinitionVersionsPage', 'copyProcess', 'switchProcessDefinitionVersion', 'deleteProcessDefinitionVersion', 'moveProcess']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
+
+      selectable (row, index) {
+        if (row.releaseState === 'ONLINE') {
+          return false
+        } else {
+          return true
+        }
+      },
+      _rtPublishStatus (code) {
+        return _.filter(publishStatus, v => v.code === code)[0].desc
+      },
+      _treeView (item) {
+        this.$router.push({ path: `/projects/definition/tree/${item.id}` })
+      },
+      /**
        * Start
        */
-    _start (item) {
-      this.getWorkerGroupsAll()
-      this.getStartCheck({ processDefinitionId: item.id }).then(res => {
-        this.startData = item
-        this.startDialog = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    onUpdateStart () {
-      this._onUpdate()
-      this.startDialog = false
-    },
-    closeStart () {
-      this.startDialog = false
-    },
-    /**
+      _start (item) {
+        this.getWorkerGroupsAll()
+        this.getStartCheck({ processDefinitionId: item.id }).then(res => {
+          this.startData = item
+          this.startDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      onUpdateStart () {
+        this._onUpdate()
+        this.startDialog = false
+      },
+      closeStart () {
+        this.startDialog = false
+      },
+      /**
        * get emial
        */
-    _getReceiver (id) {
-      return new Promise((resolve, reject) => {
-        this.getReceiver({ processDefinitionId: id }).then(res => {
-          resolve({
-            receivers: res.receivers && res.receivers.split(',') || [],
-            receiversCc: res.receiversCc && res.receiversCc.split(',') || []
+      _getReceiver (id) {
+        return new Promise((resolve, reject) => {
+          this.getReceiver({ processDefinitionId: id }).then(res => {
+            resolve({
+              receivers: res.receivers && res.receivers.split(',') || [],
+              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
+            })
           })
         })
-      })
-    },
-    /**
+      },
+      /**
        * timing
        */
-    _timing (item) {
-      this._getReceiver(item.id).then(res => {
-        this.timingData.item = item
-        this.timingData.receiversD = res.receivers
-        this.timingData.receiversCcD = res.receiversCc
-        this.timingData.type = 'timing'
-        this.timingDialog = true
-      })
-    },
-    onUpdateTiming () {
-      this._onUpdate()
-      this.timingDialog = false
-    },
-    closeTiming () {
-      this.timingDialog = false
-    },
-    /**
+      _timing (item) {
+        this._getReceiver(item.id).then(res => {
+          this.timingData.item = item
+          this.timingData.receiversD = res.receivers
+          this.timingData.receiversCcD = res.receiversCc
+          this.timingData.type = 'timing'
+          this.timingDialog = true
+        })
+      },
+      onUpdateTiming () {
+        this._onUpdate()
+        this.timingDialog = false
+      },
+      closeTiming () {
+        this.timingDialog = false
+      },
+      /**
        * Timing manage
        */
-    _timingManage (item) {
-      this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
-    },
-    /**
+      _timingManage (item) {
+        this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
+      },
+      /**
        * delete
        */
-    _delete (item, i) {
-      // remove tow++
-      if (i < 0) {
-        this._batchDelete()
-        return
-      }
-      // remove one
-      this.deleteDefinition({
-        processDefinitionId: item.id
-      }).then(res => {
-        this._onUpdate()
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _delete (item, i) {
+        // remove tow++
+        if (i < 0) {
+          this._batchDelete()
+          return
+        }
+        // remove one
+        this.deleteDefinition({
+          processDefinitionId: item.id
+        }).then(res => {
+          this._onUpdate()
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * edit
        */
-    _edit (item) {
-      this.$router.push({ path: `/projects/definition/list/${item.id}` })
-    },
-    /**
+      _edit (item) {
+        this.$router.push({ path: `/projects/definition/list/${item.id}` })
+      },
+      /**
        * Offline
        */
-    _downline (item) {
-      this._upProcessState({
-        processId: item.id,
-        releaseState: 0
-      })
-    },
-    /**
+      _downline (item) {
+        this._upProcessState({
+          processId: item.id,
+          releaseState: 0
+        })
+      },
+      /**
        * online
        */
-    _poponline (item) {
-      this._upProcessState({
-        processId: item.id,
-        releaseState: 1
-      })
-    },
-    /**
+      _poponline (item) {
+        this._upProcessState({
+          processId: item.id,
+          releaseState: 1
+        })
+      },
+      /**
        * copy
        */
-    _copyProcess (item) {
-      this.copyProcess({
-        processDefinitionIds: item.id,
-        targetProjectId: item.projectId
-      }).then(res => {
-        this.strSelectIds = ''
-        this.$message.success(res.msg)
-        // $('body').find('.tooltip.fade.top.in').remove()
-        this._onUpdate()
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
+      _copyProcess (item) {
+        this.copyProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          // $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
 
-    /**
+      /**
        * move
        */
-    _moveProcess (item) {
-      this.moveProcess({
-        processDefinitionIds: item.id,
-        targetProjectId: item.projectId
-      }).then(res => {
-        this.strSelectIds = ''
-        this.$message.success(res.msg)
-        $('body').find('.tooltip.fade.top.in').remove()
-        this._onUpdate()
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
+      _moveProcess (item) {
+        this.moveProcess({
+          processDefinitionIds: item.id,
+          targetProjectId: item.projectId
+        }).then(res => {
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
 
-    _export (item) {
-      this.exportDefinition({
-        processDefinitionIds: item.id,
-        fileName: item.name
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _export (item) {
+        this.exportDefinition({
+          processDefinitionIds: item.id,
+          fileName: item.name
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
         * switch version in process definition version list
         *
         * @param version the version user want to change
         * @param processDefinitionId the process definition id
         * @param fromThis fromThis
       */
-    mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-      this.switchProcessDefinitionVersion({
-        version: version,
-        processDefinitionId: processDefinitionId
-      }).then(res => {
-        this.$message.success($t('Switch Version Successfully'))
-        this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      mVersionSwitchProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.switchProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success($t('Switch Version Successfully'))
+          this.$router.push({ path: `/projects/definition/list/${processDefinitionId}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
         * Paging event of process definition versions
         *
         * @param pageNo page number
@@ -375,169 +375,169 @@ export default {
         * @param processDefinitionId the process definition id of page version
         * @param fromThis fromThis
       */
-    mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
-      this.getProcessDefinitionVersionsPage({
-        pageNo: pageNo,
-        pageSize: pageSize,
-        processDefinitionId: processDefinitionId
-      }).then(res => {
-        this.versionData.processDefinitionVersions = res.data.lists
-        this.versionData.total = res.data.totalCount
-        this.versionData.pageSize = res.data.pageSize
-        this.versionData.pageNo = res.data.currentPage
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      mVersionGetProcessDefinitionVersionsPage ({ pageNo, pageSize, processDefinitionId, fromThis }) {
+        this.getProcessDefinitionVersionsPage({
+          pageNo: pageNo,
+          pageSize: pageSize,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.versionData.processDefinitionVersions = res.data.lists
+          this.versionData.total = res.data.totalCount
+          this.versionData.pageSize = res.data.pageSize
+          this.versionData.pageNo = res.data.currentPage
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
         * delete one version of process definition
         *
         * @param version the version need to delete
         * @param processDefinitionId the process definition id user want to delete
         * @param fromThis fromThis
       */
-    mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
-      this.deleteProcessDefinitionVersion({
-        version: version,
-        processDefinitionId: processDefinitionId
-      }).then(res => {
-        this.$message.success(res.msg || '')
-        this.mVersionGetProcessDefinitionVersionsPage({
-          pageNo: 1,
-          pageSize: 10,
-          processDefinitionId: processDefinitionId,
-          fromThis: fromThis
-        })
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    _version (item) {
-      this.getProcessDefinitionVersionsPage({
-        pageNo: 1,
-        pageSize: 10,
-        processDefinitionId: item.id
-      }).then(res => {
-        const processDefinitionVersions = res.data.lists
-        const total = res.data.totalCount
-        const pageSize = res.data.pageSize
-        const pageNo = res.data.currentPage
-
-        this.versionData.processDefinition = item
-        this.versionData.processDefinitionVersions = processDefinitionVersions
-        this.versionData.total = total
-        this.versionData.pageNo = pageNo
-        this.versionData.pageSize = pageSize
-        this.drawer = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-
-    closeVersion () {
-      this.drawer = false
-    },
-
-    _batchExport () {
-      this.exportDefinition({
-        processDefinitionIds: this.strSelectIds,
-        fileName: 'process_' + new Date().getTime()
-      }).then(res => {
-        this._onUpdate()
-        this.checkAll = false
-        this.strSelectIds = ''
-      }).catch(e => {
-        this.strSelectIds = ''
-        this.checkAll = false
-        this.$message.error(e.msg)
-      })
-    },
-    /**
-       * Batch Copy
-       */
-    _batchCopy () {
-      this.relatedItemsDialog = true
-      this.tmp = false
-    },
-    onBatchCopy (item) {
-      this._copyProcess({ id: this.strSelectIds, projectId: item })
-      this.relatedItemsDialog = false
-    },
-    closeRelatedItems () {
-      this.relatedItemsDialog = false
-    },
-    /**
-       * _batchMove
-       */
-    _batchMove () {
-      this.tmp = true
-      this.relatedItemsDialog = true
-    },
-    onBatchMove (item) {
-      this._moveProcess({ id: this.strSelectIds, projectId: item })
-      this.relatedItemsDialog = false
-    },
-    /**
-       * Edit state
-       */
-    _upProcessState (o) {
-      this.editProcessState(o).then(res => {
-        this.$message.success(res.msg)
-        $('body').find('.tooltip.fade.top.in').remove()
-        this._onUpdate()
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    _onUpdate () {
-      this.$emit('on-update')
-    },
-    /**
-       * the array that to be delete
-       */
-    _arrDelChange (v) {
-      let arr = []
-      arr = _.map(v, 'id')
-      this.strSelectIds = _.join(arr, ',')
-    },
-    /**
-       * batch delete
-       */
-    _batchDelete () {
-      this.batchDeleteDefinition({
-        processDefinitionIds: this.strSelectIds
-      }).then(res => {
-        this._onUpdate()
-        this.checkAll = false
-        this.strSelectIds = ''
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.strSelectIds = ''
-        this.checkAll = false
-        this.$message.error(e.msg || '')
-      })
-    }
-  },
-  watch: {
-    processList: {
-      handler (a) {
-        this.checkAll = false
-        this.list = []
-        setTimeout(() => {
-          this.list = _.cloneDeep(a)
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
-      immediate: true,
-      deep: true
+      _version (item) {
+        this.getProcessDefinitionVersionsPage({
+          pageNo: 1,
+          pageSize: 10,
+          processDefinitionId: item.id
+        }).then(res => {
+          let processDefinitionVersions = res.data.lists
+          let total = res.data.totalCount
+          let pageSize = res.data.pageSize
+          let pageNo = res.data.currentPage
+
+          this.versionData.processDefinition = item
+          this.versionData.processDefinitionVersions = processDefinitionVersions
+          this.versionData.total = total
+          this.versionData.pageNo = pageNo
+          this.versionData.pageSize = pageSize
+          this.drawer = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      closeVersion () {
+        this.drawer = false
+      },
+
+      _batchExport () {
+        this.exportDefinition({
+          processDefinitionIds: this.strSelectIds,
+          fileName: 'process_' + new Date().getTime()
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.strSelectIds = ''
+        }).catch(e => {
+          this.strSelectIds = ''
+          this.checkAll = false
+          this.$message.error(e.msg)
+        })
+      },
+      /**
+       * Batch Copy
+       */
+      _batchCopy () {
+        this.relatedItemsDialog = true
+        this.tmp = false
+      },
+      onBatchCopy (item) {
+        this._copyProcess({ id: this.strSelectIds, projectId: item })
+        this.relatedItemsDialog = false
+      },
+      closeRelatedItems () {
+        this.relatedItemsDialog = false
+      },
+      /**
+       * _batchMove
+       */
+      _batchMove () {
+        this.tmp = true
+        this.relatedItemsDialog = true
+      },
+      onBatchMove (item) {
+        this._moveProcess({ id: this.strSelectIds, projectId: item })
+        this.relatedItemsDialog = false
+      },
+      /**
+       * Edit state
+       */
+      _upProcessState (o) {
+        this.editProcessState(o).then(res => {
+          this.$message.success(res.msg)
+          $('body').find('.tooltip.fade.top.in').remove()
+          this._onUpdate()
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      _onUpdate () {
+        this.$emit('on-update')
+      },
+      /**
+       * the array that to be delete
+       */
+      _arrDelChange (v) {
+        let arr = []
+        arr = _.map(v, 'id')
+        this.strSelectIds = _.join(arr, ',')
+      },
+      /**
+       * batch delete
+       */
+      _batchDelete () {
+        this.batchDeleteDefinition({
+          processDefinitionIds: this.strSelectIds
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.strSelectIds = ''
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.strSelectIds = ''
+          this.checkAll = false
+          this.$message.error(e.msg || '')
+        })
+      }
     },
-    pageNo () {
-      this.strSelectIds = ''
-    }
-  },
-  created () {
-  },
-  mounted () {
-  },
-  components: { mVersions, mStart, mTiming, mRelatedItems }
-}
+    watch: {
+      processList: {
+        handler (a) {
+          this.checkAll = false
+          this.list = []
+          setTimeout(() => {
+            this.list = _.cloneDeep(a)
+          })
+        },
+        immediate: true,
+        deep: true
+      },
+      pageNo () {
+        this.strSelectIds = ''
+      }
+    },
+    created () {
+    },
+    mounted () {
+    },
+    components: { mVersions, mStart, mTiming, mRelatedItems }
+  }
 </script>

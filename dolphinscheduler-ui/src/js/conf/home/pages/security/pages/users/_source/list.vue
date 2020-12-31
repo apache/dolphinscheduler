@@ -106,282 +106,282 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import { mapActions } from 'vuex'
-import mTransfer from '@/module/components/transfer/transfer'
-import mResource from '@/module/components/transfer/resource'
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import { mapActions } from 'vuex'
+  import mTransfer from '@/module/components/transfer/transfer'
+  import mResource from '@/module/components/transfer/resource'
 
-export default {
-  name: 'user-list',
-  data () {
-    return {
-      list: [],
-      authProjectDialog: false,
-      transferData: {
-        sourceListPrs: [],
-        targetListPrs: [],
-        type: {
-          name: ''
-        }
-      },
-      item: {},
-      authDataSourceDialog: false,
-      authUdfFuncDialog: false,
-      resourceData: {
-        fileSourceList: [],
-        udfSourceList: [],
-        fileTargetList: [],
-        udfTargetList: [],
-        type: {
-          name: ''
-        }
-      },
-      resourceDialog: false
-    }
-  },
-  props: {
-    userList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList']),
-    _delete (item, i) {
-      this.deleteUser({
-        id: item.id
-      }).then(res => {
-        this.$emit('on-update')
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    _edit (item) {
-      this.$emit('on-edit', item)
-    },
-    _authProject (item, i) {
-      this.getAuthList({
-        id: item.id,
-        type: 'project',
-        category: 'projects'
-      }).then(data => {
-        const sourceListPrs = _.map(data[0], v => {
-          return {
-            id: v.id,
-            name: v.name
+  export default {
+    name: 'user-list',
+    data () {
+      return {
+        list: [],
+        authProjectDialog: false,
+        transferData: {
+          sourceListPrs: [],
+          targetListPrs: [],
+          type: {
+            name: ''
           }
-        })
-        const targetListPrs = _.map(data[1], v => {
-          return {
-            id: v.id,
-            name: v.name
+        },
+        item: {},
+        authDataSourceDialog: false,
+        authUdfFuncDialog: false,
+        resourceData: {
+          fileSourceList: [],
+          udfSourceList: [],
+          fileTargetList: [],
+          udfTargetList: [],
+          type: {
+            name: ''
           }
+        },
+        resourceDialog: false
+      }
+    },
+    props: {
+      userList: Array,
+      pageNo: Number,
+      pageSize: Number
+    },
+    methods: {
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization', 'getResourceList']),
+      _delete (item, i) {
+        this.deleteUser({
+          id: item.id
+        }).then(res => {
+          this.$emit('on-update')
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
-        this.item = item
-        this.transferData.sourceListPrs = sourceListPrs
-        this.transferData.targetListPrs = targetListPrs
-        this.transferData.type.name = `${i18n.$t('Project')}`
-        this.authProjectDialog = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    onUpdateAuthProject (projectIds) {
-      this._grantAuthorization('users/grant-project', {
-        userId: this.item.id,
-        projectIds: projectIds
-      })
-      this.authProjectDialog = false
-    },
+      },
+      _edit (item) {
+        this.$emit('on-edit', item)
+      },
+      _authProject (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'project',
+          category: 'projects'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.name
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.name
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('Project')}`
+          this.authProjectDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      onUpdateAuthProject (projectIds) {
+        this._grantAuthorization('users/grant-project', {
+          userId: this.item.id,
+          projectIds: projectIds
+        })
+        this.authProjectDialog = false
+      },
 
-    closeAuthProject () {
-      this.authProjectDialog = false
-    },
+      closeAuthProject () {
+        this.authProjectDialog = false
+      },
 
-    /*
+      /*
         getAllLeaf
        */
-    getAllLeaf (data) {
-      const result = []
-      const getLeaf = (data) => {
-        data.forEach(item => {
-          if (item.children.length === 0) {
-            result.push(item)
-          } else {
-            getLeaf(item.children)
-          }
+      getAllLeaf (data) {
+        let result = []
+        let getLeaf = (data) => {
+          data.forEach(item => {
+            if (item.children.length === 0) {
+              result.push(item)
+            } else {
+              getLeaf(item.children)
+            }
+          })
+        }
+        getLeaf(data)
+        return result
+      },
+      _authFile (item, i) {
+        this.getResourceList({
+          id: item.id,
+          type: 'file',
+          category: 'resources'
+        }).then(data => {
+          let fileSourceList = []
+          let udfSourceList = []
+          data[0].forEach((value, index, array) => {
+            if (value.type === 'FILE') {
+              fileSourceList.push(value)
+            } else {
+              udfSourceList.push(value)
+            }
+          })
+          let fileTargetList = []
+          let udfTargetList = []
+
+          let pathId = []
+          data[1].forEach(v => {
+            let arr = []
+            arr[0] = v
+            if (this.getAllLeaf(arr).length > 0) {
+              pathId.push(this.getAllLeaf(arr)[0])
+            }
+          })
+          data[1].forEach((value, index, array) => {
+            if (value.type === 'FILE') {
+              fileTargetList.push(value)
+            } else {
+              udfTargetList.push(value)
+            }
+          })
+          fileTargetList = _.map(fileTargetList, v => {
+            return v.id
+          })
+          udfTargetList = _.map(udfTargetList, v => {
+            return v.id
+          })
+          this.item = item
+          this.resourceData.fileSourceList = fileSourceList
+          this.resourceData.udfSourceList = udfSourceList
+          this.resourceData.fileTargetList = fileTargetList
+          this.resourceData.udfTargetList = udfTargetList
+          this.resourceData.type.name = `${i18n.$t('Resources')}`
+          this.resourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+
+      onUpdateAuthResource (resourceIds) {
+        this._grantAuthorization('users/grant-file', {
+          userId: this.item.id,
+          resourceIds: resourceIds
+        })
+        this.resourceDialog = false
+      },
+
+      closeAuthResource () {
+        this.resourceDialog = false
+      },
+
+      _authDataSource (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'datasource',
+          category: 'datasources'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.name
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.name
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('Datasource')}`
+          this.authDataSourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      onUpdateAuthDataSource (datasourceIds) {
+        this._grantAuthorization('users/grant-datasource', {
+          userId: this.item.id,
+          datasourceIds: datasourceIds
+        })
+        this.authDataSourceDialog = false
+      },
+      closeAuthDataSource () {
+        this.authDataSourceDialog = false
+      },
+
+      _authUdfFunc (item, i) {
+        this.getAuthList({
+          id: item.id,
+          type: 'udf-func',
+          category: 'resources'
+        }).then(data => {
+          let sourceListPrs = _.map(data[0], v => {
+            return {
+              id: v.id,
+              name: v.funcName
+            }
+          })
+          let targetListPrs = _.map(data[1], v => {
+            return {
+              id: v.id,
+              name: v.funcName
+            }
+          })
+          this.item = item
+          this.transferData.sourceListPrs = sourceListPrs
+          this.transferData.targetListPrs = targetListPrs
+          this.transferData.type.name = `${i18n.$t('UDF Function')}`
+          this.authUdfFuncDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      onUpdateAuthUdfFunc (udfIds) {
+        this._grantAuthorization('users/grant-udf-func', {
+          userId: this.item.id,
+          udfIds: udfIds
+        })
+        this.authUdfFuncDialog = false
+      },
+
+      closeAuthUdfFunc () {
+        this.authUdfFuncDialog = false
+      },
+
+      _grantAuthorization (api, param) {
+        this.grantAuthorization({
+          api: api,
+          param: param
+        }).then(res => {
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       }
-      getLeaf(data)
-      return result
     },
-    _authFile (item, i) {
-      this.getResourceList({
-        id: item.id,
-        type: 'file',
-        category: 'resources'
-      }).then(data => {
-        const fileSourceList = []
-        const udfSourceList = []
-        data[0].forEach((value, index, array) => {
-          if (value.type === 'FILE') {
-            fileSourceList.push(value)
-          } else {
-            udfSourceList.push(value)
-          }
+    watch: {
+      userList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
         })
-        let fileTargetList = []
-        let udfTargetList = []
-
-        const pathId = []
-        data[1].forEach(v => {
-          const arr = []
-          arr[0] = v
-          if (this.getAllLeaf(arr).length > 0) {
-            pathId.push(this.getAllLeaf(arr)[0])
-          }
-        })
-        data[1].forEach((value, index, array) => {
-          if (value.type === 'FILE') {
-            fileTargetList.push(value)
-          } else {
-            udfTargetList.push(value)
-          }
-        })
-        fileTargetList = _.map(fileTargetList, v => {
-          return v.id
-        })
-        udfTargetList = _.map(udfTargetList, v => {
-          return v.id
-        })
-        this.item = item
-        this.resourceData.fileSourceList = fileSourceList
-        this.resourceData.udfSourceList = udfSourceList
-        this.resourceData.fileTargetList = fileTargetList
-        this.resourceData.udfTargetList = udfTargetList
-        this.resourceData.type.name = `${i18n.$t('Resources')}`
-        this.resourceDialog = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
+      }
     },
-
-    onUpdateAuthResource (resourceIds) {
-      this._grantAuthorization('users/grant-file', {
-        userId: this.item.id,
-        resourceIds: resourceIds
-      })
-      this.resourceDialog = false
+    created () {
+      this.list = this.userList
     },
-
-    closeAuthResource () {
-      this.resourceDialog = false
+    mounted () {
     },
-
-    _authDataSource (item, i) {
-      this.getAuthList({
-        id: item.id,
-        type: 'datasource',
-        category: 'datasources'
-      }).then(data => {
-        const sourceListPrs = _.map(data[0], v => {
-          return {
-            id: v.id,
-            name: v.name
-          }
-        })
-        const targetListPrs = _.map(data[1], v => {
-          return {
-            id: v.id,
-            name: v.name
-          }
-        })
-        this.item = item
-        this.transferData.sourceListPrs = sourceListPrs
-        this.transferData.targetListPrs = targetListPrs
-        this.transferData.type.name = `${i18n.$t('Datasource')}`
-        this.authDataSourceDialog = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    onUpdateAuthDataSource (datasourceIds) {
-      this._grantAuthorization('users/grant-datasource', {
-        userId: this.item.id,
-        datasourceIds: datasourceIds
-      })
-      this.authDataSourceDialog = false
-    },
-    closeAuthDataSource () {
-      this.authDataSourceDialog = false
-    },
-
-    _authUdfFunc (item, i) {
-      this.getAuthList({
-        id: item.id,
-        type: 'udf-func',
-        category: 'resources'
-      }).then(data => {
-        const sourceListPrs = _.map(data[0], v => {
-          return {
-            id: v.id,
-            name: v.funcName
-          }
-        })
-        const targetListPrs = _.map(data[1], v => {
-          return {
-            id: v.id,
-            name: v.funcName
-          }
-        })
-        this.item = item
-        this.transferData.sourceListPrs = sourceListPrs
-        this.transferData.targetListPrs = targetListPrs
-        this.transferData.type.name = `${i18n.$t('UDF Function')}`
-        this.authUdfFuncDialog = true
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    onUpdateAuthUdfFunc (udfIds) {
-      this._grantAuthorization('users/grant-udf-func', {
-        userId: this.item.id,
-        udfIds: udfIds
-      })
-      this.authUdfFuncDialog = false
-    },
-
-    closeAuthUdfFunc () {
-      this.authUdfFuncDialog = false
-    },
-
-    _grantAuthorization (api, param) {
-      this.grantAuthorization({
-        api: api,
-        param: param
-      }).then(res => {
-        this.$message.success(res.msg)
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    }
-  },
-  watch: {
-    userList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-    this.list = this.userList
-  },
-  mounted () {
-  },
-  components: { mTransfer, mResource }
-}
+    components: { mTransfer, mResource }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

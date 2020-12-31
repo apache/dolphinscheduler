@@ -25,13 +25,13 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'no-data',
-  props: {
-    msg: String,
-    height: Number
+  export default {
+    name: 'no-data',
+    props: {
+      msg: String,
+      height: Number
+    }
   }
-}
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

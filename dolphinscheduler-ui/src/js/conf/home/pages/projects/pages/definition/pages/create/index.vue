@@ -18,9 +18,9 @@
   <m-create-dag></m-create-dag>
 </template>
 <script>
-import mCreateDag from '@/conf/home/pages/dag/index'
-export default {
-  name: 'definition-create-index',
-  components: { mCreateDag }
-}
+  import mCreateDag from '@/conf/home/pages/dag/index'
+  export default {
+    name: 'definition-create-index',
+    components: { mCreateDag }
+  }
 </script>

@@ -30,47 +30,47 @@
   </el-select>
 </template>
 <script>
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'form-worker-group',
-  data () {
-    return {
-      selectedValue: this.value,
-      workerGroupsList: []
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    value: {
-      type: String,
-      default: 'default'
-    }
-  },
-  model: {
-    prop: 'value',
-    event: 'workerGroupsEvent'
-  },
-  methods: {
-    _onChange (o) {
-      this.$emit('workerGroupsEvent', o)
-    }
-  },
-  watch: {
-    value (val) {
-      this.selectedValue = val
-    }
-  },
-  created () {
-    const stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
-    if (stateWorkerGroupsList.length) {
-      this.workerGroupsList = stateWorkerGroupsList
-    } else {
-      this.store.dispatch('security/getWorkerGroupsAll').then(res => {
-        this.$nextTick(() => {
-          this.workerGroupsList = res
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'form-worker-group',
+    data () {
+      return {
+        selectedValue: this.value,
+        workerGroupsList: []
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      value: {
+        type: String,
+        default: 'default'
+      }
+    },
+    model: {
+      prop: 'value',
+      event: 'workerGroupsEvent'
+    },
+    methods: {
+      _onChange (o) {
+        this.$emit('workerGroupsEvent', o)
+      }
+    },
+    watch: {
+      value (val) {
+        this.selectedValue = val
+      }
+    },
+    created () {
+      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (stateWorkerGroupsList.length) {
+        this.workerGroupsList = stateWorkerGroupsList
+      } else {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.$nextTick(() => {
+            this.workerGroupsList = res
+          })
         })
-      })
+      }
     }
   }
-}
 </script>

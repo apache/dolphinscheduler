@@ -81,75 +81,75 @@
   </div>
 </template>
 <script>
-import Permissions from '@/module/permissions'
-import mLog from '@/conf/home/pages/dag/_source/formModel/log'
-import { tasksState } from '@/conf/home/pages/dag/_source/config'
-import { mapActions } from 'vuex'
+  import Permissions from '@/module/permissions'
+  import mLog from '@/conf/home/pages/dag/_source/formModel/log'
+  import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import { mapActions } from 'vuex'
 
-export default {
-  name: 'list',
-  data () {
-    return {
-      list: [],
-      isAuth: Permissions.getAuth(),
-      backfillItem: {},
-      logDialog: false,
-      item: {},
-      source: '',
-      logId: null
-    }
-  },
-  props: {
-    taskInstanceList: Array,
-    pageNo: Number,
-    pageSize: Number
-  },
-  methods: {
-    ...mapActions('dag', ['forceTaskSuccess']),
-    _rtState (code) {
-      const o = tasksState[code]
-      return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
+  export default {
+    name: 'list',
+    data () {
+      return {
+        list: [],
+        isAuth: Permissions.getAuth(),
+        backfillItem: {},
+        logDialog: false,
+        item: {},
+        source: '',
+        logId: null
+      }
     },
-    _refreshLog (item) {
-      this.item = item
-      this.source = 'list'
-      this.logId = item.id
-      this.logDialog = true
+    props: {
+      taskInstanceList: Array,
+      pageNo: Number,
+      pageSize: Number
     },
-    ok () {},
+    methods: {
+      ...mapActions('dag', ['forceTaskSuccess']),
+      _rtState (code) {
+        let o = tasksState[code]
+        return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
+      },
+      _refreshLog (item) {
+        this.item = item
+        this.source = 'list'
+        this.logId = item.id
+        this.logDialog = true
+      },
+      ok () {},
 
-    close () {
-      this.logDialog = false
-    },
+      close () {
+        this.logDialog = false
+      },
 
-    _forceSuccess (item) {
-      this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
-        if (res.code === 0) {
-          this.$message.success(res.msg)
-        } else {
-          this.$message.error(res.msg)
-        }
-      }).catch(e => {
-        this.$message.error(e.msg)
-      })
+      _forceSuccess (item) {
+        this.forceTaskSuccess({ taskInstanceId: item.id }).then(res => {
+          if (res.code === 0) {
+            this.$message.success(res.msg)
+          } else {
+            this.$message.error(res.msg)
+          }
+        }).catch(e => {
+          this.$message.error(e.msg)
+        })
+      },
+      _go (item) {
+        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+      }
     },
-    _go (item) {
-      this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
-    }
-  },
-  watch: {
-    taskInstanceList (a) {
-      this.list = []
-      setTimeout(() => {
-        this.list = a
-      })
-    }
-  },
-  created () {
-  },
-  mounted () {
-    this.list = this.taskInstanceList
-  },
-  components: { mLog }
-}
+    watch: {
+      taskInstanceList (a) {
+        this.list = []
+        setTimeout(() => {
+          this.list = a
+        })
+      }
+    },
+    created () {
+    },
+    mounted () {
+      this.list = this.taskInstanceList
+    },
+    components: { mLog }
+  }
 </script>

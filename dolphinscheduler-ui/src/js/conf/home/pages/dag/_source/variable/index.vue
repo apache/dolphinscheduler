@@ -22,29 +22,29 @@
   </div>
 </template>
 <script>
-import mVariablesView from './variablesView'
-export default {
-  name: 'assist-dag-index',
-  data () {
-    return {
-      isView: false,
-      isActive: true
-    }
-  },
-  methods: {
-    _toggleView () {
-      this.isView = !this.isView
-    }
-  },
-  watch: {
-    $route: {
-      deep: true,
-      handler () {
-        this.isActive = false
-        this.$nextTick(() => (this.isActive = true))
+  import mVariablesView from './variablesView'
+  export default {
+    name: 'assist-dag-index',
+    data () {
+      return {
+        isView: false,
+        isActive: true
       }
-    }
-  },
-  components: { mVariablesView }
-}
+    },
+    methods: {
+      _toggleView () {
+        this.isView = !this.isView
+      }
+    },
+    watch: {
+      $route: {
+        deep: true,
+        handler () {
+          this.isActive = false
+          this.$nextTick(() => (this.isActive = true))
+        }
+      }
+    },
+    components: { mVariablesView }
+  }
 </script>

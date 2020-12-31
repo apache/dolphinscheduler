@@ -21,9 +21,9 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'no-type'
-}
+  export default {
+    name: 'no-type'
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

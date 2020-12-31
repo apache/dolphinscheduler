@@ -57,126 +57,126 @@
    </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mList from './_source/list'
-import localStore from '@/module/util/localStorage'
-import mSpin from '@/module/components/spin/spin'
-import { findComponentDownward } from '@/module/util/'
-import mNoData from '@/module/components/noData/noData'
-import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-import mConditions from '@/module/components/conditions/conditions'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mList from './_source/list'
+  import localStore from '@/module/util/localStorage'
+  import mSpin from '@/module/components/spin/spin'
+  import { findComponentDownward } from '@/module/util/'
+  import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import mConditions from '@/module/components/conditions/conditions'
 
-export default {
-  name: 'resource-list-index-FILE',
-  data () {
-    return {
-      total: null,
-      isLoading: false,
-      fileResourcesList: [],
-      searchParams: {
-        id: this.$route.params.id,
-        pageSize: 10,
-        pageNo: 1,
-        searchVal: '',
-        type: 'FILE'
-      },
-      isLeft: true,
-      breadList: []
-    }
-  },
-  mixins: [listUrlParamHandle],
-  props: {},
-  methods: {
-    ...mapActions('resource', ['getResourcesListP', 'getResourceId']),
-    /**
+  export default {
+    name: 'resource-list-index-FILE',
+    data () {
+      return {
+        total: null,
+        isLoading: false,
+        fileResourcesList: [],
+        searchParams: {
+          id: this.$route.params.id,
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: '',
+          type: 'FILE'
+        },
+        isLeft: true,
+        breadList: []
+      }
+    },
+    mixins: [listUrlParamHandle],
+    props: {},
+    methods: {
+      ...mapActions('resource', ['getResourcesListP', 'getResourceId']),
+      /**
        * File Upload
        */
-    _uploading () {
-      findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE', this.searchParams.id)
-    },
-    _onConditions (o) {
-      this.searchParams = _.assign(this.searchParams, o)
-      this.searchParams.pageNo = 1
-    },
-    _page (val) {
-      this.searchParams.pageNo = val
-    },
-    _pageSize (val) {
-      this.searchParams.pageSize = val
-    },
-    _getList (flag) {
-      if (sessionStorage.getItem('isLeft') === 0) {
-        this.isLeft = false
-      } else {
-        this.isLeft = true
-      }
-      this.isLoading = !flag
-      this.getResourcesListP(this.searchParams).then(res => {
-        if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
-          this.searchParams.pageNo = this.searchParams.pageNo - 1
+      _uploading () {
+        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE', this.searchParams.id)
+      },
+      _onConditions (o) {
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
+      },
+      _page (val) {
+        this.searchParams.pageNo = val
+      },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
+      _getList (flag) {
+        if (sessionStorage.getItem('isLeft') === 0) {
+          this.isLeft = false
         } else {
-          this.fileResourcesList = res.totalList
-          this.total = res.total
+          this.isLeft = true
+        }
+        this.isLoading = !flag
+        this.getResourcesListP(this.searchParams).then(res => {
+          if (this.searchParams.pageNo > 1 && res.totalList.length === 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo - 1
+          } else {
+            this.fileResourcesList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
+        }).catch(e => {
           this.isLoading = false
-        }
-      }).catch(e => {
-        this.isLoading = false
-      })
+        })
+      },
+      _updateList (data) {
+        this.searchParams.id = data
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        this._debounceGET()
+      },
+      _onUpdate () {
+        this.searchParams.id = this.$route.params.id
+        this._debounceGET()
+      },
+      _ckOperation (index) {
+        let breadName = ''
+        this.breadList.forEach((item, i) => {
+          if (i <= index) {
+            breadName = breadName + '/' + item
+          }
+        })
+        this.transferApi(breadName)
+      },
+      transferApi (api) {
+        this.getResourceId({
+          type: 'FILE',
+          fullName: api
+        }).then(res => {
+          localStore.setItem('currentDir', `${res.fullName}`)
+          this.$router.push({ path: `/resource/file/subdirectory/${res.id}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      }
     },
-    _updateList (data) {
-      this.searchParams.id = data
-      this.searchParams.pageNo = 1
-      this.searchParams.searchVal = ''
-      this._debounceGET()
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+        this.searchParams.id = a.params.id
+        let dir = localStore.getItem('currentDir').split('/')
+        dir.shift()
+        this.breadList = dir
+      }
     },
-    _onUpdate () {
-      this.searchParams.id = this.$route.params.id
-      this._debounceGET()
-    },
-    _ckOperation (index) {
-      let breadName = ''
-      this.breadList.forEach((item, i) => {
-        if (i <= index) {
-          breadName = breadName + '/' + item
-        }
-      })
-      this.transferApi(breadName)
-    },
-    transferApi (api) {
-      this.getResourceId({
-        type: 'FILE',
-        fullName: api
-      }).then(res => {
-        localStore.setItem('currentDir', `${res.fullName}`)
-        this.$router.push({ path: `/resource/file/subdirectory/${res.id}` })
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    }
-  },
-  watch: {
-    // router
-    '$route' (a) {
-      // url no params get instance list
-      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-      this.searchParams.id = a.params.id
-      const dir = localStore.getItem('currentDir').split('/')
+    created () {},
+    mounted () {
+      let dir = localStore.getItem('currentDir').split('/')
       dir.shift()
       this.breadList = dir
-    }
-  },
-  created () {},
-  mounted () {
-    const dir = localStore.getItem('currentDir').split('/')
-    dir.shift()
-    this.breadList = dir
-  },
-  beforeDestroy () {
-    sessionStorage.setItem('isLeft', 1)
-  },
-  components: { mConditions, mList, mSpin, mNoData }
-}
+    },
+    beforeDestroy () {
+      sessionStorage.setItem('isLeft', 1)
+    },
+    components: { mConditions, mList, mSpin, mNoData }
+  }
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .bread {

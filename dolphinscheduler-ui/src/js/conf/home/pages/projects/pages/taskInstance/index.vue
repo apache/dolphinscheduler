@@ -47,126 +47,126 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mList from './_source/list'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
-import mListConstruction from '@/module/components/listConstruction/listConstruction'
-import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mList from './_source/list'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/conditions/instance/taskInstance'
 
-export default {
-  name: 'task-instance-list-index',
-  data () {
-    return {
-      isLoading: true,
-      total: null,
-      taskInstanceList: [],
-      searchParams: {
-        // page size
-        pageSize: 10,
-        // page index
-        pageNo: 1,
-        // Query name
-        searchVal: '',
-        // Process instance id
-        processInstanceId: '',
-        // host
-        host: '',
-        // state
-        stateType: '',
-        // start date
-        startDate: '',
-        // end date
-        endDate: '',
-        // Exectuor Name
-        executorName: '',
-        processInstanceName: ''
-      },
-      isLeft: true
-    }
-  },
-  mixins: [listUrlParamHandle],
-  props: {},
-  methods: {
-    ...mapActions('dag', ['getTaskInstanceList']),
-    /**
+  export default {
+    name: 'task-instance-list-index',
+    data () {
+      return {
+        isLoading: true,
+        total: null,
+        taskInstanceList: [],
+        searchParams: {
+          // page size
+          pageSize: 10,
+          // page index
+          pageNo: 1,
+          // Query name
+          searchVal: '',
+          // Process instance id
+          processInstanceId: '',
+          // host
+          host: '',
+          // state
+          stateType: '',
+          // start date
+          startDate: '',
+          // end date
+          endDate: '',
+          // Exectuor Name
+          executorName: '',
+          processInstanceName: ''
+        },
+        isLeft: true
+      }
+    },
+    mixins: [listUrlParamHandle],
+    props: {},
+    methods: {
+      ...mapActions('dag', ['getTaskInstanceList']),
+      /**
        * click query
        */
-    _onQuery (o) {
-      this.searchParams = _.assign(this.searchParams, o)
-      this.searchParams.processInstanceId = ''
-      if (this.searchParams.taskName) {
-        this.searchParams.taskName = ''
-      }
-      this.searchParams.pageNo = 1
-    },
-    _page (val) {
-      this.searchParams.pageNo = val
-    },
-    _pageSize (val) {
-      this.searchParams.pageSize = val
-    },
-    /**
+      _onQuery (o) {
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.processInstanceId = ''
+        if (this.searchParams.taskName) {
+          this.searchParams.taskName = ''
+        }
+        this.searchParams.pageNo = 1
+      },
+      _page (val) {
+        this.searchParams.pageNo = val
+      },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
+      /**
        * get list data
        */
-    _getList (flag) {
-      this.isLoading = !flag
-      if (this.searchParams.pageNo === undefined) {
-        this.$router.push({ path: '/projects/index' })
-        return false
-      }
-      this.getTaskInstanceList(this.searchParams).then(res => {
-        this.taskInstanceList = []
-        this.taskInstanceList = res.totalList
-        this.total = res.total
-        this.isLoading = false
-      }).catch(e => {
-        this.isLoading = false
-      })
-    },
-    /**
+      _getList (flag) {
+        this.isLoading = !flag
+        if (this.searchParams.pageNo === undefined) {
+          this.$router.push({ path: '/projects/index' })
+          return false
+        }
+        this.getTaskInstanceList(this.searchParams).then(res => {
+          this.taskInstanceList = []
+          this.taskInstanceList = res.totalList
+          this.total = res.total
+          this.isLoading = false
+        }).catch(e => {
+          this.isLoading = false
+        })
+      },
+      /**
        * Anti shake request interface
        * @desc Prevent functions from being called multiple times
        */
-    _debounceGET: _.debounce(function (flag) {
-      if (sessionStorage.getItem('isLeft') === 0) {
-        this.isLeft = false
-      } else {
-        this.isLeft = true
+      _debounceGET: _.debounce(function (flag) {
+        if (sessionStorage.getItem('isLeft') === 0) {
+          this.isLeft = false
+        } else {
+          this.isLeft = true
+        }
+        this._getList(flag)
+      }, 100, {
+        leading: false,
+        trailing: true
+      })
+    },
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        if (_.isEmpty(a.query)) {
+          this.searchParams.processInstanceId = ''
+        }
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
-      this._getList(flag)
-    }, 100, {
-      leading: false,
-      trailing: true
-    })
-  },
-  watch: {
-    // router
-    '$route' (a) {
-      // url no params get instance list
-      if (_.isEmpty(a.query)) {
-        this.searchParams.processInstanceId = ''
-      }
-      this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
-    }
-  },
-  created () {
-  },
-  mounted () {
-    // Cycle acquisition status
-    this.setIntervalP = setInterval(() => {
-      this._debounceGET('false')
-    }, 90000)
-  },
-  beforeDestroy () {
-    // Destruction wheel
-    clearInterval(this.setIntervalP)
-    sessionStorage.setItem('isLeft', 1)
-  },
-  components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
-}
+    },
+    created () {
+    },
+    mounted () {
+      // Cycle acquisition status
+      this.setIntervalP = setInterval(() => {
+        this._debounceGET('false')
+      }, 90000)
+    },
+    beforeDestroy () {
+      // Destruction wheel
+      clearInterval(this.setIntervalP)
+      sessionStorage.setItem('isLeft', 1)
+    },
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mNoData }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

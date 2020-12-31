@@ -106,169 +106,169 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import mSpin from '@/module/components/spin/spin'
-import mTiming from '../../pages/list/_source/timing'
-import mNoData from '@/module/components/noData/noData'
-import { publishStatus } from '@/conf/home/pages/dag/_source/config'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import mSpin from '@/module/components/spin/spin'
+  import mTiming from '../../pages/list/_source/timing'
+  import mNoData from '@/module/components/noData/noData'
+  import { publishStatus } from '@/conf/home/pages/dag/_source/config'
 
-export default {
-  name: 'list',
-  data () {
-    return {
-      isLoading: false,
-      total: null,
-      pageNo: 1,
-      pageSize: 10,
-      list: [],
-      timingDialog: false,
-      timingData: {
-        item: {},
-        receiversD: [],
-        receiversCcD: []
+  export default {
+    name: 'list',
+    data () {
+      return {
+        isLoading: false,
+        total: null,
+        pageNo: 1,
+        pageSize: 10,
+        list: [],
+        timingDialog: false,
+        timingData: {
+          item: {},
+          receiversD: [],
+          receiversCcD: []
+        }
       }
-    }
-  },
-  props: {
-  },
-  methods: {
-    ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver', 'deleteTiming']),
-    /**
+    },
+    props: {
+    },
+    methods: {
+      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver', 'deleteTiming']),
+      /**
        * delete
        */
-    _delete (item, i) {
-      this.deleteTiming({
-        scheduleId: item.id
-      }).then(res => {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
-        this.$message.success(res.msg)
-        this.$router.push({ name: 'projects-definition-list' })
-      }).catch(e => {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _delete (item, i) {
+        this.deleteTiming({
+          scheduleId: item.id
+        }).then(res => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.$message.success(res.msg)
+          this.$router.push({ name: 'projects-definition-list' })
+        }).catch(e => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * Close the delete layer
        */
-    _closeDelete (i) {
-      this.$refs[`poptip-delete-${i}`][0].doClose()
-    },
-    /**
+      _closeDelete (i) {
+        this.$refs[`poptip-delete-${i}`][0].doClose()
+      },
+      /**
        * return state
        */
-    _rtReleaseState (code) {
-      return _.filter(publishStatus, v => v.code === code)[0].desc
-    },
-    /**
+      _rtReleaseState (code) {
+        return _.filter(publishStatus, v => v.code === code)[0].desc
+      },
+      /**
        * page
        */
-    _page (val) {
-      this.pageNo = val
-      this._getScheduleList()
-    },
-    _pageSize (val) {
-      this.pageSize = val
-      this._getScheduleList()
-    },
-    /**
+      _page (val) {
+        this.pageNo = val
+        this._getScheduleList()
+      },
+      _pageSize (val) {
+        this.pageSize = val
+        this._getScheduleList()
+      },
+      /**
        * Inquire list
        */
-    _getScheduleList (flag) {
-      this.isLoading = !flag
-      this.getScheduleList({
-        processDefinitionId: this.$route.params.id,
-        searchVal: '',
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      }).then(res => {
-        this.list = []
-        setTimeout(() => {
-          this.list = res.data.totalList
+      _getScheduleList (flag) {
+        this.isLoading = !flag
+        this.getScheduleList({
+          processDefinitionId: this.$route.params.id,
+          searchVal: '',
+          pageNo: this.pageNo,
+          pageSize: this.pageSize
+        }).then(res => {
+          this.list = []
+          setTimeout(() => {
+            this.list = res.data.totalList
+          })
+          this.total = res.data.total
+          this.isLoading = false
+        }).catch(e => {
+          this.isLoading = false
         })
-        this.total = res.data.total
-        this.isLoading = false
-      }).catch(e => {
-        this.isLoading = false
-      })
-    },
-    /**
+      },
+      /**
        * search
        */
-    _onConditions (o) {
-      this.searchVal = o.searchVal
-      this.pageNo = 1
-      this._getScheduleList('false')
-    },
-    /**
+      _onConditions (o) {
+        this.searchVal = o.searchVal
+        this.pageNo = 1
+        this._getScheduleList('false')
+      },
+      /**
        * online
        */
-    _online (item) {
-      this.pageNo = 1
-      this.scheduleOnline({
-        id: item.id
-      }).then(res => {
-        this.$message.success(res.msg)
-        this._getScheduleList('false')
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _online (item) {
+        this.pageNo = 1
+        this.scheduleOnline({
+          id: item.id
+        }).then(res => {
+          this.$message.success(res.msg)
+          this._getScheduleList('false')
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * offline
        */
-    _offline (item) {
-      this.pageNo = 1
-      this.scheduleOffline({
-        id: item.id
-      }).then(res => {
-        this.$message.success(res.msg)
-        this._getScheduleList('false')
-      }).catch(e => {
-        this.$message.error(e.msg || '')
-      })
-    },
-    /**
+      _offline (item) {
+        this.pageNo = 1
+        this.scheduleOffline({
+          id: item.id
+        }).then(res => {
+          this.$message.success(res.msg)
+          this._getScheduleList('false')
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * get email
        */
-    _getReceiver (id) {
-      return new Promise((resolve, reject) => {
-        this.getReceiver({ processDefinitionId: id }).then(res => {
-          resolve({
-            receivers: res.receivers && res.receivers.split(',') || [],
-            receiversCc: res.receiversCc && res.receiversCc.split(',') || []
+      _getReceiver (id) {
+        return new Promise((resolve, reject) => {
+          this.getReceiver({ processDefinitionId: id }).then(res => {
+            resolve({
+              receivers: res.receivers && res.receivers.split(',') || [],
+              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
+            })
           })
         })
-      })
-    },
-    /**
+      },
+      /**
        * timing
        */
-    _editTiming (item) {
-      this._getReceiver(item.processDefinitionId).then(res => {
-        this.timingData.item = item
-        this.timingData.receiversD = res.receivers
-        this.timingData.receiversCcD = res.receiversCc
-        this.timingDialog = true
-      })
+      _editTiming (item) {
+        this._getReceiver(item.processDefinitionId).then(res => {
+          this.timingData.item = item
+          this.timingData.receiversD = res.receivers
+          this.timingData.receiversCcD = res.receiversCc
+          this.timingDialog = true
+        })
+      },
+      onUpdateTiming () {
+        this.pageNo = 1
+        this._getScheduleList('false')
+        this.timingDialog = false
+      },
+      closeTiming () {
+        this.timingDialog = false
+      }
     },
-    onUpdateTiming () {
-      this.pageNo = 1
-      this._getScheduleList('false')
-      this.timingDialog = false
+    watch: {},
+    created () {
+      this._getScheduleList()
     },
-    closeTiming () {
-      this.timingDialog = false
-    }
-  },
-  watch: {},
-  created () {
-    this._getScheduleList()
-  },
-  mounted () {},
-  components: { mSpin, mNoData, mTiming }
-}
+    mounted () {},
+    components: { mSpin, mNoData, mTiming }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

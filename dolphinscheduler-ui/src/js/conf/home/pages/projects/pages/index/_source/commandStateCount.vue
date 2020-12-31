@@ -27,68 +27,68 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import { mapActions } from 'vuex'
-import { simple } from './chartConfig'
-import Chart from '@/module/ana-charts'
-import mNoData from '@/module/components/noData/noData'
+  import _ from 'lodash'
+  import { mapActions } from 'vuex'
+  import { simple } from './chartConfig'
+  import Chart from '@/module/ana-charts'
+  import mNoData from '@/module/components/noData/noData'
 
-export default {
-  name: 'command-state-count',
-  data () {
-    return {
-      isSpin: true,
-      msg: ''
-    }
-  },
-  props: {
-    searchParams: Object
-  },
-  methods: {
-    ...mapActions('projects', ['getCommandStateCount']),
-    _handleCommandState (res) {
-      const data = []
-      _.forEach(res.data, (v, i) => {
-        const key = _.keys(v)
-        if (key[0] === 'errorCount') {
-          data.push({ typeName: `${this.$t('Error command count')}`, key: v.commandState, value: v.errorCount })
-        }
-      })
-      _.forEach(res.data, (v, i) => {
-        const key = _.keys(v)
-        if (key[1] === 'normalCount') {
-          data.push({ typeName: `${this.$t('Normal command count')}`, key: v.commandState, value: v.normalCount })
-        }
-      })
-      const myChart = Chart.bar('#command-state-bar', data, {
-        title: ''
-      })
-      myChart.echart.setOption(simple)
-    }
-  },
-  created () {
-
-  },
-  watch: {
-    searchParams: {
-      deep: true,
-      immediate: true,
-      handler (o) {
-        this.isSpin = true
-        this.getCommandStateCount(o).then(res => {
-          this._handleCommandState(res)
-          this.isSpin = false
-        }).catch(e => {
-          this.msg = e.msg || 'error'
-          this.isSpin = false
-        })
+  export default {
+    name: 'command-state-count',
+    data () {
+      return {
+        isSpin: true,
+        msg: ''
       }
-    }
-  },
-  mounted () {
+    },
+    props: {
+      searchParams: Object
+    },
+    methods: {
+      ...mapActions('projects', ['getCommandStateCount']),
+      _handleCommandState (res) {
+        let data = []
+        _.forEach(res.data, (v, i) => {
+          let key = _.keys(v)
+          if (key[0] === 'errorCount') {
+            data.push({ typeName: `${this.$t('Error command count')}`, key: v.commandState, value: v.errorCount })
+          }
+        })
+        _.forEach(res.data, (v, i) => {
+          let key = _.keys(v)
+          if (key[1] === 'normalCount') {
+            data.push({ typeName: `${this.$t('Normal command count')}`, key: v.commandState, value: v.normalCount })
+          }
+        })
+        const myChart = Chart.bar('#command-state-bar', data, {
+          title: ''
+        })
+        myChart.echart.setOption(simple)
+      }
+    },
+    created () {
 
-  },
-  computed: {},
-  components: { mNoData }
-}
+    },
+    watch: {
+      searchParams: {
+        deep: true,
+        immediate: true,
+        handler (o) {
+          this.isSpin = true
+          this.getCommandStateCount(o).then(res => {
+            this._handleCommandState(res)
+            this.isSpin = false
+          }).catch(e => {
+            this.msg = e.msg || 'error'
+            this.isSpin = false
+          })
+        }
+      }
+    },
+    mounted () {
+
+    },
+    computed: {},
+    components: { mNoData }
+  }
 </script>

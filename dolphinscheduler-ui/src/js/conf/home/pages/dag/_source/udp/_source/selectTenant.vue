@@ -30,57 +30,57 @@
   </el-select>
 </template>
 <script>
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'form-tenant',
-  data () {
-    return {
-      selectedValue: this.value,
-      itemList: []
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    value: {
-      type: String,
-      default: 'default'
-    }
-  },
-  model: {
-    prop: 'value',
-    event: 'tenantSelectEvent'
-  },
-  mounted () {
-    const result = this.itemList.some(item => {
-      if (item.id === this.value) {
-        return true
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'form-tenant',
+    data () {
+      return {
+        selectedValue: this.value,
+        itemList: []
       }
-    })
-    if (!result) {
-      this.selectedValue = 'default'
-    }
-  },
-  methods: {
-    _onChange (o) {
-      this.$emit('tenantSelectEvent', o)
-    }
-  },
-  watch: {
-    value (val) {
-      this.selectedValue = val
-    }
-  },
-  created () {
-    const stateTenantAllList = this.store.state.security.tenantAllList || []
-    if (stateTenantAllList.length) {
-      this.itemList = stateTenantAllList
-    } else {
-      this.store.dispatch('security/getTenantList').then(res => {
-        this.$nextTick(() => {
-          this.itemList = res
-        })
+    },
+    mixins: [disabledState],
+    props: {
+      value: {
+        type: String,
+        default: 'default'
+      }
+    },
+    model: {
+      prop: 'value',
+      event: 'tenantSelectEvent'
+    },
+    mounted () {
+      let result = this.itemList.some(item => {
+        if (item.id === this.value) {
+          return true
+        }
       })
+      if (!result) {
+        this.selectedValue = 'default'
+      }
+    },
+    methods: {
+      _onChange (o) {
+        this.$emit('tenantSelectEvent', o)
+      }
+    },
+    watch: {
+      value (val) {
+        this.selectedValue = val
+      }
+    },
+    created () {
+      let stateTenantAllList = this.store.state.security.tenantAllList || []
+      if (stateTenantAllList.length) {
+        this.itemList = stateTenantAllList
+      } else {
+        this.store.dispatch('security/getTenantList').then(res => {
+          this.$nextTick(() => {
+            this.itemList = res
+          })
+        })
+      }
     }
   }
-}
 </script>

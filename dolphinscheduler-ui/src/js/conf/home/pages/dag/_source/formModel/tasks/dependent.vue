@@ -61,117 +61,117 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import mListBox from './_source/listBox'
-import mDependItemList from './_source/dependItemList'
-import disabledState from '@/module/mixin/disabledState'
+  import _ from 'lodash'
+  import mListBox from './_source/listBox'
+  import mDependItemList from './_source/dependItemList'
+  import disabledState from '@/module/mixin/disabledState'
 
-export default {
-  name: 'dependence',
-  data () {
-    return {
-      relation: 'AND',
-      dependTaskList: [],
-      isLoading: false
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    backfillItem: Object
-  },
-  methods: {
-    _addDep () {
-      if (!this.isLoading) {
-        this.isLoading = true
-        this.dependTaskList.push({
-          dependItemList: [],
-          relation: 'AND'
-        })
-      }
-    },
-    _deleteDep (i) {
-      // remove index dependent
-      this.dependTaskList.splice(i, 1)
-
-      // remove tootip
-      $('body').find('.tooltip.fade.top.in').remove()
-    },
-    _onDeleteAll (i) {
-      this.dependTaskList[this.index].dependItemList.splice(i, 1)
-      this.dependTaskList.map((item, i) => {
-        if (item.dependItemList.length === 0) {
-          this.dependTaskList.splice(i, 1)
-        }
-      })
-      // this._deleteDep(i)
-    },
-    _setGlobalRelation () {
-      this.relation = this.relation === 'AND' ? 'OR' : 'AND'
-    },
-    getDependTaskList (i) {
-      // console.log('getDependTaskList',i)
-    },
-    _setRelation (i) {
-      this.dependTaskList[i].relation = this.dependTaskList[i].relation === 'AND' ? 'OR' : 'AND'
-    },
-    _verification () {
-      this.$emit('on-dependent', {
-        relation: this.relation,
-        dependTaskList: _.map(this.dependTaskList, v => {
-          return {
-            relation: v.relation,
-            dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
-          }
-        })
-      })
-      return true
-    }
-  },
-  watch: {
-    dependTaskList (e) {
-      setTimeout(() => {
-        this.isLoading = false
-      }, 600)
-    },
-    cacheDependence (val) {
-      this.$emit('on-cache-dependent', val)
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    const o = this.backfillItem
-    const dependentResult = $(`#${o.id}`).data('dependent-result') || {}
-    // Does not represent an empty object backfill
-    if (!_.isEmpty(o)) {
-      this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
-      this.dependTaskList = _.cloneDeep(o.dependence.dependTaskList) || []
-      const defaultState = this.isDetails ? 'WAITING' : ''
-      // Process instance return status display matches by key
-      _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
-        v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState
-      }))
-    }
-  },
-  mounted () {
-  },
-  destroyed () {
-  },
-  computed: {
-    cacheDependence () {
+  export default {
+    name: 'dependence',
+    data () {
       return {
-        relation: this.relation,
-        dependTaskList: _.map(this.dependTaskList, v => {
-          return {
-            relation: v.relation,
-            dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+        relation: 'AND',
+        dependTaskList: [],
+        isLoading: false
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      backfillItem: Object
+    },
+    methods: {
+      _addDep () {
+        if (!this.isLoading) {
+          this.isLoading = true
+          this.dependTaskList.push({
+            dependItemList: [],
+            relation: 'AND'
+          })
+        }
+      },
+      _deleteDep (i) {
+        // remove index dependent
+        this.dependTaskList.splice(i, 1)
+
+        // remove tootip
+        $('body').find('.tooltip.fade.top.in').remove()
+      },
+      _onDeleteAll (i) {
+        this.dependTaskList[this.index].dependItemList.splice(i, 1)
+        this.dependTaskList.map((item, i) => {
+          if (item.dependItemList.length === 0) {
+            this.dependTaskList.splice(i, 1)
           }
         })
+        // this._deleteDep(i)
+      },
+      _setGlobalRelation () {
+        this.relation = this.relation === 'AND' ? 'OR' : 'AND'
+      },
+      getDependTaskList (i) {
+        // console.log('getDependTaskList',i)
+      },
+      _setRelation (i) {
+        this.dependTaskList[i].relation = this.dependTaskList[i].relation === 'AND' ? 'OR' : 'AND'
+      },
+      _verification () {
+        this.$emit('on-dependent', {
+          relation: this.relation,
+          dependTaskList: _.map(this.dependTaskList, v => {
+            return {
+              relation: v.relation,
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+            }
+          })
+        })
+        return true
       }
-    }
-  },
-  components: { mListBox, mDependItemList }
-}
+    },
+    watch: {
+      dependTaskList (e) {
+        setTimeout(() => {
+          this.isLoading = false
+        }, 600)
+      },
+      cacheDependence (val) {
+        this.$emit('on-cache-dependent', val)
+      }
+    },
+    beforeCreate () {
+    },
+    created () {
+      let o = this.backfillItem
+      let dependentResult = $(`#${o.id}`).data('dependent-result') || {}
+      // Does not represent an empty object backfill
+      if (!_.isEmpty(o)) {
+        this.relation = _.cloneDeep(o.dependence.relation) || 'AND'
+        this.dependTaskList = _.cloneDeep(o.dependence.dependTaskList) || []
+        let defaultState = this.isDetails ? 'WAITING' : ''
+        // Process instance return status display matches by key
+        _.map(this.dependTaskList, v => _.map(v.dependItemList, v1 => {
+          v1.state = dependentResult[`${v1.definitionId}-${v1.depTasks}-${v1.cycle}-${v1.dateValue}`] || defaultState
+        }))
+      }
+    },
+    mounted () {
+    },
+    destroyed () {
+    },
+    computed: {
+      cacheDependence () {
+        return {
+          relation: this.relation,
+          dependTaskList: _.map(this.dependTaskList, v => {
+            return {
+              relation: v.relation,
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+            }
+          })
+        }
+      }
+    },
+    components: { mListBox, mDependItemList }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

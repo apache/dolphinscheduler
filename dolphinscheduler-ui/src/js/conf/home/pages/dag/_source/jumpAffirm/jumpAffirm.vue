@@ -24,20 +24,20 @@
   </div>
 </template>
 <script>
-import mPopup from '@/module/components/popup/popup'
+  import mPopup from '@/module/components/popup/popup'
 
-export default {
-  name: 'affirm',
-  methods: {
-    _ok () {
-      this.$emit('ok')
+  export default {
+    name: 'affirm',
+    methods: {
+      _ok () {
+        this.$emit('ok')
+      },
+      _close () {
+        this.$emit('close')
+      }
     },
-    _close () {
-      this.$emit('close')
-    }
-  },
-  components: { mPopup }
-}
+    components: { mPopup }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

@@ -18,7 +18,7 @@
   <router-view></router-view>
 </template>
 <script>
-export default {
-  name: 'projects-conditions-index'
-}
+  export default {
+    name: 'projects-conditions-index'
+  }
 </script>

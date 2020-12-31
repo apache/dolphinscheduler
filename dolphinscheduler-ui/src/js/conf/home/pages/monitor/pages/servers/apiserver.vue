@@ -20,31 +20,31 @@
   </div>
 </template>
 <script>
-export default {
-  name: 'apiserver',
-  data () {
-    return {}
-  },
-  props: {},
-  methods: {},
-  watch: {},
-  beforeCreate () {
-  },
-  created () {
-  },
-  beforeMount () {
-  },
-  mounted () {
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {},
-  components: {}
-}
+  export default {
+    name: 'apiserver',
+    data () {
+      return {}
+    },
+    props: {},
+    methods: {},
+    watch: {},
+    beforeCreate () {
+    },
+    created () {
+    },
+    beforeMount () {
+    },
+    mounted () {
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {},
+    components: {}
+  }
 </script>

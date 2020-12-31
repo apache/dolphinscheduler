@@ -50,85 +50,85 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import i18n from '@/module/i18n'
-import disabledState from '@/module/mixin/disabledState'
-export default {
-  name: 'user-def-statements',
-  data () {
-    return {
-      // Increased data
-      localStatementList: [],
-      // Current execution index
-      localStatementIndex: null
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    statementList: Array
-  },
-  methods: {
-    /**
+  import _ from 'lodash'
+  import i18n from '@/module/i18n'
+  import disabledState from '@/module/mixin/disabledState'
+  export default {
+    name: 'user-def-statements',
+    data () {
+      return {
+        // Increased data
+        localStatementList: [],
+        // Current execution index
+        localStatementIndex: null
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      statementList: Array
+    },
+    methods: {
+      /**
        * Current index
        */
-    _getIndex (index) {
-      this.localStatementIndex = index
-    },
-    /**
+      _getIndex (index) {
+        this.localStatementIndex = index
+      },
+      /**
        * delete item
        */
-    _removeStatement (index) {
-      this.localStatementList.splice(index, 1)
-      this._verifProp('value')
-    },
-    /**
+      _removeStatement (index) {
+        this.localStatementList.splice(index, 1)
+        this._verifProp('value')
+      },
+      /**
        * add
        */
-    _addStatement () {
-      this.localStatementList.push('')
-    },
-    /**
+      _addStatement () {
+        this.localStatementList.push('')
+      },
+      /**
        * blur verification
        */
-    _handleValue () {
-      this._verifProp('value')
-    },
-    /**
+      _handleValue () {
+        this._verifProp('value')
+      },
+      /**
        * Verify that the value exists or is empty
        */
-    _verifProp (type) {
-      const arr = []
-      let flag = true
-      _.map(this.localStatementList, v => {
-        arr.push(v)
-        if (!v) {
-          flag = false
+      _verifProp (type) {
+        let arr = []
+        let flag = true
+        _.map(this.localStatementList, v => {
+          arr.push(v)
+          if (!v) {
+            flag = false
+          }
+        })
+        if (!flag) {
+          if (!type) {
+            this.$message.warning(`${i18n.$t('Statement cannot be empty')}`)
+          }
+          return false
         }
-      })
-      if (!flag) {
-        if (!type) {
-          this.$message.warning(`${i18n.$t('Statement cannot be empty')}`)
-        }
-        return false
-      }
 
-      this.$emit('on-statement-list', _.cloneDeep(this.localStatementList))
-      return true
-    }
-  },
-  watch: {
-    // Monitor data changes
-    statementList () {
+        this.$emit('on-statement-list', _.cloneDeep(this.localStatementList))
+        return true
+      }
+    },
+    watch: {
+      // Monitor data changes
+      statementList () {
+        this.localStatementList = this.statementList
+      }
+    },
+    created () {
       this.localStatementList = this.statementList
-    }
-  },
-  created () {
-    this.localStatementList = this.statementList
-  },
-  mounted () {
-  },
-  components: { }
-}
+    },
+    mounted () {
+    },
+    components: { }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

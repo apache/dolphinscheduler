@@ -33,65 +33,65 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
-import disabledState from '@/module/mixin/disabledState'
+  import _ from 'lodash'
+  import disabledState from '@/module/mixin/disabledState'
 
-export default {
-  name: 'resourceList',
-  data () {
-    return {
-      // Resource(List)
-      resList: [],
-      // Resource
-      value: []
-    }
-  },
-  mixins: [disabledState],
-  props: {
-    resourceList: Array
-  },
-  methods: {
-    /**
+  export default {
+    name: 'resourceList',
+    data () {
+      return {
+        // Resource(List)
+        resList: [],
+        // Resource
+        value: []
+      }
+    },
+    mixins: [disabledState],
+    props: {
+      resourceList: Array
+    },
+    methods: {
+      /**
        * Verify data source
        */
-    _verifResources () {
-      this.$emit('on-resourcesData', _.map(this.value, v => {
-        return {
-          res: v
-        }
-      }))
-      return true
-    }
-  },
-  watch: {
-    // Listening data source
-    resourceList (a) {
-      this.value = _.map(_.cloneDeep(a), v => v.res)
-    },
-    value (val) {
-      this.$emit('on-cache-resourcesData', _.map(val, v => {
-        return {
-          res: v
-        }
-      }))
-    }
-  },
-  created () {
-    this.resList = _.map(_.cloneDeep(this.store.state.dag.resourcesListS), v => {
-      return {
-        code: v.alias
+      _verifResources () {
+        this.$emit('on-resourcesData', _.map(this.value, v => {
+          return {
+            res: v
+          }
+        }))
+        return true
       }
-    })
+    },
+    watch: {
+      // Listening data source
+      resourceList (a) {
+        this.value = _.map(_.cloneDeep(a), v => v.res)
+      },
+      value (val) {
+        this.$emit('on-cache-resourcesData', _.map(val, v => {
+          return {
+            res: v
+          }
+        }))
+      }
+    },
+    created () {
+      this.resList = _.map(_.cloneDeep(this.store.state.dag.resourcesListS), v => {
+        return {
+          code: v.alias
+        }
+      })
 
-    if (this.resourceList.length) {
-      this.value = _.map(_.cloneDeep(this.resourceList), v => v.res)
-    }
-  },
-  mounted () {
+      if (this.resourceList.length) {
+        this.value = _.map(_.cloneDeep(this.resourceList), v => v.res)
+      }
+    },
+    mounted () {
 
-  },
-  components: { }
-}
+    },
+    components: { }
+  }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">

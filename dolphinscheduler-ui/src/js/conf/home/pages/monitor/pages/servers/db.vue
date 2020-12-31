@@ -79,39 +79,39 @@
   </div>
 </template>
 <script>
-import { mapActions } from 'vuex'
-import mSpin from '@/module/components/spin/spin'
-import mNoData from '@/module/components/noData/noData'
-import themeData from '@/module/echarts/themeData.json'
+  import { mapActions } from 'vuex'
+  import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import themeData from '@/module/echarts/themeData.json'
 
-export default {
-  name: 'servers-mysql',
-  data () {
-    return {
-      isLoading: false,
-      mysqlList: [],
-      color: themeData.color
-    }
-  },
-  props: {},
-  methods: {
-    ...mapActions('monitor', ['getDatabaseData'])
-  },
-  watch: {},
-  created () {
-    this.isLoading = true
-    this.getDatabaseData()
-      .then(res => {
-        this.mysqlList = res
-        this.isLoading = false
-      })
-      .catch(() => {
-        this.isLoading = false
-      })
-  },
-  mounted () {},
-  components: { mSpin, mNoData }
-}
+  export default {
+    name: 'servers-mysql',
+    data () {
+      return {
+        isLoading: false,
+        mysqlList: [],
+        color: themeData.color
+      }
+    },
+    props: {},
+    methods: {
+      ...mapActions('monitor', ['getDatabaseData'])
+    },
+    watch: {},
+    created () {
+      this.isLoading = true
+      this.getDatabaseData()
+        .then(res => {
+          this.mysqlList = res
+          this.isLoading = false
+        })
+        .catch(() => {
+          this.isLoading = false
+        })
+    },
+    mounted () {},
+    components: { mSpin, mNoData }
+  }
 </script>
 <style lang="scss" rel="stylesheet/scss">
 @import "./servers";

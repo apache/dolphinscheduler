@@ -61,101 +61,101 @@
 </template>
 
 <script>
-import i18n from './_source/i18n'
-import mSecond from './_times/second'
-import mMinute from './_times/minute'
-import mHour from './_times/hour'
-import mDay from './_times/day'
-import mMonth from './_times/month'
-import mYear from './_times/year'
+  import i18n from './_source/i18n'
+  import mSecond from './_times/second'
+  import mMinute from './_times/minute'
+  import mHour from './_times/hour'
+  import mDay from './_times/day'
+  import mMonth from './_times/month'
+  import mYear from './_times/year'
 
-export default {
-  name: 'app',
-  data () {
-    return {
-      tabVal: 'second',
-      secondVal: '*',
-      minuteVal: '*',
-      hourVal: '*',
-      dayVal: '*',
-      monthVal: '*',
-      weekVal: '?',
-      yearVal: '*',
-      watchValue: ''
-    }
-  },
-  mixins: [i18n],
-  props: {
-    value: {
-      type: String,
-      default: '* * * * * ? *'
+  export default {
+    name: 'app',
+    data () {
+      return {
+        tabVal: 'second',
+        secondVal: '*',
+        minuteVal: '*',
+        hourVal: '*',
+        dayVal: '*',
+        monthVal: '*',
+        weekVal: '?',
+        yearVal: '*',
+        watchValue: ''
+      }
     },
-    locale: {
-      type: String,
-      default: 'en_US'
-    }
-  },
-  model: {
-    prop: 'value',
-    event: 'valueEvent'
-  },
-  methods: {
-    onTab (val) {
-      this.tabVal = val
+    mixins: [i18n],
+    props: {
+      value: {
+        type: String,
+        default: '* * * * * ? *'
+      },
+      locale: {
+        type: String,
+        default: 'en_US'
+      }
     },
-    _onDayValue (val) {
-      this.dayVal = val
+    model: {
+      prop: 'value',
+      event: 'valueEvent'
     },
-    _onWeekValue (val) {
-      this.weekVal = val
+    methods: {
+      onTab (val) {
+        this.tabVal = val
+      },
+      _onDayValue (val) {
+        this.dayVal = val
+      },
+      _onWeekValue (val) {
+        this.weekVal = val
+      },
+      _reset () {
+        let str = this.value.split(' ')
+        this.secondVal = str[0]
+        this.minuteVal = str[1]
+        this.hourVal = str[2]
+        this.dayVal = str[3]
+        this.monthVal = str[4]
+        this.weekVal = str[5]
+        this.yearVal = str[6]
+      }
     },
-    _reset () {
-      const str = this.value.split(' ')
-      this.secondVal = str[0]
-      this.minuteVal = str[1]
-      this.hourVal = str[2]
-      this.dayVal = str[3]
-      this.monthVal = str[4]
-      this.weekVal = str[5]
-      this.yearVal = str[6]
-    }
-  },
-  watch: {
-    rtValue (val) {
-      this.$emit('valueEvent', val)
+    watch: {
+      rtValue (val) {
+        this.$emit('valueEvent', val)
+      },
+      value () {
+        this._reset()
+      }
     },
-    value () {
+    beforeCreate () {
+    },
+    created () {
+      // International binding under win
+      window.localeCrontab = this.locale
+
+      // Initialization
       this._reset()
-    }
-  },
-  beforeCreate () {
-  },
-  created () {
-    // International binding under win
-    window.localeCrontab = this.locale
-
-    // Initialization
-    this._reset()
-  },
-  beforeMount () {
-  },
-  mounted () {
-  },
-  beforeUpdate () {
-  },
-  updated () {
-  },
-  beforeDestroy () {
-  },
-  destroyed () {
-  },
-  computed: {
-    rtValue () {
-      return `${this.secondVal} ${this.minuteVal} ${this.hourVal} ${this.dayVal} ${this.monthVal} ${this.weekVal} ${this.yearVal}`
-    }
-  },
-  components: { mSecond, mMinute, mHour, mDay, mMonth, mYear }
-}
+    },
+    beforeMount () {
+    },
+    mounted () {
+    },
+    beforeUpdate () {
+    },
+    updated () {
+    },
+    beforeDestroy () {
+    },
+    destroyed () {
+    },
+    computed: {
+      rtValue () {
+        return `${this.secondVal} ${this.minuteVal} ${this.hourVal} ${this.dayVal} ${this.monthVal} ${this.weekVal} ${this.yearVal}`
+      }
+    },
+    components: { mSecond, mMinute, mHour, mDay, mMonth, mYear }
+  }
 </script>
 
 <style lang="scss">
