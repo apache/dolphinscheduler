@@ -120,8 +120,8 @@ public class TaskExecuteThreadTest {
         PowerMockito.when(CommonUtils.getSystemEnvPath()).thenReturn("/user_home/.bash_profile");
 
         List<String> osUserList = new ArrayList<String>() {{
-                add("test");
-            }};
+            add("test");
+        }};
         PowerMockito.mockStatic(OSUtils.class);
         PowerMockito.when(OSUtils.getUserList()).thenReturn(osUserList);
     }
@@ -132,7 +132,7 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setStartTime(new Date());
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
         taskExecutionContext.setTenantCode("test");
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
         taskExecutionContext.getCurrentExecutionStatus();
 
@@ -147,9 +147,8 @@ public class TaskExecuteThreadTest {
         taskExecutionContext.setStartTime(null);
         taskExecutionContext.setDelayTime(1);
         taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.DELAY_EXECUTION);
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecutionContext.setTenantCode("test");
-        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger);
+        TaskExecuteThread taskExecuteThread = new TaskExecuteThread(taskExecutionContext, taskCallbackService, taskLogger, alertClientService);
         taskExecuteThread.run();
 
         Assert.assertEquals(ExecutionStatus.RUNNING_EXECUTION, taskExecutionContext.getCurrentExecutionStatus());
