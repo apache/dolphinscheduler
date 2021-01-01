@@ -27,37 +27,39 @@ import java.util.Map;
  */
 public abstract class AbstractParameters implements IParameters {
 
-  /**
-   * local parameters
-   */
-  private List<Property> localParams;
+    /**
+     * local parameters
+     */
+    private List<Property> localParams;
 
-  /**
-   * get local parameters list
-   * @return Property list
-   */
-  public List<Property> getLocalParams() {
-    return localParams;
-  }
+    /**
+     * get local parameters list
+     *
+     * @return Property list
+     */
+    public List<Property> getLocalParams() {
+        return localParams;
+    }
 
-  public void setLocalParams(List<Property> localParams) {
-    this.localParams = localParams;
-  }
+    public void setLocalParams(List<Property> localParams) {
+        this.localParams = localParams;
+    }
 
-  /**
-   * get local parameters map
-   * @return parameters map
-   */
-  public Map<String,Property> getLocalParametersMap() {
-      if (localParams != null) {
-        Map<String,Property> localParametersMaps = new LinkedHashMap<>();
+    /**
+     * get local parameters map
+     *
+     * @return parameters map
+     */
+    public Map<String, Property> getLocalParametersMap() {
+        if (localParams != null) {
+            Map<String, Property> localParametersMaps = new LinkedHashMap<>();
 
-        for (Property property : localParams) {
-          localParametersMaps.put(property.getProp(),property);
+            for (Property property : localParams) {
+                localParametersMaps.put(property.getProp(), property);
+            }
+            return localParametersMaps;
         }
-        return localParametersMaps;
-      }
-      return null;
-  }
+        return null;
+    }
 
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.curator.ensemble.EnsembleProvider;
@@ -27,7 +28,7 @@ public class DefaultEnsembleProvider implements EnsembleProvider {
 
     private final String serverList;
 
-    public DefaultEnsembleProvider(String serverList){
+    public DefaultEnsembleProvider(String serverList) {
         this.serverList = serverList;
     }
 

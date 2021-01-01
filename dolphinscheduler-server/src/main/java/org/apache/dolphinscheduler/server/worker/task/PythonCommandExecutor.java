@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +50,15 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * constructor
-     * @param logHandler    log handler
-     * @param taskExecutionContext       taskExecutionContext
-     * @param logger        logger
+     *
+     * @param logHandler log handler
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
      */
     public PythonCommandExecutor(Consumer<List<String>> logHandler,
                                  TaskExecutionContext taskExecutionContext,
                                  Logger logger) {
-        super(logHandler,taskExecutionContext,logger);
+        super(logHandler, taskExecutionContext, logger);
     }
 
 
@@ -72,9 +74,10 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * create command file if not exists
-     * @param execCommand   exec command
-     * @param commandFile   command file
-     * @throws IOException  io exception
+     *
+     * @param execCommand exec command
+     * @param commandFile command file
+     * @throws IOException io exception
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
@@ -99,6 +102,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * get command options
+     *
      * @return command options list
      */
     @Override
@@ -109,29 +113,29 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * get python home
+     *
      * @return python home
      */
     @Override
     protected String commandInterpreter() {
         String pythonHome = getPythonHome(taskExecutionContext.getEnvFile());
-        if (StringUtils.isEmpty(pythonHome)){
+        if (StringUtils.isEmpty(pythonHome)) {
             return PYTHON;
         }
         return pythonHome;
     }
 
 
-
     /**
-     *  get the absolute path of the Python command
-     *  note :
-     *  common.properties
-     *  PYTHON_HOME configured under common.properties is Python absolute path, not PYTHON_HOME itself
-     *
-     *  for example :
-     *  your PYTHON_HOM is /opt/python3.7/
-     *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
-     *  dolphinscheduler.env.path file.
+     * get the absolute path of the Python command
+     * note :
+     * common.properties
+     * PYTHON_HOME configured under common.properties is Python absolute path, not PYTHON_HOME itself
+     * <p>
+     * for example :
+     * your PYTHON_HOM is /opt/python3.7/
+     * you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
+     * dolphinscheduler.env.path file.
      *
      * @param envPath env path
      * @return python home
@@ -139,25 +143,25 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     private static String getPythonHome(String envPath) {
         StringBuilder sb = new StringBuilder();
 
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)))) {
             String line;
-            while ((line = br.readLine()) != null){
-                if (line.contains(Constants.PYTHON_HOME)){
+            while ((line = br.readLine()) != null) {
+                if (line.contains(Constants.PYTHON_HOME)) {
                     sb.append(line);
                     break;
                 }
             }
             String result = sb.toString();
-            if (org.apache.commons.lang.StringUtils.isEmpty(result)){
+            if (org.apache.commons.lang.StringUtils.isEmpty(result)) {
                 return null;
             }
             String[] arrs = result.split(Constants.EQUAL_SIGN);
-            if (arrs.length == 2){
+            if (arrs.length == 2) {
                 return arrs[1];
             }
 
-        }catch (IOException e){
-            logger.error("read file failure",e);
+        } catch (IOException e) {
+            logger.error("read file failure", e);
         }
         return null;
     }

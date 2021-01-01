@@ -89,7 +89,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -679,8 +678,8 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     private void downloadProcessDefinitionFile(HttpServletResponse response, List<ProcessMeta> processDefinitionList) {
         response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
 
-        try(BufferedOutputStream buff =
-                    new BufferedOutputStream(response.getOutputStream())) {
+        try (BufferedOutputStream buff =
+                     new BufferedOutputStream(response.getOutputStream())) {
             buff.write(JSONUtils.toJsonString(processDefinitionList).getBytes(StandardCharsets.UTF_8));
             buff.flush();
         } catch (IOException e) {

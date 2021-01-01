@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.runner;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
@@ -25,12 +26,13 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.api.AlertPlugin;
 import org.apache.dolphinscheduler.plugin.model.AlertData;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * alert sender

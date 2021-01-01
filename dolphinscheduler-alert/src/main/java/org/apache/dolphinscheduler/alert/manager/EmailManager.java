@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class EmailManager {
     /**
      * email send
+     *
      * @param receiversList the receiver list
      * @param receiversCcList the cc List
      * @param title the title
@@ -34,22 +36,23 @@ public class EmailManager {
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receiversList,List<String> receiversCcList,String title,String content,String showType){
+    public Map<String, Object> send(List<String> receiversList, List<String> receiversCcList, String title, String content, String showType) {
 
         return MailUtils.sendMails(receiversList, receiversCcList, title, content, showType);
     }
 
     /**
      * msg send
+     *
      * @param receiversList the receiver list
      * @param title the title
      * @param content the content
      * @param showType the showType
      * @return the send result
      */
-    public Map<String,Object> send(List<String> receiversList,String title,String content,String showType){
+    public Map<String, Object> send(List<String> receiversList, String title, String content, String showType) {
 
-        return MailUtils.sendMails(receiversList,title, content, showType);
+        return MailUtils.sendMails(receiversList, title, content, showType);
     }
-    
+
 }

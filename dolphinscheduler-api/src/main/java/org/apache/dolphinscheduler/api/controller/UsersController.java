@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.controller;
 
+package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -25,15 +25,18 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import springfox.documentation.annotations.ApiIgnore;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
@@ -59,13 +62,13 @@ public class UsersController extends BaseController {
     /**
      * create user
      *
-     * @param loginUser    login user
-     * @param userName     user name
+     * @param loginUser login user
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tenant id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @param queue queue
      * @return create result code
      */
     @ApiOperation(value = "createUser", notes = "CREATE_USER_NOTES")
@@ -104,9 +107,9 @@ public class UsersController extends BaseController {
      * query user list paging
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search avlue
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return user list page
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
@@ -139,14 +142,14 @@ public class UsersController extends BaseController {
     /**
      * update user
      *
-     * @param loginUser    login user
-     * @param id           user id
-     * @param userName     user name
+     * @param loginUser login user
+     * @param id user id
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tennat id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @param queue queue
      * @return update result code
      */
     @ApiOperation(value = "updateUser", notes = "UPDATE_USER_NOTES")
@@ -187,7 +190,7 @@ public class UsersController extends BaseController {
      * delete user by id
      *
      * @param loginUser login user
-     * @param id        user id
+     * @param id user id
      * @return delete result code
      */
     @ApiOperation(value = "delUserById", notes = "DELETE_USER_BY_ID_NOTES")
@@ -208,8 +211,8 @@ public class UsersController extends BaseController {
     /**
      * grant project
      *
-     * @param loginUser  login user
-     * @param userId     user id
+     * @param loginUser login user
+     * @param userId user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -233,8 +236,8 @@ public class UsersController extends BaseController {
     /**
      * grant resource
      *
-     * @param loginUser   login user
-     * @param userId      user id
+     * @param loginUser login user
+     * @param userId user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -260,8 +263,8 @@ public class UsersController extends BaseController {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
+     * @param userId user id
+     * @param udfIds udf id array
      * @return grant result code
      */
     @ApiOperation(value = "grantUDFFunc", notes = "GRANT_UDF_FUNC_NOTES")
@@ -285,8 +288,8 @@ public class UsersController extends BaseController {
     /**
      * grant datasource
      *
-     * @param loginUser     login user
-     * @param userId        user id
+     * @param loginUser login user
+     * @param userId user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -364,7 +367,7 @@ public class UsersController extends BaseController {
      * verify username
      *
      * @param loginUser login user
-     * @param userName  user name
+     * @param userName user name
      * @return true if user name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyUserName", notes = "VERIFY_USER_NAME_NOTES")
@@ -388,7 +391,7 @@ public class UsersController extends BaseController {
     /**
      * unauthorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -412,7 +415,7 @@ public class UsersController extends BaseController {
     /**
      * authorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return authorized result code
      */
@@ -440,10 +443,10 @@ public class UsersController extends BaseController {
     /**
      * user register
      *
-     * @param userName       user name
-     * @param userPassword   user password
+     * @param userName user name
+     * @param userPassword user password
      * @param repeatPassword repeat password
-     * @param email          user email
+     * @param email user email
      */
     @ApiOperation(value = "registerUser", notes = "REGISTER_USER_NOTES")
     @ApiImplicitParams({

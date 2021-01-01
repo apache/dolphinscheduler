@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.utils;
 
 /**
@@ -23,6 +24,7 @@ public class Constants {
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
+
     /**
      * alert properties path
      */
@@ -67,7 +69,7 @@ public class Constants {
 
     public static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
 
-    public static final String MAIL_SMTP_SSL_TRUST="mail.smtp.ssl.trust";
+    public static final String MAIL_SMTP_SSL_TRUST = "mail.smtp.ssl.trust";
 
     public static final String TEXT_HTML_CHARSET_UTF_8 = "text/html;charset=utf-8";
 
@@ -156,7 +158,7 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
-    
+
 
     public static final String DINGTALK_WEBHOOK = "dingtalk.webhook";
 
@@ -174,7 +176,13 @@ public class Constants {
 
     public static final String DINGTALK_ENABLE = "dingtalk.isEnable";
 
-    public static final String HTML_HEADER_PREFIX = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><html><head><title>dolphinscheduler</title><meta name='Keywords' content=''><meta name='Description' content=''><style type=\"text/css\">table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: left;}table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: left;}</style></head><body style=\"margin:0;padding:0\"><table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\"> ";
+    public static final String HTML_HEADER_PREFIX = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'"
+            + " 'http://www.w3.org/TR/html4/loose.dtd'><html><head><title>dolphinscheduler</title><meta name='Keywords' content=''>"
+            + "<meta name='Description' content=''><style type=\"text/css\">"
+            + "table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;"
+            + "border-collapse: collapse;}table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;"
+            + "text-align: left;}table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: left;}"
+            + "</style></head><body style=\"margin:0;padding:0\"><table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\"> ";
 
     public static final String TABLE_BODY_HTML_TAIL = "</table></body></html>";
 

@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -25,13 +23,17 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import io.swagger.annotations.*;
+
 import org.apache.dolphinscheduler.common.enums.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.text.ParseException;
@@ -56,22 +58,22 @@ public class ExecutorController extends BaseController {
     /**
      * execute process instance
      *
-     * @param loginUser               login user
-     * @param projectName             project name
-     * @param processDefinitionId     process definition id
-     * @param scheduleTime            schedule time
-     * @param failureStrategy         failure strategy
-     * @param startNodeList           start nodes list
-     * @param taskDependType          task depend type
-     * @param execType                execute type
-     * @param warningType             warning type
-     * @param warningGroupId          warning group id
-     * @param receivers               receivers
-     * @param receiversCc             receivers cc
-     * @param runMode                 run mode
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param scheduleTime schedule time
+     * @param failureStrategy failure strategy
+     * @param startNodeList start nodes list
+     * @param taskDependType task depend type
+     * @param execType execute type
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param receivers receivers
+     * @param receiversCc receivers cc
+     * @param runMode run mode
      * @param processInstancePriority process instance priority
-     * @param workerGroup             worker group
-     * @param timeout                 timeout
+     * @param workerGroup worker group
+     * @param timeout timeout
      * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes = "RUN_PROCESS_INSTANCE_NOTES")
@@ -138,10 +140,10 @@ public class ExecutorController extends BaseController {
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser         login user
-     * @param projectName       project name
+     * @param loginUser login user
+     * @param projectName project name
      * @param processInstanceId process instance id
-     * @param executeType       execute type
+     * @param executeType execute type
      * @return execute result code
      */
     @ApiOperation(value = "execute", notes = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
@@ -168,7 +170,7 @@ public class ExecutorController extends BaseController {
     /**
      * check process definition and all of the son process definitions is on line.
      *
-     * @param loginUser           login user
+     * @param loginUser login user
      * @param processDefinitionId process definition id
      * @return check result code
      */
@@ -190,9 +192,9 @@ public class ExecutorController extends BaseController {
     /**
      * query recipients and copyers by process definition ID
      *
-     * @param loginUser           login user
+     * @param loginUser login user
      * @param processDefinitionId process definition id
-     * @param processInstanceId   process instance id
+     * @param processInstanceId process instance id
      * @return receivers cc list
      */
     @ApiIgnore

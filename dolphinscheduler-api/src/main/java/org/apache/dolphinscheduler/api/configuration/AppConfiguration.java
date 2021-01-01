@@ -18,14 +18,20 @@
 package org.apache.dolphinscheduler.api.configuration;
 
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
+
+import java.util.Locale;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
-
-import java.util.Locale;
 
 
 /**
@@ -41,12 +47,10 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
     public static final int COOKIE_MAX_AGE = 3600;
 
-
     @Bean
     public LoginHandlerInterceptor loginInterceptor() {
         return new LoginHandlerInterceptor();
     }
-
 
     /**
      * Cookie
@@ -71,13 +75,15 @@ public class AppConfiguration implements WebMvcConfigurer {
         return lci;
     }
 
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //i18n
         registry.addInterceptor(localeChangeInterceptor());
 
-        registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
+        registry.addInterceptor(loginInterceptor())
+                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
+                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
+                        "/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
     }
 
     @Override
@@ -98,7 +104,6 @@ public class AppConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping(PATH_PATTERN).allowedOrigins("*").allowedMethods("*");
     }
-
 
     /**
      * Turn off suffix-based content negotiation

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.Channel;
 
 /**
- *  logger request process logic
+ * logger request process logic
  */
 public class LoggerRequestProcessor implements NettyRequestProcessor {
 
@@ -139,8 +139,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      */
     private byte[] getFileContentBytes(String filePath) {
 
-        try(InputStream in = new FileInputStream(filePath);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+        try (InputStream in = new FileInputStream(filePath);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) != -1) {
@@ -148,7 +148,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             }
             return bos.toByteArray();
         } catch (IOException e) {
-            logger.error("get file bytes error",e);
+            logger.error("get file bytes error", e);
         }
         return new byte[0];
     }
@@ -162,14 +162,14 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return part file content
      */
     private List<String> readPartFileContent(String filePath,
-                                            int skipLine,
-                                            int limit) {
+                                             int skipLine,
+                                             int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
             } catch (IOException e) {
-                logger.error("read file error",e);
+                logger.error("read file error", e);
             }
         } else {
             logger.info("file path: {} not exists", filePath);
@@ -186,13 +186,13 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     private String readWholeFileContent(String filePath) {
         String line;
         StringBuilder sb = new StringBuilder();
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
             while ((line = br.readLine()) != null) {
                 sb.append(line).append("\r\n");
             }
             return sb.toString();
         } catch (IOException e) {
-            logger.error("read file error",e);
+            logger.error("read file error", e);
         }
         return "";
     }

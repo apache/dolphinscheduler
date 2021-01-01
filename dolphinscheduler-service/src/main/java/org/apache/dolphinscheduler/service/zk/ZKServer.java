@@ -14,19 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.zk;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+
 import org.apache.zookeeper.server.ZooKeeperServer;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * just speed experience version
@@ -51,7 +53,7 @@ public class ZKServer {
         ZKServer zkServer;
         if (args.length == 0) {
             zkServer = new ZKServer();
-        } else if (args.length == 1){
+        } else if (args.length == 1) {
             zkServer = new ZKServer(Integer.valueOf(args[0]), "");
         } else {
             zkServer = new ZKServer(Integer.valueOf(args[0]), args[1]);
@@ -90,7 +92,7 @@ public class ZKServer {
         }
     }
 
-    public boolean isStarted(){
+    public boolean isStarted() {
         return isStarted.get();
     }
 
@@ -119,19 +121,19 @@ public class ZKServer {
         if (file.exists()) {
             logger.warn("The path of zk server exists");
         }
-        logger.info("zk server starting, data dir path:{}" , zkDataDir);
-        startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME,"60");
+        logger.info("zk server starting, data dir path:{}", zkDataDir);
+        startLocalZkServer(port, zkDataDir, ZooKeeperServer.DEFAULT_TICK_TIME, "60");
     }
 
     /**
      * Starts a local Zk instance
      *
-     * @param port        The port to listen on
+     * @param port The port to listen on
      * @param dataDirPath The path for the Zk data directory
-     * @param tickTime    zk tick time
-     * @param maxClientCnxns    zk max client connections
+     * @param tickTime zk tick time
+     * @param maxClientCnxns zk max client connections
      */
-    private void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
+    private void startLocalZkServer(final int port, final String dataDirPath, final int tickTime, String maxClientCnxns) {
         if (isStarted.compareAndSet(false, true)) {
             zooKeeperServerMain = new PublicZooKeeperServerMain();
             logger.info("Zookeeper data path : {} ", dataDirPath);
@@ -159,7 +161,7 @@ public class ZKServer {
             logger.info("zk server stopped");
 
         } catch (Exception e) {
-            logger.error("Failed to stop ZK ",e);
+            logger.error("Failed to stop ZK ", e);
         }
     }
 

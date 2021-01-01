@@ -379,7 +379,6 @@ public class ProjectServiceImpl extends BaseService implements ProjectService {
      * query authorized and user create project list by user
      *
      * @param loginUser login user
-     * @return
      */
     public Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser) {
         Map<String, Object> result = new HashMap<>();

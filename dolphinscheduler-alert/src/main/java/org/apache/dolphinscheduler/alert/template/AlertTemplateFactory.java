@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.template;
 
 import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +29,12 @@ public class AlertTemplateFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertTemplateFactory.class);
 
-    private AlertTemplateFactory(){}
+    private AlertTemplateFactory() {
+    }
 
     /**
      * get a template from alert.properties conf file
+     *
      * @return a template, default is DefaultHTMLTemplate
      */
     public static AlertTemplate getMessageTemplate() {

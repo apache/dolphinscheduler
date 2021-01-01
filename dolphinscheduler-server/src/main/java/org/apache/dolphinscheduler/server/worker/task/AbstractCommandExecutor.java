@@ -192,9 +192,9 @@ public abstract class AbstractCommandExecutor {
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-            taskExecutionContext.getExecutePath(),
-            processId
-            , result.getExitStatusCode());
+                taskExecutionContext.getExecutePath(),
+                processId
+                , result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
@@ -339,7 +339,7 @@ public abstract class AbstractCommandExecutor {
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
         parseProcessOutputExecutorService.submit(() -> {
 
-            try(BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));) {
+            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));) {
                 String line;
 
                 long lastFlushTime = System.currentTimeMillis();
@@ -374,7 +374,7 @@ public abstract class AbstractCommandExecutor {
                     ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
                     logger.info("appId:{}, final state:{}", appId, applicationStatus.name());
                     if (applicationStatus.equals(ExecutionStatus.FAILURE)
-                        || applicationStatus.equals(ExecutionStatus.KILL)) {
+                            || applicationStatus.equals(ExecutionStatus.KILL)) {
                         return false;
                     }
 
@@ -433,7 +433,7 @@ public abstract class AbstractCommandExecutor {
             return lineList;
         }
 
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8))) {
             String line = null;
             while ((line = br.readLine()) != null) {
                 lineList.add(line);

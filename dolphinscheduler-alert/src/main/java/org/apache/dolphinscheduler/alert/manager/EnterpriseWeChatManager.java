@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.EnterpriseWeChatUtils;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,29 +27,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Enterprise WeChat Manager
  */
 public class EnterpriseWeChatManager {
     private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
+
     /**
      * Enterprise We Chat send
+     *
      * @param alertInfo the alert info
      * @param token the token
      * @return the send result
      */
-    public Map<String,Object> send(AlertInfo alertInfo, String token){
-        Map<String,Object> retMap = new HashMap<>();
+    public Map<String, Object> send(AlertInfo alertInfo, String token) {
+        Map<String, Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
         String agentId = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_AGENT_ID;
         String users = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_USERS;
         List<String> userList = Arrays.asList(users.split(","));
         logger.info("send message {}", alertInfo.getAlertData().getTitle());
-        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alertInfo.getAlertData()));
+        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId, EnterpriseWeChatUtils.markdownByAlert(alertInfo.getAlertData()));
         try {
             EnterpriseWeChatUtils.sendEnterpriseWeChat(Constants.UTF_8, msg, token);
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         retMap.put(Constants.STATUS, true);
         return retMap;

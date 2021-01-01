@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.alert.manager;
 
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.DingTalkUtils;
 import org.apache.dolphinscheduler.plugin.model.AlertInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Ding Talk Manager
@@ -32,15 +34,15 @@ import java.util.Map;
 public class DingTalkManager {
     private static final Logger logger = LoggerFactory.getLogger(DingTalkManager.class);
 
-    public Map<String,Object> send(AlertInfo alert) {
-        Map<String,Object> retMap = new HashMap<>();
+    public Map<String, Object> send(AlertInfo alert) {
+        Map<String, Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
         logger.info("send message {}", alert.getAlertData().getTitle());
         try {
             String msg = buildMessage(alert);
             DingTalkUtils.sendDingTalkMsg(msg, Constants.UTF_8);
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         retMap.put(Constants.STATUS, true);
         return retMap;

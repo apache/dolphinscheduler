@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,35 +84,36 @@ public class DolphinSchedulerManager {
 
     /**
      * upgrade DolphinScheduler
+     *
      * @throws Exception if error throws Exception
      */
-    public void upgradeDolphinScheduler() throws Exception{
+    public void upgradeDolphinScheduler() throws Exception {
 
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
-        if(schemaList == null || schemaList.isEmpty()) {
+        if (schemaList == null || schemaList.isEmpty()) {
             logger.info("There is no schema to upgrade!");
-        }else {
+        } else {
 
             String version = "";
             // Gets the version of the current system
             if (upgradeDao.isExistsTable("t_escheduler_version")) {
                 version = upgradeDao.getCurrentVersion("t_escheduler_version");
-            }else if(upgradeDao.isExistsTable("t_ds_version")){
+            } else if (upgradeDao.isExistsTable("t_ds_version")) {
                 version = upgradeDao.getCurrentVersion("t_ds_version");
-            }else if(upgradeDao.isExistsColumn("t_escheduler_queue","create_time")){
+            } else if (upgradeDao.isExistsColumn("t_escheduler_queue", "create_time")) {
                 version = "1.0.1";
-            }else if(upgradeDao.isExistsTable("t_escheduler_queue")){
+            } else if (upgradeDao.isExistsTable("t_escheduler_queue")) {
                 version = "1.0.0";
-            }else{
+            } else {
                 logger.error("Unable to determine current software version, so cannot upgrade");
                 throw new RuntimeException("Unable to determine current software version, so cannot upgrade");
             }
             // The target version of the upgrade
             String schemaVersion = "";
-            for(String schemaDir : schemaList) {
+            for (String schemaDir : schemaList) {
                 schemaVersion = schemaDir.split("_")[0];
-                if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
+                if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
                     logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
                     logger.info("Begin upgrading DolphinScheduler's table structure");
                     upgradeDao.upgradeDolphinScheduler(schemaDir);
