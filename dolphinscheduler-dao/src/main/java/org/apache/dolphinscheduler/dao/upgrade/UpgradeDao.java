@@ -263,7 +263,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         }
 
         String[] versionArr = version.split("\\.");
-        String highClose = versionArr[0] + "." + Integer.parseInt(versionArr[1]) + 1 + "." + 0;
+        String highClose = versionArr[0] + "." + (Integer.parseInt(versionArr[1]) + 1) + "." + 0;
         String lowClose = versionArr[0] + "." + (versionArr[1]) + "." + 0;
 
         return (closestMirror.equals(highClose) || closestMirror.equals(lowClose));
@@ -461,7 +461,12 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        String sqlFilePath = "";
+        if (schemaDir.startsWith("m")) {
+            sqlFilePath = MessageFormat.format("{0}/sql/create/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        } else if (schemaDir.startsWith("1")) {
+            sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        }
         logger.info("sqlSQLFilePath" + sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -537,7 +542,12 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        String sqlFilePath = "";
+        if (schemaDir.startsWith("m")) {
+            sqlFilePath = MessageFormat.format("{0}/sql/create/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        } else if (schemaDir.startsWith("1")) {
+            sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", rootDir, schemaDir, getDbType().name().toLowerCase());
+        }
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {

@@ -132,12 +132,13 @@ public class DolphinSchedulerManager {
                                 if ("1.3.0".equals(schemaVersion)) {
                                     upgradeDao.upgradeDolphinSchedulerWorkerGroup();
                                 }
+                                closestMirror = schemaVersion;
                             }
-                            closestMirror = schemaVersion;
-                        }
 
+                        }
+                        version = closestMirror;
                     }
-                    version = closestMirror;
+
                 }
 
             }
