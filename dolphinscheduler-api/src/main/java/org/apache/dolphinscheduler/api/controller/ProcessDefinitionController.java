@@ -262,7 +262,8 @@ public class ProcessDefinitionController extends BaseController {
         projectName = StringUtils.replaceNRTtoUnderline(projectName);
         name = StringUtils.replaceNRTtoUnderline(name);
         description = StringUtils.replaceNRTtoUnderline(description);
-        connects = StringUtils.replaceNRTtoUnderline(locations);
+        locations = StringUtils.replaceNRTtoUnderline(locations);
+        connects = StringUtils.replaceNRTtoUnderline(connects);
         logger.info("login user {}, update process define, project name: {}, process define name: {}, "
                         + "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
                 loggedInUser, projectName, name, processDefinitionJson, description, locations, connects);
