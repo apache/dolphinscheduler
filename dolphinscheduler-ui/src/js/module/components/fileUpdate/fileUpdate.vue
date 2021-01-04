@@ -33,9 +33,6 @@
             <em class="ans el-icon-warning"></em>
             <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
-          <!--<div class="hide-archive" v-if="progress !== 0" @click="_ckArchive">
-            <em class="fa fa-minus" data-toggle="tooltip" title="关闭窗口 继续上传" data-container="body" ></em>
-          </div>-->
           <div class="update-popup" v-if="dragOver">
             <div class="icon-box">
               <em class="ans el-icon-upload"></em>

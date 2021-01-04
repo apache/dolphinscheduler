@@ -490,7 +490,6 @@ MIT licenses
     codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
     dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
     element-ui 2.13.2: https://github.com/ElemeFE/element MIT
-    font-awesome ^4.7.0: https://github.com/FortAwesome/Font-Awesome OFL-1.1 AND MIT
     html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
     jquery 3.3.1: https://github.com/jquery/jquery MIT
     jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT
@@ -508,6 +507,7 @@ MIT licenses
 Apache 2.0 licenses
 ========================================
     echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
+    remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
 
 
 ========================================
@@ -518,4 +518,3 @@ BSD licenses
 ========================================
 OFL licenses
 ========================================
-    font-awesome ^4.7.0: https://github.com/FortAwesome/Font-Awesome OFL-1.1 AND MIT
