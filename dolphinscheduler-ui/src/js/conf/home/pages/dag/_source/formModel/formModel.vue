@@ -24,7 +24,7 @@
           <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon el-icon-alarm-clock"></em><em>{{$t('View history')}}</em></a></template>
           <template slot="log"><a href="javascript:"><em class="ansicon el-icon-document"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon fa fa-tasks"></em><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ri-node-tree"></em><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
