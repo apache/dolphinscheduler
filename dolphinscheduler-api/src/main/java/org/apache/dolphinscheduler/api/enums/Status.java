@@ -233,7 +233,7 @@ public enum Status {
     COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
     START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
     EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
-    CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "检查工作流实例错误"),
+    CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "工作流定义错误"),
     QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR(50017, "query recipients and copyers by process definition error", "查询收件人和抄送人错误"),
     DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),
     DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
