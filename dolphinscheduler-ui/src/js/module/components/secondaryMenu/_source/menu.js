@@ -27,7 +27,7 @@ const menu = {
       path: 'projects-index',
       isOpen: true,
       disabled: true,
-      icon: 'fa-home',
+      icon: 'ri-home-4-line',
       children: []
     },
     {
@@ -36,7 +36,7 @@ const menu = {
       path: 'projects-kinship',
       isOpen: true,
       disabled: true,
-      icon: 'fa-tasks',
+      icon: 'ri-node-tree',
       children: []
     },
     {
@@ -124,7 +124,7 @@ const menu = {
       path: 'queue-manage',
       isOpen: true,
       disabled: true,
-      icon: 'fa-recycle',
+      icon: 'ri-group-line',
       children: []
     },
     {
