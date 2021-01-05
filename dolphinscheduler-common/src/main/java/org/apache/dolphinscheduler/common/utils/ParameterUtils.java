@@ -156,6 +156,33 @@ public class ParameterUtils {
      * @param globalParamList global param list
      * @param commandType     command type
      * @param scheduleTime    schedule time
+     * @param startParams     start param map
+     * @return curing user define parameters
+     */
+    public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
+                                            CommandType commandType, Date scheduleTime, Map<String, String> startParams) {
+        String globalParamsJson = curingGlobalParams(globalParamMap, globalParamList, commandType, scheduleTime);
+        // merge start params
+        if (startParams != null && startParams.size() > 0) {
+            List<Property> curingGlobalParams = JSONUtils.toList(globalParamsJson, Property.class);
+            for (Property property : curingGlobalParams) {
+                String val = startParams.get(property.getProp());
+                if (val != null) {
+                    property.setValue(val);
+                }
+            }
+            return JSONUtils.toJsonString(curingGlobalParams);
+        }
+        return globalParamsJson;
+    }
+
+    /**
+     * curing user define parameters
+     *
+     * @param globalParamMap  global param map
+     * @param globalParamList global param list
+     * @param commandType     command type
+     * @param scheduleTime    schedule time
      * @return curing user define parameters
      */
     public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
