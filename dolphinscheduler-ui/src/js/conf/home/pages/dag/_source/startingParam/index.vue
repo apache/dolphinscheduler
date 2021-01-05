@@ -18,7 +18,7 @@
   <div class="starting-params-dag-index">
     <template v-if="isView && isActive">
        <div class="box">
-         <p class="box-hd"><em class="fa fa-chevron-circle-right"></em><strong>{{$t('Startup parameter')}}</strong></p>
+         <p class="box-hd"><em class="ri-terminal-line"></em><strong>{{$t('Startup parameter')}}</strong></p>
          <ul class="box-bd">
            <li><span class="tab">{{$t('Startup type')}}：</span><span class="content">{{_rtRunningType(startupParam.commandType)}}</span></li>
            <li><span class="tab">{{$t('Complement range')}}：</span><span class="content" v-if="startupParam.commandParam && startupParam.commandParam.complementStartDate">{{startupParam.commandParam.complementStartDate}}-{{startupParam.commandParam.complementEndDate}}</span><span class="content" v-else>-</span></li>
