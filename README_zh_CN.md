@@ -82,7 +82,6 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 ### 获得帮助
 1. 提交issue
 1. 先订阅邮件开发列表:[订阅邮件列表](https://dolphinscheduler.apache.org/zh-cn/docs/development/subscribe.html), 订阅成功后发送邮件到dev@dolphinscheduler.apache.org.
-1. 联系微信群助手(ID:dailidong66). 微信仅用于中国用户讨论.
 
 ### 版权
 请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
