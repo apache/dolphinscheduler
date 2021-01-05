@@ -83,7 +83,7 @@ public class TenantServiceTest {
             Map<String, Object> result =
                     tenantService.createTenant(getLoginUser(), "%!1111", 1, "TenantServiceTest");
             logger.info(result.toString());
-            Assert.assertEquals(Status.VERIFY_TENANT_CODE_ERROR, result.get(Constants.STATUS));
+            Assert.assertEquals(Status.VERIFY_OS_TENANT_CODE_ERROR, result.get(Constants.STATUS));
 
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, 1, "TenantServiceTest");
@@ -193,7 +193,7 @@ public class TenantServiceTest {
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
         String resultString;
         if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
-            resultString = "租户编码[TenantServiceTest]已存在";
+            resultString = "操作系统租户[TenantServiceTest]已存在";
         } else {
             resultString = "tenant code TenantServiceTest already exists";
         }
