@@ -94,7 +94,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         }
 
         if (RegexUtils.isNumeric(tenantCode)) {
-            putMsg(result, Status.CHECK_TENANT_CODE_ERROR);
+            putMsg(result, Status.CHECK_OS_TENANT_CODE_ERROR);
             return result;
         }
 
@@ -107,7 +107,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
         Date now = new Date();
 
         if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")) {
-            putMsg(result, Status.VERIFY_TENANT_CODE_ERROR);
+            putMsg(result, Status.VERIFY_OS_TENANT_CODE_ERROR);
             return result;
         }
         tenant.setTenantCode(tenantCode);
@@ -200,7 +200,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
                     HadoopUtils.getInstance().mkdir(udfsPath);
                 }
             } else {
-                putMsg(result, Status.TENANT_CODE_HAS_ALREADY_EXISTS);
+                putMsg(result, Status.OS_TENANT_CODE_HAS_ALREADY_EXISTS);
                 return result;
             }
         }
@@ -329,7 +329,7 @@ public class TenantServiceImpl extends BaseService implements TenantService {
     public Result verifyTenantCode(String tenantCode) {
         Result result = new Result();
         if (checkTenantExists(tenantCode)) {
-            putMsg(result, Status.TENANT_CODE_EXIST, tenantCode);
+            putMsg(result, Status.OS_TENANT_CODE_EXIST, tenantCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
