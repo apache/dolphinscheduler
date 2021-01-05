@@ -23,7 +23,7 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/home'}" tag="a" active-class="active">
-            <span><em class="fa icon ansiconfont fa-home"></em>{{$t('Home')}}</span><strong></strong>
+            <span><em class="ansfont ri-home-4-line"></em>{{$t('Home')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
@@ -44,7 +44,7 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><em class="ansiconfont fa fa-database"></em>{{$t('Datasource manage')}}</span><strong></strong>
+            <span><em class="ansfont ri-database-2-line"></em>{{$t('Datasource manage')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
@@ -58,7 +58,7 @@
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
-            <span><em class="ansiconfont fa fa-shield"></em>{{$t('Security')}}</span><strong></strong>
+            <span><em class="ansfont ri-shield-check-line"></em>{{$t('Security')}}</span><strong></strong>
           </router-link>
         </div>
       </div>
@@ -100,7 +100,7 @@
     </div>
     <div class="adaptive-m-nav">
       <div class="m-nav-box ">
-        <a href="javascript:" @click="mIsNav = !mIsNav"><em class="fa fa-database"></em></a>
+        <a href="javascript:" @click="mIsNav = !mIsNav"><em class="ansfont ri-database-2-line"></em></a>
       </div>
       <div class="m-title-box">
         <div class="logo-m"></div>
@@ -112,7 +112,7 @@
         <div class="m-nav-list" v-if="mIsNav">
           <ul @click="mIsNav = false">
             <router-link :to="{ path: '/home'}" tag="li" active-class="active">
-              <em class="fa icon fa-home"></em>
+              <em class="ansfont ri-home-4-line"></em>
               <span>{{$t('Home')}}</span>
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
@@ -124,11 +124,11 @@
               <span>{{$t('Resources manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
-              <em class="fa fa-database"></em>
+              <em class="ansfont ri-database-2-line"></em>
               <span>{{$t('Datasource manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
-              <em class="fa fa-shield"></em>
+              <em class="ansfont ri-shield-check-line"></em>
               <span>{{$t('Security')}}</span>
             </router-link>
           </ul>
@@ -139,28 +139,28 @@
     <el-dialog
       :visible.sync="definitionUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-definition-update :type="type" @onProgressDefinition="onProgressDefinition" @onUpdateDefinition="onUpdateDefinition" @onArchiveDefinition="onArchiveDefinition" @closeDefinition="closeDefinition"></m-definition-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-file-update :type="type" @onProgressFileUpdate="onProgressFileUpdate" @onUpdateFileUpdate="onUpdateFileUpdate" @onArchiveDefinition="onArchiveFileUpdate" @closeFileUpdate="closeFileUpdate"></m-file-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="fileChildUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-file-child-update :type="type" :id="id" @onProgressFileChildUpdate="onProgressFileChildUpdate" @onUpdateFileChildUpdate="onUpdateFileChildUpdate" @onArchiveFileChildUpdate="onArchiveFileChildUpdate" @closeFileChildUpdate="closeFileChildUpdate"></m-file-child-update>
     </el-dialog>
 
     <el-dialog
       :visible.sync="resourceChildUpdateDialog"
       append-to-body="true"
-      width="40%">
+      width="auto">
       <m-resource-child-update :type="type" :id="id" @onProgressResourceChildUpdate="onProgressResourceChildUpdate" @onUpdateResourceChildUpdate="onUpdateResourceChildUpdate" @onArchiveFileChildUpdate="onArchiveResourceChildUpdate" @closeResourceChildUpdate="closeResourceChildUpdate"></m-resource-child-update>
     </el-dialog>
   </div>
@@ -433,6 +433,11 @@
               .ansiconfont {
                 vertical-align: -2px;
                 font-size: 22px;
+                margin-right: 4px;
+              }
+              .ansfont {
+                vertical-align: -6px;
+                font-size: 24px;
                 margin-right: 4px;
               }
             }

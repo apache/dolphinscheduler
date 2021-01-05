@@ -19,7 +19,7 @@
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
-        <el-table-column :label="$t('UDF Resource Name')" min-width="200">
+        <el-table-column :label="$t('UDF Resource Name')" min-width="150">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
               <p>{{ scope.row.alias }}</p>
@@ -29,29 +29,29 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Whether directory')" width="100">
+        <el-table-column :label="$t('Whether directory')" min-width="100">
           <template slot-scope="scope">
             {{scope.row.directory? $t('Yes') : $t('No')}}
           </template>
         </el-table-column>
-        <el-table-column prop="fileName" :label="$t('File Name')" min-width="200"></el-table-column>
+        <el-table-column prop="fileName" :label="$t('File Name')" min-width="150"></el-table-column>
         <el-table-column :label="$t('File Size')">
           <template slot-scope="scope">
             {{_rtSize(scope.row.size)}}
           </template>
         </el-table-column>
         <el-table-column prop="description" :label="$t('Description')" min-width="180"></el-table-column>
-        <el-table-column :label="$t('Create Time')" min-width="140">
+        <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" min-width="140">
+        <el-table-column :label="$t('Update Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="150">
+        <el-table-column :label="$t('Operation')" min-width="120">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit" @click="_rename(scope.row,scope.$index)" circle></el-button></span>
@@ -77,7 +77,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
-      width="45%">
+      width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
   </div>

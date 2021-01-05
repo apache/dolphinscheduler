@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.form-model-model {
+.form-model-wrapper {
   width: 720px;
+  height: 100vh;
   position: relative;
   .title-box {
     height: 61px;
@@ -72,21 +73,21 @@
   }
   .content-box {
     overflow-y: scroll;
-    height: calc(100vh - 61px);
-    padding-bottom: 60px;
+    height: calc(100vh - 121px);
   }
 }
-.from-model {
+.form-model {
   padding-top: 26px;
+  padding-bottom: 10px;
   >div {
     clear: both;
   }
   .list {
-    position: relative;
+    display: flex;
+    margin-right: 25px;
     margin-bottom: 10px;
     .text-box {
-      width: 112px;
-      float: left;
+      width: 130px;
       text-align: right;
       margin-right: 8px;
       >span {
@@ -97,8 +98,7 @@
       }
     }
     .cont-box {
-      width: 580px;
-      float: left;
+      flex: 1;
       .label-box {
         width: 100%;
       }
@@ -108,6 +108,27 @@
         display: inline-block;
         padding:0 6px 0 20px;
       }
+      .cont-extra {
+        margin-left: 15px;
+        flex: 1;
+      }
+      .el-radio-group {
+        vertical-align: sub;
+        padding-top: 6px;
+        margin-top: 3px;
+      }
+      .user-def-params-model {
+        padding-top: 3px;
+      }
+    }
+    .cont-box + .text-box {
+      margin-left: 30px;
+    }
+    .display-flex {
+      display: flex;
+    }
+    .flex-1 {
+      flex: 1;
     }
     .add {
       line-height: 32px;
@@ -118,6 +139,23 @@
     .list-t {
       width: 50%;
       float: left;
+    }
+  }
+  .requiredIcon {
+    color: #ff0000;
+    padding-right: 4px;
+  }
+  .ans-modal-box-max {
+    position: absolute;
+    right: -12px;
+    top: -16px;
+  }
+  .vue-treeselect--disabled {
+    .vue-treeselect__control {
+      background-color: #ecf3f8;
+      .vue-treeselect__single-value {
+        color: #6d859e;
+      }
     }
   }
 }

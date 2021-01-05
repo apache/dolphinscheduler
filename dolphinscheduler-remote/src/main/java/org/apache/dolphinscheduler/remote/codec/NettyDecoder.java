@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandContext;
 import org.apache.dolphinscheduler.remote.command.CommandHeader;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.slf4j.Logger;
@@ -54,16 +55,34 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
         switch (state()){
             case MAGIC:
                 checkMagic(in.readByte());
+                checkpoint(State.VERSION);
+                // fallthru
+            case VERSION:
+                checkVersion(in.readByte());
                 checkpoint(State.COMMAND);
+                // fallthru
             case COMMAND:
                 commandHeader.setType(in.readByte());
                 checkpoint(State.OPAQUE);
+                // fallthru
             case OPAQUE:
                 commandHeader.setOpaque(in.readLong());
+                checkpoint(State.CONTEXT_LENGTH);
+                // fallthru
+            case CONTEXT_LENGTH:
+                commandHeader.setContextLength(in.readInt());
+                checkpoint(State.CONTEXT);
+                // fallthru
+            case CONTEXT:
+                byte[] context = new byte[commandHeader.getContextLength()];
+                in.readBytes(context);
+                commandHeader.setContext(context);
                 checkpoint(State.BODY_LENGTH);
+                // fallthru
             case BODY_LENGTH:
                 commandHeader.setBodyLength(in.readInt());
                 checkpoint(State.BODY);
+                // fallthru
             case BODY:
                 byte[] body = new byte[commandHeader.getBodyLength()];
                 in.readBytes(body);
@@ -71,6 +90,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 Command packet = new Command();
                 packet.setType(commandType(commandHeader.getType()));
                 packet.setOpaque(commandHeader.getOpaque());
+                packet.setContext(CommandContext.valueOf(commandHeader.getContext()));
                 packet.setBody(body);
                 out.add(packet);
                 //
@@ -105,10 +125,23 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
         }
     }
 
+    /**
+     *  check version
+     * @param version
+     */
+    private void checkVersion(byte version) {
+        if (version != Command.VERSION) {
+            throw new IllegalArgumentException("illegal protocol [version]" + version);
+        }
+    }
+
     enum State{
         MAGIC,
+        VERSION,
         COMMAND,
         OPAQUE,
+        CONTEXT_LENGTH,
+        CONTEXT,
         BODY_LENGTH,
         BODY;
     }

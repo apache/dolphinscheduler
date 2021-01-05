@@ -34,7 +34,7 @@
           </el-option>
         </el-select>
         <el-button type="primary"
-                  icon="fa-dot-circle-o"
+                  icon="ri-record-circle-fill"
                   size="mini"
                   v-tooltip.small.top.start="$t('Reset')"
                   @click="reset"

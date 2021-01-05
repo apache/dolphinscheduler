@@ -379,7 +379,7 @@
       .v-crontab {
       }
     }
-    .from-model {
+    .form-model {
       padding-top: 0;
     }
     .title-box {
@@ -412,7 +412,7 @@
       padding-bottom: 30px;
     }
   }
-  .v-crontab-from-model {
+  .v-crontab-form-model {
     .list-box {
       padding: 0;
     }

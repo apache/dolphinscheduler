@@ -24,7 +24,7 @@
           </el-button-group>
           <el-dialog
             :visible.sync="createUdfDialog"
-            width="60%">
+            width="auto">
             <m-create-udf @onUpdate="onUpdate" @close="close"></m-create-udf>
           </el-dialog>
         </template>

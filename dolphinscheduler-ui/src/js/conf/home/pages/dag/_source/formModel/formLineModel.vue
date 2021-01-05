@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 <template>
-  <div class="form-model-model" v-clickoutside="_handleClose">
+  <div class="form-model-wrapper" v-clickoutside="_handleClose">
     <div class="title-box">
       <span class="name">{{$t('Current connection settings')}}</span>
     </div>
     <div class="content-box">
-      <div class="from-model">
+      <div class="form-model">
         <!-- Node name -->
         <div class="clearfix list">
           <div class="text-box"><span>{{$t('Connection name')}}</span></div>

@@ -90,7 +90,7 @@
                   style="opacity: 0;">
           </textarea>
           <a class="ans-modal-box-max">
-            <em class="el-icon-rank" @click="setEditorVal"></em>
+            <em class="el-icon-full-screen" @click="setEditorVal"></em>
           </a>
         </div>
       </div>
@@ -507,14 +507,3 @@
     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .requiredIcon {
-    color: #ff0000;
-    padding-right: 4px;
-  }
-  .ans-modal-box-max {
-    position: absolute;
-    right: -12px;
-    top: -16px;
-  }
-</style>

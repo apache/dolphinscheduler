@@ -95,7 +95,6 @@
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
         <presto.jdbc.version>0.238.1</presto.jdbc.version>
-        <jsp-2.1.version>6.1.14</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
         <apache.rat.version>0.13</apache.rat.version>
@@ -118,6 +117,7 @@
         <servlet-api.version>2.5</servlet-api.version>
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
+        <swagger-models.version>1.5.24</swagger-models.version>
         <guava-retry.version>2.0.0</guava-retry.version>
     </properties>
 
@@ -511,13 +511,6 @@
                 <optional>true</optional>
             </dependency>
 
-            <!-- for api module -->
-            <dependency>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jsp-2.1</artifactId>
-                <version>${jsp-2.1.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
@@ -539,6 +532,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${springfox.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-models.version}</version>
             </dependency>
 
             <dependency>
@@ -718,8 +717,10 @@
                         <include>**/api/exceptions/ApiExceptionHandlerTest.java</include>
                         <include>**/api/exceptions/ServiceExceptionTest.java</include>
                         <include>**/api/interceptor/LoginHandlerInterceptorTest.java</include>
-                        <include>**/api/security/PasswordAuthenticatorTest.java</include>
-                        <include>**/api/security/SecurityConfigTest.java</include>
+                        <include>**/api/security/impl/pwd/PasswordAuthenticatorTest.java</include>
+                        <include>**/api/security/impl/ldap/LdapAuthenticatorTest.java</include>
+                        <include>**/api/security/SecurityConfigLDAPTest.java</include>
+                        <include>**/api/security/SecurityConfigPasswordTest.java</include>
                         <include>**/api/service/AccessTokenServiceTest.java</include>
                         <include>**/api/service/AlertGroupServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>
@@ -853,6 +854,7 @@
                         <!--<include>**/server/worker/task/datax/DataxTaskTest.java</include>-->
                         <!--<include>**/server/worker/task/http/HttpTaskTest.java</include>-->
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/TaskManagerTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>

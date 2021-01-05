@@ -19,18 +19,19 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <el-button size="mini" @click="_create('')">{{$t('Create Project')}}</el-button>
+          <el-button size="mini" @click="_create('')">{{ $t('Create Project') }}</el-button>
           <el-dialog
             :visible.sync="createProjectDialog"
-            width="40%">
-            <m-create-project :item="item" @_onUpdate="_onUpdate"></m-create-project>
+            width="auto">
+            <m-create-project :item="item" @_onUpdate="_onUpdate" @close="_close"></m-create-project>
           </el-dialog>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
       <template v-if="projectsList.length || total>0">
-        <m-list :projects-list="projectsList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+        <m-list :projects-list="projectsList" @on-update="_onUpdate" :page-no="searchParams.pageNo"
+                :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
           <el-pagination
             background
@@ -103,6 +104,9 @@
       _onUpdate () {
         this.createProjectDialog = false
         this._debounceGET()
+      },
+      _close () {
+        this.createProjectDialog = false
       },
       _getList (flag) {
         this.isLoading = !flag

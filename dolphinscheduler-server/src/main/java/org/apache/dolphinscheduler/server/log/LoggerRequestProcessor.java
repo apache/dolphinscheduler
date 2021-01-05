@@ -169,10 +169,15 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     private List<String> readPartFileContent(String filePath,
                                             int skipLine,
                                             int limit) {
-        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-            return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-        } catch (IOException e) {
-            logger.error("read file error",e);
+        File file = new File(filePath);
+        if (file.exists() && file.isFile()) {
+            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
+                return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
+            } catch (IOException e) {
+                logger.error("read file error",e);
+            }
+        } else {
+            logger.info("file path: {} not exists", filePath);
         }
         return Collections.emptyList();
     }

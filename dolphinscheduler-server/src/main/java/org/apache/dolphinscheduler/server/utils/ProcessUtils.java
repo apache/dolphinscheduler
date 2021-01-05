@@ -30,9 +30,6 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -40,21 +37,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * mainly used to get the start command line of a process.
  */
 public class ProcessUtils {
+
     /**
-     * logger.
+     * logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
+    private static final  Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
-     * avoid the thread safety problem of multi-thread operation.
+     * avoid the thread safety problem of multi-thread operation
      */
     private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
 
+    /**
+     * Expression of PID recognition in Windows scene
+     */
     private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
 
     private static final String LOCAL_PROCESS_EXEC = "jdk.lang.Process.allowAmbiguousCommands";
@@ -79,7 +83,7 @@ public class ProcessUtils {
             }
 
             cmdstr = createCommandLine(
-                VERIFICATION_LEGACY, executablePath, cmd);
+                    VERIFICATION_LEGACY, executablePath, cmd);
         } else {
             String executablePath;
             try {
@@ -102,7 +106,7 @@ public class ProcessUtils {
 
             cmdstr = createCommandLine(
 
-                isShellFile(executablePath) ? VERIFICATION_CMD_BAT : VERIFICATION_WIN32, quoteString(executablePath), cmd);
+                    isShellFile(executablePath) ? VERIFICATION_CMD_BAT : VERIFICATION_WIN32, quoteString(executablePath), cmd);
         }
         return cmdstr;
     }
@@ -211,8 +215,8 @@ public class ProcessUtils {
      * create command line.
      *
      * @param verificationType verification type
-     * @param executablePath   executable path
-     * @param cmd              cmd
+     * @param executablePath executable path
+     * @param cmd cmd
      * @return command line
      */
     private static String createCommandLine(int verificationType, final String executablePath, final String[] cmd) {
@@ -241,8 +245,8 @@ public class ProcessUtils {
      * whether is quoted.
      *
      * @param noQuotesInside no quotes inside
-     * @param arg            arg
-     * @param errorMessage   error message
+     * @param arg arg
+     * @param errorMessage error message
      * @return boolean
      */
     private static boolean isQuoted(boolean noQuotesInside, String arg, String errorMessage) {
@@ -266,7 +270,7 @@ public class ProcessUtils {
      * whether needs escaping.
      *
      * @param verificationType verification type
-     * @param arg              arg
+     * @param arg arg
      * @return boolean
      */
     private static boolean needsEscaping(int verificationType, String arg) {
@@ -287,9 +291,9 @@ public class ProcessUtils {
     /**
      * kill yarn application.
      *
-     * @param appIds      app id list
-     * @param logger      logger
-     * @param tenantCode  tenant code
+     * @param appIds app id list
+     * @param logger logger
+     * @param tenantCode tenant code
      * @param executePath execute path
      */
     public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
@@ -301,7 +305,7 @@ public class ProcessUtils {
 
                     if (!applicationStatus.typeIsFinished()) {
                         String commandFile = String
-                            .format("%s/%s.kill", executePath, appId);
+                                .format("%s/%s.kill", executePath, appId);
                         String cmd = "yarn application -kill " + appId;
                         execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
                     }
@@ -315,11 +319,11 @@ public class ProcessUtils {
     /**
      * build kill command for yarn application
      *
-     * @param logger      logger
-     * @param tenantCode  tenant code
-     * @param appId       app id
+     * @param logger logger
+     * @param tenantCode tenant code
+     * @param appId app id
      * @param commandFile command file
-     * @param cmd         cmd
+     * @param cmd cmd
      */
     private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile, String cmd) {
         try {
@@ -361,7 +365,7 @@ public class ProcessUtils {
             int processId = taskExecutionContext.getProcessId();
             if (processId == 0) {
                 logger.error("process kill failed, process id :{}, task id:{}",
-                    processId, taskExecutionContext.getTaskInstanceId());
+                        processId, taskExecutionContext.getTaskInstanceId());
                 return;
             }
 
@@ -422,8 +426,8 @@ public class ProcessUtils {
             try {
                 logClient = new LogClientService();
                 log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
-                    Constants.RPC_PORT,
-                    taskExecutionContext.getLogPath());
+                        Constants.RPC_PORT,
+                        taskExecutionContext.getLogPath());
             } finally {
                 if (logClient != null) {
                     logClient.close();

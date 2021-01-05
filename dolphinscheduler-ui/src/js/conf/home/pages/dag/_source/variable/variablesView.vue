@@ -18,7 +18,7 @@
   <div class="variable-model">
     <template v-if="list">
       <div class="list">
-        <div class="name"><em class="fa fa-tasks"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</strong></div>
+        <div class="name"><em class="ri-code-s-slash-line"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</strong></div>
         <div class="var-cont">
           <template v-for="(item,$index) in list.globalParams">
             <el-button
@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="list" style="height: 30px;">
-        <div class="name"><em class="fa fa-code"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</strong></div>
+        <div class="name"><em class="ri-code-s-slash-line"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</strong></div>
         <div class="var-cont">
           &nbsp;
         </div>

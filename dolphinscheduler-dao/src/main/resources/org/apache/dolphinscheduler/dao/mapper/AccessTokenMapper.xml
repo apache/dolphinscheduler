@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper">
     <select id="selectAccessTokenPage" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
-        select t.id, t.user_id, t.token, t.expire_time, t.create_time, t.update_time
+        select t.id, t.user_id, t.token, t.expire_time, t.create_time, t.update_time, u.user_name
         from t_ds_access_token t
         left join t_ds_user u on t.user_id = u.id
         where 1 = 1

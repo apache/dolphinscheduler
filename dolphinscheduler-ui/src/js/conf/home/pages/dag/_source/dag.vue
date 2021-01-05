@@ -148,26 +148,26 @@
       </div>
       <el-drawer
         :visible.sync="drawer"
-        size="35%"
+        size=""
         :with-header="false">
-        <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion"></m-versions>
+        <m-versions :versionData = versionData @mVersionSwitchProcessDefinitionVersion="mVersionSwitchProcessDefinitionVersion" @mVersionGetProcessDefinitionVersionsPage="mVersionGetProcessDefinitionVersionsPage" @mVersionDeleteProcessDefinitionVersion="mVersionDeleteProcessDefinitionVersion" @closeVersion="closeVersion"></m-versions>
       </el-drawer>
       <el-drawer
         :visible.sync="nodeDrawer"
-        size="50%"
+        size=""
         :with-header="false">
         <m-form-model v-if="nodeDrawer" :nodeData=nodeData @seeHistory="seeHistory" @addTaskInfo="addTaskInfo" @cacheTaskInfo="cacheTaskInfo" @close="close" @onSubProcess="onSubProcess"></m-form-model>
       </el-drawer>
       <el-drawer
         :visible.sync="lineDrawer"
-        size="50%"
+        size=""
         :wrapperClosable="false"
         :with-header="false">
         <m-form-line-model :lineData = lineData @addLineInfo="addLineInfo" @cancel="cancel"></m-form-line-model>
       </el-drawer>
       <el-drawer
         :visible.sync="udpDrawer"
-        size="50%"
+        size=""
         :wrapperClosable="false"
         :with-header="false">
         <m-udp></m-udp>
@@ -175,16 +175,15 @@
       <el-dialog
         :title="$t('Set the DAG diagram name')"
         :visible.sync="dialogVisible"
-        width="45%">
+        width="auto">
         <m-udp @onUdp="onUdpDialog" @close="closeDialog"></m-udp>
       </el-dialog>
-
       <el-dialog
-      :title="$t('Please set the parameters before starting')"
-      :visible.sync="startDialog"
-      width="65%">
-      <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
-    </el-dialog>
+        :title="$t('Please set the parameters before starting')"
+        :visible.sync="startDialog"
+        width="auto">
+        <m-start :startData= "startData" :startNodeList="startNodeList" :sourceType="sourceType" @onUpdateStart="onUpdateStart" @closeStart="closeStart"></m-start>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -754,6 +753,29 @@
       },
 
       /**
+       * delete one version of process definition
+       *
+       * @param version the version need to delete
+       * @param processDefinitionId the process definition id user want to delete
+       * @param fromThis fromThis
+       */
+      mVersionDeleteProcessDefinitionVersion ({ version, processDefinitionId, fromThis }) {
+        this.deleteProcessDefinitionVersion({
+          version: version,
+          processDefinitionId: processDefinitionId
+        }).then(res => {
+          this.$message.success(res.msg || '')
+          this.mVersionGetProcessDefinitionVersionsPage({
+            pageNo: 1,
+            pageSize: 10,
+            processDefinitionId: processDefinitionId,
+            fromThis: fromThis
+          })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * query the process definition pagination version
        */
       _version (item) {
@@ -777,6 +799,10 @@
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
+      },
+
+      closeVersion () {
+        this.drawer = false
       }
     },
     watch: {
@@ -848,6 +874,6 @@
 <style lang="scss" rel="stylesheet/scss">
   @import "./dag";
   .operBtn {
-    padding: 8px 20px;
+    padding: 8px 6px;
   }
 </style>

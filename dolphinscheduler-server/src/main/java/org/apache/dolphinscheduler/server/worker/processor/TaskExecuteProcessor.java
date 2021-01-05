@@ -116,6 +116,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
             logger.error("task execution context is null");
             return;
         }
+
         setTaskCache(taskExecutionContext);
         // custom logger
         Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
@@ -134,7 +135,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         FileUtils.taskLoggerThreadLocal.set(taskLogger);
         try {
-            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
+            FileUtils.createWorkDirIfAbsent(execLocalPath);
         } catch (Throwable ex) {
             String errorLog = String.format("create execLocalPath : %s", execLocalPath);
             LoggerUtils.logError(Optional.of(logger), errorLog, ex);
