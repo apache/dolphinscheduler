@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_E
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_TENANT_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -119,8 +119,8 @@ public class TenantController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
     public Result queryTenantlistPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam(value = "searchVal", required = false) String searchVal,
+                                        @RequestParam("pageNo") Integer pageNo,
                                         @RequestParam("pageSize") Integer pageSize) {
         logger.info("login user {}, list paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);
@@ -220,7 +220,7 @@ public class TenantController extends BaseController {
     })
     @GetMapping(value = "/verify-tenant-code")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_TENANT_CODE_ERROR)
+    @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     public Result verifyTenantCode(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "tenantCode") String tenantCode) {
         logger.info("login user {}, verfiy tenant code: {}",

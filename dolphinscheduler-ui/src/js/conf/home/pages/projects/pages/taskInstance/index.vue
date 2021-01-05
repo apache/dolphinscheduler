@@ -203,5 +203,10 @@
         }
       }
     }
+    .list-model {
+      .el-dialog__header, .el-dialog__body {
+        padding: 0;
+      }
+    }
   }
 </style>

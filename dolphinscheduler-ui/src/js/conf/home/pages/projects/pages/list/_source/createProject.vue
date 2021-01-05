@@ -15,29 +15,30 @@
  * limitations under the License.
  */
 <template>
-  <m-popup ref="popup" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit') : $t('Create Project')" @ok="_ok">
+  <m-popup ref="popup" :nameText="item ? $t('Edit') : $t('Create Project')" :ok-text="item ? $t('Edit') : $t('Submit')"
+           @close="_close" @ok="_ok">
     <template slot="content">
       <div class="projects-create-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
+          <template slot="name"><strong>*</strong>{{ $t('Project Name') }}</template>
           <template slot="content">
             <el-input
-                    type="input"
-                    v-model="projectName"
-                    maxlength="60"
-                    size="small"
-                    :placeholder="$t('Please enter name')">
+              v-model="projectName"
+              :placeholder="$t('Please enter name')"
+              maxlength="60"
+              size="small"
+              type="input">
             </el-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('Description')}}</template>
+          <template slot="name">{{ $t('Description') }}</template>
           <template slot="content">
             <el-input
-                    type="textarea"
-                    v-model="description"
-                    size="small"
-                    :placeholder="$t('Please enter description')">
+              v-model="description"
+              :placeholder="$t('Please enter description')"
+              size="small"
+              type="textarea">
             </el-input>
           </template>
         </m-list-box-f>
@@ -96,6 +97,9 @@
           this.$message.error(e.msg || '')
           this.$refs.popup.spinnerLoading = false
         })
+      },
+      _close () {
+        this.$emit('close')
       },
       _verification () {
         if (!this.projectName) {
