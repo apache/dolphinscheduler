@@ -29,8 +29,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apk update && \
     apk --update add --no-cache dos2unix shadow bash openrc python2 python3 sudo vim wget iputils net-tools openssh-server py-pip tini && \
     apk add --update procps && \
-    openrc boot && \
-    pip install kazoo
+    openrc boot
 
 #2. install jdk
 RUN apk add openjdk8

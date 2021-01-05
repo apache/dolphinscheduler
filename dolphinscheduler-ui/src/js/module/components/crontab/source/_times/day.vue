@@ -161,7 +161,7 @@
         selectSpecificDayList: selectList['day'],
         monthLastDaysVal: 'L',
         monthLastWorkingDays: 'LW',
-        monthLastWeeksVal: '1L',
+        monthLastWeeksVal: '?',
         monthLastWeeksList: _.map(_.cloneDeep(selectList['lastWeeks']), v => {
           return {
             value: v.value,
@@ -313,7 +313,7 @@
             this.monthLastWorkingDaysReset()
             break
           case 'monthLastWeeks':
-            this.weekValue = '?'
+            this.weekValue = '1L'
             this.monthLastWeeksReset()
             break
           case 'monthTailBefore':
@@ -352,8 +352,8 @@
       },
       monthLastWeeksVal (val) {
         if (this.radioDay === 'monthLastWeeks') {
-          this.weekValue = `?`
-          this.dayValue = val
+          this.weekValue = val
+          this.dayValue = `?`
         }
       },
       WkmonthNumWeeksWeekVal (val) {

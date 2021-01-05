@@ -14,9 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,21 +33,54 @@ import org.slf4j.LoggerFactory;
  */
 public class CommonGenerator {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(CommonGenerator.class);
 
     public String generate(SqoopParameters sqoopParameters) {
-        StringBuilder result = new StringBuilder();
-        try{
-            result.append("sqoop ")
-                    .append(sqoopParameters.getModelType());
-            if(sqoopParameters.getConcurrency() >0){
-                result.append(" -m ")
-                        .append(sqoopParameters.getConcurrency());
+
+        StringBuilder commonSb = new StringBuilder();
+
+        try {
+            //sqoop task model
+            commonSb.append(SqoopConstants.SQOOP)
+                .append(Constants.SPACE)
+                .append(sqoopParameters.getModelType());
+
+            //sqoop map-reduce job name
+            commonSb.append(Constants.SPACE).append(Constants.D).append(Constants.SPACE)
+                .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
+                    Constants.EQUAL_SIGN, sqoopParameters.getJobName()));
+
+            //hadoop custom param
+            List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
+            if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
+                StringBuilder hadoopCustomParamStr = new StringBuilder();
+                for (Property hadoopCustomParam : hadoopCustomParams) {
+                    hadoopCustomParamStr.append(Constants.D)
+                            .append(Constants.SPACE).append(hadoopCustomParam.getProp())
+                            .append(Constants.EQUAL_SIGN).append(hadoopCustomParam.getValue())
+                            .append(Constants.SPACE);
+                }
+                commonSb.append(Constants.SPACE).append(hadoopCustomParamStr.substring(0, hadoopCustomParamStr.length() - 1));
             }
-        }catch (Exception e){
-            logger.error(e.getMessage());
+
+            //sqoop custom params
+            List<Property> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
+            if (CollectionUtils.isNotEmpty(sqoopAdvancedParams)) {
+                for (Property sqoopAdvancedParam : sqoopAdvancedParams) {
+                    commonSb.append(Constants.SPACE).append(sqoopAdvancedParam.getProp())
+                        .append(Constants.SPACE).append(sqoopAdvancedParam.getValue());
+                }
+            }
+
+            //sqoop parallelism
+            if (sqoopParameters.getConcurrency() > 0) {
+                commonSb.append(Constants.SPACE).append(SqoopConstants.SQOOP_PARALLELISM)
+                    .append(Constants.SPACE).append(sqoopParameters.getConcurrency());
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
         }
 
-        return result.toString();
+        return commonSb.toString();
     }
 }

@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceHiveParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,33 +34,40 @@ import org.slf4j.LoggerFactory;
  */
 public class HiveSourceGenerator implements ISourceGenerator {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(HiveSourceGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
-        StringBuilder sb = new StringBuilder();
-        try{
+    public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
+
+        StringBuilder hiveSourceSb = new StringBuilder();
+
+        try {
             SourceHiveParameter sourceHiveParameter
-                    = JSONUtils.parseObject(sqoopParameters.getSourceParams(),SourceHiveParameter.class);
-            if(sourceHiveParameter != null){
-                if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())){
-                    sb.append(" --hcatalog-database ").append(sourceHiveParameter.getHiveDatabase());
+                = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
+
+            if (null != sourceHiveParameter) {
+                if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())) {
+                    hiveSourceSb.append(Constants.SPACE).append(SqoopConstants.HCATALOG_DATABASE)
+                        .append(Constants.SPACE).append(sourceHiveParameter.getHiveDatabase());
                 }
 
-                if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())){
-                    sb.append(" --hcatalog-table ").append(sourceHiveParameter.getHiveTable());
+                if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())) {
+                    hiveSourceSb.append(Constants.SPACE).append(SqoopConstants.HCATALOG_TABLE)
+                        .append(Constants.SPACE).append(sourceHiveParameter.getHiveTable());
                 }
 
-                if(StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())&&
-                        StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())){
-                    sb.append(" --hcatalog-partition-keys ").append(sourceHiveParameter.getHivePartitionKey())
-                            .append(" --hcatalog-partition-values ").append(sourceHiveParameter.getHivePartitionValue());
+                if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())
+                    && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
+                    hiveSourceSb.append(Constants.SPACE).append(SqoopConstants.HCATALOG_PARTITION_KEYS)
+                        .append(Constants.SPACE).append(sourceHiveParameter.getHivePartitionKey())
+                        .append(Constants.SPACE).append(SqoopConstants.HCATALOG_PARTITION_VALUES)
+                        .append(Constants.SPACE).append(sourceHiveParameter.getHivePartitionValue());
                 }
             }
-        }catch (Exception e){
-            logger.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error(String.format("Sqoop hive source params build failed: [%s]", e.getMessage()));
         }
 
-        return sb.toString();
+        return hiveSourceSb.toString();
     }
 }

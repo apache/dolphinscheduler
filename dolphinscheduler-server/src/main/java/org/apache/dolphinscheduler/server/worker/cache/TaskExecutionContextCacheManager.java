@@ -42,7 +42,16 @@ public interface TaskExecutionContextCacheManager {
 
     /**
      * remove taskInstance by taskInstanceId
+     *
      * @param taskInstanceId taskInstanceId
      */
     void removeByTaskInstanceId(Integer taskInstanceId);
+
+    /**
+     * If the value for the specified key is present and non-null,then perform the update，otherwise it will return false
+     *
+     * @param taskExecutionContext taskExecutionContext
+     * @return status
+     */
+    boolean updateTaskExecutionContext(TaskExecutionContext taskExecutionContext);
 }

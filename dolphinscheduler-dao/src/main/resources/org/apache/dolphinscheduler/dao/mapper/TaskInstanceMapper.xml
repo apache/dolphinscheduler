@@ -100,8 +100,8 @@
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select instance.*,process.name as process_instance_name
         from t_ds_task_instance instance
-        join t_ds_process_definition define ON instance.process_definition_id = define.id
-        join  t_ds_process_instance process on process.id=instance.process_instance_id
+        left join t_ds_process_definition define on instance.process_definition_id = define.id
+        left join t_ds_process_instance process on process.id=instance.process_instance_id
         where define.project_id = #{projectId}
         <if test="startTime != null">
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}

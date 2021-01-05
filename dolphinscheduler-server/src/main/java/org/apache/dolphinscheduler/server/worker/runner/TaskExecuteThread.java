@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.runner;
 
+package org.apache.dolphinscheduler.server.worker.runner;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections.MapUtils;
@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.ResponceCache;
@@ -36,18 +36,21 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
-
-
 /**
- *  task scheduler thread
+ * task scheduler thread
  */
 public class TaskExecuteThread implements Runnable {
 
@@ -57,17 +60,17 @@ public class TaskExecuteThread implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteThread.class);
 
     /**
-     *  task instance
+     * task instance
      */
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     *  abstract task
+     * abstract task
      */
     private AbstractTask task;
 
     /**
-     *  task callback service
+     * task callback service
      */
     private TaskCallbackService taskCallbackService;
 
@@ -77,14 +80,22 @@ public class TaskExecuteThread implements Runnable {
     private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     /**
+     * task logger
+     */
+    private Logger taskLogger;
+
+    /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService){
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext
+            , TaskCallbackService taskCallbackService
+            , Logger taskLogger) {
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
+        this.taskLogger = taskLogger;
     }
 
     @Override
@@ -113,14 +124,7 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            // custom logger
-            Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskExecutionContext.getProcessDefineId(),
-                    taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId()));
-
-            task = TaskManager.newTask(taskExecutionContext,
-                    taskLogger);
+            task = TaskManager.newTask(taskExecutionContext, taskLogger);
 
             // task init
             task.init();
@@ -135,7 +139,7 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
@@ -144,18 +148,47 @@ public class TaskExecuteThread implements Runnable {
             responseCommand.setAppIds(task.getAppIds());
         } finally {
             taskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(),responseCommand.convert2Command(),Event.RESULT);
+            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
-
+            clearTaskExecPath();
         }
     }
 
     /**
+     * when task finish, clear execute path.
+     */
+    private void clearTaskExecPath() {
+        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
+
+        if (!CommonUtils.isDevelopMode()) {
+            // get exec dir
+            String execLocalPath = taskExecutionContext.getExecutePath();
+
+            if (StringUtils.isEmpty(execLocalPath)) {
+                logger.warn("task: {} exec local path is empty.", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            if ("/".equals(execLocalPath)) {
+                logger.warn("task: {} exec local path is '/'， direct deletion is not allowed", taskExecutionContext.getTaskName());
+                return;
+            }
+
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
+                logger.info("exec local path: {} cleared.", execLocalPath);
+            } catch (IOException e) {
+                logger.error("delete exec dir failed : {}", e.getMessage(), e);
+            }
+        }
+
+    }
+
+    /**
      * get global paras map
-     * @return
      */
     private Map<String, String> getGlobalParamsMap() {
-        Map<String,String> globalParamsMap = new HashMap<>(16);
+        Map<String, String> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
@@ -168,17 +201,17 @@ public class TaskExecuteThread implements Runnable {
 
     /**
      * set task timeout
+     *
      * @param taskExecutionContext TaskExecutionContext
-     * @param taskNode
      */
     private void setTaskTimeout(TaskExecutionContext taskExecutionContext, TaskNode taskNode) {
         // the default timeout is the maximum value of the integer
         taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         TaskTimeoutParameter taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
-        if (taskTimeoutParameter.getEnable()){
+        if (taskTimeoutParameter.getEnable()) {
             // get timeout strategy
             taskExecutionContext.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy().getCode());
-            switch (taskTimeoutParameter.getStrategy()){
+            switch (taskTimeoutParameter.getStrategy()) {
                 case WARN:
                     break;
                 case FAILED:
@@ -199,38 +232,32 @@ public class TaskExecuteThread implements Runnable {
         }
     }
 
-
     /**
-     *  kill task
+     * kill task
      */
-    public void kill(){
-        if (task != null){
+    public void kill() {
+        if (task != null) {
             try {
                 task.cancelApplication(true);
-            }catch (Exception e){
-                logger.error(e.getMessage(),e);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
     }
 
-
     /**
      * download resource file
-     *
-     * @param execLocalPath
-     * @param projectRes
-     * @param logger
      */
     private void downloadResource(String execLocalPath,
-                                  Map<String,String> projectRes,
+                                  Map<String, String> projectRes,
                                   Logger logger) throws Exception {
-        if (MapUtils.isEmpty(projectRes)){
+        if (MapUtils.isEmpty(projectRes)) {
             return;
         }
 
         Set<Map.Entry<String, String>> resEntries = projectRes.entrySet();
 
-        for (Map.Entry<String,String> resource : resEntries) {
+        for (Map.Entry<String, String> resource : resEntries) {
             String fullName = resource.getKey();
             String tenantCode = resource.getValue();
             File resFile = new File(execLocalPath, fullName);
@@ -241,8 +268,8 @@ public class TaskExecuteThread implements Runnable {
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + fullName, false, true);
-                }catch (Exception e){
-                    logger.error(e.getMessage(),e);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                     throw new RuntimeException(e.getMessage());
                 }
             } else {

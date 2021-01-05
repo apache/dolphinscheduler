@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <url>http://dolphinscheduler.apache.org</url>
@@ -63,8 +63,8 @@
         <java.version>1.8</java.version>
         <logback.version>1.2.3</logback.version>
         <hadoop.version>2.7.3</hadoop.version>
-        <quartz.version>2.2.3</quartz.version>
-        <jackson.version>2.9.8</jackson.version>
+        <quartz.version>2.3.0</quartz.version>
+        <jackson.version>2.9.10</jackson.version>
         <mybatis-plus.version>3.2.0</mybatis-plus.version>
         <mybatis.spring.version>2.0.1</mybatis.spring.version>
         <cron.utils.version>5.0.5</cron.utils.version>
@@ -761,6 +761,7 @@
                         <include>**/common/utils/LoggerUtilsTest.java</include>
                         <include>**/common/utils/OSUtilsTest.java</include>
                         <include>**/common/utils/ParameterUtilsTest.java</include>
+                        <include>**/common/utils/TimePlaceholderUtilsTest.java</include>
                         <include>**/common/utils/PreconditionsTest.java</include>
                         <include>**/common/utils/PropertyUtilsTest.java</include>
                         <include>**/common/utils/SchemaUtilsTest.java</include>
@@ -793,6 +794,7 @@
                         <include>**/server/log/WorkerLogFilterTest.java</include>
                         <include>**/server/master/consumer/TaskPriorityQueueConsumerTest.java</include>
                         <include>**/server/master/runner/MasterTaskExecThreadTest.java</include>
+                        <include>**/server/worker/runner/TaskExecuteThreadTest.java</include>
                         <include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>
                         <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
                         <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
@@ -818,6 +820,7 @@
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/worker/EnvFileTest.java</include>
                         <include>**/service/process/ProcessServiceTest.java</include>
                         <include>**/service/quartz/cron/CronUtilsTest.java</include>

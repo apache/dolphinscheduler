@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -38,12 +37,10 @@ import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-
+import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -55,7 +52,6 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  * master exec thread,split dag
  */
 public class MasterExecThread implements Runnable {
-
     /**
      * logger of MasterExecThread
      */
@@ -97,9 +93,9 @@ public class MasterExecThread implements Runnable {
     private Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
 
     /**
-     * ready to submit task list
+     * ready to submit task queue
      */
-    private Map<String, TaskInstance> readyToSubmitTaskList = new ConcurrentHashMap<>();
+    private PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
     /**
      * depend failed task map
@@ -192,8 +188,6 @@ public class MasterExecThread implements Runnable {
             processService.updateProcessInstance(processInstance);
         }finally {
             taskExecService.shutdown();
-            // post handle
-            postHandle();
         }
     }
 
@@ -382,27 +376,6 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
-     * process post handle
-     */
-    private void postHandle() {
-        logger.info("develop mode is: {}", CommonUtils.isDevelopMode());
-
-        if (!CommonUtils.isDevelopMode()) {
-            // get exec dir
-            String execLocalPath = org.apache.dolphinscheduler.common.utils.FileUtils
-                    .getProcessExecDir(processInstance.getProcessDefinition().getProjectId(),
-                            processInstance.getProcessDefinitionId(),
-                            processInstance.getId());
-
-            try {
-                FileUtils.deleteDirectory(new File(execLocalPath));
-            } catch (IOException e) {
-                logger.error("delete exec dir failed ", e);
-            }
-        }
-    }
-
-    /**
      * submit task to execute
      * @param taskInstance task instance
      * @return TaskInstance
@@ -514,7 +487,7 @@ public class MasterExecThread implements Runnable {
         }
         // if previous node success , post node submit
         for(TaskInstance task : taskInstances){
-            if(readyToSubmitTaskList.containsKey(task.getName())){
+            if(readyToSubmitTaskQueue.contains(task)){
                 continue;
             }
             if(completeTaskList.containsKey(task.getName())){
@@ -648,7 +621,7 @@ public class MasterExecThread implements Runnable {
                 return true;
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
-                return readyToSubmitTaskList.size() == 0 || activeTaskNode.size() == 0;
+                return readyToSubmitTaskQueue.size() == 0 || activeTaskNode.size() == 0;
             }
         }
         return false;
@@ -678,7 +651,7 @@ public class MasterExecThread implements Runnable {
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
         if(CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
-                || readyToSubmitTaskList.size() > 0){
+                || readyToSubmitTaskQueue.size() > 0){
             return ExecutionStatus.PAUSE;
         }else{
             return ExecutionStatus.SUCCESS;
@@ -729,7 +702,7 @@ public class MasterExecThread implements Runnable {
         // success
         if(state == ExecutionStatus.RUNNING_EXEUTION){
             List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
-            if(readyToSubmitTaskList.size() > 0){
+            if(readyToSubmitTaskQueue.size() > 0){
                 //tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return ExecutionStatus.RUNNING_EXEUTION;
             }else if(CollectionUtils.isNotEmpty(killTasks)){
@@ -752,8 +725,8 @@ public class MasterExecThread implements Runnable {
 
         boolean result = false;
 
-        for(String taskName : readyToSubmitTaskList.keySet()){
-            TaskInstance task = readyToSubmitTaskList.get(taskName);
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
+            TaskInstance task =  iter.next();
             if(task.getState().typeIsFailure()){
                 result = true;
                 break;
@@ -817,7 +790,11 @@ public class MasterExecThread implements Runnable {
      */
     private void addTaskToStandByList(TaskInstance taskInstance){
         logger.info("add task to stand by list: {}", taskInstance.getName());
-        readyToSubmitTaskList.putIfAbsent(taskInstance.getName(), taskInstance);
+        try {
+            readyToSubmitTaskQueue.put(taskInstance);
+        } catch (Exception e) {
+            logger.error("add task instance to readyToSubmitTaskQueue error");
+        }
     }
 
     /**
@@ -826,7 +803,11 @@ public class MasterExecThread implements Runnable {
      */
     private void removeTaskFromStandbyList(TaskInstance taskInstance){
         logger.info("remove task from stand by list: {}", taskInstance.getName());
-        readyToSubmitTaskList.remove(taskInstance.getName());
+        try {
+            readyToSubmitTaskQueue.remove(taskInstance);
+        } catch (Exception e) {
+            logger.error("remove task instance from readyToSubmitTaskQueue error");
+        }
     }
 
     /**
@@ -834,10 +815,11 @@ public class MasterExecThread implements Runnable {
      * @return Boolean whether has retry task in standby
      */
     private boolean hasRetryTaskInStandBy(){
-        for (Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
-            if(entry.getValue().getState().typeIsFailure()){
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
+            if(iter.next().getState().typeIsFailure()){
                 return true;
             }
+
         }
         return false;
     }
@@ -1019,20 +1001,26 @@ public class MasterExecThread implements Runnable {
      * handling the list of tasks to be submitted
      */
     private void submitStandByTask(){
-        for(Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
-            TaskInstance task = entry.getValue();
-            DependResult dependResult = getDependResultForTask(task);
-            if(DependResult.SUCCESS == dependResult){
-                if(retryTaskIntervalOverTime(task)){
-                    submitTaskExec(task);
+
+        try {
+            int length = readyToSubmitTaskQueue.size();
+            for (int i=0;i<length;i++) {
+                TaskInstance task = readyToSubmitTaskQueue.peek();
+                DependResult dependResult = getDependResultForTask(task);
+                if(DependResult.SUCCESS == dependResult){
+                    if(retryTaskIntervalOverTime(task)){
+                        submitTaskExec(task);
+                        removeTaskFromStandbyList(task);
+                    }
+                }else if(DependResult.FAILED == dependResult){
+                    // if the dependency fails, the current node is not submitted and the state changes to failure.
+                    dependFailedTask.put(task.getName(), task);
                     removeTaskFromStandbyList(task);
+                    logger.info("task {},id:{} depend result : {}",task.getName(), task.getId(), dependResult);
                 }
-            }else if(DependResult.FAILED == dependResult){
-                // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTask.put(entry.getKey(), task);
-                removeTaskFromStandbyList(task);
-                logger.info("task {},id:{} depend result : {}",task.getName(), task.getId(), dependResult);
             }
+        } catch (Exception e) {
+            logger.error("submit standby task error",e);
         }
     }
 

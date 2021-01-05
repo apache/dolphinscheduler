@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>1.3.4-SNAPSHOT</version>
+        <version>1.3.5-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-alert</artifactId>
     <name>${project.artifactId}</name>

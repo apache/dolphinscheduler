@@ -19,17 +19,18 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.common.Constants.TASK_INFO_LENGTH;
+import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
 
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implementation
  */
 @Service
-public class TaskPriorityQueueImpl implements TaskPriorityQueue {
+public class TaskPriorityQueueImpl implements TaskPriorityQueue<String> {
     /**
      * queue size
      */

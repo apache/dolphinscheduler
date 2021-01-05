@@ -530,4 +530,50 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * upgrade DolphinScheduler sqoop task params
+     * ds-1.3.4 modify the sqoop task params for process definition json
+     */
+    public void upgradeDolphinSchedulerSqoopTaskParams() {
+        upgradeProcessDefinitionJsonSqoopTaskParams();
+    }
+
+    /**
+     * upgradeProcessDefinitionJsonSqoopTaskParams
+     */
+    protected void upgradeProcessDefinitionJsonSqoopTaskParams() {
+        ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
+        Map<Integer,String> replaceProcessDefinitionMap = new HashMap<>();
+
+        try {
+            Map<Integer,String> processDefinitionJsonMap = processDefinitionDao.queryAllProcessDefinition(dataSource.getConnection());
+            for (Map.Entry<Integer,String> entry : processDefinitionJsonMap.entrySet()) {
+                JSONObject jsonObject = JSONObject.parseObject(entry.getValue());
+                JSONArray tasks = JSONArray.parseArray(jsonObject.getString("tasks"));
+
+                for (int i = 0; i < tasks.size(); i++) {
+                    JSONObject task = tasks.getJSONObject(i);
+                    String taskType = task.getString("type");
+                    if ("SQOOP".equals(taskType) && !task.getString("params").contains("jobType")) {
+                        JSONObject taskParams = JSONObject.parseObject(task.getString("params"));
+                        taskParams.put("jobType","TEMPLATE");
+                        taskParams.put("jobName","sqoop-job");
+                        taskParams.put("hadoopCustomParams", new JSONArray());
+                        taskParams.put("sqoopAdvancedParams", new JSONArray());
+
+                        task.remove(task.getString("params"));
+                        task.put("params",taskParams);
+                    }
+                    jsonObject.remove(jsonObject.getString("tasks"));
+                    jsonObject.put("tasks", tasks);
+                    replaceProcessDefinitionMap.put(entry.getKey(), jsonObject.toJSONString());
+                }
+            }
+            if (replaceProcessDefinitionMap.size() > 0) {
+                processDefinitionDao.updateProcessDefinitionJson(dataSource.getConnection(),replaceProcessDefinitionMap);
+            }
+        } catch (Exception e) {
+            logger.error("update process definition json sqoop task params error: {}", e.getMessage());
+        }
+    }
 }

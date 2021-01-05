@@ -216,6 +216,11 @@ public final class Constants {
     public static final String COLON = ":";
 
     /**
+     * SPACE " "
+     */
+    public static final String SPACE = " ";
+
+    /**
      * SINGLE_SLASH /
      */
     public static final String SINGLE_SLASH = "/";
@@ -224,6 +229,15 @@ public final class Constants {
      * DOUBLE_SLASH //
      */
     public static final String DOUBLE_SLASH = "//";
+
+    /**
+     * SINGLE_QUOTES "'"
+     */
+    public static final String SINGLE_QUOTES = "'";
+    /**
+     * DOUBLE_QUOTES "\""
+     */
+    public static final String DOUBLE_QUOTES = "\"";
 
     /**
      * SEMICOLON ;
@@ -969,5 +983,15 @@ public final class Constants {
     public static final int NORAML_NODE_STATUS = 0;
     public static final int ABNORMAL_NODE_STATUS = 1;
 
+
+    /**
+     * exec shell scripts
+     */
+    public static final String SH = "sh";
+
+    /**
+     * pstree, get pud and sub pid
+     */
+    public static final String PSTREE = "pstree";
 
 }

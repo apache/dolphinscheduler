@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,57 +34,63 @@ import org.slf4j.LoggerFactory;
  */
 public class HiveTargetGenerator implements ITargetGenerator {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(HiveTargetGenerator.class);
 
     @Override
-    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, TaskExecutionContext taskExecutionContext) {
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder hiveTargetSb = new StringBuilder();
 
-        try{
+        try {
             TargetHiveParameter targetHiveParameter =
-                    JSONUtils.parseObject(sqoopParameters.getTargetParams(),TargetHiveParameter.class);
-            if(targetHiveParameter != null){
+                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHiveParameter.class);
+            if (null != targetHiveParameter) {
+                hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_IMPORT);
 
-                result.append(" --hive-import ");
-
-                if(StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase())&&
-                        StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())){
-                    result.append(" --hive-table ")
-                            .append(targetHiveParameter.getHiveDatabase())
-                            .append(".")
-                            .append(targetHiveParameter.getHiveTable());
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveDatabase())
+                    && StringUtils.isNotEmpty(targetHiveParameter.getHiveTable())) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_DATABASE)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHiveDatabase())
+                        .append(Constants.SPACE).append(SqoopConstants.HIVE_TABLE)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHiveTable());
                 }
 
-                if(targetHiveParameter.isCreateHiveTable()){
-                    result.append(" --create-hive-table");
+                if (targetHiveParameter.isCreateHiveTable()) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.CREATE_HIVE_TABLE);
                 }
 
-                if(targetHiveParameter.isDropDelimiter()){
-                    result.append(" --hive-drop-import-delims");
+                if (targetHiveParameter.isDropDelimiter()) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_DROP_IMPORT_DELIMS);
                 }
 
-                if(targetHiveParameter.isHiveOverWrite()){
-                    result.append(" --hive-overwrite -delete-target-dir");
+                if (targetHiveParameter.isHiveOverWrite()) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_OVERWRITE)
+                        .append(Constants.SPACE).append(SqoopConstants.DELETE_TARGET_DIR);
                 }
 
-                if(StringUtils.isNotEmpty(targetHiveParameter.getReplaceDelimiter())){
-                    result.append(" --hive-delims-replacement ").append(targetHiveParameter.getReplaceDelimiter());
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHiveTargetDir())) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.TARGET_DIR)
+                            .append(Constants.SPACE).append(targetHiveParameter.getHiveTargetDir());
                 }
 
-                if(StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionKey())&&
-                        StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())){
-                    result.append(" --hive-partition-key ")
-                            .append(targetHiveParameter.getHivePartitionKey())
-                            .append(" --hive-partition-value ")
-                            .append(targetHiveParameter.getHivePartitionValue());
+                if (StringUtils.isNotEmpty(targetHiveParameter.getReplaceDelimiter())) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_DELIMS_REPLACEMENT)
+                        .append(Constants.SPACE).append(targetHiveParameter.getReplaceDelimiter());
+                }
+
+                if (StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionKey())
+                    && StringUtils.isNotEmpty(targetHiveParameter.getHivePartitionValue())) {
+                    hiveTargetSb.append(Constants.SPACE).append(SqoopConstants.HIVE_PARTITION_KEY)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHivePartitionKey())
+                        .append(Constants.SPACE).append(SqoopConstants.HIVE_PARTITION_VALUE)
+                        .append(Constants.SPACE).append(targetHiveParameter.getHivePartitionValue());
                 }
 
             }
-        }catch(Exception e){
-            logger.error(e.getMessage());
+        } catch (Exception e) {
+            logger.error(String.format("Sqoop hive target params build failed: [%s]", e.getMessage()));
         }
 
-        return result.toString();
+        return hiveTargetSb.toString();
     }
 }

@@ -19,7 +19,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.3.4-SNAPSHOT</version>
+        <version>1.3.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -55,10 +55,18 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <exclusions>
-                <exclusion>
-                    <artifactId>c3p0</artifactId>
-                    <groupId>c3p0</groupId>
-                </exclusion>
+              <exclusion>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.mchange</groupId>
+                <artifactId>mchange-commons-java</artifactId>
+              </exclusion>
+              <exclusion>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP-java6</artifactId>
+              </exclusion>
             </exclusions>
         </dependency>
 

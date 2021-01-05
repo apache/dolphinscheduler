@@ -41,6 +41,11 @@ public class TargetHiveParameter {
      * hive overwrite
      */
     private boolean hiveOverWrite;
+
+    /**
+     * hive target dir
+     */
+    private String hiveTargetDir;
     /**
      * replace delimiter
      */
@@ -116,5 +121,13 @@ public class TargetHiveParameter {
 
     public void setHivePartitionValue(String hivePartitionValue) {
         this.hivePartitionValue = hivePartitionValue;
+    }
+
+    public String getHiveTargetDir() {
+        return hiveTargetDir;
+    }
+
+    public void setHiveTargetDir(String hiveTargetDir) {
+        this.hiveTargetDir = hiveTargetDir;
     }
 }
