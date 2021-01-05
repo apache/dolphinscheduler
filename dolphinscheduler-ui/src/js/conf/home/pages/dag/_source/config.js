@@ -53,7 +53,7 @@ const toolOper = (dagThis) => {
     },
     {
       code: 'screen',
-      icon: 'el-icon-rank',
+      icon: 'el-icon-full-screen',
       disable: false,
       desc: `${i18n.$t('Full Screen')}`
     }
