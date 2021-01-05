@@ -23,7 +23,7 @@
           <el-dialog
             :title="item ?($t('Edit')+$t('Datasource')) : ($t('Create')+$t('Datasource'))"
             :visible.sync="dialogVisible"
-            width="65%"
+            width="auto"
             :append-to-body="true">
             <m-create-data-source :item="item" @onUpdate="onUpdate" @close="close"></m-create-data-source>
           </el-dialog>

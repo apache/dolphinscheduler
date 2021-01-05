@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.entity;
+package org.apache.dolphinscheduler.service.queue;
 
-import static org.apache.dolphinscheduler.common.Constants.*;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  *  task priority info
  */
-public class TaskPriority {
+public class TaskPriority implements Comparable<TaskPriority> {
 
     /**
      * processInstancePriority
@@ -50,9 +51,9 @@ public class TaskPriority {
     private String groupName;
 
     /**
-     *   ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${groupName}
+     * context
      */
-    private String taskPriorityInfo;
+    private Map<String, String> context;
 
     public TaskPriority(){}
 
@@ -65,15 +66,6 @@ public class TaskPriority {
         this.taskInstancePriority = taskInstancePriority;
         this.taskId = taskId;
         this.groupName = groupName;
-        this.taskPriorityInfo = this.processInstancePriority +
-                UNDERLINE +
-                this.processInstanceId +
-                UNDERLINE +
-                this.taskInstancePriority +
-                UNDERLINE +
-                this.taskId +
-                UNDERLINE +
-                this.groupName;
     }
 
     public int getProcessInstancePriority() {
@@ -104,6 +96,10 @@ public class TaskPriority {
         return taskId;
     }
 
+    public Map<String, String> getContext() {
+        return context;
+    }
+
     public void setTaskId(int taskId) {
         this.taskId = taskId;
     }
@@ -116,32 +112,61 @@ public class TaskPriority {
         this.groupName = groupName;
     }
 
-    public String getTaskPriorityInfo() {
-        return taskPriorityInfo;
+    public void setContext(Map<String, String> context) {
+        this.context = context;
     }
 
-    public void setTaskPriorityInfo(String taskPriorityInfo) {
-        this.taskPriorityInfo = taskPriorityInfo;
-    }
-
-    /**
-     * taskPriorityInfo convert taskPriority
-     *
-     * @param taskPriorityInfo taskPriorityInfo
-     * @return TaskPriority
-     */
-    public static TaskPriority of(String taskPriorityInfo){
-        String[] parts = taskPriorityInfo.split(UNDERLINE);
-
-        if (parts.length != 5) {
-            throw new IllegalArgumentException(String.format("TaskPriority : %s illegal.", taskPriorityInfo));
+    @Override
+    public int compareTo(TaskPriority other) {
+        if (this.getProcessInstancePriority() > other.getProcessInstancePriority()) {
+            return 1;
         }
-        TaskPriority taskPriority = new TaskPriority(
-                Integer.parseInt(parts[0]),
-                Integer.parseInt(parts[1]),
-                Integer.parseInt(parts[2]),
-                Integer.parseInt(parts[3]),
-                parts[4]);
-        return taskPriority;
+        if (this.getProcessInstancePriority() < other.getProcessInstancePriority()) {
+            return -1;
+        }
+
+        if (this.getProcessInstanceId() > other.getProcessInstanceId()) {
+            return 1;
+        }
+        if (this.getProcessInstanceId() < other.getProcessInstanceId()) {
+            return -1;
+        }
+
+        if (this.getTaskInstancePriority() > other.getTaskInstancePriority()) {
+            return 1;
+        }
+        if (this.getTaskInstancePriority() < other.getTaskInstancePriority()) {
+            return -1;
+        }
+
+        if (this.getTaskId() > other.getTaskId()) {
+            return 1;
+        }
+        if (this.getTaskId() < other.getTaskId()) {
+            return -1;
+        }
+
+        return this.getGroupName().compareTo(other.getGroupName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TaskPriority that = (TaskPriority) o;
+        return processInstancePriority == that.processInstancePriority
+                &&  processInstanceId == that.processInstanceId
+                && taskInstancePriority == that.taskInstancePriority
+                && taskId == that.taskId
+                && Objects.equals(groupName, that.groupName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(processInstancePriority, processInstanceId, taskInstancePriority, taskId, groupName);
     }
 }

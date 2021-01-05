@@ -32,7 +32,11 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" width="200"></el-table-column>
+        <el-table-column :label="$t('Description')" min-width="100">
+          <template slot-scope="scope">
+            <span>{{scope.row.note | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Create Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>

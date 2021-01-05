@@ -39,7 +39,7 @@
         </el-table-column>
         <el-table-column :label="$t('Submit Time')" width="135">
           <template slot-scope="scope">
-            <span v-if="scope.row.scheduleTime">{{scope.row.scheduleTime | formatDate}}</span>
+            <span v-if="scope.row.submitTime">{{scope.row.submitTime | formatDate}}</span>
             <span v-else>-</span>
           </template>
         </el-table-column>
@@ -73,8 +73,9 @@
       </el-table>
     </div>
     <el-dialog
+      :show-close="false"
       :visible.sync="logDialog"
-      width="30%">
+      width="auto">
       <m-log :item="item" :source="source" :logId="logId" @ok="ok" @close="close"></m-log>
     </el-dialog>
   </div>

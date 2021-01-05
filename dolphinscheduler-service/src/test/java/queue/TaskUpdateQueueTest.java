@@ -17,6 +17,7 @@
 
 package queue;
 
+import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.junit.Test;
@@ -31,19 +32,16 @@ public class TaskUpdateQueueTest {
     @Test
     public void testQueue() throws Exception{
 
-        // ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${groupName}
-
         /**
          * 1_1_2_1_default
          * 1_1_2_2_default
          * 1_1_0_3_default
          * 1_1_0_4_default
          */
-
-        String taskInfo1 = "1_1_2_1_default";
-        String taskInfo2 = "1_1_2_2_default";
-        String taskInfo3 = "1_1_0_3_default";
-        String taskInfo4 = "1_1_0_4_default";
+        TaskPriority taskInfo1 = new TaskPriority(1, 1, 2, 1, "default");
+        TaskPriority taskInfo2 = new TaskPriority(1, 1, 2, 2, "default");
+        TaskPriority taskInfo3 = new TaskPriority(1, 1, 0, 3, "default");
+        TaskPriority taskInfo4 = new TaskPriority(1, 1, 0, 4, "default");
 
         TaskPriorityQueue queue = new TaskPriorityQueueImpl();
         queue.put(taskInfo1);
@@ -51,9 +49,9 @@ public class TaskUpdateQueueTest {
         queue.put(taskInfo3);
         queue.put(taskInfo4);
 
-        assertEquals("1_1_0_3_default", queue.take());
-        assertEquals("1_1_0_4_default", queue.take());
-        assertEquals("1_1_2_1_default",queue.take());
-        assertEquals("1_1_2_2_default",queue.take());
+        assertEquals(taskInfo3, queue.take());
+        assertEquals(taskInfo4, queue.take());
+        assertEquals(taskInfo1, queue.take());
+        assertEquals(taskInfo2, queue.take());
     }
 }

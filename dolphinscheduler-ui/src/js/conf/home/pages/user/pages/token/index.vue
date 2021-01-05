@@ -22,7 +22,7 @@
           <el-button size="mini" @click="_create('')">{{$t('Create token')}}</el-button>
           <el-dialog
             :visible.sync="createTokenDialog"
-            width="50%">
+            width="auto">
             <m-create-token :item="item" @onUpdate="onUpdate" @close="close"></m-create-token>
           </el-dialog>
         </template>

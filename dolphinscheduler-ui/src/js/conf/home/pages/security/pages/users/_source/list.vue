@@ -20,31 +20,35 @@
       <el-table :data="list" size="mini" style="width: 100%">
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column prop="userName" :label="$t('User Name')"></el-table-column>
-        <el-table-column :label="$t('User Type')">
+        <el-table-column :label="$t('User Type')" width="80">
           <template slot-scope="scope">
-            <span>{{scope.row.userType === 'GENERAL_USER'? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
+            {{scope.row.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}
           </template>
         </el-table-column>
-        <el-table-column prop="tenantCode" :label="$t('Tenant')" width="160"></el-table-column>
-        <el-table-column prop="queue" :label="$t('Queue')"></el-table-column>
-        <el-table-column prop="email" :label="$t('Email')" min-width="120"></el-table-column>
-        <el-table-column prop="phone" :label="$t('Phone')" min-width="90"></el-table-column>
-        <el-table-column  :label="$t('State')">
+        <el-table-column prop="tenantCode" :label="$t('Tenant')" min-width="120"></el-table-column>
+        <el-table-column prop="queue" :label="$t('Queue')" width="90"></el-table-column>
+        <el-table-column prop="email" :label="$t('Email')" min-width="200"></el-table-column>
+        <el-table-column prop="phone" :label="$t('Phone')" width="100">
           <template slot-scope="scope">
-            <span>{{scope.row.state === 1? `${$t('Enable')}` : `${$t('Disable')}`}}</span>
+            <span>{{scope.row.phone | filterNull}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Create Time')" min-width="120">
+        <el-table-column :label="$t('State')" width="60">
+          <template slot-scope="scope">
+            {{scope.row.state === 1 ? `${$t('Enable')}` : `${$t('Disable')}`}}
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('Create Time')" width="135">
           <template slot-scope="scope">
             <span>{{scope.row.createTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Update Time')" min-width="120">
+        <el-table-column :label="$t('Update Time')" width="135">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="130">
+        <el-table-column :label="$t('Operation')" width="120" fixed="right">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Authorize')" placement="top">
               <el-dropdown trigger="click">
@@ -78,25 +82,25 @@
     </div>
     <el-dialog
       :visible.sync="authProjectDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthProject="onUpdateAuthProject" @closeAuthProject="closeAuthProject"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="authDataSourceDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthDataSource="onUpdateAuthDataSource" @closeAuthDataSource="closeAuthDataSource"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="authUdfFuncDialog"
-      width="50%">
+      width="auto">
       <m-transfer :transferData="transferData" @onUpdateAuthUdfFunc="onUpdateAuthUdfFunc" @closeAuthUdfFunc="closeAuthUdfFunc"></m-transfer>
     </el-dialog>
 
     <el-dialog
       :visible.sync="resourceDialog"
-      width="50%">
+      width="auto">
       <m-resource :resourceData="resourceData" @onUpdateAuthResource="onUpdateAuthResource" @closeAuthResource="closeAuthResource"></m-resource>
     </el-dialog>
   </div>
@@ -179,6 +183,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('Project')}`
           this.authProjectDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthProject (projectIds) {
@@ -256,6 +262,8 @@
           this.resourceData.udfTargetList = udfTargetList
           this.resourceData.type.name = `${i18n.$t('Resources')}`
           this.resourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
 
@@ -294,6 +302,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('Datasource')}`
           this.authDataSourceDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthDataSource (datasourceIds) {
@@ -330,6 +340,8 @@
           this.transferData.targetListPrs = targetListPrs
           this.transferData.type.name = `${i18n.$t('UDF Function')}`
           this.authUdfFuncDialog = true
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       onUpdateAuthUdfFunc (udfIds) {

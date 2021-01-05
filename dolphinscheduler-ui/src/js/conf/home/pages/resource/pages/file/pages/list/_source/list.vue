@@ -35,7 +35,11 @@
           </template>
         </el-table-column>
         <el-table-column prop="fileName" :label="$t('File Name')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" width="200"></el-table-column>
+        <el-table-column :label="$t('Description')" width="200">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
         <el-table-column :label="$t('Size')">
           <template slot-scope="scope">
             {{_rtSize(scope.row.size)}}
@@ -75,7 +79,7 @@
     </div>
     <el-dialog
       :visible.sync="renameDialog"
-      width="45%">
+      width="auto">
       <m-rename :item="item" @onUpDate="onUpDate" @close="close"></m-rename>
     </el-dialog>
   </div>

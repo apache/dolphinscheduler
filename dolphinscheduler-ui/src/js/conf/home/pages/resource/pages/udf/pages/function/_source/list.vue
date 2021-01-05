@@ -18,7 +18,7 @@
   <div class="list-model">
     <div class="table-box">
       <el-table :data="list" size="mini" style="width: 100%">
-        <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
+        <el-table-column type="index" :label="$t('#')" min-width="120"></el-table-column>
         <el-table-column :label="$t('UDF Function Name')">
           <template slot-scope="scope">
             <el-popover trigger="hover" placement="top">
@@ -29,16 +29,20 @@
             </el-popover>
           </template>
         </el-table-column>
-        <el-table-column prop="className" :label="$t('Class Name')"></el-table-column>
+        <el-table-column prop="className" :label="$t('Class Name')" min-width="120"></el-table-column>
         <el-table-column prop="type" :label="$t('type')"></el-table-column>
-        <el-table-column prop="description" :label="$t('Description')" width="200"></el-table-column>
-        <el-table-column prop="resourceName" :label="$t('Jar Package')"></el-table-column>
+        <el-table-column :label="$t('Description')" min-width="150">
+          <template slot-scope="scope">
+            <span>{{scope.row.description | filterNull}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="resourceName" :label="$t('Jar Package')" min-width="150"></el-table-column>
         <el-table-column :label="$t('Update Time')" min-width="120">
           <template slot-scope="scope">
             <span>{{scope.row.updateTime | formatDate}}</span>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('Operation')" width="150">
+        <el-table-column :label="$t('Operation')" min-width="100">
           <template slot-scope="scope">
             <el-tooltip :content="$t('Rename')" placement="top" :enterable="false">
               <span><el-button type="primary" size="mini" icon="el-icon-edit-outline" @click="_edit(scope.row)" circle></el-button></span>
@@ -61,7 +65,7 @@
     </div>
     <el-dialog
       :visible.sync="createUdfDialog"
-      width="60%">
+      width="auto">
       <m-create-udf :item="item" @onUpdate="onUpdate" @close="close"></m-create-udf>
     </el-dialog>
   </div>
