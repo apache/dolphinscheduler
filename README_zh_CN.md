@@ -50,10 +50,6 @@ Dolphin Scheduler Official Website
 
 ![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
 
-### 我要体验
-
-- <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
-
 
 ### 近期研发计划
 
