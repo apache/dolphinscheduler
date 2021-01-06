@@ -416,9 +416,8 @@ public class ProcessDefinitionController extends BaseController {
                                                                   @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                                   @RequestParam("processDefinitionName") String processDefinitionName
     ) {
-        String userName = loginUser.getUserName();
-        logger.info("query detail of process definition by name, login user:{}, project name:{}, process definition name:{}",
-                userName, projectName, processDefinitionName);
+        logger.info("query detail of process definition by name, project name:{}, process definition name:{}",
+                projectName, processDefinitionName);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }
