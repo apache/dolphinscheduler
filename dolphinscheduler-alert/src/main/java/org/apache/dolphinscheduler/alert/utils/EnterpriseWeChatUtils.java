@@ -124,8 +124,8 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
         return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty}", toParty)
-                .replace(AGENT_ID_REG_EXP, agentId)
-                .replace(MSG_REG_EXP, msg);
+                .replaceAll(AGENT_ID_REG_EXP, agentId)
+                .replaceAll(MSG_REG_EXP, msg);
     }
 
     /**
@@ -139,8 +139,8 @@ public class EnterpriseWeChatUtils {
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
         return ENTERPRISE_WE_CHAT_TEAM_SEND_MSG.replaceAll("\\{toParty}", listParty)
-                .replace(AGENT_ID_REG_EXP, agentId)
-                .replace(MSG_REG_EXP, msg);
+                .replaceAll(AGENT_ID_REG_EXP, agentId)
+                .replaceAll(MSG_REG_EXP, msg);
     }
 
     /**
@@ -153,8 +153,8 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
         return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll("\\{toUser}", toUser)
-                .replace(AGENT_ID_REG_EXP, agentId)
-                .replace(MSG_REG_EXP, msg);
+                .replaceAll(AGENT_ID_REG_EXP, agentId)
+                .replaceAll(MSG_REG_EXP, msg);
     }
 
     /**
@@ -167,9 +167,9 @@ public class EnterpriseWeChatUtils {
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
-        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replace(USER_REG_EXP, listUser)
-                .replace(AGENT_ID_REG_EXP, agentId)
-                .replace(MSG_REG_EXP, msg);
+        return ENTERPRISE_WE_CHAT_USER_SEND_MSG.replaceAll(USER_REG_EXP, listUser)
+                .replaceAll(AGENT_ID_REG_EXP, agentId)
+                .replaceAll(MSG_REG_EXP, msg);
     }
 
     /**
