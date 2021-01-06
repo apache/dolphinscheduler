@@ -215,7 +215,6 @@ Apache 2.0 licenses
 The following components are provided under the Apache License. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    ant-1.6.5 https://mvnrepository.com/artifact/ant/ant/1.6.5, Apache 2.0
     apacheds-i18n 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-i18n/2.0.0-M15, Apache 2.0
     apacheds-kerberos-codec 2.0.0-M15: https://mvnrepository.com/artifact/org.apache.directory.server/apacheds-kerberos-codec/2.0.0-M15, Apache 2.0
     apache-el 8.5.35.1: https://mvnrepository.com/artifact/org.mortbay.jasper/apache-el/8.5.35.1, Apache 2.0
@@ -321,7 +320,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     joda-time 2.10.1: https://github.com/JodaOrg/joda-time, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     jsqlparser 2.1: https://github.com/JSQLParser/JSqlParser, Apache 2.0 or LGPL 2.1
-    jsp-api-2.1 6.1.14: https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-api-2.1/6.1.14, Apache 2.0
     jsr305 3.0.0: https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305, Apache 2.0
     libfb303 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libfb303/0.9.3, Apache 2.0
     libthrift 0.9.3: https://mvnrepository.com/artifact/org.apache.thrift/libthrift/0.9.3, Apache 2.0
@@ -437,7 +435,6 @@ The following components are provided under the EPL License. See project link fo
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     aspectjweaver 1.9.2:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.2, EPL 1.0
-    core-3.1.1 https://mvnrepository.com/artifact/org.eclipse.jdt/core/3.1.1 Eclipse Public License v1.0
     logback-classic 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.3, EPL 1.0 and LGPL 2.1
     logback-core 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.3, EPL 1.0 and LGPL 2.1
     oshi-core 3.5.0: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.5.0, EPL 1.0
@@ -482,7 +479,6 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    ans-UI 1.1.7: https://github.com/analysys/ans-ui MIT
     axios 0.16.2: https://github.com/axios/axios MIT
     bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
     canvg 1.5.1: https://github.com/canvg/canvg MIT
@@ -507,6 +503,7 @@ MIT licenses
 Apache 2.0 licenses
 ========================================
     echarts	4.1.0: https://github.com/apache/incubator-echarts	Apache-2.0
+    remixicon 2.5.0 https://github.com/Remix-Design/remixicon   Apache-2.0
 
 
 ========================================
