@@ -24,7 +24,7 @@ Its main objectives are as follows:
  - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
  - Support many task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
  - Support process scheduling, dependency scheduling, manual scheduling, manual pause/stop/recovery, support for failed retry/alarm, recovery from specified nodes, Kill task, etc.
- - support the priority of process & task, task failover, and task timeout alarm or failure.
+ - Support the priority of process & task, task failover, and task timeout alarm or failure.
  - Support process global parameters and node custom parameter settings.
  - Support online upload/download of resource files, management, etc. Support online file creation and editing.
  - Support task log online viewing and scrolling, online download log, etc.
@@ -81,7 +81,7 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release
 ### Thanks
 
 Dolphin Scheduler is based on a lot of excellent open-source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
-Thanks to the contributions of these open-source projects make the dream of Dolphin Scheduler come true. We are very grateful for all the open-source softwares used! We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we expect the partners who have the same passion and conviction to open-source will join in and contribute to the open-source community!
+We would like to express our deep gratitude to all the open-source projects which contribute to making the dream of Dolphin Scheduler comes true. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we expect the partners who have the same passion and conviction to open-source will join in and contribute to the open-source community!
 
 
 ### Get Help
