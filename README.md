@@ -24,17 +24,17 @@ Its main objectives are as follows:
  - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
  - Support many task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
  - Support process scheduling, dependency scheduling, manual scheduling, manual pause/stop/recovery, support for failed retry/alarm, recovery from specified nodes, Kill task, etc.
- - Support process priority, task priority and task failover, and task timeout alarm/failure
- - Support process global parameters and node custom parameter settings
- - Support online upload/download of resource files, management, etc. Support online file creation and editing
+ - support the priority of process & task, task failover, and task timeout alarm or failure.
+ - Support process global parameters and node custom parameter settings.
+ - Support online upload/download of resource files, management, etc. Support online file creation and editing.
  - Support task log online viewing and scrolling, online download log, etc.
- - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
- - Support online viewing of `Master/Worker` CPU load, memory
- - Support process running history tree/Gantt chart display, support task status statistics, process status statistics
- - Support backfilling data
- - Support multi-tenant
- - Support internationalization
- - There are more waiting for partners to explore
+ - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper.
+ - Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics.
+ - Support presenting tree or Gantt chart of workflow history as well as the statistics results of task & process status in each workflow.
+ - Support backfilling data.
+ - Support multi-tenant.
+ - Support internationalization.
+ - There are more waiting for partners to explore...
 
 
 ### What's in Dolphin Scheduler
@@ -43,7 +43,7 @@ Its main objectives are as follows:
  -- | -- | -- | --
 Decentralized multi-master and multi-worker | Visualization process defines key information such as task status, task type, retry times, task running machine, visual variables, and so on at a glance.  |  Support pause, recover operation | Support custom task types
 HA is supported by itself | All process definition operations are visualized, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, the API mode operation is provided. | Users on Dolphin Scheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs.  | The scheduler uses distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic online and offline.
-Overload processing: Overload processing: By using the task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured. Machine jam can be avoided with high tolerance to numbers of tasks cached in task queue. | One-click deployment | Supports traditional shell tasks, and big data platform task scheduling: MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Procedure, Sub_Process |  |
+Overload processing: Overload processing: By using the task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured. Machine jam can be avoided with high tolerance to numbers of tasks cached in task queue. | One-click deployment | Support traditional shell tasks, and big data platform task scheduling: MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Procedure, Sub_Process |  |
 
 
 ### System partial screenshot
@@ -81,12 +81,13 @@ dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${latest.release
 ### Thanks
 
 Dolphin Scheduler is based on a lot of excellent open-source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
-Thanks to the contributions of these open-source projects, the dream of Dolphin Scheduler comes true. We are very grateful for all the open-source softwares used! We hope that we are not only the beneficiaries of open-source, but also be the open-source contributors. Besides, we expect the partners who have the same passion and conviction to open-source will join in and contribute to open-source community!
+Thanks to the contributions of these open-source projects make the dream of Dolphin Scheduler come true. We are very grateful for all the open-source softwares used! We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we expect the partners who have the same passion and conviction to open-source will join in and contribute to the open-source community!
+
 
 ### Get Help
 1. Submit an issue
 1. Subscribe to the mail list: https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html, then email dev@dolphinscheduler.apache.org
-1. Slack channel: [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://join.slack.com/share/zt-do3gvfhj-UUhrAX2GxkVX_~JJt1jpKA)
+
 
 ### License
 Please refer to the [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
