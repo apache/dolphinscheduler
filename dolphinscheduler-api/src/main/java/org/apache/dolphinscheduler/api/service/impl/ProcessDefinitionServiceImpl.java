@@ -349,7 +349,29 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
+        } else {
+            result.put(Constants.DATA_LIST, processDefinition);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> queryProcessDefinitionByName(User loginUser, String projectName, String processDefinitionName) {
+
+        Map<String, Object> result = new HashMap<>();
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineName(project.getId(),processDefinitionName);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionName);
         } else {
             result.put(Constants.DATA_LIST, processDefinition);
             putMsg(result, Status.SUCCESS);
