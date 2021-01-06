@@ -372,7 +372,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition bu id
+     * query datail of process definition by id
      *
      * @param loginUser login user
      * @param projectName project name
