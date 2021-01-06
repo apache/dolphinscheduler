@@ -372,7 +372,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition
+     * query datail of process definition bu id
      *
      * @param loginUser login user
      * @param projectName project name
@@ -393,6 +393,31 @@ public class ProcessDefinitionController extends BaseController {
         logger.info("query detail of process definition, login user:{}, project name:{}, process definition id:{}",
                 loginUser.getUserName(), projectName, processId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
+        return returnDataList(result);
+    }
+
+    /**
+     * query datail of process definition by name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionName process definition name
+     * @return process definition detail
+     */
+    @ApiOperation(value = "queryProcessDefinitionByName", notes = "QUERY_PROCESS_DEFINITION_BY_NAME_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionName", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
+    })
+    @GetMapping(value = "/select-by-name")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    public Result queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                             @RequestParam("processDefinitionName") String processDefinitionName
+    ) {
+        logger.info("query detail of process definition by name, login user:{}, project name:{}, process definition name:{}",
+                loginUser.getUserName(), projectName, processDefinitionName);
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }
 
