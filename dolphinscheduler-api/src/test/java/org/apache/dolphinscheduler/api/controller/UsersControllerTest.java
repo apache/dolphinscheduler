@@ -230,8 +230,12 @@ public class UsersControllerTest extends AbstractControllerTest{
 
     @Test
     public void testVerifyUserName() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName","user_test1");
+
         MvcResult mvcResult = mockMvc.perform(get("/users/verify-user-name")
-                .header(SESSION_ID, sessionId))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -322,5 +326,24 @@ public class UsersControllerTest extends AbstractControllerTest{
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+    }
+
+    @Test
+    public void testQueryUserList() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("pageNo","1");
+        paramsMap.add("searchVal","sample");
+        paramsMap.add("pageSize","10");
+
+        MvcResult mvcResult = mockMvc.perform(get("/users/list-paging")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

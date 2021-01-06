@@ -91,7 +91,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state) throws Exception {
+                             @RequestParam(value = "state", required = false) Integer state) throws Exception {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         userName = StringUtils.replaceNRTtoUnderline(userName);
         email = StringUtils.replaceNRTtoUnderline(email);
@@ -174,7 +174,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "tenantId") int tenantId,
                              @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state) throws Exception {
+                             @RequestParam(value = "state", required = false) Integer state) throws Exception {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         userName = StringUtils.replaceNRTtoUnderline(userName);
         email = StringUtils.replaceNRTtoUnderline(email);

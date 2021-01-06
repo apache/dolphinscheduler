@@ -62,6 +62,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
     public void testQueryResourceListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("type", String.valueOf(ResourceType.FILE));
+        paramsMap.add("id", "1");
         paramsMap.add("pageNo", "1");
         paramsMap.add("searchVal", "test");
         paramsMap.add("pageSize", "1");
@@ -84,7 +85,7 @@ public class ResourcesControllerTest extends AbstractControllerTest{
     public void testVerifyResourceName() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","list_resources_1.sh");
+        paramsMap.add("fullName","list_resources_1.sh");
         paramsMap.add("type","FILE");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/verify-name")
@@ -152,6 +153,27 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "1");
         paramsMap.add("content","echo test_1111");
+
+
+        MvcResult mvcResult = mockMvc.perform(post("/resources/update-content")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testUpdateResourceEmptyContent() throws Exception {
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id", "1");
+        paramsMap.add("content","");
 
 
         MvcResult mvcResult = mockMvc.perform(post("/resources/update-content")
@@ -336,7 +358,6 @@ public class ResourcesControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testUnauthorizedFile() throws Exception {
