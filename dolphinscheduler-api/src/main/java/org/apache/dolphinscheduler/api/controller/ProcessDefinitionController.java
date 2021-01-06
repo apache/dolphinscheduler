@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.ArrayList;
@@ -411,12 +412,13 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/select-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
-    public Result queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                             @RequestParam("processDefinitionName") String processDefinitionName
+    public Result<ProcessDefinition> queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                                  @RequestParam("processDefinitionName") String processDefinitionName
     ) {
+        String userName = loginUser.getUserName();
         logger.info("query detail of process definition by name, login user:{}, project name:{}, process definition name:{}",
-                loginUser.getUserName(), projectName, processDefinitionName);
+                userName, projectName, processDefinitionName);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }
