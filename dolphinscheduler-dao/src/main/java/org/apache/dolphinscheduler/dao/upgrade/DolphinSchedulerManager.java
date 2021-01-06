@@ -137,6 +137,22 @@ public class DolphinSchedulerManager {
 
                         }
                         version = closestMirror;
+                    } else if (!UpgradeDao.isClosestMirror(closestMirror, version)) {
+                        String schemaVersion = "";
+                        for (String schemaDir : schemaList) {
+                            schemaVersion = schemaDir.split("_")[0];
+                            if (SchemaUtils.isAGreatVersion(schemaVersion, version)) {
+                                logger.info("upgrade DolphinScheduler metadata version from {} to {}", version, schemaVersion);
+                                logger.info("Begin upgrading DolphinScheduler's table structure");
+                                upgradeDao.upgradeDolphinScheduler(schemaDir);
+                                if ("1.3.0".equals(schemaVersion)) {
+                                    upgradeDao.upgradeDolphinSchedulerWorkerGroup();
+                                }
+                                version = schemaVersion;
+                            }
+
+                        }
+
                     }
 
                 }
