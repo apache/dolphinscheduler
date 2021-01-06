@@ -406,7 +406,7 @@ public abstract class AbstractCommandExecutor {
         List<String> logs = convertFile2List(logPath);
 
         List<String> appIds = new ArrayList<>();
-        /**
+        /*
          * analysis log?get submited yarn application id
          */
         for (String log : logs) {
@@ -504,32 +504,17 @@ public abstract class AbstractCommandExecutor {
     private long flush(long lastFlushTime) {
         long now = System.currentTimeMillis();
 
-        /**
+        /*
          * when log buffer siz or flush time reach condition , then flush
          */
         if (logBuffer.size() >= Constants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > Constants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
-            /** log handle */
+            /* log handle */
             logHandler.accept(logBuffer);
 
             logBuffer.clear();
         }
         return lastFlushTime;
-    }
-
-    /**
-     * close buffer reader
-     *
-     * @param inReader in reader
-     */
-    private void close(BufferedReader inReader) {
-        if (inReader != null) {
-            try {
-                inReader.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
     }
 
     protected List<String> commandOptions() {

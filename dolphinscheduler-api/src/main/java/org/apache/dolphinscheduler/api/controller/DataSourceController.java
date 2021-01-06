@@ -192,7 +192,8 @@ public class DataSourceController extends BaseController {
     public Result queryDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") int id) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, query datasource: {}", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("login user {}, query datasource: {}", loggedInUser, idParam);
         Map<String, Object> result = dataSourceService.queryDataSource(id);
         return returnDataList(result);
     }
@@ -327,7 +328,8 @@ public class DataSourceController extends BaseController {
     public Result connectionTest(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("id") int id) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("connection test, login user:{}, id:{}", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("connection test, login user:{}, id:{}", loggedInUser, idParam);
 
         boolean isConnection = dataSourceService.connectionTest(id);
         Result result = new Result();
@@ -357,7 +359,8 @@ public class DataSourceController extends BaseController {
     public Result delete(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                          @RequestParam("id") int id) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("delete datasource,login user:{}, id:{}", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("delete datasource,login user:{}, id:{}", loggedInUser, idParam);
         return dataSourceService.delete(loginUser, id);
     }
 
@@ -379,7 +382,8 @@ public class DataSourceController extends BaseController {
                                        @RequestParam(value = "name") String name
     ) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, verfiy datasource name: {}", loggedInUser, name);
+        String nameParam = String.valueOf(name);
+        logger.info("login user {}, verfiy datasource name: {}", loggedInUser, nameParam);
 
         return dataSourceService.verifyDataSourceName(name);
     }
@@ -402,8 +406,9 @@ public class DataSourceController extends BaseController {
     public Result unauthDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String userIdParam = String.valueOf(userId);
         logger.info("unauthorized datasource, login user:{}, unauthorized userId:{}",
-                loggedInUser, userId);
+                loggedInUser, userIdParam);
         Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
         return returnDataList(result);
     }
@@ -426,8 +431,9 @@ public class DataSourceController extends BaseController {
     public Result authedDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String userIdParam = String.valueOf(userId);
         logger.info("authorized data source, login user:{}, authorized useId:{}",
-                loggedInUser, userId);
+                loggedInUser, userIdParam);
         Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
         return returnDataList(result);
     }

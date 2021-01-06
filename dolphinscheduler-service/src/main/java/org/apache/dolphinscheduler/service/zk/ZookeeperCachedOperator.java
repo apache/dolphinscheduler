@@ -68,6 +68,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
 
     //for sub class
     protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path) {
+        // used by sub class
     }
 
     public String getFromCache(final String cachePath, final String key) {

@@ -95,8 +95,8 @@ public class QueueController extends BaseController {
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
                                        @RequestParam("pageSize") Integer pageSize) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        searchVal = StringUtils.replaceNRTtoUnderline(searchVal);
-        logger.info("login user {}, query queue list,search value:{}", loggedInUser, searchVal);
+        String searchValParam = StringUtils.replaceNRTtoUnderline(searchVal);
+        logger.info("login user {}, query queue list,search value:{}", loggedInUser, searchValParam);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);

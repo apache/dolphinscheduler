@@ -203,7 +203,8 @@ public class UsersController extends BaseController {
     public Result delUserById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "id") int id) throws Exception {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, delete user, userId: {},", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("login user {}, delete user, userId: {},", loggedInUser, idParam);
         Map<String, Object> result = usersService.deleteUserById(loginUser, id);
         return returnDataList(result);
     }
@@ -228,7 +229,9 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userId") int userId,
                                @RequestParam(value = "projectIds") String projectIds) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, grant project, userId: {},projectIds : {}", loggedInUser, userId, projectIds);
+        String userIdParam = String.valueOf(userId);
+        String projectIdParam = StringUtils.replaceNRTtoUnderline(projectIds);
+        logger.info("login user {}, grant project, userId: {},projectIds : {}", loggedInUser, userIdParam, projectIdParam);
         Map<String, Object> result = usersService.grantProject(loginUser, userId, projectIds);
         return returnDataList(result);
     }
@@ -253,7 +256,9 @@ public class UsersController extends BaseController {
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "resourceIds") String resourceIds) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, grant project, userId: {},resourceIds : {}", loggedInUser, userId, resourceIds);
+        String userIdParam = String.valueOf(userId);
+        String resourceIdParam = StringUtils.replaceNRTtoUnderline(resourceIds);
+        logger.info("login user {}, grant project, userId: {},resourceIds : {}", loggedInUser, userIdParam, resourceIdParam);
         Map<String, Object> result = usersService.grantResources(loginUser, userId, resourceIds);
         return returnDataList(result);
     }
@@ -279,7 +284,9 @@ public class UsersController extends BaseController {
                                @RequestParam(value = "userId") int userId,
                                @RequestParam(value = "udfIds") String udfIds) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, grant project, userId: {},resourceIds : {}", loggedInUser, userId, udfIds);
+        String userIdParam = String.valueOf(userId);
+        String udfIdParam = StringUtils.replaceNRTtoUnderline(udfIds);
+        logger.info("login user {}, grant project, userId: {},resourceIds : {}", loggedInUser, userIdParam, udfIdParam);
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, userId, udfIds);
         return returnDataList(result);
     }
@@ -305,7 +312,9 @@ public class UsersController extends BaseController {
                                   @RequestParam(value = "userId") int userId,
                                   @RequestParam(value = "datasourceIds") String datasourceIds) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, grant project, userId: {},projectIds : {}", loggedInUser, userId, datasourceIds);
+        String userIdParam = String.valueOf(userId);
+        String datasourceIdParam = StringUtils.replaceNRTtoUnderline(datasourceIds);
+        logger.info("login user {}, grant project, userId: {},projectIds : {}", loggedInUser, userIdParam, datasourceIdParam);
         Map<String, Object> result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         return returnDataList(result);
     }
@@ -381,9 +390,9 @@ public class UsersController extends BaseController {
                                  @RequestParam(value = "userName") String userName
     ) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        userName = StringUtils.replaceNRTtoUnderline(userName);
+        String userNameParam = StringUtils.replaceNRTtoUnderline(userName);
         logger.info("login user {}, verfiy user name: {}",
-                loggedInUser, userName);
+                loggedInUser, userNameParam);
         return usersService.verifyUserName(userName);
     }
 

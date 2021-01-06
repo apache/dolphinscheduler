@@ -46,7 +46,6 @@ public class DagHelper {
         throw new IllegalStateException(DagHelper.class.getName());
     }
 
-
     /**
      * generate flow node relation list by task node list;
      * Edges that are not in the task Node List will not be added to the result
@@ -73,10 +72,10 @@ public class DagHelper {
     /**
      * generate task nodes needed by dag
      *
-     * @param taskNodeList         taskNodeList
-     * @param startNodeNameList    startNodeNameList
+     * @param taskNodeList taskNodeList
+     * @param startNodeNameList startNodeNameList
      * @param recoveryNodeNameList recoveryNodeNameList
-     * @param taskDependType       taskDependType
+     * @param taskDependType taskDependType
      * @return task node list
      */
     public static List<TaskNode> generateFlowNodeListByStartNode(List<TaskNode> taskNodeList, List<String> startNodeNameList,
@@ -130,11 +129,10 @@ public class DagHelper {
         return destTaskNodeList;
     }
 
-
     /**
      * find all the nodes that depended on the start node
      *
-     * @param startNode    startNode
+     * @param startNode startNode
      * @param taskNodeList taskNodeList
      * @return task node list
      */
@@ -155,13 +153,12 @@ public class DagHelper {
         return resultList;
     }
 
-
     /**
      * find all nodes that start nodes depend on.
      *
-     * @param startNode            startNode
+     * @param startNode startNode
      * @param recoveryNodeNameList recoveryNodeNameList
-     * @param taskNodeList         taskNodeList
+     * @param taskNodeList taskNodeList
      * @return task node list
      */
     private static List<TaskNode> getFlowNodeListPre(TaskNode startNode, List<String> recoveryNodeNameList, List<TaskNode> taskNodeList, List<String> visitedNodeNameList) {
@@ -195,9 +192,9 @@ public class DagHelper {
      * generate dag by start nodes and recovery nodes
      *
      * @param processDefinitionJson processDefinitionJson
-     * @param startNodeNameList     startNodeNameList
-     * @param recoveryNodeNameList  recoveryNodeNameList
-     * @param depNodeType           depNodeType
+     * @param startNodeNameList startNodeNameList
+     * @param recoveryNodeNameList recoveryNodeNameList
+     * @param depNodeType depNodeType
      * @return process dag
      * @throws Exception if error throws Exception
      */
@@ -244,12 +241,11 @@ public class DagHelper {
         return forbidTaskNodeMap;
     }
 
-
     /**
      * find node by node name
      *
      * @param nodeDetails nodeDetails
-     * @param nodeName    nodeName
+     * @param nodeName nodeName
      * @return task node
      */
     public static TaskNode findNodeByName(List<TaskNode> nodeDetails, String nodeName) {
@@ -264,8 +260,8 @@ public class DagHelper {
     /**
      * the task can be submit when  all the depends nodes are forbidden or complete
      *
-     * @param taskNode         taskNode
-     * @param dag              dag
+     * @param taskNode taskNode
+     * @param dag dag
      * @param completeTaskList completeTaskList
      * @return can submit
      */
@@ -279,10 +275,9 @@ public class DagHelper {
         }
         for (String dependNodeName : dependList) {
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if (dependNode == null || completeTaskList.containsKey(dependNodeName)
+            if (!(dependNode == null || completeTaskList.containsKey(dependNodeName)
                     || dependNode.isForbidden()
-                    || skipTaskNodeList.containsKey(dependNodeName)) {
-            } else {
+                    || skipTaskNodeList.containsKey(dependNodeName))) {
                 return false;
             }
         }
@@ -294,7 +289,6 @@ public class DagHelper {
      * this function parse the condition node to find the right branch.
      * also check all the depends nodes forbidden or complete
      *
-     * @param preNodeName
      * @return successor nodes
      */
     public static Set<String> parsePostNodes(String preNodeName,
@@ -331,9 +325,6 @@ public class DagHelper {
 
     /**
      * if all of the task dependence are skipped, skip it too.
-     *
-     * @param taskNode
-     * @return
      */
     private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
                                               Map<String, TaskNode> skipTaskNodeList
@@ -353,9 +344,6 @@ public class DagHelper {
     /**
      * parse condition task find the branch process
      * set skip flag for another one.
-     *
-     * @param nodeName
-     * @return
      */
     public static List<String> parseConditionTask(String nodeName,
                                                   Map<String, TaskNode> skipTaskNodeList,
@@ -390,11 +378,6 @@ public class DagHelper {
 
     /**
      * set task node and the post nodes skip flag
-     *
-     * @param skipNodeName
-     * @param dag
-     * @param completeTaskList
-     * @param skipTaskNodeList
      */
     private static void setTaskNodeSkip(String skipNodeName,
                                         DAG<String, TaskNode, TaskNodeRelation> dag,
@@ -469,9 +452,6 @@ public class DagHelper {
 
     /**
      * is there have conditions after the parent node
-     *
-     * @param parentNodeName
-     * @return
      */
     public static boolean haveConditionsAfterNode(String parentNodeName,
                                                   DAG<String, TaskNode, TaskNodeRelation> dag
@@ -493,9 +473,6 @@ public class DagHelper {
 
     /**
      * is there have conditions after the parent node
-     *
-     * @param parentNodeName
-     * @return
      */
     public static boolean haveConditionsAfterNode(String parentNodeName,
                                                   List<TaskNode> taskNodes

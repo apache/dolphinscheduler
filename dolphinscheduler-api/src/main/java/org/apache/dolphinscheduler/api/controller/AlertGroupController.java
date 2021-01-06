@@ -36,7 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
@@ -192,7 +191,8 @@ public class AlertGroupController extends BaseController {
     public Result delAlertgroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "id") int id) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, delete AlertGroup, id: {},", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("login user {}, delete AlertGroup, id: {},", loggedInUser, idParam);
         Map<String, Object> result = alertGroupService.delAlertgroupById(loginUser, id);
         return returnDataList(result);
     }
@@ -214,13 +214,13 @@ public class AlertGroupController extends BaseController {
     public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        groupName = StringUtils.replaceNRTtoUnderline(groupName);
-        logger.info("login user {}, verify group name: {}", loggedInUser, groupName);
+        String groupNameParam = StringUtils.replaceNRTtoUnderline(groupName);
+        logger.info("login user {}, verify group name: {}", loggedInUser, groupNameParam);
 
         boolean exist = alertGroupService.existGroupName(groupName);
         Result result = new Result();
         if (exist) {
-            logger.error("group {} already exist, can't create again.", groupName);
+            logger.error("group {} already exist, can't create again.", groupNameParam);
             result.setCode(Status.ALERT_GROUP_EXIST.getCode());
             result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
         } else {
@@ -250,8 +250,10 @@ public class AlertGroupController extends BaseController {
                             @RequestParam(value = "alertgroupId") int alertgroupId,
                             @RequestParam(value = "userIds") String userIds) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String alertGroupIdParam = String.valueOf(alertgroupId);
+        String userIdParam = String.valueOf(userIds);
         logger.info("login user {}, grant user, alertGroupId: {},userIds : {}",
-                loggedInUser, alertgroupId, userIds);
+                loggedInUser, alertGroupIdParam, userIdParam);
         Map<String, Object> result = alertGroupService.grantUser(loginUser, alertgroupId, userIds);
         return returnDataList(result);
     }

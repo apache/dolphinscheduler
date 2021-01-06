@@ -222,7 +222,8 @@ public class ResourcesController extends BaseController {
                                     @RequestParam(value = "type") ResourceType type
     ) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("query resource list, login user:{}, resource type:{}", loggedInUser, type);
+        String typeParam = String.valueOf(type.getCode());
+        logger.info("query resource list, login user:{}, resource type:{}", loggedInUser, typeParam);
         Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
         return returnDataList(result);
     }
@@ -683,7 +684,8 @@ public class ResourcesController extends BaseController {
     public Result<Object> queryUdfFuncList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("query udf func list, user:{}, type:{}", loggedInUser, type);
+        String typeParam = String.valueOf(type.getCode());
+        logger.info("query udf func list, user:{}, type:{}", loggedInUser, typeParam);
         Map<String, Object> result = udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
         return returnDataList(result);
     }
@@ -732,7 +734,8 @@ public class ResourcesController extends BaseController {
                                 @RequestParam(value = "id") int udfFuncId
     ) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, delete udf function id: {}", loggedInUser, udfFuncId);
+        String udfFuncIdParam = String.valueOf(udfFuncId);
+        logger.info("login user {}, delete udf function id: {}", loggedInUser, udfFuncIdParam);
         return udfFuncService.delete(udfFuncId);
     }
 
@@ -799,7 +802,8 @@ public class ResourcesController extends BaseController {
     public Result unauthUDFFunc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("unauthorized udf function, login user:{}, unauthorized user id:{}", loggedInUser, userId);
+        String userIdParam = String.valueOf(userId);
+        logger.info("unauthorized udf function, login user:{}, unauthorized user id:{}", loggedInUser, userIdParam);
 
         Map<String, Object> result = resourceService.unauthorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
@@ -823,7 +827,8 @@ public class ResourcesController extends BaseController {
     public Result authorizedUDFFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("auth udf function, login user:{}, auth user id:{}", loggedInUser, userId);
+        String userIdParam = String.valueOf(userId);
+        logger.info("auth udf function, login user:{}, auth user id:{}", loggedInUser, userIdParam);
         Map<String, Object> result = resourceService.authorizedUDFFunction(loginUser, userId);
         return returnDataList(result);
     }

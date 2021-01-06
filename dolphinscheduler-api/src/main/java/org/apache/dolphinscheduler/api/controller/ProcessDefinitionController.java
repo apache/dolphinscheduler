@@ -462,9 +462,9 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                    @RequestParam("pageSize") Integer pageSize) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        projectName = StringUtils.replaceNRTtoUnderline(projectName);
+        String projectNameParam = StringUtils.replaceNRTtoUnderline(projectName);
         logger.info("query process definition list paging, login user:{}, project name:{}",
-                loggedInUser, projectName);
+                loggedInUser, projectNameParam);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);

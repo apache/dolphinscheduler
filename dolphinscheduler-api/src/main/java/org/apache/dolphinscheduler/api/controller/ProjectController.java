@@ -131,7 +131,8 @@ public class ProjectController extends BaseController {
     public Result queryProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("projectId") Integer projectId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, query project by id: {}", loggedInUser, projectId);
+        String projectIdParam = String.valueOf(projectId);
+        logger.info("login user {}, query project by id: {}", loggedInUser, projectIdParam);
 
         Map<String, Object> result = projectService.queryById(projectId);
         return returnDataList(result);
@@ -185,7 +186,8 @@ public class ProjectController extends BaseController {
                                 @RequestParam("projectId") Integer projectId
     ) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, delete project: {}.", loggedInUser, projectId);
+        String projectIdParam = String.valueOf(projectId);
+        logger.info("login user {}, delete project: {}.", loggedInUser, projectIdParam);
         Map<String, Object> result = projectService.deleteProject(loginUser, projectId);
         return returnDataList(result);
     }
@@ -207,7 +209,8 @@ public class ProjectController extends BaseController {
     public Result queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, query unauthorized project by user id: {}.", loggedInUser, userId);
+        String userIdParam = String.valueOf(userId);
+        logger.info("login user {}, query unauthorized project by user id: {}.", loggedInUser, userIdParam);
         Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser, userId);
         return returnDataList(result);
     }
@@ -230,7 +233,8 @@ public class ProjectController extends BaseController {
     public Result queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, query authorized project by user id: {}.", loggedInUser, userId);
+        String userIdParam = String.valueOf(userId);
+        logger.info("login user {}, query authorized project by user id: {}.", loggedInUser, userIdParam);
         Map<String, Object> result = projectService.queryAuthorizedProject(loginUser, userId);
         return returnDataList(result);
     }

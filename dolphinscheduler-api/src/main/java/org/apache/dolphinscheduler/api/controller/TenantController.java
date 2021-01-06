@@ -206,7 +206,8 @@ public class TenantController extends BaseController {
     public Result deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) throws Exception {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        logger.info("login user {}, delete tenant, tenantId: {},", loggedInUser, id);
+        String idParam = String.valueOf(id);
+        logger.info("login user {}, delete tenant, tenantId: {},", loggedInUser, idParam);
         Map<String, Object> result = tenantService.deleteTenantById(loginUser, id);
         return returnDataList(result);
     }

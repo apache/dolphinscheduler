@@ -87,8 +87,9 @@ public class AccessTokenController extends BaseController {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
         token = StringUtils.replaceNRTtoUnderline(token);
+        String userIdParam = String.valueOf(userId);
         logger.info("login user {}, create token , userId : {} , token expire time : {} , token : {}",
-                loggedInUser, userId, expireTime, token);
+                loggedInUser, userIdParam, expireTime, token);
 
         Map<String, Object> result = accessTokenService.createToken(loginUser, userId, expireTime, token);
         return returnDataList(result);
@@ -111,8 +112,9 @@ public class AccessTokenController extends BaseController {
                                 @RequestParam(value = "expireTime") String expireTime) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
+        String userIdParam = String.valueOf(userId);
         logger.info("login user {}, generate token , userId : {} , token expire time : {}",
-                loggedInUser, userId, expireTime);
+                loggedInUser, userIdParam, expireTime);
         Map<String, Object> result = accessTokenService.generateToken(loginUser, userId, expireTime);
         return returnDataList(result);
     }
@@ -168,8 +170,9 @@ public class AccessTokenController extends BaseController {
     public Result delAccessTokenById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "id") int id) {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String idParam = String.valueOf(id);
         logger.info("login user {}, delete access token, id: {},",
-                loggedInUser, id);
+                loggedInUser, idParam);
         Map<String, Object> result = accessTokenService.delAccessTokenById(loginUser, id);
         return returnDataList(result);
     }
@@ -197,9 +200,9 @@ public class AccessTokenController extends BaseController {
         String loggedInUser = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         expireTime = StringUtils.replaceNRTtoUnderline(expireTime);
         token = StringUtils.replaceNRTtoUnderline(token);
+        String userIdParam = String.valueOf(userId);
         logger.info("login user {}, update token , userId : {} , token expire time : {} , token : {}",
-                loggedInUser,
-                userId, expireTime, token);
+                loggedInUser, userIdParam, expireTime, token);
 
         Map<String, Object> result = accessTokenService.updateToken(loginUser, id, userId, expireTime, token);
         return returnDataList(result);

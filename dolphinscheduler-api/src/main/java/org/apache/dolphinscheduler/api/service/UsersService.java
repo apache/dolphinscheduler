@@ -113,13 +113,13 @@ public class UsersService extends BaseService {
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser    login user
-     * @param userName     user name
+     * @param loginUser login user
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tenant id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @param queue queue
      * @return create result code
      * @throws Exception exception
      */
@@ -255,7 +255,7 @@ public class UsersService extends BaseService {
     /**
      * query user
      *
-     * @param name     name
+     * @param name name
      * @param password password
      * @return user info
      */
@@ -289,9 +289,9 @@ public class UsersService extends BaseService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo    page number
+     * @param pageNo page number
      * @param searchVal search avlue
-     * @param pageSize  page size
+     * @param pageSize page size
      * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -317,14 +317,14 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
-     * @param loginUser    The login user
-     * @param userId       user id
-     * @param userName     user name
+     * @param loginUser The login user
+     * @param userId user id
+     * @param userName user name
      * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tennat id
-     * @param phone        phone
-     * @param queue        queue
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @param queue queue
      * @return update result code
      * @throws Exception exception
      */
@@ -393,54 +393,52 @@ public class UsersService extends BaseService {
             Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
             //query tenant
             Tenant newTenant = tenantMapper.queryById(tenantId);
-            if (newTenant != null) {
-                // if hdfs startup
-                if (Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState()) && oldTenant != null) {
-                    String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
-                    String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
+            // if hdfs startup
+            if (newTenant != null && Boolean.TRUE.equals(PropertyUtils.getResUploadStartupState()) && oldTenant != null) {
+                String newTenantCode = newTenant.getTenantCode();
+                String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
+                String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
 
-                    // if old tenant dir exists
-                    if (HadoopUtils.getInstance().exists(oldResourcePath)) {
-                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
-                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
+                // if old tenant dir exists
+                if (HadoopUtils.getInstance().exists(oldResourcePath)) {
+                    String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
+                    String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
 
-                        //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.FILE.ordinal());
-                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
-                        }
-
-                        //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.UDF.ordinal());
-                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
-                        }
-
-                        //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(), userId);
-                        HadoopUtils.getInstance().delete(oldUserPath, true);
-                    } else {
-                        // if old tenant dir not exists , create
-                        createTenantDirIfNotExists(oldTenant.getTenantCode());
+                    //file resources list
+                    List<Resource> fileResourcesList = resourceMapper.queryResourceList(
+                            null, userId, ResourceType.FILE.ordinal());
+                    if (CollectionUtils.isNotEmpty(fileResourcesList)) {
+                        ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
+                        ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+                        copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
                     }
 
-                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))) {
-                        //create user in the new tenant directory
-                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(), user.getId());
-                        HadoopUtils.getInstance().mkdir(newUserPath);
-                    } else {
-                        // if new tenant dir not exists , create
-                        createTenantDirIfNotExists(newTenant.getTenantCode());
+                    //udf resources
+                    List<Resource> udfResourceList = resourceMapper.queryResourceList(
+                            null, userId, ResourceType.UDF.ordinal());
+                    if (CollectionUtils.isNotEmpty(udfResourceList)) {
+                        ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
+                        ResourceComponent resourceComponent = resourceTreeVisitor.visit();
+                        copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
                     }
 
+                    //Delete the user from the old tenant directory
+                    String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(), userId);
+                    HadoopUtils.getInstance().delete(oldUserPath, true);
+                } else {
+                    // if old tenant dir not exists , create
+                    createTenantDirIfNotExists(oldTenant.getTenantCode());
                 }
+
+                if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))) {
+                    //create user in the new tenant directory
+                    String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(), user.getId());
+                    HadoopUtils.getInstance().mkdir(newUserPath);
+                } else {
+                    // if new tenant dir not exists , create
+                    createTenantDirIfNotExists(newTenant.getTenantCode());
+                }
+
             }
             user.setTenantId(tenantId);
         }
@@ -455,7 +453,7 @@ public class UsersService extends BaseService {
      * delete user
      *
      * @param loginUser login user
-     * @param id        user id
+     * @param id user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
@@ -491,8 +489,8 @@ public class UsersService extends BaseService {
     /**
      * grant project
      *
-     * @param loginUser  login user
-     * @param userId     user id
+     * @param loginUser login user
+     * @param userId user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -541,8 +539,8 @@ public class UsersService extends BaseService {
     /**
      * grant resource
      *
-     * @param loginUser   login user
-     * @param userId      user id
+     * @param loginUser login user
+     * @param userId user id
      * @param resourceIds resource id array
      * @return grant result code
      */
@@ -639,8 +637,8 @@ public class UsersService extends BaseService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
+     * @param userId user id
+     * @param udfIds udf id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
@@ -685,8 +683,8 @@ public class UsersService extends BaseService {
     /**
      * grant datasource
      *
-     * @param loginUser     login user
-     * @param userId        user id
+     * @param loginUser login user
+     * @param userId user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
@@ -831,7 +829,7 @@ public class UsersService extends BaseService {
     /**
      * unauthorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -868,7 +866,7 @@ public class UsersService extends BaseService {
     /**
      * authorized user
      *
-     * @param loginUser    login user
+     * @param loginUser login user
      * @param alertgroupId alert group id
      * @return authorized result code
      */
@@ -896,8 +894,8 @@ public class UsersService extends BaseService {
     /**
      * @param userName The username
      * @param password The password
-     * @param email    The Email
-     * @param phone    Teh phone number
+     * @param email The Email
+     * @param phone Teh phone number
      * @return if check failed return the field, otherwise return null
      */
     private String checkUserParams(String userName, String password, String email, String phone) {
@@ -924,8 +922,8 @@ public class UsersService extends BaseService {
      * copy resource files
      *
      * @param resourceComponent resource component
-     * @param srcBasePath       src base path
-     * @param dstBasePath       dst base path
+     * @param srcBasePath src base path
+     * @param dstBasePath dst base path
      * @throws IOException io exception
      */
     private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
@@ -960,10 +958,10 @@ public class UsersService extends BaseService {
     /**
      * register user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName       user name
-     * @param userPassword   user password
+     * @param userName user name
+     * @param userPassword user password
      * @param repeatPassword repeat password
-     * @param email          email
+     * @param email email
      * @return register result code
      * @throws Exception exception
      */
@@ -993,7 +991,7 @@ public class UsersService extends BaseService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName  user name
+     * @param userName user name
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {

@@ -79,12 +79,12 @@ public class WorkerGroupController extends BaseController {
                                              @RequestParam("pageSize") Integer pageSize
     ) {
         String loggedInUSer = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
-        searchVal = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
+        String searchValParam = StringUtils.replaceNRTtoUnderline(loginUser.getUserName());
         logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
-                loggedInUSer, pageNo, pageSize, searchVal);
+                loggedInUSer, pageNo, pageSize, searchValParam);
 
-        searchVal = ParameterUtils.handleEscapes(searchVal);
-        Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchVal);
+        String searchValNoEsc = ParameterUtils.handleEscapes(searchVal);
+        Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser, pageNo, pageSize, searchValNoEsc);
         return returnDataListPaging(result);
     }
 

@@ -66,9 +66,11 @@ public class ZookeeperOperator implements InitializingBean {
      * this method is for sub class,
      */
     protected void registerListener() {
+        // for sub class
     }
 
     protected void treeCacheStart() {
+        // for sub class
     }
 
     public void initStateLister() {
