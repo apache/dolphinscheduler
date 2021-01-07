@@ -62,7 +62,6 @@ public class CommandMapperTest {
     @Test
     public void testInsert(){
         Command command = createCommand();
-        assertNotNull(command.getId());
         assertThat(command.getId(),greaterThan(0));
     }
 

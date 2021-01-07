@@ -29,7 +29,7 @@
                 <th>{{$t('Number')}}</th>
                 <th>{{$t('State')}}</th>
               </tr>
-              <tr v-for="(item,$index) in queueList">
+              <tr :key="$index" v-for="(item,$index) in queueList">
                 <td><span>{{$index+1}}</span></td>
                 <td><span><a href="javascript:" >{{item.value}}</a></span></td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
@@ -76,7 +76,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {

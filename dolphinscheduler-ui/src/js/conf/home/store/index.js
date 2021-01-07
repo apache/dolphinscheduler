@@ -17,6 +17,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import dag from './dag'
+import kinship from './kinship'
 import projects from './projects'
 import resource from './resource'
 import security from './security'
@@ -28,6 +29,7 @@ export default new Vuex.Store({
   modules: {
     dag,
     projects,
+    kinship,
     resource,
     security,
     datasource,

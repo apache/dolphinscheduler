@@ -16,9 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.json.JSONException;
 import org.junit.Test;
@@ -48,13 +49,13 @@ public class DataSourceParamTest {
                 "\"preTasks\":[\"dependent\"]}";
 
 
-        JSONObject taskNode = JSONUtils.parseObject(sqlJson);
-        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
-            String taskType = taskNode.getString("type");
+        ObjectNode taskNode = JSONUtils.parseObject(sqlJson);
+        if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
+            String taskType = taskNode.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject sql = addTaskParam.addExportSpecialParam(taskNode);
+            JsonNode sql = addTaskParam.addExportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), sql.toString(), false);
         }
@@ -72,13 +73,13 @@ public class DataSourceParamTest {
                 "\"taskInstancePriority\":\"MEDIUM\",\"name\":\"mysql\",\"dependence\":{}," +
                 "\"retryInterval\":\"1\",\"preTasks\":[\"dependent\"],\"id\":\"tasks-8745\"}";
 
-        JSONObject taskNode = JSONUtils.parseObject(sqlJson);
-        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
-            String taskType = taskNode.getString("type");
+        ObjectNode taskNode = JSONUtils.parseObject(sqlJson);
+        if (StringUtils.isNotEmpty(taskNode.path("type").asText())) {
+            String taskType = taskNode.path("type").asText();
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject sql = addTaskParam.addImportSpecialParam(taskNode);
+            JsonNode sql = addTaskParam.addImportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), sql.toString(), false);
         }

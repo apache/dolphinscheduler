@@ -16,13 +16,15 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
-import org.apache.dolphinscheduler.alert.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.common.utils.*;
 
 import java.util.*;
 
@@ -34,6 +36,7 @@ import static org.apache.dolphinscheduler.common.utils.Preconditions.*;
 public class DefaultHTMLTemplate implements AlertTemplate {
 
     public static final Logger logger = LoggerFactory.getLogger(DefaultHTMLTemplate.class);
+
 
     @Override
     public String getMessageFromTemplate(String content, ShowType showType,boolean showAll) {
@@ -107,18 +110,11 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTextTypeMessage(String content,boolean showAll){
 
         if (StringUtils.isNotEmpty(content)){
-            List<String> list;
-            try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
-                return null;
-            }
-
+            ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
+            for (JsonNode jsonNode : list){
                 contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
+                contents.append(Constants.TD).append(jsonNode.toString()).append(Constants.TD_END);
                 contents.append(Constants.TR_END);
             }
 
@@ -140,21 +136,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
         checkNotNull(content);
         String htmlTableThead = StringUtils.isEmpty(title) ? "" : String.format("<thead>%s</thead>\n",title);
 
-        return "<html>\n" +
-                "    <head>\n" +
-                "        <title>dolphinscheduler</title>\n" +
-                "        <meta name='Keywords' content=''>\n" +
-                "        <meta name='Description' content=''>\n" +
-                "        <style type=\"text/css\">\n" +
-                "            table {margin-top:0px;padding-top:0px;border:1px solid;font-size: 14px;color: #333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}\n" +
-                "            table th {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #dedede;text-align: right;}\n" +
-                "            table td {border-width: 1px;padding: 8px;border-style: solid;border-color: #666666;background-color: #ffffff;text-align: right;}\n" +
-                "        </style>\n" +
-                "    </head>\n" +
-                "    <body style=\"margin:0;padding:0\">\n" +
-                "        <table border=\"1px\" cellpadding=\"5px\" cellspacing=\"-10px\">\n" + htmlTableThead + content +
-                "        </table>\n" +
-                "    </body>\n" +
-                "</html>";
+        return Constants.HTML_HEADER_PREFIX +htmlTableThead + content + Constants.TABLE_BODY_HTML_TAIL;
     }
+
 }

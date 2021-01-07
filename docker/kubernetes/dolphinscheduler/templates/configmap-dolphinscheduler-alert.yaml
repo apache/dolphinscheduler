@@ -24,6 +24,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 data:
+  ALERT_PLUGIN_DIR: {{ .Values.alert.configmap.ALERT_PLUGIN_DIR | quote }}
   XLS_FILE_PATH: {{ .Values.alert.configmap.XLS_FILE_PATH | quote }}
   MAIL_SERVER_HOST: {{ .Values.alert.configmap.MAIL_SERVER_HOST | quote }}
   MAIL_SERVER_PORT: {{ .Values.alert.configmap.MAIL_SERVER_PORT | quote }}

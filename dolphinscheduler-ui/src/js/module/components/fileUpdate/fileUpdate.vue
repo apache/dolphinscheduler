@@ -20,6 +20,7 @@
           :ok-text="$t('Upload')"
           :nameText="$t('File Upload')"
           @ok="_ok"
+          @close="close"
           :disabled="progress === 0 ? false : true">
     <template slot="content">
       <form name="files" enctype="multipart/form-data" method="post">
@@ -29,15 +30,12 @@
              @dragleave.prevent="dragOver = false"
              id="file-update-model">
           <div class="tooltip-info">
-            <em class="ans ans-icon-warn-solid"></em>
+            <em class="ans el-icon-warning"></em>
             <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
-          <!--<div class="hide-archive" v-if="progress !== 0" @click="_ckArchive">
-            <em class="fa fa-minus" data-toggle="tooltip" title="关闭窗口 继续上传" data-container="body" ></em>
-          </div>-->
           <div class="update-popup" v-if="dragOver">
             <div class="icon-box">
-              <em class="ans ans-icon-upload"></em>
+              <em class="ans el-icon-upload"></em>
             </div>
             <p class="p1">
               <span>{{$t('Drag area upload')}}</span>
@@ -46,25 +44,25 @@
           <m-list-box-f>
             <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
             <template slot="content">
-              <x-input
+              <el-input
                       type="input"
                       v-model="name"
                       :disabled="progress !== 0"
-                      :placeholder="$t('Please enter name')"
-                      autocomplete="off">
-              </x-input>
+                      size="small"
+                      :placeholder="$t('Please enter name')">
+              </el-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
             <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
-              <x-input
+              <el-input
                       type="textarea"
                       v-model="description"
                       :disabled="progress !== 0"
-                      :placeholder="$t('Please enter description')"
-                      autocomplete="off">
-              </x-input>
+                      size="small"
+                      :placeholder="$t('Please enter description')">
+              </el-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
@@ -73,7 +71,7 @@
               <div class="file-update-box">
                 <template v-if="progress === 0">
                   <input name="file" id="file" type="file" class="file-update">
-                  <x-button type="dashed" size="xsmall"> {{$t('Upload')}} </x-button>
+                  <el-button type="dashed" size="mini">{{$t('Upload')}}<em class="el-icon-upload"></em></el-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>
@@ -123,31 +121,31 @@
        * submit
        */
       _ok () {
-        this.$refs['popup'].spinnerLoading = true
+        this.$refs.popup.spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            fullName: '/'+this.name,
+            fullName: '/' + this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
-            if(isLt1024M) {
+            if (isLt1024M) {
               this._formDataUpdate().then(res => {
                 setTimeout(() => {
-                  this.$refs['popup'].spinnerLoading = false
+                  this.$refs.popup.spinnerLoading = false
                 }, 800)
               }).catch(e => {
-                this.$refs['popup'].spinnerLoading = false
+                this.$refs.popup.spinnerLoading = false
               })
             } else {
               this.$message.warning(`${i18n.$t('Upload File Size')}`)
-              this.$refs['popup'].spinnerLoading = false
+              this.$refs.popup.spinnerLoading = false
             }
           }).catch(e => {
             this.$message.error(e.msg || '')
-            this.$refs['popup'].spinnerLoading = false
+            this.$refs.popup.spinnerLoading = false
           })
         } else {
-          this.$refs['popup'].spinnerLoading = false
+          this.$refs.popup.spinnerLoading = false
         }
       },
       /**
@@ -177,13 +175,13 @@
           formData.append('pid', this.pid)
           formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
-          io.post(`resources/create`, res => {
+          io.post('resources/create', res => {
             this.$message.success(res.msg)
             resolve()
-            self.$emit('onUpdate')
+            self.$emit('onUpdateFileUpdate')
           }, e => {
             reject(e)
-            self.$emit('close')
+            self.$emit('closeFileUpdate')
             this.$message.error(e.msg || '')
           }, {
             data: formData,
@@ -194,7 +192,7 @@
               // Total attachment size
               let total = progressEvent.total
               self.progress = Math.floor(100 * loaded / total)
-              self.$emit('onProgress', self.progress)
+              self.$emit('onProgressFileUpdate', self.progress)
             }
           })
         })
@@ -204,7 +202,10 @@
        */
       _ckArchive () {
         $('.update-file-modal').hide()
-        this.$emit('onArchive')
+        this.$emit('onArchiveFileUpdate')
+      },
+      close () {
+        this.$emit('closeFileUpdate')
       },
       /**
        * Drag and drop upload

@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * ProcessAddTaskParam
@@ -28,12 +28,12 @@ public interface ProcessAddTaskParam {
      * @param taskNode task node json object
      * @return task node json object
      */
-    JSONObject addExportSpecialParam(JSONObject taskNode);
+    JsonNode addExportSpecialParam(JsonNode taskNode);
 
     /**
      * add task special param: sql task dependent task
      * @param taskNode task node json object
      * @return task node json object
      */
-    JSONObject addImportSpecialParam(JSONObject taskNode);
+    JsonNode addImportSpecialParam(JsonNode taskNode);
 }

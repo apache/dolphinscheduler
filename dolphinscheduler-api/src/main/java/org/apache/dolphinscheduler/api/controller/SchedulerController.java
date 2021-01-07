@@ -52,7 +52,7 @@ public class SchedulerController extends BaseController {
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
-
+    public static final String DEFAULT_PROCESS_INSTANCE_PRIORITY = "MEDIUM";
 
     @Autowired
     private SchedulerService schedulerService;
@@ -99,7 +99,7 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "receivers", required = false) String receivers,
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                 @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) throws IOException {
+                                 @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) throws IOException {
         logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
                 loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
@@ -176,7 +176,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                          @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule setScheduleState, project name: {}, id: {}",
                 loginUser.getUserName(), projectName, id);
@@ -199,7 +199,7 @@ public class SchedulerController extends BaseController {
     @PostMapping("/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable("projectName") String projectName,
+                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                           @RequestParam("id") Integer id) {
         logger.info("login user {}, schedule offline, project name: {}, process definition id: {}",
                 loginUser.getUserName(), projectName, id);

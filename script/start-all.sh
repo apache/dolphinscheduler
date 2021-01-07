@@ -20,6 +20,17 @@ workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/install_config.conf
 
+declare -A workersGroupMap=()
+
+workersGroup=(${workers//,/ })
+for workerGroup in ${workersGroup[@]}
+do
+  echo $workerGroup;
+  worker=`echo $workerGroup|awk -F':' '{print $1}'`
+  groupName=`echo $workerGroup|awk -F':' '{print $2}'`
+  workersGroupMap+=([$worker]=$groupName)
+done
+
 mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
@@ -28,8 +39,7 @@ do
 
 done
 
-workersHost=(${workers//,/ })
-for worker in ${workersHost[@]}
+for worker in ${!workersGroupMap[*]}
 do
   echo "$worker worker server is starting"
 
@@ -46,3 +56,6 @@ do
   ssh -p $sshPort $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
 done
 
+# query server status
+echo "query server status"
+cd $installPath/; sh bin/status-all.sh

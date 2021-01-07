@@ -29,7 +29,7 @@ CREATE TABLE `QRTZ_BLOB_TRIGGERS` (
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   KEY `SCHED_NAME` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_BLOB_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_BLOB_TRIGGERS
@@ -44,7 +44,7 @@ CREATE TABLE `QRTZ_CALENDARS` (
   `CALENDAR_NAME` varchar(200) NOT NULL,
   `CALENDAR` blob NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`CALENDAR_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_CALENDARS
@@ -62,7 +62,7 @@ CREATE TABLE `QRTZ_CRON_TRIGGERS` (
   `TIME_ZONE_ID` varchar(80) DEFAULT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_CRON_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_CRON_TRIGGERS
@@ -93,7 +93,7 @@ CREATE TABLE `QRTZ_FIRED_TRIGGERS` (
   KEY `IDX_QRTZ_FT_JG` (`SCHED_NAME`,`JOB_GROUP`),
   KEY `IDX_QRTZ_FT_T_G` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   KEY `IDX_QRTZ_FT_TG` (`SCHED_NAME`,`TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_FIRED_TRIGGERS
@@ -117,7 +117,7 @@ CREATE TABLE `QRTZ_JOB_DETAILS` (
   PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
   KEY `IDX_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
   KEY `IDX_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_JOB_DETAILS
@@ -131,7 +131,7 @@ CREATE TABLE `QRTZ_LOCKS` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `LOCK_NAME` varchar(40) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`LOCK_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_LOCKS
@@ -145,7 +145,7 @@ CREATE TABLE `QRTZ_PAUSED_TRIGGER_GRPS` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_GROUP` varchar(200) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_PAUSED_TRIGGER_GRPS
@@ -161,7 +161,7 @@ CREATE TABLE `QRTZ_SCHEDULER_STATE` (
   `LAST_CHECKIN_TIME` bigint(13) NOT NULL,
   `CHECKIN_INTERVAL` bigint(13) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`INSTANCE_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_SCHEDULER_STATE
@@ -180,7 +180,7 @@ CREATE TABLE `QRTZ_SIMPLE_TRIGGERS` (
   `TIMES_TRIGGERED` bigint(10) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_SIMPLE_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_SIMPLE_TRIGGERS
@@ -207,7 +207,7 @@ CREATE TABLE `QRTZ_SIMPROP_TRIGGERS` (
   `BOOL_PROP_2` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_SIMPROP_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_SIMPROP_TRIGGERS
@@ -248,7 +248,7 @@ CREATE TABLE `QRTZ_TRIGGERS` (
   KEY `IDX_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
   KEY `IDX_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
   CONSTRAINT `QRTZ_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `QRTZ_JOB_DETAILS` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of QRTZ_TRIGGERS
@@ -424,6 +424,33 @@ CREATE TABLE `t_ds_process_definition` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_process_definition_version
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_definition_version`;
+CREATE TABLE `t_ds_process_definition_version` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `process_definition_id` int(11) NOT NULL COMMENT 'process definition id',
+  `version` int(11) DEFAULT NULL COMMENT 'process definition version',
+  `process_definition_json` longtext COMMENT 'process definition json content',
+  `description` text,
+  `global_params` text COMMENT 'global parameters',
+  `locations` text COMMENT 'Node location information',
+  `connects` text COMMENT 'Node connection information',
+  `receivers` text COMMENT 'receivers',
+  `receivers_cc` text COMMENT 'cc',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `timeout` int(11) DEFAULT '0' COMMENT 'time out',
+  `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `process_definition_id_and_version` (`process_definition_id`,`version`) USING BTREE,
+  KEY `process_definition_index` (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=84 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_ds_process_definition
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_process_instance
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_instance`;
@@ -460,6 +487,7 @@ CREATE TABLE `t_ds_process_instance` (
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_id`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`) USING BTREE
@@ -479,8 +507,8 @@ CREATE TABLE `t_ds_project` (
   `description` varchar(200) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'update time',
+  `create_time` datetime DEFAULT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -630,7 +658,8 @@ CREATE TABLE `t_ds_resources` (
   `pid` int(11) DEFAULT NULL,
   `full_name` varchar(64) DEFAULT NULL,
   `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -700,13 +729,16 @@ CREATE TABLE `t_ds_task_instance` (
   `alert_flag` tinyint(4) DEFAULT NULL COMMENT 'whether alert',
   `retry_times` int(4) DEFAULT '0' COMMENT 'task retry times',
   `pid` int(4) DEFAULT NULL COMMENT 'pid of task',
-  `app_link` varchar(255) DEFAULT NULL COMMENT 'yarn app id',
+  `app_link` text COMMENT 'yarn app id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `retry_interval` int(4) DEFAULT NULL COMMENT 'retry interval when task failed ',
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
   `executor_id` int(11) DEFAULT NULL,
+  `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
+  `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
+  `var_pool` longtext COMMENT 'var_pool',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,
@@ -724,7 +756,6 @@ DROP TABLE IF EXISTS `t_ds_tenant`;
 CREATE TABLE `t_ds_tenant` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
-  `tenant_name` varchar(64) DEFAULT NULL COMMENT 'tenant name',
   `description` varchar(256) DEFAULT NULL,
   `queue_id` int(11) DEFAULT NULL COMMENT 'queue id',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
@@ -775,6 +806,7 @@ CREATE TABLE `t_ds_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `queue` varchar(64) DEFAULT NULL COMMENT 'queue',
+  `state` int(1) DEFAULT 1 COMMENT 'state 0:disable 1:enable',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -798,7 +830,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT INTO `t_ds_version` VALUES ('1', '2.0.0');
+INSERT INTO `t_ds_version` VALUES ('1', '1.3.0');
 
 
 -- ----------------------------
@@ -814,4 +846,4 @@ INSERT INTO `t_ds_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 1
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
-INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
+INSERT INTO `t_ds_user` VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22', null, 1);

@@ -1,54 +1,10 @@
 Apache DolphinScheduler (incubating)
-Copyright 2019 The Apache Software Foundation
+Copyright 2019-2020 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 ========================================================================
-
-grpc NOTICE
-
-========================================================================
-
-Copyright 2014 gRPC authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
------------------------------------------------------------------------
-
-This product contains a modified portion of 'OkHttp', an open source
-HTTP & SPDY client for Android and Java applications, which can be obtained
-at:
-
-  * LICENSE:
-    * okhttp/third_party/okhttp/LICENSE (Apache License 2.0)
-  * HOMEPAGE:
-    * https://github.com/square/okhttp
-  * LOCATION_IN_GRPC:
-    * okhttp/third_party/okhttp
-
-This product contains a modified portion of 'Netty', an open source
-networking library, which can be obtained at:
-
-  * LICENSE:
-    * netty/third_party/netty/LICENSE.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * https://netty.io
-  * LOCATION_IN_GRPC:
-    * netty/third_party/netty
-
-========================================================================
-
 
 Jetty NOTICE
 
@@ -86,6 +42,13 @@ The following artifacts are EPL and ASL2.
 The following artifacts are EPL and CDDL 1.0.
  * org.eclipse.jetty.orbit:javax.mail.glassfish
 
+
+------
+presto-jdbc
+
+The code for the t-digest was originally authored by Ted Dunning
+
+Adrien Grand contributed the heart of the AVLTreeDigest (https://github.com/jpountz)
 
 ------
 Oracle
@@ -172,18 +135,6 @@ Permission to use, copy, modify and distribute UnixCrypt
 for non-commercial or commercial purposes and without fee is
 granted provided that the copyright notice appears in all copies.
 
-
-========================================================================
-
-
-Apache Log4j NOTICE
-
-========================================================================
-Apache log4j
-Copyright 2007 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
 
 ========================================================================
 
@@ -433,8 +384,8 @@ This product contains the Maven wrapper scripts from 'Maven Wrapper', that provi
 Spring Framework NOTICE
 
 ========================================================================
-Spring Framework 5.1.5.RELEASE
-Copyright (c) 2002-2019 Pivotal, Inc.
+Spring Framework 5.1.18.RELEASE
+Copyright (c) 2002-2020 Pivotal, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0
 (the "License"). You may not use this product except in compliance with
@@ -479,17 +430,6 @@ The Apache Software Foundation (http://www.apache.org/).
 
 This product includes software from the Spring Framework,
 under the Apache License 2.0 (see: StringUtils.containsWhitespace())
-========================================================================
-
-
-Apache Jakarta Commons Lang NOTICE
-
-========================================================================
-Apache Jakarta Commons Lang
-Copyright 2001-2007 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
 ========================================================================
 
 
@@ -716,109 +656,6 @@ The licenses for these third party components are included in LICENSE.txt
 ========================================================================
 
 
-Apache Commons CLI NOTICE
-
-========================================================================
-Apache Commons CLI
-Copyright 2001-2009 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache Commons Collections NOTICE
-
-========================================================================
-Apache Commons Collections
-Copyright 2001-2015 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-========================================================================
-
-
-Apache Commons Collections4 NOTICE
-
-========================================================================
-Apache Commons Collections
-Copyright 2001-2019 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache Commons Compress NOTICE
-
-========================================================================
-Apache Commons Compress
-Copyright 2002-2012 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache Commons Configuration NOTICE
-
-========================================================================
-Apache Commons Configuration
-Copyright 2001-2013 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache Commons Daemon NOTICE
-
-========================================================================
-Copyright 1999-2019 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache Commons Email NOTICE
-
-========================================================================
-Apache Commons Email
-Copyright 2001-2017 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
-Apache HttpComponents Client NOTICE
-
-========================================================================
-Copyright 1999-2018 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-Apache Commons IO NOTICE
-
-========================================================================
-Copyright 2002-2019 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-========================================================================
-
-
 Commons Logging NOTICE
 
 ========================================================================
@@ -914,18 +751,6 @@ The complete text of licenses and disclaimers associated with the the original
 sources enumerated above at the time of code translation are in the LICENSE.txt
 file.
 ========================================================================
-
-
-Apache Commons Pool NOTICE
-
-========================================================================
-Apache Commons Pool
-Copyright 2001-2012 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-=========================================================================
 
 
 Apache Derby NOTICE
@@ -1220,29 +1045,6 @@ No other notice covers that jar file.
 =========================================================================
 
 
-Apache FreeMarker NOTICE
-
-=========================================================================
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-See the LICENSE.txt for more details.
-
-=========================================================================
-
-
-Apache HttpClient NOTICE
-
-=========================================================================
-Apache HttpComponents Client
-Copyright 1999-2015 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
-=========================================================================
-
-
 Apache Httpcomponents core NOTICE
 
 =========================================================================
@@ -1281,28 +1083,6 @@ FasterXML.com (http://fasterxml.com).
 A list of contributors may be found from CREDITS file, which is included
 in some artifacts (usually source distributions); but is always available
 from the source code management (SCM) system project uses.
-=========================================================================
-
-
-Apache Avro NOTICE
-
-=========================================================================
-Apache Avro
-Copyright 2009-2013 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apach Commons IO NOTICE
-
-=========================================================================
-Apache Commons IO
-Copyright 2002-2012 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
 =========================================================================
 
 
@@ -1390,39 +1170,6 @@ Junit4 NOTICE
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
- =========================================================================
-
-
-Apache Thrift NOTICE
-
-=========================================================================
- Apache Thrift
- Copyright 2006-2010 The Apache Software Foundation.
-
- This product includes software developed at
- The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
- Apache Commons DBCP NOTICE
-
-=========================================================================
- Apache Commons DBCP
- Copyright 2001-2010 The Apache Software Foundation
-
- This product includes software developed by
- The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
- Apache Commons Daemon NOTICE
-
-=========================================================================
- Apache Commons Daemon
- Copyright 1999-2013 The Apache Software Foundation
-
- This product includes software developed by
- The Apache Software Foundation (http://www.apache.org/).
 =========================================================================
 
 Bonecp NOTICE
@@ -1555,28 +1302,6 @@ Licensed under the Apache License, Version 2.0 (the "License");
 =========================================================================
 
 
- Apache EL NOTICE
-
-=========================================================================
- Apache Tomcat
- Copyright 1999-2018 The Apache Software Foundation
-
- This product includes software developed at
- The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apache Commons Net NOTICE
-
-=========================================================================
-Apache Commons Net
-Copyright 2001-2012 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
 Apache Logging Log4j2 NOTICE
 
 =========================================================================
@@ -1641,50 +1366,6 @@ Portions of this software were originally based on the following:
 =========================================================================
 
 
-Apache Parquet Hadoop Bundle NOTICE
-
-=========================================================================
-Apache Parquet Hadoop Bundle
-Copyright 2015 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apache Log4j 1.x NOTICE
-
-=========================================================================
-Apache Log4j 1.x Compatibility API
-Copyright 1999-2019 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apache log4j NOTICE
-
-=========================================================================
-Apache log4j
-Copyright 2007 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apache Java Data Objects (JDO) NOTICE
-
-=========================================================================
-Apache Java Data Objects (JDO)
-Copyright 2005-2006 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
 Jackson XC NOTICE
 
 =========================================================================
@@ -1711,17 +1392,6 @@ see CREDITS file.
 =========================================================================
 
 
-Apache HttpClient Mime NOTICE
-
-=========================================================================
-Apache HttpClient Mime
-Copyright 1999-2019 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
 Apache HttpCore NOTICE
 
 =========================================================================
@@ -1742,17 +1412,6 @@ htrace-core NOTICE
 
 =========================================================================
 Copyright 2015 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Hive Storage API NOTICE
-
-=========================================================================
-Apache Hive
-Copyright 2016 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -2118,28 +1777,6 @@ which has the following notices:
    org.apache.taglibs:taglibs-standard-spec
    org.apache.taglibs:taglibs-standard-impl
 
-
-   ------
-   MortBay
-
-   The following artifacts are ASL2 licensed.  Based on selected classes from
-   following Apache Tomcat jars, all ASL2 licensed.
-
-   org.mortbay.jasper:apache-jsp
-     org.apache.tomcat:tomcat-jasper
-     org.apache.tomcat:tomcat-juli
-     org.apache.tomcat:tomcat-jsp-api
-     org.apache.tomcat:tomcat-el-api
-     org.apache.tomcat:tomcat-jasper-el
-     org.apache.tomcat:tomcat-api
-     org.apache.tomcat:tomcat-util-scan
-     org.apache.tomcat:tomcat-util
-
-   org.mortbay.jasper:apache-el
-     org.apache.tomcat:tomcat-jasper-el
-     org.apache.tomcat:tomcat-el-api
-
-
    ------
    Mortbay
 
@@ -2214,26 +1851,6 @@ The Apache Software Foundation (http://www.apache.org/).
 =========================================================================
 
 
-FastJson NOTICE
-=========================================================================
-/*
- * Copyright 1999-2017 Alibaba Group.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-=========================================================================
-
-
 Datanucleus NOTICE
 
 =========================================================================
@@ -2287,60 +1904,19 @@ Other developers who have contributed code are:
 
 =========================================================================
 
-
-Apache Yetus NOTICE
-
-=========================================================================
-Apache Yetus - Audience Annotations
-Copyright 2015-2017 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-Apache Directory LDAP API Utilities NOTICE
+ANT NOTICE
 
 =========================================================================
-Apache Directory LDAP API Utilities
-Copyright 2003-2013 The Apache Software Foundation
 
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
 
+   This product includes also software developed by :
+     - the W3C consortium (http://www.w3c.org) ,
+     - the SAX project (http://www.saxproject.org)
 
-Apache Directory API ASN.1 API NOTICE
-
-=========================================================================
-Apache Directory API ASN.1 API
-Copyright 2003-2013 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-ApacheDS Protocol Kerberos Codec NOTICE
-
-=========================================================================
-ApacheDS Protocol Kerberos Codec
-Copyright 2003-2013 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
-ApacheDS I18n NOTICE
-
-=========================================================================
-ApacheDS I18n
-Copyright 2003-2013 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-
+   Please read the different LICENSE files present in the root directory of
+   this distribution.
 
 
 

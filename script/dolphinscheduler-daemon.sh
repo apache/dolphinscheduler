@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop) <command> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -29,7 +29,6 @@ shift
 command=$1
 shift
 
-echo "Begin $startStop $command......"
 
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
@@ -46,7 +45,6 @@ export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
 export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
 export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
 
-export DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms1g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
 export STOP_TIMEOUT=5
 
 if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
@@ -59,23 +57,44 @@ pid=$DOLPHINSCHEDULER_PID_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
+  HEAP_INITIAL_SIZE=1g
+  HEAP_MAX_SIZE=1g
+  HEAP_NEW_GENERATION__SIZE=500m
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
+  HEAP_INITIAL_SIZE=4g
+  HEAP_MAX_SIZE=4g
+  HEAP_NEW_GENERATION__SIZE=2g
   LOG_FILE="-Dlogging.config=classpath:logback-master.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
+  HEAP_INITIAL_SIZE=2g
+  HEAP_MAX_SIZE=2g
+  HEAP_NEW_GENERATION__SIZE=1g
   LOG_FILE="-Dlogging.config=classpath:logback-worker.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
+  HEAP_INITIAL_SIZE=1g
+  HEAP_MAX_SIZE=1g
+  HEAP_NEW_GENERATION__SIZE=500m
   LOG_FILE="-Dlogback.configurationFile=conf/logback-alert.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
+  HEAP_INITIAL_SIZE=1g
+  HEAP_MAX_SIZE=1g
+  HEAP_NEW_GENERATION__SIZE=500m
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
+elif [ "$command" = "zookeeper-server" ]; then
+  #note: this command just for getting a quick experience，not recommended for production. this operation will start a standalone zookeeper server
+  LOG_FILE="-Dlogback.configurationFile=classpath:logback-zookeeper.xml"
+  CLASS=org.apache.dolphinscheduler.service.zk.ZKServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
 fi
+
+export DOLPHINSCHEDULER_OPTS="-server -Xms$HEAP_INITIAL_SIZE -Xmx$HEAP_MAX_SIZE -Xmn$HEAP_NEW_GENERATION__SIZE -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=128m  -Xss512k -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError  -XX:HeapDumpPath=dump.hprof $DOLPHINSCHEDULER_OPTS"
 
 case $startStop in
   (start)
@@ -117,6 +136,20 @@ case $startStop in
         echo no $command to stop
       fi
       ;;
+
+  (status)
+    # more details about the status can be added later
+    serverCount=`ps -ef |grep "$CLASS" |grep -v "grep" |wc -l`
+    state="STOP"
+    #  font color - red
+    state="[ \033[1;31m $state \033[0m ]"
+    if [[ $serverCount -gt 0 ]];then
+      state="RUNNING"
+      # font color - green
+      state="[ \033[1;32m $state \033[0m ]"
+    fi
+    echo -e "$command  $state"
+    ;;
 
   (*)
     echo $usage

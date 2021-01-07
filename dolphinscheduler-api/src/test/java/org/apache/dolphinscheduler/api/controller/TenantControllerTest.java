@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -43,7 +43,6 @@ public class TenantControllerTest extends AbstractControllerTest{
     public void testCreateTenant() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("tenantCode","tenantCode");
-        paramsMap.add("tenantName","tenantName");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -84,7 +83,6 @@ public class TenantControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","9");
         paramsMap.add("tenantCode","cxc_te");
-        paramsMap.add("tenantName","tenant_update_2");
         paramsMap.add("queueId","1");
         paramsMap.add("description","tenant description");
 
@@ -96,7 +94,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -120,7 +118,23 @@ public class TenantControllerTest extends AbstractControllerTest{
 
     }
 
+    @Test
+    public void testVerifyTenantCodeExists() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("tenantCode", "tenantCode");
 
+        MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.OS_TENANT_CODE_EXIST.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
 
     @Test
     public void testQueryTenantlist() throws Exception {
@@ -149,7 +163,7 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

@@ -17,28 +17,30 @@
 <template>
   <div class="datasource-model">
     <div class="select-listpp">
-      <x-select v-model="type"
+      <el-select v-model="type"
                 style="width: 160px;"
-                @on-change="_handleTypeChanged"
+                size="small"
+                @change="_handleTypeChanged"
                 :disabled="isDetails">
-        <x-option
+        <el-option
                 v-for="city in typeList"
                 :key="city.code"
                 :value="city.code"
                 :label="city.code">
-        </x-option>
-      </x-select>
-      <x-select :placeholder="$t('Please select the datasource')"
+        </el-option>
+      </el-select>
+      <el-select :placeholder="$t('Please select the datasource')"
                 v-model="datasource"
                 style="width: 288px;"
+                size="small"
                 :disabled="isDetails">
-        <x-option
+        <el-option
                 v-for="city in datasourceList"
                 :key="city.id"
                 :value="city.id"
                 :label="city.code">
-        </x-option>
-      </x-select>
+        </el-option>
+      </el-select>
     </div>
   </div>
 </template>
@@ -101,7 +103,7 @@
       /**
        * Brush type
        */
-      _handleTypeChanged ({ value }) {
+      _handleTypeChanged (value) {
         this.type = value
         this._getDatasourceData().then(res => {
           this.datasource = this.datasourceList.length && this.datasourceList[0].id || ''
@@ -126,12 +128,12 @@
         this.$emit('on-dsData', {
           type: this.type,
           datasource: val
-        });
+        })
       }
     },
     created () {
       let supportType = this.supportType || []
-      this.typeList = _.cloneDeep(this.store.state.dag.dsTypeListS)
+      this.typeList = this.data.typeList || _.cloneDeep(this.store.state.dag.dsTypeListS)
       // Have a specified data source
       if (supportType.length) {
         let is = (type) => {

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -26,6 +25,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -33,19 +33,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static org.apache.dolphinscheduler.common.Constants.SLEEP_TIME_MILLIS;
 
 /**
- *  taks callback service
+ *  task callback service
  */
 @Service
 public class TaskCallbackService {
 
     private final Logger logger = LoggerFactory.getLogger(TaskCallbackService.class);
+    private static final int [] RETRY_BACKOFF = { 1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200 };
 
     /**
      *  remote channels
@@ -58,6 +57,7 @@ public class TaskCallbackService {
     @Autowired
     private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
+
     /**
      * netty remoting client
      */
@@ -67,6 +67,8 @@ public class TaskCallbackService {
     public TaskCallbackService(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        this.nettyRemotingClient.registerProcessor(CommandType.DB_TASK_ACK, new DBTaskAckProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.DB_TASK_RESPONSE, new DBTaskResponseProcessor());
     }
 
     /**
@@ -84,39 +86,64 @@ public class TaskCallbackService {
      * @return callback channel
      */
     private NettyRemoteChannel getRemoteChannel(int taskInstanceId){
+        Channel newChannel;
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(taskInstanceId);
-        if(nettyRemoteChannel == null){
-            throw new IllegalArgumentException("nettyRemoteChannel is empty, should call addRemoteChannel first");
-        }
-        if(nettyRemoteChannel.isActive()){
-            return nettyRemoteChannel;
-        }
-        Channel newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
-        if(newChannel != null){
-            return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
-        }
-        logger.warn("original master : {} is not reachable, random select master", nettyRemoteChannel.getHost());
-        Set<String> masterNodes = null;
-        while (Stopper.isRunning()) {
-            masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
-            if (CollectionUtils.isEmpty(masterNodes)) {
-                logger.error("no available master node");
-                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
-            }else {
-                break;
+        if(nettyRemoteChannel != null){
+            if(nettyRemoteChannel.isActive()){
+                return nettyRemoteChannel;
             }
-        }
-        for(String masterNode : masterNodes){
-            newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+            newChannel = nettyRemotingClient.getChannel(nettyRemoteChannel.getHost());
             if(newChannel != null){
                 return getRemoteChannel(newChannel, nettyRemoteChannel.getOpaque(), taskInstanceId);
             }
+            logger.warn("original master : {} for task : {} is not reachable, random select master",
+                    nettyRemoteChannel.getHost(),
+                    taskInstanceId);
         }
-        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable", masterNodes));
+
+        Set<String> masterNodes = null;
+        int ntries = 0;
+        while (Stopper.isRunning()) {
+            masterNodes = zookeeperRegistryCenter.getMasterNodesDirectly();
+            if (CollectionUtils.isEmpty(masterNodes)) {
+                logger.info("try {} times but not find any master for task : {}.",
+                        ntries + 1,
+                        taskInstanceId);
+                masterNodes = null;
+                ThreadUtils.sleep(pause(ntries++));
+                continue;
+            }
+            logger.info("try {} times to find {} masters for task : {}.",
+                    ntries + 1,
+                    masterNodes.size(),
+                    taskInstanceId);
+            for (String masterNode : masterNodes) {
+                newChannel = nettyRemotingClient.getChannel(Host.of(masterNode));
+                if (newChannel != null) {
+                    return getRemoteChannel(newChannel,taskInstanceId);
+                }
+            }
+            masterNodes = null;
+            ThreadUtils.sleep(pause(ntries++));
+        }
+
+        throw new IllegalStateException(String.format("all available master nodes : %s are not reachable for task: {}", masterNodes, taskInstanceId));
     }
+
+
+    public int pause(int ntries){
+        return SLEEP_TIME_MILLIS * RETRY_BACKOFF[ntries % RETRY_BACKOFF.length];
+    }
+
 
     private NettyRemoteChannel getRemoteChannel(Channel newChannel, long opaque, int taskInstanceId){
         NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel, opaque);
+        addRemoteChannel(taskInstanceId, remoteChannel);
+        return remoteChannel;
+    }
+
+    private NettyRemoteChannel getRemoteChannel(Channel newChannel, int taskInstanceId){
+        NettyRemoteChannel remoteChannel = new NettyRemoteChannel(newChannel);
         addRemoteChannel(taskInstanceId, remoteChannel);
         return remoteChannel;
     }

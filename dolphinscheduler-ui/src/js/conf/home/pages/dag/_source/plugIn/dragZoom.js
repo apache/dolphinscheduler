@@ -29,7 +29,7 @@ DragZoom.prototype.init = function () {
     .scaleExtent([0.5, 2])
     .on('zoom', () => {
       this.scale = d3.event.scale
-      $canvas.css('transform', 'translate(' + d3.event.translate[0] + 'px,' + d3.event.translate[1] + 'px) scale(' + this.scale + ')')
+      $canvas.css('transform', 'scale(' + this.scale + ')')
       $canvas.css('transform-origin', '0 0')
     })
   this.element.call(this.zoom).on('dblclick.zoom', null)

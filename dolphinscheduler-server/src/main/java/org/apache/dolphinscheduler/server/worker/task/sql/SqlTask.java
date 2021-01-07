@@ -16,9 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -86,7 +85,7 @@ public class SqlTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         logger.info("sql task params {}", taskExecutionContext.getTaskParams());
-        this.sqlParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
+        this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
@@ -132,8 +131,7 @@ public class SqlTask extends AbstractTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(),
-                    taskExecutionContext.getTenantCode(),
+            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncTenantCodeMap(),
                     logger);
 
             // execute sql task
@@ -149,8 +147,8 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  ready to execute SQL and parameter entity Map
-     * @return
+     * ready to execute SQL and parameter entity Map
+     * @return SqlBinds
      */
     private SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer,Property> sqlParamsMap =  new HashMap<>();
@@ -177,9 +175,10 @@ public class SqlTask extends AbstractTask {
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
+        
         //new
         //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime(), paramsMap);
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -251,35 +250,29 @@ public class SqlTask extends AbstractTask {
      * result process
      *
      * @param resultSet resultSet
-     * @throws Exception
+     * @throws Exception Exception
      */
     private void resultProcess(ResultSet resultSet) throws Exception{
-        JSONArray resultJSONArray = new JSONArray();
+        ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         ResultSetMetaData md = resultSet.getMetaData();
         int num = md.getColumnCount();
 
         int rowCount = 0;
 
         while (rowCount < LIMIT && resultSet.next()) {
-            JSONObject mapOfColValues = new JSONObject(true);
+            ObjectNode mapOfColValues = JSONUtils.createObjectNode();
             for (int i = 1; i <= num; i++) {
-                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
             }
             resultJSONArray.add(mapOfColValues);
             rowCount++;
         }
-        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+        String result = JSONUtils.toJsonString(resultJSONArray);
+        logger.debug("execute sql : {}", result);
 
-        // if there is a result set
-        if (!resultJSONArray.isEmpty() ) {
-            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                sendAttachment(sqlParameters.getTitle(),
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }else{
-                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-            }
-        }
+        sendAttachment(StringUtils.isNotEmpty(sqlParameters.getTitle()) ?
+                        sqlParameters.getTitle(): taskExecutionContext.getTaskName() + " query result sets",
+                JSONUtils.toJsonString(resultJSONArray));
     }
 
     /**
@@ -300,7 +293,7 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * post psql
+     * post sql
      *
      * @param connection connection
      * @param postStatementsBinds postStatementsBinds
@@ -331,11 +324,12 @@ public class SqlTask extends AbstractTask {
             }
         }
     }
+    
     /**
      * create connection
      *
      * @return connection
-     * @throws Exception
+     * @throws Exception Exception
      */
     private Connection createConnection() throws Exception{
         // if hive , load connection params if exists
@@ -371,17 +365,17 @@ public class SqlTask extends AbstractTask {
                        Connection connection){
         if (resultSet != null){
             try {
-                connection.close();
+                resultSet.close();
             } catch (SQLException e) {
-
+                logger.error("close result set error : {}",e.getMessage(),e);
             }
         }
 
         if (pstmt != null){
             try {
-                connection.close();
+                pstmt.close();
             } catch (SQLException e) {
-
+                logger.error("close prepared statement error : {}",e.getMessage(),e);
             }
         }
 
@@ -389,17 +383,17 @@ public class SqlTask extends AbstractTask {
             try {
                 connection.close();
             } catch (SQLException e) {
-
+                logger.error("close connection error : {}",e.getMessage(),e);
             }
         }
     }
 
     /**
      * preparedStatement bind
-     * @param connection
-     * @param sqlBinds
-     * @return
-     * @throws Exception
+     * @param connection connection
+     * @param sqlBinds  sqlBinds
+     * @return PreparedStatement
+     * @throws Exception Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
         // is the timeout set
@@ -430,34 +424,34 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<>();
+        List<String> receiversList = new ArrayList<>();
         for(User user:users){
-            receviersList.add(user.getEmail().trim());
+            receiversList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver.trim());
+                receiversList.add(receiver.trim());
             }
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<>();
+        List<String> receiversCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc.trim());
+                receiversCcList.add(receiverCc.trim());
             }
         }
 
         String showTypeName = sqlParameters.getShowType().replace(COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
-                    receviersCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
+            Map<String, Object> mailResult = MailUtils.sendMails(receiversList,
+                    receiversCcList, title, content, ShowType.valueOf(showTypeName).getDescp());
             if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }

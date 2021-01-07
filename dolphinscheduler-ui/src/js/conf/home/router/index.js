@@ -58,6 +58,14 @@ const router = new Router({
           }
         },
         {
+          path: '/projects/kinship',
+          name: 'projects-kinship',
+          component: resolve => require(['../pages/projects/pages/kinship/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Kinship')}`
+          }
+        },
+        {
           path: '/projects/list',
           name: 'projects-list',
           component: resolve => require(['../pages/projects/pages/list/index'], resolve),

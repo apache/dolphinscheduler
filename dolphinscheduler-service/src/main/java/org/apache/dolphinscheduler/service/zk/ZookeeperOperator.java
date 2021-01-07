@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
+import org.apache.curator.framework.api.transaction.CuratorOp;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
@@ -36,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
 
@@ -56,13 +58,15 @@ public class ZookeeperOperator implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
         initStateLister();
-        registerListener();
+        treeCacheStart();
     }
 
     /**
      * this method is for sub class,
      */
     protected void registerListener(){}
+
+    protected void treeCacheStart(){}
 
     public void initStateLister() {
         checkNotNull(zkClient);

@@ -22,7 +22,6 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Process Pid')}}: {{item.port}}</span>
               <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
             </div>
             <div class="right">
@@ -69,7 +68,6 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mGauge from './_source/gauge'
-  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import themeData from '@/module/echarts/themeData.json'
@@ -96,6 +94,7 @@
       this.getMasterData().then(res => {
         this.masterList = _.map(res, (v, i) => {
           return _.assign(v, {
+            id: v.host + '_' + v.id,
             resInfo: JSON.parse(v.resInfo)
           })
         })
@@ -104,7 +103,7 @@
         this.isLoading = false
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mGauge }
+    components: { mListConstruction, mSpin, mNoData, mGauge }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

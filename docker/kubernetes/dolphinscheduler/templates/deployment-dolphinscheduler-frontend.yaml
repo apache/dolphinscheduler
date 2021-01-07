@@ -43,6 +43,10 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/managed-by: {{ .Release.Service }}
         app.kubernetes.io/component: frontend
+      {{- if .Values.alert.annotations }}
+      annotations:
+        {{- toYaml .Values.alert.annotations | nindent 8 }}
+      {{- end }}
     spec:
       {{- if .Values.frontend.affinity }}
       affinity: {{- toYaml .Values.frontend.affinity | nindent 8 }}
@@ -52,6 +56,10 @@ spec:
       {{- end }}
       {{- if .Values.frontend.tolerations }}
       tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      - name: {{ include "dolphinscheduler.image.pullSecrets" . }}
       {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-frontend
@@ -69,6 +77,15 @@ spec:
               value: '{{ include "dolphinscheduler.fullname" . }}-api'
             - name: FRONTEND_API_SERVER_PORT
               value: "12345"
+          {{- if .Values.frontend.resources }}
+          resources:
+            limits:
+              memory: {{ .Values.frontend.resources.limits.memory | quote }}
+              cpu: {{ .Values.frontend.resources.limits.cpu | quote }}
+            requests:
+              memory: {{ .Values.frontend.resources.requests.memory | quote }}
+              cpu: {{ .Values.frontend.resources.requests.cpu | quote }}
+          {{- end }}
           {{- if .Values.frontend.livenessProbe.enabled }}
           livenessProbe:
             tcpSocket:

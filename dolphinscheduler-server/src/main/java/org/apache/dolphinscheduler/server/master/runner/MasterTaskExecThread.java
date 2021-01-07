@@ -17,9 +17,6 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 
-
-import com.alibaba.fastjson.JSON;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -27,6 +24,9 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.Set;
@@ -122,15 +121,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         taskInstance = processService.findTaskInstanceById(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
-        // task time out
-        boolean checkTimeout = false;
-        TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
-        if(taskTimeoutParameter.getEnable()){
-            TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
-            if(strategy == TaskTimeoutStrategy.WARN || strategy == TaskTimeoutStrategy.WARNFAILED){
-                checkTimeout = true;
-            }
-        }
 
         while (Stopper.isRunning()){
             try {
@@ -142,24 +132,17 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
                     cancelTaskInstance();
                 }
+                if(processInstance.getState() == ExecutionStatus.READY_PAUSE){
+                    pauseTask();
+                }
                 // task instance finished
                 if (taskInstance.getState().typeIsFinished()){
                     // if task is final result , then remove taskInstance from cache
                     taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
                     break;
                 }
-                if(checkTimeout){
-                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
-                    if (remainTime < 0) {
-                        logger.warn("task id: {} execution time out",taskInstance.getId());
-                        // process define
-                        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-                        // send warn mail
-                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
-                                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
-                                taskInstance.getId(),taskInstance.getName());
-                        checkTimeout = false;
-                    }
+                if (checkTaskTimeout()) {
+                    this.checkTimeoutFlag = !alertTimeout();
                 }
                 // updateProcessInstance task instance
                 taskInstance = processService.findTaskInstanceById(taskInstance.getId());
@@ -176,20 +159,33 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return true;
     }
 
+    /**
+     * pause task if task have not been dispatched to worker, do not dispatch anymore.
+     *
+     */
+    public void pauseTask() {
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(taskInstance == null){
+            return;
+        }
+        if(StringUtils.isBlank(taskInstance.getHost())){
+            taskInstance.setState(ExecutionStatus.PAUSE);
+            taskInstance.setEndTime(new Date());
+            processService.updateTaskInstance(taskInstance);
+        }
+    }
+
 
     /**
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance() throws Exception{
         if(alreadyKilled){
-            return ;
+            return;
         }
         alreadyKilled = true;
-
-        String taskInstanceWorkerGroup = taskInstance.getWorkerGroup();
-
-        // not exists
-        if (!existsValidWorkerGroup(taskInstanceWorkerGroup)){
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        if(StringUtils.isBlank(taskInstance.getHost())){
             taskInstance.setState(ExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
             processService.updateTaskInstance(taskInstance);
@@ -233,25 +229,4 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return true;
     }
 
-    /**
-     * get task timeout parameter
-     * @return TaskTimeoutParameter
-     */
-    private TaskTimeoutParameter getTaskTimeoutParameter(){
-        String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
-        return taskNode.getTaskTimeoutParameter();
-    }
-
-
-    /**
-     * get remain time?s?
-     *
-     * @return remain time
-     */
-    private long getRemaintime(long timeoutSeconds) {
-        Date startTime = taskInstance.getStartTime();
-        long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
-        return timeoutSeconds - usedTime;
-    }
 }

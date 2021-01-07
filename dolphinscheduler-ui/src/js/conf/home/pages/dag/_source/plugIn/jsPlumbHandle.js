@@ -17,7 +17,6 @@
 import 'jquery-ui/ui/widgets/draggable'
 import 'jquery-ui/ui/widgets/droppable'
 import 'jquery-ui/ui/widgets/resizable'
-import Vue from 'vue'
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
@@ -31,9 +30,10 @@ import {
   rtTasksTpl,
   setSvgColor,
   saveTargetarr,
-  rtTargetarrArr
+  rtTargetarrArr,
+  computeScale
 } from './util'
-import mStart from '@/conf/home/pages/projects/pages/definition/pages/list/_source/start'
+import multiDrag from './multiDrag'
 
 const JSP = function () {
   this.dag = {}
@@ -54,7 +54,6 @@ const JSP = function () {
     isClick: false
   }
 }
-
 /**
  * dag init
  */
@@ -83,8 +82,11 @@ JSP.prototype.init = function ({ dag, instance, options }) {
 
   // Monitor line click
   this.JspInstance.bind('click', e => {
+    // Untie event
     if (this.config.isClick) {
       this.connectClick(e)
+    } else {
+      findComponentDownward(this.dag.$root, 'dag-chart')._createLineLabel({ id: e._jsPlumb.overlays.label.canvas.id, sourceId: e.sourceId, targetId: e.targetId })
     }
   })
 
@@ -92,6 +94,9 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   if (this.config.isNewNodes) {
     DragZoom.init()
   }
+
+  // support multi drag
+  multiDrag()
 }
 
 /**
@@ -145,12 +150,13 @@ JSP.prototype.draggable = function () {
       scope: 'plant',
       drop: function (ev, ui) {
         let id = 'tasks-' + Math.ceil(Math.random() * 100000) // eslint-disable-line
-        // Get mouse coordinates
-        const left = parseInt(ui.offset.left - $(this).offset().left)
-        let top = parseInt(ui.offset.top - $(this).offset().top) - 10
-        if (top < 25) {
-          top = 25
-        }
+
+        let scale = computeScale($(this))
+        scale = scale || 1
+
+        // Get mouse coordinates and after scale coordinate
+        const left = parseInt(ui.offset.left - $(this).offset().left) / scale
+        const top = parseInt(ui.offset.top - $(this).offset().top) / scale
         // Generate template node
         $('#canvas').append(rtTasksTpl({
           id: id,
@@ -199,7 +205,9 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       isAttachment: this.config.isAttachment,
       taskType: v.type,
       runFlag: v.runFlag,
-      nodenumber: locations[v.id].nodenumber
+      nodenumber: locations[v.id].nodenumber,
+      successNode: v.conditionResult === undefined ? '' : v.conditionResult.successNode[0],
+      failedNode: v.conditionResult === undefined ? '' : v.conditionResult.failedNode[0]
     }))
 
     // contextmenu event
@@ -270,10 +278,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     const isTwo = store.state.dag.isDetails
 
     const html = [
-      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="ans-icon-play"></em><span>${i18n.$t('Start')}</span></a>`,
-      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-edit"></em><span>${i18n.$t('Edit')}</span></a>`,
-      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-copy"></em><span>${i18n.$t('Copy')}</span></a>`,
-      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-trash"></em><span>${i18n.$t('Delete')}</span></a>`
+      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="el-icon-video-play"></em><span>${i18n.$t('Start')}</span></a>`,
+      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-edit-outline"></em><span>${i18n.$t('Edit')}</span></a>`,
+      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-copy-document"></em><span>${i18n.$t('Copy')}</span></a>`,
+      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="el-icon-delete"></em><span>${i18n.$t('Delete')}</span></a>`
     ]
 
     const operationHtml = () => {
@@ -300,35 +308,7 @@ JSP.prototype.tasksContextmenu = function (event) {
         const name = store.state.dag.name
         const id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
-          const modal = Vue.$modal.dialog({
-            closable: false,
-            showMask: true,
-            escClose: true,
-            className: 'v-modal-custom',
-            transitionName: 'opacityp',
-            render (h) {
-              return h(mStart, {
-                on: {
-                  onUpdate () {
-                    modal.remove()
-                  },
-                  close () {
-                    modal.remove()
-                  }
-                },
-                props: {
-                  item: {
-                    id: id,
-                    name: name
-                  },
-                  startNodeList: $name,
-                  sourceType: 'contextmenu'
-                }
-              })
-            }
-          })
-        }).catch(e => {
-          Vue.$message.error(e.msg || '')
+          this.dag.startRunning({ id: id, name: name }, $name, 'contextmenu')
         })
       })
     }
@@ -360,7 +340,6 @@ JSP.prototype.tasksDblclick = function (e) {
   // Untie event
   if (this.config.isDblclick) {
     const id = $(e.currentTarget.offsetParent).attr('id')
-
     findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({
       id: id,
       type: $(`#${id}`).attr('data-tasks-type')
@@ -489,6 +468,16 @@ JSP.prototype.removeNodes = function ($id) {
 
   // callback onRemoveNodes event
   this.options && this.options.onRemoveNodes && this.options.onRemoveNodes($id)
+  const connects = []
+  _.map(this.JspInstance.getConnections(), v => {
+    connects.push({
+      endPointSourceId: v.sourceId,
+      endPointTargetId: v.targetId,
+      label: v._jsPlumb.overlays.label.canvas.innerText
+    })
+  })
+  // Storage line dependence
+  store.commit('dag/setConnects', connects)
 }
 
 /**
@@ -584,10 +573,10 @@ JSP.prototype.copyNodes = function ($id) {
 JSP.prototype.handleEventScreen = function ({ item, is }) {
   let screenOpen = true
   if (is) {
-    item.icon = 'ans-icon-min'
+    item.icon = 'el-icon-minus'
     screenOpen = true
   } else {
-    item.icon = 'ans-icon-max'
+    item.icon = 'el-icon-full-screen'
     screenOpen = false
   }
   const $mainLayoutModel = $('.main-layout-model')
@@ -638,13 +627,38 @@ JSP.prototype.saveStore = function () {
         tasks.push(tasksParam)
       }
     })
-
-    _.map(this.JspInstance.getConnections(), v => {
-      connects.push({
-        endPointSourceId: v.sourceId,
-        endPointTargetId: v.targetId
+    if (store.state.dag.connects.length === this.JspInstance.getConnections().length) {
+      _.map(store.state.dag.connects, u => {
+        connects.push({
+          endPointSourceId: u.endPointSourceId,
+          endPointTargetId: u.endPointTargetId,
+          label: u.label
+        })
       })
-    })
+    } else if (store.state.dag.connects.length > 0 && store.state.dag.connects.length < this.JspInstance.getConnections().length) {
+      _.map(this.JspInstance.getConnections(), v => {
+        connects.push({
+          endPointSourceId: v.sourceId,
+          endPointTargetId: v.targetId,
+          label: v._jsPlumb.overlays.label.canvas.innerText
+        })
+      })
+      _.map(store.state.dag.connects, u => {
+        _.map(connects, v => {
+          if (u.label && u.endPointSourceId === v.endPointSourceId && u.endPointTargetId === v.endPointTargetId) {
+            v.label = u.label
+          }
+        })
+      })
+    } else if (store.state.dag.connects.length === 0) {
+      _.map(this.JspInstance.getConnections(), v => {
+        connects.push({
+          endPointSourceId: v.sourceId,
+          endPointTargetId: v.targetId,
+          label: v._jsPlumb.overlays.label.canvas.innerText
+        })
+      })
+    }
 
     _.map(tasksAll(), v => {
       locations[v.id] = {
@@ -738,6 +752,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
     _.map(connects, v => {
       let sourceId = v.endPointSourceId.split('-')
       let targetId = v.endPointTargetId.split('-')
+      const labels = v.label
       if (sourceId.length === 4 && targetId.length === 4) {
         sourceId = `${sourceId[0]}-${sourceId[1]}-${sourceId[2]}`
         targetId = `${targetId[0]}-${targetId[1]}-${targetId[2]}`
@@ -746,12 +761,34 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         targetId = v.endPointTargetId
       }
 
-      this.JspInstance.connect({
-        source: sourceId,
-        target: targetId,
-        type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
-      })
+      if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-successnode') === $(`#${targetId}`).find('.name-p').text()) {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#4caf50' },
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
+        })
+      } else if ($(`#${sourceId}`).attr('data-tasks-type') === 'CONDITIONS' && $(`#${sourceId}`).attr('data-failednode') === $(`#${targetId}`).find('.name-p').text()) {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#252d39' },
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
+        })
+      } else {
+        this.JspInstance.connect({
+          source: sourceId,
+          target: targetId,
+          type: 'basic',
+          paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' },
+          HoverPaintStyle: { stroke: '#ccc', strokeWidth: 3 },
+          overlays: [['Label', { label: labels }]]
+        })
+      }
     })
   })
 

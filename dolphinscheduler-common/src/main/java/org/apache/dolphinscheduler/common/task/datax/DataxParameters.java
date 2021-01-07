@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.task.datax;
+
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 /**
  * DataX parameter
@@ -31,7 +33,7 @@ public class DataxParameters extends AbstractParameters {
     /**
      * if custom json config，eg  0, 1
      */
-    private Integer customConfig;
+    private int customConfig;
 
     /**
      * if customConfig eq 1 ,then json is usable
@@ -88,11 +90,21 @@ public class DataxParameters extends AbstractParameters {
      */
     private int jobSpeedRecord;
 
-    public Integer getCustomConfig() {
+    /**
+     * Xms memory
+     */
+    private int xms;
+
+    /**
+     * Xmx memory
+     */
+    private int xmx;
+
+    public int getCustomConfig() {
         return customConfig;
     }
 
-    public void setCustomConfig(Integer customConfig) {
+    public void setCustomConfig(int customConfig) {
         this.customConfig = customConfig;
     }
 
@@ -184,13 +196,25 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
+    public int getXms() {
+        return xms;
+    }
+
+    public void setXms(int xms) {
+        this.xms = xms;
+    }
+
+    public int getXmx() {
+        return xmx;
+    }
+
+    public void setXmx(int xmx) {
+        this.xmx = xmx;
+    }
 
     @Override
     public boolean checkParameters() {
-        if (customConfig == null) {
-            return false;
-        }
-        if (customConfig == 0) {
+        if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0
                     && dataTarget != 0
                     && StringUtils.isNotEmpty(sql)
@@ -207,19 +231,21 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{" +
-                "customConfig=" + customConfig +
-                ", json='" + json + '\'' +
-                ", dsType='" + dsType + '\'' +
-                ", dataSource=" + dataSource +
-                ", dtType='" + dtType + '\'' +
-                ", dataTarget=" + dataTarget +
-                ", sql='" + sql + '\'' +
-                ", targetTable='" + targetTable + '\'' +
-                ", preStatements=" + preStatements +
-                ", postStatements=" + postStatements +
-                ", jobSpeedByte=" + jobSpeedByte +
-                ", jobSpeedRecord=" + jobSpeedRecord +
-                '}';
+        return "DataxParameters{"
+                + "customConfig=" + customConfig
+                + ", json='" + json + '\''
+                + ", dsType='" + dsType + '\''
+                + ", dataSource=" + dataSource
+                + ", dtType='" + dtType + '\''
+                + ", dataTarget=" + dataTarget
+                + ", sql='" + sql + '\''
+                + ", targetTable='" + targetTable + '\''
+                + ", preStatements=" + preStatements
+                + ", postStatements=" + postStatements
+                + ", jobSpeedByte=" + jobSpeedByte
+                + ", jobSpeedRecord=" + jobSpeedRecord
+                + ", xms=" + xms
+                + ", xmx=" + xmx
+                + '}';
     }
 }

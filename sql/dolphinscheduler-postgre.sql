@@ -191,7 +191,7 @@ CREATE TABLE t_ds_alert (
   content text ,
   alert_type int DEFAULT NULL ,
   alert_status int DEFAULT '0' ,
-  ·log· text ,
+  log text ,
   alertgroup_id int DEFAULT NULL ,
   receivers text ,
   receivers_cc text ,
@@ -309,10 +309,35 @@ CREATE TABLE t_ds_process_definition (
   update_time timestamp DEFAULT NULL ,
   modify_by varchar(36) DEFAULT '' ,
   resource_ids varchar(64),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT process_definition_unique UNIQUE (name, project_id)
 ) ;
 
 create index process_definition_index on t_ds_process_definition (project_id,id);
+
+--
+-- Table structure for table t_ds_process_definition_version
+--
+
+DROP TABLE IF EXISTS t_ds_process_definition_version;
+CREATE TABLE t_ds_process_definition_version (
+  id int NOT NULL  ,
+  process_definition_id int NOT NULL  ,
+  version int DEFAULT NULL ,
+  process_definition_json text ,
+  description text ,
+  global_params text ,
+  locations text ,
+  connects text ,
+  receivers text ,
+  receivers_cc text ,
+  create_time timestamp DEFAULT NULL ,
+  timeout int DEFAULT '0' ,
+  resource_ids varchar(64),
+  PRIMARY KEY (id)
+) ;
+
+create index process_definition_id_and_version on t_ds_process_definition_version (process_definition_id,version);
 
 --
 -- Table structure for table t_ds_process_instance
@@ -352,6 +377,7 @@ CREATE TABLE t_ds_process_instance (
   worker_group varchar(64) ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
   create index process_instance_index on t_ds_process_instance (process_definition_id,id);
@@ -498,7 +524,8 @@ CREATE TABLE t_ds_resources (
   pid int,
   full_name varchar(64),
   is_directory int,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
 ) ;
 
 
@@ -565,8 +592,11 @@ CREATE TABLE t_ds_task_instance (
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
-   worker_group varchar(64),
+  worker_group varchar(64),
   executor_id int DEFAULT NULL ,
+  first_submit_time timestamp DEFAULT NULL ,
+  delay_time int DEFAULT '0' ,
+  var_pool text ,
   PRIMARY KEY (id)
 ) ;
 
@@ -578,7 +608,6 @@ DROP TABLE IF EXISTS t_ds_tenant;
 CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
-  tenant_name varchar(64) DEFAULT NULL ,
   description varchar(256) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
@@ -623,8 +652,10 @@ CREATE TABLE t_ds_user (
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   queue varchar(64) DEFAULT NULL ,
+  state int DEFAULT 1 ,
   PRIMARY KEY (id)
 );
+comment on column t_ds_user.state is 'state 0:disable 1:enable';
 
 --
 -- Table structure for table t_ds_version
@@ -688,6 +719,9 @@ ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource
 DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_id_sequence;
 ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definition_version_id_sequence;
+CREATE SEQUENCE  t_ds_process_definition_version_id_sequence;
+ALTER TABLE t_ds_process_definition_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_version_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
 CREATE SEQUENCE  t_ds_process_instance_id_sequence;
 ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
@@ -749,7 +783,7 @@ ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_
 
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
-INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,state,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup，dolphinscheduler warning group
 INSERT INTO t_ds_alertgroup(group_name,group_type,description,create_time,update_time)  VALUES ('dolphinscheduler warning group', '0', 'dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
@@ -759,4 +793,4 @@ INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,upda
 INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('2.0.0');
+INSERT INTO t_ds_version(version) VALUES ('1.3.0');

@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.dto.treeview;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 /**
@@ -42,11 +44,13 @@ public class Instance {
     /**
      * node start time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date startTime;
 
     /**
      * node end time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date endTime;
 
 

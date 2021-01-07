@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
 import org.apache.commons.collections.CollectionUtils;
+
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -30,16 +32,15 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  *  netty executor manager
@@ -159,9 +160,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
             } catch (Exception ex) {
                 logger.error(String.format("send command : %s to %s error", command, host), ex);
                 retryCount--;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignore) {}
+                ThreadUtils.sleep(100);
             }
         } while (retryCount >= 0 && !success);
 

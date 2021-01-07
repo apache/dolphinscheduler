@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -79,12 +80,6 @@ public class  User {
     private String tenantCode;
 
     /**
-     * tenant name
-     */
-    @TableField(exist = false)
-    private String tenantName;
-
-    /**
      * queue name
      */
     @TableField(exist = false)
@@ -104,11 +99,13 @@ public class  User {
     /**
      * create time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
     public int getId() {
@@ -200,14 +197,6 @@ public class  User {
         this.alertGroup = alertGroup;
     }
 
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-
     public String getTenantCode() {
         return tenantCode;
     }
@@ -269,7 +258,6 @@ public class  User {
                 ", tenantId=" + tenantId +
                 ", state=" + state +
                 ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
                 ", queueName='" + queueName + '\'' +
                 ", alertGroup='" + alertGroup + '\'' +
                 ", queue='" + queue + '\'' +

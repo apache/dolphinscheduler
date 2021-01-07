@@ -131,16 +131,12 @@ public class ZookeeperNodeManager implements InitializingBean {
                     if (event.getType() == TreeCacheEvent.Type.NODE_ADDED) {
                         logger.info("worker group node : {} added.", path);
                         String group = parseGroup(path);
-                        Set<String> workerNodes = workerGroupNodes.getOrDefault(group, new HashSet<>());
-                        Set<String> previousNodes = new HashSet<>(workerNodes);
                         Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
                         logger.info("currentNodes : {}", currentNodes);
                         syncWorkerGroupNodes(group, currentNodes);
                     } else if (event.getType() == TreeCacheEvent.Type.NODE_REMOVED) {
                         logger.info("worker group node : {} down.", path);
                         String group = parseGroup(path);
-                        Set<String> workerNodes = workerGroupNodes.getOrDefault(group, new HashSet<>());
-                        Set<String> previousNodes = new HashSet<>(workerNodes);
                         Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "WORKER");
@@ -155,10 +151,10 @@ public class ZookeeperNodeManager implements InitializingBean {
 
         private String parseGroup(String path){
             String[] parts = path.split("\\/");
-            if(parts.length != 6){
+            if (parts.length < 6) {
                 throw new IllegalArgumentException(String.format("worker group path : %s is not valid, ignore", path));
             }
-            String group = parts[4];
+            String group = parts[parts.length - 2];
             return group;
         }
     }
@@ -175,12 +171,10 @@ public class ZookeeperNodeManager implements InitializingBean {
                 try {
                     if (event.getType() == TreeCacheEvent.Type.NODE_ADDED) {
                         logger.info("master node : {} added.", path);
-                        Set<String> previousNodes = new HashSet<>(masterNodes);
                         Set<String> currentNodes = registryCenter.getMasterNodesDirectly();
                         syncMasterNodes(currentNodes);
                     } else if (event.getType() == TreeCacheEvent.Type.NODE_REMOVED) {
                         logger.info("master node : {} down.", path);
-                        Set<String> previousNodes = new HashSet<>(masterNodes);
                         Set<String> currentNodes = registryCenter.getMasterNodesDirectly();
                         syncMasterNodes(currentNodes);
                         alertDao.sendServerStopedAlert(1, path, "MASTER");

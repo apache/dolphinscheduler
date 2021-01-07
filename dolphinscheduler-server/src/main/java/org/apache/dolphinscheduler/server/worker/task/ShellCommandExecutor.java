@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -60,7 +60,10 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.command", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        return String.format("%s/%s.%s"
+                , taskExecutionContext.getExecutePath()
+                , taskExecutionContext.getTaskAppId()
+                , OSUtils.isWindows() ? "bat" : "command");
     }
 
     /**

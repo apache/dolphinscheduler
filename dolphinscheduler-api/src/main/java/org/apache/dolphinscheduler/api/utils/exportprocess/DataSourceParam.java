@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,6 +33,7 @@ import java.util.List;
 @Service
 public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
 
+    private static final String PARAMS = "params";
     @Autowired
     private DataSourceMapper dataSourceMapper;
 
@@ -42,14 +43,14 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
      * @return task node json object
      */
     @Override
-    public JSONObject addExportSpecialParam(JSONObject taskNode) {
+    public JsonNode addExportSpecialParam(JsonNode taskNode) {
         // add sqlParameters
-        JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-        DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
+        ObjectNode sqlParameters = (ObjectNode) taskNode.path(PARAMS);
+        DataSource dataSource = dataSourceMapper.selectById(sqlParameters.get("datasource").asInt());
         if (null != dataSource) {
             sqlParameters.put("datasourceName", dataSource.getName());
         }
-        taskNode.put("params", sqlParameters);
+        ((ObjectNode)taskNode).set(PARAMS, sqlParameters);
 
         return taskNode;
     }
@@ -60,14 +61,14 @@ public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
      * @return task node json object
      */
     @Override
-    public JSONObject addImportSpecialParam(JSONObject taskNode) {
-        JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-        List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(sqlParameters.getString("datasourceName"));
+    public JsonNode addImportSpecialParam(JsonNode taskNode) {
+        ObjectNode sqlParameters = (ObjectNode) taskNode.path(PARAMS);
+        List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(sqlParameters.path("datasourceName").asText());
         if (!dataSources.isEmpty()) {
             DataSource dataSource = dataSources.get(0);
             sqlParameters.put("datasource", dataSource.getId());
         }
-        taskNode.put("params", sqlParameters);
+        ((ObjectNode)taskNode).set(PARAMS, sqlParameters);
         return taskNode;
     }
 

@@ -35,9 +35,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.Map;
-
 import static org.apache.dolphinscheduler.api.enums.Status.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -70,9 +72,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/create")
@@ -103,8 +105,8 @@ public class UsersController extends BaseController {
      */
     @ApiOperation(value = "queryUserList", notes = "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type = "String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "10"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String")
     })
     @GetMapping(value = "/list-paging")
@@ -112,8 +114,8 @@ public class UsersController extends BaseController {
     @ApiException(QUERY_USER_LIST_PAGING_ERROR)
     public Result queryUserList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("pageNo") Integer pageNo,
-                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                @RequestParam("pageSize") Integer pageSize) {
+                                @RequestParam("pageSize") Integer pageSize,
+                                @RequestParam(value = "searchVal", required = false) String searchVal) {
         logger.info("login user {}, list user paging, pageNo: {}, searchVal: {}, pageSize: {}",
                 loginUser.getUserName(), pageNo, searchVal, pageSize);
         Map<String, Object> result = checkPageParams(pageNo, pageSize);
@@ -145,9 +147,9 @@ public class UsersController extends BaseController {
             @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
             @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "String"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "String"),
             @ApiImplicitParam(name = "state", value = "STATE", dataType = "Int", example = "1")
     })
     @PostMapping(value = "/update")
@@ -164,7 +166,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}, state: {}",
                 loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone, queue, state);
-        Map<String, Object> result = usersService.updateUser(id, userName, userPassword, email, tenantId, phone, queue, state);
+        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
     }
 
@@ -410,5 +412,76 @@ public class UsersController extends BaseController {
         }
     }
 
+    /**
+     * user register
+     *
+     * @param userName       user name
+     * @param userPassword   user password
+     * @param repeatPassword repeat password
+     * @param email          user email
+     */
+    @ApiOperation(value="registerUser",notes = "REGISTER_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "repeatPassword", value = "REPEAT_PASSWORD", type = "String"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", type = "String"),
+    })
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(CREATE_USER_ERROR)
+    public Result<Object> registerUser(@RequestParam(value = "userName") String userName,
+                               @RequestParam(value = "userPassword") String userPassword,
+                               @RequestParam(value = "repeatPassword") String repeatPassword,
+                               @RequestParam(value = "email") String email) throws Exception {
+        userName = ParameterUtils.handleEscapes(userName);
+        userPassword = ParameterUtils.handleEscapes(userPassword);
+        repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
+        email = ParameterUtils.handleEscapes(email);
+        logger.info("user self-register, userName: {}, userPassword {}, repeatPassword {}, eamil {}",
+                userName, Constants.PASSWORD_DEFAULT, Constants.PASSWORD_DEFAULT, email);
+        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+        return returnDataList(result);
+    }
 
+    /**
+     * user activate
+     *
+     * @param userName       user name
+     */
+    @ApiOperation(value="activateUser",notes = "ACTIVATE_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", type = "String"),
+    })
+    @PostMapping("/activate")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_USER_ERROR)
+    public Result<Object> activateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "userName") String userName) {
+        userName = ParameterUtils.handleEscapes(userName);
+        logger.info("login user {}, activate user, userName: {}",
+                loginUser.getUserName(), userName);
+        Map<String, Object> result = usersService.activateUser(loginUser, userName);
+        return returnDataList(result);
+    }
+
+    /**
+     * user batch activate
+     *
+     * @param  userNames       user names
+     */
+    @ApiOperation(value = "batchActivateUser",notes = "BATCH_ACTIVATE_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userNames", value = "USER_NAMES", type = "String"),
+    })
+    @PostMapping("/batch/activate")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_USER_ERROR)
+    public Result<Object> batchActivateUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestBody List<String> userNames) {
+        List<String> formatUserNames = userNames.stream().map(ParameterUtils::handleEscapes).collect(Collectors.toList());
+        logger.info(" activate userNames: {}", formatUserNames);
+        Map<String, Object> result = usersService.batchActivateUser(loginUser, formatUserNames);
+        return returnDataList(result);
+    }
 }

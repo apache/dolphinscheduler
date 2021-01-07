@@ -20,13 +20,13 @@ services:
 
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:latest
-    ports:
-    - 5432:5432
     environment:
       TZ: Asia/Shanghai
       POSTGRESQL_USERNAME: root
       POSTGRESQL_PASSWORD: root
       POSTGRESQL_DATABASE: dolphinscheduler
+    ports:
+    - 5432:5432
     volumes:
     - dolphinscheduler-postgresql:/bitnami/postgresql
     networks:
@@ -37,11 +37,12 @@ services:
 
   dolphinscheduler-zookeeper:
     image: bitnami/zookeeper:latest
-    ports:
-    - 2181:2181
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
+    ports:
+    - 2181:2181
     volumes:
     - dolphinscheduler-zookeeper:/bitnami/zookeeper
     networks:
@@ -51,18 +52,18 @@ services:
       replicas: 1
 
   dolphinscheduler-api:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["api-server"]
-    ports:
-    - 12345:12345
     environment:
       TZ: Asia/Shanghai
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
+    ports:
+    - 12345:12345
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "ApiApplicationServer"]
       interval: 30
@@ -70,7 +71,7 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-    - dolphinscheduler-api:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks: 
     - dolphinscheduler
     deploy:
@@ -78,7 +79,7 @@ services:
       replicas: 1
 
   dolphinscheduler-frontend:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["frontend"]
     ports:
     - 8888:8888
@@ -93,7 +94,7 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-    - dolphinscheduler-frontend:/var/log/nginx
+    - dolphinscheduler-logs:/var/log/nginx
     networks:
     - dolphinscheduler
     deploy:
@@ -101,7 +102,7 @@ services:
       replicas: 1
 
   dolphinscheduler-alert:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["alert-server"]
     environment:
       TZ: Asia/Shanghai
@@ -119,11 +120,11 @@ services:
       ENTERPRISE_WECHAT_SECRET: ""
       ENTERPRISE_WECHAT_AGENT_ID: ""
       ENTERPRISE_WECHAT_USERS: ""
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "AlertServer"]
       interval: 30
@@ -131,7 +132,7 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-    - dolphinscheduler-alert:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks: 
     - dolphinscheduler
     deploy:
@@ -139,7 +140,7 @@ services:
       replicas: 1
 
   dolphinscheduler-master:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["master-server"]
     ports: 
     - 5678:5678
@@ -152,11 +153,11 @@ services:
       MASTER_TASK_COMMIT_INTERVAL: "1000"
       MASTER_MAX_CPULOAD_AVG: "100"
       MASTER_RESERVED_MEMORY: "0.1"
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "MasterServer"]
@@ -165,7 +166,7 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-    - dolphinscheduler-master:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:
     - dolphinscheduler
     deploy:
@@ -173,7 +174,7 @@ services:
       replicas: 1
 
   dolphinscheduler-worker:
-    image: registry.cn-qingdao.aliyuncs.com/sxyj/dolphinscheduler:dev
+    image: apache/dolphinscheduler:latest
     command: ["worker-server"]
     ports: 
     - 1234:1234
@@ -186,12 +187,13 @@ services:
       WORKER_MAX_CPULOAD_AVG: "100"
       WORKER_RESERVED_MEMORY: "0.1"
       WORKER_GROUP: "default"
+      WORKER_WEIGHT: "100"
       DOLPHINSCHEDULER_DATA_BASEDIR_PATH: "/tmp/dolphinscheduler"
-      POSTGRESQL_HOST: dolphinscheduler-postgresql
-      POSTGRESQL_PORT: 5432
-      POSTGRESQL_USERNAME: root
-      POSTGRESQL_PASSWORD: root
-      POSTGRESQL_DATABASE: dolphinscheduler
+      DATABASE_HOST: dolphinscheduler-postgresql
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: root
+      DATABASE_PASSWORD: root
+      DATABASE_DATABASE: dolphinscheduler
       ZOOKEEPER_QUORUM: dolphinscheduler-zookeeper:2181
     healthcheck:
       test: ["CMD", "/root/checkpoint.sh", "WorkerServer"]
@@ -201,7 +203,7 @@ services:
       start_period: 30s
     volumes:
     - dolphinscheduler-worker-data:/tmp/dolphinscheduler
-    - dolphinscheduler-worker-logs:/opt/dolphinscheduler/logs
+    - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     configs:
     - source: dolphinscheduler-worker-task-env
       target: /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh
@@ -218,12 +220,8 @@ networks:
 volumes:
   dolphinscheduler-postgresql:
   dolphinscheduler-zookeeper:
-  dolphinscheduler-api:
-  dolphinscheduler-frontend:
-  dolphinscheduler-alert:
-  dolphinscheduler-master:
   dolphinscheduler-worker-data:
-  dolphinscheduler-worker-logs:
+  dolphinscheduler-logs:
 
 configs:
   dolphinscheduler-worker-task-env:

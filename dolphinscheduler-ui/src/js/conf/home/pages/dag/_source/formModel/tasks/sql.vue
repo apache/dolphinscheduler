@@ -36,10 +36,10 @@
           </m-sql-type>
         </div>
         <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
-          <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</x-checkbox>
-            <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
-          </x-checkbox-group>
+          <el-checkbox-group v-model="showType" size="small">
+            <el-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('TableMode')}}</el-checkbox>
+            <el-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</el-checkbox>
+          </el-checkbox-group>
         </div>
       </div>
     </m-list-box>
@@ -47,12 +47,12 @@
       <m-list-box>
         <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
-          <x-input
+          <el-input
             type="input"
+            size="small"
             v-model="title"
-            :placeholder="$t('Please enter the title of email')"
-            autocomplete="off">
-          </x-input>
+            :placeholder="$t('Please enter the title of email')">
+          </el-input>
         </div>
       </m-list-box>
       <m-list-box>
@@ -71,13 +71,13 @@
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
-        <x-input
+        <el-input
                 :disabled="isDetails"
                 type="input"
+                size="small"
                 v-model="connParams"
-                :placeholder="$t('Please enter format') + ' key1=value1;key2=value2...'"
-                autocomplete="off">
-        </x-input>
+                :placeholder="$t('Please enter format') + ' key1=value1;key2=value2...'">
+        </el-input>
       </div>
     </m-list-box>
     <m-list-box>
@@ -89,6 +89,9 @@
                   name="code-sql-mirror"
                   style="opacity: 0;">
           </textarea>
+          <a class="ans-modal-box-max">
+            <em class="el-icon-full-screen" @click="setEditorVal"></em>
+          </a>
         </div>
       </div>
     </m-list-box>
@@ -133,6 +136,12 @@
         </m-statement-list>
       </div>
     </m-list-box>
+    <el-dialog
+      :visible.sync="scriptBoxDialog"
+      append-to-body="true"
+      width="80%">
+      <m-script-box :item="item" @getSriptBoxValue="getSriptBoxValue" @closeAble="closeAble"></m-script-box>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -140,6 +149,7 @@
   import i18n from '@/module/i18n'
   import mUdfs from './_source/udfs'
   import mListBox from './_source/listBox'
+  import mScriptBox from './_source/scriptBox'
   import mSqlType from './_source/sqlType'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
@@ -181,7 +191,9 @@
         // recipients
         receivers: [],
         // copy to
-        receiversCc: []
+        receiversCc: [],
+        item: '',
+        scriptBoxDialog: false
       }
     },
     mixins: [disabledState],
@@ -190,12 +202,19 @@
       createNodeId: Number
     },
     methods: {
+      setEditorVal () {
+        this.item = editor.getValue()
+        this.scriptBoxDialog = true
+      },
+      getSriptBoxValue (val) {
+        editor.setValue(val)
+      },
       /**
        * return sqlType
        */
       _onSqlType (a) {
         this.sqlType = a
-        if(a==0) {
+        if (a === 0) {
           this.showType = ['TABLE']
         }
       },
@@ -243,24 +262,24 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        if (this.sqlType==0 && !this.showType.length) {
+        if (this.sqlType === 0 && !this.showType.length) {
           this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
           return false
         }
-        if (this.sqlType==0 && !this.title) {
+        if (this.sqlType === 0 && !this.title) {
           this.$message.warning(`${i18n.$t('Mail subject required')}`)
           return false
         }
-        if (this.sqlType==0 && !this.receivers.length) {
+        if (this.sqlType === 0 && !this.receivers.length) {
           this.$message.warning(`${i18n.$t('Recipient required')}`)
           return false
         }
         // receivers Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refEmail._manualEmail()) {
+        if (this.sqlType === 0 && !this.$refs.refEmail._manualEmail()) {
           return false
         }
         // receiversCc Subcomponent verification
-        if (this.sqlType==0 && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType === 0 && !this.$refs.refCc._manualEmail()) {
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -371,7 +390,6 @@
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
           showType: (() => {
-
             let showType = this.showType
             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
               return [showType[1], showType[0]].join(',')
@@ -383,10 +401,10 @@
           connParams: this.connParams,
           preStatements: this.preStatements,
           postStatements: this.postStatements
-        });
+        })
       },
       _destroyEditor () {
-         if (editor) {
+        if (editor) {
           editor.toTextArea() // Uninstall
           editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
           editor.off($('.code-sql-mirror'), 'changes', this.changes)
@@ -396,10 +414,10 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val==0) {
+        if (val === 0) {
           this.showType = []
         }
-        if (val != 0) {
+        if (val !== 0) {
           this.title = ''
           this.receivers = []
           this.receiversCc = []
@@ -411,7 +429,7 @@
           this.connParams = ''
         }
       },
-      //Watch the cacheParams
+      // Watch the cacheParams
       cacheParams (val) {
         this._cacheParams()
       }
@@ -429,7 +447,7 @@
         this.sqlType = o.params.sqlType
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        if(o.params.showType == '') {
+        if (o.params.showType === '') {
           this.showType = []
         } else {
           this.showType = o.params.showType.split(',') || []
@@ -472,7 +490,6 @@
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
           showType: (() => {
-
             let showType = this.showType
             if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
               return [showType[1], showType[0]].join(',')
@@ -487,13 +504,6 @@
         }
       }
     },
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail, mScriptBox }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .requiredIcon {
-    color: #ff0000;
-    padding-right: 4px;
-  }
-</style>
-

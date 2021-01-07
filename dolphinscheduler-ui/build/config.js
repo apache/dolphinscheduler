@@ -47,7 +47,7 @@ const jsEntry = (() => {
     parts.shift()
     let modules = parts.join('/')
     let entry = moduleName(modules)
-    obj[entry] = val
+    obj[entry] = ['babel-polyfill', val]
   })
   return obj
 })()
@@ -95,7 +95,7 @@ const rewriterPath = p => {
     }
   }
 }
-
+const version = new Date().getTime();
 const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
   let pagePath = `${path.join(viewDir, p)}`
   let newPagePath = rewriterPath(pagePath)
@@ -109,21 +109,32 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
     filename: newPagePath || path.join('view', p),
     template: `${path.join('src/view', p)}`,
     cache: true,
+    favicon:'./favicon.png',
     inject: true,
+    hash: version,
     chunks: chunks,
     minify: minifierConfig
   })
 })
-
 const baseConfig = {
   entry: jsEntry,
   output: {
     path: distDir,
     publicPath: '/',
-    filename: 'js/[name].[chunkhash:7].js'
+    filename: 'js/[name].[chunkhash:7]'+version+'.js'
   },
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        enforce: 'pre',
+        include: [resolve('src')],
+        options: {
+          formatter: require('eslint-friendly-formatter'),
+          emitWarning: true
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -206,7 +217,7 @@ const baseConfig = {
       'jquery':'jquery/dist/jquery.min.js',
       'jquery-ui': 'jquery-ui'
     },
-    extensions: ['.js', 'json', '.vue', '.scss']
+    extensions: ['*', '.js', 'json', '.vue', '.scss']
   },
   plugins: [
     new VueLoaderPlugin(),

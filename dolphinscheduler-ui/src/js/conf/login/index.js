@@ -18,16 +18,18 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 // import $ from 'jquery'
+import 'babel-polyfill'
 import Vue from 'vue'
+import ElementUI from 'element-ui'
+import locale from 'element-ui/lib/locale/lang/en'
+import 'element-ui/lib/theme-chalk/index.css'
 import App from './App'
 import i18n from '@/module/i18n'
-import 'ans-ui/lib/ans-ui.min.css'
-import ans from 'ans-ui/lib/ans-ui.min'
 
 import 'sass/conf/login/index.scss'
 import 'bootstrap/dist/js/bootstrap.min.js'
 
-Vue.use(ans)
+i18n.globalScope.LOCALE === 'en_US' ? Vue.use(ElementUI, { locale }) : Vue.use(ElementUI)
 
 Vue.config.devtools = true
 Vue.config.productionTip = true

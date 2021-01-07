@@ -56,6 +56,17 @@ public class HttpParameters extends AbstractParameters {
     private String condition;
 
 
+    /**
+     * Connect Timeout
+     * Unit: ms
+     */
+    private int connectTimeout ;
+
+    /**
+     * Socket Timeout
+     * Unit: ms
+     */
+    private int socketTimeout ;
 
     @Override
     public boolean checkParameters() {
@@ -105,5 +116,21 @@ public class HttpParameters extends AbstractParameters {
 
     public void setCondition(String condition) {
         this.condition = condition;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(int socketTimeout) {
+        this.socketTimeout = socketTimeout;
     }
 }

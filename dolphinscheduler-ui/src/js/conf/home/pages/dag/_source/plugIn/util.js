@@ -37,15 +37,15 @@ const saveTargetarr = (valId, domId) => {
 }
 
 const rtBantpl = () => {
-  return `<em class="ans-icon-forbidden" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></em>`
+  return `<em class="ri-indeterminate-circle-line" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></em>`
 }
 
 /**
  * return node html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber, successNode, failedNode }) => {
   let tpl = ''
-  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
+  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-successNode="${successNode || ''}" data-failedNode="${failedNode || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += '<div>'
   tpl += '<div class="state-p"></div>'
   tpl += `<div class="icos icos-${taskType}"></div>`
@@ -100,13 +100,27 @@ const setSvgColor = (e, color) => {
   // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
-      $(v).attr('fill', '#2d8cf0').attr('stroke', '#2d8cf0').attr('stroke-width', 2)
+      if ($(v).attr('fill') === '#ccc') {
+        $(v).attr('fill', '#2d8cf0')
+      }
+      if ($(v).attr('fill') === '#4caf50') {
+        $(v).attr('fill', '#4caf50').attr('stroke', '#4caf50').attr('stroke-width', 2)
+        $(v).prev().attr('stroke', '#4caf50').attr('stroke-width', 2)
+      } else if ($(v).attr('fill') === '#252d39') {
+        $(v).attr('stroke', '#252d39').attr('stroke-width', 2)
+        $(v).prev().attr('stroke', '#252d39').attr('stroke-width', 2)
+      } else {
+        $(v).attr('stroke', '#2d8cf0').attr('stroke-width', 2)
+      }
     })
   })
 
   // Add color to the selection
   _.map($(e.canvas)[0].childNodes, (v, i) => {
-    $(v).attr('fill', color).attr('stroke', color)
+    if ($(v).attr('fill') === '#2d8cf0') {
+      $(v).attr('fill', '#ccc')
+    }
+    $(v).attr('stroke', '#ccc')
     if ($(v).attr('class')) {
       $(v).attr('stroke-width', 2)
     }
@@ -130,6 +144,19 @@ const allNodesId = () => {
   })
   return idArr
 }
+/**
+ * compute scale，because it cant get from jquery directly
+ * @param el element
+ * @returns {boolean|number}
+ */
+const computeScale = function (el) {
+  const matrix = el.css('transform')
+  if (!matrix || matrix === 'none') {
+    return false
+  }
+  const values = matrix.split('(')[1].split(')')[0].split(',')
+  return Math.sqrt(values[0] * values[0] + values[1] * values[1])
+}
 
 export {
   rtTargetarrArr,
@@ -139,5 +166,6 @@ export {
   isNameExDag,
   setSvgColor,
   allNodesId,
-  rtBantpl
+  rtBantpl,
+  computeScale
 }

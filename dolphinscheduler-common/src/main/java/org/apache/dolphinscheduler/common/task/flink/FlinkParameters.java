@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * spark parameters
+ * flink parameters
  */
 public class FlinkParameters extends AbstractParameters {
 
@@ -89,6 +89,11 @@ public class FlinkParameters extends AbstractParameters {
    * other arguments
    */
   private String others;
+
+  /**
+   * flink version
+   */
+  private String flinkVersion;
 
   /**
    * program type
@@ -200,6 +205,14 @@ public class FlinkParameters extends AbstractParameters {
     this.programType = programType;
   }
 
+  public String getFlinkVersion() {
+    return flinkVersion;
+  }
+
+  public void setFlinkVersion(String flinkVersion) {
+    this.flinkVersion = flinkVersion;
+  }
+
   @Override
   public boolean checkParameters() {
     return mainJar != null && programType != null;
@@ -213,6 +226,4 @@ public class FlinkParameters extends AbstractParameters {
     }
     return resourceList;
   }
-
-
 }

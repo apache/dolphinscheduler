@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.utils;
 
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -47,7 +47,7 @@ public class ExecutionContextTestUtils {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
         ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER);
-        executionContext.setHost(Host.of(OSUtils.getHost() + ":" + port));
+        executionContext.setHost(Host.of(NetUtils.getHost() + ":" + port));
 
         return executionContext;
     }

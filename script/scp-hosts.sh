@@ -20,6 +20,24 @@ workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/install_config.conf
 
+txt=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    txt="''"
+fi
+
+declare -A workersGroupMap=()
+
+workersGroup=(${workers//,/ })
+for workerGroup in ${workersGroup[@]}
+do
+  echo $workerGroup;
+  worker=`echo $workerGroup|awk -F':' '{print $1}'`
+  groupsName=`echo $workerGroup|awk -F':' '{print $2}'`
+  workersGroupMap+=([$worker]=$groupsName)
+done
+
+
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
@@ -33,6 +51,11 @@ do
 
   for dsDir in bin conf lib script sql ui install.sh
   do
+    # if worker in workersGroupMap
+    if [[ "${workersGroupMap[${host}]}" ]] && [[ "${dsDir}" == "conf" ]]; then
+      sed -i ${txt} "s:.*worker.groups.*:worker.groups=${workersGroupMap[${host}]}:g" ${dsDir}/worker.properties
+    fi
+
     echo "start to scp $dsDir to $host/$installPath"
     scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
   done

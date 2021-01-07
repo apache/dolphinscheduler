@@ -14,270 +14,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-
 /**
- * A collection of static utility methods to validate input.
- *
- * <p>This class is modelled after Google Guava's Preconditions class, and partly takes code
- * from that class. We add this code to here base in order to reduce external
- * dependencies.
+ * utility methods for validating input
  */
 public final class Preconditions {
 
-    // ------------------------------------------------------------------------
-    //  Null checks
-    // ------------------------------------------------------------------------
+    private Preconditions() {
+        throw new UnsupportedOperationException("Construct Preconditions");
+    }
 
     /**
-     * Ensures that the given object reference is not null.
-     * Upon violation, a {@code NullPointerException} with no message is thrown.
+     * if obj is null will throw NPE
      *
-     * @param reference reference
+     * @param obj obj
      * @param <T> T
      * @return T
      */
-    public static <T> T checkNotNull(T reference) {
-        if (reference == null) {
+    public static <T> T checkNotNull(T obj) {
+        if (obj == null) {
             throw new NullPointerException();
         }
-        return reference;
+        return obj;
     }
 
     /**
-     * Ensures that the given object reference is not null.
-     * Upon violation, a {@code NullPointerException} with the given message is thrown.
-     * @param reference reference
-     * @param errorMessage errorMessage
+     * if obj is null will throw NullPointerException with error message
+     *
+     * @param obj obj
+     * @param errorMsg error message
      * @param <T> T
      * @return T
      */
-    public static <T> T checkNotNull(T reference,  String errorMessage) {
-        if (reference == null) {
-            throw new NullPointerException(String.valueOf(errorMessage));
+    public static <T> T checkNotNull(T obj, String errorMsg) {
+        if (obj == null) {
+            throw new NullPointerException(errorMsg);
         }
-        return reference;
+        return obj;
     }
 
     /**
-     * Ensures that the given object reference is not null.
-     * Upon violation, a {@code NullPointerException} with the given message is thrown.
+     * if condition is false will throw an IllegalArgumentException with the given message
      *
-     * <p>The error message is constructed from a template and an arguments array, after
-     * a similar fashion as {@link String#format(String, Object...)}, but supporting only
-     * {@code %s} as a placeholder.
-     *
-     * @param reference The object reference
-     * @param errorMessageTemplate The message template for the {@code NullPointerException}
-     *                             that is thrown if the check fails. The template substitutes its
-     *                             {@code %s} placeholders with the error message arguments.
-     * @param errorMessageArgs The arguments for the error message, to be inserted into the
-     *                         message template for the {@code %s} placeholders.
-     *
-     * @param <T> T
-     * @return The object reference itself (generically typed).
-     */
-    public static <T> T checkNotNull(T reference,
-                                      String errorMessageTemplate,
-                                      Object... errorMessageArgs) {
-
-        if (reference == null) {
-            throw new NullPointerException(format(errorMessageTemplate, errorMessageArgs));
-        }
-        return reference;
-    }
-
-    // ------------------------------------------------------------------------
-    //  Boolean Condition Checking (Argument)
-    // ------------------------------------------------------------------------
-
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalArgumentException} if
-     * the condition is not met (evaluates to {@code false}).
-     *
-     * @param condition The condition to check
-     *
+     * @param condition condition
+     * @param errorMsg error message
      * @throws IllegalArgumentException Thrown, if the condition is violated.
      */
-    public static void checkArgument(boolean condition) {
+    public static void checkArgument(boolean condition, Object errorMsg) {
         if (!condition) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.valueOf(errorMsg));
         }
     }
 
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalArgumentException} if
-     * the condition is not met (evaluates to {@code false}). The exception will have the
-     * given error message.
-     *
-     * @param condition The condition to check
-     * @param errorMessage The message for the {@code IllegalArgumentException} that is thrown if the check fails.
-     *
-     * @throws IllegalArgumentException Thrown, if the condition is violated.
-     */
-    public static void checkArgument(boolean condition,  Object errorMessage) {
-        if (!condition) {
-            throw new IllegalArgumentException(String.valueOf(errorMessage));
-        }
-    }
-
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalArgumentException} if
-     * the condition is not met (evaluates to {@code false}).
-     *
-     * @param condition The condition to check
-     * @param errorMessageTemplate The message template for the {@code IllegalArgumentException}
-     *                             that is thrown if the check fails. The template substitutes its
-     *                             {@code %s} placeholders with the error message arguments.
-     * @param errorMessageArgs The arguments for the error message, to be inserted into the
-     *                         message template for the {@code %s} placeholders.
-     *
-     * @throws IllegalArgumentException Thrown, if the condition is violated.
-     */
-    public static void checkArgument(boolean condition,
-                                      String errorMessageTemplate,
-                                      Object... errorMessageArgs) {
-
-        if (!condition) {
-            throw new IllegalArgumentException(format(errorMessageTemplate, errorMessageArgs));
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    //  Boolean Condition Checking (State)
-    // ------------------------------------------------------------------------
-
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalStateException} if
-     * the condition is not met (evaluates to {@code false}).
-     *
-     * @param condition The condition to check
-     *
-     * @throws IllegalStateException Thrown, if the condition is violated.
-     */
-    public static void checkState(boolean condition) {
-        if (!condition) {
-            throw new IllegalStateException();
-        }
-    }
-
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalStateException} if
-     * the condition is not met (evaluates to {@code false}). The exception will have the
-     * given error message.
-     *
-     * @param condition The condition to check
-     * @param errorMessage The message for the {@code IllegalStateException} that is thrown if the check fails.
-     *
-     * @throws IllegalStateException Thrown, if the condition is violated.
-     */
-    public static void checkState(boolean condition,  Object errorMessage) {
-        if (!condition) {
-            throw new IllegalStateException(String.valueOf(errorMessage));
-        }
-    }
-
-    /**
-     * Checks the given boolean condition, and throws an {@code IllegalStateException} if
-     * the condition is not met (evaluates to {@code false}).
-     *
-     * @param condition The condition to check
-     * @param errorMessageTemplate The message template for the {@code IllegalStateException}
-     *                             that is thrown if the check fails. The template substitutes its
-     *                             {@code %s} placeholders with the error message arguments.
-     * @param errorMessageArgs The arguments for the error message, to be inserted into the
-     *                         message template for the {@code %s} placeholders.
-     *
-     * @throws IllegalStateException Thrown, if the condition is violated.
-     */
-    public static void checkState(boolean condition,
-                                   String errorMessageTemplate,
-                                   Object... errorMessageArgs) {
-
-        if (!condition) {
-            throw new IllegalStateException(format(errorMessageTemplate, errorMessageArgs));
-        }
-    }
-
-    /**
-     * Ensures that the given index is valid for an array, list or string of the given size.
-     *
-     * @param index index to check
-     * @param size size of the array, list or string
-     *
-     * @throws IllegalArgumentException Thrown, if size is negative.
-     * @throws IndexOutOfBoundsException Thrown, if the index negative or greater than or equal to size
-     */
-    public static void checkElementIndex(int index, int size) {
-        checkArgument(size >= 0, "Size was negative.");
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    /**
-     * Ensures that the given index is valid for an array, list or string of the given size.
-     *
-     * @param index index to check
-     * @param size size of the array, list or string
-     * @param errorMessage The message for the {@code IndexOutOfBoundsException} that is thrown if the check fails.
-     *
-     * @throws IllegalArgumentException Thrown, if size is negative.
-     * @throws IndexOutOfBoundsException Thrown, if the index negative or greater than or equal to size
-     */
-    public static void checkElementIndex(int index, int size,  String errorMessage) {
-        checkArgument(size >= 0, "Size was negative.");
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException(String.valueOf(errorMessage) + " Index: " + index + ", Size: " + size);
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    //  Utilities
-    // ------------------------------------------------------------------------
-
-    /**
-     * A simplified formatting method. Similar to {@link String#format(String, Object...)}, but
-     * with lower overhead (only String parameters, no locale, no format validation).
-     *
-     * <p>This method is taken quasi verbatim from the Guava Preconditions class.
-     */
-    private static String format( String template,  Object... args) {
-        final int numArgs = args == null ? 0 : args.length;
-        template = String.valueOf(template); // null -> "null"
-
-        // start substituting the arguments into the '%s' placeholders
-        StringBuilder builder = new StringBuilder(template.length() + 16 * numArgs);
-        int templateStart = 0;
-        int i = 0;
-        while (i < numArgs) {
-            int placeholderStart = template.indexOf("%s", templateStart);
-            if (placeholderStart == -1) {
-                break;
-            }
-            builder.append(template.substring(templateStart, placeholderStart));
-            builder.append(args[i++]);
-            templateStart = placeholderStart + 2;
-        }
-        builder.append(template.substring(templateStart));
-
-        // if we run out of placeholders, append the extra args in square braces
-        if (i < numArgs) {
-            builder.append(" [");
-            builder.append(args[i++]);
-            while (i < numArgs) {
-                builder.append(", ");
-                builder.append(args[i++]);
-            }
-            builder.append(']');
-        }
-
-        return builder.toString();
-    }
-
-    // ------------------------------------------------------------------------
-
-    /** Private constructor to prevent instantiation. */
-    private Preconditions() {}
 }

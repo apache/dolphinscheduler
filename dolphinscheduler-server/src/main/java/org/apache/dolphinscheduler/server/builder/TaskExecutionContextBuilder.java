@@ -40,6 +40,7 @@ public class TaskExecutionContextBuilder {
     public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance){
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
+        taskExecutionContext.setFirstSubmitTime(taskInstance.getFirstSubmitTime());
         taskExecutionContext.setStartTime(taskInstance.getStartTime());
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
@@ -48,6 +49,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setResources(taskInstance.getResources());
+        taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
         return this;
     }
 

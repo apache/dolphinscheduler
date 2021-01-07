@@ -16,9 +16,6 @@
  */
 <template>
   <div class="start-process-model">
-    <div class="title-box">
-      <span>{{$t('Please set the parameters before starting')}}</span>
-    </div>
     <div class="clearfix list">
       <div class="text">
         {{$t('Process Name')}}
@@ -30,10 +27,10 @@
         {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
-        <x-radio-group v-model="failureStrategy" style="margin-top: 7px;">
-          <x-radio :label="'CONTINUE'">{{$t('Continue')}}</x-radio>
-          <x-radio :label="'END'">{{$t('End')}}</x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="failureStrategy" style="margin-top: 7px;" size="small">
+          <el-radio :label="'CONTINUE'">{{$t('Continue')}}</el-radio>
+          <el-radio :label="'END'">{{$t('End')}}</el-radio>
+        </el-radio-group>
       </div>
     </div>
     <div class="clearfix list" v-if="sourceType === 'contextmenu'" style="margin-top: -8px;">
@@ -41,11 +38,11 @@
         {{$t('Node execution')}}
       </div>
       <div class="cont" style="padding-top: 6px;">
-        <x-radio-group v-model="taskDependType">
-          <x-radio :label="'TASK_POST'">{{$t('Backward execution')}}</x-radio>
-          <x-radio :label="'TASK_PRE'">{{$t('Forward execution')}}</x-radio>
-          <x-radio :label="'TASK_ONLY'">{{$t('Execute only the current node')}}</x-radio>
-        </x-radio-group>
+        <el-radio-group v-model="taskDependType" size="small">
+          <el-radio :label="'TASK_POST'">{{$t('Backward execution')}}</el-radio>
+          <el-radio :label="'TASK_PRE'">{{$t('Forward execution')}}</el-radio>
+          <el-radio :label="'TASK_ONLY'">{{$t('Execute only the current node')}}</el-radio>
+        </el-radio-group>
       </div>
     </div>
     <div class="clearfix list">
@@ -53,14 +50,14 @@
         {{$t('Notification strategy')}}
       </div>
       <div class="cont">
-        <x-select style="width: 200px;" v-model="warningType">
-          <x-option
+        <el-select style="width: 200px;" v-model="warningType" size="small">
+          <el-option
                   v-for="city in warningTypeList"
                   :key="city.id"
                   :value="city.id"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div class="clearfix list">
@@ -84,21 +81,22 @@
         {{$t('Notification group')}}
       </div>
       <div class="cont">
-        <x-select
-                style="width: 200px;"
-                v-model="warningGroupId"
-                :disabled="!notifyGroupList.length">
-          <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
-            <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
-            <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId"></em>
-          </x-input>
-          <x-option
+        <el-select
+           style="width: 200px;"
+           size="small"
+           v-model="warningGroupId"
+          :disabled="!notifyGroupList.length">
+          <el-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" size="small" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+            <em slot="suffix" class="el-icon-error" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></em>
+            <em slot="suffix" class="el-icon-bottom" style="font-size: 12px;" v-show="!warningGroupId"></em>
+          </el-input>
+          <el-option
                   v-for="city in notifyGroupList"
                   :key="city.id"
                   :value="city.id"
                   :label="city.code">
-          </x-option>
-        </x-select>
+          </el-option>
+        </el-select>
       </div>
     </div>
     <div class="clearfix list">
@@ -123,7 +121,7 @@
       </div>
       <div class="cont">
         <div style="padding-top: 6px;">
-          <x-checkbox v-model="execType">{{$t('Whether it is a complement process?')}}</x-checkbox>
+          <el-checkbox v-model="execType" size="small">{{$t('Whether it is a complement process?')}}</el-checkbox>
         </div>
       </div>
     </div>
@@ -133,10 +131,10 @@
           {{$t('Mode of execution')}}
         </div>
         <div class="cont">
-          <x-radio-group v-model="runMode" style="margin-top: 7px;">
-            <x-radio :label="'RUN_MODE_SERIAL'">{{$t('Serial execution')}}</x-radio>
-            <x-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</x-radio>
-          </x-radio-group>
+          <el-radio-group v-model="runMode" style="margin-top: 7px;">
+            <el-radio :label="'RUN_MODE_SERIAL'">{{$t('Serial execution')}}</el-radio>
+            <el-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</el-radio>
+          </el-radio-group>
         </div>
       </div>
       <div class="clearfix list">
@@ -144,27 +142,27 @@
           {{$t('Schedule date')}}
         </div>
         <div class="cont">
-          <x-datepicker
-                  style="width: 360px;"
-                  :panel-num="2"
-                  placement="bottom-start"
-                  @on-change="_datepicker"
-                  :value="scheduleTime"
-                  type="daterange"
-                  :placeholder="$t('Select date range')"
-                  format="YYYY-MM-DD HH:mm:ss">
-          </x-datepicker>
+          <el-date-picker
+            style="width: 360px"
+            v-model="scheduleTime"
+            size="small"
+            @change="_datepicker"
+            type="datetimerange"
+            range-separator="-"
+            :start-placeholder="$t('startDate')"
+            :end-placeholder="$t('endDate')"
+            value-format="yyyy-MM-dd HH:mm:ss">
+          </el-date-picker>
         </div>
       </div>
     </template>
     <div class="submit">
-      <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </x-button>
+      <el-button type="text" size="small" @click="close()"> {{$t('Cancel')}} </el-button>
+      <el-button type="primary" size="small" round :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </el-button>
     </div>
   </div>
 </template>
 <script>
-  import _ from 'lodash'
   import dayjs from 'dayjs'
   import mEmail from './email.vue'
   import store from '@/conf/home/store'
@@ -197,7 +195,7 @@
       }
     },
     props: {
-      item: Object,
+      startData: Object,
       startNodeList: {
         type: String,
         default: ''
@@ -211,11 +209,11 @@
       _start () {
         this.spinnerLoading = true
         let param = {
-          processDefinitionId: this.item.id,
+          processDefinitionId: this.startData.id,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
           warningType: this.warningType,
-          warningGroupId: this.warningGroupId=='' ? 0 : this.warningGroupId,
+          warningGroupId: this.warningGroupId === '' ? 0 : this.warningGroupId,
           execType: this.execType ? 'COMPLEMENT_DATA' : null,
           startNodeList: this.startNodeList,
           taskDependType: this.taskDependType,
@@ -231,7 +229,7 @@
         }
         this.store.dispatch('dag/processStart', param).then(res => {
           this.$message.success(res.msg)
-          this.$emit('onUpdate')
+          this.$emit('onUpdateStart')
           setTimeout(() => {
             this.spinnerLoading = false
             this.close()
@@ -243,20 +241,14 @@
       },
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
-          let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
-          if (!notifyGroupListS.length) {
-            this.store.dispatch('dag/getNotifyGroupList').then(res => {
-              this.notifyGroupList = res
-              resolve()
-            })
-          } else {
-            this.notifyGroupList = notifyGroupListS
+          this.store.dispatch('dag/getNotifyGroupList').then(res => {
+            this.notifyGroupList = res
             resolve()
-          }
+          })
         })
       },
       _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.item.id }).then(res => {
+        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
           this.receivers = res.receivers && res.receivers.split(',') || []
           this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
         })
@@ -265,7 +257,7 @@
         this._start()
       },
       close () {
-        this.$emit('close')
+        this.$emit('closeStart')
       }
     },
     watch: {
@@ -275,7 +267,7 @@
     },
     created () {
       this.warningType = this.warningTypeList[0].id
-      this.workflowName = this.item.name
+      this.workflowName = this.startData.name
 
       this._getReceiver()
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
@@ -284,7 +276,7 @@
       } else {
         this.store.dispatch('security/getWorkerGroupsAll').then(res => {
           this.$nextTick(() => {
-            if(res.length>0) {
+            if (res.length > 0) {
               this.workerGroup = res[0].id
             }
           })
@@ -297,7 +289,7 @@
           this.warningGroupId = ''
         })
       })
-      this.workflowName = this.item.name
+      this.workflowName = this.startData.name
     },
     computed: {},
     components: { mEmail, mPriority, mWorkerGroups }

@@ -16,10 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DependentParam implements ProcessAddTaskParam, InitializingBean {
 
+    private static final String DEPENDENCE = "dependence";
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
@@ -47,18 +49,18 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
      * @return task node json object
      */
     @Override
-    public JSONObject addExportSpecialParam(JSONObject taskNode) {
+    public JsonNode addExportSpecialParam(JsonNode taskNode) {
         // add dependent param
-        JSONObject dependentParameters = JSONUtils.parseObject(taskNode.getString("dependence"));
+        ObjectNode dependentParameters = JSONUtils.parseObject(taskNode.path(DEPENDENCE).asText());
 
         if (null != dependentParameters) {
-            JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
+            ArrayNode dependTaskList = (ArrayNode) dependentParameters.get("dependTaskList");
             for (int j = 0; j < dependTaskList.size(); j++) {
-                JSONObject dependentTaskModel = dependTaskList.getJSONObject(j);
-                JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
+                JsonNode dependentTaskModel = dependTaskList.path(j);
+                ArrayNode dependItemList = (ArrayNode) dependentTaskModel.get("dependItemList");
                 for (int k = 0; k < dependItemList.size(); k++) {
-                    JSONObject dependentItem = dependItemList.getJSONObject(k);
-                    int definitionId = dependentItem.getInteger("definitionId");
+                    ObjectNode dependentItem = (ObjectNode) dependItemList.path(k);
+                    int definitionId = dependentItem.path("definitionId").asInt();
                     ProcessDefinition definition = processDefineMapper.queryByDefineId(definitionId);
                     if (null != definition) {
                         dependentItem.put("projectName", definition.getProjectName());
@@ -66,7 +68,7 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
                     }
                 }
             }
-            taskNode.put("dependence", dependentParameters);
+            ((ObjectNode)taskNode).set(DEPENDENCE, dependentParameters);
         }
 
         return taskNode;
@@ -78,18 +80,18 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
      * @return
      */
     @Override
-    public JSONObject addImportSpecialParam(JSONObject taskNode) {
-        JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
+    public JsonNode addImportSpecialParam(JsonNode taskNode) {
+        ObjectNode dependentParameters =  JSONUtils.parseObject(taskNode.path(DEPENDENCE).asText());
         if(dependentParameters != null){
-            JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
+            ArrayNode dependTaskList = (ArrayNode) dependentParameters.path("dependTaskList");
             for (int h = 0; h < dependTaskList.size(); h++) {
-                JSONObject dependentTaskModel = dependTaskList.getJSONObject(h);
-                JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
+                ObjectNode dependentTaskModel = (ObjectNode) dependTaskList.path(h);
+                ArrayNode dependItemList = (ArrayNode) dependentTaskModel.get("dependItemList");
                 for (int k = 0; k < dependItemList.size(); k++) {
-                    JSONObject dependentItem = dependItemList.getJSONObject(k);
-                    Project dependentItemProject = projectMapper.queryByName(dependentItem.getString("projectName"));
+                    ObjectNode dependentItem = (ObjectNode) dependItemList.path(k);
+                    Project dependentItemProject = projectMapper.queryByName(dependentItem.path("projectName").asText());
                     if(dependentItemProject != null){
-                        ProcessDefinition definition = processDefineMapper.queryByDefineName(dependentItemProject.getId(),dependentItem.getString("definitionName"));
+                        ProcessDefinition definition = processDefineMapper.queryByDefineName(dependentItemProject.getId(),dependentItem.path("definitionName").asText());
                         if(definition != null){
                             dependentItem.put("projectId",dependentItemProject.getId());
                             dependentItem.put("definitionId",definition.getId());
@@ -97,7 +99,7 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
                     }
                 }
             }
-            taskNode.put("dependence", dependentParameters);
+            ((ObjectNode)taskNode).set(DEPENDENCE, dependentParameters);
         }
         return taskNode;
     }

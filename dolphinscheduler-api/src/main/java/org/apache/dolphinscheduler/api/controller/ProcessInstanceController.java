@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -205,6 +206,39 @@ public class ProcessInstanceController extends BaseController {
     }
 
     /**
+     * query top n process instance order by running duration
+     *
+     * @param loginUser     login user
+     * @param projectName   project name
+     * @param size          number of process instance
+     * @param startTime     start time
+     * @param endTime       end time
+     * @return              list of process instance
+     */
+    @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", dataType = "Int", example = "10"),
+            @ApiImplicitParam(name = "startTime", value = "PROCESS_INSTANCE_START_TIME", dataType = "String"),
+            @ApiImplicitParam(name = "endTime", value = "PROCESS_INSTANCE_END_TIME", dataType = "String"),
+    })
+    @GetMapping(value = "/top-n")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                         @RequestParam("size") Integer size,
+                                                         @RequestParam(value = "startTime",required = true) String startTime,
+                                                         @RequestParam(value = "endTime",required = true) String endTime
+
+    ) {
+        projectName=ParameterUtils.handleEscapes(projectName);
+        logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
+                loginUser.getUserName(), projectName);
+        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+        return returnDataList(result);
+    }
+
+    /**
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
@@ -220,9 +254,9 @@ public class ProcessInstanceController extends BaseController {
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                            @RequestParam("processInstanceId") Integer processInstanceId
+    public Result<ProcessInstance> deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                             @RequestParam("processInstanceId") Integer processInstanceId
     ) {
         logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                 loginUser.getUserName(), projectName, processInstanceId);
@@ -336,7 +370,7 @@ public class ProcessInstanceController extends BaseController {
         logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
                 loginUser.getUserName(), projectName, processInstanceIds);
         // task queue
-        Map<String, Object> result = new HashMap<>(5);
+        Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
         if (StringUtils.isNotEmpty(processInstanceIds)) {
             String[] processInstanceIdArray = processInstanceIds.split(",");

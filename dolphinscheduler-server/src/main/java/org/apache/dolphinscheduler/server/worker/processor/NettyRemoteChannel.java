@@ -34,7 +34,7 @@ public class NettyRemoteChannel {
     private final Channel channel;
 
     /**
-     *  equest unique identification
+     *  request unique identification
      */
     private final long opaque;
 
@@ -48,6 +48,12 @@ public class NettyRemoteChannel {
         this.channel = channel;
         this.host = ChannelUtils.toAddress(channel);
         this.opaque = opaque;
+    }
+
+    public NettyRemoteChannel(Channel channel) {
+        this.channel = channel;
+        this.host = ChannelUtils.toAddress(channel);
+        this.opaque = -1;
     }
 
     public Channel getChannel() {

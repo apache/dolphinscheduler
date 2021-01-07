@@ -34,15 +34,6 @@
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
-		<name>worker.fetch.task.num</name>
-		<value>3</value>
-		<value-attributes>
-			<type>int</type>
-		</value-attributes>
-		<description>submit the number of tasks at a time</description>
-		<on-ambari-upgrade add="true"/>
-	</property>
-	<property>
 		<name>worker.max.cpuload.avg</name>
 		<value>100</value>
 		<value-attributes>

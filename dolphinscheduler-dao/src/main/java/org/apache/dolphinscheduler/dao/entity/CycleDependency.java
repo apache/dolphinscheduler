@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
 import java.util.Date;
@@ -31,10 +32,12 @@ public class CycleDependency {
     /**
      * last schedule time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date lastScheduleTime;
     /**
      * expiration time
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date expirationTime;
     /**
      * cycle enum
