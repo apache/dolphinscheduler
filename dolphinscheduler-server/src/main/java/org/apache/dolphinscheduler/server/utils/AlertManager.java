@@ -81,8 +81,6 @@ public class AlertManager {
                 return "pause";
             case STOP:
                 return "stop";
-            case RESUME_FROM_FORCED_SUCCESS:
-                return "resume from forced success";
             default:
                 return "unknown type";
         }

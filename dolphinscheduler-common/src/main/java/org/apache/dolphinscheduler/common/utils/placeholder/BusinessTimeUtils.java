@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.common.utils.placeholder;
 
 import org.apache.dolphinscheduler.common.Constants;
@@ -29,15 +28,14 @@ import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME
 import static org.apache.dolphinscheduler.common.utils.DateUtils.format;
 import static org.apache.commons.lang.time.DateUtils.addDays;
 
+
 /**
  * business time utils
  */
 public class BusinessTimeUtils {
-
     private BusinessTimeUtils() {
         throw new IllegalStateException("BusinessTimeUtils class");
     }
-
     /**
      * get business time in parameters by different command types
      *
@@ -56,12 +54,13 @@ public class BusinessTimeUtils {
             case RECOVER_SUSPENDED_PROCESS:
             case START_FAILURE_TASK_PROCESS:
             case REPEAT_RUNNING:
-            case RESUME_FROM_FORCED_SUCCESS:
             case SCHEDULER:
             default:
                 businessDate = addDays(new Date(), -1);
-                if (runTime != null) {
-                    // If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
+                if (runTime != null){
+                    /**
+                     * If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
+                     */
                     businessDate = addDays(runTime, -1);
                 }
                 break;
