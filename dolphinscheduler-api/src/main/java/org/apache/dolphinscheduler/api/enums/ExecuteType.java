@@ -29,9 +29,8 @@ public enum ExecuteType {
      * 3 resume failure
      * 4 stop
      * 5 pause
-     * 6 resume from forced success
      */
-    NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE, RESUME_FROM_FORCED_SUCCESS;
+    NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE;
 
 
     public static ExecuteType getEnum(int value){

@@ -414,7 +414,7 @@ public class MasterExecThread implements Runnable {
             if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getName(), dag)) {
                 continue;
             }
-            if (task.getState().typeIsFailure() && !task.taskCanRetry() && !task.isConditionsTask()) {
+            if (task.getState().typeIsFailure() && !task.taskCanRetry()) {
                 errorTaskList.put(task.getName(), task);
             }
         }
