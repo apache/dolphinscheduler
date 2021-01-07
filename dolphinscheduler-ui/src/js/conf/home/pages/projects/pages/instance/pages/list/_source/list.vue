@@ -61,7 +61,7 @@
         <el-table-column prop="recovery" :label="$t('fault-tolerant sign')"></el-table-column>
         <el-table-column prop="executorName" :label="$t('Executor')"></el-table-column>
         <el-table-column prop="host" :label="$t('host')" width="150"></el-table-column>
-        <el-table-column :label="$t('Operation')" width="270" fixed="right">
+        <el-table-column :label="$t('Operation')" width="240" fixed="right">
           <template slot-scope="scope">
             <div v-show="scope.row.disabled">
               <el-tooltip :content="$t('Edit')" placement="top" :enterable="false">
@@ -75,11 +75,6 @@
               <el-tooltip :content="$t('Recovery Failed')" placement="top" :enterable="false">
                 <span>
                   <el-button type="success" size="mini" icon="el-icon-circle-close" :disabled="scope.row.state !== 'FAILURE'" @click="_restore(scope.row,scope.$index)" circle></el-button>
-                </span>
-              </el-tooltip>
-              <el-tooltip :content="$t('Resume Forced Success')" placement="top" :enterable="false">
-                <span>
-                  <el-button type="success" size="mini" icon="el-icon-stopwatch" :disabled="!(scope.row.state === 'FAILURE' || scope.row.state === 'NEED_FAULT_TOLERANCE' || scope.row.state === 'KILL')" @click="_resumeFromForcedSuccess(scope.row,scope.$index)" circle></el-button>
                 </span>
               </el-tooltip>
               <el-tooltip :content="scope.row.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')" placement="top" :enterable="false">
@@ -151,24 +146,6 @@
                   size="mini"
                   circle
                   icon="el-icon-circle-close"
-                  disabled="true">
-              </el-button>
-
-              <!--Resume from forced success-->
-              <el-button
-                  v-show="buttonType === 'forced'"
-                  type="success"
-                  size="mini"
-                  circle
-                  disabled="true">
-                  <span style="padding: 0 3px">{{scope.row.count}}</span>
-              </el-button>
-              <el-button
-                  v-show="buttonType !== 'forced'"
-                  type="success"
-                  size="mini"
-                  circle
-                  icon="el-icon-stopwatch"
                   disabled="true">
               </el-button>
 
@@ -357,18 +334,6 @@
             executeType: 'STOP'
           })
         }
-      },
-      /**
-       * Resume from forced success
-       * @param RESUME_FROM_FORCED_SUCCESS
-       */
-      _resumeFromForcedSuccess (item, index) {
-        this._countDownFn({
-          id: item.id,
-          executeType: 'RESUME_FROM_FORCED_SUCCESS',
-          index: index,
-          buttonType: 'forced'
-        })
       },
       /**
        * pause

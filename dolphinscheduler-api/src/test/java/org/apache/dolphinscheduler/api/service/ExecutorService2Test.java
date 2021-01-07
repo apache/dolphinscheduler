@@ -275,39 +275,6 @@ public class ExecutorService2Test {
 
     }
 
-    @Test
-    public void testExecute() {
-        List<Integer> mockRes = new ArrayList<>();
-        mockRes.add(1);
-        mockRes.add(2);
-        Mockito.when(processService.verifyIsNeedCreateCommand(any(Command.class)))
-            .thenReturn(true);
-
-        // check execute type error
-        processInstance.setState(ExecutionStatus.SUCCESS);
-        Map<String, Object> checkExeTypeRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, checkExeTypeRes.get(Constants.STATUS));
-
-        // no valid forced success task
-        processInstance.setState(ExecutionStatus.FAILURE);
-        Map<String, Object> noValidTaskRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
-        Assert.assertEquals(Status.NO_VALID_FORCED_SUCCESS_TASK, noValidTaskRes.get(Constants.STATUS));
-
-        // have forced success in sub-process
-        Mockito.when(processService.findTaskIdByInstanceStatusAndType(anyInt(), any(ExecutionStatus[].class), any(TaskType.class)))
-            .thenReturn(mockRes);
-        Mockito.when(processService.haveForcedSuccessInSubProcess(anyInt()))
-            .thenReturn(true);
-        Map<String, Object> successRes1 = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
-        Assert.assertEquals(Status.SUCCESS, successRes1.get(Constants.STATUS));
-
-        // test success
-        Mockito.when(processService.findTaskIdByInstanceState(processInstanceId, ExecutionStatus.FORCED_SUCCESS)).thenReturn(mockRes);
-        Map<String, Object> successRes = executorService.execute(loginUser, projectName, processInstanceId, ExecuteType.RESUME_FROM_FORCED_SUCCESS);
-        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
-        verify(processService, times(2)).createCommand(any(Command.class));
-    }
-
     private List<Server> getMasterServersList() {
         List<Server> masterServerList = new ArrayList<>();
         Server masterServer1 = new Server();

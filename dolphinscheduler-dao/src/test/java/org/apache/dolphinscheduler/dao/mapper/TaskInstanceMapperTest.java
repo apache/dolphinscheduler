@@ -26,10 +26,8 @@ import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -318,54 +316,5 @@ public class TaskInstanceMapperTest {
         processDefinitionMapper.deleteById(definition.getId());
         Assert.assertNotEquals(taskInstanceIPage.getTotal(), 0);
 
-    }
-
-    @Test
-    public void testQueryTaskByProcessIdAndStateAndType() {
-        // insert three task instances with the same process instance id
-        List<TaskInstance> taskList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            String name = "ut task" + String.valueOf(i);
-            taskList.add(insertOne(name, 66, ExecutionStatus.FAILURE, TaskType.SUB_PROCESS.toString()));
-        }
-
-        // test query result
-        List<Integer> resultArray = taskInstanceMapper.queryTaskByProcessIdAndStateAndType(66,
-            new int[] {ExecutionStatus.FAILURE.ordinal(), ExecutionStatus.KILL.ordinal(), ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal()},
-            TaskType.SUB_PROCESS.toString());
-        Assert.assertEquals(3, resultArray.size());
-
-        // delete
-        for (int i = 0; i < 3; i++) {
-            taskInstanceMapper.deleteById(taskList.get(i));
-        }
-    }
-
-    @Test
-    public void testQueryTaskBySubProcessTaskIdAndStateAndType() {
-        TaskInstance parentTask = insertOne("parent-task", 66, ExecutionStatus.FAILURE, TaskType.SUB_PROCESS.toString());
-
-        ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
-        processInstanceMap.setParentProcessInstanceId(66);
-        processInstanceMap.setParentTaskInstanceId(parentTask.getId());
-        processInstanceMap.setProcessInstanceId(67);
-        processInstanceMapMapper.insert(processInstanceMap);
-
-        TaskInstance subTask1 = insertOne("sub1", 67, ExecutionStatus.SUCCESS, TaskType.SHELL.toString());
-        TaskInstance subTask2 = insertOne("sub2", 67, ExecutionStatus.FORCED_SUCCESS, TaskType.SHELL.toString());
-
-        // test query result
-        List<Integer> resultList = taskInstanceMapper.queryTaskBySubProcessTaskIdAndStateAndType(parentTask.getId(),
-            new int[] {ExecutionStatus.FORCED_SUCCESS.ordinal()},
-            null);
-
-        Assert.assertEquals(1, resultList.size());
-        Assert.assertEquals(subTask2.getId(), resultList.get(0).intValue());
-
-        // delete
-        taskInstanceMapper.deleteById(parentTask.getId());
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
-        taskInstanceMapper.deleteById(subTask1.getId());
-        taskInstanceMapper.deleteById(subTask2.getId());
     }
 }

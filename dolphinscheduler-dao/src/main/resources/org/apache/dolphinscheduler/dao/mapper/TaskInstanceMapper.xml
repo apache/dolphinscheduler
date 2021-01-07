@@ -152,27 +152,4 @@
         </if>
         order by instance.start_time desc
     </select>
-    <select id="queryTaskByProcessIdAndStateAndType" resultType="java.lang.Integer">
-        select id from t_ds_task_instance
-        where process_instance_id = #{processInstanceId}
-        and task_type = #{taskType}
-        and state in
-        <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
-            #{i}
-        </foreach>
-        and flag = 1
-    </select>
-    <select id="queryTaskBySubProcessTaskIdAndStateAndType" resultType="java.lang.Integer">
-        select id from t_ds_task_instance
-        where process_instance_id =
-        (select process_instance_id from t_ds_relation_process_instance where parent_task_instance_id = #{subProcessTaskId})
-        and state in
-        <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
-            #{i}
-        </foreach>
-        <if test="taskType != null">
-            and task_type = #{taskType}
-        </if>
-        and flag = 1
-    </select>
 </mapper>
