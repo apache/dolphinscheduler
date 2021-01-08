@@ -217,6 +217,7 @@ public class DependentTaskTest {
         taskInstance.setId(252612);
         taskInstance.setName("C");
         taskInstance.setProcessInstanceId(10111);
+        taskInstance.setTaskJson("{}");
         taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
         return taskInstance;
     }
