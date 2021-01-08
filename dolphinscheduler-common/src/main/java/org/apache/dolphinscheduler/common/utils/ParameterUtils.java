@@ -32,6 +32,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,10 @@ public class ParameterUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParameterUtils.class);
 
+    private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\]]+)]";
+
+    private static final String DATE_START_PATTERN = "^[0-9]";
+
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
     }
@@ -51,33 +57,29 @@ public class ParameterUtils {
      * convert parameters place holders
      *
      * @param parameterString parameter
-     * @param parameterMap parameter map
+     * @param parameterMap    parameter map
      * @return convert parameters place holders
      */
     public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
-        if (StringUtils.isEmpty(parameterString) || parameterMap == null) {
+        if (StringUtils.isEmpty(parameterString)) {
             return parameterString;
         }
-
-        //Get current time, schedule execute time
-        String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
-
-        Date cronTime = null;
-
-        if (StringUtils.isNotEmpty(cronTimeStr)) {
+        Date cronTime;
+        if (parameterMap != null && !parameterMap.isEmpty()) {
+            // replace variable ${} form,refers to the replacement of system variables and custom variables
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
+        if (parameterMap != null && null != parameterMap.get(Constants.PARAMETER_DATETIME)) {
+            //Get current time, schedule execute time
+            String cronTimeStr = parameterMap.get(Constants.PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, Constants.PARAMETER_FORMAT_TIME);
         } else {
             cronTime = new Date();
         }
-
-        // replace variable ${} form,refers to the replacement of system variables and custom variables
-        parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
-
         // replace time $[...] form, eg. $[yyyyMMdd]
         if (cronTime != null) {
-            parameterString = TimePlaceholderUtils.replacePlaceholders(parameterString, cronTime, true);
+            return dateTemplateParse(parameterString, cronTime);
         }
-
         return parameterString;
     }
 
@@ -86,7 +88,7 @@ public class ParameterUtils {
      * convert parameters place holders
      *
      * @param parameterString parameter
-     * @param parameterMap parameter map
+     * @param parameterMap    parameter map
      * @return convert parameters place holders
      */
     public static String convertParameterPlaceholders2(String parameterString, Map<String, String> parameterMap) {
@@ -105,12 +107,13 @@ public class ParameterUtils {
         }
 
         // replace variable ${} form,refers to the replacement of system variables and custom variables
-        parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        if (!parameterMap.isEmpty()) {
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
 
         // replace time $[...] form, eg. $[yyyyMMdd]
         if (cronTime != null) {
-            parameterString = TimePlaceholderUtils.replacePlaceholders(parameterString, cronTime, true);
-
+            return dateTemplateParse(parameterString, cronTime);
         }
         return parameterString;
     }
@@ -118,10 +121,10 @@ public class ParameterUtils {
     /**
      * set in parameter
      *
-     * @param index index
-     * @param stmt preparedstatement
+     * @param index    index
+     * @param stmt     preparedstatement
      * @param dataType data type
-     * @param value value
+     * @param value    value
      * @throws Exception errors
      */
     public static void setInParameter(int index, PreparedStatement stmt, DataType dataType, String value) throws Exception {
@@ -149,10 +152,10 @@ public class ParameterUtils {
     /**
      * curing user define parameters
      *
-     * @param globalParamMap global param map
+     * @param globalParamMap  global param map
      * @param globalParamList global param list
-     * @param commandType command type
-     * @param scheduleTime schedule time
+     * @param commandType     command type
+     * @param scheduleTime    schedule time
      * @return curing user define parameters
      */
     public static String curingGlobalParams(Map<String, String> globalParamMap, List<Property> globalParamList,
@@ -169,7 +172,7 @@ public class ParameterUtils {
         Map<String, String> allParamMap = new HashMap<>();
         //If it is a complement, a complement time needs to be passed in, according to the task type
         Map<String, String> timeParams = BusinessTimeUtils
-                .getBusinessTime(commandType, scheduleTime);
+            .getBusinessTime(commandType, scheduleTime);
 
         if (timeParams != null) {
             allParamMap.putAll(timeParams);
@@ -248,4 +251,30 @@ public class ParameterUtils {
         }
         return map;
     }
+
+    private static String dateTemplateParse(String templateStr, Date date) {
+        if (templateStr == null) {
+            return null;
+        }
+        Pattern pattern = Pattern.compile(DATE_PARSE_PATTERN);
+
+        StringBuffer newValue = new StringBuffer(templateStr.length());
+
+        Matcher matcher = pattern.matcher(templateStr);
+
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (Pattern.matches(DATE_START_PATTERN, key)) {
+                continue;
+            }
+            String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
+            assert value != null;
+            matcher.appendReplacement(newValue, value);
+        }
+
+        matcher.appendTail(newValue);
+
+        return newValue.toString();
+    }
+
 }

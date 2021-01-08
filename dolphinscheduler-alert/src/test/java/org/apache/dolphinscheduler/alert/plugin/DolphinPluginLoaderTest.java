@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.alert.plugin;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -27,6 +28,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * DolphinPluginLoader Tester.
  */
+@Ignore
 public class DolphinPluginLoaderTest {
 
     @Before

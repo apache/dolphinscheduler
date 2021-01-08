@@ -14,17 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils.placeholder;
+
+import static org.apache.dolphinscheduler.common.Constants.ADD_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.ADD_STRING;
+import static org.apache.dolphinscheduler.common.Constants.DIVISION_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.DIVISION_STRING;
+import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.LEFT_BRACE_STRING;
+import static org.apache.dolphinscheduler.common.Constants.MULTIPLY_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.MULTIPLY_STRING;
+import static org.apache.dolphinscheduler.common.Constants.N;
+import static org.apache.dolphinscheduler.common.Constants.P;
+import static org.apache.dolphinscheduler.common.Constants.RIGHT_BRACE_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_CHAR;
+import static org.apache.dolphinscheduler.common.Constants.SUBTRACT_STRING;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
-
-import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * time place holder utils
@@ -46,8 +65,8 @@ public class TimePlaceholderUtils {
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PropertyPlaceholderHelper.PlaceholderResolver}.
      *
-     * @param value                 the value containing the placeholders to be replaced
-     * @param date                  custom date
+     * @param value                          the value containing the placeholders to be replaced
+     * @param date                           custom date
      * @param ignoreUnresolvablePlaceholders ignore unresolvable placeholders
      * @return the supplied value with placeholders replaced inline
      */
@@ -59,11 +78,11 @@ public class TimePlaceholderUtils {
         return helper.replacePlaceholders(value, new TimePlaceholderResolver(value, date));
     }
 
-
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
+     *
      * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
-     * be ignored ({@code true}) or cause an exception ({@code false})
+     *                                       be ignored ({@code true}) or cause an exception ({@code false})
      */
     private static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
         return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
@@ -89,7 +108,7 @@ public class TimePlaceholderUtils {
      * Change the sign in the expression to P (positive) N (negative)
      *
      * @param expression
-     * @return  eg. "-3+-6*(+8)-(-5) -> S3+S6*(P8)-(S5)"
+     * @return eg. "-3+-6*(+8)-(-5) -> S3+S6*(P8)-(S5)"
      */
     private static String convert(String expression) {
         char[] arr = expression.toCharArray();
@@ -262,7 +281,7 @@ public class TimePlaceholderUtils {
      * Placeholder replacement resolver
      */
     private static class TimePlaceholderResolver implements
-            PropertyPlaceholderHelper.PlaceholderResolver {
+        PropertyPlaceholderHelper.PlaceholderResolver {
 
         private final String value;
 
@@ -278,12 +297,28 @@ public class TimePlaceholderUtils {
             try {
                 return calculateTime(placeholderName, date);
             } catch (Exception ex) {
-                logger.error("resolve placeholder '{}' in [ {} ]" , placeholderName, value, ex);
+                logger.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
                 return null;
             }
         }
     }
 
+    /**
+     * return the formatted date according to the corresponding date format
+     *
+     * @param expression date expression
+     * @param date       date
+     * @return reformat date
+     */
+    public static String getPlaceHolderTime(String expression, Date date) {
+        if (StringUtils.isBlank(expression)) {
+            return null;
+        }
+        if (null == date) {
+            return null;
+        }
+        return calculateTime(expression, date);
+    }
 
     /**
      * calculate time
@@ -320,9 +355,10 @@ public class TimePlaceholderUtils {
 
     /**
      * calculate time expresstion
+     *
      * @param expression expresstion
-     * @param date  date
-     * @return  map with date, date format
+     * @param date       date
+     * @return map with date, date format
      */
     public static Map.Entry<Date, String> calcTimeExpression(String expression, Date date) {
         Map.Entry<Date, String> resultEntry;
@@ -346,8 +382,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get first day of month
+     *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return first day of month
      */
     public static Map.Entry<Date, String> calcMonthBegin(String expression, Date date) {
@@ -369,8 +406,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get last day of month
+     *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return last day of month
      */
     public static Map.Entry<Date, String> calcMonthEnd(String expression, Date date) {
@@ -392,8 +430,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get first day of week
+     *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return monday
      */
     public static Map.Entry<Date, String> calcWeekStart(String expression, Date date) {
@@ -414,8 +453,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get last day of week
+     *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return last day of week
      */
     public static Map.Entry<Date, String> calcWeekEnd(String expression, Date date) {
@@ -437,8 +477,9 @@ public class TimePlaceholderUtils {
 
     /**
      * calc months expression
+     *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return calc months
      */
     public static Map.Entry<Date, String> calcMonths(String expression, Date date) {
@@ -461,7 +502,7 @@ public class TimePlaceholderUtils {
      * calculate time expression
      *
      * @param expression expresstion
-     * @param date  date
+     * @param date       date
      * @return calculate time expression with date,format
      */
     public static Map.Entry<Date, String> calcMinutes(String expression, Date date) {
@@ -471,7 +512,7 @@ public class TimePlaceholderUtils {
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
                 Date targetDate = org.apache.commons.lang.time.DateUtils
-                        .addMinutes(date, calcMinutes(addMinuteExpr));
+                    .addMinutes(date, calcMinutes(addMinuteExpr));
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -482,7 +523,7 @@ public class TimePlaceholderUtils {
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
                 Date targetDate = org.apache.commons.lang.time.DateUtils
-                        .addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+                    .addMinutes(date, 0 - calcMinutes(addMinuteExpr));
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -512,7 +553,7 @@ public class TimePlaceholderUtils {
         } else {
 
             calcExpression = String.format("60*24*(%s)%s", minuteExpression.substring(0, index),
-                    minuteExpression.substring(index));
+                minuteExpression.substring(index));
         }
 
         return calculate(calcExpression);

@@ -18,10 +18,12 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper">
-    <select id="queryAllAlertPluginInstanceList" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+
+    <select id="queryAllAlertPluginInstanceList"
+            resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
         select *
         from t_ds_alert_plugin_instance
-        where 1=1
+        where 1 = 1
     </select>
 
     <select id="queryByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">

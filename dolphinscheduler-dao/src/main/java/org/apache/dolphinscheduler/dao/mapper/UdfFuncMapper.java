@@ -100,5 +100,12 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      */
     List<UdfFunc> listAuthorizedUdfByResourceId(@Param("userId") int userId,@Param("resourceIds") int[] resourceIds);
 
+    /**
+     * batch update udf func
+     * @param udfFuncList  udf list
+     * @return update num
+     */
+    int batchUpdateUdfFunc(@Param("udfFuncList") List<UdfFunc> udfFuncList);
+
 
 }

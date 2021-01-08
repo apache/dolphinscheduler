@@ -31,10 +31,40 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UDFUser;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +72,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * user service
@@ -174,6 +202,37 @@ public class UsersService extends BaseService {
         return user;
     }
 
+    /***
+     * create User for ldap login
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public User createUser(UserType userType, String userId, String email) {
+        User user = new User();
+        Date now = new Date();
+
+        user.setUserName(userId);
+        user.setEmail(email);
+        // create general users, administrator users are currently built-in
+        user.setUserType(userType);
+        user.setCreateTime(now);
+        user.setUpdateTime(now);
+        user.setQueue("");
+
+        // save user
+        userMapper.insert(user);
+        return user;
+    }
+
+    /**
+     * get user by user name
+     *
+     * @param userName user name
+     * @return exist user or null
+     */
+    public User getUserByUserName(String userName) {
+        return userMapper.queryByUserNameAccurately(userName);
+    }
+
     /**
      * query user by id
      *
@@ -208,7 +267,6 @@ public class UsersService extends BaseService {
 
     /**
      * get user id by user name
-     *
      * @param name user name
      * @return if name empty 0, user not exists -1, user exist user id
      */
@@ -269,7 +327,7 @@ public class UsersService extends BaseService {
      * @return update result code
      * @throws Exception exception
      */
-    public Map<String, Object> updateUser(int userId,
+    public Map<String, Object> updateUser(User loginUser, int userId,
                                           String userName,
                                           String userPassword,
                                           String email,
@@ -280,13 +338,14 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
+        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
         User user = userMapper.selectById(userId);
-
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
@@ -587,7 +646,7 @@ public class UsersService extends BaseService {
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
@@ -627,14 +686,14 @@ public class UsersService extends BaseService {
     /**
      * grant datasource
      *
-     * @param loginUser     login user
-     * @param userId        user id
+     * @param loginUser login user
+     * @param userId user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
     @Transactional(rollbackFor = RuntimeException.class)
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
         //only admin can operate
@@ -687,6 +746,18 @@ public class UsersService extends BaseService {
             user = loginUser;
         } else {
             user = userMapper.queryDetailsById(loginUser.getId());
+
+            List<AlertGroup> alertGroups = alertGroupMapper.queryByUserId(loginUser.getId());
+
+            StringBuilder sb = new StringBuilder();
+
+            if (alertGroups != null && alertGroups.size() > 0) {
+                for (int i = 0; i < alertGroups.size() - 1; i++) {
+                    sb.append(alertGroups.get(i).getGroupName() + ",");
+                }
+                sb.append(alertGroups.get(alertGroups.size() - 1));
+                user.setAlertGroup(sb.toString());
+            }
         }
 
         result.put(Constants.DATA_LIST, user);
@@ -816,24 +887,6 @@ public class UsersService extends BaseService {
     }
 
     /**
-     * check
-     *
-     * @param result              result
-     * @param bool                bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * @param tenantId tenant id
      * @return true if tenant exists, otherwise return false
      */
@@ -842,10 +895,6 @@ public class UsersService extends BaseService {
     }
 
     /**
-     * @param userName
-     * @param password
-     * @param email
-     * @param phone
      * @return if check failed return the field, otherwise return null
      */
     private String checkUserParams(String userName, String password, String email, String phone) {
@@ -872,8 +921,8 @@ public class UsersService extends BaseService {
      * copy resource files
      *
      * @param resourceComponent resource component
-     * @param srcBasePath       src base path
-     * @param dstBasePath       dst base path
+     * @param srcBasePath src base path
+     * @param dstBasePath dst base path
      * @throws IOException io exception
      */
     private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
@@ -908,10 +957,10 @@ public class UsersService extends BaseService {
     /**
      * register user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName       user name
-     * @param userPassword   user password
+     * @param userName user name
+     * @param userPassword user password
      * @param repeatPassword repeat password
-     * @param email          email
+     * @param email email
      * @return register result code
      * @throws Exception exception
      */
@@ -941,7 +990,7 @@ public class UsersService extends BaseService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName  user name
+     * @param userName user name
      * @return create result code
      */
     public Map<String, Object> activateUser(User loginUser, String userName) {

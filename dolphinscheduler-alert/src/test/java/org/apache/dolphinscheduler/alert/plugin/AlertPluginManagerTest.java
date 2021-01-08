@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * AlertPluginManager Tester.
  */
+@Ignore
 public class AlertPluginManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginManagerTest.class);

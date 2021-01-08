@@ -42,6 +42,7 @@ public class FlinkTask extends AbstractYarnTask {
 
   /**
    *  flink command
+   *  usage: flink run [OPTIONS] <jar-file> <arguments>
    */
   private static final String FLINK_COMMAND = "flink";
   private static final String FLINK_RUN = "run";
@@ -102,6 +103,7 @@ public class FlinkTask extends AbstractYarnTask {
    */
   @Override
   protected String buildCommand() {
+    // flink run [OPTIONS] <jar-file> <arguments>
     List<String> args = new ArrayList<>();
 
     args.add(FLINK_COMMAND);
