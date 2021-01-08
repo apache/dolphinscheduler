@@ -14,31 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.queue;
 
+import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
-public interface TaskPriorityQueue {
+/**
+ * task priority queue
+ * @param <T>
+ */
+public interface TaskPriorityQueue<T> {
 
     /**
      * put task info
      *
      * @param taskInfo taskInfo
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    void put(String taskInfo) throws Exception;
+    void put(T taskInfo) throws TaskPriorityQueueException;
 
     /**
      * take taskInfo
+     *
      * @return taskInfo
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    String take()throws Exception;
+    T take() throws TaskPriorityQueueException, InterruptedException;
 
     /**
      * size
      *
      * @return size
-     * @throws Exception
+     * @throws TaskPriorityQueueException
      */
-    int size() throws Exception;
+    int size() throws TaskPriorityQueueException;
 }
