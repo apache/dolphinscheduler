@@ -16,11 +16,14 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import io.swagger.annotations.ApiParam;
+
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import io.swagger.annotations.ApiParam;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_LINEAGE_ERROR;
+import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 @RestController
 @RequestMapping("lineages/{projectId}")
@@ -45,7 +49,9 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value="/list-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal, @ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
+    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                    @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
+                                                                    @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
         try {
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
@@ -58,7 +64,9 @@ public class WorkFlowLineageController extends BaseController {
 
     @GetMapping(value="/list-ids")
     @ResponseStatus(HttpStatus.OK)
-    public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestParam(value = "ids", required = false) String ids,@ApiParam(name = "projectId", value = "PROJECT_ID", required = true) @PathVariable int projectId) {
+    public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                 @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
+                                                                 @ApiIgnore @RequestParam(value = "ids", required = false) String ids) {
 
         try {
             ids = ParameterUtils.handleEscapes(ids);
