@@ -25,11 +25,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,12 +90,16 @@ public class AlertManager {
      * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
-                                            List<TaskInstance> taskInstances) {
+                                            List<TaskInstance> taskInstances,
+                                            ProjectUser projectUser) {
 
         String res = "";
         if (processInstance.getState().typeIsSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                    .projectId(projectUser.getProjectId())
+                    .projectName(projectUser.getProjectName())
+                    .owner(projectUser.getUserName())
                     .processId(processInstance.getId())
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
@@ -120,6 +120,9 @@ public class AlertManager {
                     continue;
                 }
                 ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+                        .projectId(projectUser.getProjectId())
+                        .projectName(projectUser.getProjectName())
+                        .owner(projectUser.getUserName())
                         .processId(processInstance.getId())
                         .processName(processInstance.getName())
                         .taskId(task.getId())
@@ -196,7 +199,8 @@ public class AlertManager {
      * @param taskInstances task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
-                                         List<TaskInstance> taskInstances) {
+                                         List<TaskInstance> taskInstances,
+                                         ProjectUser projectUser) {
 
         if(Flag.YES == processInstance.getIsSubProcess()){
             return;
@@ -231,7 +235,7 @@ public class AlertManager {
         alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         alert.setShowType(showType);
-        String content = getContentProcessInstance(processInstance, taskInstances);
+        String content = getContentProcessInstance(processInstance, taskInstances, projectUser);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(processInstance.getWarningGroupId());
