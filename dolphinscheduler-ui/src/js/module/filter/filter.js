@@ -22,9 +22,33 @@ import dayjs from 'dayjs'
  */
 const formatDate = (value, fmt) => {
   fmt = fmt || 'YYYY-MM-DD HH:mm:ss'
-  return dayjs(value).format(fmt)
+  if (value === null) {
+    return '-'
+  } else {
+    return dayjs(formatISODate(value)).format(fmt)
+  }
+}
+/**
+ * Formatting iso date
+ */
+const formatISODate = date => {
+  let [datetime, timezone] = date.split('+')
+  if (!timezone || timezone.indexOf(':') >= 0) return date
+  let hourOfTz = timezone.substring(0, 2) || '00'
+  let secondOfTz = timezone.substring(2, 4) || '00'
+  return `${datetime}+${hourOfTz}:${secondOfTz}`
+}
+/**
+ * filter null
+ */
+const filterNull = (value) => {
+  if (value === null || value === '') {
+    return '-'
+  } else {
+    return value
+  }
 }
 
 export {
-  formatDate
+  formatDate, filterNull
 }

@@ -111,29 +111,4 @@ public class MasterCommandTest {
     }
 
 
-    @Test
-    public void testDagHelper(){
-
-        ProcessDefinition processDefinition = processDefinitionMapper.selectById(19);
-
-        try {
-            ProcessDag processDag = DagHelper.generateFlowDag(processDefinition.getProcessDefinitionJson(),
-                    new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
-
-            DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
-            Collection<String> start = DagHelper.getStartVertex("1", dag, null);
-
-            System.out.println(start.toString());
-
-            Map<String, TaskNode> forbidden = DagHelper.getForbiddenTaskNodeMaps(processDefinition.getProcessDefinitionJson());
-            System.out.println(forbidden);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
-
-
 }

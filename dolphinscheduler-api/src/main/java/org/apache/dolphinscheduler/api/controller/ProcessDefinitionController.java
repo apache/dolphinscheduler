@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiOperation(value = "copyProcessDefinition", notes = "COPY_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, dataType = "Int", example = "10")
     })
     @PostMapping(value = "/copy")
     @ResponseStatus(HttpStatus.OK)
@@ -174,7 +175,7 @@ public class ProcessDefinitionController extends BaseController {
     @ApiOperation(value = "moveProcessDefinition", notes = "MOVE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", required = true, dataType = "String", example = "3,4"),
-            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, type = "Integer")
+            @ApiImplicitParam(name = "targetProjectId", value = "TARGET_PROJECT_ID", required = true, dataType = "Int", example = "10")
     })
     @PostMapping(value = "/move")
     @ResponseStatus(HttpStatus.OK)
@@ -373,7 +374,7 @@ public class ProcessDefinitionController extends BaseController {
     }
 
     /**
-     * query datail of process definition
+     * query datail of process definition by id
      *
      * @param loginUser login user
      * @param projectName project name
@@ -394,6 +395,29 @@ public class ProcessDefinitionController extends BaseController {
         logger.info("query detail of process definition, login user:{}, project name:{}, process definition id:{}",
                 loginUser.getUserName(), projectName, processId);
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionById(loginUser, projectName, processId);
+        return returnDataList(result);
+    }
+
+    /**
+     * query datail of process definition by name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionName process definition name
+     * @return process definition detail
+     */
+    @ApiOperation(value = "queryProcessDefinitionByName", notes = "QUERY_PROCESS_DEFINITION_BY_NAME_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionName", value = "PROCESS_DEFINITION_ID", required = true, dataType = "String")
+    })
+    @GetMapping(value = "/select-by-name")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_DATAIL_OF_PROCESS_DEFINITION_ERROR)
+    public Result<ProcessDefinition> queryProcessDefinitionByName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                                                  @RequestParam("processDefinitionName") String processDefinitionName
+    ) {
+        Map<String, Object> result = processDefinitionService.queryProcessDefinitionByName(loginUser, projectName, processDefinitionName);
         return returnDataList(result);
     }
 

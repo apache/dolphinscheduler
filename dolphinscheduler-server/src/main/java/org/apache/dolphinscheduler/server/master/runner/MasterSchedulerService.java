@@ -124,52 +124,57 @@ public class MasterSchedulerService extends Thread {
     public void run() {
         logger.info("master scheduler started");
         while (Stopper.isRunning()){
-            InterProcessMutex mutex = null;
             try {
                 boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
-                if(!runCheckFlag) {
+                if (!runCheckFlag) {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
                 if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
-
-                    mutex = zkMasterClient.blockAcquireMutex();
-
-                    int activeCount = masterExecService.getActiveCount();
-                    // make sure to scan and delete command  table in one transaction
-                    Command command = processService.findOneCommand();
-                    if (command != null) {
-                        logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
-
-                        try{
-
-                            ProcessInstance processInstance = processService.handleCommand(logger,
-                                    getLocalAddress(),
-                                    this.masterConfig.getMasterExecThreads() - activeCount, command);
-                            if (processInstance != null) {
-                                logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(
-                                        new MasterExecThread(
-                                                processInstance
-                                                , processService
-                                                , nettyRemotingClient
-                                                , alertManager
-                                                , masterConfig));
-                            }
-                        }catch (Exception e){
-                            logger.error("scan command error ", e);
-                            processService.moveToErrorCommand(command, e.toString());
-                        }
-                    } else{
-                        //indicate that no command ,sleep for 1s
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    }
+                    scheduleProcess();
                 }
-            } catch (Exception e){
-                logger.error("master scheduler thread error",e);
-            } finally{
-                zkMasterClient.releaseMutex(mutex);
+            } catch (Exception e) {
+                logger.error("master scheduler thread error", e);
             }
+        }
+    }
+
+    private void scheduleProcess() throws Exception {
+        InterProcessMutex mutex = null;
+        try {
+            mutex = zkMasterClient.blockAcquireMutex();
+
+            int activeCount = masterExecService.getActiveCount();
+            // make sure to scan and delete command  table in one transaction
+            Command command = processService.findOneCommand();
+            if (command != null) {
+                logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
+
+                try {
+
+                    ProcessInstance processInstance = processService.handleCommand(logger,
+                            getLocalAddress(),
+                            this.masterConfig.getMasterExecThreads() - activeCount, command);
+                    if (processInstance != null) {
+                        logger.info("start master exec thread , split DAG ...");
+                        masterExecService.execute(
+                                new MasterExecThread(
+                                        processInstance
+                                        , processService
+                                        , nettyRemotingClient
+                                        , alertManager
+                                        , masterConfig));
+                    }
+                } catch (Exception e) {
+                    logger.error("scan command error ", e);
+                    processService.moveToErrorCommand(command, e.toString());
+                }
+            } else {
+                //indicate that no command ,sleep for 1s
+                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+            }
+        } finally {
+            zkMasterClient.releaseMutex(mutex);
         }
     }
 

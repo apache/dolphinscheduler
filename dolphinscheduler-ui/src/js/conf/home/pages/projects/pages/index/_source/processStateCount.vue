@@ -19,7 +19,7 @@
     <div v-show="!msg">
       <div class="data-area" v-spin="isSpin" style="height: 430px;">
         <div class="col-md-7">
-          <div id="process-state-pie" style="height:260px;margin-top: 100px;"></div>
+          <div id="process-state-pie" style="width:100%;height:260px;margin-top: 100px;"></div>
         </div>
         <div class="col-md-5">
           <div class="table-small-model">
@@ -31,7 +31,10 @@
               </tr>
               <tr v-for="(item,$index) in processStateList" :key="$index">
                 <td><span>{{$index+1}}</span></td>
-                <td><span><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a></span></td>
+                <td>
+                  <a v-if="currentName === 'home'" style="cursor: default">{{item.value}}</a>
+                  <span v-else><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)">{{item.value}}</a></span>
+                </td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
               </tr>
             </table>
@@ -49,15 +52,17 @@
   import { mapActions } from 'vuex'
   import { pie } from './chartConfig'
   import Chart from '@/module/ana-charts'
+  import echarts from 'echarts'
   import mNoData from '@/module/components/noData/noData'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/conditions/instance/common'
   export default {
     name: 'process-state-count',
     data () {
       return {
         isSpin: true,
         msg: '',
-        processStateList: []
+        processStateList: [],
+        currentName: ''
       }
     },
     props: {
@@ -69,7 +74,7 @@
         this.$router.push({
           name: 'projects-instance-list',
           query: {
-            stateType: _.find(stateType, ['label', name])['code'],
+            stateType: _.find(stateType, ['label', name]).code,
             startDate: this.searchParams.startDate,
             endDate: this.searchParams.endDate
           }
@@ -79,7 +84,7 @@
         let data = res.data.taskCountDtos
         this.processStateList = _.map(data, v => {
           return {
-            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            key: _.find(stateType, ['code', v.taskStateType]).label,
             value: v.count
           }
         })
@@ -94,7 +99,7 @@
       }
     },
     watch: {
-      'searchParams': {
+      searchParams: {
         deep: true,
         immediate: true,
         handler (o) {
@@ -108,11 +113,15 @@
             this.isSpin = false
           })
         }
+      },
+      '$store.state.projects.sideBar': function () {
+        echarts.init(document.getElementById('process-state-pie')).resize()
       }
     },
     beforeCreate () {
     },
     created () {
+      this.currentName = this.$router.currentRoute.name
     },
     beforeMount () {
     },
@@ -132,7 +141,4 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .process-state-count-model {
-
-  }
 </style>

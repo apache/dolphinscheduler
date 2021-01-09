@@ -47,4 +47,28 @@ public class TaskStateCount {
     public void setTaskStateType(ExecutionStatus taskStateType) {
         this.taskStateType = taskStateType;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TaskStateCount that = (TaskStateCount) o;
+
+        if (count != that.count) {
+            return false;
+        }
+        return taskStateType == that.taskStateType;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = count;
+        result = 31 * result + (taskStateType != null ? taskStateType.hashCode() : 0);
+        return result;
+    }
 }

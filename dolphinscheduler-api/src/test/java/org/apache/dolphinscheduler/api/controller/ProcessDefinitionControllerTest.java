@@ -117,14 +117,14 @@ public class ProcessDefinitionControllerTest {
     public void testVerifyProcessDefinitionName() throws Exception {
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROCESS_INSTANCE_EXIST);
+        putMsg(result, Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR);
         String projectName = "test";
         String name = "dag_test";
 
         Mockito.when(processDefinitionService.verifyProcessDefinitionName(user, projectName, name)).thenReturn(result);
 
         Result response = processDefinitionController.verifyProcessDefinitionName(user, projectName, name);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_EXIST.getCode(), response.getCode().intValue());
+        Assert.assertEquals(Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR.getCode(), response.getCode().intValue());
 
     }
 

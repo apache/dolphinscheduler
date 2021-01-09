@@ -216,7 +216,7 @@ public class SparkParameters extends AbstractParameters {
 
   @Override
   public boolean checkParameters() {
-    return mainJar != null && programType != null && sparkVersion != null;
+    return mainJar != null && programType != null;
   }
 
   @Override

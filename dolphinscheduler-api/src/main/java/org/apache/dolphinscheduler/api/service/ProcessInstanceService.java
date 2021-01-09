@@ -305,10 +305,10 @@ public class ProcessInstanceService extends BaseService {
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
             if (taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())) {
-                Result logResult = loggerService.queryLog(
+                Result<String> logResult = loggerService.queryLog(
                         taskInstance.getId(), 0, 4098);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
-                    String log = (String) logResult.getData();
+                    String log = logResult.getData();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
                     taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
                 }

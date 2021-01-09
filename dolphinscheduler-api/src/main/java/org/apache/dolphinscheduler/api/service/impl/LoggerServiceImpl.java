@@ -130,7 +130,6 @@ public class LoggerServiceImpl implements LoggerService {
                 logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath()));
     }
 
-
     /**
      * get host
      *
