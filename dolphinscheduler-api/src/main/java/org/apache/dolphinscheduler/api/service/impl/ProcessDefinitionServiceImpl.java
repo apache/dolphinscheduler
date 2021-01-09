@@ -1592,6 +1592,18 @@ public class ProcessDefinitionServiceImpl extends BaseService implements
     }
 
     /**
+     * query task dependencies by task name
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process id
+     * @param taskName task name
+     * @return task dependencies list
+     */
+    public Map<String, Object> queryTaskDependenciesByTaskName(User loginUser, String projectName, Integer processId, String taskName) {
+        return null;
+    }
+
+    /**
      * do batch move process definition
      *
      * @param targetProject targetProject

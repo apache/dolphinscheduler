@@ -260,5 +260,17 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser, String projectName
             , int processDefinitionId, long version);
+
+    /**
+     * query task dependencies by task name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process id
+     * @param taskName task name
+     * @return task dependencies list
+     */
+    Map<String, Object> queryTaskDependenciesByTaskName(User loginUser, String projectName,
+                                                        Integer processId, String taskName);
 }
 

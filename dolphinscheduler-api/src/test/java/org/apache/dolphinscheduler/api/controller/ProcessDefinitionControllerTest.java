@@ -346,6 +346,21 @@ public class ProcessDefinitionControllerTest {
     }
 
     @Test
+    public void testQueryTaskDependenciesByTaskName() throws Exception {
+        String projectName = "test";
+        int processId = 1;
+        String taskName = "task_test";
+
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+
+        Mockito.when(processDefinitionService.queryTaskDependenciesByTaskName(user, projectName, processId, taskName));
+        Result response = processDefinitionController.queryTaskDependenciesByTaskName(user, projectName, processId, taskName);
+
+        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
+
+    @Test
     public void testViewTree() throws Exception {
         String projectName = "test";
         int processId = 1;

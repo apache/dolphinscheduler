@@ -195,6 +195,7 @@ public enum Status {
     QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     DELETE_PROCESS_DEFINITION_BY_ID_FAIL(10162, "delete process definition by id fail, for there are {0} process instances in executing using it", "删除工作流定义失败，有[{0}]个运行中的工作流实例正在使用"),
     CHECK_TENANT_CODE_ERROR(10163, "Please enter the English tenant code", "请输入英文租户编码"),
+    QUERY_TASK_DEPENDENCIES_BY_TASK_NAME_ERROR(10164, "query task dependencies by task name error", "通过任务名称错误查询任务依赖性"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),

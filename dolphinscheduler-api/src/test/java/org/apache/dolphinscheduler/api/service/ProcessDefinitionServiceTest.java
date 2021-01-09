@@ -713,6 +713,11 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    public void  testQueryTaskDependenciesByTaskName() {
+
+    }
+
+    @Test
     public void testViewTree() throws Exception {
         //process definition not exist
         ProcessDefinition processDefinition = getProcessDefinition();
