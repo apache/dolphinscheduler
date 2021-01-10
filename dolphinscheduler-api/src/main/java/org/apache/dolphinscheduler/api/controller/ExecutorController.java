@@ -112,10 +112,11 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "startParams", required = false) String startParams) throws ParseException {
         logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                         + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                        + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
+                        + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}, "
+                        + "startParams: {}",
                 loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
                 failureStrategy, startNodeList, taskDependType, warningType, workerGroup, receivers, receiversCc, runMode, processInstancePriority,
-                workerGroup, timeout);
+                workerGroup, timeout, startParams);
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
