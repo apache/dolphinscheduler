@@ -25,7 +25,12 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -202,7 +207,7 @@ public class AlertManager {
                                          List<TaskInstance> taskInstances,
                                          ProjectUser projectUser) {
 
-        if(Flag.YES == processInstance.getIsSubProcess()){
+        if (Flag.YES == processInstance.getIsSubProcess()) {
             return;
         }
         boolean sendWarnning = false;
