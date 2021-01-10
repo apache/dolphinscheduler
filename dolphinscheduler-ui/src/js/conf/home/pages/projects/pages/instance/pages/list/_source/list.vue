@@ -17,7 +17,7 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <el-table :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
+      <el-table class="fixed" :data="list" size="mini" style="width: 100%" @selection-change="_arrDelChange">
         <el-table-column type="selection" width="50"></el-table-column>
         <el-table-column type="index" :label="$t('#')" width="50"></el-table-column>
         <el-table-column :label="$t('Process Name')" min-width="200">
@@ -102,35 +102,34 @@
             <div v-show="!scope.row.disabled">
               <!--Edit-->
               <el-button
-                      type="info"
-                      size="mini"
-                      icon="el-icon-edit-outline"
-                      disabled="true"
-                      circle>
+                  type="info"
+                  size="mini"
+                  icon="el-icon-edit-outline"
+                  disabled="true"
+                  circle>
               </el-button>
 
               <!--Rerun-->
-              <el-tooltip :content="$t('Rerun')" placement="top" :enterable="false">
-                <span>
-                  <el-button
-                    v-show="buttonType === 'run'"
-                    type="info"
-                    size="mini"
-                    disabled="true"
-                    circle>
-                    <span style="padding: 0 2px">{{scope.row.count}}</span>
-                  </el-button>
-                </span>
-              </el-tooltip>
+              <span>
+                <el-button
+                  v-show="buttonType === 'run'"
+                  type="info"
+                  size="mini"
+                  disabled="true"
+                  circle>
+                  <span style="padding: 0 2px">{{scope.row.count}}</span>
+                </el-button>
+              </span>
               <el-button
-                      v-show="buttonType !== 'run'"
-                      type="info"
-                      size="mini"
-                      icon="el-icon-refresh"
-                      disabled="true"
-                      circle>
+                  v-show="buttonType !== 'run'"
+                  type="info"
+                  size="mini"
+                  icon="el-icon-refresh"
+                  disabled="true"
+                  circle>
               </el-button>
 
+              <!--Store-->
               <span>
                 <el-button
                   v-show="buttonType === 'store'"
@@ -153,13 +152,12 @@
               <!--Recovery Suspend/Pause-->
               <span>
                 <el-button
-                  style="padding: 0 3px"
                   v-show="(scope.row.state === 'PAUSE' || scope.row.state === 'STOP') && buttonType === 'suspend'"
                   type="warning"
                   size="mini"
                   circle
                   disabled="true">
-                  {{scope.row.count}}
+                  <span style="padding: 0 3px">{{scope.row.count}}</span>
                 </el-button>
               </span>
 
@@ -185,7 +183,19 @@
                 </el-button>
               </span>
 
-              <!--delete-->
+              <!--Stop-->
+              <span>
+                <el-button
+                  v-show="scope.row.state !== 'STOP'"
+                  type="warning"
+                  size="mini"
+                  circle
+                  icon="el-icon-video-pause"
+                  disabled="true">
+                </el-button>
+              </span>
+
+              <!--Delete-->
               <el-button
                   type="danger"
                   circle
@@ -286,7 +296,6 @@
        * @param REPEAT_RUNNING
        */
       _reRun (item, index) {
-        console.log(index)
         this._countDownFn({
           id: item.id,
           executeType: 'REPEAT_RUNNING',
