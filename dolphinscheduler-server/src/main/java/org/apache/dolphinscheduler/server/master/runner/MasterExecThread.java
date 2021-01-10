@@ -987,6 +987,7 @@ public class MasterExecThread implements Runnable {
             // updateProcessInstance completed task status
             // failure priority is higher than pause
             // if a task fails, other suspended tasks need to be reset kill
+            // check if there exists forced success nodes in errorTaskList
             if (errorTaskList.size() > 0) {
                 for (Map.Entry<String, TaskInstance> entry : completeTaskList.entrySet()) {
                     TaskInstance completeTask = entry.getValue();
@@ -994,6 +995,22 @@ public class MasterExecThread implements Runnable {
                         completeTask.setState(ExecutionStatus.KILL);
                         completeTaskList.put(entry.getKey(), completeTask);
                         processService.updateTaskInstance(completeTask);
+                    }
+                }
+                for (Map.Entry<String, TaskInstance> entry : errorTaskList.entrySet()) {
+                    TaskInstance errorTask = entry.getValue();
+                    TaskInstance currentTask = processService.findTaskInstanceById(errorTask.getId());
+                    if (currentTask == null) {
+                        continue;
+                    }
+                    // for nodes that have been forced success
+                    if (errorTask.getState().typeIsFailure() && currentTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                        // update state in this thread and remove from errorTaskList
+                        errorTask.setState(currentTask.getState());
+                        logger.info("task: {} has been forced success, remove it from error task list", errorTask.getName());
+                        errorTaskList.remove(errorTask.getName());
+                        // submit post nodes
+                        submitPostNode(errorTask.getName());
                     }
                 }
             }
@@ -1096,6 +1113,18 @@ public class MasterExecThread implements Runnable {
             int length = readyToSubmitTaskQueue.size();
             for (int i = 0; i < length; i++) {
                 TaskInstance task = readyToSubmitTaskQueue.peek();
+                // stop tasks which is retrying if forced success happens
+                if (task.taskCanRetry()) {
+                    TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
+                    if (retryTask != null && retryTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                        task.setState(retryTask.getState());
+                        logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
+                        removeTaskFromStandbyList(task);
+                        completeTaskList.put(task.getName(), task);
+                        submitPostNode(task.getName());
+                        continue;
+                    }
+                }
                 DependResult dependResult = getDependResultForTask(task);
                 if (DependResult.SUCCESS == dependResult) {
                     if (retryTaskIntervalOverTime(task)) {
