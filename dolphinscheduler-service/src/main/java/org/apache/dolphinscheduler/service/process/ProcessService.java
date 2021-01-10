@@ -558,19 +558,31 @@ public class ProcessService {
         processInstance.setCommandStartTime(command.getStartTime());
         processInstance.setLocations(processDefinition.getLocations());
         processInstance.setConnects(processDefinition.getConnects());
-        // curing global params
 
+        // get start params from command param
         Map<String, String> startParamMap = null;
         if (cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
             String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
             startParamMap = JSONUtils.toMap(startParamJson);
         }
+
+        // set start param into global params
+        if (startParamMap != null && startParamMap.size() > 0
+                && processDefinition.getGlobalParamMap() != null) {
+            for (Map.Entry<String, String> param : processDefinition.getGlobalParamMap().entrySet()) {
+                String val = startParamMap.get(param.getKey());
+                if (val != null) {
+                    param.setValue(val);
+                }
+            }
+        }
+
+        // curing global params
         processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
             processDefinition.getGlobalParamMap(),
             processDefinition.getGlobalParamList(),
             getCommandTypeIfComplement(processInstance, command),
-            processInstance.getScheduleTime(),
-            startParamMap));
+            processInstance.getScheduleTime()));
 
         //copy process define json to process instance
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());

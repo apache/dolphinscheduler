@@ -109,9 +109,6 @@ public class ParameterUtilsTest {
         Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
-        Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
-        globalParamList.add(testStartParamProperty);
-
         String result2 = ParameterUtils.curingGlobalParams(null, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
         Assert.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
 
@@ -136,10 +133,25 @@ public class ParameterUtilsTest {
         String result5 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
         Assert.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
-        Map<String, String> startParams = new HashMap<>(2);
-        startParams.put("testStartParam", "startParam");
-        String result6 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, startParams);
-        Assert.assertTrue(result6.contains("\"startParam\""));
+        Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
+        globalParamList.add(testStartParamProperty);
+        Property testStartParam2Property = new Property("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
+        globalParamList.add(testStartParam2Property);
+        globalParamMap.put("testStartParam", "");
+        globalParamMap.put("testStartParam2", "$[yyyy-MM-dd+1]");
+
+        Map<String, String> startParamMap = new HashMap<>(2);
+        startParamMap.put("testStartParam", "$[yyyyMMdd]");
+
+        for (Map.Entry<String, String> param : globalParamMap.entrySet()) {
+            String val = startParamMap.get(param.getKey());
+            if (val != null) {
+                param.setValue(val);
+            }
+        }
+
+        String result6 = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList, CommandType.START_CURRENT_TASK_PROCESS, scheduleTime);
+        Assert.assertTrue(result6.contains("20191220"));
     }
 
     /**
