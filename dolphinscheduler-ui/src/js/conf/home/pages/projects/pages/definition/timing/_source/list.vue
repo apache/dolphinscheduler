@@ -124,16 +124,14 @@
         list: [],
         timingDialog: false,
         timingData: {
-          item: {},
-          receiversD: [],
-          receiversCcD: []
+          item: {}
         }
       }
     },
     props: {
     },
     methods: {
-      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver', 'deleteTiming']),
+      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'deleteTiming']),
       /**
        * delete
        */
@@ -229,28 +227,11 @@
         })
       },
       /**
-       * get email
-       */
-      _getReceiver (id) {
-        return new Promise((resolve, reject) => {
-          this.getReceiver({ processDefinitionId: id }).then(res => {
-            resolve({
-              receivers: res.receivers && res.receivers.split(',') || [],
-              receiversCc: res.receiversCc && res.receiversCc.split(',') || []
-            })
-          })
-        })
-      },
-      /**
        * timing
        */
       _editTiming (item) {
-        this._getReceiver(item.processDefinitionId).then(res => {
-          this.timingData.item = item
-          this.timingData.receiversD = res.receivers
-          this.timingData.receiversCcD = res.receiversCc
-          this.timingDialog = true
-        })
+        this.timingData.item = item
+        this.timingDialog = true
       },
       onUpdateTiming () {
         this.pageNo = 1

@@ -479,6 +479,7 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
+    @form-create/element-ui 1.0.18: https://github.com/xaboy/form-create MIT
     axios 0.16.2: https://github.com/axios/axios MIT
     bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
     canvg 1.5.1: https://github.com/canvg/canvg MIT
