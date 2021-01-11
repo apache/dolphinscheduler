@@ -561,7 +561,7 @@ public class ProcessService {
 
         // get start params from command param
         Map<String, String> startParamMap = null;
-        if (cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
+        if (cmdParam != null && cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
             String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
             startParamMap = JSONUtils.toMap(startParamJson);
         }
