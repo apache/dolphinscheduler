@@ -101,22 +101,6 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('Recipient')}}
-      </div>
-      <div class="cont" style="width: 688px;">
-        <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
-        {{$t('Cc')}}
-      </div>
-      <div class="cont" style="width: 688px;">
-        <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
-      </div>
-    </div>
-    <div class="clearfix list">
-      <div class="text">
         {{$t('Complement Data')}}
       </div>
       <div class="cont">
@@ -164,7 +148,6 @@
 </template>
 <script>
   import dayjs from 'dayjs'
-  import mEmail from './email.vue'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
@@ -186,8 +169,6 @@
         spinnerLoading: false,
         execType: false,
         taskDependType: 'TASK_POST',
-        receivers: [],
-        receiversCc: [],
         runMode: 'RUN_MODE_SERIAL',
         processInstancePriority: 'MEDIUM',
         workerGroup: 'default'
@@ -219,8 +200,6 @@
           taskDependType: this.taskDependType,
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
-          receivers: this.receivers.join(',') || '',
-          receiversCc: this.receiversCc.join(',') || '',
           workerGroup: this.workerGroup
         }
         // Executed from the specified node
@@ -247,12 +226,6 @@
           })
         })
       },
-      _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.startData.id }).then(res => {
-          this.receivers = res.receivers && res.receivers.split(',') || []
-          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
-        })
-      },
       ok () {
         this._start()
       },
@@ -269,7 +242,6 @@
       this.warningType = this.warningTypeList[0].id
       this.workflowName = this.startData.name
 
-      this._getReceiver()
       let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
       if (stateWorkerGroupsList.length) {
         this.workerGroup = stateWorkerGroupsList[0].id
@@ -292,7 +264,7 @@
       this.workflowName = this.startData.name
     },
     computed: {},
-    components: { mEmail, mPriority, mWorkerGroups }
+    components: { mPriority, mWorkerGroups }
   }
 </script>
 
