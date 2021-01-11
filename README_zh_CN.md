@@ -50,10 +50,6 @@ Dolphin Scheduler Official Website
 
 ![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
 
-### 我要体验
-
-- <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
-
 
 ### 近期研发计划
 
@@ -86,7 +82,6 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 ### 获得帮助
 1. 提交issue
 1. 先订阅邮件开发列表:[订阅邮件列表](https://dolphinscheduler.apache.org/zh-cn/docs/development/subscribe.html), 订阅成功后发送邮件到dev@dolphinscheduler.apache.org.
-1. 联系微信群助手(ID:dailidong66). 微信仅用于中国用户讨论.
 
 ### 版权
 请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
